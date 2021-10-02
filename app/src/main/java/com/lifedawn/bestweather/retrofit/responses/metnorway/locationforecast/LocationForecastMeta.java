@@ -11,4 +11,20 @@ public class LocationForecastMeta {
 	@Expose
 	@SerializedName("units")
 	private LocationForecastUnits units;
+	
+	public String getUpdatedAt() {
+		return updatedAt;
+	}
+	
+	public void setUpdatedAt(String updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+	
+	public LocationForecastUnits getUnits() {
+		return units;
+	}
+	
+	public void setUnits(LocationForecastUnits units) {
+		this.units = units;
+	}
 }

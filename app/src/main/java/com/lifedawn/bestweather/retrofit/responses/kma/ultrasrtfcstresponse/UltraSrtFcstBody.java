@@ -7,14 +7,14 @@ import com.google.gson.annotations.SerializedName;
 public class UltraSrtFcstBody {
 	@Expose
 	@SerializedName("items")
-	private UltraSrtFcstItems items;
+	private UltraSrtFcstItemsKma items;
 
 
-	public void setItems(UltraSrtFcstItems items) {
+	public void setItems(UltraSrtFcstItemsKma items) {
 		this.items = items;
 	}
 
-	public UltraSrtFcstItems getItems() {
+	public UltraSrtFcstItemsKma getItems() {
 		return items;
 	}
 }

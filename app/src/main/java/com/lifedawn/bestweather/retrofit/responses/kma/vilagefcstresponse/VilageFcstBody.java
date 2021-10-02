@@ -6,14 +6,14 @@ import com.google.gson.annotations.SerializedName;
 public class VilageFcstBody {
 	@Expose
 	@SerializedName("items")
-	private VilageFcstItems items;
+	private VilageFcstItemsKma items;
 
 
-	public void setItems(VilageFcstItems items) {
+	public void setItems(VilageFcstItemsKma items) {
 		this.items = items;
 	}
 
-	public VilageFcstItems getItems() {
+	public VilageFcstItemsKma getItems() {
 		return items;
 	}
 }

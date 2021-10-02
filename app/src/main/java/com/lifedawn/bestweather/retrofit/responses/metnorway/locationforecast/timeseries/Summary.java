@@ -7,4 +7,12 @@ public class Summary {
 	@Expose
 	@SerializedName("symbol_code")
 	private String symbolCode;
+	
+	public String getSymbolCode() {
+		return symbolCode;
+	}
+	
+	public void setSymbolCode(String symbolCode) {
+		this.symbolCode = symbolCode;
+	}
 }

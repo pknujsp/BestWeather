@@ -1,15 +1,13 @@
 package com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse;
 
 
-import android.os.Parcel;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lifedawn.bestweather.retrofit.responses.kma.WeatherItems;
+import com.lifedawn.bestweather.retrofit.responses.kma.KmaWeatherItems;
 
 import java.util.List;
 
-public class MidLandFcstItems extends WeatherItems
+public class MidLandFcstItemsKma extends KmaWeatherItems
 {
     @Expose
     @SerializedName("item")

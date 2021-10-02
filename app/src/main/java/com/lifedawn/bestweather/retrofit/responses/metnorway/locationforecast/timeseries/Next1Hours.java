@@ -11,4 +11,20 @@ public class Next1Hours {
 	@Expose
 	@SerializedName("details")
 	private Details details;
+	
+	public Summary getSummary() {
+		return summary;
+	}
+	
+	public void setSummary(Summary summary) {
+		this.summary = summary;
+	}
+	
+	public Details getDetails() {
+		return details;
+	}
+	
+	public void setDetails(Details details) {
+		this.details = details;
+	}
 }

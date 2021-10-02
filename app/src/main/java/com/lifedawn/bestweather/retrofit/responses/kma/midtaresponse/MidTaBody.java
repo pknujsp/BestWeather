@@ -1,7 +1,5 @@
 package com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse;
 
-import android.os.Parcel;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -9,15 +7,15 @@ public class MidTaBody
 {
     @Expose
     @SerializedName("items")
-    private MidTaItems items;
+    private MidTaItemsKma items;
 
 
-    public void setItems(MidTaItems items)
+    public void setItems(MidTaItemsKma items)
     {
         this.items = items;
     }
 
-    public MidTaItems getItems()
+    public MidTaItemsKma getItems()
     {
         return items;
     }
