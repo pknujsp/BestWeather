@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.retrofit.responses.kma;
+package com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstcommons;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

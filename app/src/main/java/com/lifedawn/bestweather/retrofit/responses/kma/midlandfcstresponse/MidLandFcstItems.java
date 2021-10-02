@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class MidLandFcstItemsKma {
+public class MidLandFcstItems {
     @Expose
     @SerializedName("item")
     private List<MidLandFcstItem> item;

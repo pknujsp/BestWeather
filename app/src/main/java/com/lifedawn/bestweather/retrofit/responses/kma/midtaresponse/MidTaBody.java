@@ -7,15 +7,15 @@ public class MidTaBody
 {
     @Expose
     @SerializedName("items")
-    private MidTaItemsKma items;
+    private MidTaItems items;
 
 
-    public void setItems(MidTaItemsKma items)
+    public void setItems(MidTaItems items)
     {
         this.items = items;
     }
 
-    public MidTaItemsKma getItems()
+    public MidTaItems getItems()
     {
         return items;
     }

@@ -2,8 +2,9 @@ package com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.lifedawn.bestweather.retrofit.responses.kma.kmacommons.KmaRoot;
 
-public class MidLandFcstRoot {
+public class MidLandFcstRoot extends KmaRoot {
 	@Expose
 	@SerializedName("response")
 	private MidLandFcstResponse response;

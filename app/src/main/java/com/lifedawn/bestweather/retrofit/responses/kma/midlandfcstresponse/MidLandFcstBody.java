@@ -7,14 +7,14 @@ public class MidLandFcstBody
 {
     @Expose
     @SerializedName("items")
-    private MidLandFcstItemsKma items;
+    private MidLandFcstItems items;
     
-    public void setItems(MidLandFcstItemsKma items)
+    public void setItems(MidLandFcstItems items)
     {
         this.items = items;
     }
 
-    public MidLandFcstItemsKma getItems()
+    public MidLandFcstItems getItems()
     {
         return items;
     }
