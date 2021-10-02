@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse;
+package com.lifedawn.bestweather.retrofit.responses.kma;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -6,14 +6,13 @@ import com.google.gson.annotations.SerializedName;
 public class VilageFcstBody {
 	@Expose
 	@SerializedName("items")
-	private VilageFcstItemsKma items;
-
-
-	public void setItems(VilageFcstItemsKma items) {
+	private VilageFcstItems items;
+	
+	public void setItems(VilageFcstItems items) {
 		this.items = items;
 	}
-
-	public VilageFcstItemsKma getItems() {
+	
+	public VilageFcstItems getItems() {
 		return items;
 	}
 }

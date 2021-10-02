@@ -1,25 +1,24 @@
-package com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse;
+package com.lifedawn.bestweather.retrofit.responses.kma;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lifedawn.bestweather.retrofit.responses.kma.Header;
 
 public class VilageFcstResponse {
 	@Expose
 	@SerializedName("header")
-	private Header header;
+	private VilageFcstHeader vilageFcstHeader;
 
 	@Expose
 	@SerializedName("body")
 	private VilageFcstBody body;
 
 
-	public Header getHeader() {
-		return header;
+	public VilageFcstHeader getHeader() {
+		return vilageFcstHeader;
 	}
 
-	public void setHeader(Header header) {
-		this.header = header;
+	public void setHeader(VilageFcstHeader vilageFcstHeader) {
+		this.vilageFcstHeader = vilageFcstHeader;
 	}
 
 	public VilageFcstBody getBody() {

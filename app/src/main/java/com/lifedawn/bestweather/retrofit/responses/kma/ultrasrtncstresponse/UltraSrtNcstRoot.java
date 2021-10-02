@@ -1,25 +1,21 @@
 package com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtncstresponse;
 
 
-import androidx.annotation.Keep;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.lifedawn.bestweather.retrofit.responses.kma.VilageFcstResponse;
 
-public class UltraSrtNcstRoot
-{
-    @Expose
-    @SerializedName("response")
-    private UltraSrtNcstResponse response;
-
-
-    public void setResponse(UltraSrtNcstResponse response)
-    {
-        this.response = response;
-    }
-
-    public UltraSrtNcstResponse getResponse()
-    {
-        return response;
-    }
+public class UltraSrtNcstRoot {
+	@Expose
+	@SerializedName("response")
+	private VilageFcstResponse response;
+	
+	
+	public void setResponse(VilageFcstResponse response) {
+		this.response = response;
+	}
+	
+	public VilageFcstResponse getResponse() {
+		return response;
+	}
 }

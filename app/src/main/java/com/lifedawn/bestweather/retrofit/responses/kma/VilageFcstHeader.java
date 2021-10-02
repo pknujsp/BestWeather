@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Header {
+public class VilageFcstHeader {
 	@Expose
 	@SerializedName("resultCode")
 	private String resultCode;
