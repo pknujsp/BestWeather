@@ -1,108 +1,93 @@
 package com.lifedawn.bestweather.weathers.dataprocessing;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.interfaces.JsonDownloader;
-import com.lifedawn.bestweather.retrofit.interfaces.RetrofitCallListManager;
+import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
+import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.retrofit.util.RetrofitCallListManager;
 import com.lifedawn.bestweather.retrofit.parameters.kma.MidLandParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.MidTaParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.UltraSrtFcstParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.UltraSrtNcstParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.VilageFcstParameter;
-import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse.VilageFcstRoot;
+import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstRoot;
+import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaRoot;
+import com.lifedawn.bestweather.weathers.dataprocessing.callback.KmaVilageFcstCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class KmaProcessing implements RetrofitCallListManager.CallManagerListener {
-	private static RetrofitCallListManager retrofitCallListManager = new RetrofitCallListManager();
-	private static KmaProcessing instance = new KmaProcessing();
-	
-	public static KmaProcessing getInstance() {
-		return instance;
-	}
-	
-	public static void close() {
-		retrofitCallListManager.clear();
-	}
-	
-	public KmaProcessing() {
+public final class KmaProcessing {
+	private KmaProcessing() {
 	}
 	
 	/**
 	 * 초단기 실황
 	 */
-	public void getUltraSrtNcstData(UltraSrtNcstParameter parameter, Calendar calendar, JsonDownloader<JsonObject> callback) {
+	public Call<JsonObject> getUltraSrtNcstData(UltraSrtNcstParameter parameter, Calendar calendar, JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
 		//basetime설정
-		
 		if (calendar.get(Calendar.MINUTE) < 40) {
 			calendar.add(Calendar.HOUR_OF_DAY, -1);
 		}
 		
-		SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
-		SimpleDateFormat HH = new SimpleDateFormat("HH");
-		
+		SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd", Locale.US);
+		SimpleDateFormat HH = new SimpleDateFormat("HH", Locale.US);
 		parameter.setBaseDate(yyyyMMdd.format(calendar.getTime()));
 		parameter.setBaseTime(HH.format(calendar.getTime()) + "00");
 		
 		Call<JsonObject> call = querys.getUltraSrtNcst(parameter.getMap());
-		retrofitCallListManager.add(call);
-		
 		call.enqueue(new Callback<JsonObject>() {
 			@Override
 			public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 				callback.processResult(response);
-				retrofitCallListManager.remove(call);
 			}
 			
 			@Override
 			public void onFailure(Call<JsonObject> call, Throwable t) {
 				callback.processResult(t);
-				retrofitCallListManager.remove(call);
 			}
 		});
 		
+		return call;
 	}
 	
 	/**
 	 * 초단기예보
-	 *
-	 * @param parameter
 	 */
-	public void getUltraSrtFcstData(UltraSrtFcstParameter parameter, Calendar calendar, JsonDownloader<JsonObject> callback) {
+	public Call<JsonObject> getUltraSrtFcstData(UltraSrtFcstParameter parameter, Calendar calendar, JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
 		//basetime설정
 		if (calendar.get(Calendar.MINUTE) < 45) {
 			calendar.add(Calendar.HOUR_OF_DAY, -1);
 		}
-		SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
-		SimpleDateFormat HH = new SimpleDateFormat("HH");
+		SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd", Locale.US);
+		SimpleDateFormat HH = new SimpleDateFormat("HH", Locale.US);
 		
 		parameter.setBaseDate(yyyyMMdd.format(calendar.getTime()));
 		parameter.setBaseTime(HH.format(calendar.getTime()) + "30");
 		
-		Call<JsonObject> call = querys.getUltraSrtFcst(parameter.getMap());
-		retrofitCallListManager.add(call);
-		
+		Call<JsonObject> call = Objects.requireNonNull(querys).getUltraSrtFcst(parameter.getMap());
 		call.enqueue(new Callback<JsonObject>() {
 			@Override
 			public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 				callback.processResult(response);
-				retrofitCallListManager.remove(call);
 			}
 			
 			@Override
 			public void onFailure(Call<JsonObject> call, Throwable t) {
 				callback.processResult(t);
-				retrofitCallListManager.remove(call);
 			}
 		});
+		return call;
 	}
 	
 	/**
@@ -111,7 +96,7 @@ public class KmaProcessing implements RetrofitCallListManager.CallManagerListene
 	 * - Base_time : 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회)
 	 * - API 제공 시간(~이후) : 02:10, 05:10, 08:10, 11:10, 14:10, 17:10, 20:10, 23:10
 	 */
-	public void getVilageFcstData(VilageFcstParameter parameter, Calendar calendar, JsonDownloader<JsonObject> callback) {
+	public Call<JsonObject> getVilageFcstData(VilageFcstParameter parameter, Calendar calendar, JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.VILAGE_FCST);
 		//basetime설정
 		final int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -133,89 +118,51 @@ public class KmaProcessing implements RetrofitCallListManager.CallManagerListene
 		} else {
 			calendar.set(Calendar.HOUR_OF_DAY, baseHour);
 		}
-		SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd");
-		SimpleDateFormat HH = new SimpleDateFormat("HH");
+		SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyyMMdd", Locale.US);
+		SimpleDateFormat HH = new SimpleDateFormat("HH", Locale.US);
 		
 		parameter.setBaseDate(yyyyMMdd.format(calendar.getTime()));
 		parameter.setBaseTime(HH.format(calendar.getTime()) + "00");
 		
-		Call<JsonObject> call = querys.getVilageFcst(parameter.getMap());
-		retrofitCallListManager.add(call);
+		Call<JsonObject> call = Objects.requireNonNull(querys).getVilageFcst(parameter.getMap());
 		
 		call.enqueue(new Callback<JsonObject>() {
 			@Override
 			public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 				callback.processResult(response);
-				retrofitCallListManager.remove(call);
 			}
 			
 			@Override
 			public void onFailure(Call<JsonObject> call, Throwable t) {
 				callback.processResult(t);
-				retrofitCallListManager.remove(call);
 			}
 		});
-		
+		return call;
 	}
 	
-	public void getHourlyFcstData(VilageFcstParameter vilageFcstParameter, UltraSrtFcstParameter ultraSrtFcstParameter, Calendar calendar,
-			JsonDownloader<VilageFcstRoot> callback) {
-		VilageFcstRoot hourlyFcstRoot = new VilageFcstRoot();
-		
-		getVilageFcstData(vilageFcstParameter, (Calendar) calendar.clone(), new JsonDownloader<JsonObject>() {
-			@Override
-			public void onResponseSuccessful(JsonObject result) {
-				hourlyFcstRoot.setVilageFcst(result);
-				checkHourlyFcstDataDownload(hourlyFcstRoot, callback);
-			}
-			
-			@Override
-			public void onResponseFailed(Exception e) {
-				hourlyFcstRoot.setException(e);
-				checkHourlyFcstDataDownload(hourlyFcstRoot, callback);
-			}
-		});
-		
-		getUltraSrtFcstData(ultraSrtFcstParameter, (Calendar) calendar.clone(), new JsonDownloader<JsonObject>() {
-			@Override
-			public void onResponseSuccessful(JsonObject result) {
-				hourlyFcstRoot.setUltraSrtFcst(result);
-				checkHourlyFcstDataDownload(hourlyFcstRoot, callback);
-			}
-			
-			@Override
-			public void onResponseFailed(Exception e) {
-				hourlyFcstRoot.setException(e);
-				checkHourlyFcstDataDownload(hourlyFcstRoot, callback);
-			}
-		});
-	}
 	
 	/**
 	 * 중기육상예보
 	 *
 	 * @param parameter
 	 */
-	public void getMidLandFcstData(MidLandParameter parameter, JsonDownloader<JsonObject> callback) {
+	public Call<JsonObject> getMidLandFcstData(MidLandParameter parameter, JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.MID_LAND_FCST);
 		
-		Call<JsonObject> call = querys.getMidLandFcst(parameter.getMap());
-		retrofitCallListManager.add(call);
+		Call<JsonObject> call = Objects.requireNonNull(querys).getMidLandFcst(parameter.getMap());
 		
 		call.enqueue(new Callback<JsonObject>() {
 			@Override
 			public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 				callback.processResult(response);
-				retrofitCallListManager.remove(call);
 			}
 			
 			@Override
 			public void onFailure(Call<JsonObject> call, Throwable t) {
 				callback.processResult(t);
-				retrofitCallListManager.remove(call);
 			}
 		});
-		
+		return call;
 	}
 	
 	/**
@@ -223,63 +170,140 @@ public class KmaProcessing implements RetrofitCallListManager.CallManagerListene
 	 *
 	 * @param parameter
 	 */
-	public void getMidTaData(MidTaParameter parameter, JsonDownloader<JsonObject> callback) {
+	public Call<JsonObject> getMidTaData(MidTaParameter parameter, JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.MID_TA_FCST);
 		
-		Call<JsonObject> call = querys.getMidTa(parameter.getMap());
-		retrofitCallListManager.add(call);
+		Call<JsonObject> call = Objects.requireNonNull(querys).getMidTa(parameter.getMap());
 		
 		call.enqueue(new Callback<JsonObject>() {
 			@Override
 			public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
 				callback.processResult(response);
-				retrofitCallListManager.remove(call);
 			}
 			
 			@Override
 			public void onFailure(Call<JsonObject> call, Throwable t) {
 				callback.processResult(t);
-				retrofitCallListManager.remove(call);
 			}
 		});
+		
+		return call;
 	}
 	
-	public void getMidFcstData(MidLandParameter midLandFcstParameter, MidTaParameter midTaParameter,
-			JsonDownloader<MidFcstParentRoot> callback) {
-		MidFcstParentRoot midFcstRoot = new MidFcstParentRoot();
+	public void getKmaForecasts(UltraSrtNcstParameter ultraSrtNcstParameter, UltraSrtFcstParameter ultraSrtFcstParameter,
+			VilageFcstParameter vilageFcstParameter, MidLandParameter midLandParameter, MidTaParameter midTaParameter, Calendar calendar,
+			MultipleJsonDownloader multipleJsonDownloader) {
+		Call<JsonObject> ultraSrtNcstCall = getUltraSrtNcstData(ultraSrtNcstParameter, (Calendar) calendar.clone(),
+				new KmaVilageFcstCallback() {
+					@Override
+					public void onResponseSuccessful(Response<JsonObject> response) {
+						multipleJsonDownloader.processResult(response);
+					}
+					
+					@Override
+					public void onResponseFailed(Exception e) {
+						multipleJsonDownloader.processResult(e);
+					}
+				});
 		
-		getMidLandFcstData(midLandFcstParameter, new JsonDownloader<JsonObject>() {
+		Call<JsonObject> ultraSrtFcstCall = getUltraSrtFcstData(ultraSrtFcstParameter, (Calendar) calendar.clone(),
+				new KmaVilageFcstCallback() {
+					@Override
+					public void onResponseSuccessful(Response<JsonObject> response) {
+						multipleJsonDownloader.processResult(response);
+					}
+					
+					@Override
+					public void onResponseFailed(Exception e) {
+						multipleJsonDownloader.processResult(e);
+					}
+				});
+		
+		Call<JsonObject> vilageFcstCall = getVilageFcstData(vilageFcstParameter, (Calendar) calendar.clone(), new KmaVilageFcstCallback() {
 			@Override
-			public void onResponseSuccessful(JsonObject result) {
+			public void onResponseSuccessful(Response<JsonObject> response) {
+				multipleJsonDownloader.processResult(response);
 			}
 			
 			@Override
 			public void onResponseFailed(Exception e) {
+				multipleJsonDownloader.processResult(e);
 			}
 		});
 		
-		getMidTaData(midTaParameter, new JsonDownloader<JsonObject>() {
-			
+		Call<JsonObject> midTaFcstCall = getMidTaData(midTaParameter, new JsonDownloader() {
 			@Override
-			public void onResponseSuccessful(JsonObject result) {
-			
+			public void onResponseSuccessful(Response<JsonObject> response) {
+				multipleJsonDownloader.processResult(response);
 			}
 			
 			@Override
 			public void onResponseFailed(Exception e) {
-			
+				multipleJsonDownloader.processResult(e);
 			}
 			
 			@Override
-			public void processResult(Response<? extends JsonObject> response) {
-			
+			public void processResult(Response<JsonObject> response) {
+				MidTaRoot midTaRoot = null;
+				if (response.body() != null) {
+					Gson gson = new Gson();
+					midTaRoot = gson.fromJson(response.body().toString(), MidTaRoot.class);
+				} else {
+					onResponseFailed(new Exception(response.message()));
+					return;
+				}
+				
+				if (midTaRoot != null) {
+					if (midTaRoot.getResponse().getHeader().getResultCode().equals("00")) {
+						onResponseSuccessful(response);
+						midTaRoot = null;
+						
+					} else {
+						onResponseFailed(new Exception(midTaRoot.getResponse().getHeader().getResultMsg()));
+					}
+				}
 			}
 		});
-	}
-	
-	
-	@Override
-	public void clear() {
-		retrofitCallListManager.clear();
+		
+		Call<JsonObject> midLandFcstCall = getMidLandFcstData(midLandParameter, new JsonDownloader() {
+			@Override
+			public void onResponseSuccessful(Response<JsonObject> response) {
+				multipleJsonDownloader.processResult(response);
+			}
+			
+			@Override
+			public void onResponseFailed(Exception e) {
+				multipleJsonDownloader.processResult(e);
+			}
+			
+			@Override
+			public void processResult(Response<JsonObject> response) {
+				MidLandFcstRoot midLandFcstRoot = null;
+				if (response.body() != null) {
+					Gson gson = new Gson();
+					midLandFcstRoot = gson.fromJson(response.body().toString(), MidLandFcstRoot.class);
+				} else {
+					onResponseFailed(new Exception(response.message()));
+					return;
+				}
+				
+				if (midLandFcstRoot != null) {
+					if (midLandFcstRoot.getResponse().getHeader().getResultCode().equals("00")) {
+						onResponseSuccessful(response);
+						midLandFcstRoot = null;
+					} else {
+						onResponseFailed(new Exception(midLandFcstRoot.getResponse().getHeader().getResultMsg()));
+					}
+				}
+				
+			}
+		});
+		
+		RetrofitCallListManager.CallObj newCallObj = RetrofitCallListManager.newCalls();
+		newCallObj.add(ultraSrtNcstCall);
+		newCallObj.add(ultraSrtFcstCall);
+		newCallObj.add(vilageFcstCall);
+		newCallObj.add(midTaFcstCall);
+		newCallObj.add(midLandFcstCall);
 	}
 }

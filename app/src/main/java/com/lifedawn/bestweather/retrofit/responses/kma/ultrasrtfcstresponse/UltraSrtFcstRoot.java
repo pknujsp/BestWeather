@@ -2,10 +2,9 @@ package com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtfcstresponse;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lifedawn.bestweather.retrofit.responses.kma.kmacommons.KmaRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstcommons.VilageFcstResponse;
 
-public class UltraSrtFcstRoot extends KmaRoot {
+public class UltraSrtFcstRoot {
 	@Expose
 	@SerializedName("response")
 	private VilageFcstResponse response;

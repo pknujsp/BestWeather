@@ -32,20 +32,35 @@ public interface Querys {
 	Call<JsonObject> getMidTa(@QueryMap(encoded = true) Map<String, String> queryMap);
 	
 	//accu weather
-	@GET("currentconditions/v1")
-	Call<JsonObject> getCurrentConditions(@QueryMap(encoded = true) Map<String, String> queryMap);
+	/* http://dataservice.accuweather.com/locations/v1/cities/geoposition/
+	search?apikey=tUnqAFCcGWIyhZf4zSVlKgQb1wsbJOo8&q=35.235421%2C128.868227
+	*/
+	@GET("locations/v1/cities/geoposition/search")
+	Call<JsonObject> geoPositionSearch(@QueryMap(encoded = true) Map<String, String> queryMap);
 	
-	@GET("forecasts/v1/daily/5day")
-	Call<JsonObject> get5Days(@QueryMap(encoded = true) Map<String, String> queryMap);
+	//http://dataservice.accuweather.com/currentconditions/v1/3430446?apikey=tUnqAFCcGWIyhZf4zSVlKgQb1wsbJOo8&details=true&metric=true
+	@GET("currentconditions/v1/{location_key}")
+	Call<JsonObject> getCurrentConditions(@Path(value = "location_key", encoded = true) String locationKey,
+			@QueryMap(encoded = true) Map<String, String> queryMap);
 	
-	@GET("forecasts/v1/hourly/12hour")
-	Call<JsonObject> get12Hourly(@QueryMap(encoded = true) Map<String, String> queryMap);
+	//http://dataservice.accuweather.com/forecasts/v1/daily/5day/3430446?apikey=tUnqAFCcGWIyhZf4zSVlKgQb1wsbJOo8&details=true&metric=true
+	@GET("forecasts/v1/daily/5day/{location_key}")
+	Call<JsonObject> get5Days(@Path(value = "location_key", encoded = true) String locationKey,
+			@QueryMap(encoded = true) Map<String, String> queryMap);
+	
+	//http://dataservice.accuweather.com/forecasts/v1/hourly/12hour/3430446?apikey=tUnqAFCcGWIyhZf4zSVlKgQb1wsbJOo8&details=true&metric=true
+	@GET("forecasts/v1/hourly/12hour/{location_key}")
+	Call<JsonObject> get12Hourly(@Path(value = "location_key", encoded = true) String locationKey,
+			@QueryMap(encoded = true) Map<String, String> queryMap);
 	
 	//met norway
+	//https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=35.235421&lon=128.868227
 	@GET("locationforecast/2.0/complete")
 	Call<JsonObject> getLocationForecast(@QueryMap(encoded = true) Map<String, String> queryMap);
 	
 	//aqicn
-	@GET("feed")
-	Call<JsonObject> getGeolocalizedFeed(@QueryMap(encoded = true) Map<String, String> queryMap);
+	//https://api.waqi.info/feed/geo:35.235421;128.868227/?token=8538c6118653f6e4acbfd8ae5667bd07683a1cde
+	@GET("feed/geo:{latitude};{longitude}/")
+	Call<JsonObject> getGeolocalizedFeed(@Path(value = "latitude", encoded = true) String latitude,
+			@Path(value = "longitude", encoded = true) String longitude, @QueryMap(encoded = true) Map<String, String> queryMap);
 }

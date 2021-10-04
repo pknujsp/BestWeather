@@ -1,14 +1,15 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.callback;
 
-import com.lifedawn.bestweather.retrofit.interfaces.JsonDownloader;
-import com.lifedawn.bestweather.retrofit.responses.kma.kmacommons.KmaRoot;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse.VilageFcstRoot;
 
 import retrofit2.Response;
 
 public class KmaVilageFcstCallback extends JsonDownloader {
 	@Override
-	public void onResponseSuccessful(Response response) {
+	public void onResponseSuccessful(Response<JsonObject> response) {
 	
 	}
 	
@@ -18,10 +19,11 @@ public class KmaVilageFcstCallback extends JsonDownloader {
 	}
 	
 	@Override
-	public void processResult(Response response) {
+	public void processResult(Response<JsonObject> response) {
 		VilageFcstRoot vilageFcstRoot = null;
 		if (response.body() != null) {
-			vilageFcstRoot = (VilageFcstRoot) response.body();
+			Gson gson = new Gson();
+			vilageFcstRoot = gson.fromJson(response.body().toString(), VilageFcstRoot.class);
 		} else {
 			onResponseFailed(new Exception(response.message()));
 			return;
@@ -30,9 +32,11 @@ public class KmaVilageFcstCallback extends JsonDownloader {
 		if (vilageFcstRoot != null) {
 			if (vilageFcstRoot.getResponse().getHeader().getResultCode().equals("00")) {
 				onResponseSuccessful(response);
+				vilageFcstRoot = null;
 			} else {
 				onResponseFailed(new Exception(vilageFcstRoot.getResponse().getHeader().getResultMsg()));
 			}
 		}
+		
 	}
 }

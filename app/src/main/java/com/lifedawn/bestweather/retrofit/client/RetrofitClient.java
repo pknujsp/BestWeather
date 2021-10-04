@@ -12,9 +12,7 @@ public class RetrofitClient {
 	public static final String MID_FCST_INFO_SERVICE_URL = "http://apis.data.go.kr/1360000/MidFcstInfoService/";
 	public static final String VILAGE_FCST_INFO_SERVICE_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/";
 	//accu weather
-	public static final String ACCU_WEATHER_CURRENT_CONDITIONS_SERVICE_URL = "http://dataservice.accuweather.com/";
-	public static final String ACCU_WEATHER_5_DAYS_OF_DAILY_FORECASTS_SERVICE_URL = "http://dataservice.accuweather.com/";
-	public static final String ACCU_WEATHER_12_HOURLY_OF_HOURLY_FORECASTS_SERVICE_URL = "http://dataservice.accuweather.com/";
+	public static final String ACCU_WEATHER_SERVICE_URL = "http://dataservice.accuweather.com/";
 	//met norway
 	public static final String MET_NORWAY_LOCATION_FORECAST_SERVICE_URL = "https://api.met.no/weatherapi/";
 	//aqicn
@@ -29,7 +27,7 @@ public class RetrofitClient {
 	public static final String DATATYPE = "JSON";
 	
 	public enum ServiceType {
-		ULTRA_SRT_NCST, ULTRA_SRT_FCST, MID_LAND_FCST, MID_TA_FCST, VILAGE_FCST, ACCU_CURRENT_CONDITIONS, ACCU_5_DAYS_OF_DAILY, ACCU_12_HOURLY, MET_NORWAY_LOCATION_FORECAST, AQICN_GEOLOCALIZED_FEED
+		ULTRA_SRT_NCST, ULTRA_SRT_FCST, MID_LAND_FCST, MID_TA_FCST, VILAGE_FCST, ACCU_GEOPOSITION_SEARCH, ACCU_CURRENT_CONDITIONS, ACCU_5_DAYS_OF_DAILY, ACCU_12_HOURLY, MET_NORWAY_LOCATION_FORECAST, AQICN_GEOLOCALIZED_FEED
 	}
 	
 	
@@ -52,23 +50,14 @@ public class RetrofitClient {
 						VILAGE_FCST_INFO_SERVICE_URL).build();
 				return vilageFcstInstance.create(Querys.class);
 			
-			case ACCU_5_DAYS_OF_DAILY:
-				Retrofit accu5DaysOfDailyInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						ACCU_WEATHER_5_DAYS_OF_DAILY_FORECASTS_SERVICE_URL).build();
-				return accu5DaysOfDailyInstance.create(Querys.class);
-			
+			case ACCU_GEOPOSITION_SEARCH:
 			case ACCU_12_HOURLY:
-				Retrofit accu12HourlyInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						ACCU_WEATHER_12_HOURLY_OF_HOURLY_FORECASTS_SERVICE_URL).build();
-				return accu12HourlyInstance.create(Querys.class);
-			
 			case ACCU_CURRENT_CONDITIONS:
-				Retrofit accuCurrentConditionsInstance = new Retrofit.Builder().client(client).addConverterFactory(
+			case ACCU_5_DAYS_OF_DAILY:
+				Retrofit accuWeatherInstance = new Retrofit.Builder().client(client).addConverterFactory(
 						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						ACCU_WEATHER_CURRENT_CONDITIONS_SERVICE_URL).build();
-				return accuCurrentConditionsInstance.create(Querys.class);
+						ACCU_WEATHER_SERVICE_URL).build();
+				return accuWeatherInstance.create(Querys.class);
 			
 			case MET_NORWAY_LOCATION_FORECAST:
 				Retrofit metNorwayLocationForecastsInstance = new Retrofit.Builder().client(client).addConverterFactory(
