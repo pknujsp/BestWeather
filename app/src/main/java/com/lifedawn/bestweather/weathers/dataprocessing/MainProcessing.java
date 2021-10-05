@@ -16,62 +16,64 @@ import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 public class MainProcessing {
 	public enum WeatherSourceType {
 		ACCU_WEATHER, KMA, MET_NORWAY
 	}
-
+	
 	public static void downloadWeatherData(Context context, final String latitude, final String longitude,
-	                                       final Set<WeatherSourceType> weatherSourceTypeSet) {
-		final Calendar calendar = Calendar.getInstance();
-
+			final Set<WeatherSourceType> weatherSourceTypeSet) {
+		final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
+		
 		if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
-
+		
 		}
 		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
 			KmaAreaCodesRepository kmaAreaCodesRepository = new KmaAreaCodesRepository(context);
-			kmaAreaCodesRepository.getAreaCodes(Double.parseDouble(latitude), Double.parseDouble(longitude), new DbQueryCallback<List<KmaAreaCodeDto>>() {
-				@Override
-				public void onResultSuccessful(List<KmaAreaCodeDto> result) {
-					final double[] criteriaLatLng = {Double.parseDouble(latitude), Double.parseDouble(longitude)};
-					double minDistance = Double.MAX_VALUE;
-					double distance = 0;
-					double[] compLatLng = new double[2];
-					KmaAreaCodeDto nearbyKmaAreaCodeDto = null;
-
-					for (KmaAreaCodeDto weatherAreaCodeDTO : result) {
-						compLatLng[0] = Double.parseDouble(weatherAreaCodeDTO.getLatitudeSecondsDivide100());
-						compLatLng[1] = Double.parseDouble(weatherAreaCodeDTO.getLongitudeSecondsDivide100());
-
-						distance = LocationDistance.distance(criteriaLatLng[0], criteriaLatLng[1], compLatLng[0], compLatLng[1],
-								LocationDistance.Unit.METER);
-						if (distance < minDistance) {
-							minDistance = distance;
-							nearbyKmaAreaCodeDto = weatherAreaCodeDTO;
-						}
-					}
-
-					KmaProcessing.getKmaForecasts(nearbyKmaAreaCodeDto, (Calendar) calendar.clone(), new MultipleJsonDownloader(5) {
+			kmaAreaCodesRepository.getAreaCodes(Double.parseDouble(latitude), Double.parseDouble(longitude),
+					new DbQueryCallback<List<KmaAreaCodeDto>>() {
 						@Override
-						public void onResult() {
-
+						public void onResultSuccessful(List<KmaAreaCodeDto> result) {
+							final double[] criteriaLatLng = {Double.parseDouble(latitude), Double.parseDouble(longitude)};
+							double minDistance = Double.MAX_VALUE;
+							double distance = 0;
+							double[] compLatLng = new double[2];
+							KmaAreaCodeDto nearbyKmaAreaCodeDto = null;
+							
+							for (KmaAreaCodeDto weatherAreaCodeDTO : result) {
+								compLatLng[0] = Double.parseDouble(weatherAreaCodeDTO.getLatitudeSecondsDivide100());
+								compLatLng[1] = Double.parseDouble(weatherAreaCodeDTO.getLongitudeSecondsDivide100());
+								
+								distance = LocationDistance.distance(criteriaLatLng[0], criteriaLatLng[1], compLatLng[0], compLatLng[1],
+										LocationDistance.Unit.METER);
+								if (distance < minDistance) {
+									minDistance = distance;
+									nearbyKmaAreaCodeDto = weatherAreaCodeDTO;
+								}
+							}
+							
+							KmaProcessing.getKmaForecasts(nearbyKmaAreaCodeDto, (Calendar) calendar.clone(), new MultipleJsonDownloader(5) {
+								@Override
+								public void onResult() {
+								
+								}
+							});
+						}
+						
+						@Override
+						public void onResultNoData() {
+						
 						}
 					});
-				}
-
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
-
-
+			
+			
 		}
 		if (weatherSourceTypeSet.contains(WeatherSourceType.MET_NORWAY)) {
-
+		
 		}
-
-
+		
+		
 	}
 }

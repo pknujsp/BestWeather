@@ -7,7 +7,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "kma_area_codes_table")
+@Entity(tableName = "weather_area_code_table")
 public class KmaAreaCodeDto {
 	@ColumnInfo(name = "administrative_area_code")
 	@PrimaryKey
