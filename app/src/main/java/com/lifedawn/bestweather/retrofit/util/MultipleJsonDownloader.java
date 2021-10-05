@@ -8,26 +8,26 @@ import java.util.List;
 
 import retrofit2.Response;
 
-public abstract class MultipleJsonDownloader {
+public abstract class MultipleJsonDownloader<T> {
 	final int REQUEST_COUNT;
 	int responseCount;
-	
-	List<Response<JsonObject>> responseList = new ArrayList<>();
+
+	List<Response<? extends T>> responseList = new ArrayList<>();
 	List<Exception> exceptionList = new ArrayList<>();
-	
+
 	public MultipleJsonDownloader(int REQUEST_COUNT) {
 		this.REQUEST_COUNT = REQUEST_COUNT;
 	}
-	
+
 	public abstract void onResult();
-	
-	public void processResult(Response<JsonObject> response) {
+
+	public void processResult(Response<? extends T> response) {
 		responseList.add(response);
 		if (REQUEST_COUNT == ++responseCount) {
 			onResult();
 		}
 	}
-	
+
 	public void processResult(Exception e) {
 		exceptionList.add(e);
 		if (REQUEST_COUNT == ++responseCount) {

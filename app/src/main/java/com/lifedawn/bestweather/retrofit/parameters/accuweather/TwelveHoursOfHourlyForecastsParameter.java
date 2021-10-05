@@ -6,26 +6,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TwelveHoursOfHourlyForecastsParameter {
-	private String locationId;
+	private String locationKey;
 	private final String details = "True";
 	private final String metric = "True";
 	
 	public Map<String, String> getMap() {
 		Map<String, String> map = new HashMap<>();
-		map.put("apiKey", RetrofitClient.ACCU_WEATHER_SERVICE_KEY);
+		map.put("apikey", RetrofitClient.ACCU_WEATHER_SERVICE_KEY);
 		map.put("details", details);
-		map.put("locationId", locationId);
 		map.put("metric", metric);
 		
 		return map;
 	}
 	
-	public String getLocationId() {
-		return locationId;
+	public String getLocationKey() {
+		return locationKey;
 	}
 	
-	public void setLocationId(String locationId) {
-		this.locationId = locationId;
+	public void setLocationKey(String locationKey) {
+		this.locationKey = locationKey;
 	}
 	
 }

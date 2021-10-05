@@ -1,13 +1,38 @@
 package com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.ValueUnit;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Wind;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.WindGust;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Response;
+
 public class TwelveHoursOfHourlyForecastsResponse {
+	private List<Item> items;
+
+	public List<Item> getItems() {
+		return items;
+	}
+
+	public void setItems(JsonElement responseJsonElement) {
+		JsonArray jsonArray = responseJsonElement.getAsJsonArray();
+		Gson gson = new Gson();
+
+		items = new ArrayList<>();
+		for (JsonElement jsonElement : jsonArray) {
+			Item item = gson.fromJson(jsonElement.toString(), Item.class);
+			items.add(item);
+		}
+	}
 
 	public static class Item {
 		@Expose

@@ -11,6 +11,10 @@ public class LocationForecastResponse {
 	@Expose
 	@SerializedName("geometry")
 	private LocationForecastGeometry geometry;
+
+	@Expose
+	@SerializedName("properties")
+	private LocationForecastProperties properties;
 	
 	public String getType() {
 		return type;
@@ -26,5 +30,13 @@ public class LocationForecastResponse {
 	
 	public void setGeometry(LocationForecastGeometry geometry) {
 		this.geometry = geometry;
+	}
+
+	public LocationForecastProperties getProperties() {
+		return properties;
+	}
+
+	public void setProperties(LocationForecastProperties properties) {
+		this.properties = properties;
 	}
 }

@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.weathers.dataprocessing;
 
 import android.content.Context;
 
+import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.retrofit.parameters.kma.MidLandParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.MidTaParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.UltraSrtFcstParameter;
@@ -22,13 +23,18 @@ public class MainProcessing {
 	public enum WeatherSourceType {
 		ACCU_WEATHER, KMA, MET_NORWAY
 	}
-	
+
 	public static void downloadWeatherData(Context context, final String latitude, final String longitude,
-			final Set<WeatherSourceType> weatherSourceTypeSet) {
+	                                       final Set<WeatherSourceType> weatherSourceTypeSet) {
 		final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
-		
+
 		if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
-		
+			AccuWeatherProcessing.getAccuWeatherForecasts(latitude, longitude, null, new MultipleJsonDownloader<JsonObject>(4) {
+				@Override
+				public void onResult() {
+
+				}
+			});
 		}
 		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
 			KmaAreaCodesRepository kmaAreaCodesRepository = new KmaAreaCodesRepository(context);
@@ -41,11 +47,11 @@ public class MainProcessing {
 							double distance = 0;
 							double[] compLatLng = new double[2];
 							KmaAreaCodeDto nearbyKmaAreaCodeDto = null;
-							
+
 							for (KmaAreaCodeDto weatherAreaCodeDTO : result) {
 								compLatLng[0] = Double.parseDouble(weatherAreaCodeDTO.getLatitudeSecondsDivide100());
 								compLatLng[1] = Double.parseDouble(weatherAreaCodeDTO.getLongitudeSecondsDivide100());
-								
+
 								distance = LocationDistance.distance(criteriaLatLng[0], criteriaLatLng[1], compLatLng[0], compLatLng[1],
 										LocationDistance.Unit.METER);
 								if (distance < minDistance) {
@@ -53,27 +59,33 @@ public class MainProcessing {
 									nearbyKmaAreaCodeDto = weatherAreaCodeDTO;
 								}
 							}
-							
-							KmaProcessing.getKmaForecasts(nearbyKmaAreaCodeDto, (Calendar) calendar.clone(), new MultipleJsonDownloader(5) {
-								@Override
-								public void onResult() {
-								
-								}
-							});
+
+							KmaProcessing.getKmaForecasts(nearbyKmaAreaCodeDto, (Calendar) calendar.clone(),
+									new MultipleJsonDownloader<JsonObject>(5) {
+										@Override
+										public void onResult() {
+
+										}
+									});
 						}
-						
+
 						@Override
 						public void onResultNoData() {
-						
+
 						}
 					});
-			
-			
+
+
 		}
 		if (weatherSourceTypeSet.contains(WeatherSourceType.MET_NORWAY)) {
-		
+			MetNorwayProcessing.getMetNorwayForecasts(latitude, longitude, new MultipleJsonDownloader<JsonObject>(1) {
+				@Override
+				public void onResult() {
+
+				}
+			});
 		}
-		
-		
+
+
 	}
 }

@@ -21,19 +21,19 @@ import java.util.Set;
 
 public class TestFragment extends Fragment {
 	private FragmentTestBinding binding;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentTestBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -42,7 +42,7 @@ public class TestFragment extends Fragment {
 			public void onClick(View view) {
 				// 내외동 좌표:35.235421,128.868227
 				Set<MainProcessing.WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
-				weatherSourceTypeSet.add(MainProcessing.WeatherSourceType.KMA);
+				weatherSourceTypeSet.add(MainProcessing.WeatherSourceType.MET_NORWAY);
 				MainProcessing.downloadWeatherData(getActivity().getApplicationContext(), "35.235421", "128.868227", weatherSourceTypeSet);
 			}
 		});

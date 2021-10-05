@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse.VilageFcstRoot;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.RetrofitCallListManager;
@@ -15,7 +16,6 @@ import com.lifedawn.bestweather.retrofit.parameters.kma.VilageFcstParameter;
 import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaRoot;
 import com.lifedawn.bestweather.room.dto.KmaAreaCodeDto;
-import com.lifedawn.bestweather.weathers.dataprocessing.callback.KmaVilageFcstCallback;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -33,7 +33,7 @@ public final class KmaProcessing {
 	/**
 	 * 초단기 실황
 	 */
-	public static Call<JsonObject> getUltraSrtNcstData(UltraSrtNcstParameter parameter, Calendar calendar, JsonDownloader callback) {
+	public static Call<JsonObject> getUltraSrtNcstData(UltraSrtNcstParameter parameter, Calendar calendar, JsonDownloader<JsonObject> callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
 		//basetime설정
 		if (calendar.get(Calendar.MINUTE) < 40) {
@@ -64,7 +64,7 @@ public final class KmaProcessing {
 	/**
 	 * 초단기예보
 	 */
-	public static Call<JsonObject> getUltraSrtFcstData(UltraSrtFcstParameter parameter, Calendar calendar, JsonDownloader callback) {
+	public static Call<JsonObject> getUltraSrtFcstData(UltraSrtFcstParameter parameter, Calendar calendar, JsonDownloader<JsonObject> callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
 		//basetime설정
 		if (calendar.get(Calendar.MINUTE) < 45) {
@@ -97,7 +97,7 @@ public final class KmaProcessing {
 	 * - Base_time : 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회)
 	 * - API 제공 시간(~이후) : 02:10, 05:10, 08:10, 11:10, 14:10, 17:10, 20:10, 23:10
 	 */
-	public static Call<JsonObject> getVilageFcstData(VilageFcstParameter parameter, Calendar calendar, JsonDownloader callback) {
+	public static Call<JsonObject> getVilageFcstData(VilageFcstParameter parameter, Calendar calendar, JsonDownloader<JsonObject> callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.VILAGE_FCST);
 		//basetime설정
 		final int currentHour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -147,7 +147,7 @@ public final class KmaProcessing {
 	 *
 	 * @param parameter
 	 */
-	public static Call<JsonObject> getMidLandFcstData(MidLandParameter parameter, JsonDownloader callback) {
+	public static Call<JsonObject> getMidLandFcstData(MidLandParameter parameter, JsonDownloader<JsonObject> callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.MID_LAND_FCST);
 
 		Call<JsonObject> call = Objects.requireNonNull(querys).getMidLandFcst(parameter.getMap());
@@ -171,7 +171,7 @@ public final class KmaProcessing {
 	 *
 	 * @param parameter
 	 */
-	public static Call<JsonObject> getMidTaData(MidTaParameter parameter, JsonDownloader callback) {
+	public static Call<JsonObject> getMidTaData(MidTaParameter parameter, JsonDownloader<JsonObject> callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.MID_TA_FCST);
 
 		Call<JsonObject> call = Objects.requireNonNull(querys).getMidTa(parameter.getMap());
@@ -192,7 +192,7 @@ public final class KmaProcessing {
 	}
 
 	public static void getKmaForecasts(KmaAreaCodeDto nearbyKmaAreaCodeDto, Calendar calendar,
-	                                   MultipleJsonDownloader multipleJsonDownloader) {
+	                                   MultipleJsonDownloader<JsonObject> multipleJsonDownloader) {
 		UltraSrtNcstParameter ultraSrtNcstParameter = new UltraSrtNcstParameter();
 		UltraSrtFcstParameter ultraSrtFcstParameter = new UltraSrtFcstParameter();
 		VilageFcstParameter vilageFcstParameter = new VilageFcstParameter();
@@ -226,47 +226,51 @@ public final class KmaProcessing {
 		midLandParameter.setTmFc(tmFc);
 		midTaParameter.setTmFc(tmFc);
 
-		Call<JsonObject> ultraSrtNcstCall = getUltraSrtNcstData(ultraSrtNcstParameter, (Calendar) calendar.clone(),
-				new KmaVilageFcstCallback() {
-					@Override
-					public void onResponseSuccessful(Response<JsonObject> response) {
-						multipleJsonDownloader.processResult(response);
-					}
+		final JsonDownloader<JsonObject> kmaVilageFcstCallback = new JsonDownloader<JsonObject>() {
+			@Override
+			public void onResponseSuccessful(Response<? extends JsonObject> response) {
+				multipleJsonDownloader.processResult(response);
+			}
 
-					@Override
-					public void onResponseFailed(Exception e) {
-						multipleJsonDownloader.processResult(e);
+			@Override
+			public void onResponseFailed(Exception e) {
+				multipleJsonDownloader.processResult(e);
+			}
+
+			@Override
+			public void processResult(Response<? extends JsonObject> response) {
+				VilageFcstRoot vilageFcstRoot = null;
+				if (response.body() != null) {
+					Gson gson = new Gson();
+					vilageFcstRoot = gson.fromJson(response.body().toString(), VilageFcstRoot.class);
+				} else {
+					onResponseFailed(new Exception(response.message()));
+					return;
+				}
+
+				if (vilageFcstRoot != null) {
+					if (vilageFcstRoot.getResponse().getHeader().getResultCode().equals("00")) {
+						onResponseSuccessful(response);
+						vilageFcstRoot = null;
+					} else {
+						onResponseFailed(new Exception(vilageFcstRoot.getResponse().getHeader().getResultMsg()));
 					}
-				});
+				}
+			}
+		};
+
+
+		Call<JsonObject> ultraSrtNcstCall = getUltraSrtNcstData(ultraSrtNcstParameter, (Calendar) calendar.clone(),
+				kmaVilageFcstCallback);
 
 		Call<JsonObject> ultraSrtFcstCall = getUltraSrtFcstData(ultraSrtFcstParameter, (Calendar) calendar.clone(),
-				new KmaVilageFcstCallback() {
-					@Override
-					public void onResponseSuccessful(Response<JsonObject> response) {
-						multipleJsonDownloader.processResult(response);
-					}
+				kmaVilageFcstCallback);
 
-					@Override
-					public void onResponseFailed(Exception e) {
-						multipleJsonDownloader.processResult(e);
-					}
-				});
+		Call<JsonObject> vilageFcstCall = getVilageFcstData(vilageFcstParameter, (Calendar) calendar.clone(), kmaVilageFcstCallback);
 
-		Call<JsonObject> vilageFcstCall = getVilageFcstData(vilageFcstParameter, (Calendar) calendar.clone(), new KmaVilageFcstCallback() {
+		Call<JsonObject> midTaFcstCall = getMidTaData(midTaParameter, new JsonDownloader<JsonObject>() {
 			@Override
-			public void onResponseSuccessful(Response<JsonObject> response) {
-				multipleJsonDownloader.processResult(response);
-			}
-
-			@Override
-			public void onResponseFailed(Exception e) {
-				multipleJsonDownloader.processResult(e);
-			}
-		});
-
-		Call<JsonObject> midTaFcstCall = getMidTaData(midTaParameter, new JsonDownloader() {
-			@Override
-			public void onResponseSuccessful(Response<JsonObject> response) {
+			public void onResponseSuccessful(Response<? extends JsonObject> response) {
 				multipleJsonDownloader.processResult(response);
 			}
 
@@ -276,7 +280,7 @@ public final class KmaProcessing {
 			}
 
 			@Override
-			public void processResult(Response<JsonObject> response) {
+			public void processResult(Response<? extends JsonObject> response) {
 				MidTaRoot midTaRoot = null;
 				if (response.body() != null) {
 					Gson gson = new Gson();
@@ -298,9 +302,9 @@ public final class KmaProcessing {
 			}
 		});
 
-		Call<JsonObject> midLandFcstCall = getMidLandFcstData(midLandParameter, new JsonDownloader() {
+		Call<JsonObject> midLandFcstCall = getMidLandFcstData(midLandParameter, new JsonDownloader<JsonObject>() {
 			@Override
-			public void onResponseSuccessful(Response<JsonObject> response) {
+			public void onResponseSuccessful(Response<? extends JsonObject> response) {
 				multipleJsonDownloader.processResult(response);
 			}
 
@@ -310,7 +314,7 @@ public final class KmaProcessing {
 			}
 
 			@Override
-			public void processResult(Response<JsonObject> response) {
+			public void processResult(Response<? extends JsonObject> response) {
 				MidLandFcstRoot midLandFcstRoot = null;
 				if (response.body() != null) {
 					Gson gson = new Gson();
@@ -339,4 +343,6 @@ public final class KmaProcessing {
 		newCallObj.add(midTaFcstCall);
 		newCallObj.add(midLandFcstCall);
 	}
+
+
 }

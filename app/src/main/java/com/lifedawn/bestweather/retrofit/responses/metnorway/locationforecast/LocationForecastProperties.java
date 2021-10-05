@@ -10,23 +10,23 @@ public class LocationForecastProperties {
 	@Expose
 	@SerializedName("meta")
 	private LocationForecastMeta meta;
-	
+
 	@Expose
 	@SerializedName("timeseries")
 	private List<LocationForecastTimeSeriesItem> timeSeries;
-	
+
 	public LocationForecastMeta getMeta() {
 		return meta;
 	}
-	
+
 	public void setMeta(LocationForecastMeta meta) {
 		this.meta = meta;
 	}
-	
+
 	public List<LocationForecastTimeSeriesItem> getTimeSeries() {
 		return timeSeries;
 	}
-	
+
 	public void setTimeSeries(List<LocationForecastTimeSeriesItem> timeSeries) {
 		this.timeSeries = timeSeries;
 	}
