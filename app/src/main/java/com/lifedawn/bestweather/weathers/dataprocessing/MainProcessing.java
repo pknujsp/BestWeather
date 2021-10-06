@@ -21,7 +21,7 @@ import java.util.TimeZone;
 
 public class MainProcessing {
 	public enum WeatherSourceType {
-		ACCU_WEATHER, KMA, MET_NORWAY
+		ACCU_WEATHER, KMA, MET_NORWAY, OPEN_WEATHER_MAP
 	}
 
 	public static void downloadWeatherData(Context context, final String latitude, final String longitude,
@@ -79,6 +79,14 @@ public class MainProcessing {
 		}
 		if (weatherSourceTypeSet.contains(WeatherSourceType.MET_NORWAY)) {
 			MetNorwayProcessing.getMetNorwayForecasts(latitude, longitude, new MultipleJsonDownloader<JsonObject>(1) {
+				@Override
+				public void onResult() {
+
+				}
+			});
+		}
+		if (weatherSourceTypeSet.contains(WeatherSourceType.OPEN_WEATHER_MAP)) {
+			OpenWeatherMapProcessing.getOwmForecasts(latitude, longitude, true, new MultipleJsonDownloader<JsonObject>(1) {
 				@Override
 				public void onResult() {
 

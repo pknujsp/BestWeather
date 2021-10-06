@@ -42,7 +42,7 @@ public class TestFragment extends Fragment {
 			public void onClick(View view) {
 				// 내외동 좌표:35.235421,128.868227
 				Set<MainProcessing.WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
-				weatherSourceTypeSet.add(MainProcessing.WeatherSourceType.MET_NORWAY);
+				weatherSourceTypeSet.add(MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP);
 				MainProcessing.downloadWeatherData(getActivity().getApplicationContext(), "35.235421", "128.868227", weatherSourceTypeSet);
 			}
 		});

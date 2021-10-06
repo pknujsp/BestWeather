@@ -65,4 +65,21 @@ public interface Querys {
 	@GET("feed/geo:{latitude};{longitude}/")
 	Call<JsonObject> getGeolocalizedFeed(@Path(value = "latitude", encoded = true) String latitude,
 	                                     @Path(value = "longitude", encoded = true) String longitude, @QueryMap(encoded = true) Map<String, String> queryMap);
+
+	//openweathermap
+	//https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
+	@GET("data/2.5/weather")
+	Call<JsonObject> getCurrentWeather(@QueryMap(encoded = true) Map<String, String> queryMap);
+
+	//https://pro.openweathermap.org/data/2.5/forecast/hourly?lat={lat}&lon={lon}&appid={API key}
+	@GET("data/2.5/forecast/hourly")
+	Call<JsonObject> getHourlyForecast(@QueryMap(encoded = true) Map<String, String> queryMap);
+
+	//https://api.openweathermap.org/data/2.5/forecast/daily?lat={lat}&lon={lon}&cnt={cnt}&appid={API key}
+	@GET("data/2.5/forecast/daily")
+	Call<JsonObject> getDailyForecast(@QueryMap(encoded = true) Map<String, String> queryMap);
+
+	//https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={part}&appid={API key}
+	@GET("data/2.5/onecall")
+	Call<JsonObject> getOneCall(@QueryMap(encoded = true) Map<String, String> queryMap);
 }
