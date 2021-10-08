@@ -21,18 +21,16 @@ import java.util.TimeZone;
 
 public class MainProcessing {
 	public enum WeatherSourceType {
-		ACCU_WEATHER, KMA, MET_NORWAY, OPEN_WEATHER_MAP
+		ACCU_WEATHER, KMA, MET_NORWAY, OPEN_WEATHER_MAP, AQICN
 	}
-
+	
 	public static void downloadWeatherData(Context context, final String latitude, final String longitude,
-	                                       final Set<WeatherSourceType> weatherSourceTypeSet) {
-		final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
-
+			final Set<WeatherSourceType> weatherSourceTypeSet) {
 		if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
 			AccuWeatherProcessing.getAccuWeatherForecasts(latitude, longitude, null, new MultipleJsonDownloader<JsonObject>(4) {
 				@Override
 				public void onResult() {
-
+				
 				}
 			});
 		}
@@ -47,11 +45,11 @@ public class MainProcessing {
 							double distance = 0;
 							double[] compLatLng = new double[2];
 							KmaAreaCodeDto nearbyKmaAreaCodeDto = null;
-
+							
 							for (KmaAreaCodeDto weatherAreaCodeDTO : result) {
 								compLatLng[0] = Double.parseDouble(weatherAreaCodeDTO.getLatitudeSecondsDivide100());
 								compLatLng[1] = Double.parseDouble(weatherAreaCodeDTO.getLongitudeSecondsDivide100());
-
+								
 								distance = LocationDistance.distance(criteriaLatLng[0], criteriaLatLng[1], compLatLng[0], compLatLng[1],
 										LocationDistance.Unit.METER);
 								if (distance < minDistance) {
@@ -59,29 +57,28 @@ public class MainProcessing {
 									nearbyKmaAreaCodeDto = weatherAreaCodeDTO;
 								}
 							}
-
-							KmaProcessing.getKmaForecasts(nearbyKmaAreaCodeDto, (Calendar) calendar.clone(),
-									new MultipleJsonDownloader<JsonObject>(5) {
-										@Override
-										public void onResult() {
-
-										}
-									});
+							
+							KmaProcessing.getKmaForecasts(nearbyKmaAreaCodeDto, new MultipleJsonDownloader<JsonObject>(5) {
+								@Override
+								public void onResult() {
+								
+								}
+							});
 						}
-
+						
 						@Override
 						public void onResultNoData() {
-
+						
 						}
 					});
-
-
+			
+			
 		}
 		if (weatherSourceTypeSet.contains(WeatherSourceType.MET_NORWAY)) {
 			MetNorwayProcessing.getMetNorwayForecasts(latitude, longitude, new MultipleJsonDownloader<JsonObject>(1) {
 				@Override
 				public void onResult() {
-
+				
 				}
 			});
 		}
@@ -89,11 +86,19 @@ public class MainProcessing {
 			OpenWeatherMapProcessing.getOwmForecasts(latitude, longitude, true, new MultipleJsonDownloader<JsonObject>(1) {
 				@Override
 				public void onResult() {
-
+				
 				}
 			});
 		}
-
-
+		if (weatherSourceTypeSet.contains(WeatherSourceType.AQICN)) {
+			AqicnProcessing.getAirQuality(latitude, longitude, new MultipleJsonDownloader<JsonObject>(1) {
+				@Override
+				public void onResult() {
+				
+				}
+			});
+		}
+		
+		
 	}
 }
