@@ -12,8 +12,6 @@ public class AqicnParameter {
 	public Map<String, String> getMap() {
 		Map<String, String> map = new HashMap<>();
 		map.put("token", RetrofitClient.AQICN_TOKEN);
-		map.put("latitude", latitude);
-		map.put("longitude", longitude);
 		
 		return map;
 	}
@@ -22,15 +20,17 @@ public class AqicnParameter {
 		return latitude;
 	}
 	
-	public void setLatitude(String latitude) {
+	public AqicnParameter setLatitude(String latitude) {
 		this.latitude = latitude;
+		return this;
 	}
 	
 	public String getLongitude() {
 		return longitude;
 	}
 	
-	public void setLongitude(String longitude) {
+	public AqicnParameter setLongitude(String longitude) {
 		this.longitude = longitude;
+		return this;
 	}
 }
