@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/transparent">
+
+    <ImageButton
+        android:id="@+id/open_navigation_drawer"
+        android:layout_width="@dimen/toolbar_image_size"
+        android:layout_height="@dimen/toolbar_image_size"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/toolbar_start_end_margin"
+        android:background="?attr/selectableItemBackground"
+        android:src="@drawable/menu"
+        app:tint="@color/black" />
+
+
+    <ImageButton
+        android:id="@+id/gps"
+        android:layout_width="@dimen/toolbar_image_size"
+        android:layout_height="@dimen/toolbar_image_size"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/toolbar_left_right_margin"
+        android:layout_toLeftOf="@id/refresh"
+        android:background="@color/transparent"
+        android:src="@drawable/gps"
+        app:tint="@color/black" />
+
+
+    <ImageButton
+        android:id="@+id/refresh"
+        android:layout_width="@dimen/toolbar_image_size"
+        android:layout_height="@dimen/toolbar_image_size"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/toolbar_start_end_margin"
+        android:background="@color/transparent"
+        android:src="@drawable/refresh"
+        app:tint="@color/black" />
+
+</RelativeLayout>

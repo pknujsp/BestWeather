@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        android:key="@string/pref_key_value_units"
+        android:summary="@string/pref_summary_value_units"
+        android:title="@string/pref_title_value_units" />
+
+    <Preference
+        android:key="@string/pref_key_app_theme"
+        android:summary="@string/pref_summary_app_theme"
+        android:title="@string/pref_title_app_theme" />
+
+</PreferenceScreen>

@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">BestWeather</string>
 
+    <!-- 날씨 제공사 -->
+    <string name="kma">대한민국 기상청</string>
+    <string name="accu_weather">Accu Weather</string>
+    <string name="owm">OpenWeatherMap</string>
+
     <!-- airquality -->
     <string name="pm10_str">미세먼지</string>
     <string name="pm25_str">초미세먼지</string>
@@ -9,7 +14,6 @@
 
 
     <string name="good">좋음</string>
-
 
     <string name="compare">비교</string>
     <string name="detail">자세히</string>
@@ -20,4 +24,45 @@
     <string name="daily_forecast">일별 예보</string>
     <string name="air_quality">대기 상태</string>
     <string name="sun_set_rise">일출, 일몰</string>
+
+    <!-- preference -->
+    <string name="settings">설정</string>
+
+    <string name="pref_key_value_units">pref_key_value_units</string>
+    <string name="pref_summary_value_units">온도 : ºC, ºF / 풍속 : m/s, km/h 등</string>
+    <string name="pref_title_value_units">값 단위</string>
+
+    <string name="pref_key_app_theme">pref_key_app_theme</string>
+    <string name="pref_summary_app_theme">검정, 하양 중 선택</string>
+    <string name="pref_title_app_theme">앱 테마</string>
+
+    <string name="pref_key_unit_temp">pref_key_unit_temp</string>
+    <string name="pref_title_unit_temp">기온</string>
+
+    <string name="pref_key_unit_visibility">pref_key_unit_visibility</string>
+    <string name="pref_title_unit_visibility">시정거리</string>
+
+    <string name="pref_key_unit_wind">pref_key_unit_wind</string>
+    <string name="pref_title_unit_wind">풍속</string>
+
+    <string name="pref_key_unit_clock">pref_key_unit_clock</string>
+    <string name="pref_title_unit_clock">12/24 시간제</string>
+    <string name="tag_units_fragment">tag_units_fragment</string>
+    <string name="black">검정</string>
+    <string name="white">하양</string>
+    <string name="celsius">ºC</string>
+    <string name="fahrenheit">ºF</string>
+    <string name="mmPerSec">mm/s</string>
+    <string name="kmPerHour">km/h</string>
+    <string name="km">km</string>
+    <string name="mile">mile</string>
+    <string name="clock12">12시간제</string>
+    <string name="clock24">24시간제</string>
+    <string name="pref_key_unit_preference">pref_key_unit_preference</string>
+    <string name="favorite">즐겨찾기</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tag_favorites_fragment">tag_favorites_fragment</string>
+    <string name="tag_settings_main_fragment">tag_settings_main_fragment</string>
+    <string name="tag_weather_main_fragment">tag_weather_main_fragment</string>
 </resources>
