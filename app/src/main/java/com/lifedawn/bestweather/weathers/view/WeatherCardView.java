@@ -33,7 +33,7 @@ public final class WeatherCardView extends LinearLayout {
 
 	public WeatherCardView(Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, R.style.forecasts_card_background);
-		TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ForecastsCardView, R.style.forecasts_card_background, 0);
+		TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ForecastsCardView, 0, 0);
 		init(a);
 	}
 
