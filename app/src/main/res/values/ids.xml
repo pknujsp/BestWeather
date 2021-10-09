@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="forecasts_name_text_view" type="id" />
+    <item name="detail_forecasts_btn" type="id" />
+    <item name="compare_forecasts_btn" type="id" />
+</resources>

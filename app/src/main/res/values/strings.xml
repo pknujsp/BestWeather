@@ -1,14 +1,23 @@
 <resources>
     <string name="app_name">BestWeather</string>
-    <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- airquality -->
+    <string name="pm10_str">미세먼지</string>
+    <string name="pm25_str">초미세먼지</string>
+    <string name="pm10">pm10</string>
+    <string name="pm25">pm25</string>
+
+
+    <string name="good">좋음</string>
+
+
+    <string name="compare">비교</string>
+    <string name="detail">자세히</string>
+
+    <!-- 날씨 예보 종류 -->
+    <string name="current_conditions">현재 날씨</string>
+    <string name="hourly_forecast">시간별 예보</string>
+    <string name="daily_forecast">일별 예보</string>
+    <string name="air_quality">대기 상태</string>
+    <string name="sun_set_rise">일출, 일몰</string>
 </resources>
