@@ -12,4 +12,14 @@
         android:summary="@string/pref_summary_app_theme"
         android:title="@string/pref_title_app_theme" />
 
+    <Preference
+        android:key="@string/pref_key_weather_data_sources"
+        android:summary="@string/pref_summary_weather_data_sources"
+        android:title="@string/pref_title_weather_data_sources" />
+
+    <SwitchPreference
+        android:key="@string/pref_key_use_current_location"
+        android:summary="@string/pref_summary_use_current_location"
+        android:title="@string/pref_title_use_current_location" />
+
 </PreferenceScreen>

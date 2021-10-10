@@ -2,21 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:key="@string/pref_key_unit_preference">
-
-    <Preference
-        android:key="@string/pref_key_unit_temp"
-        android:title="@string/pref_title_unit_temp" />
-
-    <Preference
-        android:key="@string/pref_key_unit_wind"
-        android:title="@string/pref_title_unit_wind" />
-
-    <Preference
-        android:key="@string/pref_key_unit_visibility"
-        android:title="@string/pref_title_unit_visibility" />
-
-    <Preference
-        android:key="@string/pref_key_unit_clock"
-        android:title="@string/pref_title_unit_clock" />
+    
 
 </PreferenceScreen>

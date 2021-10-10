@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
+import androidx.preference.SwitchPreference;
 
 import android.preference.PreferenceFragment;
 import android.provider.CalendarContract;
@@ -28,6 +29,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 	private SharedPreferences sharedPreferences;
 	private Preference unitsPreference;
 	private Preference appThemePreference;
+	private Preference weatherDataSourcesPreference;
+	private SwitchPreference useCurrentLocationPreference;
 
 	public SettingsFragment(IAppbarTitle iAppbarTitle) {
 		this.iAppbarTitle = iAppbarTitle;
@@ -52,6 +55,12 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
 		unitsPreference = findPreference(getString(R.string.pref_key_value_units));
 		appThemePreference = findPreference(getString(R.string.pref_key_app_theme));
+		weatherDataSourcesPreference = findPreference(getString(R.string.pref_key_weather_data_sources));
+		useCurrentLocationPreference = findPreference(getString(R.string.pref_key_use_current_location));
+
+		useCurrentLocationPreference.setOnPreferenceChangeListener(onPreferenceChangeListener);
+
+		initPreferences();
 	}
 
 	private void initPreferences() {
@@ -88,11 +97,13 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 									case 0:
 										sharedPreferences.edit()
 												.putString(appThemePreference.getKey(), AppThemes.BLACK.name()).apply();
-										//검정
+										break;
+									//검정
 									case 1:
 										sharedPreferences.edit()
 												.putString(appThemePreference.getKey(), AppThemes.WHITE.name()).apply();
-										//하양
+										break;
+									//하양
 								}
 								dialog.dismiss();
 							}
@@ -100,10 +111,52 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 				return true;
 			}
 		});
+
+		//날씨 제공사
+		weatherDataSourcesPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				iAppbarTitle.setAppbarTitle(getString(R.string.pref_title_weather_data_sources));
+
+				WeatherSourcesFragment weatherSourcesFragment = new WeatherSourcesFragment();
+				getParentFragmentManager().beginTransaction().hide(SettingsFragment.this)
+						.add(R.id.fragment_container, weatherSourcesFragment, getString(R.string.tag_weather_data_sources_fragment))
+						.addToBackStack(getString(R.string.tag_weather_data_sources_fragment)).commit();
+				return true;
+			}
+		});
+
+		//현재 위치 사용
+		useCurrentLocationPreference.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), true));
 	}
+
+	private Preference.OnPreferenceChangeListener onPreferenceChangeListener = new Preference.OnPreferenceChangeListener() {
+		@Override
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			if (preference.getKey().equals(useCurrentLocationPreference.getKey())) {
+				boolean enabled = (Boolean) newValue;
+
+				if (enabled != useCurrentLocationPreference.isChecked()) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			return false;
+		}
+	};
 
 	@Override
 	public void onViewCreated(View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 	}
+
+	@Override
+	public void onHiddenChanged(boolean hidden) {
+		super.onHiddenChanged(hidden);
+		if (!hidden) {
+			iAppbarTitle.setAppbarTitle(getString(R.string.settings));
+		}
+	}
+
 }

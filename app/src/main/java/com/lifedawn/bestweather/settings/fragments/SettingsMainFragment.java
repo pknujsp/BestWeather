@@ -48,12 +48,14 @@ public class SettingsMainFragment extends Fragment implements IAppbarTitle {
 		SettingsFragment settingsFragment = new SettingsFragment(this);
 		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), settingsFragment).commitNow();
 
-		binding.backBtn.setOnClickListener(new View.OnClickListener() {
+		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				onBackPressedCallback.handleOnBackPressed();
 			}
 		});
+
+		binding.toolbar.fragmentTitle.setText(R.string.settings);
 	}
 
 	@Override
@@ -64,6 +66,6 @@ public class SettingsMainFragment extends Fragment implements IAppbarTitle {
 
 	@Override
 	public void setAppbarTitle(String title) {
-		binding.fragmentTitle.setText(title);
+		binding.toolbar.fragmentTitle.setText(title);
 	}
 }

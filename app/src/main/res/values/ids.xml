@@ -3,4 +3,5 @@
     <item name="forecasts_name_text_view" type="id" />
     <item name="detail_forecasts_btn" type="id" />
     <item name="compare_forecasts_btn" type="id" />
+    <item name="progress_status_textview" type="id" />
 </resources>

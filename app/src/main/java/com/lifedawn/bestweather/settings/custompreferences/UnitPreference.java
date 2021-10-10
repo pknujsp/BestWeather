@@ -37,6 +37,7 @@ public class UnitPreference extends Preference {
 			int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32f, getContext().getResources().getDisplayMetrics());
 			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, height);
 			layoutParams.gravity = Gravity.RIGHT;
+
 			unitTextView.setLayoutParams(layoutParams);
 
 			LinearLayout viewGroup = (LinearLayout) holder.findViewById(R.id.layout_widget_root);

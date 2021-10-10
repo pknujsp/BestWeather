@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <TextView
+                android:id="@+id/accu_weather_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="32dp"
+                android:text="@string/accu_weather"
+                android:textColor="@color/black"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/accu_weather_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/accu_weather_name"
+                android:layout_alignLeft="@id/accu_weather_name"
+                android:text="@string/pref_summary_accu_weather"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/accu_weather"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/accu_weather_name"
+                android:layout_alignBottom="@id/accu_weather_name"
+                android:layout_alignParentRight="true"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:id="@+id/open_weather_map_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/accu_weather_description"
+                android:layout_alignLeft="@id/accu_weather_description"
+                android:layout_marginTop="24dp"
+                android:text="@string/owm"
+                android:textColor="@color/black"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/open_weather_map_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/open_weather_map_name"
+                android:layout_alignLeft="@id/accu_weather_name"
+                android:text="@string/pref_summary_open_weather_map"
+                android:textSize="16sp" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/open_weather_map"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/open_weather_map_name"
+                android:layout_alignBottom="@id/open_weather_map_name"
+                android:layout_alignParentRight="true"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/open_weather_map_description"
+                android:layout_alignLeft="@id/accu_weather_description"
+                android:layout_marginTop="32dp"
+                android:text="@string/msg_kma_always_enabled_in_south_korea"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</layout>

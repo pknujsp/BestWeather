@@ -47,7 +47,22 @@
 
     <string name="pref_key_unit_clock">pref_key_unit_clock</string>
     <string name="pref_title_unit_clock">12/24 시간제</string>
-    <string name="tag_units_fragment">tag_units_fragment</string>
+
+    <string name="pref_title_accu_weather">Accu Weather</string>
+    <string name="pref_summary_accu_weather">Accu Weather 설명</string>
+    <string name="pref_key_accu_weather">pref_key_accu_weather</string>
+
+    <string name="pref_key_open_weather_map">pref_key_open_weather_map</string>
+    <string name="pref_summary_open_weather_map">OpenWeatherMap 설명</string>
+    <string name="pref_title_open_weather_map">OpenWeatherMap</string>
+
+    <string name="pref_key_use_current_location">pref_key_use_current_location</string>
+    <string name="pref_summary_use_current_location">GPS를 통해 현재 위치의 날씨를 표시</string>
+    <string name="pref_title_use_current_location">현재 위치 사용</string>
+
+    <string name="pref_key_unit_preference">pref_key_unit_preference</string>
+
+
     <string name="black">검정</string>
     <string name="white">하양</string>
     <string name="celsius">ºC</string>
@@ -58,11 +73,27 @@
     <string name="mile">mile</string>
     <string name="clock12">12시간제</string>
     <string name="clock24">24시간제</string>
-    <string name="pref_key_unit_preference">pref_key_unit_preference</string>
     <string name="favorite">즐겨찾기</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- fragment tag -->
     <string name="tag_favorites_fragment">tag_favorites_fragment</string>
     <string name="tag_settings_main_fragment">tag_settings_main_fragment</string>
     <string name="tag_weather_main_fragment">tag_weather_main_fragment</string>
+    <string name="tag_units_fragment">tag_units_fragment</string>
+    <string name="tag_weather_data_sources_fragment">tag_weather_data_sources_fragment</string>
+
+    <string name="message_request_double_click_for_close">한번 더 누르면 종료됩니다</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="msg_kma_always_enabled_in_south_korea">날씨 데이터 요청 지역이 대한민국인 경우에만 대한민국 기상청의 자료가 제공됩니다</string>
+    <string name="msg_at_least_one_must_be_selected">최소 하나는 선택되어야 합니다</string>
+    <string name="pref_key_weather_data_sources">pref_key_weather_data_sources</string>
+    <string name="pref_summary_weather_data_sources">Accu Weather, OpenWeatherMap, Kma...</string>
+    <string name="pref_title_weather_data_sources">날씨 제공사</string>
+    <string name="tag_find_address_fragment">tag_find_address_fragment</string>
+    <string name="hint_input_address">주소명 입력</string>
+    <string name="find_address">주소 검색</string>
+    <string name="not_search_result">검색결과가 없습니다</string>
+    <string name="empty_favorite_addresses">즐겨찾기가 비어있습니다</string>
+
 </resources>

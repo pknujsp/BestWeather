@@ -1,12 +1,15 @@
 package com.lifedawn.bestweather.main;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -14,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.CloseWindow;
 import com.lifedawn.bestweather.databinding.FragmentMainBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.settings.fragments.SettingsMainFragment;
@@ -23,6 +27,30 @@ import org.jetbrains.annotations.NotNull;
 
 public class MainFragment extends Fragment {
 	private FragmentMainBinding binding;
+
+	private CloseWindow closeWindow = new CloseWindow(new CloseWindow.OnBackKeyDoubleClickedListener() {
+		@Override
+		public void onDoubleClicked() {
+			requireActivity().finish();
+		}
+	});
+
+	private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+		@Override
+		public void handleOnBackPressed() {
+			if (getChildFragmentManager().getBackStackEntryCount() > 0) {
+				getChildFragmentManager().popBackStackImmediate();
+			} else {
+				closeWindow.clicked(getActivity());
+			}
+		}
+	};
+
+	@Override
+	public void onAttach(@NonNull @NotNull Context context) {
+		super.onAttach(context);
+		requireActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -53,6 +81,12 @@ public class MainFragment extends Fragment {
 		getChildFragmentManager().beginTransaction()
 				.add(binding.fragmentContainer.getId(), weatherMainFragment,
 						getString(R.string.tag_weather_main_fragment)).commitNow();
+	}
+
+	@Override
+	public void onDestroy() {
+		onBackPressedCallback.remove();
+		super.onDestroy();
 	}
 
 	private final View.OnClickListener sideNavOnClickListener = new View.OnClickListener() {

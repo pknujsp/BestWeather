@@ -19,4 +19,8 @@
             <enum name="gone" value="8" />
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="CustomProgressView">
+        <attr name="contentViewId" format="reference" />
+    </declare-styleable>
 </resources>
