@@ -18,6 +18,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginBottom="4dp"
                 android:text="주소명"
                 android:textAlignment="center"
@@ -35,7 +38,7 @@
                 android:text="업데이트 시각"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/white"
-                android:textSize="15sp" />
+                android:textSize="14sp" />
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/current_conditions_simple"

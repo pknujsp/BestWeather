@@ -23,9 +23,7 @@ import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 
 public class FindAddressFragment extends Fragment {
@@ -64,7 +62,8 @@ public class FindAddressFragment extends Fragment {
 			@Override
 			public void onClickedAddress(Address address) {
 				FavoriteAddressDto favoriteAddressDto = new FavoriteAddressDto();
-				favoriteAddressDto.setCountry(address.getCountryName());
+				favoriteAddressDto.setCountryName(address.getCountryName());
+				favoriteAddressDto.setCountryCode(address.getCountryCode());
 				favoriteAddressDto.setAddress(address.getAddressLine(0));
 				favoriteAddressDto.setLatitude(String.valueOf(address.getLatitude()));
 				favoriteAddressDto.setLongitude(String.valueOf(address.getLongitude()));

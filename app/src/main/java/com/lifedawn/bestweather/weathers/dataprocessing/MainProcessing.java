@@ -2,7 +2,7 @@ package com.lifedawn.bestweather.weathers.dataprocessing;
 
 import android.content.Context;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.retrofit.parameters.kma.MidLandParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.MidTaParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.UltraSrtFcstParameter;
@@ -23,16 +23,31 @@ public class MainProcessing {
 	public enum WeatherSourceType {
 		ACCU_WEATHER, KMA, MET_NORWAY, OPEN_WEATHER_MAP, AQICN
 	}
-	
+
 	public static void downloadWeatherData(Context context, final String latitude, final String longitude,
-			final Set<WeatherSourceType> weatherSourceTypeSet) {
+	                                       final Set<WeatherSourceType> weatherSourceTypeSet, MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+		int totalRequestCount = 0;
+
 		if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
-			AccuWeatherProcessing.getAccuWeatherForecasts(latitude, longitude, null, new MultipleJsonDownloader<JsonObject>(4) {
-				@Override
-				public void onResult() {
-				
-				}
-			});
+			totalRequestCount += 4;
+		}
+		if (weatherSourceTypeSet.contains(WeatherSourceType.AQICN)) {
+			totalRequestCount += 1;
+		}
+		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
+			totalRequestCount += 5;
+		}
+		if (weatherSourceTypeSet.contains(WeatherSourceType.MET_NORWAY)) {
+			totalRequestCount += 1;
+		}
+		if (weatherSourceTypeSet.contains(WeatherSourceType.OPEN_WEATHER_MAP)) {
+			totalRequestCount += 1;
+		}
+
+		multipleJsonDownloader.setRequestCount(totalRequestCount);
+
+		if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
+			AccuWeatherProcessing.getAccuWeatherForecasts(latitude, longitude, null, multipleJsonDownloader);
 		}
 		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
 			KmaAreaCodesRepository kmaAreaCodesRepository = new KmaAreaCodesRepository(context);
@@ -45,11 +60,11 @@ public class MainProcessing {
 							double distance = 0;
 							double[] compLatLng = new double[2];
 							KmaAreaCodeDto nearbyKmaAreaCodeDto = null;
-							
+
 							for (KmaAreaCodeDto weatherAreaCodeDTO : result) {
 								compLatLng[0] = Double.parseDouble(weatherAreaCodeDTO.getLatitudeSecondsDivide100());
 								compLatLng[1] = Double.parseDouble(weatherAreaCodeDTO.getLongitudeSecondsDivide100());
-								
+
 								distance = LocationDistance.distance(criteriaLatLng[0], criteriaLatLng[1], compLatLng[0], compLatLng[1],
 										LocationDistance.Unit.METER);
 								if (distance < minDistance) {
@@ -57,48 +72,28 @@ public class MainProcessing {
 									nearbyKmaAreaCodeDto = weatherAreaCodeDTO;
 								}
 							}
-							
-							KmaProcessing.getKmaForecasts(nearbyKmaAreaCodeDto, new MultipleJsonDownloader<JsonObject>(5) {
-								@Override
-								public void onResult() {
-								
-								}
-							});
+
+							KmaProcessing.getKmaForecasts(nearbyKmaAreaCodeDto, multipleJsonDownloader);
 						}
-						
+
 						@Override
 						public void onResultNoData() {
-						
+
 						}
 					});
-			
-			
+
+
 		}
 		if (weatherSourceTypeSet.contains(WeatherSourceType.MET_NORWAY)) {
-			MetNorwayProcessing.getMetNorwayForecasts(latitude, longitude, new MultipleJsonDownloader<JsonObject>(1) {
-				@Override
-				public void onResult() {
-				
-				}
-			});
+			MetNorwayProcessing.getMetNorwayForecasts(latitude, longitude, multipleJsonDownloader);
 		}
 		if (weatherSourceTypeSet.contains(WeatherSourceType.OPEN_WEATHER_MAP)) {
-			OpenWeatherMapProcessing.getOwmForecasts(latitude, longitude, true, new MultipleJsonDownloader<JsonObject>(1) {
-				@Override
-				public void onResult() {
-				
-				}
-			});
+			OpenWeatherMapProcessing.getOwmForecasts(latitude, longitude, true, multipleJsonDownloader);
 		}
 		if (weatherSourceTypeSet.contains(WeatherSourceType.AQICN)) {
-			AqicnProcessing.getAirQuality(latitude, longitude, new MultipleJsonDownloader<JsonObject>(1) {
-				@Override
-				public void onResult() {
-				
-				}
-			});
+			AqicnProcessing.getAirQuality(latitude, longitude, multipleJsonDownloader);
 		}
-		
-		
+
+
 	}
 }

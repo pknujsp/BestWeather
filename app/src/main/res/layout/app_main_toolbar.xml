@@ -17,6 +17,16 @@
         android:src="@drawable/menu"
         app:tint="@color/black" />
 
+    <ImageButton
+        android:id="@+id/find"
+        android:layout_width="@dimen/toolbar_image_size"
+        android:layout_height="@dimen/toolbar_image_size"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/toolbar_left_right_margin"
+        android:layout_toLeftOf="@id/gps"
+        android:background="@color/transparent"
+        android:src="@drawable/search"
+        app:tint="@color/black" />
 
     <ImageButton
         android:id="@+id/gps"

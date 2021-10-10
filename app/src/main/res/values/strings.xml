@@ -62,6 +62,12 @@
 
     <string name="pref_key_unit_preference">pref_key_unit_preference</string>
 
+    <string name="pref_key_weather_data_sources">pref_key_weather_data_sources</string>
+    <string name="pref_summary_weather_data_sources">Accu Weather, OpenWeatherMap, Kma...</string>
+    <string name="pref_title_weather_data_sources">날씨 제공사</string>
+
+    <string name="pref_key_last_current_location_latitude">pref_key_last_current_location_latitude</string>
+    <string name="pref_key_last_current_location_longitude">pref_key_last_current_location_longitude</string>
 
     <string name="black">검정</string>
     <string name="white">하양</string>
@@ -87,13 +93,21 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="msg_kma_always_enabled_in_south_korea">날씨 데이터 요청 지역이 대한민국인 경우에만 대한민국 기상청의 자료가 제공됩니다</string>
     <string name="msg_at_least_one_must_be_selected">최소 하나는 선택되어야 합니다</string>
-    <string name="pref_key_weather_data_sources">pref_key_weather_data_sources</string>
-    <string name="pref_summary_weather_data_sources">Accu Weather, OpenWeatherMap, Kma...</string>
-    <string name="pref_title_weather_data_sources">날씨 제공사</string>
+
+
     <string name="tag_find_address_fragment">tag_find_address_fragment</string>
     <string name="hint_input_address">주소명 입력</string>
     <string name="find_address">주소 검색</string>
     <string name="not_search_result">검색결과가 없습니다</string>
     <string name="empty_favorite_addresses">즐겨찾기가 비어있습니다</string>
+    <string name="bundle_key_selected_address">bundle_key_selected_address</string>
+    <string name="bundle_key_favorite_address_type">bundle_key_favorite_address_type</string>
+    <string name="current_location">현재 위치</string>
+    <string name="request_to_make_gps_on">GPS를 켜주세요</string>
+    <string name="check">확인</string>
+    <string name="no">아니오</string>
+    <string name="message_needs_location_permission">위치 사용 권한이 필요합니다</string>
+    <string name="update_failed">업데이트 실패</string>
+    <string name="msg_finding_current_location">현재 위치 파악중</string>
 
 </resources>

@@ -23,4 +23,9 @@
     <declare-styleable name="CustomProgressView">
         <attr name="contentViewId" format="reference" />
     </declare-styleable>
+
+    <declare-styleable name="ViewPagerIndicator">
+        <attr name="IndicatorUnselectedDotDrawable" format="reference" />
+        <attr name="IndicatorSelectedDotDrawable" format="reference" />
+    </declare-styleable>
 </resources>

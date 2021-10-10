@@ -1,9 +1,10 @@
 package com.lifedawn.bestweather.weathers.dataprocessing;
 
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.retrofit.client.Querys;
@@ -12,10 +13,7 @@ import com.lifedawn.bestweather.retrofit.parameters.accuweather.CurrentCondition
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.FiveDaysOfDailyForecastsParameter;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.GeoPositionSearchParameter;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.TwelveHoursOfHourlyForecastsParameter;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.geopositionsearch.GeoPositionResponse;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.RetrofitCallListManager;
@@ -37,12 +35,12 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.processResult(response);
+				callback.onResponseResult(response);
 			}
 
 			@Override
 			public void onFailure(Call<JsonElement> call, Throwable t) {
-				callback.processResult(t);
+				callback.onResponseResult(t);
 			}
 		});
 		return call;
@@ -60,12 +58,12 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.processResult(response);
+				callback.onResponseResult(response);
 			}
 
 			@Override
 			public void onFailure(Call<JsonElement> call, Throwable t) {
-				callback.processResult(t);
+				callback.onResponseResult(t);
 			}
 		});
 
@@ -84,12 +82,12 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.processResult(response);
+				callback.onResponseResult(response);
 			}
 
 			@Override
 			public void onFailure(Call<JsonElement> call, Throwable t) {
-				callback.processResult(t);
+				callback.onResponseResult(t);
 			}
 		});
 		return call;
@@ -99,20 +97,20 @@ public class AccuWeatherProcessing {
 	/**
 	 * GeoPosition Search
 	 */
-	public static Call<JsonObject> getGeoPositionSearch(GeoPositionSearchParameter geoPositionSearchParameter,
-	                                                    JsonDownloader<JsonObject> callback) {
+	public static Call<JsonElement> getGeoPositionSearch(GeoPositionSearchParameter geoPositionSearchParameter,
+	                                                     JsonDownloader<JsonElement> callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH);
 
-		Call<JsonObject> call = querys.geoPositionSearch(geoPositionSearchParameter.getMap());
-		call.enqueue(new Callback<JsonObject>() {
+		Call<JsonElement> call = querys.geoPositionSearch(geoPositionSearchParameter.getMap());
+		call.enqueue(new Callback<JsonElement>() {
 			@Override
-			public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-				callback.processResult(response);
+			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+				callback.onResponseResult(response);
 			}
 
 			@Override
-			public void onFailure(Call<JsonObject> call, Throwable t) {
-				callback.processResult(t);
+			public void onFailure(Call<JsonElement> call, Throwable t) {
+				callback.onResponseResult(t);
 			}
 		});
 
@@ -121,21 +119,22 @@ public class AccuWeatherProcessing {
 
 
 	public static void getAccuWeatherForecasts(String latitude, String longitude, @Nullable String locationKey,
-	                                           MultipleJsonDownloader multipleJsonDownloader) {
+	                                           MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
 		GeoPositionSearchParameter geoPositionSearchParameter = new GeoPositionSearchParameter();
 		CurrentConditionsParameter currentConditionsParameter = new CurrentConditionsParameter();
 		FiveDaysOfDailyForecastsParameter fiveDaysOfDailyForecastsParameter = new FiveDaysOfDailyForecastsParameter();
 		TwelveHoursOfHourlyForecastsParameter twelveHoursOfHourlyForecastsParameter = new TwelveHoursOfHourlyForecastsParameter();
 
-		RetrofitCallListManager.CallObj newCallObj = RetrofitCallListManager.newCalls();
-
 		if (locationKey == null) {
 			geoPositionSearchParameter.setLatitude(latitude).setLongitude(longitude);
-			Call<JsonObject> geoPositionSearchCall = getGeoPositionSearch(geoPositionSearchParameter, new JsonDownloader<JsonObject>() {
-
+			Call<JsonElement> geoPositionSearchCall = getGeoPositionSearch(geoPositionSearchParameter, new JsonDownloader<JsonElement>() {
 
 				@Override
-				public void onResponseSuccessful(Response<? extends JsonObject> response) {
+				public void onResponseResult(Response<? extends JsonElement> response) {
+					Log.e(RetrofitClient.LOG_TAG, "accu weather geoposition search 성공");
+					multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+							RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH, response);
+
 					Gson gson = new Gson();
 					GeoPositionResponse geoPositionResponse = gson.fromJson(response.body().toString(), GeoPositionResponse.class);
 
@@ -146,87 +145,75 @@ public class AccuWeatherProcessing {
 
 					Call<JsonElement> currentConditionsCall = getCurrentConditions(currentConditionsParameter, new JsonDownloader<JsonElement>() {
 						@Override
-						public void onResponseSuccessful(Response<? extends JsonElement> response) {
-
+						public void onResponseResult(Response<? extends JsonElement> response) {
+							Log.e(RetrofitClient.LOG_TAG, "accu weather current conditions 성공");
+							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+									RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, response);
 						}
 
 						@Override
-						public void onResponseFailed(Exception e) {
-
+						public void onResponseResult(Throwable t) {
+							Log.e(RetrofitClient.LOG_TAG, "accu weather current conditions 실패");
+							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+									RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, t);
 						}
 
-						@Override
-						public void processResult(Response<? extends JsonElement> response) {
-							if (response.body() != null) {
-								onResponseSuccessful(response);
-							} else {
-								onResponseFailed(new Exception(response.toString()));
-							}
-						}
+
 					});
 
 					Call<JsonElement> fiveDaysOfDailyForecastsCall = get5DaysOfDailyForecasts(fiveDaysOfDailyForecastsParameter,
 							new JsonDownloader<JsonElement>() {
 								@Override
-								public void onResponseSuccessful(Response<? extends JsonElement> response) {
+								public void onResponseResult(Response<? extends JsonElement> response) {
+									Log.e(RetrofitClient.LOG_TAG, "accu weather daily forecast 성공");
+									multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+											RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, response);
 
 								}
 
 								@Override
-								public void onResponseFailed(Exception e) {
+								public void onResponseResult(Throwable t) {
+									Log.e(RetrofitClient.LOG_TAG, "accu weather daily forecast 실패");
+									multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+											RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
 
 								}
 
-								@Override
-								public void processResult(Response<? extends JsonElement> response) {
-									if (response.body() != null) {
-										onResponseSuccessful(response);
-									} else {
-										onResponseFailed(new Exception(response.toString()));
-									}
-								}
+
 							});
 
 					Call<JsonElement> twelveHoursOfHourlyForecastsCall = get12HoursOfHourlyForecasts(twelveHoursOfHourlyForecastsParameter,
 							new JsonDownloader<JsonElement>() {
 								@Override
-								public void onResponseSuccessful(Response<? extends JsonElement> response) {
+								public void onResponseResult(Response<? extends JsonElement> response) {
+									Log.e(RetrofitClient.LOG_TAG, "accu weather hourly forecast 성공");
+									multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+											RetrofitClient.ServiceType.ACCU_12_HOURLY, response);
 
 								}
 
 								@Override
-								public void onResponseFailed(Exception e) {
-
+								public void onResponseResult(Throwable t) {
+									Log.e(RetrofitClient.LOG_TAG, "accu weather hourly forecast 실패");
+									multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+											RetrofitClient.ServiceType.ACCU_12_HOURLY, t);
 								}
 
-								@Override
-								public void processResult(Response<? extends JsonElement> response) {
-									if (response.body() != null) {
-										onResponseSuccessful(response);
-									} else {
-										onResponseFailed(new Exception(response.toString()));
-									}
-								}
+
 							});
 
 				}
 
 				@Override
-				public void onResponseFailed(Exception e) {
-
+				public void onResponseResult(Throwable t) {
+					Log.e(RetrofitClient.LOG_TAG, "accu weather geocoding search 실패");
+					multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+							RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH, t);
 				}
 
-				@Override
-				public void processResult(Response<? extends JsonObject> response) {
-					if (response.body() != null) {
-						onResponseSuccessful(response);
-					} else {
-						onResponseFailed(new Exception(response.toString()));
-					}
-				}
+
 			});
 
-			newCallObj.add(geoPositionSearchCall);
 		}
 	}
 

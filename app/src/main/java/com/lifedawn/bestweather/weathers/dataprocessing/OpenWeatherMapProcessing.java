@@ -1,12 +1,12 @@
 package com.lifedawn.bestweather.weathers.dataprocessing;
 
 import android.util.ArraySet;
+import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.parameters.metnorway.LocationForecastParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.CurrentWeatherParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.DailyForecastParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
@@ -14,7 +14,6 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCal
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import retrofit2.Call;
@@ -25,20 +24,20 @@ public class OpenWeatherMapProcessing {
 	/**
 	 * current weather
 	 */
-	public static Call<JsonObject> getCurrentWeather(CurrentWeatherParameter currentWeatherParameter,
-	                                                 JsonDownloader<JsonObject> callback) {
+	public static Call<JsonElement> getCurrentWeather(CurrentWeatherParameter currentWeatherParameter,
+	                                                  JsonDownloader<JsonElement> callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_CURRENT_WEATHER);
 
-		Call<JsonObject> call = querys.getCurrentWeather(currentWeatherParameter.getMap());
-		call.enqueue(new Callback<JsonObject>() {
+		Call<JsonElement> call = querys.getCurrentWeather(currentWeatherParameter.getMap());
+		call.enqueue(new Callback<JsonElement>() {
 			@Override
-			public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-				callback.processResult(response);
+			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+				callback.onResponseResult(response);
 			}
 
 			@Override
-			public void onFailure(Call<JsonObject> call, Throwable t) {
-				callback.processResult(t);
+			public void onFailure(Call<JsonElement> call, Throwable t) {
+				callback.onResponseResult(t);
 			}
 		});
 		return call;
@@ -47,20 +46,20 @@ public class OpenWeatherMapProcessing {
 	/**
 	 * daily forecast
 	 */
-	public static Call<JsonObject> getDailyForecast(DailyForecastParameter dailyForecastParameter,
-	                                                JsonDownloader<JsonObject> callback) {
+	public static Call<JsonElement> getDailyForecast(DailyForecastParameter dailyForecastParameter,
+	                                                 JsonDownloader<JsonElement> callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
 
-		Call<JsonObject> call = querys.getDailyForecast(dailyForecastParameter.getMap());
-		call.enqueue(new Callback<JsonObject>() {
+		Call<JsonElement> call = querys.getDailyForecast(dailyForecastParameter.getMap());
+		call.enqueue(new Callback<JsonElement>() {
 			@Override
-			public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-				callback.processResult(response);
+			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+				callback.onResponseResult(response);
 			}
 
 			@Override
-			public void onFailure(Call<JsonObject> call, Throwable t) {
-				callback.processResult(t);
+			public void onFailure(Call<JsonElement> call, Throwable t) {
+				callback.onResponseResult(t);
 			}
 		});
 		return call;
@@ -69,27 +68,27 @@ public class OpenWeatherMapProcessing {
 	/**
 	 * one call
 	 */
-	public static Call<JsonObject> getOneCall(OneCallParameter oneCallParameter,
-	                                          JsonDownloader<JsonObject> callback) {
+	public static Call<JsonElement> getOneCall(OneCallParameter oneCallParameter,
+	                                           JsonDownloader<JsonElement> callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
-		Call<JsonObject> call = querys.getOneCall(oneCallParameter.getMap());
-		call.enqueue(new Callback<JsonObject>() {
+		Call<JsonElement> call = querys.getOneCall(oneCallParameter.getMap());
+		call.enqueue(new Callback<JsonElement>() {
 			@Override
-			public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-				callback.processResult(response);
+			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+				callback.onResponseResult(response);
 			}
 
 			@Override
-			public void onFailure(Call<JsonObject> call, Throwable t) {
-				callback.processResult(t);
+			public void onFailure(Call<JsonElement> call, Throwable t) {
+				callback.onResponseResult(t);
 			}
 		});
 		return call;
 	}
 
 	public static void getOwmForecasts(String latitude, String longitude, boolean useOneCall,
-	                                   MultipleJsonDownloader<JsonObject> multipleJsonDownloader) {
+	                                   MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
 		if (useOneCall) {
 			OneCallParameter oneCallParameter = new OneCallParameter();
 			Set<OneCallParameter.OneCallApis> excludeOneCallApis = new ArraySet<>();
@@ -97,26 +96,22 @@ public class OpenWeatherMapProcessing {
 			excludeOneCallApis.add(OneCallParameter.OneCallApis.minutely);
 			oneCallParameter.setLatitude(latitude).setLongitude(longitude).setOneCallApis(excludeOneCallApis);
 
-			Call<JsonObject> oneCallCall = getOneCall(oneCallParameter, new JsonDownloader<JsonObject>() {
+			Call<JsonElement> oneCallCall = getOneCall(oneCallParameter, new JsonDownloader<JsonElement>() {
 				@Override
-				public void onResponseSuccessful(Response<? extends JsonObject> response) {
-					Gson gson = new Gson();
-					OneCallResponse oneCallResponse = gson.fromJson(response.body().toString(), OneCallResponse.class);
+				public void onResponseResult(Response<? extends JsonElement> response) {
+					Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
+					multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP,
+							RetrofitClient.ServiceType.OWM_ONE_CALL, response);
 				}
 
 				@Override
-				public void onResponseFailed(Exception e) {
-
+				public void onResponseResult(Throwable t) {
+					Log.e(RetrofitClient.LOG_TAG, "own one call 실패");
+					multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP,
+							RetrofitClient.ServiceType.OWM_ONE_CALL, t);
 				}
 
-				@Override
-				public void processResult(Response<? extends JsonObject> response) {
-					if (response.body() != null) {
-						onResponseSuccessful(response);
-					} else {
-						onResponseFailed(new Exception(response.toString()));
-					}
-				}
+
 			});
 		}
 	}

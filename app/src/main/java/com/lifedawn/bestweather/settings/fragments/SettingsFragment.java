@@ -136,6 +136,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 			if (preference.getKey().equals(useCurrentLocationPreference.getKey())) {
 				boolean enabled = (Boolean) newValue;
 
+				sharedPreferences.edit().remove(getString(R.string.pref_key_last_current_location_latitude))
+						.remove(getString(R.string.pref_key_last_current_location_longitude)).apply();
+
 				if (enabled != useCurrentLocationPreference.isChecked()) {
 					return true;
 				} else {

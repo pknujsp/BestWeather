@@ -1,12 +1,13 @@
 package com.lifedawn.bestweather.room.dto;
 
-import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity(tableName = "favorite_address_table")
-public class FavoriteAddressDto {
+public class FavoriteAddressDto implements Serializable {
 
 	@PrimaryKey(autoGenerate = true)
 	@ColumnInfo(name = "id")
@@ -16,7 +17,10 @@ public class FavoriteAddressDto {
 	private String address;
 
 	@ColumnInfo
-	private String country;
+	private String countryName;
+
+	@ColumnInfo
+	private String countryCode;
 
 	@ColumnInfo
 	private String latitude;
@@ -40,12 +44,12 @@ public class FavoriteAddressDto {
 		this.address = address;
 	}
 
-	public String getCountry() {
-		return country;
+	public String getCountryName() {
+		return countryName;
 	}
 
-	public void setCountry(String country) {
-		this.country = country;
+	public void setCountryName(String countryName) {
+		this.countryName = countryName;
 	}
 
 	public String getLatitude() {
@@ -62,5 +66,13 @@ public class FavoriteAddressDto {
 
 	public void setLongitude(String longitude) {
 		this.longitude = longitude;
+	}
+
+	public void setCountryCode(String countryCode) {
+		this.countryCode = countryCode;
+	}
+
+	public String getCountryCode() {
+		return countryCode;
 	}
 }

@@ -20,6 +20,8 @@ public class RetrofitClient {
 	//openweathermap
 	public static final String DEFAULT_OPEN_WEATHER_MAP_SERVICE_URL = "https://api.openweathermap.org/";
 	public static final String PRO_OPEN_WEATHER_MAP_SERVICE_URL = "https://pro.openweathermap.org/";
+	//flickr
+	public static final String FLICKR_SERVICE_URL = "https://www.flickr.com/services/rest/";
 
 	//service key, token
 	public static final String VILAGE_FCST_INFO_SERVICE_SERVICE_KEY = "T2nJm9zlOA0Z7Dut%2BThT6Jp0Itn0zZw80AUP3uMdOWlZJR1gVPkx9p1t8etuSW1kWsSNrGGHKdxbwr1IUlt%2Baw%3D%3D";
@@ -27,13 +29,17 @@ public class RetrofitClient {
 	public static final String ACCU_WEATHER_SERVICE_KEY = "tUnqAFCcGWIyhZf4zSVlKgQb1wsbJOo8";
 	public static final String AQICN_TOKEN = "8538c6118653f6e4acbfd8ae5667bd07683a1cde";
 	public static final String OWM_API_KEY = "4e3a18c58bdf77658cd11a9ee0cb51cc";
+	public static final String FLICKR_KEY = "2c887b8d73b8334ddb3b0809c387de1b";
+	public static final String FLICKR_SECRET = "0112b42bf9b07200";
 
 	public static final String DATATYPE = "JSON";
+
+	public static final String LOG_TAG = "Retrofit Response";
 
 	public enum ServiceType {
 		ULTRA_SRT_NCST, ULTRA_SRT_FCST, MID_LAND_FCST, MID_TA_FCST, VILAGE_FCST, ACCU_GEOPOSITION_SEARCH, ACCU_CURRENT_CONDITIONS,
 		ACCU_5_DAYS_OF_DAILY, ACCU_12_HOURLY, MET_NORWAY_LOCATION_FORECAST, AQICN_GEOLOCALIZED_FEED,
-		OWM_CURRENT_WEATHER, OWM_HOURLY_FORECAST, OWM_DAILY_FORECAST, OWM_ONE_CALL
+		OWM_CURRENT_WEATHER, OWM_HOURLY_FORECAST, OWM_DAILY_FORECAST, OWM_ONE_CALL, FLICKR
 	}
 
 
@@ -90,6 +96,12 @@ public class RetrofitClient {
 						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
 						PRO_OPEN_WEATHER_MAP_SERVICE_URL).build();
 				return owmProInstance.create(Querys.class);
+
+			case FLICKR:
+				Retrofit flickrInstance = new Retrofit.Builder().client(client).addConverterFactory(
+						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
+						FLICKR_SERVICE_URL).build();
+				return flickrInstance.create(Querys.class);
 
 			default:
 				return null;

@@ -3,30 +3,53 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageView
+            android:id="@+id/current_conditions_img"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/transparent"
             android:orientation="vertical">
 
             <include
                 android:id="@+id/main_toolbar"
                 layout="@layout/app_main_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize" />
+                android:layout_height="?attr/actionBarSize"
+                android:layout_gravity="top" />
+
+            <com.lifedawn.bestweather.commons.views.ViewPagerIndicator
+                android:id="@+id/viewpager_indicator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                app:IndicatorSelectedDotDrawable="@drawable/selected_dot_indicator"
+                app:IndicatorUnselectedDotDrawable="@drawable/unselected_dot_indicator" />
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@color/transparent"
+                android:orientation="horizontal" />
+
+            <com.lifedawn.bestweather.commons.views.CustomProgressView
+                android:id="@+id/custom_progress_view"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
         </LinearLayout>
-
-
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/calendar_container_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
+    </FrameLayout>
 </layout>

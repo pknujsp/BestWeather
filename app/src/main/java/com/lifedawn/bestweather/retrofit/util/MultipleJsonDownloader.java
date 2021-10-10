@@ -1,37 +1,88 @@
 package com.lifedawn.bestweather.retrofit.util;
 
-import com.google.gson.JsonObject;
+import android.util.ArrayMap;
 
-import java.time.format.ResolverStyle;
-import java.util.ArrayList;
-import java.util.List;
+import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.weathers.dataprocessing.MainProcessing;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import retrofit2.Response;
 
 public abstract class MultipleJsonDownloader<T> {
-	final int REQUEST_COUNT;
-	int responseCount;
+	private int requestCount;
+	private int responseCount;
 
-	List<Response<? extends T>> responseList = new ArrayList<>();
-	List<Exception> exceptionList = new ArrayList<>();
+	protected Map<MainProcessing.WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<T>>> responseMap
+			= new ArrayMap<>();
 
-	public MultipleJsonDownloader(int REQUEST_COUNT) {
-		this.REQUEST_COUNT = REQUEST_COUNT;
+	public MultipleJsonDownloader() {
+	}
+
+	public MultipleJsonDownloader(int requestCount) {
+		this.requestCount = requestCount;
+	}
+
+	public void setRequestCount(int requestCount) {
+		this.requestCount = requestCount;
 	}
 
 	public abstract void onResult();
 
-	public void processResult(Response<? extends T> response) {
-		responseList.add(response);
-		if (REQUEST_COUNT == ++responseCount) {
+	public void processResult(MainProcessing.WeatherSourceType weatherSourceType,
+	                          RetrofitClient.ServiceType serviceType, Response<? extends T> response) {
+		if (!responseMap.containsKey(weatherSourceType)) {
+			responseMap.put(weatherSourceType, new ArrayMap<>());
+		}
+		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult<T>(response));
+
+		if (requestCount == ++responseCount) {
 			onResult();
 		}
 	}
 
-	public void processResult(Exception e) {
-		exceptionList.add(e);
-		if (REQUEST_COUNT == ++responseCount) {
+	public void processResult(MainProcessing.WeatherSourceType weatherSourceType,
+	                          RetrofitClient.ServiceType serviceType, Throwable t) {
+		if (!responseMap.containsKey(weatherSourceType)) {
+			responseMap.put(weatherSourceType, new ArrayMap<>());
+		}
+		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult<T>(t));
+
+		if (requestCount == ++responseCount) {
 			onResult();
+		}
+	}
+
+	public static class ResponseResult<T> {
+		private Response<? extends T> response;
+		private Throwable t;
+
+		public ResponseResult() {
+		}
+
+		public ResponseResult(Throwable t) {
+			this.t = t;
+		}
+
+		public ResponseResult(Response<? extends T> response) {
+			this.response = response;
+		}
+
+		public Response<? extends T> getResponse() {
+			return response;
+		}
+
+		public void setResponse(Response<? extends T> response) {
+			this.response = response;
+		}
+
+		public Throwable getT() {
+			return t;
+		}
+
+		public void setT(Throwable t) {
+			this.t = t;
 		}
 	}
 }

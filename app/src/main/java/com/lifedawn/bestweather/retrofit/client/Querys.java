@@ -18,26 +18,26 @@ import retrofit2.http.QueryMap;
 public interface Querys {
 	// kma
 	@GET("getUltraSrtNcst")
-	Call<JsonObject> getUltraSrtNcst(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> getUltraSrtNcst(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	@GET("getUltraSrtFcst")
-	Call<JsonObject> getUltraSrtFcst(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> getUltraSrtFcst(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	@GET("getVilageFcst")
-	Call<JsonObject> getVilageFcst(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> getVilageFcst(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	@GET("getMidLandFcst")
-	Call<JsonObject> getMidLandFcst(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> getMidLandFcst(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	@GET("getMidTa")
-	Call<JsonObject> getMidTa(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> getMidTa(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	//accu weather
 	/* http://dataservice.accuweather.com/locations/v1/cities/geoposition/
 	search?apikey=tUnqAFCcGWIyhZf4zSVlKgQb1wsbJOo8&q=35.235421%2C128.868227
 	*/
 	@GET("locations/v1/cities/geoposition/search")
-	Call<JsonObject> geoPositionSearch(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> geoPositionSearch(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	//http://dataservice.accuweather.com/currentconditions/v1/3430446?apikey=tUnqAFCcGWIyhZf4zSVlKgQb1wsbJOo8&details=true&metric=true
 	@GET("currentconditions/v1/{location_key}")
@@ -58,28 +58,33 @@ public interface Querys {
 	//https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=35.235421&lon=128.868227
 	@Headers("User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
 	@GET("locationforecast/2.0/complete")
-	Call<JsonObject> getLocationForecast(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> getLocationForecast(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	//aqicn
 	//https://api.waqi.info/feed/geo:35.235421;128.868227/?token=8538c6118653f6e4acbfd8ae5667bd07683a1cde
 	@GET("feed/geo:{latitude};{longitude}/")
-	Call<JsonObject> getGeolocalizedFeed(@Path(value = "latitude", encoded = true) String latitude,
-	                                     @Path(value = "longitude", encoded = true) String longitude, @QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> getGeolocalizedFeed(@Path(value = "latitude", encoded = true) String latitude,
+	                                      @Path(value = "longitude", encoded = true) String longitude, @QueryMap(encoded = true) Map<String, String> queryMap);
 
 	//openweathermap
 	//https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
 	@GET("data/2.5/weather")
-	Call<JsonObject> getCurrentWeather(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> getCurrentWeather(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	//https://pro.openweathermap.org/data/2.5/forecast/hourly?lat={lat}&lon={lon}&appid={API key}
 	@GET("data/2.5/forecast/hourly")
-	Call<JsonObject> getHourlyForecast(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> getHourlyForecast(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	//https://api.openweathermap.org/data/2.5/forecast/daily?lat={lat}&lon={lon}&cnt={cnt}&appid={API key}
 	@GET("data/2.5/forecast/daily")
-	Call<JsonObject> getDailyForecast(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> getDailyForecast(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	//https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude={part}&appid={API key}
 	@GET("data/2.5/onecall")
-	Call<JsonObject> getOneCall(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> getOneCall(@QueryMap(encoded = true) Map<String, String> queryMap);
+
+	//flickr
+	//https://api.flickr.com/services/rest/?method=flickr.galleries.getPhotos&api_key=2c887b8d73b8334ddb3b0809c387de1b&gallery_id=72157719980390655&format=json
+	@GET("rest/")
+	Call<JsonElement> getPhotosFromGallery(@QueryMap(encoded = true) Map<String, String> queryMap);
 }
