@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.weathers.dataprocessing;
+package com.lifedawn.bestweather.weathers.dataprocessing.request;
 
 import android.util.Log;
 
@@ -8,7 +8,6 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.aqicn.AqicnParameter;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
-import com.lifedawn.bestweather.retrofit.util.RetrofitCallListManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;

@@ -1,5 +1,7 @@
 package com.lifedawn.bestweather.retrofit.responses.openweathermap;
 
+import android.graphics.drawable.Drawable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -19,6 +21,9 @@ public class Weather {
 	@Expose
 	@SerializedName("icon")
 	private String icon;
+
+	private Drawable weatherImg;
+
 
 	public String getId() {
 		return id;
@@ -50,5 +55,13 @@ public class Weather {
 
 	public void setIcon(String icon) {
 		this.icon = icon;
+	}
+
+	public Drawable getWeatherImg() {
+		return weatherImg;
+	}
+
+	public void setWeatherImg(Drawable weatherImg) {
+		this.weatherImg = weatherImg;
 	}
 }

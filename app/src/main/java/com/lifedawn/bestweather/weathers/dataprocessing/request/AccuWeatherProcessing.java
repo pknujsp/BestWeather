@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.weathers.dataprocessing;
+package com.lifedawn.bestweather.weathers.dataprocessing.request;
 
 import android.util.Log;
 
@@ -6,7 +6,6 @@ import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.CurrentConditionsParameter;
@@ -16,7 +15,6 @@ import com.lifedawn.bestweather.retrofit.parameters.accuweather.TwelveHoursOfHou
 import com.lifedawn.bestweather.retrofit.responses.accuweather.geopositionsearch.GeoPositionResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
-import com.lifedawn.bestweather.retrofit.util.RetrofitCallListManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;

@@ -1,16 +1,14 @@
-package com.lifedawn.bestweather.weathers.dataprocessing;
+package com.lifedawn.bestweather.weathers.dataprocessing.request;
 
 import android.util.ArraySet;
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.CurrentWeatherParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.DailyForecastParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 

@@ -12,11 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.gson.JsonElement;
-import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.FragmentTestBinding;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
-import com.lifedawn.bestweather.weathers.dataprocessing.MainProcessing;
+import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 
 import org.jetbrains.annotations.NotNull;
 

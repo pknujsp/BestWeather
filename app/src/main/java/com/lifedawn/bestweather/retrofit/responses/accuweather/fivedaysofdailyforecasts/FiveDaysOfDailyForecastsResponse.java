@@ -1,5 +1,7 @@
 package com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts;
 
+import android.graphics.drawable.Drawable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Direction;
@@ -302,6 +304,8 @@ public class FiveDaysOfDailyForecastsResponse {
 			@SerializedName("Icon")
 			private String icon;
 
+			private Drawable weatherImg;
+
 			@Expose
 			@SerializedName("IconPhrase")
 			private String iconPhrase;
@@ -373,6 +377,14 @@ public class FiveDaysOfDailyForecastsResponse {
 			@Expose
 			@SerializedName("Ice")
 			private ValueUnit ice;
+
+			public void setWeatherImg(Drawable weatherImg) {
+				this.weatherImg = weatherImg;
+			}
+
+			public Drawable getWeatherImg() {
+				return weatherImg;
+			}
 
 			public String getIcon() {
 				return icon;

@@ -1,5 +1,7 @@
 package com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts;
 
+import android.graphics.drawable.Drawable;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -46,6 +48,9 @@ public class TwelveHoursOfHourlyForecastsResponse {
 		@Expose
 		@SerializedName("WeatherIcon")
 		private String weatherIcon;
+
+		private Drawable weatherImg;
+
 
 		@Expose
 		@SerializedName("IconPhrase")
@@ -151,6 +156,14 @@ public class TwelveHoursOfHourlyForecastsResponse {
 		@Expose
 		@SerializedName("Ceiling")
 		private ValueUnit ceiling;
+
+		public Drawable getWeatherImg() {
+			return weatherImg;
+		}
+
+		public void setWeatherImg(Drawable weatherImg) {
+			this.weatherImg = weatherImg;
+		}
 
 		public String getDateTime() {
 			return dateTime;

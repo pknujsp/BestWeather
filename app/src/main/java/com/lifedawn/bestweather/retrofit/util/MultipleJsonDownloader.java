@@ -3,9 +3,8 @@ package com.lifedawn.bestweather.retrofit.util;
 import android.util.ArrayMap;
 
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.weathers.dataprocessing.MainProcessing;
+import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import retrofit2.Response;

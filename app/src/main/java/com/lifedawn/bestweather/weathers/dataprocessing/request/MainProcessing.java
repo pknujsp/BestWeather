@@ -1,23 +1,16 @@
-package com.lifedawn.bestweather.weathers.dataprocessing;
+package com.lifedawn.bestweather.weathers.dataprocessing.request;
 
 import android.content.Context;
 
 import com.google.gson.JsonElement;
-import com.lifedawn.bestweather.retrofit.parameters.kma.MidLandParameter;
-import com.lifedawn.bestweather.retrofit.parameters.kma.MidTaParameter;
-import com.lifedawn.bestweather.retrofit.parameters.kma.UltraSrtFcstParameter;
-import com.lifedawn.bestweather.retrofit.parameters.kma.UltraSrtNcstParameter;
-import com.lifedawn.bestweather.retrofit.parameters.kma.VilageFcstParameter;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.KmaAreaCodeDto;
 import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
-import java.util.TimeZone;
 
 public class MainProcessing {
 	public enum WeatherSourceType {

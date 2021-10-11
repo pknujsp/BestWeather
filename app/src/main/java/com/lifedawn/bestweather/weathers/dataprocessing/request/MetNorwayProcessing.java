@@ -1,11 +1,9 @@
-package com.lifedawn.bestweather.weathers.dataprocessing;
+package com.lifedawn.bestweather.weathers.dataprocessing.request;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.metnorway.LocationForecastParameter;
-import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 

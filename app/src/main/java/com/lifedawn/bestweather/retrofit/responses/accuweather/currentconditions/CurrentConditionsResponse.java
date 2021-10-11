@@ -1,5 +1,7 @@
 package com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions;
 
+import android.graphics.drawable.Drawable;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -51,6 +53,9 @@ public class CurrentConditionsResponse {
 		@Expose
 		@SerializedName("WeatherIcon")
 		private String weatherIcon;
+
+		private Drawable weatherImg;
+
 
 		@Expose
 		@SerializedName("HasPrecipitation")
@@ -171,6 +176,253 @@ public class CurrentConditionsResponse {
 		@SerializedName("TemperatureSummary")
 		private TemperatureSummary temperatureSummary;
 
+		public String getLocalObservationDateTime() {
+			return localObservationDateTime;
+		}
+
+		public void setLocalObservationDateTime(String localObservationDateTime) {
+			this.localObservationDateTime = localObservationDateTime;
+		}
+
+		public String getEpochTime() {
+			return epochTime;
+		}
+
+		public void setEpochTime(String epochTime) {
+			this.epochTime = epochTime;
+		}
+
+		public String getWeatherText() {
+			return weatherText;
+		}
+
+		public void setWeatherText(String weatherText) {
+			this.weatherText = weatherText;
+		}
+
+		public String getWeatherIcon() {
+			return weatherIcon;
+		}
+
+		public void setWeatherIcon(String weatherIcon) {
+			this.weatherIcon = weatherIcon;
+		}
+
+		public Drawable getWeatherImg() {
+			return weatherImg;
+		}
+
+		public void setWeatherImg(Drawable weatherImg) {
+			this.weatherImg = weatherImg;
+		}
+
+		public String getHasPrecipitation() {
+			return hasPrecipitation;
+		}
+
+		public void setHasPrecipitation(String hasPrecipitation) {
+			this.hasPrecipitation = hasPrecipitation;
+		}
+
+		public String getPrecipitationType() {
+			return precipitationType;
+		}
+
+		public void setPrecipitationType(String precipitationType) {
+			this.precipitationType = precipitationType;
+		}
+
+		public String getIsDayTime() {
+			return isDayTime;
+		}
+
+		public void setIsDayTime(String isDayTime) {
+			this.isDayTime = isDayTime;
+		}
+
+		public String getRelativeHumidity() {
+			return relativeHumidity;
+		}
+
+		public void setRelativeHumidity(String relativeHumidity) {
+			this.relativeHumidity = relativeHumidity;
+		}
+
+		public String getIndoorRelativeHumidity() {
+			return indoorRelativeHumidity;
+		}
+
+		public void setIndoorRelativeHumidity(String indoorRelativeHumidity) {
+			this.indoorRelativeHumidity = indoorRelativeHumidity;
+		}
+
+		public String getuVIndex() {
+			return uVIndex;
+		}
+
+		public void setuVIndex(String uVIndex) {
+			this.uVIndex = uVIndex;
+		}
+
+		public String getuVIndexText() {
+			return uVIndexText;
+		}
+
+		public void setuVIndexText(String uVIndexText) {
+			this.uVIndexText = uVIndexText;
+		}
+
+		public String getObstructionsToVisibility() {
+			return obstructionsToVisibility;
+		}
+
+		public void setObstructionsToVisibility(String obstructionsToVisibility) {
+			this.obstructionsToVisibility = obstructionsToVisibility;
+		}
+
+		public String getCloudCover() {
+			return cloudCover;
+		}
+
+		public void setCloudCover(String cloudCover) {
+			this.cloudCover = cloudCover;
+		}
+
+		public ValueUnit getTemperature() {
+			return temperature;
+		}
+
+		public void setTemperature(ValueUnit temperature) {
+			this.temperature = temperature;
+		}
+
+		public ValueUnit getRealFeelTemperature() {
+			return realFeelTemperature;
+		}
+
+		public void setRealFeelTemperature(ValueUnit realFeelTemperature) {
+			this.realFeelTemperature = realFeelTemperature;
+		}
+
+		public ValueUnit getRealFeelTemperatureShade() {
+			return realFeelTemperatureShade;
+		}
+
+		public void setRealFeelTemperatureShade(ValueUnit realFeelTemperatureShade) {
+			this.realFeelTemperatureShade = realFeelTemperatureShade;
+		}
+
+		public ValueUnit getDewPoint() {
+			return dewPoint;
+		}
+
+		public void setDewPoint(ValueUnit dewPoint) {
+			this.dewPoint = dewPoint;
+		}
+
+		public Wind getWind() {
+			return wind;
+		}
+
+		public void setWind(Wind wind) {
+			this.wind = wind;
+		}
+
+		public WindGust getWindGust() {
+			return windGust;
+		}
+
+		public void setWindGust(WindGust windGust) {
+			this.windGust = windGust;
+		}
+
+		public Visibility getVisibility() {
+			return visibility;
+		}
+
+		public void setVisibility(Visibility visibility) {
+			this.visibility = visibility;
+		}
+
+		public Ceiling getCeiling() {
+			return ceiling;
+		}
+
+		public void setCeiling(Ceiling ceiling) {
+			this.ceiling = ceiling;
+		}
+
+		public Pressure getPressure() {
+			return pressure;
+		}
+
+		public void setPressure(Pressure pressure) {
+			this.pressure = pressure;
+		}
+
+		public PressureTendency getPressureTendency() {
+			return pressureTendency;
+		}
+
+		public void setPressureTendency(PressureTendency pressureTendency) {
+			this.pressureTendency = pressureTendency;
+		}
+
+		public Past24HourTemperatureDeparture getPast24HourTemperatureDeparture() {
+			return past24HourTemperatureDeparture;
+		}
+
+		public void setPast24HourTemperatureDeparture(Past24HourTemperatureDeparture past24HourTemperatureDeparture) {
+			this.past24HourTemperatureDeparture = past24HourTemperatureDeparture;
+		}
+
+		public ApparentTemperature getApparentTemperature() {
+			return apparentTemperature;
+		}
+
+		public void setApparentTemperature(ApparentTemperature apparentTemperature) {
+			this.apparentTemperature = apparentTemperature;
+		}
+
+		public WindChillTemperature getWindChillTemperature() {
+			return windChillTemperature;
+		}
+
+		public void setWindChillTemperature(WindChillTemperature windChillTemperature) {
+			this.windChillTemperature = windChillTemperature;
+		}
+
+		public WetBulbTemperature getWetBulbTemperature() {
+			return wetBulbTemperature;
+		}
+
+		public void setWetBulbTemperature(WetBulbTemperature wetBulbTemperature) {
+			this.wetBulbTemperature = wetBulbTemperature;
+		}
+
+		public Precip1hr getPrecip1hr() {
+			return precip1hr;
+		}
+
+		public void setPrecip1hr(Precip1hr precip1hr) {
+			this.precip1hr = precip1hr;
+		}
+
+		public PrecipitationSummary getPrecipitationSummary() {
+			return precipitationSummary;
+		}
+
+		public void setPrecipitationSummary(PrecipitationSummary precipitationSummary) {
+			this.precipitationSummary = precipitationSummary;
+		}
+
+		public TemperatureSummary getTemperatureSummary() {
+			return temperatureSummary;
+		}
+
+		public void setTemperatureSummary(TemperatureSummary temperatureSummary) {
+			this.temperatureSummary = temperatureSummary;
+		}
 
 		public static class Wind {
 			@Expose

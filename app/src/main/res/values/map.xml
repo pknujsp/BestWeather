@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <AccuWeatherWeatherIcons>
+        <entry key="">bar</entry>
+    </AccuWeatherWeatherIcons>
+
+    <OpenWeatherMapWeatherIcons>
+        <entry key="foo">bar</entry>
+        <entry key="goo">baz</entry>
+    </OpenWeatherMapWeatherIcons>
+
+    <KmaWeatherIcons>
+        <entry key="foo">bar</entry>
+        <entry key="goo"></entry>
+    </KmaWeatherIcons>
+</resources>
