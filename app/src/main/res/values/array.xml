@@ -1,4 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <array name="AccuWeatherWeatherIconCodes">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>11</item>
+        <item>12</item>
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+        <item>26</item>
+        <item>29</item>
+        <item>30</item>
+        <item>31</item>
+        <item>32</item>
+        <item>33</item>
+        <item>34</item>
+        <item>35</item>
+        <item>36</item>
+        <item>37</item>
+        <item>38</item>
+        <item>39</item>
+        <item>40</item>
+        <item>41</item>
+        <item>42</item>
+        <item>43</item>
+        <item>44</item>
+    </array>
+
+    <array name="OpenWeatherMapWeatherIconCodes">
+        <item>200</item>
+        <item>201</item>
+        <item>202</item>
+        <item>210</item>
+        <item>211</item>
+        <item>212</item>
+        <item>221</item>
+        <item>230</item>
+        <item>231</item>
+        <item>232</item>
+        <item>300</item>
+        <item>301</item>
+        <item>302</item>
+        <item>310</item>
+        <item>311</item>
+        <item>312</item>
+        <item>313</item>
+        <item>314</item>
+        <item>321</item>
+        <item>500</item>
+        <item>501</item>
+        <item>502</item>
+        <item>503</item>
+        <item>504</item>
+        <item>511</item>
+        <item>520</item>
+        <item>521</item>
+        <item>522</item>
+        <item>531</item>
+        <item>600</item>
+        <item>601</item>
+        <item>602</item>
+        <item>611</item>
+        <item>612</item>
+        <item>613</item>
+        <item>615</item>
+        <item>616</item>
+        <item>620</item>
+        <item>621</item>
+        <item>622</item>
+        <item>701</item>
+        <item>711</item>
+        <item>721</item>
+        <item>731</item>
+        <item>741</item>
+        <item>751</item>
+        <item>761</item>
+        <item>762</item>
+        <item>771</item>
+        <item>781</item>
+        <item>800</item>
+        <item>801</item>
+        <item>802</item>
+        <item>803</item>
+        <item>804</item>
+    </array>
+
+
+    <array name="KmaSkyIconCodes">
+        <item>1</item>
+        <item>3</item>
+        <item>4</item>
+    </array>
+
+    <array name="KmaPtyIconCodes">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </array>
+
 
 </resources>

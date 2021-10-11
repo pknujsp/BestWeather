@@ -118,4 +118,135 @@
     <string name="msg_refreshing_weather_data">날씨 자료 업데이트 중</string>
     <string name="main_datasource">기본 날씨 제공사</string>
 
+    <!-- accu weather weather icon text -->
+    <string name="accu_weather_icon_1_sunny">맑음</string>
+    <string name="accu_weather_icon_2_mostly_sunny">대개 맑음</string>
+    <string name="accu_weather_icon_3_partly_sunny">조금 맑음</string>
+    <string name="accu_weather_icon_4_intermittent_clouds">간헐적으로 구름</string>
+    <string name="accu_weather_icon_5_hazy_sunshine">흐릿한 햇살</string>
+    <string name="accu_weather_icon_6_mostly_cloudy">대체로 흐림</string>
+    <string name="accu_weather_icon_7_cloudy">흐림</string>
+    <string name="accu_weather_icon_8_overcast">흐림</string>
+    <string name="accu_weather_icon_11_fog">안개</string>
+    <string name="accu_weather_icon_12_showers">소나기</string>
+    <string name="accu_weather_icon_13_mostly_cloudy_and_showers">대체로 흐리고 소나기</string>
+    <string name="accu_weather_icon_14_partly_sunny_and_showers">조금 맑고 소나기</string>
+    <string name="accu_weather_icon_15_thunderstorms">뇌우</string>
+    <string name="accu_weather_icon_16_mostly_cloudy_and_thunderstorms">대체로 흐리고 뇌우</string>
+    <string name="accu_weather_icon_17_partly_sunny_and_thunderstorms">조금 맑고 뇌우</string>
+    <string name="accu_weather_icon_18_rain">비</string>
+    <string name="accu_weather_icon_19_flurries">눈보라</string>
+    <string name="accu_weather_icon_20_mostly_cloudy_and_flurries">대체로 흐리고 눈보라</string>
+    <string name="accu_weather_icon_21_partly_sunny_and_flurries">조금 맑고 눈보라</string>
+    <string name="accu_weather_icon_22_snow">눈</string>
+    <string name="accu_weather_icon_23_mostly_cloudy_and_snow">대체로 흐리고 눈</string>
+    <string name="accu_weather_icon_24_ice">결빙</string>
+    <string name="accu_weather_icon_25_sleet">진눈깨비</string>
+    <string name="accu_weather_icon_26_freezing_rain">어는비</string>
+    <string name="accu_weather_icon_29_rain_and_snow">비와 눈</string>
+    <string name="accu_weather_icon_30_hot">더움</string>
+    <string name="accu_weather_icon_31_cold">추움</string>
+    <string name="accu_weather_icon_32_wind">바람</string>
+    <string name="accu_weather_icon_33_clear">맑음</string>
+    <string name="accu_weather_icon_34_mostly_clear">대개 맑음</string>
+    <string name="accu_weather_icon_35_partly_cloudy">조금 흐림</string>
+    <string name="accu_weather_icon_36_intermittent_clouds">간헐적으로 구름</string>
+    <string name="accu_weather_icon_37_hazy_moonlight">흐릿한 달빛</string>
+    <string name="accu_weather_icon_38_mostly_cloudy">대체로 흐림</string>
+    <string name="accu_weather_icon_39_partly_cloudy_and_showers">조금 흐리고 소나기</string>
+    <string name="accu_weather_icon_40_mostly_cloudy_and_showers">대체로 흐리고 소나기</string>
+    <string name="accu_weather_icon_41_partly_cloudy_and_thunderstorms">조금 흐리고 뇌우</string>
+    <string name="accu_weather_icon_42_mostly_cloudy_and_thunderstorms">대체로 흐리고 뇌우</string>
+    <string name="accu_weather_icon_43_mostly_cloudy_and_flurries">대체로 흐리고 눈보라</string>
+    <string name="accu_weather_icon_44_mostly_cloudy_and_snow">대체로 흐리고 눈</string>
+
+    <!-- open weather map weather icon text -->
+    <string name="owm_icon_200_thunderstorm_with_light_rain">가벼운 비를 동반한 뇌우</string>
+    <string name="owm_icon_201_thunderstorm_with_rain">비를 동반한 뇌우</string>
+    <string name="owm_icon_202_thunderstorm_with_heavy_rain">많은 비를 동반한 뇌우</string>
+    <string name="owm_icon_210_light_thunderstorm">가벼운 뇌우</string>
+    <string name="owm_icon_211_thunderstorm">뇌우</string>
+    <string name="owm_icon_212_heavy_thunderstorm">심한 뇌우</string>
+    <string name="owm_icon_221_ragged_thunderstorm">심한 뇌우</string>
+    <string name="owm_icon_230_thunderstorm_with_light_drizzle">가벼운 가랑비를 동반한 뇌우</string>
+    <string name="owm_icon_231_thunderstorm_with_drizzle">가랑비를 동반한 뇌우</string>
+    <string name="owm_icon_232_thunderstorm_with_heavy_drizzle">심한 가랑비를 동반한 뇌우</string>
+
+    <string name="owm_icon_300_light_intensity_drizzle">약한 이슬비</string>
+    <string name="owm_icon_301_drizzle">가랑비</string>
+    <string name="owm_icon_302_heavy_intensity_drizzle">굵은 이슬비</string>
+    <string name="owm_icon_310_light_intensity_drizzle_rain">약한 이슬비</string>
+    <string name="owm_icon_311_drizzle_rain">이슬비</string>
+    <string name="owm_icon_312_heavy_intensity_drizzle_rain">심한 이슬비</string>
+    <string name="owm_icon_313_shower_rain_and_drizzle">소나기와 가랑비</string>
+    <string name="owm_icon_314_heavy_shower_rain_and_drizzle">심한 소나기와 가랑비</string>
+    <string name="owm_icon_321_shower_drizzle">이슬비</string>
+
+    <string name="owm_icon_500_light_rain">가벼운 비</string>
+    <string name="owm_icon_501_moderate_rain">적당한 비</string>
+    <string name="owm_icon_502_heavy_intensity_rain">집중호우</string>
+    <string name="owm_icon_503_very_heavy_rain">매우 많은 비</string>
+    <string name="owm_icon_504_extreme_rain">매우 많은 비</string>
+    <string name="owm_icon_511_freezing_rain">어는비</string>
+    <string name="owm_icon_520_light_intensity_shower_rain">약한 소나기</string>
+    <string name="owm_icon_521_shower_rain">소나기</string>
+    <string name="owm_icon_522_heavy_intensity_shower_rain">강한 소나기</string>
+    <string name="owm_icon_531_ragged_shower_rain">너덜너덜 내리는 소나기</string>
+
+    <string name="owm_icon_600_light_snow">가벼운 눈</string>
+    <string name="owm_icon_601_snow">눈</string>
+    <string name="owm_icon_602_heavy_snow">많은 눈</string>
+    <string name="owm_icon_611_sleet">진눈깨비</string>
+    <string name="owm_icon_612_light_shower_sleet">가벼운 소나기 진눈깨비</string>
+    <string name="owm_icon_613_shower_sleet">소나기 진눈깨비</string>
+    <string name="owm_icon_615_light_rain_and_snow">가벼운 비와 눈</string>
+    <string name="owm_icon_616_rain_and_snow">비와 눈</string>
+    <string name="owm_icon_620_light_shower_snow">가벼운 소나기 눈</string>
+    <string name="owm_icon_621_shower_snow">소나기 눈</string>
+    <string name="owm_icon_622_heavy_shower_snow">폭설</string>
+
+    <string name="owm_icon_701_mist">박무</string>
+    <string name="owm_icon_711_smoke">Smoke</string>
+    <string name="owm_icon_721_haze">연무</string>
+    <string name="owm_icon_731_dust">황사</string>
+    <string name="owm_icon_741_fog">안개</string>
+    <string name="owm_icon_751_sand">모래</string>
+    <string name="owm_icon_761_dust">황사</string>
+    <string name="owm_icon_762_volcanic_ash">화산재</string>
+    <string name="owm_icon_771_squalls">스콜</string>
+    <string name="owm_icon_781_tornado">토네이도</string>
+
+    <string name="owm_icon_800_clear">맑음</string>
+    <string name="owm_icon_801_few_clouds">구름 조금</string>
+    <string name="owm_icon_802_scattered_clouds">흩어진 구름</string>
+    <string name="owm_icon_803_broken_clouds">부서진 구름</string>
+    <string name="owm_icon_804_overcast_clouds">흐림</string>
+
+    <!-- kma sky text -->
+    <string name="kma_sky_1_clear">맑음</string>
+    <string name="kma_sky_3_mostly_cloudy">구름 많음</string>
+    <string name="kma_sky_4_overcast">흐림</string>
+
+    <string name="kma_pty_0">없음</string>
+    <string name="kma_pty_1">비</string>
+    <string name="kma_pty_2">비/눈</string>
+    <string name="kma_pty_3">눈</string>
+    <string name="kma_pty_4">소나기</string>
+    <string name="kma_pty_5">빗방울</string>
+    <string name="kma_pty_6">빗방울눈날림</string>
+    <string name="kma_pty_7">눈날림</string>
+
+    <string name="kma_mid_clear">맑음</string>
+    <string name="kma_mid_mostly_cloudy">구름많음</string>
+    <string name="kma_mid_mostly_cloudy_rain">구름많고 비</string>
+    <string name="kma_mid_mostly_cloudy_snow">구름많고 눈</string>
+    <string name="kma_mid_mostly_cloudy_rain_and_snow">구름많고 비/눈</string>
+    <string name="kma_mid_mostly_cloudy_shower">구름많고 소나기</string>
+    <string name="kma_mid_overcast">흐림</string>
+    <string name="kma_mid_overcast_rain">흐리고 비</string>
+    <string name="kma_mid_overcast_snow">흐리고 눈</string>
+    <string name="kma_mid_overcast_rain_and_snow">흐리고 비/눈</string>
+    <string name="kma_mid_overcast_shower">흐리고 소나기</string>
+    <string name="kma_mid_shower">소나기</string>
+
 </resources>
