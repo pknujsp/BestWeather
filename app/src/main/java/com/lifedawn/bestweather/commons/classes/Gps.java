@@ -47,6 +47,7 @@ public class Gps {
 
 						if (!isCompleted) {
 							isCompleted = true;
+							clear();
 							callback.onSuccessful(location);
 						}
 					}

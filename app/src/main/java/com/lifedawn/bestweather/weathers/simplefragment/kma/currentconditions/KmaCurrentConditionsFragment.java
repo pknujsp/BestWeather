@@ -8,10 +8,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.lifedawn.bestweather.databinding.FragmentKmaCurrentConditionsBinding;
+import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
 
 public class KmaCurrentConditionsFragment extends Fragment {
-	private FragmentKmaCurrentConditionsBinding binding;
+	private BaseLayoutSimpleCurrentConditionsBinding binding;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -22,7 +22,7 @@ public class KmaCurrentConditionsFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
-		binding = FragmentKmaCurrentConditionsBinding.inflate(inflater);
+		binding = BaseLayoutSimpleCurrentConditionsBinding.inflate(inflater);
 		return binding.getRoot();
 	}
 }

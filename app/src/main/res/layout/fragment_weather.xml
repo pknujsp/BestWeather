@@ -1,87 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.core.widget.NestedScrollView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/transparent">
+        android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:id="@+id/weather_root_layout"
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:background="@color/transparent">
 
-            <TextView
-                android:id="@+id/address_name"
-                style="@style/text_shadow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="32dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginBottom="4dp"
-                android:text="주소명"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="19sp" />
-
-            <TextView
-                android:id="@+id/updated_datetime"
-                style="@style/text_shadow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/address_name"
-                android:layout_alignRight="@id/address_name"
-                android:layout_marginBottom="150dp"
-                android:text="업데이트 시각"
-                android:textAlignment="viewEnd"
-                android:textColor="@color/white"
-                android:textSize="14sp" />
-
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/current_conditions_simple"
+            <RelativeLayout
+                android:id="@+id/weather_root_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/updated_datetime"
-                android:layout_marginBottom="16dp" />
+                android:layout_height="wrap_content">
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/hourly_forecast_simple"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/current_conditions_simple"
-                android:layout_marginBottom="16dp" />
+                <TextView
+                    android:id="@+id/address_name"
+                    style="@style/text_shadow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="주소명"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="19sp" />
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/daily_forecast_simple"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/hourly_forecast_simple"
-                android:layout_marginBottom="16dp" />
+                <TextView
+                    android:id="@+id/updated_datetime"
+                    style="@style/text_shadow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/address_name"
+                    android:layout_alignRight="@id/address_name"
+                    android:layout_marginBottom="150dp"
+                    android:text="업데이트 시각"
+                    android:textAlignment="viewEnd"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/current_conditions_detail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/daily_forecast_simple"
-                android:layout_marginBottom="16dp" />
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/current_conditions_simple"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/updated_datetime"
+                    android:layout_marginBottom="16dp" />
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/air_quality_simple"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/current_conditions_detail"
-                android:layout_marginBottom="16dp" />
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/hourly_forecast_simple"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/current_conditions_simple"
+                    android:layout_marginBottom="16dp" />
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/sun_set_rise"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/air_quality_simple"
-                android:layout_marginBottom="16dp" />
-        </RelativeLayout>
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/daily_forecast_simple"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/hourly_forecast_simple"
+                    android:layout_marginBottom="16dp" />
 
-    </androidx.core.widget.NestedScrollView>
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/current_conditions_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/daily_forecast_simple"
+                    android:layout_marginBottom="16dp" />
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/air_quality_simple"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/current_conditions_detail"
+                    android:layout_marginBottom="16dp" />
+
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/sun_set_rise"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/air_quality_simple"
+                    android:layout_marginBottom="16dp" />
+            </RelativeLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <com.lifedawn.bestweather.commons.views.CustomProgressView
+            android:layout_width="match_parent"
+            android:id="@+id/custom_progress_view"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
 </layout>

@@ -6,7 +6,7 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 
 import java.util.Map;
 
-public class getPhotosFromGalleryParameter {
+public class FlickrGetPhotosFromGalleryParameter {
 	private String galleryId;
 
 	public Map<String, String> getMap() {
@@ -16,6 +16,7 @@ public class getPhotosFromGalleryParameter {
 		map.put("api_key", RetrofitClient.FLICKR_KEY);
 		map.put("gallery_id", galleryId);
 		map.put("format", "json");
+		map.put("nojsoncallback", "1");
 		return map;
 	}
 

@@ -17,34 +17,49 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.databinding.FragmentWeatherMainBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
+import com.lifedawn.bestweather.retrofit.client.Querys;
+import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.parameters.flickr.FlickrGetPhotosFromGalleryParameter;
+import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 import com.lifedawn.bestweather.weathers.viewpager.WeatherViewPagerAdapter;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class WeatherMainFragment extends Fragment implements IGps {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class WeatherMainFragment extends Fragment implements IGps, WeatherViewModel.ILoadImgOfCurrentConditions {
 	private FragmentWeatherMainBinding binding;
 	private View.OnClickListener menuOnClickListener;
 	private FavoriteAddressRepository favoriteAddressRepository;
 	private WeatherViewPagerAdapter weatherViewPagerAdapter;
 	private Gps gps;
+	private WeatherViewModel weatherViewModel;
 
 	public WeatherMainFragment(View.OnClickListener menuOnClickListener) {
 		this.menuOnClickListener = menuOnClickListener;
@@ -55,6 +70,9 @@ public class WeatherMainFragment extends Fragment implements IGps {
 		super.onCreate(savedInstanceState);
 		favoriteAddressRepository = new FavoriteAddressRepository(getContext());
 		gps = new Gps();
+
+		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
+		weatherViewModel.setiLoadImgOfCurrentConditions(this);
 	}
 
 	@Override
@@ -78,6 +96,7 @@ public class WeatherMainFragment extends Fragment implements IGps {
 				}
 			}
 		});
+
 		binding.mainToolbar.find.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -85,6 +104,13 @@ public class WeatherMainFragment extends Fragment implements IGps {
 				getParentFragmentManager().beginTransaction().hide(WeatherMainFragment.this)
 						.add(R.id.fragment_container, findAddressFragment, getString(R.string.tag_find_address_fragment))
 						.addToBackStack(getString(R.string.tag_find_address_fragment)).commit();
+			}
+		});
+
+		binding.mainToolbar.refresh.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
 			}
 		});
 
@@ -195,5 +221,35 @@ public class WeatherMainFragment extends Fragment implements IGps {
 	@Override
 	public void setUseGps() {
 		binding.mainToolbar.gps.callOnClick();
+	}
+
+	@Override
+	public void loadImgOfCurrentConditions(String val) {
+		FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
+		photosFromGalleryParameter.setGalleryId("72157719980390655");
+
+		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
+		Call<JsonElement> call = querys.getPhotosFromGallery(photosFromGalleryParameter.getMap());
+		call.enqueue(new Callback<JsonElement>() {
+			@Override
+			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+				Gson gson = new Gson();
+				PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
+						PhotosFromGalleryResponse.class);
+
+				// https://live.staticflickr.com/65535/50081787401_355bcec912_b.jpg
+				// https://live.staticflickr.com/server/id_secret_size.jpg
+				final String url = "https://live.staticflickr.com/" + photosFromGalleryResponse.getPhotos().getPhoto().get(0).getServer()
+						+ "/" + photosFromGalleryResponse.getPhotos().getPhoto().get(0).getId() + "_" +
+						photosFromGalleryResponse.getPhotos().getPhoto().get(0).getSecret() + "_b.jpg";
+
+				Glide.with(WeatherMainFragment.this).load(url).into(binding.currentConditionsImg);
+			}
+
+			@Override
+			public void onFailure(Call<JsonElement> call, Throwable t) {
+
+			}
+		});
 	}
 }

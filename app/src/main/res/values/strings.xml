@@ -56,6 +56,10 @@
     <string name="pref_summary_open_weather_map">OpenWeatherMap 설명</string>
     <string name="pref_title_open_weather_map">OpenWeatherMap</string>
 
+    <string name="pref_key_kma">pref_key_kma</string>
+    <string name="pref_summary_kma">Kma 설명</string>
+    <string name="pref_title_kma">Kma</string>
+
     <string name="pref_key_use_current_location">pref_key_use_current_location</string>
     <string name="pref_summary_use_current_location">GPS를 통해 현재 위치의 날씨를 표시</string>
     <string name="pref_title_use_current_location">현재 위치 사용</string>
@@ -68,6 +72,8 @@
 
     <string name="pref_key_last_current_location_latitude">pref_key_last_current_location_latitude</string>
     <string name="pref_key_last_current_location_longitude">pref_key_last_current_location_longitude</string>
+
+    <string name="pref_key_main_weather_data_source">pref_key_main_weather_data_source</string>
 
     <string name="black">검정</string>
     <string name="white">하양</string>
@@ -87,6 +93,7 @@
     <string name="tag_weather_main_fragment">tag_weather_main_fragment</string>
     <string name="tag_units_fragment">tag_units_fragment</string>
     <string name="tag_weather_data_sources_fragment">tag_weather_data_sources_fragment</string>
+    <string name="tag_find_address_fragment">tag_find_address_fragment</string>
 
     <string name="message_request_double_click_for_close">한번 더 누르면 종료됩니다</string>
     <!-- TODO: Remove or change this placeholder text -->
@@ -95,7 +102,6 @@
     <string name="msg_at_least_one_must_be_selected">최소 하나는 선택되어야 합니다</string>
 
 
-    <string name="tag_find_address_fragment">tag_find_address_fragment</string>
     <string name="hint_input_address">주소명 입력</string>
     <string name="find_address">주소 검색</string>
     <string name="not_search_result">검색결과가 없습니다</string>
@@ -109,5 +115,7 @@
     <string name="message_needs_location_permission">위치 사용 권한이 필요합니다</string>
     <string name="update_failed">업데이트 실패</string>
     <string name="msg_finding_current_location">현재 위치 파악중</string>
+    <string name="msg_refreshing_weather_data">날씨 자료 업데이트 중</string>
+    <string name="main_datasource">기본 날씨 제공사</string>
 
 </resources>

@@ -1,5 +1,8 @@
 package com.lifedawn.bestweather.retrofit.client;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -21,7 +24,7 @@ public class RetrofitClient {
 	public static final String DEFAULT_OPEN_WEATHER_MAP_SERVICE_URL = "https://api.openweathermap.org/";
 	public static final String PRO_OPEN_WEATHER_MAP_SERVICE_URL = "https://pro.openweathermap.org/";
 	//flickr
-	public static final String FLICKR_SERVICE_URL = "https://www.flickr.com/services/rest/";
+	public static final String FLICKR_SERVICE_URL = "https://www.flickr.com/services/";
 
 	//service key, token
 	public static final String VILAGE_FCST_INFO_SERVICE_SERVICE_KEY = "T2nJm9zlOA0Z7Dut%2BThT6Jp0Itn0zZw80AUP3uMdOWlZJR1gVPkx9p1t8etuSW1kWsSNrGGHKdxbwr1IUlt%2Baw%3D%3D";
@@ -98,9 +101,10 @@ public class RetrofitClient {
 				return owmProInstance.create(Querys.class);
 
 			case FLICKR:
-				Retrofit flickrInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						FLICKR_SERVICE_URL).build();
+				Retrofit flickrInstance = new Retrofit.Builder().client(client)
+						.addConverterFactory(GsonConverterFactory.create())
+						.addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
+								FLICKR_SERVICE_URL).build();
 				return flickrInstance.create(Querys.class);
 
 			default:

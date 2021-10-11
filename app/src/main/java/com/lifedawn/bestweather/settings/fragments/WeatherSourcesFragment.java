@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.settings.fragments;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,6 +19,8 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.FragmentWeatherSourcesBinding;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Locale;
 
 public class WeatherSourcesFragment extends Fragment {
 	private FragmentWeatherSourcesBinding binding;
@@ -44,6 +47,20 @@ public class WeatherSourcesFragment extends Fragment {
 		binding.accuWeather.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_accu_weather), true));
 		binding.openWeatherMap.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_open_weather_map), true));
 
+		Locale locale;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			locale = getResources().getConfiguration().getLocales().get(0);
+		} else {
+			locale = getResources().getConfiguration().locale;
+		}
+		String country = locale.getCountry();
+
+		if (country.equals("KR")) {
+
+		} else {
+			binding.kmaLayout.setVisibility(View.GONE);
+		}
+
 		binding.accuWeather.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -57,6 +74,18 @@ public class WeatherSourcesFragment extends Fragment {
 		});
 
 		binding.openWeatherMap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (!isChecked && !binding.accuWeather.isChecked()) {
+					Toast.makeText(getContext(), R.string.msg_at_least_one_must_be_selected, Toast.LENGTH_SHORT).show();
+					binding.openWeatherMap.setChecked(true);
+					return;
+				}
+				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_open_weather_map), isChecked).apply();
+			}
+		});
+
+		binding.kma.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (!isChecked && !binding.accuWeather.isChecked()) {

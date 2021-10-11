@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.preference.PreferenceManager;
 import android.util.ArrayMap;
@@ -39,6 +40,7 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.MainProcessing;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -52,6 +54,8 @@ public class WeatherFragment extends Fragment {
 	private FavoriteAddressDto selectedAddress;
 	private FavoriteAddressType favoriteAddressType;
 	private IGps iGps;
+	private WeatherViewModel.ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions;
+	private WeatherViewModel weatherViewModel;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -62,6 +66,9 @@ public class WeatherFragment extends Fragment {
 		if (favoriteAddressType == FavoriteAddressType.SelectedAddress) {
 			selectedAddress = (FavoriteAddressDto) bundle.getSerializable(getString(R.string.bundle_key_selected_address));
 		}
+
+		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
+		iLoadImgOfCurrentConditions = weatherViewModel.getiLoadImgOfCurrentConditions();
 	}
 
 	@Override
@@ -74,6 +81,7 @@ public class WeatherFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		binding.customProgressView.setContentView(binding.scrollView);
 
 		if (favoriteAddressType == FavoriteAddressType.SelectedAddress) {
 			binding.addressName.setText(selectedAddress.getAddress());
@@ -131,6 +139,8 @@ public class WeatherFragment extends Fragment {
 	}
 
 	private void refresh(Double latitude, Double longitude, String countryCode) {
+		binding.customProgressView.onStartedProcessingData(getString(R.string.msg_refreshing_weather_data));
+
 		Set<MainProcessing.WeatherSourceType> weatherSourceTypeSet = new ArraySet<>();
 		weatherSourceTypeSet.add(MainProcessing.WeatherSourceType.AQICN);
 
@@ -147,6 +157,7 @@ public class WeatherFragment extends Fragment {
 		}
 
 		Log.e(RetrofitClient.LOG_TAG, "날씨 정보 요청, " + weatherSourceTypeSet.toString());
+		iLoadImgOfCurrentConditions.loadImgOfCurrentConditions(null);
 		/*
 		MainProcessing.downloadWeatherData(getContext(), latitude.toString(), longitude.toString(), weatherSourceTypeSet
 				, new MultipleJsonDownloader<JsonElement>() {
@@ -163,6 +174,7 @@ public class WeatherFragment extends Fragment {
 				});
 
 		 */
+		binding.customProgressView.onSuccessfulProcessingData();
 	}
 
 	public FavoriteAddressType getFavoriteAddressType() {
