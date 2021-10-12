@@ -243,4 +243,30 @@
     </array>
 
     <array name="KmaPtyIconDrawableIdsForCode"></array>
+
+    <array name="AqiGrades">
+        <item>50</item>
+        <item>100</item>
+        <item>150</item>
+        <item>200</item>
+        <item>300</item>
+    </array>
+
+    <array name="AqiGradeColors">
+        <item>@color/aqi_1_good</item>
+        <item>@color/aqi_2_Moderate</item>
+        <item>@color/aqi_3_unhealthy_for_sensitive_groups</item>
+        <item>@color/aqi_4_unhealthy</item>
+        <item>@color/aqi_5_very_unhealthy</item>
+        <item>@color/aqi_6_hazardous</item>
+    </array>
+
+    <array name="AqiGradeDescriptions">
+        <item>@string/aqi_1_good</item>
+        <item>@string/aqi_2_Moderate</item>
+        <item>@string/aqi_3_unhealthy_for_sensitive_groups</item>
+        <item>@string/aqi_4_unhealthy</item>
+        <item>@string/aqi_5_very_unhealthy</item>
+        <item>@string/aqi_6_hazardous</item>
+    </array>
 </resources>

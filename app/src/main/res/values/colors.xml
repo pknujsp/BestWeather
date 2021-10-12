@@ -11,4 +11,12 @@
     <color name="app_theme_black">#151515</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="weather_card_background_color">#4D000000</color>
+
+    <!-- aqi grade color -->
+    <color name="aqi_1_good">#009966</color>
+    <color name="aqi_2_Moderate">#ffde33</color>
+    <color name="aqi_3_unhealthy_for_sensitive_groups">#ff9933</color>
+    <color name="aqi_4_unhealthy">#cc0033</color>
+    <color name="aqi_5_very_unhealthy">#660099</color>
+    <color name="aqi_6_hazardous">#7e0023</color>
 </resources>

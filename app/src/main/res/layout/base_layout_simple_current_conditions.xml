@@ -62,6 +62,7 @@
                     android:textSize="52sp" />
 
                 <GridLayout
+                    android:id="@+id/air_quality_in_current_conditions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"

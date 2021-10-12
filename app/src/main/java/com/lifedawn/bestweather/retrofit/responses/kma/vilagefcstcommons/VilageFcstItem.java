@@ -25,7 +25,7 @@ public class VilageFcstItem {
 	private String fcstTime;
 	
 	@Expose
-	@SerializedName("fcstValue")
+	@SerializedName(value = "fcstValue", alternate = {"fcstValue", "obsrValue"})
 	private String fcstValue;
 	
 	@Expose

@@ -43,6 +43,85 @@ public class GeolocalizedFeedResponse {
 		@SerializedName("dominentpol")
 		private String dominentPol;
 		
+		@Expose
+		@SerializedName("city")
+		private City city;
+		
+		@Expose
+		@SerializedName("iaqi")
+		private IAqi iaqi;
+		
+		@Expose
+		@SerializedName("time")
+		private Time time;
+		
+		@Expose
+		@SerializedName("forecast")
+		private Forecast forecast;
+		
+		public City getCity() {
+			return city;
+		}
+		
+		public Data setCity(City city) {
+			this.city = city;
+			return this;
+		}
+		
+		public IAqi getIaqi() {
+			return iaqi;
+		}
+		
+		public Data setIaqi(IAqi iaqi) {
+			this.iaqi = iaqi;
+			return this;
+		}
+		
+		public Time getTime() {
+			return time;
+		}
+		
+		public Data setTime(Time time) {
+			this.time = time;
+			return this;
+		}
+		
+		public Forecast getForecast() {
+			return forecast;
+		}
+		
+		public Data setForecast(Forecast forecast) {
+			this.forecast = forecast;
+			return this;
+		}
+		
+		public String getAqi() {
+			return aqi;
+		}
+		
+		public Data setAqi(String aqi) {
+			this.aqi = aqi;
+			return this;
+		}
+		
+		public String getIdx() {
+			return idx;
+		}
+		
+		public Data setIdx(String idx) {
+			this.idx = idx;
+			return this;
+		}
+		
+		public String getDominentPol() {
+			return dominentPol;
+		}
+		
+		public Data setDominentPol(String dominentPol) {
+			this.dominentPol = dominentPol;
+			return this;
+		}
+		
 		public static class City {
 			@Expose
 			@SerializedName("geo")

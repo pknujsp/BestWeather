@@ -118,6 +118,14 @@
     <string name="msg_refreshing_weather_data">날씨 자료 업데이트 중</string>
     <string name="main_datasource">기본 날씨 제공사</string>
 
+    <!-- accu weather precipitation type -->
+    <string name="accu_weather_pty_rain">비</string>
+    <string name="accu_weather_pty_snow">눈</string>
+    <string name="accu_weather_pty_ice">결빙</string>
+    <string name="accu_weather_pty_not">강수없음</string>
+    <string name="accu_weather_pty_mixed">비와 눈</string>
+
+
     <!-- accu weather weather icon text -->
     <string name="accu_weather_icon_1_sunny">맑음</string>
     <string name="accu_weather_icon_2_mostly_sunny">대개 맑음</string>
@@ -248,5 +256,13 @@
     <string name="kma_mid_overcast_rain_and_snow">흐리고 비/눈</string>
     <string name="kma_mid_overcast_shower">흐리고 소나기</string>
     <string name="kma_mid_shower">소나기</string>
+
+    <!-- aqi grade -->
+    <string name="aqi_1_good">좋음</string>
+    <string name="aqi_2_Moderate">보통</string>
+    <string name="aqi_3_unhealthy_for_sensitive_groups">약간 나쁨</string>
+    <string name="aqi_4_unhealthy">나쁨</string>
+    <string name="aqi_5_very_unhealthy">매우 나쁨</string>
+    <string name="aqi_6_hazardous">비상사태</string>
 
 </resources>

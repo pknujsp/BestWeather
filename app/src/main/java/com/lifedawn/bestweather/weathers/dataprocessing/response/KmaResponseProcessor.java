@@ -4,14 +4,23 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.ClockUtil;
+import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstItem;
+import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstItems;
+import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstRoot;
+import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaItem;
+import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaItems;
+import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtfcstresponse.UltraSrtFcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtncstresponse.UltraSrtNcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstcommons.VilageFcstItem;
 import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstcommons.VilageFcstItems;
 import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse.VilageFcstRoot;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -20,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class KmaResponseProcessor {
 	private static final Map<String, String> WEATHER_SKY_ICON_DESCRIPTION_MAP = new HashMap<>();
@@ -85,15 +95,7 @@ public class KmaResponseProcessor {
 	
 	public static FinalCurrentConditions getFinalCurrentConditions(UltraSrtNcstRoot ultraSrtNcstRoot) {
 		FinalCurrentConditions finalCurrentConditions = new FinalCurrentConditions();
-		VilageFcstItems ultraSrtNcstItems = ultraSrtNcstRoot.getResponse().getBody().getItems();
-		List<VilageFcstItem> items = ultraSrtNcstItems.getItem();
-		
-		final String T1H = "T1H";
-		final String RN1 = "RN1";
-		final String REH = "REH";
-		final String PTY = "PTY";
-		final String VEC = "VEC";
-		final String WSD = "WSD";
+		List<VilageFcstItem> items = ultraSrtNcstRoot.getResponse().getBody().getItems().getItem();
 		
 		for (VilageFcstItem item : items) {
 			if (item.getCategory().equals(T1H)) {
@@ -116,14 +118,14 @@ public class KmaResponseProcessor {
 	public static List<FinalHourlyForecast> getFinalHourlyForecastList(UltraSrtFcstRoot ultraSrtFcstRoot, VilageFcstRoot vilageFcstRoot) {
 		List<VilageFcstItem> ultraSrtFcstItemList = ultraSrtFcstRoot.getResponse().getBody().getItems().getItem();
 		List<VilageFcstItem> vilageItemList = vilageFcstRoot.getResponse().getBody().getItems().getItem();
-		Map<Long, List<VilageFcstItem>> hourDataListMap = new HashMap();
+		Map<Long, List<VilageFcstItem>> hourDataListMap = new HashMap<>();
 		
 		long newDateTime = 0L;
 		long lastDateTime = 0L;
 		
 		//데이터를 날짜별로 분류해서 map에 저장
 		for (VilageFcstItem item : ultraSrtFcstItemList) {
-			newDateTime = Long.parseLong(new String(item.getFcstDate() + item.getFcstTime()));
+			newDateTime = Long.parseLong(item.getFcstDate() + item.getFcstTime());
 			if (newDateTime > lastDateTime) {
 				hourDataListMap.put(newDateTime, new ArrayList<>());
 				lastDateTime = newDateTime;
@@ -134,7 +136,7 @@ public class KmaResponseProcessor {
 		final long lastDateTimeLongOfUltraSrtFcst = lastDateTime;
 		
 		for (VilageFcstItem item : vilageItemList) {
-			newDateTime = Long.parseLong(new String(item.getFcstDate() + item.getFcstTime()));
+			newDateTime = Long.parseLong(item.getFcstDate() + item.getFcstTime());
 			
 			if (newDateTime > lastDateTimeLongOfUltraSrtFcst) {
 				if (newDateTime > lastDateTime) {
@@ -146,22 +148,20 @@ public class KmaResponseProcessor {
 		}
 		
 		List<FinalHourlyForecast> finalHourlyForecastList = new ArrayList<>();
+		Calendar calendar = Calendar.getInstance();
+		String fcstDate = null;
+		String fcstTime = null;
 		
 		for (Map.Entry<Long, List<VilageFcstItem>> entry : hourDataListMap.entrySet()) {
 			FinalHourlyForecast finalHourlyForecast = new FinalHourlyForecast();
 			List<VilageFcstItem> hourlyFcstItems = entry.getValue();
-			String date = hourlyFcstItems.get(0).getFcstDate();
-			String time = hourlyFcstItems.get(0).getFcstTime().substring(0, 2);
+			fcstDate = hourlyFcstItems.get(0).getFcstDate();
+			fcstTime = hourlyFcstItems.get(0).getFcstTime().substring(0, 2);
 			
-			int year = Integer.parseInt(date.substring(0, 4));
-			int month = Integer.parseInt(date.substring(4, 6));
-			int day = Integer.parseInt(date.substring(6, 8));
-			int hour = Integer.parseInt(time.substring(0, 2));
+			calendar.set(Integer.parseInt(fcstDate.substring(0, 4)), Integer.parseInt(fcstDate.substring(4, 6)) - 1,
+					Integer.parseInt(fcstDate.substring(6, 8)), Integer.parseInt(fcstTime), 0, 0);
 			
-			Calendar calendar = Calendar.getInstance();
-			calendar.set(year, month - 1, day, hour, 0, 0);
-			
-			finalHourlyForecast.setFcstDateTime(calendar.getTime());
+			finalHourlyForecast.setFcstDateTime(calendar.getTime().getTime());
 			
 			for (VilageFcstItem item : hourlyFcstItems) {
 				if (item.getCategory().equals(POP)) {
@@ -205,5 +205,59 @@ public class KmaResponseProcessor {
 		});
 		
 		return finalHourlyForecastList;
+	}
+	
+	public static List<FinalDailyForecast> getFinalDailyForecastList(MidLandFcstRoot midLandFcstRoot, MidTaRoot midTaRoot, Long tmFc) {
+		//중기예보 데이터 생성 3~10일후
+		Calendar calendar = Calendar.getInstance(ClockUtil.KR_TIMEZONE);
+		calendar.setTimeInMillis(tmFc);
+		//3일 후로 이동
+		calendar.add(Calendar.DATE, 3);
+		
+		MidLandFcstItem midLandFcstData = midLandFcstRoot.getResponse().getBody().getItems().getItem().get(0);
+		MidTaItem midTaFcstData = midTaRoot.getResponse().getBody().getItems().getItem().get(0);
+		List<FinalDailyForecast> finalDailyForecastList = new ArrayList<>();
+		
+		finalDailyForecastList.add(new FinalDailyForecast(calendar.getTime(), midLandFcstData.getWf3Am(), midLandFcstData.getWf3Pm(),
+				midLandFcstData.getRnSt3Am(), midLandFcstData.getRnSt3Pm(), midTaFcstData.getTaMin3(), midTaFcstData.getTaMax3()));
+		
+		calendar.add(Calendar.DATE, 1);
+		
+		finalDailyForecastList.add(new FinalDailyForecast(calendar.getTime(), midLandFcstData.getWf4Am(), midLandFcstData.getWf4Pm(),
+				midLandFcstData.getRnSt4Am(), midLandFcstData.getRnSt4Pm(), midTaFcstData.getTaMin4(), midTaFcstData.getTaMax4()));
+		
+		calendar.add(Calendar.DATE, 1);
+		
+		finalDailyForecastList.add(new FinalDailyForecast(calendar.getTime(), midLandFcstData.getWf5Am(), midLandFcstData.getWf5Pm(),
+				midLandFcstData.getRnSt5Am(), midLandFcstData.getRnSt5Pm(), midTaFcstData.getTaMin5(), midTaFcstData.getTaMax5()));
+		
+		calendar.add(Calendar.DATE, 1);
+		
+		finalDailyForecastList.add(new FinalDailyForecast(calendar.getTime(), midLandFcstData.getWf6Am(), midLandFcstData.getWf6Pm(),
+				midLandFcstData.getRnSt6Am(), midLandFcstData.getRnSt6Pm(), midTaFcstData.getTaMin6(), midTaFcstData.getTaMax6()));
+		
+		calendar.add(Calendar.DATE, 1);
+		
+		finalDailyForecastList.add(new FinalDailyForecast(calendar.getTime(), midLandFcstData.getWf7Am(), midLandFcstData.getWf7Pm(),
+				midLandFcstData.getRnSt7Am(), midLandFcstData.getRnSt7Pm(), midTaFcstData.getTaMin7(), midTaFcstData.getTaMax7()));
+		
+		calendar.add(Calendar.DATE, 1);
+		
+		finalDailyForecastList.add(
+				new FinalDailyForecast(calendar.getTime(), midLandFcstData.getWf8(), midLandFcstData.getRnSt8(), midTaFcstData.getTaMin8(),
+						midTaFcstData.getTaMax8()));
+		
+		calendar.add(Calendar.DATE, 1);
+		
+		finalDailyForecastList.add(
+				new FinalDailyForecast(calendar.getTime(), midLandFcstData.getWf9(), midLandFcstData.getRnSt9(), midTaFcstData.getTaMin9(),
+						midTaFcstData.getTaMax9()));
+		
+		calendar.add(Calendar.DATE, 1);
+		
+		finalDailyForecastList.add(new FinalDailyForecast(calendar.getTime(), midLandFcstData.getWf10(), midLandFcstData.getRnSt10(),
+				midTaFcstData.getTaMin10(), midTaFcstData.getTaMax10()));
+		
+		return finalDailyForecastList;
 	}
 }
