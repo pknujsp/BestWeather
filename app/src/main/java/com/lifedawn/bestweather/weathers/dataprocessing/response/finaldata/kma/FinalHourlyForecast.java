@@ -1,8 +1,10 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma;
 
+import java.util.Date;
+
 public class FinalHourlyForecast {
 	
-	
+	private Date fcstDateTime;
 	//nx
 	private String nx;
 	//ny
@@ -31,6 +33,15 @@ public class FinalHourlyForecast {
 	private String windSpeed;
 	//낙뢰 LGT
 	private String lightning;
+	
+	public FinalHourlyForecast setFcstDateTime(Date fcstDateTime) {
+		this.fcstDateTime = fcstDateTime;
+		return this;
+	}
+	
+	public Date getFcstDateTime() {
+		return fcstDateTime;
+	}
 	
 	public String getNx() {
 		return nx;

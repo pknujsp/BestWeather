@@ -26,4 +26,67 @@ public class FinalCurrentConditions {
 		this.nx = nx;
 		return this;
 	}
+	
+	public String getNy() {
+		return ny;
+	}
+	
+	public FinalCurrentConditions setNy(String ny) {
+		this.ny = ny;
+		return this;
+	}
+	
+	public String getTemperature() {
+		return temperature;
+	}
+	
+	public FinalCurrentConditions setTemperature(String temperature) {
+		this.temperature = temperature;
+		return this;
+	}
+	
+	public String getPrecipitation1Hour() {
+		return precipitation1Hour;
+	}
+	
+	public FinalCurrentConditions setPrecipitation1Hour(String precipitation1Hour) {
+		this.precipitation1Hour = precipitation1Hour;
+		return this;
+	}
+	
+	public String getHumidity() {
+		return humidity;
+	}
+	
+	public FinalCurrentConditions setHumidity(String humidity) {
+		this.humidity = humidity;
+		return this;
+	}
+	
+	public String getPrecipitationType() {
+		return precipitationType;
+	}
+	
+	public FinalCurrentConditions setPrecipitationType(String precipitationType) {
+		this.precipitationType = precipitationType;
+		return this;
+	}
+	
+	public String getWindDirection() {
+		return windDirection;
+	}
+	
+	public FinalCurrentConditions setWindDirection(String windDirection) {
+		this.windDirection = windDirection;
+		return this;
+	}
+	
+	public String getWindSpeed() {
+		return windSpeed;
+	}
+	
+	public FinalCurrentConditions setWindSpeed(String windSpeed) {
+		this.windSpeed = windSpeed;
+		return this;
+	}
 }
