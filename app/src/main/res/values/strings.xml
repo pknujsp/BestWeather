@@ -227,14 +227,14 @@
     <string name="kma_sky_3_mostly_cloudy">구름 많음</string>
     <string name="kma_sky_4_overcast">흐림</string>
 
-    <string name="kma_pty_0">없음</string>
-    <string name="kma_pty_1">비</string>
-    <string name="kma_pty_2">비/눈</string>
-    <string name="kma_pty_3">눈</string>
-    <string name="kma_pty_4">소나기</string>
-    <string name="kma_pty_5">빗방울</string>
-    <string name="kma_pty_6">빗방울눈날림</string>
-    <string name="kma_pty_7">눈날림</string>
+    <string name="kma_pty_0_not">없음</string>
+    <string name="kma_pty_1_rain">비</string>
+    <string name="kma_pty_2_rain_and_snow">비/눈</string>
+    <string name="kma_pty_3_snow">눈</string>
+    <string name="kma_pty_4_showers">소나기</string>
+    <string name="kma_pty_5_raindrop">빗방울</string>
+    <string name="kma_pty_6_raindrop_and_snow_blizzard">빗방울눈날림</string>
+    <string name="kma_pty_7_snow_blizzard">눈날림</string>
 
     <string name="kma_mid_clear">맑음</string>
     <string name="kma_mid_mostly_cloudy">구름많음</string>

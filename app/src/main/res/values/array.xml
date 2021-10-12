@@ -43,6 +43,51 @@
         <item>44</item>
     </array>
 
+    <array name="AccuWeatherWeatherIconDescriptionsForCode">
+        <item>@string/accu_weather_icon_1_sunny</item>
+        <item>@string/accu_weather_icon_2_mostly_sunny</item>
+        <item>@string/accu_weather_icon_3_partly_sunny</item>
+        <item>@string/accu_weather_icon_4_intermittent_clouds</item>
+        <item>@string/accu_weather_icon_5_hazy_sunshine</item>
+        <item>@string/accu_weather_icon_6_mostly_cloudy</item>
+        <item>@string/accu_weather_icon_7_cloudy</item>
+        <item>@string/accu_weather_icon_8_overcast</item>
+        <item>@string/accu_weather_icon_11_fog</item>
+        <item>@string/accu_weather_icon_12_showers</item>
+        <item>@string/accu_weather_icon_13_mostly_cloudy_and_showers</item>
+        <item>@string/accu_weather_icon_14_partly_sunny_and_showers</item>
+        <item>@string/accu_weather_icon_15_thunderstorms</item>
+        <item>@string/accu_weather_icon_16_mostly_cloudy_and_thunderstorms</item>
+        <item>@string/accu_weather_icon_17_partly_sunny_and_thunderstorms</item>
+        <item>@string/accu_weather_icon_18_rain</item>
+        <item>@string/accu_weather_icon_19_flurries</item>
+        <item>@string/accu_weather_icon_20_mostly_cloudy_and_flurries</item>
+        <item>@string/accu_weather_icon_21_partly_sunny_and_flurries</item>
+        <item>@string/accu_weather_icon_22_snow</item>
+        <item>@string/accu_weather_icon_23_mostly_cloudy_and_snow</item>
+        <item>@string/accu_weather_icon_24_ice</item>
+        <item>@string/accu_weather_icon_25_sleet</item>
+        <item>@string/accu_weather_icon_26_freezing_rain</item>
+        <item>@string/accu_weather_icon_29_rain_and_snow</item>
+        <item>@string/accu_weather_icon_30_hot</item>
+        <item>@string/accu_weather_icon_31_cold</item>
+        <item>@string/accu_weather_icon_32_wind</item>
+        <item>@string/accu_weather_icon_33_clear</item>
+        <item>@string/accu_weather_icon_34_mostly_clear</item>
+        <item>@string/accu_weather_icon_35_partly_cloudy</item>
+        <item>@string/accu_weather_icon_36_intermittent_clouds</item>
+        <item>@string/accu_weather_icon_37_hazy_moonlight</item>
+        <item>@string/accu_weather_icon_38_mostly_cloudy</item>
+        <item>@string/accu_weather_icon_39_partly_cloudy_and_showers</item>
+        <item>@string/accu_weather_icon_40_mostly_cloudy_and_showers</item>
+        <item>@string/accu_weather_icon_41_partly_cloudy_and_thunderstorms</item>
+        <item>@string/accu_weather_icon_42_mostly_cloudy_and_thunderstorms</item>
+        <item>@string/accu_weather_icon_43_mostly_cloudy_and_flurries</item>
+        <item>@string/accu_weather_icon_44_mostly_cloudy_and_snow</item>
+    </array>
+
+    <array name="AccuWeatherWeatherIconDrawableIdsForCode"></array>
+
     <array name="OpenWeatherMapWeatherIconCodes">
         <item>200</item>
         <item>201</item>
@@ -101,12 +146,79 @@
         <item>804</item>
     </array>
 
+    <array name="OpenWeatherMapWeatherIconDescriptionsForCode">
+        <item>@string/owm_icon_200_thunderstorm_with_light_rain</item>
+        <item>@string/owm_icon_201_thunderstorm_with_rain</item>
+        <item>@string/owm_icon_202_thunderstorm_with_heavy_rain</item>
+        <item>@string/owm_icon_210_light_thunderstorm</item>
+        <item>@string/owm_icon_211_thunderstorm</item>
+        <item>@string/owm_icon_212_heavy_thunderstorm</item>
+        <item>@string/owm_icon_221_ragged_thunderstorm</item>
+        <item>@string/owm_icon_230_thunderstorm_with_light_drizzle</item>
+        <item>@string/owm_icon_231_thunderstorm_with_drizzle</item>
+        <item>@string/owm_icon_232_thunderstorm_with_heavy_drizzle</item>
+        <item>@string/owm_icon_300_light_intensity_drizzle</item>
+        <item>@string/owm_icon_301_drizzle</item>
+        <item>@string/owm_icon_302_heavy_intensity_drizzle</item>
+        <item>@string/owm_icon_310_light_intensity_drizzle_rain</item>
+        <item>@string/owm_icon_311_drizzle_rain</item>
+        <item>@string/owm_icon_312_heavy_intensity_drizzle_rain</item>
+        <item>@string/owm_icon_313_shower_rain_and_drizzle</item>
+        <item>@string/owm_icon_314_heavy_shower_rain_and_drizzle</item>
+        <item>@string/owm_icon_321_shower_drizzle</item>
+        <item>@string/owm_icon_500_light_rain</item>
+        <item>@string/owm_icon_501_moderate_rain</item>
+        <item>@string/owm_icon_502_heavy_intensity_rain</item>
+        <item>@string/owm_icon_503_very_heavy_rain</item>
+        <item>@string/owm_icon_504_extreme_rain</item>
+        <item>@string/owm_icon_511_freezing_rain</item>
+        <item>@string/owm_icon_520_light_intensity_shower_rain</item>
+        <item>@string/owm_icon_521_shower_rain</item>
+        <item>@string/owm_icon_522_heavy_intensity_shower_rain</item>
+        <item>@string/owm_icon_531_ragged_shower_rain</item>
+        <item>@string/owm_icon_600_light_snow</item>
+        <item>@string/owm_icon_601_snow</item>
+        <item>@string/owm_icon_602_heavy_snow</item>
+        <item>@string/owm_icon_611_sleet</item>
+        <item>@string/owm_icon_612_light_shower_sleet</item>
+        <item>@string/owm_icon_613_shower_sleet</item>
+        <item>@string/owm_icon_615_light_rain_and_snow</item>
+        <item>@string/owm_icon_616_rain_and_snow</item>
+        <item>@string/owm_icon_620_light_shower_snow</item>
+        <item>@string/owm_icon_621_shower_snow</item>
+        <item>@string/owm_icon_622_heavy_shower_snow</item>
+        <item>@string/owm_icon_701_mist</item>
+        <item>@string/owm_icon_711_smoke</item>
+        <item>@string/owm_icon_721_haze</item>
+        <item>@string/owm_icon_731_dust</item>
+        <item>@string/owm_icon_741_fog</item>
+        <item>@string/owm_icon_751_sand</item>
+        <item>@string/owm_icon_761_dust</item>
+        <item>@string/owm_icon_762_volcanic_ash</item>
+        <item>@string/owm_icon_771_squalls</item>
+        <item>@string/owm_icon_781_tornado</item>
+        <item>@string/owm_icon_800_clear</item>
+        <item>@string/owm_icon_801_few_clouds</item>
+        <item>@string/owm_icon_802_scattered_clouds</item>
+        <item>@string/owm_icon_803_broken_clouds</item>
+        <item>@string/owm_icon_804_overcast_clouds</item>
+    </array>
+
+    <array name="OpenWeatherMapWeatherIconDrawableIdsForCode"></array>
 
     <array name="KmaSkyIconCodes">
         <item>1</item>
         <item>3</item>
         <item>4</item>
     </array>
+
+    <array name="KmaSkyIconDescriptionsForCode">
+        <item>@string/kma_sky_1_clear</item>
+        <item>@string/kma_sky_3_mostly_cloudy</item>
+        <item>@string/kma_sky_4_overcast</item>
+    </array>
+
+    <array name="KmaSkyIconDrawableIdsForCode"></array>
 
     <array name="KmaPtyIconCodes">
         <item>0</item>
@@ -119,5 +231,16 @@
         <item>7</item>
     </array>
 
+    <array name="KmaPtyIconDescriptionsForCode">
+        <item>@string/kma_pty_0_not</item>
+        <item>@string/kma_pty_1_rain</item>
+        <item>@string/kma_pty_2_rain_and_snow</item>
+        <item>@string/kma_pty_3_snow</item>
+        <item>@string/kma_pty_4_showers</item>
+        <item>@string/kma_pty_5_raindrop</item>
+        <item>@string/kma_pty_6_raindrop_and_snow_blizzard</item>
+        <item>@string/kma_pty_7_snow_blizzard</item>
+    </array>
 
+    <array name="KmaPtyIconDrawableIdsForCode"></array>
 </resources>
