@@ -5,4 +5,7 @@
     <dimen name="toolbar_start_end_margin">16dp</dimen>
     <dimen name="toolbar_page_title_margin">28dp</dimen>
     <dimen name="toolbar_image_size">24dp</dimen>
+    <dimen name="label_view_width_in_forecast_scroll_view">24dp</dimen>
+    <dimen name="row_top_bottom_margin_in_forecast_scroll_view">4dp</dimen>
+    <dimen name="column_width_in_forecast_scroll_view">60dp</dimen>
 </resources>

@@ -96,7 +96,6 @@
     <string name="tag_find_address_fragment">tag_find_address_fragment</string>
 
     <string name="message_request_double_click_for_close">한번 더 누르면 종료됩니다</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="msg_kma_always_enabled_in_south_korea">날씨 데이터 요청 지역이 대한민국인 경우에만 대한민국 기상청의 자료가 제공됩니다</string>
     <string name="msg_at_least_one_must_be_selected">최소 하나는 선택되어야 합니다</string>
@@ -264,5 +263,17 @@
     <string name="aqi_4_unhealthy">나쁨</string>
     <string name="aqi_5_very_unhealthy">매우 나쁨</string>
     <string name="aqi_6_hazardous">비상사태</string>
+
+    <!-- forecast label -->
+    <string name="date">날짜</string>
+    <string name="clock">시각</string>
+    <string name="weather">날씨</string>
+    <string name="temperature">기온</string>
+    <string name="probability_of_precipitation">강수확률</string>
+    <string name="probability_of_snow">강설확률</string>
+    <string name="probability_of_rain">강우확률</string>
+    <string name="rain_volume">강우량</string>
+    <string name="snow_volume">강설량</string>
+    <string name="precipitation_volume">강수량</string>
 
 </resources>
