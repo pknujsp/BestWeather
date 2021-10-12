@@ -8,7 +8,7 @@
 
         <include
             android:id="@+id/base_weather_card_view"
-            layout="@layout/base_weather_card_view">
+            layout="@layout/weather_card_header_view">
 
 
         </include>
