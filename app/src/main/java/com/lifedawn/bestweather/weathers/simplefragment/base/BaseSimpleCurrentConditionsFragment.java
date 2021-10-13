@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutSimpleCurrentConditionsBinding binding;
-	protected CurrentConditionsResponse currentConditionsResponse;
 	protected GeolocalizedFeedResponse airQualityResponse;
 	
 	@Override
@@ -36,6 +35,11 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+	}
+	
+	public BaseSimpleCurrentConditionsFragment setAirQualityResponse(GeolocalizedFeedResponse airQualityResponse) {
+		this.airQualityResponse = airQualityResponse;
+		return this;
 	}
 	
 	@Override

@@ -9,8 +9,11 @@ import android.text.TextPaint;
 import android.view.View;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.ClockUtil;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -19,16 +22,18 @@ public class DateView extends View {
 	private final TextPaint dateTextPaint;
 	private final int viewWidth;
 	private final int viewHeight;
+	private final int columnWidth;
 	private final int textHeight;
-	private final SimpleDateFormat MdE = new SimpleDateFormat("MdE", Locale.getDefault());
+	private final SimpleDateFormat MdE = new SimpleDateFormat("M/d E", Locale.getDefault());
 	private List<DateValue> dateValueList;
 	private int currentX;
 	private int firstColX;
 	
-	public DateView(Context context, int viewWidth, int viewHeight) {
+	public DateView(Context context, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
+		this.columnWidth = columnWidth;
 		
 		dateTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		dateTextPaint.setTextAlign(Paint.Align.CENTER);
@@ -41,11 +46,36 @@ public class DateView extends View {
 		setWillNotDraw(false);
 	}
 	
-	public DateView setDateValueList(List<DateValue> dateValueList) {
+	public void init(List<Long> dateTimeList) {
+		Calendar date = Calendar.getInstance();
+		date.setTimeInMillis(dateTimeList.get(0));
+		date.add(Calendar.DATE, -15);
+		long lastDate = date.getTimeInMillis();
+		
+		List<DateView.DateValue> dateValueList = new ArrayList<>();
+		int beginX = 0;
+		
+		for (int col = 0; col < dateTimeList.size(); col++) {
+			date.setTimeInMillis(dateTimeList.get(col));
+			
+			if (date.get(Calendar.HOUR_OF_DAY) == 0 || col == 0) {
+				if (dateValueList.size() > 0) {
+					dateValueList.get(dateValueList.size() - 1).endX = columnWidth * (col - 1) + columnWidth / 2;
+				}
+				beginX = columnWidth * col + columnWidth / 2;
+				dateValueList.add(new DateView.DateValue(beginX, date.getTime()));
+			}
+			
+			if (!ClockUtil.areSameDate(lastDate, date.getTimeInMillis())) {
+				lastDate = date.getTimeInMillis();
+			}
+		}
+		dateValueList.get(dateValueList.size() - 1).endX = columnWidth * (dateTimeList.size() - 1) + columnWidth / 2;
+		
 		this.dateValueList = dateValueList;
 		this.firstColX = dateValueList.get(0).beginX;
-		return this;
 	}
+	
 	
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

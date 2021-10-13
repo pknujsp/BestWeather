@@ -275,5 +275,12 @@
     <string name="rain_volume">강우량</string>
     <string name="snow_volume">강설량</string>
     <string name="precipitation_volume">강수량</string>
+    <string name="current">현재</string>
+    <string name="o3_str">오존</string>
+    <string name="no2_str">이산화질소</string>
+    <string name="so2_str">이산화황</string>
+    <string name="co_str">일산화탄소</string>
+    <string name="rain">비</string>
+    <string name="snow">눈</string>
 
 </resources>

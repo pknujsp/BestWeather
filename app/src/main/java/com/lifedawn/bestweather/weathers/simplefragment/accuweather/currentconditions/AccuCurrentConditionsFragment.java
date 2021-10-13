@@ -19,6 +19,8 @@ import java.util.List;
 
 
 public class AccuCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
+	protected CurrentConditionsResponse currentConditionsResponse;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -32,6 +34,11 @@ public class AccuCurrentConditionsFragment extends BaseSimpleCurrentConditionsFr
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+	}
+	
+	public AccuCurrentConditionsFragment setCurrentConditionsResponse(CurrentConditionsResponse currentConditionsResponse) {
+		this.currentConditionsResponse = currentConditionsResponse;
+		return this;
 	}
 	
 	@Override

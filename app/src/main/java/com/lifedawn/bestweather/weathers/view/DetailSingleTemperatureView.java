@@ -14,7 +14,7 @@ import com.lifedawn.bestweather.R;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TemperatureDetailView extends View {
+public class DetailSingleTemperatureView extends View {
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
@@ -26,7 +26,7 @@ public class TemperatureDetailView extends View {
 	private final Paint MIN_MAX_TEMP_LINE_PAINT;
 	private List<Integer> tempList;
 	
-	public TemperatureDetailView(Context context, List<Integer> tempList, int viewWidth, int viewHeight, int columnWidth) {
+	public DetailSingleTemperatureView(Context context, List<Integer> tempList, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;

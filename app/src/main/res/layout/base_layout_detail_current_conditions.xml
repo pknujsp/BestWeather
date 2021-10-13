@@ -1,8 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.lifedawn.bestweather.weathers.view.WeatherCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:forecasts_name="@string/current_conditions"
-    app:visibility_compare_btn="gone"
-    app:visibility_detail="gone" />
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        style="@style/forecasts_card_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include
+            android:id="@+id/weather_card_view_header"
+            layout="@layout/weather_card_header_view" />
+
+        <LinearLayout
+            android:id="@+id/current_conditions_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/weather_icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/temp_img" />
+
+                <TextView
+                    android:id="@+id/weather_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:layout_toRightOf="@id/weather_icon"
+                    android:text="description"
+                    android:textSize="24sp" />
+
+            </RelativeLayout>
+
+            <GridView
+                android:id="@+id/conditions_grid"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:numColumns="3"
+                tools:listitem="@layout/current_conditions_detail_item" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

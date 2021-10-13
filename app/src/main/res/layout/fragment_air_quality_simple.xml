@@ -2,16 +2,139 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
+    <LinearLayout
+        style="@style/forecasts_card_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <include
-            android:id="@+id/base_weather_card_view"
-            layout="@layout/weather_card_header_view">
+            android:id="@+id/weather_card_view_header"
+            layout="@layout/weather_card_header_view" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/sub_title_in_forecast_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/current" />
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="3"
+                android:rowCount="4">
+
+                <TextView
+                    style="@style/label_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="@string/pm10_str" />
+
+                <TextView
+                    style="@style/label_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="@string/pm25_str" />
+
+                <TextView
+                    style="@style/label_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="@string/o3_str" />
+
+                <TextView
+                    android:id="@+id/pm10"
+                    style="@style/value_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="value" />
+
+                <TextView
+                    android:id="@+id/pm25"
+                    style="@style/value_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="value" />
+
+                <TextView
+                    android:id="@+id/o3"
+                    style="@style/value_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="value" />
+
+                <TextView
+                    style="@style/label_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="@string/co_str" />
+
+                <TextView
+                    style="@style/label_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="@string/so2_str" />
+
+                <TextView
+                    style="@style/label_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="@string/no2_str" />
+
+                <TextView
+                    android:id="@+id/co"
+                    style="@style/value_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="value" />
+
+                <TextView
+                    android:id="@+id/so2"
+                    style="@style/value_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="value" />
+
+                <TextView
+                    android:id="@+id/no2"
+                    style="@style/value_in_simple_airquality_forecast_card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:text="value" />
+
+            </GridLayout>
+
+            <TextView
+                style="@style/sub_title_in_forecast_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/daily_forecast" />
+
+            <LinearLayout
+                android:id="@+id/forecast"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
 
 
-        </include>
-
-    </FrameLayout>
+    </LinearLayout>
 </layout>

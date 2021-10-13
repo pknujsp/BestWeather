@@ -315,105 +315,121 @@ public class GeolocalizedFeedResponse {
 			@SerializedName("daily")
 			private Daily daily;
 			
+			
+			public Daily getDaily() {
+				return daily;
+			}
+			
+			public Forecast setDaily(Daily daily) {
+				this.daily = daily;
+				return this;
+			}
+			
 			public static class Daily {
 				@Expose
 				@SerializedName("o3")
-				private List<IAqi.ValueMap> o3;
+				private List<Daily.ValueMap> o3;
 				
 				@Expose
 				@SerializedName("pm10")
-				private List<IAqi.ValueMap> pm10;
+				private List<Daily.ValueMap> pm10;
 				
 				@Expose
 				@SerializedName("pm25")
-				private List<IAqi.ValueMap> pm25;
+				private List<Daily.ValueMap> pm25;
 				
 				@Expose
 				@SerializedName("uvi")
-				private List<IAqi.ValueMap> uvi;
+				private List<Daily.ValueMap> uvi;
 				
-				public List<IAqi.ValueMap> getO3() {
+				public List<Daily.ValueMap> getO3() {
 					return o3;
 				}
 				
-				public void setO3(List<IAqi.ValueMap> o3) {
+				public Daily setO3(List<ValueMap> o3) {
 					this.o3 = o3;
+					return this;
 				}
 				
-				public List<IAqi.ValueMap> getPm10() {
+				public List<ValueMap> getPm10() {
 					return pm10;
 				}
 				
-				public void setPm10(List<IAqi.ValueMap> pm10) {
+				public Daily setPm10(List<ValueMap> pm10) {
 					this.pm10 = pm10;
+					return this;
 				}
 				
-				public List<IAqi.ValueMap> getPm25() {
+				public List<ValueMap> getPm25() {
 					return pm25;
 				}
 				
-				public void setPm25(List<IAqi.ValueMap> pm25) {
+				public Daily setPm25(List<ValueMap> pm25) {
 					this.pm25 = pm25;
+					return this;
 				}
 				
-				public List<IAqi.ValueMap> getUvi() {
+				public List<ValueMap> getUvi() {
 					return uvi;
 				}
 				
-				public void setUvi(List<IAqi.ValueMap> uvi) {
+				public Daily setUvi(List<ValueMap> uvi) {
 					this.uvi = uvi;
+					return this;
+				}
+				
+				public static class ValueMap {
+					@Expose
+					@SerializedName("avg")
+					private String avg;
+					
+					@Expose
+					@SerializedName("day")
+					private String day;
+					
+					@Expose
+					@SerializedName("max")
+					private String max;
+					
+					@Expose
+					@SerializedName("min")
+					private String min;
+					
+					public String getAvg() {
+						return avg;
+					}
+					
+					public void setAvg(String avg) {
+						this.avg = avg;
+					}
+					
+					public String getDay() {
+						return day;
+					}
+					
+					public void setDay(String day) {
+						this.day = day;
+					}
+					
+					public String getMax() {
+						return max;
+					}
+					
+					public void setMax(String max) {
+						this.max = max;
+					}
+					
+					public String getMin() {
+						return min;
+					}
+					
+					public void setMin(String min) {
+						this.min = min;
+					}
 				}
 			}
 			
-			public static class ValueMap {
-				@Expose
-				@SerializedName("avg")
-				private String avg;
-				
-				@Expose
-				@SerializedName("day")
-				private String day;
-				
-				@Expose
-				@SerializedName("max")
-				private String max;
-				
-				@Expose
-				@SerializedName("min")
-				private String min;
-				
-				public String getAvg() {
-					return avg;
-				}
-				
-				public void setAvg(String avg) {
-					this.avg = avg;
-				}
-				
-				public String getDay() {
-					return day;
-				}
-				
-				public void setDay(String day) {
-					this.day = day;
-				}
-				
-				public String getMax() {
-					return max;
-				}
-				
-				public void setMax(String max) {
-					this.max = max;
-				}
-				
-				public String getMin() {
-					return min;
-				}
-				
-				public void setMin(String min) {
-					this.min = min;
-				}
-			}
+			
 		}
 	}
 }
