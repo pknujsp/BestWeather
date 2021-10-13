@@ -5,7 +5,22 @@
     <dimen name="toolbar_start_end_margin">16dp</dimen>
     <dimen name="toolbar_page_title_margin">28dp</dimen>
     <dimen name="toolbar_image_size">24dp</dimen>
-    <dimen name="label_view_width_in_forecast_scroll_view">24dp</dimen>
-    <dimen name="row_top_bottom_margin_in_forecast_scroll_view">4dp</dimen>
-    <dimen name="column_width_in_forecast_scroll_view">60dp</dimen>
+
+    <dimen name="label_view_width_in_simple_forecast_view">24dp</dimen>
+    <dimen name="row_top_bottom_margin_in_simple_forecast_view">4dp</dimen>
+    <dimen name="column_width_in_simple_forecast_view">60dp</dimen>
+
+
+    <dimen name="clock_text_size_in_simple_forecast_view">13sp</dimen>
+    <dimen name="date_text_size_in_simple_forecast_view">12sp</dimen>
+    <dimen name="default_value_text_size_in_simple_forecast_view">13sp</dimen>
+    <dimen name="wind_direction_img_size_in_simple_forecast_view">26dp</dimen>
+    <dimen name="weather_icon_size_in_simple_forecast_view">38dp</dimen>
+
+
+    <!-- forecast view 내의 value view의 height -->
+    <dimen name="date_row_height_in_simple_forecast_view">24dp</dimen>
+    <dimen name="clock_row_height_in_simple_forecast_view">24dp</dimen>
+    <dimen name="weather_icon_row_height_in_simple_forecast_view">weather_icon_size_in_simple_forecast_view</dimen>
+    <dimen name="default_row_height_in_simple_forecast_view">24dp</dimen>
 </resources>

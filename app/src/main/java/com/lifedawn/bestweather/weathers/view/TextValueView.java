@@ -3,36 +3,69 @@ package com.lifedawn.bestweather.weathers.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.text.TextPaint;
 import android.view.View;
 
-public class TextValueView extends View {
-	private TextPaint textPaint;
-	private int viewWidth;
-	private int viewHeight;
-	private String value;
+import androidx.core.content.ContextCompat;
 
-	public TextValueView(Context context, int viewWidth, int viewHeight, String value) {
+import com.lifedawn.bestweather.R;
+
+import java.util.List;
+
+public class TextValueView extends View {
+	private final int viewWidth;
+	private final int viewHeight;
+	private final int columnWidth;
+	private final int valueTextHeight;
+	private final TextPaint valueTextPaint;
+	private List<String> valueList;
+	
+	
+	public TextValueView(Context context, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
-		this.textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-		textPaint.setTextAlign(Paint.Align.CENTER);
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
-		this.value = value;
+		this.columnWidth = columnWidth;
+		valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+		valueTextPaint.setTextAlign(Paint.Align.CENTER);
+		valueTextPaint.setTextSize(context.getResources().getDimension(R.dimen.default_value_text_size_in_simple_forecast_view));
+		
+		Rect rect = new Rect();
+		valueTextPaint.getTextBounds("0", 0, 1, rect);
+		valueTextHeight = rect.height();
+		
+		setWillNotDraw(false);
 	}
-
+	
+	public TextValueView setValueList(List<String> valueList) {
+		this.valueList = valueList;
+		return this;
+	}
+	
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		setMeasuredDimension(viewWidth, viewHeight);
 	}
-
+	
 	@Override
 	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
 		super.onLayout(changed, left, top, right, bottom);
 	}
-
+	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
+		
+		valueTextPaint.setColor(ContextCompat.getColor(getContext(), R.color.white));
+		float x = 0f;
+		final float columnCenterX = columnWidth / 2f;
+		final float y = getHeight() / 2f + valueTextHeight / 2f;
+		
+		int column = 0;
+		for (String value : valueList) {
+			x = columnCenterX + (columnWidth * column++);
+			canvas.drawText(value, x, y, valueTextPaint);
+		}
 	}
 }
