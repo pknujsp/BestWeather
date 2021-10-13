@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class KmaResponseProcessor {
+public class KmaResponseProcessor extends WeatherResponseProcessor{
 	private static final Map<String, String> WEATHER_SKY_ICON_DESCRIPTION_MAP = new HashMap<>();
 	private static final Map<String, String> WEATHER_PTY_ICON_DESCRIPTION_MAP = new HashMap<>();
 	

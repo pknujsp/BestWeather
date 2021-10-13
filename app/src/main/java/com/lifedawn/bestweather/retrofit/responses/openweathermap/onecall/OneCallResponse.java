@@ -148,6 +148,10 @@ public class OneCallResponse {
 		private String wind_speed;
 
 		@Expose
+		@SerializedName("wind_gust")
+		private String windGust;
+
+		@Expose
 		@SerializedName("wind_deg")
 		private String wind_deg;
 
@@ -273,6 +277,14 @@ public class OneCallResponse {
 
 		public void setSnow(Snow snow) {
 			this.snow = snow;
+		}
+
+		public String getWindGust() {
+			return windGust;
+		}
+
+		public void setWindGust(String windGust) {
+			this.windGust = windGust;
 		}
 	}
 

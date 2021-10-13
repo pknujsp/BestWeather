@@ -5,18 +5,17 @@ import android.graphics.drawable.Drawable;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Direction;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Maximum;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Minimum;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.ValueUnit;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.Wind;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.WindGust;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Response;
 
 public class CurrentConditionsResponse {
 
@@ -422,58 +421,6 @@ public class CurrentConditionsResponse {
 
 		public void setTemperatureSummary(TemperatureSummary temperatureSummary) {
 			this.temperatureSummary = temperatureSummary;
-		}
-
-		public static class Wind {
-			@Expose
-			@SerializedName("Direction")
-			private Direction direction;
-
-			@Expose
-			@SerializedName("Speed")
-			private ValueUnit valueUnit;
-
-			public Direction getDirection() {
-				return direction;
-			}
-
-			public void setDirection(Direction direction) {
-				this.direction = direction;
-			}
-
-			public ValueUnit getValueUnit() {
-				return valueUnit;
-			}
-
-			public void setValueUnit(ValueUnit valueUnit) {
-				this.valueUnit = valueUnit;
-			}
-		}
-
-		public static class WindGust {
-			@Expose
-			@SerializedName("Metric")
-			private ValueUnit metric;
-
-			@Expose
-			@SerializedName("Imperial")
-			private ValueUnit imperial;
-
-			public ValueUnit getMetric() {
-				return metric;
-			}
-
-			public void setMetric(ValueUnit metric) {
-				this.metric = metric;
-			}
-
-			public ValueUnit getImperial() {
-				return imperial;
-			}
-
-			public void setImperial(ValueUnit imperial) {
-				this.imperial = imperial;
-			}
 		}
 
 		public static class Visibility {

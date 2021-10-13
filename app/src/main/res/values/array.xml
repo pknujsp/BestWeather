@@ -269,4 +269,5 @@
         <item>@string/aqi_5_very_unhealthy</item>
         <item>@string/aqi_6_hazardous</item>
     </array>
+
 </resources>

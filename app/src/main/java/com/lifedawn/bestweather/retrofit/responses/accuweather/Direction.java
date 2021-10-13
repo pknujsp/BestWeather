@@ -15,4 +15,28 @@ public class Direction {
 	@Expose
 	@SerializedName("English")
 	private String english;
+
+	public String getDegrees() {
+		return degrees;
+	}
+
+	public void setDegrees(String degrees) {
+		this.degrees = degrees;
+	}
+
+	public String getLocalized() {
+		return localized;
+	}
+
+	public void setLocalized(String localized) {
+		this.localized = localized;
+	}
+
+	public String getEnglish() {
+		return english;
+	}
+
+	public void setEnglish(String english) {
+		this.english = english;
+	}
 }

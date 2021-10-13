@@ -6,17 +6,17 @@ import com.google.gson.annotations.SerializedName;
 public class Wind {
 	@Expose
 	@SerializedName("Speed")
-	private ValueUnit speed;
+	private Speed speed;
 
 	@Expose
 	@SerializedName("Direction")
 	private Direction direction;
 
-	public ValueUnit getSpeed() {
+	public Speed getSpeed() {
 		return speed;
 	}
 
-	public void setSpeed(ValueUnit speed) {
+	public void setSpeed(Speed speed) {
 		this.speed = speed;
 	}
 
