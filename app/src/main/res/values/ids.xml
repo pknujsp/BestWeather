@@ -4,4 +4,7 @@
     <item name="detail_forecasts_btn" type="id" />
     <item name="compare_forecasts_btn" type="id" />
     <item name="progress_status_textview" type="id" />
+    <item name="sunSetRiseType1View" type="id" />
+    <item name="sunSetRiseType2View" type="id" />
+    <item name="sunSetRiseType3View" type="id" />
 </resources>

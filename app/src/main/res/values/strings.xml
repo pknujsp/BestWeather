@@ -305,5 +305,7 @@
     <string name="wind_strength_2_simple">약간 강</string>
     <string name="wind_strength_3_simple">강</string>
     <string name="wind_strength_4_simple">매우 강</string>
+    <string name="sunset">일몰</string>
+    <string name="sunrise">일출</string>
 
 </resources>

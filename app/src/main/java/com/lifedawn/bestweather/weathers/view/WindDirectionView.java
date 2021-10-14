@@ -26,7 +26,7 @@ public class WindDirectionView extends View {
 		this.columnWidth = columnWidth;
 		
 		imgSize = (int) getResources().getDimension(R.dimen.wind_direction_img_size_in_simple_forecast_view);
-		directionImg = ContextCompat.getDrawable(getContext(), R.drawable.temp_img);
+		directionImg = ContextCompat.getDrawable(getContext(), R.drawable.temp_icon);
 		
 		setWillNotDraw(false);
 	}
