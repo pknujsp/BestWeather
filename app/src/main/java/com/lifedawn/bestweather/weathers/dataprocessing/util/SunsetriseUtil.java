@@ -12,28 +12,27 @@ import java.util.List;
 public class SunsetriseUtil {
 	private SunsetriseUtil() {
 	}
-
-	public static List<SunSetRiseData> getSunsetRiseList(long begin, long end, double latitudeSecondsDivide100,
-	                                                     double longitudeSecondsDivide100) {
+	
+	public static List<SunSetRiseData> getSunsetRiseList(long begin, long end, double latitude, double longitude) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(begin);
-
+		
 		List<Calendar> calendarList = new ArrayList<>();
-
+		
 		while (true) {
 			calendarList.add((Calendar) calendar.clone());
-
+			
 			if (ClockUtil.areSameDate(calendar.getTimeInMillis(), end)) {
 				break;
 			}
 			calendar.add(Calendar.DATE, 1);
 		}
-
-		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(new Location(latitudeSecondsDivide100,
-				longitudeSecondsDivide100), calendar.getTimeZone());
+		
+		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(new Location(latitude, longitude),
+				calendar.getTimeZone());
 		Calendar sunRise = null;
 		Calendar sunSet = null;
-
+		
 		List<SunSetRiseData> resultList = new ArrayList<>();
 		for (Calendar date : calendarList) {
 			sunRise = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(date);
@@ -42,26 +41,26 @@ public class SunsetriseUtil {
 		}
 		return resultList;
 	}
-
+	
 	public static class SunSetRiseData {
-		private Date date;
-		private Date sunrise;
-		private Date sunset;
-
+		final Date date;
+		final Date sunrise;
+		final Date sunset;
+		
 		public SunSetRiseData(Date date, Date sunrise, Date sunset) {
 			this.date = date;
 			this.sunrise = sunrise;
 			this.sunset = sunset;
 		}
-
+		
 		public Date getDate() {
 			return date;
 		}
-
+		
 		public Date getSunrise() {
 			return sunrise;
 		}
-
+		
 		public Date getSunset() {
 			return sunset;
 		}

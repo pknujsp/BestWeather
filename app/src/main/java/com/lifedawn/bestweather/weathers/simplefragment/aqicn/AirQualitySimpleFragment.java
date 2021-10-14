@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
@@ -122,6 +123,18 @@ public class AirQualitySimpleFragment extends Fragment implements IWeatherValues
 				return forecastObj.date.compareTo(t1.date);
 			}
 		});
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd E", Locale.getDefault());
+		
+		for (ForecastObj forecastObj : forecastObjList) {
+			View forecastItemView = LayoutInflater.from(getContext()).inflate(R.layout.air_quality_simple_forecast_item, binding.forecast);
+			((TextView) forecastItemView.findViewById(R.id.date)).setText(dateFormat.format(forecastObj.date));
+			((TextView) forecastItemView.findViewById(R.id.pm10)).setText(forecastObj.pm10);
+			((TextView) forecastItemView.findViewById(R.id.pm25)).setText(forecastObj.pm25);
+			((TextView) forecastItemView.findViewById(R.id.o3)).setText(forecastObj.o3);
+			
+			binding.forecast.addView(forecastItemView);
+		}
 	}
 	
 	static class ForecastObj {
