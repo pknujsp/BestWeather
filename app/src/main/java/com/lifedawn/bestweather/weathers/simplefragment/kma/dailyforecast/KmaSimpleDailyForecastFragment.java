@@ -37,6 +37,8 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);
+		setValuesToViews();
+		
 	}
 	
 	public KmaSimpleDailyForecastFragment setFinalDailyForecastList(List<FinalDailyForecast> finalDailyForecastList) {

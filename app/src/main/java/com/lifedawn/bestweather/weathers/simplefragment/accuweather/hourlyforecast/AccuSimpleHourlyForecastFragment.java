@@ -21,6 +21,7 @@ import com.lifedawn.bestweather.weathers.view.WeatherIconView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -80,11 +81,12 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		TextValueView precipitationVolumeRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
 		
 		//시각 --------------------------------------------------------------------------
-		List<Long> dateTimeList = new ArrayList<>();
+		List<Date> dateTimeList = new ArrayList<>();
 		for (int col = 0; col < COLUMN_COUNT; col++) {
-			dateTimeList.add(Long.parseLong(items.get(col).getEpochDateTime()));
+			dateTimeList.add(new Date(Long.parseLong(items.get(col).getEpochDateTime())));
 		}
 		dateRow.init(dateTimeList);
+		clockRow.setClockList(dateTimeList);
 		
 		//날씨 아이콘
 		

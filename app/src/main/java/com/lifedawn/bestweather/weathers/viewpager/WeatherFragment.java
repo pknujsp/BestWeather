@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
@@ -26,16 +27,20 @@ import com.lifedawn.bestweather.commons.enums.FavoriteAddressType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtfcstresponse.UltraSrtFcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtncstresponse.UltraSrtNcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse.VilageFcstRoot;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
@@ -60,6 +65,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import retrofit2.Response;
 
 
 public class WeatherFragment extends Fragment {
@@ -136,7 +143,7 @@ public class WeatherFragment extends Fragment {
 								binding.addressName.setText(addressName);
 								if (refresh) {
 									mainWeatherSourceType = getMainWeatherSourceType(address.getCountryCode());
-									refresh(latitude, longitude, address.getCountryCode());
+									refresh(latitude, longitude);
 								}
 							}
 						});
@@ -172,11 +179,10 @@ public class WeatherFragment extends Fragment {
 	}
 	
 	public void refreshForSelectedLocation() {
-		refresh(Double.parseDouble(selectedAddress.getLatitude()), Double.parseDouble(selectedAddress.getLongitude()),
-				selectedAddress.getCountryCode());
+		refresh(Double.parseDouble(selectedAddress.getLatitude()), Double.parseDouble(selectedAddress.getLongitude()));
 	}
 	
-	private void refresh(Double latitude, Double longitude, String countryCode) {
+	private void refresh(Double latitude, Double longitude) {
 		binding.customProgressView.onStartedProcessingData(getString(R.string.msg_refreshing_weather_data));
 		
 		Set<MainProcessing.WeatherSourceType> weatherSourceTypeSet = new ArraySet<>();
@@ -214,7 +220,7 @@ public class WeatherFragment extends Fragment {
 								for (ResponseResult<JsonElement> responseResult : entry.getValue().values()) {
 									if (!responseResult.getResponse().isSuccessful()) {
 										mainWeatherSourceType = finalSecondWeatherSourceType;
-										refresh(latitude, longitude, countryCode);
+										refresh(latitude, longitude);
 										return;
 									}
 								}
@@ -247,33 +253,29 @@ public class WeatherFragment extends Fragment {
 		GeolocalizedFeedResponse airQualityResponse = gson.fromJson(aqicnResponse.getResponse().body().toString(),
 				GeolocalizedFeedResponse.class);
 		
+		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> arrayMap = responseMap.get(
+				mainWeatherSourceType);
+		
+		Fragment simpleCurrentConditionsFragment = null;
+		Fragment simpleHourlyForecastFragment = null;
+		Fragment simpleDailyForecastFragment = null;
+		Fragment detailCurrentConditionsFragment = null;
+		
 		switch (mainWeatherSourceType) {
 			case KMA:
-				ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> kmaArrayMap = responseMap.get(
-						MainProcessing.WeatherSourceType.KMA);
-				
-				MultipleJsonDownloader.ResponseResult<JsonElement> ultraSrtNcstResponse = kmaArrayMap.get(
-						RetrofitClient.ServiceType.ULTRA_SRT_NCST);
-				MultipleJsonDownloader.ResponseResult<JsonElement> ultraSrtFcstResponse = kmaArrayMap.get(
-						RetrofitClient.ServiceType.ULTRA_SRT_FCST);
-				MultipleJsonDownloader.ResponseResult<JsonElement> vilageFcstResponse = kmaArrayMap.get(
-						RetrofitClient.ServiceType.VILAGE_FCST);
-				MultipleJsonDownloader.ResponseResult<JsonElement> midLandResponse = kmaArrayMap.get(
-						RetrofitClient.ServiceType.MID_LAND_FCST);
-				MultipleJsonDownloader.ResponseResult<JsonElement> midTaResponse = kmaArrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST);
-				
-				UltraSrtNcstRoot ultraSrtNcstRoot = gson.fromJson(ultraSrtNcstResponse.getResponse().body().toString(),
-						UltraSrtNcstRoot.class);
-				UltraSrtFcstRoot ultraSrtFcstRoot = gson.fromJson(ultraSrtFcstResponse.getResponse().body().toString(),
-						UltraSrtFcstRoot.class);
-				VilageFcstRoot vilageFcstRoot = gson.fromJson(vilageFcstResponse.getResponse().body().toString(), VilageFcstRoot.class);
-				MidLandFcstRoot midLandFcstRoot = gson.fromJson(midLandResponse.getResponse().body().toString(), MidLandFcstRoot.class);
-				MidTaRoot midTaRoot = gson.fromJson(midTaResponse.getResponse().body().toString(), MidTaRoot.class);
-				
-				FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(ultraSrtNcstRoot);
-				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(ultraSrtFcstRoot,
-						vilageFcstRoot);
-				List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastList(midLandFcstRoot, midTaRoot,
+				FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(
+						KmaResponseProcessor.getUltraSrtNcstObjFromJson(
+								arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponse().body().toString()));
+				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
+						KmaResponseProcessor.getUltraSrtFcstObjFromJson(
+								arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponse().body().toString()),
+						KmaResponseProcessor.getVilageFcstObjFromJson(
+								arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST).getResponse().body().toString()));
+				List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastList(
+						KmaResponseProcessor.getMidLandObjFromJson(
+								arrayMap.get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponse().body().toString()),
+						KmaResponseProcessor.getMidTaObjFromJson(
+								arrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST).getResponse().body().toString()),
 						Long.parseLong(multipleJsonDownloader.get("tmFc")));
 				
 				KmaSimpleCurrentConditionsFragment kmaSimpleCurrentConditionsFragment = new KmaSimpleCurrentConditionsFragment();
@@ -287,29 +289,91 @@ public class WeatherFragment extends Fragment {
 				kmaSimpleDailyForecastFragment.setFinalDailyForecastList(finalDailyForecastList);
 				kmaDetailCurrentConditionsFragment.setFinalCurrentConditions(finalCurrentConditions);
 				
+				simpleCurrentConditionsFragment = kmaSimpleCurrentConditionsFragment;
+				simpleHourlyForecastFragment = kmaSimpleHourlyForecastFragment;
+				simpleDailyForecastFragment = kmaSimpleDailyForecastFragment;
+				detailCurrentConditionsFragment = kmaDetailCurrentConditionsFragment;
+				
 				break;
 			case ACCU_WEATHER:
 				AccuSimpleCurrentConditionsFragment accuSimpleCurrentConditionsFragment = new AccuSimpleCurrentConditionsFragment();
 				AccuSimpleHourlyForecastFragment accuSimpleHourlyForecastFragment = new AccuSimpleHourlyForecastFragment();
 				AccuSimpleDailyForecastFragment accuSimpleDailyForecastFragment = new AccuSimpleDailyForecastFragment();
 				AccuDetailCurrentConditionsFragment accuDetailCurrentConditionsFragment = new AccuDetailCurrentConditionsFragment();
+				
+				CurrentConditionsResponse currentConditionsResponse = AccuWeatherResponseProcessor.getCurrentConditionsObjFromJson(
+						arrayMap.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponse().body().toString());
+				
+				accuSimpleCurrentConditionsFragment.setCurrentConditionsResponse(currentConditionsResponse).setAirQualityResponse(
+						airQualityResponse);
+				accuSimpleHourlyForecastFragment.setTwelveHoursOfHourlyForecastsResponse(
+						AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
+								arrayMap.get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponse().body().toString()));
+				accuSimpleDailyForecastFragment.setFiveDaysOfDailyForecastsResponse(
+						AccuWeatherResponseProcessor.getDailyForecastObjFromJson(
+								arrayMap.get(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY).getResponse().body().toString()));
+				accuDetailCurrentConditionsFragment.setCurrentConditionsResponse(currentConditionsResponse);
+				
+				simpleCurrentConditionsFragment = accuSimpleCurrentConditionsFragment;
+				simpleHourlyForecastFragment = accuSimpleHourlyForecastFragment;
+				simpleDailyForecastFragment = accuSimpleDailyForecastFragment;
+				detailCurrentConditionsFragment = accuDetailCurrentConditionsFragment;
+				
 				break;
 			case OPEN_WEATHER_MAP:
 				OwmSimpleCurrentConditionsFragment owmSimpleCurrentConditionsFragment = new OwmSimpleCurrentConditionsFragment();
 				OwmSimpleHourlyForecastFragment owmSimpleHourlyForecastFragment = new OwmSimpleHourlyForecastFragment();
 				OwmSimpleDailyForecastFragment owmSimpleDailyForecastFragment = new OwmSimpleDailyForecastFragment();
 				OwmDetailCurrentConditionsFragment owmDetailCurrentConditionsFragment = new OwmDetailCurrentConditionsFragment();
+				
+				OneCallResponse oneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
+						arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponse().body().toString());
+				
+				owmSimpleCurrentConditionsFragment.setOneCallResponse(oneCallResponse).setAirQualityResponse(airQualityResponse);
+				owmSimpleHourlyForecastFragment.setOneCallResponse(oneCallResponse);
+				owmSimpleDailyForecastFragment.setOneCallResponse(oneCallResponse);
+				owmDetailCurrentConditionsFragment.setOneCallResponse(oneCallResponse);
+				
+				simpleCurrentConditionsFragment = owmSimpleCurrentConditionsFragment;
+				simpleHourlyForecastFragment = owmSimpleHourlyForecastFragment;
+				simpleDailyForecastFragment = owmSimpleDailyForecastFragment;
+				detailCurrentConditionsFragment = owmDetailCurrentConditionsFragment;
 				break;
 		}
 		SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
 		simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);
-		Fragment sunSetRiseFragment = new SunsetriseFragment();
 		
 		Bundle sunSetRiseBundle = new Bundle();
 		sunSetRiseBundle.putDouble("latitude", latitude);
 		sunSetRiseBundle.putDouble("longitude", longitude);
+		Fragment sunSetRiseFragment = new SunsetriseFragment();
 		sunSetRiseFragment.setArguments(sunSetRiseBundle);
+		
+		if (getActivity() != null) {
+			Fragment finalSimpleDailyForecastFragment = simpleDailyForecastFragment;
+			Fragment finalSimpleHourlyForecastFragment = simpleHourlyForecastFragment;
+			Fragment finalSimpleCurrentConditionsFragment = simpleCurrentConditionsFragment;
+			Fragment finalDetailCurrentConditionsFragment = detailCurrentConditionsFragment;
+			
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+					fragmentTransaction.add(binding.simpleCurrentConditions.getId(), finalSimpleCurrentConditionsFragment,
+							getString(R.string.tag_simple_current_conditions_fragment)).add(binding.simpleHourlyForecast.getId(),
+							finalSimpleHourlyForecastFragment, getString(R.string.tag_simple_hourly_forecast_fragment)).add(
+							binding.simpleDailyForecast.getId(), finalSimpleDailyForecastFragment,
+							getString(R.string.tag_simple_daily_forecast_fragment)).add(binding.detailCurrentConditions.getId(),
+							finalDetailCurrentConditionsFragment, getString(R.string.tag_detail_current_conditions_fragment)).add(
+							binding.simpleAirQuality.getId(), simpleAirQualityFragment,
+							getString(R.string.tag_simple_air_quality_fragment)).add(binding.sunSetRise.getId(), sunSetRiseFragment,
+							getString(R.string.tag_sun_set_rise_fragment)).commit();
+				}
+			});
+			
+		}
 	}
+	
 	
 	public FavoriteAddressType getFavoriteAddressType() {
 		return favoriteAddressType;

@@ -15,7 +15,7 @@
 
         <view
             android:id="@+id/dataview"
-            class="com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.SunsetriseFragment$SunSetRiseView"
+            class="com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.SunSetRiseView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 

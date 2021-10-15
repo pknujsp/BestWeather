@@ -40,6 +40,11 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);
 	}
 	
+	public OwmSimpleDailyForecastFragment setOneCallResponse(OneCallResponse oneCallResponse) {
+		this.oneCallResponse = oneCallResponse;
+		return this;
+	}
+	
 	@Override
 	public void setValuesToViews() {
 		super.setValuesToViews();

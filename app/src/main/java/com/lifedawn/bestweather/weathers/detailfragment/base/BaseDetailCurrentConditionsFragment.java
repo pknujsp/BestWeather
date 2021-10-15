@@ -26,48 +26,47 @@ import java.util.Objects;
 
 public class BaseDetailCurrentConditionsFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutDetailCurrentConditionsBinding binding;
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = BaseLayoutDetailCurrentConditionsBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-
+	
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.current_conditions);
 		binding.weatherCardViewHeader.detailForecast.setVisibility(View.GONE);
 	}
-
+	
 	@Override
 	public void setValuesToViews() {
-
+	
 	}
-
+	
 	protected View addGridItemView() {
-		return LayoutInflater.from(getContext()).inflate(R.layout.current_conditions_detail_item,
-				binding.conditionsGrid);
+		return LayoutInflater.from(getContext()).inflate(R.layout.current_conditions_detail_item, null);
 	}
-
+	
 	protected void setLabel(View gridItemView, int labelStrId) {
 		((TextView) gridItemView.findViewById(R.id.label)).setText(labelStrId);
 	}
-
+	
 	protected void setValue(View gridItemView, String value) {
 		gridItemView.findViewById(R.id.value_img).setVisibility(View.GONE);
 		((TextView) gridItemView.findViewById(R.id.value)).setText(value);
 	}
-
+	
 	protected void setValue(View gridItemView, String value, int imgId) {
 		gridItemView.findViewById(R.id.value_img).setVisibility(View.VISIBLE);
 		Glide.with(requireContext()).load(imgId).into(((ImageView) gridItemView.findViewById(R.id.value_img)));
 		((TextView) gridItemView.findViewById(R.id.value)).setText(value);
 	}
-
+	
 }

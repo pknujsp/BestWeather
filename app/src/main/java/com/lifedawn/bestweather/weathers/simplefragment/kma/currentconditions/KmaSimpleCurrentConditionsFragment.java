@@ -33,6 +33,7 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		setValuesToViews();
 	}
 	
 	public KmaSimpleCurrentConditionsFragment setFinalCurrentConditions(FinalCurrentConditions finalCurrentConditions) {

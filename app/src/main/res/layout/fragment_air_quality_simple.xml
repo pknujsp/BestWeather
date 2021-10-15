@@ -21,6 +21,7 @@
                 style="@style/sub_title_in_forecast_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="?attr/textColorInForecastCard"
                 android:text="@string/current" />
 
             <GridLayout

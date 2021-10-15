@@ -46,53 +46,53 @@
                     android:textSize="14sp" />
 
                 <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/current_conditions_simple"
+                    android:id="@+id/simple_current_conditions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/updated_datetime"
                     android:layout_marginBottom="16dp" />
 
                 <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/hourly_forecast_simple"
+                    android:id="@+id/simple_hourly_forecast"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/current_conditions_simple"
+                    android:layout_below="@id/simple_current_conditions"
                     android:layout_marginBottom="16dp" />
 
                 <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/daily_forecast_simple"
+                    android:id="@+id/simple_daily_forecast"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/hourly_forecast_simple"
+                    android:layout_below="@id/simple_hourly_forecast"
                     android:layout_marginBottom="16dp" />
 
                 <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/current_conditions_detail"
+                    android:id="@+id/detail_current_conditions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/daily_forecast_simple"
+                    android:layout_below="@id/simple_daily_forecast"
                     android:layout_marginBottom="16dp" />
 
                 <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/air_quality_simple"
+                    android:id="@+id/simple_air_quality"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/current_conditions_detail"
+                    android:layout_below="@id/detail_current_conditions"
                     android:layout_marginBottom="16dp" />
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/sun_set_rise"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/air_quality_simple"
+                    android:layout_below="@id/simple_air_quality"
                     android:layout_marginBottom="16dp" />
             </RelativeLayout>
 
         </androidx.core.widget.NestedScrollView>
 
         <com.lifedawn.bestweather.commons.views.CustomProgressView
-            android:layout_width="match_parent"
             android:id="@+id/custom_progress_view"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
     </FrameLayout>

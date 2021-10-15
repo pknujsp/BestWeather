@@ -46,9 +46,9 @@ public class DateView extends View {
 		setWillNotDraw(false);
 	}
 	
-	public void init(List<Long> dateTimeList) {
+	public void init(List<Date> dateTimeList) {
 		Calendar date = Calendar.getInstance();
-		date.setTimeInMillis(dateTimeList.get(0));
+		date.setTimeInMillis(dateTimeList.get(0).getTime());
 		date.add(Calendar.DATE, -15);
 		long lastDate = date.getTimeInMillis();
 		
@@ -56,7 +56,7 @@ public class DateView extends View {
 		int beginX = 0;
 		
 		for (int col = 0; col < dateTimeList.size(); col++) {
-			date.setTimeInMillis(dateTimeList.get(col));
+			date.setTimeInMillis(dateTimeList.get(col).getTime());
 			
 			if (date.get(Calendar.HOUR_OF_DAY) == 0 || col == 0) {
 				if (dateValueList.size() > 0) {

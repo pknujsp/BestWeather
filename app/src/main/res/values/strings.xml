@@ -94,6 +94,12 @@
     <string name="tag_units_fragment">tag_units_fragment</string>
     <string name="tag_weather_data_sources_fragment">tag_weather_data_sources_fragment</string>
     <string name="tag_find_address_fragment">tag_find_address_fragment</string>
+    <string name="tag_simple_current_conditions_fragment">tag_simple_current_conditions_fragment</string>
+    <string name="tag_simple_hourly_forecast_fragment">tag_simple_hourly_forecast_fragment</string>
+    <string name="tag_simple_daily_forecast_fragment">tag_simple_daily_forecast_fragment</string>
+    <string name="tag_detail_current_conditions_fragment">tag_detail_current_conditions_fragment</string>
+    <string name="tag_simple_air_quality_fragment">tag_simple_air_quality_fragment</string>
+    <string name="tag_sun_set_rise_fragment">tag_sun_set_rise_fragment</string>
 
     <string name="message_request_double_click_for_close">한번 더 누르면 종료됩니다</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -305,7 +311,10 @@
     <string name="wind_strength_2_simple">약간 강</string>
     <string name="wind_strength_3_simple">강</string>
     <string name="wind_strength_4_simple">매우 강</string>
+
+
     <string name="sunset">일몰</string>
     <string name="sunrise">일출</string>
+
 
 </resources>

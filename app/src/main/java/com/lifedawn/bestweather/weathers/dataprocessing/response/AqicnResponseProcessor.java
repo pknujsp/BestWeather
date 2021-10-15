@@ -2,7 +2,13 @@ package com.lifedawn.bestweather.weathers.dataprocessing.response;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
+import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+
+import retrofit2.Response;
 
 public class AqicnResponseProcessor {
 	private static final int[] AQI_GRADES = new int[5];
@@ -61,4 +67,7 @@ public class AqicnResponseProcessor {
 		return AQI_GRADE_DESCRIPTIONS[5];
 	}
 	
+	public static GeolocalizedFeedResponse getAirQualityObjFromJson(Response<JsonElement> response) {
+		return new Gson().fromJson(response.body().toString(), GeolocalizedFeedResponse.class);
+	}
 }

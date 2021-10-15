@@ -65,7 +65,7 @@ public class TextValueView extends View {
 		int column = 0;
 		for (String value : valueList) {
 			x = columnCenterX + (columnWidth * column++);
-			canvas.drawText(value, x, y, valueTextPaint);
+			canvas.drawText(value == null ? "-" : value, x, y, valueTextPaint);
 		}
 	}
 }

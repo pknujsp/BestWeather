@@ -21,6 +21,7 @@ import com.lifedawn.bestweather.weathers.view.WeatherIconView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -36,6 +37,8 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.hourly_forecast);
+		setValuesToViews();
+		
 	}
 	
 	public KmaSimpleHourlyForecastFragment setFinalHourlyForecastList(List<FinalHourlyForecast> finalHourlyForecastList) {
@@ -77,12 +80,12 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		TextValueView precipitationVolumeRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
 		
 		//시각 --------------------------------------------------------------------------
-		List<Long> dateTimeList = new ArrayList<>();
-		for(FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList){
-			dateTimeList.add(finalHourlyForecast.getFcstDateTime());
+		List<Date> dateTimeList = new ArrayList<>();
+		for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
+			dateTimeList.add(new Date(finalHourlyForecast.getFcstDateTime()));
 		}
 		dateRow.init(dateTimeList);
-		
+		clockRow.setClockList(dateTimeList);
 		//날씨 아이콘
 		
 		//기온, 강수확률, 강수량
@@ -90,7 +93,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> precipitationVolumeList = new ArrayList<>();
 		
-		for(FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList){
+		for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
 			tempList.add(finalHourlyForecast.getTemp1Hour());
 			probabilityOfPrecipitationList.add(finalHourlyForecast.getProbabilityOfPrecipitation());
 			precipitationVolumeList.add(finalHourlyForecast.getRainPrecipitation1Hour());

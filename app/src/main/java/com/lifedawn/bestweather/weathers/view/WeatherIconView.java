@@ -41,7 +41,7 @@ public class WeatherIconView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		drawImages(canvas);
+		//drawImages(canvas);
 	}
 	
 	private void drawImages(Canvas canvas) {

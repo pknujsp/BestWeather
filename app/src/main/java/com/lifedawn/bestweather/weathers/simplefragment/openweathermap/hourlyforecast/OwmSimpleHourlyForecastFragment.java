@@ -22,6 +22,7 @@ import com.lifedawn.bestweather.weathers.view.WeatherIconView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
@@ -82,11 +83,12 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		TextValueView snowVolumeRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
 		
 		//시각 --------------------------------------------------------------------------
-		List<Long> dateTimeList = new ArrayList<>();
+		List<Date> dateTimeList = new ArrayList<>();
 		for (OneCallResponse.Hourly item : items) {
-			dateTimeList.add(Long.parseLong(item.getDt()));
+			dateTimeList.add(new Date(Long.parseLong(item.getDt())));
 		}
 		dateRow.init(dateTimeList);
+		clockRow.setClockList(dateTimeList);
 		
 		//날씨 아이콘
 		

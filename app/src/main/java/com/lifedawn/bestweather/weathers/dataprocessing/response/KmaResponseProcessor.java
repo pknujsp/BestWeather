@@ -3,8 +3,11 @@ package com.lifedawn.bestweather.weathers.dataprocessing.response;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.ClockUtil;
+import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstItem;
 import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstItems;
 import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstRoot;
@@ -16,6 +19,7 @@ import com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtncstresponse.Ultr
 import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstcommons.VilageFcstItem;
 import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstcommons.VilageFcstItems;
 import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse.VilageFcstRoot;
+import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
@@ -31,7 +35,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class KmaResponseProcessor extends WeatherResponseProcessor{
+import retrofit2.Response;
+
+public class KmaResponseProcessor extends WeatherResponseProcessor {
 	private static final Map<String, String> WEATHER_SKY_ICON_DESCRIPTION_MAP = new HashMap<>();
 	private static final Map<String, String> WEATHER_PTY_ICON_DESCRIPTION_MAP = new HashMap<>();
 	
@@ -260,4 +266,25 @@ public class KmaResponseProcessor extends WeatherResponseProcessor{
 		
 		return finalDailyForecastList;
 	}
+	
+	public static UltraSrtNcstRoot getUltraSrtNcstObjFromJson(String response) {
+		return new Gson().fromJson(response, UltraSrtNcstRoot.class);
+	}
+	
+	public static UltraSrtFcstRoot getUltraSrtFcstObjFromJson(String response) {
+		return new Gson().fromJson(response, UltraSrtFcstRoot.class);
+	}
+	
+	public static VilageFcstRoot getVilageFcstObjFromJson(String response) {
+		return new Gson().fromJson(response, VilageFcstRoot.class);
+	}
+	
+	public static MidLandFcstRoot getMidLandObjFromJson(String response) {
+		return new Gson().fromJson(response, MidLandFcstRoot.class);
+	}
+	
+	public static MidTaRoot getMidTaObjFromJson(String response) {
+		return new Gson().fromJson(response, MidTaRoot.class);
+	}
+	
 }
