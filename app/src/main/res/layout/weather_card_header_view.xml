@@ -24,7 +24,6 @@
             android:layout_toLeftOf="@id/detail_forecast"
             android:text="@string/compare"
             android:textColor="?attr/textColorInWeatherCard"
-
             android:textSize="16sp" />
 
         <TextView

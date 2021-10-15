@@ -244,13 +244,13 @@
 
     <array name="KmaPtyIconDrawableIdsForCode"></array>
 
-    <string-array name="AqiGrades">
+    <integer-array name="AqiGrades">
         <item>50</item>
         <item>100</item>
         <item>150</item>
         <item>200</item>
         <item>300</item>
-    </string-array>
+    </integer-array>
 
     <string-array name="AqiGradeColors">
         <item>@color/aqi_1_good</item>

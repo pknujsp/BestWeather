@@ -20,48 +20,47 @@ import org.jetbrains.annotations.NotNull;
 public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
 	private FinalCurrentConditions finalCurrentConditions;
 	private FinalHourlyForecast finalHourlyForecast;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		setValuesToViews();
 	}
-	
+
 	public KmaSimpleCurrentConditionsFragment setFinalCurrentConditions(FinalCurrentConditions finalCurrentConditions) {
 		this.finalCurrentConditions = finalCurrentConditions;
 		return this;
 	}
-	
+
 	public KmaSimpleCurrentConditionsFragment setFinalHourlyForecast(FinalHourlyForecast finalHourlyForecast) {
 		this.finalHourlyForecast = finalHourlyForecast;
 		return this;
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
 		super.setValuesToViews();
-		
-		if (finalCurrentConditions.getPrecipitationType() == null) {
-			binding.precipitation.setVisibility(View.GONE);
-		} else {
-			// precipitation type 값 종류 : Rain, Snow, Ice, Null(Not), or Mixed
-			String precipitation = KmaResponseProcessor.getWeatherPtyIconDescription(
-					finalCurrentConditions.getPrecipitationType()) + ", " + finalCurrentConditions.getPrecipitation1Hour();
-			
-			binding.precipitation.setText(precipitation);
-			binding.precipitation.setVisibility(View.VISIBLE);
+
+		// precipitation type 값 종류 : Rain, Snow, Ice, Null(Not), or Mixed
+		String precipitation = KmaResponseProcessor.getWeatherPtyIconDescription(
+				finalCurrentConditions.getPrecipitationType());
+
+		if (Double.parseDouble(finalCurrentConditions.getPrecipitation1Hour()) > 0.0) {
+			precipitation += ", " + finalCurrentConditions.getPrecipitation1Hour();
 		}
+
+		binding.precipitation.setText(precipitation);
 		binding.sky.setText(KmaResponseProcessor.getWeatherSkyIconDescription(finalHourlyForecast.getSky()));
-		binding.temperature.setText(finalCurrentConditions.getTemperature()+getString(R.string.celsius));
+		binding.temperature.setText(finalCurrentConditions.getTemperature() + getString(R.string.celsius));
 	}
 }

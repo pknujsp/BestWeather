@@ -16,14 +16,12 @@
                 style="@style/text_shadow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
                 android:text="강수형태, N mm"
                 android:textSize="20sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -57,13 +55,13 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="기온"
-                    android:textSize="52sp" />
+                    android:textSize="58sp" />
 
                 <GridLayout
                     android:id="@+id/air_quality_in_current_conditions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
+                    android:layout_gravity="center"
                     android:columnCount="2"
                     android:rowCount="2">
 

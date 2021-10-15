@@ -28,32 +28,45 @@ import java.util.Objects;
 
 public class BaseDetailCurrentConditionsFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutDetailCurrentConditionsBinding binding;
-	
+	protected LayoutInflater layoutInflater;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = BaseLayoutDetailCurrentConditionsBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.current_conditions);
-		binding.weatherCardViewHeader.detailForecast.setVisibility(View.GONE);
+		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
+		layoutInflater = getLayoutInflater();
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
-	
+
 	}
-	
-	protected final GridItemDto makeGridItem(int labelStrId, String value, int imgId) {
-		return new GridItemDto(getString(labelStrId), value, imgId == 0 ? null : ContextCompat.getDrawable(getContext(), imgId));
+
+	protected final View addGridItem(int labelStrId, String value, int imgId) {
+		View gridItem = layoutInflater.inflate(R.layout.current_conditions_detail_item, null);
+
+		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(imgId);
+		((TextView) gridItem.findViewById(R.id.label)).setText(labelStrId);
+		((TextView) gridItem.findViewById(R.id.value)).setText(value);
+		if (imgId == 0) {
+			gridItem.findViewById(R.id.value_img).setVisibility(View.GONE);
+		} else {
+			((ImageView) gridItem.findViewById(R.id.value_img)).setImageResource(imgId);
+		}
+		binding.conditionsGrid.addView(gridItem);
+		return gridItem;
 	}
-	
+
 }

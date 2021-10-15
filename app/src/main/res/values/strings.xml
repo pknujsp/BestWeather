@@ -315,6 +315,7 @@
 
     <string name="sunset">일몰</string>
     <string name="sunrise">일출</string>
+    <string name="not_data">정보없음</string>
 
 
 </resources>

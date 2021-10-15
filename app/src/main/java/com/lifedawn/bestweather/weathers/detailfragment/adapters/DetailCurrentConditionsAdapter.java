@@ -23,38 +23,38 @@ public class DetailCurrentConditionsAdapter extends BaseAdapter {
 	private List<GridItemDto> gridItemDtoList;
 	private Context context;
 	private LayoutInflater layoutInflater;
-	
+
 	public DetailCurrentConditionsAdapter(Context context) {
 		this.context = context;
 		this.layoutInflater = LayoutInflater.from(context);
 	}
-	
+
 	public DetailCurrentConditionsAdapter setGridItemDtoList(List<GridItemDto> gridItemDtoList) {
 		this.gridItemDtoList = gridItemDtoList;
 		return this;
 	}
-	
+
 	@Override
 	public int getCount() {
 		return gridItemDtoList.size();
 	}
-	
+
 	@Override
 	public Object getItem(int i) {
 		return null;
 	}
-	
+
 	@Override
 	public long getItemId(int i) {
 		return i;
 	}
-	
+
 	@Override
 	public View getView(int i, View view, ViewGroup viewGroup) {
 		if (view == null) {
 			view = layoutInflater.inflate(R.layout.current_conditions_detail_item, viewGroup, false);
 		}
-		
+
 		GridItemDto gridItemDto = gridItemDtoList.get(i);
 		if (gridItemDto.img == null) {
 			view.findViewById(R.id.value_img).setVisibility(View.GONE);
@@ -64,7 +64,7 @@ public class DetailCurrentConditionsAdapter extends BaseAdapter {
 		}
 		((TextView) view.findViewById(R.id.label)).setText(gridItemDto.label);
 		((TextView) view.findViewById(R.id.value)).setText(gridItemDto.value);
-		
+
 		return view;
 	}
 }

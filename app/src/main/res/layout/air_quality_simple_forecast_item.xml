@@ -2,7 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
 
     <TextView
         android:id="@+id/date"
@@ -11,85 +13,39 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:text="date"
+        android:textAlignment="center"
         android:textColor="?attr/textColorInWeatherCard"
         android:textSize="14sp" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/pm10"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:text="value"
+        android:textAlignment="center"
+        android:textColor="?attr/textColorInWeatherCard"
+        android:textSize="15sp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:text="@string/pm10_str"
-            android:textAlignment="center"
-            android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/pm10"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="value"
-            android:textAlignment="center"
-            android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <TextView
+        android:id="@+id/pm25"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:text="value"
+        android:textAlignment="center"
+        android:textColor="?attr/textColorInWeatherCard"
+        android:textSize="15sp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:text="@string/pm25_str"
-            android:textAlignment="center"
-            android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="13sp" />
 
-        <TextView
-            android:id="@+id/pm25"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="value"
-            android:textAlignment="center"
-            android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <TextView
+        android:id="@+id/o3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:text="@string/o3_str"
-            android:textAlignment="center"
-            android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/o3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="value"
-            android:textAlignment="center"
-            android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="16sp" />
-
-    </LinearLayout>
+        android:text="value"
+        android:textAlignment="center"
+        android:textColor="?attr/textColorInWeatherCard"
+        android:textSize="15sp" />
 
 </LinearLayout>

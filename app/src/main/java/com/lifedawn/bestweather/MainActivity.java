@@ -28,6 +28,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResp
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,24 +37,25 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
-	
-	
+
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-		
+
 		initPreferences();
+		WeatherResponseProcessor.init(getApplicationContext());
 		AccuWeatherResponseProcessor.init(getApplicationContext());
 		AqicnResponseProcessor.init(getApplicationContext());
 		KmaResponseProcessor.init(getApplicationContext());
 		OpenWeatherMapResponseProcessor.init(getApplicationContext());
-		
+
 		MainFragment mainFragment = new MainFragment();
 		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 		fragmentTransaction.add(binding.fragmentContainer.getId(), mainFragment, mainFragment.getTag()).commit();
 	}
-	
+
 	private void initPreferences() {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		try {
@@ -67,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 				editor.putString(getString(R.string.pref_key_unit_wind), ValueUnits.mmPerSec.name());
 				editor.putString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name());
 				editor.putBoolean(getString(R.string.pref_key_use_current_location), true);
-				
+
 				Locale locale;
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 					locale = getResources().getConfiguration().getLocales().get(0);
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 					locale = getResources().getConfiguration().locale;
 				}
 				String country = locale.getCountry();
-				
+
 				if (country.equals("KR")) {
 					editor.putBoolean(getString(R.string.pref_key_kma_top_priority), true);
 				} else {
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 				editor.putBoolean(getString(R.string.pref_key_open_weather_map), false).apply();
 			}
 		} catch (NullPointerException e) {
-		
+
 		}
 	}
 }
