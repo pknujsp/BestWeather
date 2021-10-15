@@ -30,7 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 
 
-public class AirQualitySimpleFragment extends Fragment implements IWeatherValues {
+public class SimpleAirQualityFragment extends Fragment implements IWeatherValues {
 	private FragmentAirQualitySimpleBinding binding;
 	private GeolocalizedFeedResponse geolocalizedFeedResponse;
 	
@@ -59,7 +59,7 @@ public class AirQualitySimpleFragment extends Fragment implements IWeatherValues
 		});
 	}
 	
-	public AirQualitySimpleFragment setGeolocalizedFeedResponse(GeolocalizedFeedResponse geolocalizedFeedResponse) {
+	public SimpleAirQualityFragment setGeolocalizedFeedResponse(GeolocalizedFeedResponse geolocalizedFeedResponse) {
 		this.geolocalizedFeedResponse = geolocalizedFeedResponse;
 		return this;
 	}

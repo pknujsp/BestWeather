@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
@@ -15,7 +14,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentCo
 
 import org.jetbrains.annotations.NotNull;
 
-public class KmaCurrentConditionsDetailFragment extends BaseDetailCurrentConditionsFragment {
+public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
 	private FinalCurrentConditions finalCurrentConditions;
 
 	@Override
@@ -28,7 +27,7 @@ public class KmaCurrentConditionsDetailFragment extends BaseDetailCurrentConditi
 		super.onViewCreated(view, savedInstanceState);
 	}
 
-	public KmaCurrentConditionsDetailFragment setFinalCurrentConditions(FinalCurrentConditions finalCurrentConditions) {
+	public KmaDetailCurrentConditionsFragment setFinalCurrentConditions(FinalCurrentConditions finalCurrentConditions) {
 		this.finalCurrentConditions = finalCurrentConditions;
 		return this;
 	}

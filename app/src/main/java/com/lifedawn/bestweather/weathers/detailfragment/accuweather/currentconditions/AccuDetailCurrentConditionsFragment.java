@@ -1,23 +1,19 @@
 package com.lifedawn.bestweather.weathers.detailfragment.accuweather.currentconditions;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
 
 import org.jetbrains.annotations.NotNull;
 
-public class AccuCurrentConditionsDetailFragment extends BaseDetailCurrentConditionsFragment {
+public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
 	private CurrentConditionsResponse currentConditionsResponse;
 
 	@Override
@@ -30,7 +26,7 @@ public class AccuCurrentConditionsDetailFragment extends BaseDetailCurrentCondit
 		super.onViewCreated(view, savedInstanceState);
 	}
 
-	public AccuCurrentConditionsDetailFragment setCurrentConditionsResponse(CurrentConditionsResponse currentConditionsResponse) {
+	public AccuDetailCurrentConditionsFragment setCurrentConditionsResponse(CurrentConditionsResponse currentConditionsResponse) {
 		this.currentConditionsResponse = currentConditionsResponse;
 		return this;
 	}

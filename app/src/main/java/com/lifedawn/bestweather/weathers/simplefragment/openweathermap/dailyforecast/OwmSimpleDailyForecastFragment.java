@@ -26,7 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class OwmDailyForecastFragment extends BaseSimpleForecastFragment {
+public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	private OneCallResponse oneCallResponse;
 	
 	@Override

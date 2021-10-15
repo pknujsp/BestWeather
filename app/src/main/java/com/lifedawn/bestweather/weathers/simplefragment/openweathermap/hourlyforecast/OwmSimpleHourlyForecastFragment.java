@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OwmHourlyForecastFragment extends BaseSimpleForecastFragment {
+public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 	private OneCallResponse oneCallResponse;
 	
 	@Override
@@ -38,7 +38,7 @@ public class OwmHourlyForecastFragment extends BaseSimpleForecastFragment {
 		binding.weatherCardViewHeader.forecastName.setText(R.string.hourly_forecast);
 	}
 	
-	public OwmHourlyForecastFragment setOneCallResponse(OneCallResponse oneCallResponse) {
+	public OwmSimpleHourlyForecastFragment setOneCallResponse(OneCallResponse oneCallResponse) {
 		this.oneCallResponse = oneCallResponse;
 		return this;
 	}

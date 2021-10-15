@@ -19,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -193,21 +192,7 @@ public final class KmaProcessing {
 		return call;
 	}
 	
-	public static void getKmaForecasts(KmaAreaCodeDto nearbyKmaAreaCodeDto, MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
-		UltraSrtNcstParameter ultraSrtNcstParameter = new UltraSrtNcstParameter();
-		UltraSrtFcstParameter ultraSrtFcstParameter = new UltraSrtFcstParameter();
-		VilageFcstParameter vilageFcstParameter = new VilageFcstParameter();
-		MidLandParameter midLandParameter = new MidLandParameter();
-		MidTaParameter midTaParameter = new MidTaParameter();
-		
-		ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
-		ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
-		vilageFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
-		midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode());
-		midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode());
-		
-		final Calendar calendar = Calendar.getInstance(ClockUtil.KR_TIMEZONE);
-		
+	public static String getTmFc(Calendar calendar) {
 		int hour = calendar.get(Calendar.HOUR_OF_DAY);
 		int minute = calendar.get(Calendar.MINUTE);
 		String tmFc = null;
@@ -225,6 +210,25 @@ public final class KmaProcessing {
 			calendar.set(Calendar.HOUR_OF_DAY, 18);
 			tmFc = yyyyMMdd.format(calendar.getTime()) + "1800";
 		}
+		return tmFc;
+	}
+	
+	public static void getKmaForecasts(KmaAreaCodeDto nearbyKmaAreaCodeDto, Calendar calendar,
+			MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+		UltraSrtNcstParameter ultraSrtNcstParameter = new UltraSrtNcstParameter();
+		UltraSrtFcstParameter ultraSrtFcstParameter = new UltraSrtFcstParameter();
+		VilageFcstParameter vilageFcstParameter = new VilageFcstParameter();
+		MidLandParameter midLandParameter = new MidLandParameter();
+		MidTaParameter midTaParameter = new MidTaParameter();
+		
+		ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
+		ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
+		vilageFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
+		midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode());
+		midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode());
+		
+		String tmFc = getTmFc(calendar);
+		multipleJsonDownloader.put("tmFc", tmFc);
 		
 		midLandParameter.setTmFc(tmFc);
 		midTaParameter.setTmFc(tmFc);

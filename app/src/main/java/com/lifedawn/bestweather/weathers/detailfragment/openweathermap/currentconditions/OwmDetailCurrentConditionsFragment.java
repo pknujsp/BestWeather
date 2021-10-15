@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -15,7 +14,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentCo
 
 import org.jetbrains.annotations.NotNull;
 
-public class OwmCurrentConditionsDetailFragment extends BaseDetailCurrentConditionsFragment {
+public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
 	private OneCallResponse oneCallResponse;
 
 	@Override
@@ -28,7 +27,7 @@ public class OwmCurrentConditionsDetailFragment extends BaseDetailCurrentConditi
 		super.onViewCreated(view, savedInstanceState);
 	}
 
-	public OwmCurrentConditionsDetailFragment setOneCallResponse(OneCallResponse oneCallResponse) {
+	public OwmDetailCurrentConditionsFragment setOneCallResponse(OneCallResponse oneCallResponse) {
 		this.oneCallResponse = oneCallResponse;
 		return this;
 	}

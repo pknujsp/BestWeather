@@ -25,28 +25,28 @@ import java.util.Locale;
 public class WeatherSourcesFragment extends Fragment {
 	private FragmentWeatherSourcesBinding binding;
 	private SharedPreferences sharedPreferences;
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 	}
-
+	
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	                         Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentWeatherSourcesBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-
+	
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
+		
 		binding.accuWeather.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_accu_weather), true));
 		binding.openWeatherMap.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_open_weather_map), true));
-
+		binding.kmaTopPriority.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), true));
+		
 		Locale locale;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			locale = getResources().getConfiguration().getLocales().get(0);
@@ -54,46 +54,43 @@ public class WeatherSourcesFragment extends Fragment {
 			locale = getResources().getConfiguration().locale;
 		}
 		String country = locale.getCountry();
-
+		
 		if (country.equals("KR")) {
-
+			binding.kmaPriorityLayout.setVisibility(View.VISIBLE);
 		} else {
-			binding.kmaLayout.setVisibility(View.GONE);
+			binding.kmaPriorityLayout.setVisibility(View.GONE);
 		}
-
+		
 		binding.accuWeather.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (!isChecked && !binding.openWeatherMap.isChecked()) {
-					Toast.makeText(getContext(), R.string.msg_at_least_one_must_be_selected, Toast.LENGTH_SHORT).show();
-					binding.accuWeather.setChecked(true);
-					return;
+				if (!isChecked) {
+					binding.openWeatherMap.setChecked(true);
+				}
+				if (isChecked && binding.openWeatherMap.isChecked()) {
+					binding.openWeatherMap.setChecked(false);
 				}
 				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_accu_weather), isChecked).apply();
 			}
 		});
-
+		
 		binding.openWeatherMap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (!isChecked && !binding.accuWeather.isChecked()) {
-					Toast.makeText(getContext(), R.string.msg_at_least_one_must_be_selected, Toast.LENGTH_SHORT).show();
-					binding.openWeatherMap.setChecked(true);
-					return;
+				if (!isChecked) {
+					binding.accuWeather.setChecked(true);
+				}
+				if (isChecked && binding.accuWeather.isChecked()) {
+					binding.accuWeather.setChecked(false);
 				}
 				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_open_weather_map), isChecked).apply();
 			}
 		});
-
-		binding.kma.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+		
+		binding.kmaTopPriority.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (!isChecked && !binding.accuWeather.isChecked()) {
-					Toast.makeText(getContext(), R.string.msg_at_least_one_must_be_selected, Toast.LENGTH_SHORT).show();
-					binding.openWeatherMap.setChecked(true);
-					return;
-				}
-				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_open_weather_map), isChecked).apply();
+				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_kma_top_priority), isChecked).apply();
 			}
 		});
 	}

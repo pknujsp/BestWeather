@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -26,25 +27,27 @@ import com.lifedawn.bestweather.test.TestFragment;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
-
-
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
+		
 		initPreferences();
-
+		
 		MainFragment mainFragment = new MainFragment();
 		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 		fragmentTransaction.add(binding.fragmentContainer.getId(), mainFragment, mainFragment.getTag()).commit();
 	}
-
+	
 	private void initPreferences() {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
+		
 		try {
 			if (sharedPreferences.getAll().isEmpty()) {
 				SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -55,10 +58,26 @@ public class MainActivity extends AppCompatActivity {
 				editor.putString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name());
 				editor.putString(getString(R.string.pref_key_unit_wind), ValueUnits.mmPerSec.name());
 				editor.putString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name());
-				editor.putBoolean(getString(R.string.pref_key_use_current_location), true).apply();
+				editor.putBoolean(getString(R.string.pref_key_use_current_location), true);
+				
+				Locale locale;
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					locale = getResources().getConfiguration().getLocales().get(0);
+				} else {
+					locale = getResources().getConfiguration().locale;
+				}
+				String country = locale.getCountry();
+				
+				if (country.equals("KR")) {
+					editor.putBoolean(getString(R.string.pref_key_kma_top_priority), true);
+				} else {
+					editor.putBoolean(getString(R.string.pref_key_kma_top_priority), false);
+				}
+				editor.putBoolean(getString(R.string.pref_key_accu_weather), true);
+				editor.putBoolean(getString(R.string.pref_key_open_weather_map), false).apply();
 			}
 		} catch (NullPointerException e) {
-
+		
 		}
 	}
 }

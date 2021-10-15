@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AccuHourlyForecastFragment extends BaseSimpleForecastFragment {
+public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 	private TwelveHoursOfHourlyForecastsResponse twelveHoursOfHourlyForecastsResponse;
 	
 	@Override
@@ -38,7 +38,7 @@ public class AccuHourlyForecastFragment extends BaseSimpleForecastFragment {
 		binding.weatherCardViewHeader.forecastName.setText(R.string.hourly_forecast);
 	}
 	
-	public AccuHourlyForecastFragment setTwelveHoursOfHourlyForecastsResponse(
+	public AccuSimpleHourlyForecastFragment setTwelveHoursOfHourlyForecastsResponse(
 			TwelveHoursOfHourlyForecastsResponse twelveHoursOfHourlyForecastsResponse) {
 		this.twelveHoursOfHourlyForecastsResponse = twelveHoursOfHourlyForecastsResponse;
 		return this;

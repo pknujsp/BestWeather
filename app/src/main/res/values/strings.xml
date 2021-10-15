@@ -56,9 +56,9 @@
     <string name="pref_summary_open_weather_map">OpenWeatherMap 설명</string>
     <string name="pref_title_open_weather_map">OpenWeatherMap</string>
 
-    <string name="pref_key_kma">pref_key_kma</string>
-    <string name="pref_summary_kma">Kma 설명</string>
-    <string name="pref_title_kma">Kma</string>
+    <string name="pref_key_kma_top_priority">pref_key_kma_top_priority</string>
+    <string name="pref_summary_kma_top_priority">요청한 날씨 자료의 지역이 대한민국인 경우 대한민국 기상청의 자료를 기본으로 표시합니다</string>
+    <string name="pref_title_kma_top_priority">대한민국 기상청을 최우선 순위로 설정</string>
 
     <string name="pref_key_use_current_location">pref_key_use_current_location</string>
     <string name="pref_summary_use_current_location">GPS를 통해 현재 위치의 날씨를 표시</string>

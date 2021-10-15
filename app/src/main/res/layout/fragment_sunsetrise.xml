@@ -8,14 +8,18 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+
         <include
             android:id="@+id/weather_card_view_header"
             layout="@layout/weather_card_header_view" />
 
-        <RelativeLayout
+        <view
+            android:id="@+id/dataview"
+            class="com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.SunsetriseFragment$SunSetRiseView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="8dp" />
+            android:layout_height="wrap_content">
+
+        </view>
 
     </LinearLayout>
 </layout>

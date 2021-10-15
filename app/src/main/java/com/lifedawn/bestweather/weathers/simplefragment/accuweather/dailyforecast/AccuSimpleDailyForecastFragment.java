@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.weathers.simplefragment.kma.dailyforecast;
+package com.lifedawn.bestweather.weathers.simplefragment.accuweather.dailyforecast;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
@@ -21,12 +21,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-
-public class KmaDailyForecastFragment extends BaseSimpleForecastFragment {
-	private List<FinalDailyForecast> finalDailyForecastList;
+public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
+	private FiveDaysOfDailyForecastsResponse fiveDaysOfDailyForecastsResponse;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,15 +39,16 @@ public class KmaDailyForecastFragment extends BaseSimpleForecastFragment {
 		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);
 	}
 	
-	public KmaDailyForecastFragment setFinalDailyForecastList(List<FinalDailyForecast> finalDailyForecastList) {
-		this.finalDailyForecastList = finalDailyForecastList;
+	public AccuSimpleDailyForecastFragment setFiveDaysOfDailyForecastsResponse(
+			FiveDaysOfDailyForecastsResponse fiveDaysOfDailyForecastsResponse) {
+		this.fiveDaysOfDailyForecastsResponse = fiveDaysOfDailyForecastsResponse;
 		return this;
 	}
 	
 	@Override
 	public void setValuesToViews() {
 		super.setValuesToViews();
-		// 날짜, 최저/최고 기온 ,낮과 밤의 날씨상태, 강수확률
+		// 날짜, 최저/최고 기온 ,낮과 밤의 날씨상태, 강수확률, 강수량
 		Context context = getContext();
 		
 		final int DATE_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.date_row_height_in_simple_forecast_view);
@@ -57,7 +58,9 @@ public class KmaDailyForecastFragment extends BaseSimpleForecastFragment {
 				R.dimen.detail_temperature_row_height_in_simple_forecast_view);
 		final int MARGIN = (int) context.getResources().getDimension(R.dimen.row_top_bottom_margin_in_simple_forecast_view);
 		
-		final int COLUMN_COUNT = finalDailyForecastList.size();
+		List<FiveDaysOfDailyForecastsResponse.DailyForecasts> items = fiveDaysOfDailyForecastsResponse.getDailyForecasts();
+		
+		final int COLUMN_COUNT = items.size();
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.column_width_in_simple_daily_forecast_view);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 		
@@ -66,20 +69,25 @@ public class KmaDailyForecastFragment extends BaseSimpleForecastFragment {
 		
 		addLabelView(R.drawable.temp_icon, getString(R.string.date), LABEL_VIEW_WIDTH, DATE_ROW_HEIGHT, MARGIN);
 		addLabelView(R.drawable.temp_icon, getString(R.string.weather), LABEL_VIEW_WIDTH, WEATHER_ROW_HEIGHT, MARGIN);
+		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), LABEL_VIEW_WIDTH, TEMP_ROW_HEIGHT, MARGIN);
+		
 		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT,
 				MARGIN);
-		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), LABEL_VIEW_WIDTH, TEMP_ROW_HEIGHT, MARGIN);
+		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_volume), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, MARGIN);
 		
 		TextValueView dateRow = new TextValueView(context, VIEW_WIDTH, DATE_ROW_HEIGHT, COLUMN_WIDTH);
 		WeatherIconView weatherIconRow = new WeatherIconView(context, VIEW_WIDTH, WEATHER_ROW_HEIGHT, COLUMN_WIDTH);
 		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
+		TextValueView precipitationVolumeRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
 		
 		//시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
+		Date date = new Date();
 		SimpleDateFormat MdE = new SimpleDateFormat("M/d E", Locale.getDefault());
 		
-		for (FinalDailyForecast forecast : finalDailyForecastList) {
-			dateList.add(MdE.format(forecast.getDate()));
+		for (FiveDaysOfDailyForecastsResponse.DailyForecasts dailyForecasts : items) {
+			date.setTime(Long.parseLong(dailyForecasts.getEpochDate()));
+			dateList.add(MdE.format(date));
 		}
 		dateRow.setValueList(dateList);
 		
@@ -89,25 +97,47 @@ public class KmaDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
+		List<String> precipitationVolumeList = new ArrayList<>();
 		
-		int index = 0;
-		for (; index < 5; index++) {
-			minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
-			maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
-			
-			probabilityOfPrecipitationList.add(
-					finalDailyForecastList.get(index).getAmProbabilityOfPrecipitation() + " / " + finalDailyForecastList.get(
-							index).getPmProbabilityOfPrecipitation());
-		}
-		for (; index < finalDailyForecastList.size(); index++) {
-			minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
-			maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
-			
-			probabilityOfPrecipitationList.add(finalDailyForecastList.get(index).getProbabilityOfPrecipitation());
-		}
+		String pop = null;
+		String volume = null;
 		
+		for (FiveDaysOfDailyForecastsResponse.DailyForecasts dailyForecasts : items) {
+			minTempList.add(Integer.parseInt(dailyForecasts.getTemperature().getMinimum().getMetric().getValue()));
+			maxTempList.add(Integer.parseInt(dailyForecasts.getTemperature().getMaximum().getMetric().getValue()));
+			
+			if (dailyForecasts.getDay().getPrecipitationProbability() != null) {
+				pop = dailyForecasts.getDay().getPrecipitationProbability();
+			} else {
+				pop = "-";
+			}
+			
+			if (dailyForecasts.getNight().getPrecipitationProbability() != null) {
+				pop += dailyForecasts.getNight().getPrecipitationProbability();
+			} else {
+				pop += "-";
+			}
+			
+			if (dailyForecasts.getDay().getTotalLiquid().getValue() != null) {
+				volume = dailyForecasts.getDay().getTotalLiquid().getValue();
+			} else {
+				volume = "-";
+			}
+			
+			volume += " / ";
+			
+			if (dailyForecasts.getNight().getTotalLiquid().getValue() != null) {
+				volume += dailyForecasts.getNight().getTotalLiquid().getValue();
+			} else {
+				volume += "-";
+			}
+			
+			probabilityOfPrecipitationList.add(pop);
+			precipitationVolumeList.add(volume);
+		}
 		
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
+		precipitationVolumeRow.setValueList(precipitationVolumeList);
 		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(getContext(), VIEW_WIDTH, TEMP_ROW_HEIGHT, COLUMN_WIDTH,
 				minTempList, maxTempList);
 		
@@ -118,8 +148,8 @@ public class KmaDailyForecastFragment extends BaseSimpleForecastFragment {
 		
 		binding.forecastView.addView(dateRow, rowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
-		binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
 		binding.forecastView.addView(tempRow, rowLayoutParams);
-		
+		binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
+		binding.forecastView.addView(precipitationVolumeRow, rowLayoutParams);
 	}
 }
