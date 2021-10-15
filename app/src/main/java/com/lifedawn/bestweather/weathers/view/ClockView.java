@@ -7,9 +7,8 @@ import android.graphics.Rect;
 import android.text.TextPaint;
 import android.view.View;
 
-import androidx.core.content.ContextCompat;
-
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.theme.AppTheme;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,7 +21,7 @@ public class ClockView extends View {
 	private final int columnWidth;
 	private final int clockTextHeight;
 	private final TextPaint clockPaint;
-	private final SimpleDateFormat hFormat = new SimpleDateFormat("h", Locale.getDefault());
+	private final SimpleDateFormat hFormat = new SimpleDateFormat("H", Locale.getDefault());
 	
 	
 	private List<Date> clockList;
@@ -35,6 +34,7 @@ public class ClockView extends View {
 		clockPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		clockPaint.setTextAlign(Paint.Align.CENTER);
 		clockPaint.setTextSize(context.getResources().getDimension(R.dimen.clock_text_size_in_simple_forecast_view));
+		clockPaint.setColor(AppTheme.getColor(context,R.attr.textColorInWeatherCard));
 		
 		Rect rect = new Rect();
 		clockPaint.getTextBounds("0", 0, 1, rect);
@@ -62,7 +62,6 @@ public class ClockView extends View {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		
-		clockPaint.setColor(ContextCompat.getColor(getContext(), R.color.white));
 		float x = 0f;
 		final float columnCenterX = columnWidth / 2f;
 		final float y = getHeight() / 2f + clockTextHeight / 2f;

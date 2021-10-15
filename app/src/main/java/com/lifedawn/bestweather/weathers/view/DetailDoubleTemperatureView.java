@@ -10,9 +10,8 @@ import android.util.TypedValue;
 import android.view.View;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.theme.AppTheme;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class DetailDoubleTemperatureView extends View {
@@ -39,13 +38,13 @@ public class DetailDoubleTemperatureView extends View {
 		tempPaint = new TextPaint();
 		tempPaint.setTextAlign(Paint.Align.CENTER);
 		tempPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics()));
-		tempPaint.setColor(Color.BLACK);
+		tempPaint.setColor(AppTheme.getColor(context,R.attr.textColorInWeatherCard));
 		
 		linePaint = new Paint();
 		linePaint.setAntiAlias(true);
 		linePaint.setStyle(Paint.Style.FILL);
 		linePaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.3f, getResources().getDisplayMetrics()));
-		linePaint.setColor(Color.GRAY);
+		linePaint.setColor(AppTheme.getColor(context,R.attr.textColorInWeatherCard));
 		
 		minMaxTempLinePaint = new Paint();
 		minMaxTempLinePaint.setAntiAlias(true);

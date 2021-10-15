@@ -10,6 +10,7 @@ import android.view.View;
 import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.theme.AppTheme;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class TextValueView extends View {
 		valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		valueTextPaint.setTextAlign(Paint.Align.CENTER);
 		valueTextPaint.setTextSize(context.getResources().getDimension(R.dimen.default_value_text_size_in_simple_forecast_view));
+		valueTextPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
 		
 		Rect rect = new Rect();
 		valueTextPaint.getTextBounds("0", 0, 1, rect);

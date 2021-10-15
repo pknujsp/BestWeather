@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -57,6 +59,8 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 				// GeolocalizedFeedResponse 전달
 			}
 		});
+		
+		setValuesToViews();
 	}
 	
 	public SimpleAirQualityFragment setGeolocalizedFeedResponse(GeolocalizedFeedResponse geolocalizedFeedResponse) {
@@ -66,32 +70,30 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	
 	@Override
 	public void setValuesToViews() {
-		final Integer pm10Val = Integer.valueOf(geolocalizedFeedResponse.getData().getIaqi().getPm10().getValue());
-		final Integer pm25Val = Integer.valueOf(geolocalizedFeedResponse.getData().getIaqi().getPm25().getValue());
-		final Integer coVal = Integer.valueOf(geolocalizedFeedResponse.getData().getIaqi().getCo().getValue());
-		final Integer no2Val = Integer.valueOf(geolocalizedFeedResponse.getData().getIaqi().getNo2().getValue());
-		final Integer o3Val = Integer.valueOf(geolocalizedFeedResponse.getData().getIaqi().getO3().getValue());
-		final Integer so2Val = Integer.valueOf(geolocalizedFeedResponse.getData().getIaqi().getSo2().getValue());
+		final Double pm10Val = Double.valueOf(geolocalizedFeedResponse.getData().getIaqi().getPm10().getValue());
+		final Double pm25Val = Double.valueOf(geolocalizedFeedResponse.getData().getIaqi().getPm25().getValue());
+		final Double coVal = Double.valueOf(geolocalizedFeedResponse.getData().getIaqi().getCo().getValue());
+		final Double no2Val = Double.valueOf(geolocalizedFeedResponse.getData().getIaqi().getNo2().getValue());
+		final Double o3Val = Double.valueOf(geolocalizedFeedResponse.getData().getIaqi().getO3().getValue());
+		final Double so2Val = Double.valueOf(geolocalizedFeedResponse.getData().getIaqi().getSo2().getValue());
 		
-		binding.pm10.setTextColor(AqicnResponseProcessor.getGradeColorId(pm10Val));
-		binding.pm25.setTextColor(AqicnResponseProcessor.getGradeColorId(pm25Val));
-		binding.co.setTextColor(AqicnResponseProcessor.getGradeColorId(coVal));
-		binding.no2.setTextColor(AqicnResponseProcessor.getGradeColorId(no2Val));
-		binding.o3.setTextColor(AqicnResponseProcessor.getGradeColorId(o3Val));
-		binding.so2.setTextColor(AqicnResponseProcessor.getGradeColorId(so2Val));
+		binding.pm10.setTextColor(AqicnResponseProcessor.getGradeColorId(pm10Val.intValue()));
+		binding.pm25.setTextColor(AqicnResponseProcessor.getGradeColorId(pm25Val.intValue()));
+		binding.co.setTextColor(AqicnResponseProcessor.getGradeColorId(coVal.intValue()));
+		binding.no2.setTextColor(AqicnResponseProcessor.getGradeColorId(no2Val.intValue()));
+		binding.o3.setTextColor(AqicnResponseProcessor.getGradeColorId(o3Val.intValue()));
+		binding.so2.setTextColor(AqicnResponseProcessor.getGradeColorId(so2Val.intValue()));
 		
-		binding.pm10.setText(AqicnResponseProcessor.getGradeDescription(pm10Val));
-		binding.pm25.setText(AqicnResponseProcessor.getGradeDescription(pm25Val));
-		binding.co.setText(AqicnResponseProcessor.getGradeDescription(coVal));
-		binding.no2.setText(AqicnResponseProcessor.getGradeDescription(no2Val));
-		binding.o3.setText(AqicnResponseProcessor.getGradeDescription(o3Val));
-		binding.so2.setText(AqicnResponseProcessor.getGradeDescription(so2Val));
+		binding.pm10.setText(AqicnResponseProcessor.getGradeDescription(pm10Val.intValue()));
+		binding.pm25.setText(AqicnResponseProcessor.getGradeDescription(pm25Val.intValue()));
+		binding.co.setText(AqicnResponseProcessor.getGradeDescription(coVal.intValue()));
+		binding.no2.setText(AqicnResponseProcessor.getGradeDescription(no2Val.intValue()));
+		binding.o3.setText(AqicnResponseProcessor.getGradeDescription(o3Val.intValue()));
+		binding.so2.setText(AqicnResponseProcessor.getGradeDescription(so2Val.intValue()));
 		
-		LayoutInflater layoutInflater = getLayoutInflater();
-		Map<String, ForecastObj> forecastObjMap = new HashMap<>();
+		ArrayMap<String, ForecastObj> forecastObjMap = new ArrayMap<>();
 		
 		// 2021-10-13
-		
 		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm10Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm10();
 		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm10Forecast) {
 			if (!forecastObjMap.containsKey(valueMap.getDay())) {
@@ -116,7 +118,8 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			forecastObjMap.get(valueMap.getDay()).o3 = valueMap.getAvg();
 		}
 		
-		List<ForecastObj> forecastObjList = (ArrayList<ForecastObj>) forecastObjMap.values();
+		ForecastObj[] forecastObjArr = new ForecastObj[1];
+		List<ForecastObj> forecastObjList = Arrays.asList(forecastObjMap.values().toArray(forecastObjArr));
 		Collections.sort(forecastObjList, new Comparator<ForecastObj>() {
 			@Override
 			public int compare(ForecastObj forecastObj, ForecastObj t1) {
@@ -125,9 +128,10 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		});
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd E", Locale.getDefault());
+		LayoutInflater layoutInflater = LayoutInflater.from(getContext());
 		
 		for (ForecastObj forecastObj : forecastObjList) {
-			View forecastItemView = LayoutInflater.from(getContext()).inflate(R.layout.air_quality_simple_forecast_item, binding.forecast);
+			View forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 			((TextView) forecastItemView.findViewById(R.id.date)).setText(dateFormat.format(forecastObj.date));
 			((TextView) forecastItemView.findViewById(R.id.pm10)).setText(forecastObj.pm10);
 			((TextView) forecastItemView.findViewById(R.id.pm25)).setText(forecastObj.pm25);

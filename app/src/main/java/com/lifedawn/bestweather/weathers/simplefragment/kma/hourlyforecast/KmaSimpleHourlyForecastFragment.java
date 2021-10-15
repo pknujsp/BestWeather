@@ -82,7 +82,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		//시각 --------------------------------------------------------------------------
 		List<Date> dateTimeList = new ArrayList<>();
 		for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
-			dateTimeList.add(new Date(finalHourlyForecast.getFcstDateTime()));
+			dateTimeList.add(finalHourlyForecast.getFcstDateTime());
 		}
 		dateRow.init(dateTimeList);
 		clockRow.setClockList(dateTimeList);

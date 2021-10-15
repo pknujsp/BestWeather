@@ -12,10 +12,13 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
+import com.lifedawn.bestweather.weathers.detailfragment.adapters.DetailCurrentConditionsAdapter;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.GridItemDto;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
@@ -29,7 +32,7 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		setValuesToViews();
+		// setValuesToViews();
 	}
 	
 	public KmaDetailCurrentConditionsFragment setFinalCurrentConditions(FinalCurrentConditions finalCurrentConditions) {
@@ -40,34 +43,19 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 	@Override
 	public void setValuesToViews() {
 		// 기온,1시간강수량,습도,강수형태,풍향,풍속
-		View tempView = addGridItemView();
-		View humidityView = addGridItemView();
-		View windDirectionView = addGridItemView();
-		View windSpeedView = addGridItemView();
-		View windStrengthView = addGridItemView();
-		View precipitationVolumeView = addGridItemView();
-		View precipitationTypeView = addGridItemView();
+		List<GridItemDto> gridItemDtoList = new ArrayList<>();
+		gridItemDtoList.add(makeGridItem(R.string.temperature, finalCurrentConditions.getTemperature(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.humidity, finalCurrentConditions.getHumidity(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.wind_direction, finalCurrentConditions.getWindDirection(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.wind_speed, finalCurrentConditions.getWindSpeed(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.wind_strength,
+				WeatherResponseProcessor.getSimpleWindSpeedDescription(finalCurrentConditions.getWindSpeed()), 0));
+		gridItemDtoList.add(makeGridItem(R.string.precipitation_volume, finalCurrentConditions.getPrecipitation1Hour(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.precipitation_type,
+				KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()), 0));
 		
-		View[] views = new View[]{tempView, humidityView, windDirectionView, windSpeedView, windStrengthView, precipitationVolumeView,
-				precipitationTypeView};
-		
-		ArrayAdapter<View> arrayAdapter = new ArrayAdapter<View>(getActivity(), android.R.layout.simple_list_item_1, views);
+		DetailCurrentConditionsAdapter arrayAdapter = new DetailCurrentConditionsAdapter(getContext());
+		arrayAdapter.setGridItemDtoList(gridItemDtoList);
 		binding.conditionsGrid.setAdapter(arrayAdapter);
-		
-		setLabel(tempView, R.string.temperature);
-		setLabel(humidityView, R.string.humidity);
-		setLabel(windDirectionView, R.string.wind_direction);
-		setLabel(windSpeedView, R.string.wind_speed);
-		setLabel(windStrengthView, R.string.wind_strength);
-		setLabel(precipitationVolumeView, R.string.precipitation_volume);
-		setLabel(precipitationTypeView, R.string.precipitation_type);
-		
-		setValue(tempView, finalCurrentConditions.getTemperature());
-		setValue(humidityView, finalCurrentConditions.getHumidity());
-		setValue(windDirectionView, finalCurrentConditions.getWindDirection());
-		setValue(windSpeedView, finalCurrentConditions.getWindSpeed());
-		setValue(windStrengthView, WeatherResponseProcessor.getSimpleWindSpeedDescription(finalCurrentConditions.getWindSpeed()));
-		setValue(precipitationVolumeView, finalCurrentConditions.getPrecipitation1Hour());
-		setValue(precipitationTypeView, KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()));
 	}
 }

@@ -240,7 +240,7 @@
     <string name="kma_sky_3_mostly_cloudy">구름 많음</string>
     <string name="kma_sky_4_overcast">흐림</string>
 
-    <string name="kma_pty_0_not">없음</string>
+    <string name="kma_pty_0_not">강수없음</string>
     <string name="kma_pty_1_rain">비</string>
     <string name="kma_pty_2_rain_and_snow">비/눈</string>
     <string name="kma_pty_3_snow">눈</string>
@@ -268,7 +268,7 @@
     <string name="aqi_3_unhealthy_for_sensitive_groups">약간 나쁨</string>
     <string name="aqi_4_unhealthy">나쁨</string>
     <string name="aqi_5_very_unhealthy">매우 나쁨</string>
-    <string name="aqi_6_hazardous">비상사태</string>
+    <string name="aqi_6_hazardous">최악</string>
 
     <!-- forecast label -->
     <string name="date">날짜</string>

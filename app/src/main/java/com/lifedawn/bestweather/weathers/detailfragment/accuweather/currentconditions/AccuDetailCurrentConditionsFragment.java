@@ -8,10 +8,16 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.detailfragment.adapters.DetailCurrentConditionsAdapter;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.GridItemDto;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
 	private CurrentConditionsResponse currentConditionsResponse;
@@ -35,51 +41,27 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 	public void setValuesToViews() {
 		//날씨 아이콘, 기온, 체감기온, 습도, 이슬점, 풍향, 풍속, 돌풍, 바람세기, 기압, 자외선, 시정거리,
 		//운량, 강수량, 강수형태
-		View tempView = addGridItemView();
-		View realFeelTempView = addGridItemView();
-		View humidityView = addGridItemView();
-		View dewPointView = addGridItemView();
-		View windDirectionView = addGridItemView();
-		View windSpeedView = addGridItemView();
-		View windGustView = addGridItemView();
-		View windStrengthView = addGridItemView();
-		View pressureView = addGridItemView();
-		View uvView = addGridItemView();
-		View visibilityView = addGridItemView();
-		View cloudCoverView = addGridItemView();
-		View precipitationVolumeView = addGridItemView();
-		View precipitationTypeView = addGridItemView();
-		
-		setLabel(tempView, R.string.temperature);
-		setLabel(realFeelTempView, R.string.real_feel_temperature);
-		setLabel(humidityView, R.string.humidity);
-		setLabel(dewPointView, R.string.dew_point);
-		setLabel(windDirectionView, R.string.wind_direction);
-		setLabel(windSpeedView, R.string.wind_speed);
-		setLabel(windGustView, R.string.wind_gust);
-		setLabel(windStrengthView, R.string.wind_strength);
-		setLabel(pressureView, R.string.pressure);
-		setLabel(uvView, R.string.uv_index);
-		setLabel(visibilityView, R.string.visibility);
-		setLabel(cloudCoverView, R.string.cloud_cover);
-		setLabel(precipitationVolumeView, R.string.precipitation_volume);
-		setLabel(precipitationTypeView, R.string.precipitation_type);
-		
+		List<GridItemDto> gridItemDtoList = new ArrayList<>();
 		CurrentConditionsResponse.Item item = currentConditionsResponse.getItems().get(0);
-		setValue(tempView, item.getTemperature().getValue());
-		setValue(realFeelTempView, item.getRealFeelTemperature().getValue());
-		setValue(humidityView, item.getRelativeHumidity());
-		setValue(dewPointView, item.getDewPoint().getValue());
-		setValue(windDirectionView, item.getWind().getDirection().getDegrees());
-		setValue(windSpeedView, item.getWind().getSpeed().getMetric().getValue());
-		setValue(windGustView, item.getWindGust().getSpeed().getMetric().getValue());
-		setValue(windStrengthView,
-				WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()));
-		setValue(pressureView, item.getPressure().getMetric().getValue());
-		setValue(uvView, item.getuVIndexText());
-		setValue(visibilityView, item.getVisibility().getMetric().getValue());
-		setValue(cloudCoverView, item.getCloudCover());
-		setValue(precipitationVolumeView, item.getPrecip1hr().getMetric().getValue());
-		setValue(precipitationTypeView, item.getPrecipitationType());
+		
+		gridItemDtoList.add(makeGridItem(R.string.temperature, item.getTemperature().getValue(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.real_feel_temperature, item.getRealFeelTemperature().getValue(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.humidity, item.getRelativeHumidity(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.dew_point, item.getDewPoint().getValue(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.wind_direction, item.getWind().getDirection().getDegrees(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.wind_speed, item.getWind().getSpeed().getMetric().getValue(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.wind_gust, item.getWindGust().getSpeed().getMetric().getValue(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.wind_strength,
+				WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()), 0));
+		gridItemDtoList.add(makeGridItem(R.string.pressure, item.getPressure().getMetric().getValue(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.uv_index, item.getuVIndexText(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.visibility, item.getVisibility().getMetric().getValue(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.cloud_cover, item.getCloudCover(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.precipitation_volume, item.getPrecip1hr().getMetric().getValue(), 0));
+		gridItemDtoList.add(makeGridItem(R.string.precipitation_type, item.getPrecipitationType(), 0));
+		
+		DetailCurrentConditionsAdapter arrayAdapter = new DetailCurrentConditionsAdapter(getContext());
+		arrayAdapter.setGridItemDtoList(gridItemDtoList);
+		binding.conditionsGrid.setAdapter(arrayAdapter);
 	}
 }

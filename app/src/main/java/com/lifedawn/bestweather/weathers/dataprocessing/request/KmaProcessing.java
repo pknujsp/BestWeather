@@ -227,7 +227,7 @@ public final class KmaProcessing {
 		midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode());
 		midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode());
 		
-		String tmFc = getTmFc(calendar);
+		String tmFc = getTmFc((Calendar) calendar.clone());
 		multipleJsonDownloader.put("tmFc", tmFc);
 		
 		midLandParameter.setTmFc(tmFc);

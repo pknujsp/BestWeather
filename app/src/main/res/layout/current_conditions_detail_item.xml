@@ -13,6 +13,7 @@
         android:layout_marginBottom="12dp"
         android:text="label"
         android:textAlignment="center"
+        android:textColor="?attr/textColorInWeatherCard"
         android:textSize="16sp" />
 
     <LinearLayout
@@ -33,6 +34,7 @@
             android:layout_height="wrap_content"
             android:text="value"
             android:textAlignment="center"
+            android:textColor="?attr/textColorInWeatherCard"
             android:textSize="20sp" />
     </LinearLayout>
 

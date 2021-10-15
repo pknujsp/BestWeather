@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
@@ -61,6 +62,6 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 			binding.precipitation.setVisibility(View.VISIBLE);
 		}
 		binding.sky.setText(KmaResponseProcessor.getWeatherSkyIconDescription(finalHourlyForecast.getSky()));
-		binding.temperature.setText(finalCurrentConditions.getTemperature());
+		binding.temperature.setText(finalCurrentConditions.getTemperature()+getString(R.string.celsius));
 	}
 }

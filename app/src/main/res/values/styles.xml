@@ -5,11 +5,18 @@
         <item name="android:shadowColor">@color/black</item>
         <item name="android:shadowDx">0</item>
         <item name="android:shadowDy">0</item>
-        <item name="android:shadowRadius">2.0</item>
+        <item name="android:shadowRadius">2.5</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="text_shadow_black">
+        <item name="android:shadowColor">@color/black</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">0</item>
+        <item name="android:shadowRadius">2</item>
     </style>
 
     <style name="forecasts_card_background">
-        <item name="backgroundColor">@color/weather_card_background_color</item>
         <item name="android:padding">8dp</item>
         <item name="android:background">@drawable/simple_weather_card</item>
     </style>
@@ -23,12 +30,14 @@
         <item name="android:textSize">18sp</item>
         <item name="android:layout_marginBottom">18dp</item>
         <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/textColorInWeatherCard</item>
     </style>
 
     <style name="value_in_simple_airquality_forecast_card">
         <item name="android:textSize">20sp</item>
         <item name="android:layout_marginBottom">24dp</item>
         <item name="android:textAlignment">center</item>
+        <item name="android:textColor">?attr/textColorInWeatherCard</item>
     </style>
 
 </resources>

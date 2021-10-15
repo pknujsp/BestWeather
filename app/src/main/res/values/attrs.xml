@@ -28,4 +28,7 @@
         <attr name="IndicatorUnselectedDotDrawable" format="reference" />
         <attr name="IndicatorSelectedDotDrawable" format="reference" />
     </declare-styleable>
+
+    <attr name="textColorInWeatherCard" format="color" />
+    <attr name="weatherCardBackgroundColor" format="color" />
 </resources>

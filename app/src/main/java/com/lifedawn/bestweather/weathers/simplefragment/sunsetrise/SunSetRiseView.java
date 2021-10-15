@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.theme.AppTheme;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
@@ -189,13 +190,13 @@ public class SunSetRiseView extends RelativeLayout {
 			String tempStr = "0";
 			
 			typePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-			typePaint.setColor(Color.WHITE);
+			typePaint.setColor(AppTheme.getColor(context,R.attr.textColorInWeatherCard));
 			typePaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 13f, getResources().getDisplayMetrics()));
 			typePaint.getTextBounds(tempStr, 0, 1, rect);
 			typeTextHeight = rect.height();
 			
 			timePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-			timePaint.setColor(Color.WHITE);
+			timePaint.setColor(AppTheme.getColor(context,R.attr.textColorInWeatherCard));
 			timePaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, getResources().getDisplayMetrics()));
 			timePaint.getTextBounds(tempStr, 0, 1, rect);
 			timeTextHeight = rect.height();

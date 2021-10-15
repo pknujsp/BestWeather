@@ -7,10 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="app_theme_white">#FFFFFFFF</color>
-    <color name="app_theme_black">#151515</color>
     <color name="transparent">#00FFFFFF</color>
-    <color name="weather_card_background_color">#4D000000</color>
 
     <!-- aqi grade color -->
     <color name="aqi_1_good">#009966</color>

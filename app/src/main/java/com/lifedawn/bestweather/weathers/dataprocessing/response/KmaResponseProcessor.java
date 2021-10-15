@@ -32,6 +32,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -96,7 +97,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	}
 	
 	public static String getWeatherPtyIconDescription(String code) {
-		return WEATHER_SKY_ICON_DESCRIPTION_MAP.get(code);
+		return WEATHER_PTY_ICON_DESCRIPTION_MAP.get(code);
 	}
 	
 	public static FinalCurrentConditions getFinalCurrentConditions(UltraSrtNcstRoot ultraSrtNcstRoot) {
@@ -156,18 +157,17 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		List<FinalHourlyForecast> finalHourlyForecastList = new ArrayList<>();
 		Calendar calendar = Calendar.getInstance();
 		String fcstDate = null;
-		String fcstTime = null;
 		
 		for (Map.Entry<Long, List<VilageFcstItem>> entry : hourDataListMap.entrySet()) {
 			FinalHourlyForecast finalHourlyForecast = new FinalHourlyForecast();
 			List<VilageFcstItem> hourlyFcstItems = entry.getValue();
 			fcstDate = hourlyFcstItems.get(0).getFcstDate();
-			fcstTime = hourlyFcstItems.get(0).getFcstTime().substring(0, 2);
 			
 			calendar.set(Integer.parseInt(fcstDate.substring(0, 4)), Integer.parseInt(fcstDate.substring(4, 6)) - 1,
-					Integer.parseInt(fcstDate.substring(6, 8)), Integer.parseInt(fcstTime), 0, 0);
+					Integer.parseInt(fcstDate.substring(6, 8)),
+					Integer.parseInt(hourlyFcstItems.get(0).getFcstTime().substring(0, 2).substring(0, 2)), 0, 0);
 			
-			finalHourlyForecast.setFcstDateTime(calendar.getTime().getTime());
+			finalHourlyForecast.setFcstDateTime(calendar.getTime());
 			
 			for (VilageFcstItem item : hourlyFcstItems) {
 				if (item.getCategory().equals(POP)) {
@@ -216,7 +216,12 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	public static List<FinalDailyForecast> getFinalDailyForecastList(MidLandFcstRoot midLandFcstRoot, MidTaRoot midTaRoot, Long tmFc) {
 		//중기예보 데이터 생성 3~10일후
 		Calendar calendar = Calendar.getInstance(ClockUtil.KR_TIMEZONE);
-		calendar.setTimeInMillis(tmFc);
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddhhmm", Locale.US);
+		try {
+			calendar.setTime(format.parse(tmFc.toString()));
+		} catch (Exception e) {
+		
+		}
 		//3일 후로 이동
 		calendar.add(Calendar.DATE, 3);
 		

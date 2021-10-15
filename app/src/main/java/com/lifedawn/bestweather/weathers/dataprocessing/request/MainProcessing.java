@@ -67,7 +67,7 @@ public class MainProcessing {
 									nearbyKmaAreaCodeDto = weatherAreaCodeDTO;
 								}
 							}
-							final Calendar calendar = Calendar.getInstance(ClockUtil.KR_TIMEZONE);
+							final Calendar calendar = Calendar.getInstance();
 							multipleJsonDownloader.put("calendar", String.valueOf(calendar.getTimeInMillis()));
 							KmaProcessing.getKmaForecasts(nearbyKmaAreaCodeDto, calendar, multipleJsonDownloader);
 						}

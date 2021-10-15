@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="AccuWeatherWeatherIconCodes">
+    <string-array name="AccuWeatherWeatherIconCodes">
         <item>1</item>
         <item>2</item>
         <item>3</item>
@@ -41,9 +41,9 @@
         <item>42</item>
         <item>43</item>
         <item>44</item>
-    </array>
+    </string-array>
 
-    <array name="AccuWeatherWeatherIconDescriptionsForCode">
+    <string-array name="AccuWeatherWeatherIconDescriptionsForCode">
         <item>@string/accu_weather_icon_1_sunny</item>
         <item>@string/accu_weather_icon_2_mostly_sunny</item>
         <item>@string/accu_weather_icon_3_partly_sunny</item>
@@ -84,11 +84,11 @@
         <item>@string/accu_weather_icon_42_mostly_cloudy_and_thunderstorms</item>
         <item>@string/accu_weather_icon_43_mostly_cloudy_and_flurries</item>
         <item>@string/accu_weather_icon_44_mostly_cloudy_and_snow</item>
-    </array>
+    </string-array>
 
-    <array name="AccuWeatherWeatherIconDrawableIdsForCode"></array>
+    <integer-array name="AccuWeatherWeatherIconDrawableIdsForCode"></integer-array>
 
-    <array name="OpenWeatherMapWeatherIconCodes">
+    <string-array name="OpenWeatherMapWeatherIconCodes">
         <item>200</item>
         <item>201</item>
         <item>202</item>
@@ -144,9 +144,9 @@
         <item>802</item>
         <item>803</item>
         <item>804</item>
-    </array>
+    </string-array>
 
-    <array name="OpenWeatherMapWeatherIconDescriptionsForCode">
+    <string-array name="OpenWeatherMapWeatherIconDescriptionsForCode">
         <item>@string/owm_icon_200_thunderstorm_with_light_rain</item>
         <item>@string/owm_icon_201_thunderstorm_with_rain</item>
         <item>@string/owm_icon_202_thunderstorm_with_heavy_rain</item>
@@ -202,25 +202,25 @@
         <item>@string/owm_icon_802_scattered_clouds</item>
         <item>@string/owm_icon_803_broken_clouds</item>
         <item>@string/owm_icon_804_overcast_clouds</item>
-    </array>
+    </string-array>
 
     <array name="OpenWeatherMapWeatherIconDrawableIdsForCode"></array>
 
-    <array name="KmaSkyIconCodes">
+    <string-array name="KmaSkyIconCodes">
         <item>1</item>
         <item>3</item>
         <item>4</item>
-    </array>
+    </string-array>
 
-    <array name="KmaSkyIconDescriptionsForCode">
+    <string-array name="KmaSkyIconDescriptionsForCode">
         <item>@string/kma_sky_1_clear</item>
         <item>@string/kma_sky_3_mostly_cloudy</item>
         <item>@string/kma_sky_4_overcast</item>
-    </array>
+    </string-array>
 
-    <array name="KmaSkyIconDrawableIdsForCode"></array>
+    <integer-array name="KmaSkyIconDrawableIdsForCode"></integer-array>
 
-    <array name="KmaPtyIconCodes">
+    <string-array name="KmaPtyIconCodes">
         <item>0</item>
         <item>1</item>
         <item>2</item>
@@ -229,9 +229,9 @@
         <item>5</item>
         <item>6</item>
         <item>7</item>
-    </array>
+    </string-array>
 
-    <array name="KmaPtyIconDescriptionsForCode">
+    <string-array name="KmaPtyIconDescriptionsForCode">
         <item>@string/kma_pty_0_not</item>
         <item>@string/kma_pty_1_rain</item>
         <item>@string/kma_pty_2_rain_and_snow</item>
@@ -240,34 +240,34 @@
         <item>@string/kma_pty_5_raindrop</item>
         <item>@string/kma_pty_6_raindrop_and_snow_blizzard</item>
         <item>@string/kma_pty_7_snow_blizzard</item>
-    </array>
+    </string-array>
 
     <array name="KmaPtyIconDrawableIdsForCode"></array>
 
-    <array name="AqiGrades">
+    <string-array name="AqiGrades">
         <item>50</item>
         <item>100</item>
         <item>150</item>
         <item>200</item>
         <item>300</item>
-    </array>
+    </string-array>
 
-    <array name="AqiGradeColors">
+    <string-array name="AqiGradeColors">
         <item>@color/aqi_1_good</item>
         <item>@color/aqi_2_Moderate</item>
         <item>@color/aqi_3_unhealthy_for_sensitive_groups</item>
         <item>@color/aqi_4_unhealthy</item>
         <item>@color/aqi_5_very_unhealthy</item>
         <item>@color/aqi_6_hazardous</item>
-    </array>
+    </string-array>
 
-    <array name="AqiGradeDescriptions">
+    <string-array name="AqiGradeDescriptions">
         <item>@string/aqi_1_good</item>
         <item>@string/aqi_2_Moderate</item>
         <item>@string/aqi_3_unhealthy_for_sensitive_groups</item>
         <item>@string/aqi_4_unhealthy</item>
         <item>@string/aqi_5_very_unhealthy</item>
         <item>@string/aqi_6_hazardous</item>
-    </array>
+    </string-array>
 
 </resources>

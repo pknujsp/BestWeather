@@ -21,8 +21,8 @@
                 style="@style/sub_title_in_forecast_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="?attr/textColorInForecastCard"
-                android:text="@string/current" />
+                android:text="@string/current"
+                android:textColor="?attr/textColorInWeatherCard" />
 
             <GridLayout
                 android:layout_width="match_parent"
@@ -126,7 +126,8 @@
                 style="@style/sub_title_in_forecast_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/daily_forecast" />
+                android:text="@string/daily_forecast"
+                android:textColor="?attr/textColorInWeatherCard" />
 
             <LinearLayout
                 android:id="@+id/forecast"

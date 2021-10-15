@@ -10,8 +10,8 @@ import android.util.TypedValue;
 import android.view.View;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.theme.AppTheme;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class DetailSingleTemperatureView extends View {
@@ -35,11 +35,13 @@ public class DetailSingleTemperatureView extends View {
 		TEMP_PAINT = new TextPaint();
 		TEMP_PAINT.setTextAlign(Paint.Align.CENTER);
 		TEMP_PAINT.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics()));
+		TEMP_PAINT.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
 		
 		LINE_PAINT = new Paint();
 		LINE_PAINT.setAntiAlias(true);
 		LINE_PAINT.setStyle(Paint.Style.FILL);
 		LINE_PAINT.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.3f, getResources().getDisplayMetrics()));
+		LINE_PAINT.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
 		
 		MIN_MAX_TEMP_LINE_PAINT = new Paint();
 		MIN_MAX_TEMP_LINE_PAINT.setAntiAlias(true);
@@ -50,6 +52,7 @@ public class DetailSingleTemperatureView extends View {
 		CIRCLE_PAINT = new Paint();
 		CIRCLE_PAINT.setAntiAlias(true);
 		CIRCLE_PAINT.setStyle(Paint.Style.FILL);
+		CIRCLE_PAINT.setColor(Color.DKGRAY);
 		
 		this.tempList = tempList;
 		
@@ -90,10 +93,6 @@ public class DetailSingleTemperatureView extends View {
 	
 	private void drawGraph(Canvas canvas) {
 		// 텍스트의 높이+원의 반지름 만큼 뷰의 상/하단에 여백을 설정한다.
-		TEMP_PAINT.setColor(Color.BLACK);
-		CIRCLE_PAINT.setColor(Color.DKGRAY);
-		LINE_PAINT.setColor(Color.GRAY);
-		
 		final float TEXT_HEIGHT = TEMP_PAINT.descent() - TEMP_PAINT.ascent();
 		final float RADIUS = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, getResources().getDisplayMetrics());
 		

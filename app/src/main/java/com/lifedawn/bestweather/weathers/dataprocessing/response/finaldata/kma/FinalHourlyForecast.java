@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class FinalHourlyForecast {
 	
-	private Long fcstDateTime;
+	private Date fcstDateTime;
 	//nx
 	private String nx;
 	//ny
@@ -34,12 +34,12 @@ public class FinalHourlyForecast {
 	//낙뢰 LGT
 	private String lightning;
 	
-	public FinalHourlyForecast setFcstDateTime(Long fcstDateTime) {
+	public FinalHourlyForecast setFcstDateTime(Date fcstDateTime) {
 		this.fcstDateTime = fcstDateTime;
 		return this;
 	}
 	
-	public Long getFcstDateTime() {
+	public Date getFcstDateTime() {
 		return fcstDateTime;
 	}
 	

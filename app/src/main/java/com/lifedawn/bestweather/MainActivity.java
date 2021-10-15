@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,10 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
 import com.lifedawn.bestweather.main.MainFragment;
 import com.lifedawn.bestweather.test.TestFragment;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 		
 		initPreferences();
+		AccuWeatherResponseProcessor.init(getApplicationContext());
+		AqicnResponseProcessor.init(getApplicationContext());
+		KmaResponseProcessor.init(getApplicationContext());
+		OpenWeatherMapResponseProcessor.init(getApplicationContext());
 		
 		MainFragment mainFragment = new MainFragment();
 		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -47,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
 	
 	private void initPreferences() {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		
 		try {
 			if (sharedPreferences.getAll().isEmpty()) {
 				SharedPreferences.Editor editor = sharedPreferences.edit();

@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -17,6 +18,7 @@ import com.lifedawn.bestweather.databinding.BaseLayoutDetailCurrentConditionsBin
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.GridItemDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
@@ -50,23 +52,8 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	
 	}
 	
-	protected View addGridItemView() {
-		return LayoutInflater.from(getContext()).inflate(R.layout.current_conditions_detail_item, null);
-	}
-	
-	protected void setLabel(View gridItemView, int labelStrId) {
-		((TextView) gridItemView.findViewById(R.id.label)).setText(labelStrId);
-	}
-	
-	protected void setValue(View gridItemView, String value) {
-		gridItemView.findViewById(R.id.value_img).setVisibility(View.GONE);
-		((TextView) gridItemView.findViewById(R.id.value)).setText(value);
-	}
-	
-	protected void setValue(View gridItemView, String value, int imgId) {
-		gridItemView.findViewById(R.id.value_img).setVisibility(View.VISIBLE);
-		Glide.with(requireContext()).load(imgId).into(((ImageView) gridItemView.findViewById(R.id.value_img)));
-		((TextView) gridItemView.findViewById(R.id.value)).setText(value);
+	protected final GridItemDto makeGridItem(int labelStrId, String value, int imgId) {
+		return new GridItemDto(getString(labelStrId), value, imgId == 0 ? null : ContextCompat.getDrawable(getContext(), imgId));
 	}
 	
 }

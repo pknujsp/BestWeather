@@ -2,13 +2,13 @@ package com.lifedawn.bestweather.weathers.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.text.TextPaint;
 import android.view.View;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.commons.classes.ClockUtil;
 
 import java.text.SimpleDateFormat;
@@ -38,6 +38,7 @@ public class DateView extends View {
 		dateTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		dateTextPaint.setTextAlign(Paint.Align.CENTER);
 		dateTextPaint.setTextSize(context.getResources().getDimension(R.dimen.date_text_size_in_simple_forecast_view));
+		dateTextPaint.setColor(AppTheme.getColor(context,R.attr.textColorInWeatherCard));
 		
 		Rect rect = new Rect();
 		dateTextPaint.getTextBounds("0", 0, 1, rect);
@@ -90,8 +91,6 @@ public class DateView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		
-		dateTextPaint.setColor(Color.WHITE);
 		final int y = getHeight() / 2 + textHeight / 2;
 		
 		for (DateValue dateValue : dateValueList) {
