@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
+        android:id="@+id/root_layout"
         style="@style/forecasts_card_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,13 +14,10 @@
             android:id="@+id/weather_card_view_header"
             layout="@layout/weather_card_header_view" />
 
-        <view
-            android:id="@+id/dataview"
-            class="com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.SunSetRiseView"
+        <RelativeLayout
+            android:id="@+id/sunSetRiseLayout"
             android:layout_width="match_parent"
-            android:layout_height="150dp">
-
-        </view>
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </layout>
