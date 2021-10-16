@@ -14,10 +14,6 @@
             android:id="@+id/weather_card_view_header"
             layout="@layout/weather_card_header_view" />
 
-        <RelativeLayout
-            android:id="@+id/sunSetRiseLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </layout>
