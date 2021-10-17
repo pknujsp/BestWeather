@@ -86,7 +86,48 @@
         <item>@string/accu_weather_icon_44_mostly_cloudy_and_snow</item>
     </string-array>
 
-    <integer-array name="AccuWeatherWeatherIconDrawableIdsForCode"></integer-array>
+    <string-array name="AccuWeatherWeatherIconDrawableIdsForCode">
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_mostly_cloudy</item>
+        <item>@string/flickr_mostly_cloudy</item>
+        <item>@string/flickr_mostly_cloudy</item>
+        <item>@string/flickr_overcast</item>
+        <item>@string/flickr_overcast</item>
+        <item>@string/flickr_overcast</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_partly_cloudy</item>
+        <item>@string/flickr_mostly_cloudy</item>
+        <item>@string/flickr_mostly_cloudy</item>
+        <item>@string/flickr_mostly_cloudy</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_mostly_cloudy</item>
+    </string-array>
 
     <string-array name="OpenWeatherMapWeatherIconCodes">
         <item>200</item>
@@ -204,7 +245,63 @@
         <item>@string/owm_icon_804_overcast_clouds</item>
     </string-array>
 
-    <array name="OpenWeatherMapWeatherIconDrawableIdsForCode"></array>
+    <string-array name="OpenWeatherMapWeatherIconDrawableIdsForCode">
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_partly_cloudy</item>
+        <item>@string/flickr_mostly_cloudy</item>
+        <item>@string/flickr_mostly_cloudy</item>
+        <item>@string/flickr_overcast</item>
+    </string-array>
 
     <string-array name="KmaSkyIconCodes">
         <item>1</item>
@@ -218,7 +315,11 @@
         <item>@string/kma_sky_4_overcast</item>
     </string-array>
 
-    <integer-array name="KmaSkyIconDrawableIdsForCode"></integer-array>
+    <string-array name="KmaSkyIconDrawableIdsForCode">
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_mostly_cloudy</item>
+        <item>@string/flickr_overcast</item>
+    </string-array>
 
     <string-array name="KmaPtyIconCodes">
         <item>0</item>
@@ -242,7 +343,16 @@
         <item>@string/kma_pty_7_snow_blizzard</item>
     </string-array>
 
-    <array name="KmaPtyIconDrawableIdsForCode"></array>
+    <string-array name="KmaPtyIconDrawableIdsForCode">
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_rain</item>
+        <item>@string/flickr_snow</item>
+        <item>@string/flickr_snow</item>
+    </string-array>
 
     <integer-array name="AqiGrades">
         <item>50</item>

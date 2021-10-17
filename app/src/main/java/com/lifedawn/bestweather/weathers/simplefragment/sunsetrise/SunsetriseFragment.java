@@ -1,5 +1,9 @@
 package com.lifedawn.bestweather.weathers.simplefragment.sunsetrise;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,6 +17,7 @@ import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.ClockUtil;
 import com.lifedawn.bestweather.databinding.FragmentSunsetriseBinding;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
@@ -63,12 +68,31 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 		sunSetRiseViewGroup = new SunSetRiseViewGroup(getContext(), location);
 		binding.rootLayout.addView(sunSetRiseViewGroup, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 		setValuesToViews();
+
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(Intent.ACTION_TIME_TICK);
+
+		requireActivity().registerReceiver(broadcastReceiver, intentFilter);
 	}
 
+	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction() != null) {
+				if (Intent.ACTION_TIME_TICK.equals(intent.getAction())) {
+					sunSetRiseViewGroup.refresh();
+				}
+			}
+		}
+	};
 
 	@Override
 	public void setValuesToViews() {
 	}
 
-
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		requireActivity().unregisterReceiver(broadcastReceiver);
+	}
 }

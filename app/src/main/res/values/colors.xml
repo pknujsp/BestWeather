@@ -16,4 +16,6 @@
     <color name="aqi_4_unhealthy">#cc0033</color>
     <color name="aqi_5_very_unhealthy">#660099</color>
     <color name="aqi_6_hazardous">#7e0023</color>
+
+    <color name="comfortable_color_for_eyes">#A9D3ED</color>
 </resources>

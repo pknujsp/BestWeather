@@ -1,12 +1,8 @@
 package com.lifedawn.bestweather.weathers;
 
-import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -15,7 +11,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
@@ -24,7 +19,6 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -42,12 +36,16 @@ import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryRespo
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
+import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 import com.lifedawn.bestweather.weathers.viewpager.WeatherViewPagerAdapter;
+import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -224,9 +222,42 @@ public class WeatherMainFragment extends Fragment implements IGps, WeatherViewMo
 	}
 
 	@Override
-	public void loadImgOfCurrentConditions(String val) {
+	public void loadImgOfCurrentConditions(MainProcessing.WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude) {
 		FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
 		photosFromGalleryParameter.setGalleryId("72157719980390655");
+
+		Calendar calendar = Calendar.getInstance();
+		SunriseSunsetCalculator sunriseSunsetCalculator =
+				new SunriseSunsetCalculator(new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), calendar.getTimeZone());
+		Calendar sunRiseCalendar = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(calendar);
+		Calendar sunSetCalendar = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(calendar);
+
+		final long currentTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(calendar.getTimeInMillis());
+		final long sunRiseTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunRiseCalendar.getTimeInMillis());
+		final long sunSetTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunSetCalendar.getTimeInMillis());
+
+		String time = null;
+
+		//현재 시각 파악 : 낮, 밤, 일출, 일몰(+-20분)
+		if (currentTimeMinutes < sunRiseTimeMinutes - 2) {
+			//새벽
+			time = "night";
+		} else if (currentTimeMinutes <= sunRiseTimeMinutes + 20) {
+			//일출
+			time = "sunrise";
+		} else if (currentTimeMinutes > sunRiseTimeMinutes + 20 && currentTimeMinutes <= sunSetTimeMinutes - 20) {
+			//낮
+			time = "day";
+		} else if (currentTimeMinutes < sunSetTimeMinutes + 2) {
+			//일몰
+			time = "sunset";
+		} else {
+			//밤
+			time = "night";
+		}
+
+		String weather = null;
+
 
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
 		Call<JsonElement> call = querys.getPhotosFromGallery(photosFromGalleryParameter.getMap());
@@ -237,13 +268,14 @@ public class WeatherMainFragment extends Fragment implements IGps, WeatherViewMo
 				PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
 						PhotosFromGalleryResponse.class);
 
-				// https://live.staticflickr.com/65535/50081787401_355bcec912_b.jpg
-				// https://live.staticflickr.com/server/id_secret_size.jpg
-				final String url = "https://live.staticflickr.com/" + photosFromGalleryResponse.getPhotos().getPhoto().get(0).getServer()
-						+ "/" + photosFromGalleryResponse.getPhotos().getPhoto().get(0).getId() + "_" +
-						photosFromGalleryResponse.getPhotos().getPhoto().get(0).getSecret() + "_b.jpg";
-
-				Glide.with(WeatherMainFragment.this).load(url).into(binding.currentConditionsImg);
+				if (!photosFromGalleryResponse.getPhotos().getTotal().equals("0")) {
+					// https://live.staticflickr.com/65535/50081787401_355bcec912_b.jpg
+					// https://live.staticflickr.com/server/id_secret_size.jpg
+					final String url = "https://live.staticflickr.com/" + photosFromGalleryResponse.getPhotos().getPhoto().get(0).getServer()
+							+ "/" + photosFromGalleryResponse.getPhotos().getPhoto().get(0).getId() + "_" +
+							photosFromGalleryResponse.getPhotos().getPhoto().get(0).getSecret() + "_b.jpg";
+					Glide.with(WeatherMainFragment.this).load(url).into(binding.currentConditionsImg);
+				}
 			}
 
 			@Override

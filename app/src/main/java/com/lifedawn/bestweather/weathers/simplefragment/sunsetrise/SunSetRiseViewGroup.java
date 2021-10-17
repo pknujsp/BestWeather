@@ -47,11 +47,14 @@ public class SunSetRiseViewGroup extends ViewGroup {
 	private TextPaint timeTextPaint;
 	private Rect lineRect;
 	private Rect timeTextRect;
+	private Rect currentTextRect;
 	private Point timeCirclePoint;
 	private Paint timeCirclePaint;
 
 	private Point type1PointOnLine;
 	private Point type2PointOnLine;
+
+	private String current;
 
 	public SunSetRiseViewGroup(Context context, Location location) {
 		super(context);
@@ -76,13 +79,15 @@ public class SunSetRiseViewGroup extends ViewGroup {
 		timeTextPaint.setTextAlign(Paint.Align.RIGHT);
 
 		timeCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		timeCirclePaint.setColor(Color.DKGRAY);
+		timeCirclePaint.setColor(Color.WHITE);
 
 		lineRect = new Rect();
 		timeTextRect = new Rect();
 		timeCirclePoint = new Point();
+		currentTextRect = new Rect();
 
 		Calendar calendar = Calendar.getInstance();
+		current = context.getString(R.string.current);
 		String currentDateTime = dateFormat.format(calendar.getTime());
 		timeTextPaint.getTextBounds(currentDateTime, 0, currentDateTime.length(), timeTextRect);
 
@@ -152,6 +157,30 @@ public class SunSetRiseViewGroup extends ViewGroup {
 		timeCirclePoint.x = type1PointOnLine.x;
 		timeCirclePoint.y = (int) currentTimeY;
 		canvas.drawCircle(timeCirclePoint.x, timeCirclePoint.y, circleRadius, timeCirclePaint);
+
+		timeTextRect.offsetTo(timeCirclePoint.x - lineMargin - lineWidth / 2, timeCirclePoint.y);
+		timeTextPaint.setTextAlign(Paint.Align.RIGHT);
+		String currentDateTime = dateFormat.format(calendar.getTime());
+		canvas.drawText(currentDateTime, timeTextRect.left, timeTextRect.top + timeTextPaint.descent() - timeTextPaint.ascent(),
+				timeTextPaint);
+
+		timeTextPaint.getTextBounds(currentDateTime, 0, currentDateTime.length(), currentTextRect);
+
+		timeTextPaint.setTextAlign(Paint.Align.CENTER);
+
+		canvas.drawText(current, timeTextRect.left - currentTextRect.width() / 2f, timeTextRect.top,
+				timeTextPaint);
+	}
+
+	public void refresh() {
+		Calendar calendar = Calendar.getInstance();
+		if (type2View.getCalendar().before(calendar)) {
+			setViews();
+			invalidate();
+			requestLayout();
+		} else {
+			invalidate();
+		}
 	}
 
 
@@ -214,6 +243,8 @@ public class SunSetRiseViewGroup extends ViewGroup {
 		type1View = new SunSetRiseInfoView(getContext(), type1Calendar, type1);
 		type2View = new SunSetRiseInfoView(getContext(), type2Calendar, type2);
 		type3View = new SunSetRiseInfoView(getContext(), type3Calendar, type3);
+
+		removeAllViews();
 
 		addView(type1View);
 		addView(type2View);

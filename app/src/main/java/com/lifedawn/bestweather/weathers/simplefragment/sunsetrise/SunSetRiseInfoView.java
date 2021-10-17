@@ -60,7 +60,7 @@ public class SunSetRiseInfoView extends View {
 		timeTextPaint.getTextBounds(dateTime, 0, dateTime.length(), timeTextRect);
 
 		int typeTextLeftMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
-		int timeTextTopMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, getResources().getDisplayMetrics());
+		int timeTextTopMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
 
 		final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
 

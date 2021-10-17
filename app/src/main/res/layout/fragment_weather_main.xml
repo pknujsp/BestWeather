@@ -11,6 +11,7 @@
             android:id="@+id/current_conditions_img"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/comfortable_color_for_eyes"
             android:scaleType="centerCrop" />
 
         <LinearLayout
@@ -43,7 +44,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:background="@color/transparent"
-                android:orientation="horizontal" />
+                android:orientation="horizontal"
+                android:overScrollMode="never" />
 
             <com.lifedawn.bestweather.commons.views.CustomProgressView
                 android:id="@+id/custom_progress_view"

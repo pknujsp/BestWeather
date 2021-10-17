@@ -317,5 +317,12 @@
     <string name="sunrise">일출</string>
     <string name="not_data">정보없음</string>
 
+    <!-- flickr weather -->
+    <string name="flickr_clear">clear</string>
+    <string name="flickr_partly_cloudy">partly cloudy</string>
+    <string name="flickr_mostly_cloudy">mostly cloudy</string>
+    <string name="flickr_overcast">overcast</string>
+    <string name="flickr_rain">rain</string>
+    <string name="flickr_snow">snow</string>
 
 </resources>

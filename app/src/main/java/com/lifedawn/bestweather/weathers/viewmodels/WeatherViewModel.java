@@ -5,6 +5,8 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
+import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
+
 import org.jetbrains.annotations.NotNull;
 
 public class WeatherViewModel extends AndroidViewModel {
@@ -23,6 +25,6 @@ public class WeatherViewModel extends AndroidViewModel {
 	}
 
 	public interface ILoadImgOfCurrentConditions {
-		void loadImgOfCurrentConditions(String val);
+		void loadImgOfCurrentConditions(MainProcessing.WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude);
 	}
 }
