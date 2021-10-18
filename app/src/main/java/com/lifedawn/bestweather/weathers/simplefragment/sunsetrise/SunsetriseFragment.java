@@ -34,7 +34,6 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	private FragmentSunsetriseBinding binding;
 	private SunSetRiseViewGroup sunSetRiseViewGroup;
 	private Location location;
-	private final SimpleDateFormat dateFormat = new SimpleDateFormat("M.d E H:mm", Locale.getDefault());
 
 	public enum SunSetRiseType {
 		RISE, SET

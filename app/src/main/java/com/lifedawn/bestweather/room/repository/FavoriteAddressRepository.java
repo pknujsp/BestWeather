@@ -48,7 +48,7 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 			public void run() {
 				long id = favoriteAddressDao.add(favoriteAddressDto);
 				callback.processResult(id);
-				addAddressesLiveData.postValue(favoriteAddressDao.getAll().get((int) id));
+				addAddressesLiveData.postValue(favoriteAddressDao.get((int) id));
 			}
 		}).start();
 	}

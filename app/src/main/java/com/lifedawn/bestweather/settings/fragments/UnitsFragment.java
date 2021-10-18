@@ -4,29 +4,18 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
 
-import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.slider.Slider;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.interfaces.IAppbarTitle;
 import com.lifedawn.bestweather.settings.custompreferences.UnitPreference;
-
-import org.jetbrains.annotations.NotNull;
 
 public class UnitsFragment extends PreferenceFragmentCompat {
 	private UnitPreference tempPreference;
@@ -109,8 +98,8 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 										switch (which) {
 											case 0:
 												sharedPreferences.edit()
-														.putString(windPreference.getKey(), ValueUnits.mmPerSec.name()).apply();
-												windPreference.setUnit(ValueUnits.mmPerSec);
+														.putString(windPreference.getKey(), ValueUnits.mPerSec.name()).apply();
+												windPreference.setUnit(ValueUnits.mPerSec);
 												break;
 											//mmPerSec
 											case 1:
@@ -220,7 +209,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 
 			case wind:
 				switch (valueUnit) {
-					case mmPerSec:
+					case mPerSec:
 						return 0;
 					case kmPerHour:
 						return 1;
@@ -249,7 +238,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		if (preference == tempPreference) {
 			return new CharSequence[]{getString(R.string.celsius), getString(R.string.fahrenheit)};
 		} else if (preference == windPreference) {
-			return new CharSequence[]{getString(R.string.mmPerSec), getString(R.string.kmPerHour)};
+			return new CharSequence[]{getString(R.string.mPerSec), getString(R.string.kmPerHour)};
 		} else if (preference == visibilityPreference) {
 			return new CharSequence[]{getString(R.string.km), getString(R.string.mile)};
 		} else {

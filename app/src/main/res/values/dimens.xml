@@ -25,5 +25,5 @@
     <dimen name="weather_icon_row_height_in_simple_forecast_view">38dp</dimen>
     <dimen name="default_row_height_in_simple_forecast_view">24dp</dimen>
     <dimen name="detail_temperature_row_height_in_simple_forecast_view">90dp</dimen>
-    <dimen name="circle_radius_in_detail_temperature_view">3dp</dimen>
+    <dimen name="circle_radius_in_detail_temperature_view">4dp</dimen>
 </resources>

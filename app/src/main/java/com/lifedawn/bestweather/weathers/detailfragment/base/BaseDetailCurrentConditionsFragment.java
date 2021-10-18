@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers.detailfragment.base;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,9 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import com.bumptech.glide.Glide;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailCurrentConditionsBinding;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
@@ -29,10 +32,21 @@ import java.util.Objects;
 public class BaseDetailCurrentConditionsFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutDetailCurrentConditionsBinding binding;
 	protected LayoutInflater layoutInflater;
+	protected SharedPreferences sharedPreferences;
+	protected ValueUnits tempUnit;
+	protected ValueUnits windUnit;
+	protected ValueUnits visibilityUnit;
+	protected ValueUnits clockUnit;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
+		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.mPerSec.name()));
+		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.km.name()));
+		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.clock24.name()));
 	}
 
 	@Override

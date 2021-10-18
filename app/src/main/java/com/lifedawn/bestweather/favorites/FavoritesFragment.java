@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +21,7 @@ import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +30,7 @@ import java.util.List;
 public class FavoritesFragment extends Fragment {
 	private FragmentFavoritesBinding binding;
 	private FavoriteAddressesAdapter adapter;
-	private FavoriteAddressRepository favoriteAddressRepository;
+	private WeatherViewModel weatherViewModel;
 
 	private FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
 		@Override
@@ -59,6 +61,7 @@ public class FavoritesFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
+		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 	}
 
 	@Override
@@ -91,14 +94,12 @@ public class FavoritesFragment extends Fragment {
 			}
 		});
 
-		favoriteAddressRepository = new FavoriteAddressRepository(getContext());
-
 		binding.favoriteAddressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		adapter = new FavoriteAddressesAdapter();
 		adapter.setOnDeleteListener(new FavoriteAddressesAdapter.OnDeleteListener() {
 			@Override
 			public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {
-				favoriteAddressRepository.delete(favoriteAddressDto);
+				weatherViewModel.delete(favoriteAddressDto);
 			}
 		});
 
@@ -115,7 +116,7 @@ public class FavoritesFragment extends Fragment {
 				}
 			}
 		});
-		favoriteAddressRepository.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
+		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
 				adapter.setFavoriteAddressDtoList(result);
@@ -146,7 +147,7 @@ public class FavoritesFragment extends Fragment {
 	public void onHiddenChanged(boolean hidden) {
 		super.onHiddenChanged(hidden);
 		if (!hidden) {
-			favoriteAddressRepository.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
+			weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 				@Override
 				public void onResultSuccessful(List<FavoriteAddressDto> result) {
 					adapter.setFavoriteAddressDtoList(result);
@@ -155,7 +156,6 @@ public class FavoritesFragment extends Fragment {
 							@Override
 							public void run() {
 								adapter.notifyDataSetChanged();
-
 							}
 						});
 					}

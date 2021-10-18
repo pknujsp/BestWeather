@@ -10,8 +10,10 @@ import android.util.TypedValue;
 import android.view.View;
 
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.theme.AppTheme;
 
 import java.text.SimpleDateFormat;
@@ -22,7 +24,7 @@ public class SunSetRiseInfoView extends View {
 	private Drawable typeIcon;
 	private Calendar calendar;
 	private String type;
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("M.d E H:mm", Locale.getDefault());
+	private SimpleDateFormat dateFormat;
 
 	private TextPaint typeTextPaint;
 	private TextPaint timeTextPaint;
@@ -56,6 +58,13 @@ public class SunSetRiseInfoView extends View {
 		timeTextRect = new Rect();
 
 		typeTextPaint.getTextBounds(type, 0, type.length(), typeTextRect);
+
+		ValueUnits clockUnit =
+				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock),
+						ValueUnits.clock12.name()));
+		dateFormat = new SimpleDateFormat(clockUnit == ValueUnits.clock12
+				? "M.d E a h:m" : "M.d E HH:m", Locale.getDefault());
+
 		String dateTime = dateFormat.format(calendar.getTime());
 		timeTextPaint.getTextBounds(dateTime, 0, dateTime.length(), timeTextRect);
 

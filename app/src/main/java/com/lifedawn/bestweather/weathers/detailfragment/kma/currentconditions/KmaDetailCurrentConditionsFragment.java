@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.gridlayout.widget.GridLayout;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
@@ -42,14 +43,16 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 	@Override
 	public void setValuesToViews() {
 		// 기온,1시간강수량,습도,강수형태,풍향,풍속
-		addGridItem(R.string.temperature, finalCurrentConditions.getTemperature(), R.drawable.temp_icon);
+		addGridItem(R.string.temperature, ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(), tempUnit).toString(),
+				R.drawable.temp_icon);
 		addGridItem(R.string.humidity, finalCurrentConditions.getHumidity(), R.drawable.temp_icon);
 		addGridItem(R.string.wind_direction, finalCurrentConditions.getWindDirection(), R.drawable.temp_icon);
-		addGridItem(R.string.wind_speed, finalCurrentConditions.getWindSpeed(), R.drawable.temp_icon);
+		addGridItem(R.string.wind_speed, ValueUnits.convertWindSpeed(finalCurrentConditions.getWindSpeed(), windUnit).toString(),
+				R.drawable.temp_icon);
 		addGridItem(R.string.wind_strength,
 				WeatherResponseProcessor.getSimpleWindSpeedDescription(finalCurrentConditions.getWindSpeed()), R.drawable.temp_icon);
 		addGridItem(R.string.precipitation_volume, finalCurrentConditions.getPrecipitation1Hour(), R.drawable.temp_icon);
-		View lastView = addGridItem(R.string.precipitation_type,
+		addGridItem(R.string.precipitation_type,
 				KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()), R.drawable.temp_icon);
 
 	}

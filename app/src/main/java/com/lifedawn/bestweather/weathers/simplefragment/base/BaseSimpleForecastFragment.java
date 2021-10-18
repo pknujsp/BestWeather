@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers.simplefragment.base;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -13,8 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleForecastBinding;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
@@ -24,22 +27,33 @@ import org.jetbrains.annotations.NotNull;
 public class BaseSimpleForecastFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutSimpleForecastBinding binding;
 	protected DateView dateRow;
-	
+	protected SharedPreferences sharedPreferences;
+	protected ValueUnits tempUnit;
+	protected ValueUnits windUnit;
+	protected ValueUnits visibilityUnit;
+	protected ValueUnits clockUnit;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
+		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.mPerSec.name()));
+		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.km.name()));
+		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.clock24.name()));
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = BaseLayoutSimpleForecastBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		
+
 		binding.scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
@@ -49,12 +63,12 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 			}
 		});
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
-	
+
 	}
-	
+
 	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewWidth, int viewHeight, int margin) {
 		ImageView labelView = new ImageView(getContext());
 		labelView.setImageDrawable(ContextCompat.getDrawable(getContext(), labelImgId));
@@ -66,13 +80,13 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 				Toast.makeText(getContext(), labelDescription, Toast.LENGTH_SHORT).show();
 			}
 		});
-		
+
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(viewWidth, viewHeight);
 		layoutParams.gravity = Gravity.CENTER;
 		layoutParams.topMargin = margin;
 		layoutParams.bottomMargin = margin;
 		labelView.setLayoutParams(layoutParams);
-		
+
 		binding.labels.addView(labelView);
 		return labelView;
 	}

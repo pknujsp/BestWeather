@@ -17,8 +17,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
@@ -30,7 +32,7 @@ import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class SunSetRiseViewGroup extends ViewGroup {
-	private final SimpleDateFormat dateFormat = new SimpleDateFormat("M.d E H:mm", Locale.getDefault());
+	private SimpleDateFormat dateFormat;
 	private Location location;
 
 	private SunSetRiseInfoView type1View;
@@ -88,6 +90,13 @@ public class SunSetRiseViewGroup extends ViewGroup {
 
 		Calendar calendar = Calendar.getInstance();
 		current = context.getString(R.string.current);
+
+		ValueUnits clockUnit =
+				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock),
+						ValueUnits.clock12.name()));
+		dateFormat = new SimpleDateFormat(clockUnit == ValueUnits.clock12
+				? "M.d E a h:m" : "M.d E HH:m", Locale.getDefault());
+
 		String currentDateTime = dateFormat.format(calendar.getTime());
 		timeTextPaint.getTextBounds(currentDateTime, 0, currentDateTime.length(), timeTextRect);
 

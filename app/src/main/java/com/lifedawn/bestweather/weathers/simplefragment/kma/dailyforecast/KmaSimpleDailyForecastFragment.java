@@ -107,8 +107,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			
 			probabilityOfPrecipitationList.add(finalDailyForecastList.get(index).getProbabilityOfPrecipitation());
 		}
-		
-		
+
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(getContext(), VIEW_WIDTH, TEMP_ROW_HEIGHT, COLUMN_WIDTH,
 				minTempList, maxTempList);

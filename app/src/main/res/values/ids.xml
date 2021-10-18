@@ -7,4 +7,6 @@
     <item name="sunSetRiseType1View" type="id" />
     <item name="sunSetRiseType2View" type="id" />
     <item name="sunSetRiseType3View" type="id" />
+    <item name="locationTypeTagInFavLocItemViewInSideNav" type="id" />
+    <item name="favoriteLocationDtoTagInFavLocItemViewInSideNav" type="id" />
 </resources>

@@ -67,7 +67,7 @@
     <string name="pref_key_unit_preference">pref_key_unit_preference</string>
 
     <string name="pref_key_weather_data_sources">pref_key_weather_data_sources</string>
-    <string name="pref_summary_weather_data_sources">Accu Weather, OpenWeatherMap, Kma...</string>
+    <string name="pref_summary_weather_data_sources">Accu Weather, OpenWeatherMap, Kma~</string>
     <string name="pref_title_weather_data_sources">날씨 제공사</string>
 
     <string name="pref_key_last_current_location_latitude">pref_key_last_current_location_latitude</string>
@@ -75,16 +75,22 @@
 
     <string name="pref_key_main_weather_data_source">pref_key_main_weather_data_source</string>
 
+    <string name="pref_key_last_selected_favorite_address_id">pref_key_last_selected_favorite_address_id</string>
+
+    <!-- appthemes -->
     <string name="black">검정</string>
     <string name="white">하양</string>
-    <string name="celsius">ºC</string>
-    <string name="fahrenheit">ºF</string>
-    <string name="mmPerSec">mm/s</string>
+
+    <!-- value units -->
+    <string name="celsius">°C</string>
+    <string name="fahrenheit">°F</string>
+    <string name="mPerSec">m/s</string>
     <string name="kmPerHour">km/h</string>
     <string name="km">km</string>
     <string name="mile">mile</string>
     <string name="clock12">12시간제</string>
     <string name="clock24">24시간제</string>
+
     <string name="favorite">즐겨찾기</string>
 
     <!-- fragment tag -->
@@ -100,6 +106,8 @@
     <string name="tag_detail_current_conditions_fragment">tag_detail_current_conditions_fragment</string>
     <string name="tag_simple_air_quality_fragment">tag_simple_air_quality_fragment</string>
     <string name="tag_sun_set_rise_fragment">tag_sun_set_rise_fragment</string>
+    <string name="tag_weather_fragment">tag_weather_fragment</string>
+
 
     <string name="message_request_double_click_for_close">한번 더 누르면 종료됩니다</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -324,7 +332,5 @@
     <string name="flickr_overcast">overcast</string>
     <string name="flickr_rain">rain</string>
     <string name="flickr_snow">snow</string>
-    <string name="tag_weather_fragment">tag_weather_fragment</string>
-    <string name="pref_key_last_selected_favorite_address_id">pref_key_last_selected_favorite_address_id</string>
 
 </resources>

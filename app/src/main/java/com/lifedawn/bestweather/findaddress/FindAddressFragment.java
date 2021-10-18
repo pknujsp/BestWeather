@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,10 +17,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.databinding.FragmentFindAddressBinding;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -29,11 +32,13 @@ import java.util.List;
 public class FindAddressFragment extends Fragment {
 	private FragmentFindAddressBinding binding;
 	private FoundAddressesAdapter addressesAdapter;
+	private WeatherViewModel weatherViewModel;
 	private boolean selectedAddress = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 	}
 
 	@Override
@@ -68,8 +73,7 @@ public class FindAddressFragment extends Fragment {
 				favoriteAddressDto.setLatitude(String.valueOf(address.getLatitude()));
 				favoriteAddressDto.setLongitude(String.valueOf(address.getLongitude()));
 
-				FavoriteAddressRepository repository = new FavoriteAddressRepository(getContext());
-				repository.add(favoriteAddressDto, new DbQueryCallback<Long>() {
+				weatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
 					@Override
 					public void onResultSuccessful(Long result) {
 						if (getActivity() != null) {
@@ -94,39 +98,32 @@ public class FindAddressFragment extends Fragment {
 		binding.addressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		binding.addressList.setAdapter(addressesAdapter);
 
-		Geocoder geocoder = new Geocoder(getContext());
-
 		binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
 				binding.customProgressView.onStartedProcessingData();
 
-				new Thread(new Runnable() {
+				Geocoding.reverseGeocoding(getContext(), query, new Geocoding.ReverseGeocodingCallback() {
 					@Override
-					public void run() {
-						try {
-							List<Address> addressList = geocoder.getFromLocationName(query, 20);
-							addressesAdapter.setAddressList(addressList);
+					public void onReverseGeocodingResult(List<Address> addressList) {
+						addressesAdapter.setAddressList(addressList);
 
-							if (getActivity() != null) {
-								getActivity().runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										addressesAdapter.notifyDataSetChanged();
+						if (getActivity() != null) {
+							getActivity().runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									addressesAdapter.notifyDataSetChanged();
 
-										if (addressList.isEmpty()) {
-											binding.customProgressView.onFailedProcessingData(getString(R.string.not_search_result));
-										} else {
-											binding.customProgressView.onSuccessfulProcessingData();
-										}
+									if (addressList.isEmpty()) {
+										binding.customProgressView.onFailedProcessingData(getString(R.string.not_search_result));
+									} else {
+										binding.customProgressView.onSuccessfulProcessingData();
 									}
-								});
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
+								}
+							});
 						}
 					}
-				}).start();
+				});
 
 				return true;
 			}

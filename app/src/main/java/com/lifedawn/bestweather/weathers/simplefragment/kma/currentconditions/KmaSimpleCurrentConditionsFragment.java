@@ -1,15 +1,18 @@
 package com.lifedawn.bestweather.weathers.simplefragment.kma.currentconditions;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
@@ -21,9 +24,11 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 	private FinalCurrentConditions finalCurrentConditions;
 	private FinalHourlyForecast finalHourlyForecast;
 
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 	}
 
 	@Override
@@ -61,6 +66,8 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 
 		binding.precipitation.setText(precipitation);
 		binding.sky.setText(KmaResponseProcessor.getWeatherSkyIconDescription(finalHourlyForecast.getSky()));
-		binding.temperature.setText(finalCurrentConditions.getTemperature() + getString(R.string.celsius));
+		String temp = ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(), tempUnit).toString() +
+				(tempUnit == ValueUnits.celsius ? getString(R.string.celsius) : getString(R.string.fahrenheit));
+		binding.temperature.setText(temp);
 	}
 }
