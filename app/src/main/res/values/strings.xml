@@ -324,5 +324,7 @@
     <string name="flickr_overcast">overcast</string>
     <string name="flickr_rain">rain</string>
     <string name="flickr_snow">snow</string>
+    <string name="tag_weather_fragment">tag_weather_fragment</string>
+    <string name="pref_key_last_selected_favorite_address_id">pref_key_last_selected_favorite_address_id</string>
 
 </resources>

@@ -18,4 +18,5 @@
     <color name="aqi_6_hazardous">#7e0023</color>
 
     <color name="comfortable_color_for_eyes">#A9D3ED</color>
+    <color name="favorite_location_background_color">#039BE5</color>
 </resources>

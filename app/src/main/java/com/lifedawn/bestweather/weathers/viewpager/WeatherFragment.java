@@ -82,12 +82,18 @@ public class WeatherFragment extends Fragment implements IGps {
 		super.onCreate(savedInstanceState);
 		Bundle bundle = getArguments();
 		favoriteAddressType = (FavoriteAddressType) bundle.getSerializable(getString(R.string.bundle_key_favorite_address_type));
+		String newSelectedAddressId = null;
 		
 		if (favoriteAddressType == FavoriteAddressType.SelectedAddress) {
 			selectedAddress = (FavoriteAddressDto) bundle.getSerializable(getString(R.string.bundle_key_selected_address));
+			newSelectedAddressId = selectedAddress.getId().toString();
 		} else {
 			gps = new Gps();
+			newSelectedAddressId = "currentLocation";
 		}
+		
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		sharedPreferences.edit().putString(getString(R.string.pref_key_last_selected_favorite_address_id), newSelectedAddressId).apply();
 		
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		iLoadImgOfCurrentConditions = weatherViewModel.getiLoadImgOfCurrentConditions();
@@ -138,14 +144,18 @@ public class WeatherFragment extends Fragment implements IGps {
 							@Override
 							public void run() {
 								binding.addressName.setText(addressName);
+								weatherViewModel.setCurrentLocationAddressName(addressName);
+								
 								if (refresh) {
 									mainWeatherSourceType = getMainWeatherSourceType(address.getCountryCode());
 									refresh(latitude, longitude);
 								}
 							}
 						});
+						
 					}
 				}
+				
 			}
 		});
 	}

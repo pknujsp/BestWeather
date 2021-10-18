@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/address_name"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/favorite_address_background_in_side_nav"
+    android:paddingLeft="12dp"
+    android:paddingTop="16dp"
+    android:paddingRight="12dp"
+    android:paddingBottom="16dp"
+    android:text="addressName"
+    android:textColor="@color/white"
+    android:textSize="15sp">
+
+</TextView>

@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Gps;
+import com.lifedawn.bestweather.commons.enums.FavoriteAddressType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.databinding.FragmentWeatherMainBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
@@ -43,6 +44,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
+import com.lifedawn.bestweather.weathers.viewpager.WeatherFragment;
 import com.lifedawn.bestweather.weathers.viewpager.WeatherViewPagerAdapter;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
@@ -61,7 +63,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	private FragmentWeatherMainBinding binding;
 	private View.OnClickListener menuOnClickListener;
 	private FavoriteAddressRepository favoriteAddressRepository;
-	private WeatherViewPagerAdapter weatherViewPagerAdapter;
+	// private WeatherViewPagerAdapter weatherViewPagerAdapter;
 	private WeatherViewModel weatherViewModel;
 	private IGps iGps;
 	
@@ -112,6 +114,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 			}
 		});
 		
+		/*
 		binding.viewPager.registerOnPageChangeCallback(onPageChangeCallback);
 		weatherViewPagerAdapter = new WeatherViewPagerAdapter(this);
 		binding.viewPager.setAdapter(weatherViewPagerAdapter);
@@ -140,8 +143,11 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 			
 			}
 		});
+		
+		 */
 	}
 	
+	/*
 	private ViewPager2.OnPageChangeCallback onPageChangeCallback = new ViewPager2.OnPageChangeCallback() {
 		public int lastPosition = 0;
 		
@@ -172,13 +178,35 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 			super.onPageScrollStateChanged(state);
 		}
 	};
+	 */
 	
+	public void setWeatherFragment(FavoriteAddressType favoriteAddressType, @Nullable FavoriteAddressDto favoriteAddressDto) {
+		WeatherFragment weatherFragment = new WeatherFragment();
+		Bundle bundle = new Bundle();
+		
+		if (favoriteAddressType == FavoriteAddressType.CurrentLocation) {
+			bundle.putSerializable(getString(R.string.bundle_key_favorite_address_type), FavoriteAddressType.CurrentLocation);
+			bundle.putSerializable(getString(R.string.bundle_key_favorite_address_type), FavoriteAddressType.CurrentLocation);
+			iGps = weatherFragment;
+			
+			binding.mainToolbar.gps.setVisibility(View.VISIBLE);
+			binding.mainToolbar.find.setVisibility(View.GONE);
+		} else {
+			bundle.putSerializable(getString(R.string.bundle_key_favorite_address_type), FavoriteAddressType.SelectedAddress);
+			bundle.putSerializable(getString(R.string.bundle_key_selected_address), favoriteAddressDto);
+			
+			binding.mainToolbar.gps.setVisibility(View.GONE);
+			binding.mainToolbar.find.setVisibility(View.VISIBLE);
+		}
+		weatherFragment.setArguments(bundle);
+		
+		getChildFragmentManager().beginTransaction().replace(binding.weatherFragmentsContainer.getId(), weatherFragment,
+				getString(R.string.tag_weather_fragment)).commit();
+	}
 	
 	@Override
 	public void loadImgOfCurrentConditions(MainProcessing.WeatherSourceType weatherSourceType, String val, Double latitude,
 			Double longitude) {
-		
-		
 		Calendar calendar = Calendar.getInstance();
 		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(
 				new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), calendar.getTimeZone());
@@ -190,7 +218,6 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		final long sunSetTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunSetCalendar.getTimeInMillis());
 		
 		String time = null;
-		
 		//현재 시각 파악 : 낮, 밤, 일출, 일몰(+-20분)
 		if (currentTimeMinutes < sunRiseTimeMinutes - 2) {
 			//새벽
@@ -227,7 +254,6 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		final String galleryName = time + " " + weather;
 		// time : sunrise, sunset, day, night
 		// weather : clear, partly cloudy, mostly cloudy, overcast, rain, snow
-		
 		FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
 		photosFromGalleryParameter.setGalleryId(FlickrUtil.getWeatherGalleryId(galleryName));
 		
@@ -262,4 +288,5 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 			}
 		});
 	}
+	
 }

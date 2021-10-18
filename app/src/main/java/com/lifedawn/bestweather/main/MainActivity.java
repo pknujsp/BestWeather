@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather;
+package com.lifedawn.bestweather.main;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -19,6 +19,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import androidx.preference.PreferenceManager;
 
+import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
