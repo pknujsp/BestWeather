@@ -84,8 +84,7 @@ public interface Querys {
 	Call<JsonElement> getOneCall(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	//flickr
-	//https://api.flickr.com/services/rest/?method=flickr.galleries
-	// .getPhotos&api_key=2c887b8d73b8334ddb3b0809c387de1b&gallery_id=72157719980390655&format=json&nojsoncallback=1
+	//https://api.flickr.com/services/rest/?method=flickr.galleries.getPhotos&api_key=2c887b8d73b8334ddb3b0809c387de1b&gallery_id=72157719980390655&format=json&nojsoncallback=1
 	@GET("rest/")
 	Call<JsonElement> getPhotosFromGallery(@QueryMap(encoded = true) Map<String, String> queryMap);
 }

@@ -44,6 +44,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	
 	private static final Map<String, Drawable> WEATHER_SKY_ICON_IMG_MAP = new HashMap<>();
 	private static final Map<String, Drawable> WEATHER_PTY_ICON_IMG_MAP = new HashMap<>();
+	private static final Map<String, String> PTY_FLICKR_MAP = new HashMap<>();
+	private static final Map<String, String> SKY_FLICKR_MAP = new HashMap<>();
 	
 	private static final String POP = "POP";
 	private static final String PTY = "PTY";
@@ -82,6 +84,19 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 			WEATHER_PTY_ICON_DESCRIPTION_MAP.put(ptyCodes[i], ptyDescriptions[i]);
 		}
 		
+		String[] ptyFlickrGalleryNames = context.getResources().getStringArray(R.array.KmaPtyFlickrGalleryNames);
+		String[] skyFlickrGalleryNames = context.getResources().getStringArray(R.array.KmaSkyFlickrGalleryNames);
+		
+		PTY_FLICKR_MAP.clear();
+		for (int i = 0; i < ptyCodes.length; i++) {
+			PTY_FLICKR_MAP.put(ptyCodes[i], ptyFlickrGalleryNames[i]);
+		}
+		
+		SKY_FLICKR_MAP.clear();
+		for (int i = 0; i < skyCodes.length; i++) {
+			SKY_FLICKR_MAP.put(skyCodes[i], skyFlickrGalleryNames[i]);
+		}
+		
 	}
 	
 	public static Drawable getWeatherSkyIconImg(String code) {
@@ -98,6 +113,14 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	
 	public static String getWeatherPtyIconDescription(String code) {
 		return WEATHER_PTY_ICON_DESCRIPTION_MAP.get(code);
+	}
+	
+	public static String getPtyFlickrGalleryName(String code) {
+		return PTY_FLICKR_MAP.get(code);
+	}
+	
+	public static String getSkyFlickrGalleryName(String code) {
+		return SKY_FLICKR_MAP.get(code);
 	}
 	
 	public static FinalCurrentConditions getFinalCurrentConditions(UltraSrtNcstRoot ultraSrtNcstRoot) {

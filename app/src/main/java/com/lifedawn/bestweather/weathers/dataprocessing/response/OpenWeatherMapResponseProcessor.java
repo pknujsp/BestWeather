@@ -19,6 +19,7 @@ import retrofit2.Response;
 public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	private static final Map<String, String> WEATHER_ICON_DESCRIPTION_MAP = new HashMap<>();
 	private static final Map<String, Drawable> WEATHER_ICON_IMG_MAP = new HashMap<>();
+	private static final Map<String, String> FLICKR_MAP = new HashMap<>();
 	
 	private OpenWeatherMapResponseProcessor() {
 	}
@@ -30,6 +31,13 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		WEATHER_ICON_DESCRIPTION_MAP.clear();
 		for (int i = 0; i < codes.length; i++) {
 			WEATHER_ICON_DESCRIPTION_MAP.put(codes[i], descriptions[i]);
+		}
+		
+		String[] flickrGalleryNames = context.getResources().getStringArray(R.array.OpenWeatherMapFlickrGalleryNames);
+		
+		FLICKR_MAP.clear();
+		for (int i = 0; i < codes.length; i++) {
+			FLICKR_MAP.put(codes[i], flickrGalleryNames[i]);
 		}
 	}
 	
@@ -55,5 +63,9 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	
 	public static OneCallResponse getOneCallObjFromJson(String response) {
 		return new Gson().fromJson(response, OneCallResponse.class);
+	}
+	
+	public static String getFlickrGalleryName(String code) {
+		return FLICKR_MAP.get(code);
 	}
 }

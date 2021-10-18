@@ -24,53 +24,57 @@ import java.util.List;
 public class WeatherViewPagerAdapter extends FragmentStateAdapter {
 	private List<WeatherFragment> weatherFragments = new ArrayList<>();
 	private IGps iGps;
-
+	
 	public WeatherViewPagerAdapter(@NonNull @NotNull Fragment fragment) {
 		super(fragment);
-		this.iGps = (IGps) fragment;
 	}
-
+	
 	@NonNull
 	@NotNull
 	@Override
 	public Fragment createFragment(int position) {
 		return weatherFragments.get(position);
 	}
-
+	
 	@Override
 	public int getItemCount() {
 		return weatherFragments.size();
 	}
-
+	
 	public void setWeatherFragments(Context context, boolean usingCurrentLocation, List<FavoriteAddressDto> addressList) {
 		if (usingCurrentLocation) {
 			Bundle bundle = new Bundle();
 			bundle.putSerializable(context.getString(R.string.bundle_key_favorite_address_type), FavoriteAddressType.CurrentLocation);
 			bundle.putSerializable(context.getString(R.string.bundle_key_favorite_address_type), FavoriteAddressType.CurrentLocation);
-
+			
 			WeatherFragment weatherFragment = new WeatherFragment();
 			weatherFragment.setArguments(bundle);
-			weatherFragment.setiGps(iGps);
-
+			iGps = weatherFragment;
 			weatherFragments.add(weatherFragment);
+		} else {
+			iGps = null;
 		}
-
+		
 		for (FavoriteAddressDto address : addressList) {
 			Bundle bundle = new Bundle();
 			bundle.putSerializable(context.getString(R.string.bundle_key_favorite_address_type), FavoriteAddressType.SelectedAddress);
 			bundle.putSerializable(context.getString(R.string.bundle_key_selected_address), address);
-
+			
 			WeatherFragment weatherFragment = new WeatherFragment();
 			weatherFragment.setArguments(bundle);
-
+			
 			weatherFragments.add(weatherFragment);
 		}
 	}
-
+	
+	public IGps getiGps() {
+		return iGps;
+	}
+	
 	public WeatherFragment getFragment(int position) {
 		return weatherFragments.get(position);
 	}
-
+	
 	public boolean isFragmentUsingCurrentLocation(int position) {
 		return weatherFragments.get(position).isFragmentUsingCurrentLocation();
 	}

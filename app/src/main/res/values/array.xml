@@ -86,7 +86,7 @@
         <item>@string/accu_weather_icon_44_mostly_cloudy_and_snow</item>
     </string-array>
 
-    <string-array name="AccuWeatherWeatherIconDrawableIdsForCode">
+    <string-array name="AccuWeatherFlickrGalleryNames">
         <item>@string/flickr_clear</item>
         <item>@string/flickr_clear</item>
         <item>@string/flickr_clear</item>
@@ -245,7 +245,7 @@
         <item>@string/owm_icon_804_overcast_clouds</item>
     </string-array>
 
-    <string-array name="OpenWeatherMapWeatherIconDrawableIdsForCode">
+    <string-array name="OpenWeatherMapFlickrGalleryNames">
         <item>@string/flickr_rain</item>
         <item>@string/flickr_rain</item>
         <item>@string/flickr_rain</item>
@@ -315,7 +315,7 @@
         <item>@string/kma_sky_4_overcast</item>
     </string-array>
 
-    <string-array name="KmaSkyIconDrawableIdsForCode">
+    <string-array name="KmaSkyFlickrGalleryNames">
         <item>@string/flickr_clear</item>
         <item>@string/flickr_mostly_cloudy</item>
         <item>@string/flickr_overcast</item>
@@ -343,7 +343,7 @@
         <item>@string/kma_pty_7_snow_blizzard</item>
     </string-array>
 
-    <string-array name="KmaPtyIconDrawableIdsForCode">
+    <string-array name="KmaPtyFlickrGalleryNames">
         <item>@string/flickr_clear</item>
         <item>@string/flickr_rain</item>
         <item>@string/flickr_snow</item>
