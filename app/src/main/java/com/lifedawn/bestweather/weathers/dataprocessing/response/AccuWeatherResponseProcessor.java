@@ -8,6 +8,7 @@ import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.geopositionsearch.GeoPositionResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaRoot;
 
@@ -62,12 +63,20 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		return pty == null ? PTY_MAP.get("Null") : PTY_MAP.get(pty);
 	}
 	
-	public static CurrentConditionsResponse getCurrentConditionsObjFromJson(String response) {
-		return new Gson().fromJson(response, CurrentConditionsResponse.class);
+	public static GeoPositionResponse getGeoPositionObjFromJson(String response) {
+		return new Gson().fromJson(response, GeoPositionResponse.class);
 	}
 	
-	public static TwelveHoursOfHourlyForecastsResponse getHourlyForecastObjFromJson(String response) {
-		return new Gson().fromJson(response, TwelveHoursOfHourlyForecastsResponse.class);
+	public static CurrentConditionsResponse getCurrentConditionsObjFromJson(JsonElement jsonElement) {
+		CurrentConditionsResponse response = new CurrentConditionsResponse();
+		response.setItems(jsonElement);
+		return response;
+	}
+	
+	public static TwelveHoursOfHourlyForecastsResponse getHourlyForecastObjFromJson(JsonElement jsonElement) {
+		TwelveHoursOfHourlyForecastsResponse response = new TwelveHoursOfHourlyForecastsResponse();
+		response.setItems(jsonElement);
+		return response;
 	}
 	
 	public static FiveDaysOfDailyForecastsResponse getDailyForecastObjFromJson(String response) {

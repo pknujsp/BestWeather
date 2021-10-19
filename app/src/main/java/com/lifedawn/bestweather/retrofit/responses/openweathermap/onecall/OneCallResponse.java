@@ -315,21 +315,12 @@ public class OneCallResponse {
 	}
 
 	public static class Hourly extends Current {
-		@Expose
-		@SerializedName("wind_gust")
-		private String windGust;
+	
 
 		@Expose
 		@SerializedName("pop")
 		private String pop;
-
-		public String getWindGust() {
-			return windGust;
-		}
-
-		public void setWindGust(String windGust) {
-			this.windGust = windGust;
-		}
+		
 
 		public String getPop() {
 			return pop;

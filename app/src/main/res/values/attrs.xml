@@ -31,4 +31,7 @@
 
     <attr name="textColorInWeatherCard" format="color" />
     <attr name="weatherCardBackgroundColor" format="color" />
+    <attr name="toolbarTextColor" format="color" />
+    <attr name="toolbarIconColor" format="color" />
+    <attr name="backgroundColor" format="color" />
 </resources>
