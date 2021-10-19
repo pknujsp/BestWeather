@@ -51,7 +51,6 @@ public class TwelveHoursOfHourlyForecastsResponse {
 
 		private Drawable weatherImg;
 
-
 		@Expose
 		@SerializedName("IconPhrase")
 		private String iconPhrase;
