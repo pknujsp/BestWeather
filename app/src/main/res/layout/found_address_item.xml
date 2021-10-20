@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
+    android:background="?attr/backgroundColor"
     android:clickable="true"
     android:orientation="vertical"
     android:padding="8dp">
@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="country"
-        android:textColor="@color/black"
+        android:textColor="?attr/textColor"
         android:textSize="16sp" />
 
     <TextView
@@ -21,6 +21,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:text="addressName"
-        android:textColor="@color/black"
+        android:textColor="?attr/textColor"
         android:textSize="19sp" />
 </LinearLayout>

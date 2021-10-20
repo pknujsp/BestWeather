@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.weathers.simplefragment.base;
+package com.lifedawn.bestweather.weathers.detailfragment.base;
 
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -19,30 +19,26 @@ import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.databinding.BaseLayoutSimpleForecastBinding;
+import com.lifedawn.bestweather.databinding.BaseLayoutDetailForecastBinding;
 import com.lifedawn.bestweather.theme.AppTheme;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
 
 import org.jetbrains.annotations.NotNull;
 
-public class BaseSimpleForecastFragment extends Fragment implements IWeatherValues {
-	protected BaseLayoutSimpleForecastBinding binding;
-	protected DateView dateRow;
+public class BaseDetailForecastFragment extends Fragment implements IWeatherValues {
+	protected BaseLayoutDetailForecastBinding binding;
 	protected SharedPreferences sharedPreferences;
 	protected ValueUnits tempUnit;
 	protected ValueUnits windUnit;
 	protected ValueUnits visibilityUnit;
 	protected ValueUnits clockUnit;
-	protected Double latitude;
-	protected Double longitude;
 	protected String addressName;
-	protected String countryCode;
-	protected MainProcessing.WeatherSourceType mainWeatherSourceType;
+	protected DateView dateRow;
+
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
@@ -52,24 +48,27 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.clock24.name()));
 
 		Bundle bundle = getArguments();
-		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
-		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
 		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
-		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
-		mainWeatherSourceType = (MainProcessing.WeatherSourceType) bundle.getSerializable(
-				getString(R.string.bundle_key_main_weather_data_source));
 	}
 
+	@Nullable
+	@org.jetbrains.annotations.Nullable
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = BaseLayoutSimpleForecastBinding.inflate(inflater);
+	public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+		binding = BaseLayoutDetailForecastBinding.inflate(inflater);
 		return binding.getRoot();
 	}
 
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
+		binding.addressName.setText(addressName);
+		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				getParentFragmentManager().popBackStackImmediate();
+			}
+		});
 		binding.scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
@@ -78,7 +77,6 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 				}
 			}
 		});
-
 	}
 
 	@Override
@@ -86,12 +84,14 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 
 	}
 
-	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewWidth, int viewHeight) {
+	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewHeight) {
 		ImageView labelView = new ImageView(getContext());
 		labelView.setImageDrawable(ContextCompat.getDrawable(getContext(), labelImgId));
 		labelView.setClickable(true);
 		labelView.setScaleType(ImageView.ScaleType.CENTER);
 		labelView.setImageTintList(ColorStateList.valueOf(AppTheme.getColor(getContext(), R.attr.iconColor)));
+
+
 		labelView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -99,7 +99,8 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 			}
 		});
 
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(viewWidth, viewHeight);
+		int width = (int) getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, viewHeight);
 		layoutParams.gravity = Gravity.CENTER;
 		labelView.setLayoutParams(layoutParams);
 

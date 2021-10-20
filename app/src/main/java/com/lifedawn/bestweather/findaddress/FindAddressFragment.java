@@ -101,7 +101,7 @@ public class FindAddressFragment extends Fragment {
 		binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				binding.customProgressView.onStartedProcessingData();
+				binding.customProgressView.onStartedProcessingData(getString(R.string.finding_address));
 
 				Geocoding.reverseGeocoding(getContext(), query, new Geocoding.ReverseGeocodingCallback() {
 					@Override

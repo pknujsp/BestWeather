@@ -48,11 +48,11 @@ public class SunSetRiseInfoView extends View {
 
 		typeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		typeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 15f, getResources().getDisplayMetrics()));
-		typeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
+		typeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
 
 		timeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		timeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, getResources().getDisplayMetrics()));
-		timeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
+		timeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
 
 		typeTextRect = new Rect();
 		timeTextRect = new Rect();

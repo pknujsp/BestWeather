@@ -14,7 +14,7 @@
         android:layout_weight="1"
         android:text="date"
         android:textAlignment="center"
-        android:textColor="?attr/textColorInWeatherCard"
+        android:textColor="?attr/textColor"
         android:textSize="14sp" />
 
     <TextView
@@ -24,7 +24,7 @@
         android:layout_weight="1"
         android:text="value"
         android:textAlignment="center"
-        android:textColor="?attr/textColorInWeatherCard"
+        android:textColor="?attr/textColor"
         android:textSize="15sp" />
 
     <TextView
@@ -34,7 +34,7 @@
         android:layout_weight="1"
         android:text="value"
         android:textAlignment="center"
-        android:textColor="?attr/textColorInWeatherCard"
+        android:textColor="?attr/textColor"
         android:textSize="15sp" />
 
 
@@ -45,7 +45,7 @@
         android:layout_weight="1"
         android:text="value"
         android:textAlignment="center"
-        android:textColor="?attr/textColorInWeatherCard"
+        android:textColor="?attr/textColor"
         android:textSize="15sp" />
 
 </LinearLayout>

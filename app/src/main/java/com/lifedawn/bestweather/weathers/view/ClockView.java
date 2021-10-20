@@ -34,7 +34,7 @@ public class ClockView extends View {
 		clockPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		clockPaint.setTextAlign(Paint.Align.CENTER);
 		clockPaint.setTextSize(context.getResources().getDimension(R.dimen.clockValueTextSizeInSCD));
-		clockPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
+		clockPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
 		
 		Rect rect = new Rect();
 		clockPaint.getTextBounds("0", 0, 1, rect);

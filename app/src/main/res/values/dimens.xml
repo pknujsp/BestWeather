@@ -4,7 +4,7 @@
     <dimen name="toolbar_left_right_margin">24dp</dimen>
     <dimen name="toolbar_start_end_margin">16dp</dimen>
     <dimen name="toolbar_page_title_margin">28dp</dimen>
-    <dimen name="toolbar_image_size">24dp</dimen>
+    <dimen name="toolbar_image_size">28dp</dimen>
 
 
     <!-- forecast view 내의 길이, 크기 값
@@ -19,10 +19,12 @@
     <dimen name="clockValueRowHeightInCOMMON">30dp</dimen>
     <dimen name="labelIconSizeInCOMMON">30dp</dimen>
     <dimen name="labelIconColumnWidthInCOMMON">38dp</dimen>
+    <dimen name="singleTemperatureRowHeightInCOMMON">80dp</dimen>
 
-    <!-- simple, comparison : sc로 축약 -->
+    <!-- simple, comparison : SC로 축약 -->
     <dimen name="defaultValueRowHeightInSC">34dp</dimen>
     <dimen name="doubleTemperatureRowHeightInSC">90dp</dimen>
+    <dimen name="circleRadiusInSingleTemperature">4dp</dimen>
     <dimen name="circleRadiusInDoubleTemperature">4dp</dimen>
 
     <dimen name="valueColumnWidthInSCHourly">60dp</dimen>
@@ -31,7 +33,17 @@
     <dimen name="windDirectionIconValueRowHeightInSC">30dp</dimen>
     <dimen name="weatherIconSizeInSC">38dp</dimen>
     <dimen name="weatherIconValueRowHeightInSC">42dp</dimen>
-    <!-- detail -->
+
+    <!-- detail : D로 축약 -->
+    <dimen name="defaultValueRowHeightInD">38dp</dimen>
+    <dimen name="doubleTemperatureRowHeightInD">100dp</dimen>
+
+    <dimen name="valueColumnWidthInDHourly">64dp</dimen>
+    <dimen name="valueColumnWidthInDDaily">90dp</dimen>
+    <dimen name="windDirectionIconSizeInD">28dp</dimen>
+    <dimen name="windDirectionIconValueRowHeightInD">32dp</dimen>
+    <dimen name="weatherIconSizeInD">40dp</dimen>
+    <dimen name="weatherIconValueRowHeightInD">44dp</dimen>
 
     <!-- weather data source icon size -->
     <dimen name="weatherDataSourceIconSize">34dp</dimen>

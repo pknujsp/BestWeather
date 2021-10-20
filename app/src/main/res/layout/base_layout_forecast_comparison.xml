@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
@@ -32,7 +33,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="24dp"
                     android:text="addressName"
-                    android:textColor="?attr/textColorInWeatherCard"
+                    android:textColor="?attr/textColor"
                     android:textSize="18sp" />
 
                 <LinearLayout
@@ -53,14 +54,16 @@
                             android:layout_width="@dimen/labelIconColumnWidthInCOMMON"
                             android:layout_height="@dimen/dateValueRowHeightInCOMMON"
                             android:clickable="true"
-                            android:src="@drawable/temp_icon" />
+                            android:src="@drawable/date"
+                            app:tint="?attr/iconColor" />
 
                         <ImageView
                             android:id="@+id/clock_label_icon"
                             android:layout_width="@dimen/labelIconColumnWidthInCOMMON"
                             android:layout_height="@dimen/clockValueRowHeightInCOMMON"
                             android:clickable="true"
-                            android:src="@drawable/temp_icon" />
+                            android:src="@drawable/time"
+                            app:tint="?attr/iconColor" />
 
                         <include
                             android:id="@+id/kma_label_layout"
@@ -129,7 +132,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/kma"
-                            android:textColor="?attr/textColorInWeatherCard" />
+                            android:textColor="?attr/textColor" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -154,7 +157,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/accu_weather"
-                            android:textColor="?attr/textColorInWeatherCard" />
+                            android:textColor="?attr/textColor" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -178,7 +181,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/owm"
-                            android:textColor="?attr/textColorInWeatherCard" />
+                            android:textColor="?attr/textColor" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>

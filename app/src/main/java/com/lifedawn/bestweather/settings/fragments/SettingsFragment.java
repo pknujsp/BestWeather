@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -23,6 +24,8 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.interfaces.IAppbarTitle;
 
+import org.jetbrains.annotations.NotNull;
+
 public class SettingsFragment extends PreferenceFragmentCompat {
 	private IAppbarTitle iAppbarTitle;
 
@@ -40,6 +43,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
+
 
 	@Override
 	public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {

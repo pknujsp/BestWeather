@@ -38,7 +38,7 @@ public class DateView extends View {
 		dateTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		dateTextPaint.setTextAlign(Paint.Align.CENTER);
 		dateTextPaint.setTextSize(context.getResources().getDimension(R.dimen.dateValueTextSizeInSCD));
-		dateTextPaint.setColor(AppTheme.getColor(context,R.attr.textColorInWeatherCard));
+		dateTextPaint.setColor(AppTheme.getColor(context,R.attr.textColor));
 		
 		Rect rect = new Rect();
 		dateTextPaint.getTextBounds("0", 0, 1, rect);

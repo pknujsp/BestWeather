@@ -23,52 +23,52 @@ public class CustomProgressView extends LinearLayout implements OnProgressViewLi
 	private CircularProgressIndicator progressView;
 	private View contentView;
 	private boolean succeed;
-	
-	
+
+
 	public CustomProgressView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
 	}
-	
-	
+
+
 	private void init() {
 		setOrientation(VERTICAL);
 		int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, getResources().getDisplayMetrics());
 		setPadding(padding, padding, padding, padding);
 		setBackgroundResource(R.drawable.progressview_background);
 		setGravity(Gravity.CENTER);
-		
+
 		progressStatusTextView = new TextView(getContext());
 		progressStatusTextView.setId(R.id.progress_status_textview);
 		progressStatusTextView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
 		progressStatusTextView.setText(null);
 		progressStatusTextView.setTextColor(AppTheme.getColor(getContext(), R.attr.textColorInProgressView));
 		progressStatusTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
-		
+
 		progressView = new CircularProgressIndicator(getContext());
-		progressView.setIndicatorColor(ContextCompat.getColor(getContext(), R.color.design_default_color_primary));
+		progressView.setIndicatorColor(AppTheme.getColor(getContext(), R.attr.progressViewIndicatorColor));
 		progressView.setIndeterminate(true);
-		
+
 		LinearLayout.LayoutParams statusTextViewLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		
+
 		LinearLayout.LayoutParams progressViewLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		progressViewLayoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f,
 				getResources().getDisplayMetrics());
-		
+
 		progressStatusTextView.setLayoutParams(statusTextViewLayoutParams);
 		progressView.setLayoutParams(progressViewLayoutParams);
-		
+
 		addView(progressStatusTextView);
 		addView(progressView);
 	}
-	
+
 	public void setContentView(View contentView) {
 		this.contentView = contentView;
 		onSuccessfulProcessingData();
 	}
-	
+
 	@Override
 	public void onSuccessfulProcessingData() {
 		succeed = true;
@@ -77,7 +77,7 @@ public class CustomProgressView extends LinearLayout implements OnProgressViewLi
 		contentView.setVisibility(View.VISIBLE);
 		setVisibility(View.GONE);
 	}
-	
+
 	@Override
 	public void onFailedProcessingData(@NonNull String text) {
 		succeed = false;
@@ -85,10 +85,10 @@ public class CustomProgressView extends LinearLayout implements OnProgressViewLi
 		progressView.setVisibility(View.GONE);
 		contentView.setVisibility(View.GONE);
 		setVisibility(View.VISIBLE);
-		
+
 		progressStatusTextView.setText(text);
 	}
-	
+
 	@Override
 	public void onStartedProcessingData(String statusText) {
 		succeed = false;
@@ -98,7 +98,7 @@ public class CustomProgressView extends LinearLayout implements OnProgressViewLi
 		contentView.setVisibility(View.GONE);
 		setVisibility(View.VISIBLE);
 	}
-	
+
 	@Override
 	public void onStartedProcessingData() {
 		succeed = false;
@@ -108,7 +108,7 @@ public class CustomProgressView extends LinearLayout implements OnProgressViewLi
 		contentView.setVisibility(View.GONE);
 		setVisibility(View.VISIBLE);
 	}
-	
+
 	@Override
 	public boolean isSuccess() {
 		return succeed;

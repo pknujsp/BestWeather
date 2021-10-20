@@ -13,9 +13,9 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginStart="@dimen/toolbar_start_end_margin"
-        android:background="?attr/selectableItemBackground"
+        android:background="@drawable/img_btn_background"
         android:src="@drawable/menu"
-        app:tint="@color/black" />
+        app:tint="@color/white" />
 
     <ImageButton
         android:id="@+id/find"
@@ -24,9 +24,9 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="@dimen/toolbar_left_right_margin"
         android:layout_toLeftOf="@id/gps"
-        android:background="@color/transparent"
+        android:background="@drawable/img_btn_background"
         android:src="@drawable/search"
-        app:tint="@color/black" />
+        app:tint="@color/white" />
 
     <ImageButton
         android:id="@+id/gps"
@@ -35,9 +35,9 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="@dimen/toolbar_left_right_margin"
         android:layout_toLeftOf="@id/refresh"
-        android:background="@color/transparent"
+        android:background="@drawable/img_btn_background"
         android:src="@drawable/gps"
-        app:tint="@color/black" />
+        app:tint="@color/white" />
 
 
     <ImageButton
@@ -47,8 +47,8 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginEnd="@dimen/toolbar_start_end_margin"
-        android:background="@color/transparent"
+        android:background="@drawable/img_btn_background"
         android:src="@drawable/refresh"
-        app:tint="@color/black" />
+        app:tint="@color/white" />
 
 </RelativeLayout>

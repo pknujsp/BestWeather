@@ -25,11 +25,13 @@
         <attr name="IndicatorSelectedDotDrawable" format="reference" />
     </declare-styleable>
 
-    <attr name="textColorInWeatherCard" format="color" />
+    <attr name="textColor" format="color" />
     <attr name="weatherCardBackgroundColor" format="color" />
     <attr name="toolbarTextColor" format="color" />
     <attr name="toolbarIconColor" format="color" />
     <attr name="backgroundColor" format="color" />
     <attr name="progressViewBackgroundColor" format="color" />
+    <attr name="progressViewIndicatorColor" format="color" />
     <attr name="textColorInProgressView" format="color" />
+    <attr name="iconColor" format="color" />
 </resources>

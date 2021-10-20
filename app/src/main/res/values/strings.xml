@@ -12,12 +12,6 @@
     <string name="pm10">pm10</string>
     <string name="pm25">pm25</string>
 
-
-    <string name="good">좋음</string>
-
-    <string name="compare">비교</string>
-    <string name="detail">자세히</string>
-
     <!-- 날씨 예보 종류 -->
     <string name="current_conditions">현재 날씨</string>
     <string name="hourly_forecast">시간별 예보</string>
@@ -91,7 +85,6 @@
     <string name="clock12">12시간제</string>
     <string name="clock24">24시간제</string>
 
-    <string name="favorite">즐겨찾기</string>
 
     <!-- fragment tag -->
     <string name="tag_favorites_fragment">tag_favorites_fragment</string>
@@ -107,29 +100,9 @@
     <string name="tag_simple_air_quality_fragment">tag_simple_air_quality_fragment</string>
     <string name="tag_sun_set_rise_fragment">tag_sun_set_rise_fragment</string>
     <string name="tag_weather_fragment">tag_weather_fragment</string>
+    <string name="tag_detail_hourly_forecast_fragment">tag_detail_hourly_forecast_fragment</string>
+    <string name="tag_comparison_fragment">tag_comparison_fragment</string>
 
-
-    <string name="message_request_double_click_for_close">한번 더 누르면 종료됩니다</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="msg_kma_always_enabled_in_south_korea">날씨 데이터 요청 지역이 대한민국인 경우에만 대한민국 기상청의 자료가 제공됩니다</string>
-    <string name="msg_at_least_one_must_be_selected">최소 하나는 선택되어야 합니다</string>
-
-
-    <string name="hint_input_address">주소명 입력</string>
-    <string name="find_address">주소 검색</string>
-    <string name="not_search_result">검색결과가 없습니다</string>
-    <string name="empty_favorite_addresses">즐겨찾기가 비어있습니다</string>
-    <string name="bundle_key_selected_address">bundle_key_selected_address</string>
-    <string name="bundle_key_favorite_address_type">bundle_key_favorite_address_type</string>
-    <string name="current_location">현재 위치</string>
-    <string name="request_to_make_gps_on">GPS를 켜주세요</string>
-    <string name="check">확인</string>
-    <string name="no">아니오</string>
-    <string name="message_needs_location_permission">위치 사용 권한이 필요합니다</string>
-    <string name="update_failed">업데이트 실패</string>
-    <string name="msg_finding_current_location">현재 위치 파악중</string>
-    <string name="msg_refreshing_weather_data">날씨 자료 업데이트 중</string>
-    <string name="main_datasource">기본 날씨 제공사</string>
 
     <!-- accu weather precipitation type -->
     <string name="accu_weather_pty_rain">비</string>
@@ -309,7 +282,6 @@
     <string name="precipitation_type">강수형태</string>
     <string name="pressure">기압</string>
 
-
     <!-- 바람세기 -->
     <string name="wind_strength_1">약한 바람</string>
     <string name="wind_strength_2">약간 강한 바람</string>
@@ -320,10 +292,42 @@
     <string name="wind_strength_3_simple">강</string>
     <string name="wind_strength_4_simple">매우 강</string>
 
-
+    <!-- sunrise,set -->
     <string name="sunset">일몰</string>
     <string name="sunrise">일출</string>
+
+    <!-- etc -->
+    <string name="fresh_snow_cover">신적설</string>
+    <string name="thunderstorm">낙뢰</string>
     <string name="not_data">정보없음</string>
+    <string name="message_request_double_click_for_close">한번 더 누르면 종료됩니다</string>
+    <string name="msg_kma_always_enabled_in_south_korea">날씨 데이터 요청 지역이 대한민국인 경우에만 대한민국 기상청의 자료가 제공됩니다</string>
+    <string name="msg_at_least_one_must_be_selected">최소 하나는 선택되어야 합니다</string>
+    <string name="finding_address">주소 검색 중입니다</string>
+    <string name="hint_input_address">주소명 입력</string>
+    <string name="find_address">주소 검색</string>
+    <string name="not_search_result">검색결과가 없습니다</string>
+    <string name="empty_favorite_addresses">즐겨찾기가 비어있습니다</string>
+    <string name="bundle_key_selected_address">bundle_key_selected_address</string>
+    <string name="bundle_key_favorite_address_type">bundle_key_favorite_address_type</string>
+    <string name="current_location">현재 위치</string>
+    <string name="request_to_make_gps_on">GPS를 켜주세요</string>
+    <string name="check">확인</string>
+    <string name="no">아니오</string>
+    <string name="message_needs_location_permission">위치 사용 권한이 필요합니다</string>
+    <string name="update_failed">업데이트 실패</string>
+    <string name="msg_finding_current_location">현재 위치 파악중</string>
+    <string name="msg_refreshing_weather_data">날씨 자료 업데이트 중</string>
+    <string name="main_datasource">기본 날씨 제공사</string>
+    <string name="comparison_hourly_forecast">시간별 예보 비교</string>
+    <string name="comparison_daily_forecast">일별 예보 비교</string>
+    <string name="detail_hourly_forecast">세부 시간별 예보</string>
+    <string name="detail_daily_forecast">세부 일별 예보</string>
+    <string name="good">좋음</string>
+    <string name="compare">비교</string>
+    <string name="detail">자세히</string>
+    <string name="favorite">즐겨찾기</string>
+
 
     <!-- flickr weather -->
     <string name="flickr_clear">clear</string>
@@ -332,13 +336,13 @@
     <string name="flickr_overcast">overcast</string>
     <string name="flickr_rain">rain</string>
     <string name="flickr_snow">snow</string>
-    <string name="comparison_hourly_forecast">시간별 예보 비교</string>
+
+    <!-- bundle keys -->
     <string name="bundle_key_latitude">bundle_key_latitude</string>
     <string name="bundle_key_longitude">bundle_key_longitude</string>
     <string name="bundle_key_address_name">bundle_key_address_name</string>
     <string name="bundle_key_country_code">bundle_key_country_code</string>
     <string name="bundle_key_main_weather_data_source">bundle_key_main_weather_data_source</string>
-    <string name="tag_comparison_fragment">tag_comparison_fragment</string>
-    <string name="comparison_daily_forecast">일별 예보 비교</string>
+
 
 </resources>

@@ -6,17 +6,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
@@ -76,7 +69,7 @@ public class SunSetRiseViewGroup extends ViewGroup {
 		linePaint.setColor(Color.GREEN);
 
 		timeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-		timeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
+		timeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
 		timeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, getResources().getDisplayMetrics()));
 		timeTextPaint.setTextAlign(Paint.Align.RIGHT);
 

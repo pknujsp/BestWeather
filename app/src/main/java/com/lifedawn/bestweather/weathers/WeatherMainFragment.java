@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
@@ -37,6 +41,8 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +58,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	private IGps iGps;
 	private WeatherFragment weatherFragment;
 	private boolean initializing = true;
+	private static final Map<String, Drawable> backgroundImgMap = new HashMap<>();
 
 	public WeatherMainFragment(View.OnClickListener menuOnClickListener) {
 		this.menuOnClickListener = menuOnClickListener;
@@ -258,39 +265,60 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		final String galleryName = time + " " + weather;
 		// time : sunrise, sunset, day, night
 		// weather : clear, partly cloudy, mostly cloudy, overcast, rain, snow
-		FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
-		photosFromGalleryParameter.setGalleryId(FlickrUtil.getWeatherGalleryId(galleryName));
 
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
-		Call<JsonElement> call = querys.getPhotosFromGallery(photosFromGalleryParameter.getMap());
-		call.enqueue(new Callback<JsonElement>() {
-			@Override
-			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				Gson gson = new Gson();
-				PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
-						PhotosFromGalleryResponse.class);
+		//이미 다운로드 된 이미지가 있으면 다운로드 하지 않음
+		if (backgroundImgMap.containsKey(galleryName)) {
+			Glide.with(WeatherMainFragment.this).load(backgroundImgMap.get(galleryName)).into(binding.currentConditionsImg);
+		} else {
 
-				if (photosFromGalleryResponse.getStat().equals("ok")) {
-					if (!photosFromGalleryResponse.getPhotos().getTotal().equals("0")) {
-						// https://live.staticflickr.com/65535/50081787401_355bcec912_b.jpg
-						// https://live.staticflickr.com/server/id_secret_size.jpg
-						int randomIdx = new Random().nextInt(Integer.parseInt(photosFromGalleryResponse.getPhotos().getTotal()));
-						PhotosFromGalleryResponse.Photos.Photo photo = photosFromGalleryResponse.getPhotos().getPhoto().get(randomIdx);
-						final String url = "https://live.staticflickr.com/" + photo.getServer() + "/" + photo.getId() + "_" + photo.getSecret() + "_b.jpg";
-						Glide.with(WeatherMainFragment.this).load(url).into(binding.currentConditionsImg);
+			FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
+			photosFromGalleryParameter.setGalleryId(FlickrUtil.getWeatherGalleryId(galleryName));
+
+			Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
+			Call<JsonElement> call = querys.getPhotosFromGallery(photosFromGalleryParameter.getMap());
+			call.enqueue(new Callback<JsonElement>() {
+				@Override
+				public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+					Gson gson = new Gson();
+					PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
+							PhotosFromGalleryResponse.class);
+
+					if (photosFromGalleryResponse.getStat().equals("ok")) {
+						if (!photosFromGalleryResponse.getPhotos().getTotal().equals("0")) {
+							// https://live.staticflickr.com/65535/50081787401_355bcec912_b.jpg
+							// https://live.staticflickr.com/server/id_secret_size.jpg
+							int randomIdx = new Random().nextInt(Integer.parseInt(photosFromGalleryResponse.getPhotos().getTotal()));
+							PhotosFromGalleryResponse.Photos.Photo photo = photosFromGalleryResponse.getPhotos().getPhoto().get(randomIdx);
+							final String imgUrl = "https://live.staticflickr.com/" + photo.getServer() + "/" + photo.getId() + "_" + photo.getSecret() + "_b.jpg";
+
+							//Glide.with(WeatherMainFragment.this).load(url).into(binding.currentConditionsImg);
+							Target<Drawable> img = new CustomTarget<Drawable>() {
+								@Override
+								public void onResourceReady(@NonNull @NotNull Drawable resource, @Nullable @org.jetbrains.annotations.Nullable Transition<? super Drawable> transition) {
+									backgroundImgMap.put(galleryName, resource);
+									Glide.with(WeatherMainFragment.this).load(resource).into(binding.currentConditionsImg);
+								}
+
+								@Override
+								public void onLoadCleared(@Nullable @org.jetbrains.annotations.Nullable Drawable placeholder) {
+
+								}
+							};
+							Glide.with(WeatherMainFragment.this).load(imgUrl).into(img);
+						} else {
+
+						}
 					} else {
 
 					}
-				} else {
+				}
+
+				@Override
+				public void onFailure(Call<JsonElement> call, Throwable t) {
 
 				}
-			}
-
-			@Override
-			public void onFailure(Call<JsonElement> call, Throwable t) {
-
-			}
-		});
+			});
+		}
 	}
 
 	public FavoriteAddressType getFavoriteAddressTypeOfWeatherFragment() {
