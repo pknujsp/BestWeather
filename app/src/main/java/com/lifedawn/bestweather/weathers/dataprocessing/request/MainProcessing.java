@@ -6,11 +6,14 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.lifedawn.bestweather.commons.classes.ClockUtil;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.CurrentConditionsParameter;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.FiveDaysOfDailyForecastsParameter;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.GeoPositionSearchParameter;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.TwelveHoursOfHourlyForecastsParameter;
+import com.lifedawn.bestweather.retrofit.parameters.kma.MidLandParameter;
+import com.lifedawn.bestweather.retrofit.parameters.kma.MidTaParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.UltraSrtFcstParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.VilageFcstParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
@@ -256,6 +259,180 @@ public class MainProcessing {
 			excludeOneCallApis.add(OneCallParameter.OneCallApis.minutely);
 			excludeOneCallApis.add(OneCallParameter.OneCallApis.current);
 			excludeOneCallApis.add(OneCallParameter.OneCallApis.daily);
+			oneCallParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString()).setOneCallApis(excludeOneCallApis);
+			
+			Call<JsonElement> oneCallCall = OpenWeatherMapProcessing.getOneCall(oneCallParameter, new JsonDownloader<JsonElement>() {
+				@Override
+				public void onResponseResult(Response<? extends JsonElement> response) {
+					Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
+					multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP,
+							RetrofitClient.ServiceType.OWM_ONE_CALL, response);
+				}
+				
+				@Override
+				public void onResponseResult(Throwable t) {
+					Log.e(RetrofitClient.LOG_TAG, "own one call 실패");
+					multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP,
+							RetrofitClient.ServiceType.OWM_ONE_CALL, t);
+				}
+				
+				
+			});
+		}
+	}
+	
+	public static void downloadDailyForecasts(Context context, Double latitude, Double longitude,
+			Set<WeatherSourceType> requestWeatherSourceTypeSet, MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+		int totalRequestCount = 0;
+		
+		if (requestWeatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
+			totalRequestCount += 2;
+		}
+		if (requestWeatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
+			totalRequestCount += 2;
+		}
+		if (requestWeatherSourceTypeSet.contains(WeatherSourceType.OPEN_WEATHER_MAP)) {
+			totalRequestCount += 1;
+		}
+		
+		multipleJsonDownloader.setRequestCount(totalRequestCount);
+		
+		//request
+		if (requestWeatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
+			KmaAreaCodesRepository kmaAreaCodesRepository = new KmaAreaCodesRepository(context);
+			kmaAreaCodesRepository.getAreaCodes(latitude, longitude, new DbQueryCallback<List<KmaAreaCodeDto>>() {
+				@Override
+				public void onResultSuccessful(List<KmaAreaCodeDto> result) {
+					final double[] criteriaLatLng = {latitude, longitude};
+					double minDistance = Double.MAX_VALUE;
+					double distance = 0;
+					double[] compLatLng = new double[2];
+					KmaAreaCodeDto nearbyKmaAreaCodeDto = null;
+					
+					for (KmaAreaCodeDto weatherAreaCodeDTO : result) {
+						compLatLng[0] = Double.parseDouble(weatherAreaCodeDTO.getLatitudeSecondsDivide100());
+						compLatLng[1] = Double.parseDouble(weatherAreaCodeDTO.getLongitudeSecondsDivide100());
+						
+						distance = LocationDistance.distance(criteriaLatLng[0], criteriaLatLng[1], compLatLng[0], compLatLng[1],
+								LocationDistance.Unit.METER);
+						if (distance < minDistance) {
+							minDistance = distance;
+							nearbyKmaAreaCodeDto = weatherAreaCodeDTO;
+						}
+					}
+					Calendar calendar = Calendar.getInstance(ClockUtil.KR_TIMEZONE);
+					multipleJsonDownloader.put("calendar", String.valueOf(calendar.getTimeInMillis()));
+					
+					MidTaParameter midTaParameter = new MidTaParameter();
+					MidLandParameter midLandParameter = new MidLandParameter();
+					midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode());
+					midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode());
+					
+					String tmFc = KmaProcessing.getTmFc((Calendar) calendar.clone());
+					multipleJsonDownloader.put("tmFc", tmFc);
+					
+					midLandParameter.setTmFc(tmFc);
+					midTaParameter.setTmFc(tmFc);
+					
+					Call<JsonElement> midTaFcstCall = KmaProcessing.getMidTaData(midTaParameter, new JsonDownloader<JsonElement>() {
+						@Override
+						public void onResponseResult(Response<? extends JsonElement> response) {
+							Log.e(RetrofitClient.LOG_TAG, "kma mid ta 성공");
+							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA,
+									RetrofitClient.ServiceType.MID_TA_FCST, response);
+						}
+						
+						@Override
+						public void onResponseResult(Throwable t) {
+							Log.e(RetrofitClient.LOG_TAG, "kma mid ta 실패");
+							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA,
+									RetrofitClient.ServiceType.MID_TA_FCST, t);
+						}
+						
+					});
+					
+					Call<JsonElement> midLandFcstCall = KmaProcessing.getMidLandFcstData(midLandParameter,
+							new JsonDownloader<JsonElement>() {
+								@Override
+								public void onResponseResult(Response<? extends JsonElement> response) {
+									Log.e(RetrofitClient.LOG_TAG, "kma mid land 성공");
+									multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA,
+											RetrofitClient.ServiceType.MID_LAND_FCST, response);
+								}
+								
+								@Override
+								public void onResponseResult(Throwable t) {
+									Log.e(RetrofitClient.LOG_TAG, "kma mid land 실패");
+									multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA,
+											RetrofitClient.ServiceType.MID_LAND_FCST, t);
+								}
+								
+							});
+				}
+				
+				@Override
+				public void onResultNoData() {
+				
+				}
+			});
+		}
+		if (requestWeatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
+			GeoPositionSearchParameter geoPositionSearchParameter = new GeoPositionSearchParameter();
+			
+			geoPositionSearchParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString());
+			Call<JsonElement> geoPositionSearchCall = AccuWeatherProcessing.getGeoPositionSearch(geoPositionSearchParameter,
+					new JsonDownloader<JsonElement>() {
+						
+						@Override
+						public void onResponseResult(Response<? extends JsonElement> response) {
+							Log.e(RetrofitClient.LOG_TAG, "accu weather geoposition search 성공");
+							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+									RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH, response);
+							
+							Gson gson = new Gson();
+							GeoPositionResponse geoPositionResponse = gson.fromJson(response.body().toString(), GeoPositionResponse.class);
+							
+							final String locationKey = geoPositionResponse.getKey();
+							FiveDaysOfDailyForecastsParameter dailyForecastsParameter = new FiveDaysOfDailyForecastsParameter();
+							dailyForecastsParameter.setLocationKey(locationKey);
+							
+							Call<JsonElement> dailyForecastCall = AccuWeatherProcessing.get5DaysOfDailyForecasts(dailyForecastsParameter,
+									new JsonDownloader<JsonElement>() {
+										@Override
+										public void onResponseResult(Response<? extends JsonElement> response) {
+											Log.e(RetrofitClient.LOG_TAG, "accu weather daily forecast 성공");
+											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+													RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, response);
+										}
+										
+										@Override
+										public void onResponseResult(Throwable t) {
+											Log.e(RetrofitClient.LOG_TAG, "accu weather daily forecast 실패");
+											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+													RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
+										}
+										
+									});
+						}
+						
+						@Override
+						public void onResponseResult(Throwable t) {
+							Log.e(RetrofitClient.LOG_TAG, "accu weather geocoding search 실패");
+							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+									RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH, t);
+							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+									RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
+						}
+						
+					});
+		}
+		if (requestWeatherSourceTypeSet.contains(WeatherSourceType.OPEN_WEATHER_MAP)) {
+			OneCallParameter oneCallParameter = new OneCallParameter();
+			Set<OneCallParameter.OneCallApis> excludeOneCallApis = new ArraySet<>();
+			excludeOneCallApis.add(OneCallParameter.OneCallApis.alerts);
+			excludeOneCallApis.add(OneCallParameter.OneCallApis.minutely);
+			excludeOneCallApis.add(OneCallParameter.OneCallApis.current);
+			excludeOneCallApis.add(OneCallParameter.OneCallApis.hourly);
 			oneCallParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString()).setOneCallApis(excludeOneCallApis);
 			
 			Call<JsonElement> oneCallCall = OpenWeatherMapProcessing.getOneCall(oneCallParameter, new JsonDownloader<JsonElement>() {

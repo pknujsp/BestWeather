@@ -71,6 +71,13 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				getParentFragmentManager().popBackStackImmediate();
+			}
+		});
+		
 		binding.customProgressView.setContentView(binding.rootScrollView);
 		binding.kmaLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setText("K");
 		binding.kmaLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setBackgroundTintList(

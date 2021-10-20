@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.Gravity;
 import android.view.View;
@@ -12,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
+import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
@@ -40,6 +43,21 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);
 		setValuesToViews();
 		
+		
+		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				DailyForecastComparisonFragment comparisonFragment = new DailyForecastComparisonFragment();
+				comparisonFragment.setArguments(getArguments());
+				
+				String tag = getString(R.string.tag_comparison_fragment);
+				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
+				fragmentManager.beginTransaction().hide(
+						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
+						comparisonFragment, tag).addToBackStack(tag).commit();
+			}
+		});
+		
 	}
 	
 	public KmaSimpleDailyForecastFragment setFinalDailyForecastList(List<FinalDailyForecast> finalDailyForecastList) {
@@ -56,8 +74,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final int DATE_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.weatherIconValueRowHeightInSC);
 		final int DEFAULT_TEXT_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
-		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(
-				R.dimen.doubleTemperatureRowHeightInSC);
+		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
 		
 		final int COLUMN_COUNT = finalDailyForecastList.size();
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCDaily);
@@ -77,7 +94,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		
 		//시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
-		SimpleDateFormat MdE = new SimpleDateFormat("M/d E", Locale.getDefault());
+		SimpleDateFormat MdE = new SimpleDateFormat("M.d E", Locale.getDefault());
 		
 		for (FinalDailyForecast forecast : finalDailyForecastList) {
 			dateList.add(MdE.format(forecast.getDate()));
@@ -106,7 +123,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			
 			probabilityOfPrecipitationList.add(finalDailyForecastList.get(index).getProbabilityOfPrecipitation());
 		}
-
+		
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(getContext(), VIEW_WIDTH, TEMP_ROW_HEIGHT, COLUMN_WIDTH,
 				minTempList, maxTempList);

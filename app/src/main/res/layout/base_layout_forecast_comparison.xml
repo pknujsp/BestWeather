@@ -49,12 +49,14 @@
                         android:orientation="vertical">
 
                         <ImageView
+                            android:id="@+id/date_label_icon"
                             android:layout_width="@dimen/labelIconColumnWidthInCOMMON"
                             android:layout_height="@dimen/dateValueRowHeightInCOMMON"
                             android:clickable="true"
                             android:src="@drawable/temp_icon" />
 
                         <ImageView
+                            android:id="@+id/clock_label_icon"
                             android:layout_width="@dimen/labelIconColumnWidthInCOMMON"
                             android:layout_height="@dimen/clockValueRowHeightInCOMMON"
                             android:clickable="true"

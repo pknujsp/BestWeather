@@ -339,5 +339,6 @@
     <string name="bundle_key_country_code">bundle_key_country_code</string>
     <string name="bundle_key_main_weather_data_source">bundle_key_main_weather_data_source</string>
     <string name="tag_comparison_fragment">tag_comparison_fragment</string>
+    <string name="comparison_daily_forecast">일별 예보 비교</string>
 
 </resources>
