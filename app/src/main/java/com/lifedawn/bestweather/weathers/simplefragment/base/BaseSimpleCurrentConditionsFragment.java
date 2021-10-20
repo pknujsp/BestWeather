@@ -28,53 +28,48 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	protected ValueUnits windUnit;
 	protected ValueUnits visibilityUnit;
 	protected ValueUnits clockUnit;
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-
+		
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
 		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.mPerSec.name()));
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.km.name()));
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.clock24.name()));
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = BaseLayoutSimpleCurrentConditionsBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-
+	
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 	}
-
+	
 	public BaseSimpleCurrentConditionsFragment setAirQualityResponse(GeolocalizedFeedResponse airQualityResponse) {
 		this.airQualityResponse = airQualityResponse;
 		return this;
 	}
-
+	
 	@Override
 	public void setValuesToViews() {
 		setAqiValuesToViews();
 	}
-
+	
 	public void setAqiValuesToViews() {
 		if (airQualityResponse.getStatus().equals("ok")) {
-			binding.airQualityInCurrentConditions.setVisibility(View.VISIBLE);
-			binding.pm10Grade.setTextColor(
-					AqicnResponseProcessor.getGradeColorId(Integer.parseInt(airQualityResponse.getData().getIaqi().getPm10().getValue())));
-			binding.pm25Grade.setTextColor(
-					AqicnResponseProcessor.getGradeColorId(Integer.parseInt(airQualityResponse.getData().getIaqi().getPm25().getValue())));
-
 			binding.pm10Grade.setText(AqicnResponseProcessor.getGradeDescription(
 					Integer.parseInt(airQualityResponse.getData().getIaqi().getPm10().getValue())));
 			binding.pm25Grade.setText(AqicnResponseProcessor.getGradeDescription(
 					Integer.parseInt(airQualityResponse.getData().getIaqi().getPm25().getValue())));
 		} else {
-			binding.airQualityInCurrentConditions.setVisibility(View.GONE);
+			binding.pm10Grade.setText(R.string.not_data);
+			binding.pm25Grade.setText(R.string.not_data);
 		}
 	}
 }

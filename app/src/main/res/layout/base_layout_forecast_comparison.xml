@@ -16,11 +16,14 @@
             android:id="@+id/root_scroll_View"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:overScrollMode="never">
+            android:overScrollMode="never"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/address_name"
@@ -33,34 +36,155 @@
                     android:textSize="18sp" />
 
                 <LinearLayout
-                    android:id="@+id/labels"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/address_name"
-                    android:layout_alignParentLeft="true"
-                    android:orientation="vertical" />
-
-                <HorizontalScrollView
-                    android:id="@+id/scroll_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/address_name"
-                    android:layout_toRightOf="@id/labels"
-                    android:overScrollMode="never"
-                    android:scrollbars="none">
+                    android:layout_marginBottom="24dp"
+                    android:orientation="horizontal">
 
                     <LinearLayout
-                        android:id="@+id/forecast_view"
+                        android:id="@+id/label_icons"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-                </HorizontalScrollView>
-            </RelativeLayout>
+                        android:gravity="right"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="@dimen/labelIconColumnWidthInCOMMON"
+                            android:layout_height="@dimen/dateValueRowHeightInCOMMON"
+                            android:clickable="true"
+                            android:src="@drawable/temp_icon" />
+
+                        <ImageView
+                            android:layout_width="@dimen/labelIconColumnWidthInCOMMON"
+                            android:layout_height="@dimen/clockValueRowHeightInCOMMON"
+                            android:clickable="true"
+                            android:src="@drawable/temp_icon" />
+
+                        <include
+                            android:id="@+id/kma_label_layout"
+                            layout="@layout/datasource_label_view_in_comparison"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/lastRowInForecastTableMargin" />
+
+                        <include
+                            android:id="@+id/accu_label_layout"
+                            layout="@layout/datasource_label_view_in_comparison"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/lastRowInForecastTableMargin" />
+
+                        <include
+                            android:id="@+id/owm_label_layout"
+                            layout="@layout/datasource_label_view_in_comparison"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/lastRowInForecastTableMargin" />
+                    </LinearLayout>
+
+                    <HorizontalScrollView
+                        android:id="@+id/scroll_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:overScrollMode="never"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/forecast_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" />
+
+                    </HorizontalScrollView>
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="8dp"
+                            android:background="@drawable/weather_data_source_icon_background"
+                            android:backgroundTint="@color/kma_icon_color"
+                            android:gravity="center"
+                            android:text="K"
+                            android:textAlignment="center"
+                            android:textColor="@color/white" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/kma"
+                            android:textColor="?attr/textColorInWeatherCard" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="8dp"
+                            android:background="@drawable/weather_data_source_icon_background"
+                            android:backgroundTint="@color/accu_icon_color"
+                            android:gravity="center"
+                            android:text="A"
+                            android:textAlignment="center"
+                            android:textColor="@color/white" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/accu_weather"
+                            android:textColor="?attr/textColorInWeatherCard" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="8dp"
+                            android:background="@drawable/weather_data_source_icon_background"
+                            android:backgroundTint="@color/owm_icon_color"
+                            android:gravity="center"
+                            android:text="O"
+                            android:textAlignment="center"
+                            android:textColor="@color/white" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/owm"
+                            android:textColor="?attr/textColorInWeatherCard" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
         <com.lifedawn.bestweather.commons.views.CustomProgressView
             android:id="@+id/custom_progress_view"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
     </LinearLayout>

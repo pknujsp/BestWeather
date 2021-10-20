@@ -15,6 +15,7 @@ import com.lifedawn.bestweather.retrofit.parameters.accuweather.TwelveHoursOfHou
 import com.lifedawn.bestweather.retrofit.responses.accuweather.geopositionsearch.GeoPositionResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -103,7 +104,11 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.onResponseResult(response);
+				if (response.code() == 400) {
+					callback.onResponseResult(response);
+				} else {
+					callback.onResponseResult(new Exception());
+				}
 			}
 			
 			@Override

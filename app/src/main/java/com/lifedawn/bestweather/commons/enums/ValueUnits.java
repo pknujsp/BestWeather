@@ -6,7 +6,7 @@ import com.lifedawn.bestweather.R;
 
 public enum ValueUnits {
 	celsius, fahrenheit, mPerSec, kmPerHour, km, mile, clock12, clock24;
-
+	
 	public static ValueUnits enumOf(String value) throws IllegalArgumentException {
 		for (ValueUnits valueUnit : values()) {
 			if (value.equals(valueUnit.name())) {
@@ -15,7 +15,7 @@ public enum ValueUnits {
 		}
 		throw new IllegalArgumentException();
 	}
-
+	
 	public static String convertToStr(Context context, ValueUnits valueUnit) {
 		switch (valueUnit) {
 			case celsius:
@@ -38,16 +38,16 @@ public enum ValueUnits {
 				return null;
 		}
 	}
-
-	public static Double convertTemperature(String val, ValueUnits unit) {
-		Double convertedVal = Double.parseDouble(val);
+	
+	public static Integer convertTemperature(String val, ValueUnits unit) {
+		Integer convertedVal = (int) Double.parseDouble(val);
 		if (unit == fahrenheit) {
 			//화씨 (1°C × 9/5) + 32°F
-			convertedVal = (convertedVal * (9.0 / 5.0)) + 32;
+			convertedVal = (int) (convertedVal * (9.0 / 5.0)) + 32;
 		}
 		return convertedVal;
 	}
-
+	
 	public static Double convertWindSpeed(String val, ValueUnits unit) {
 		Double convertedVal = Double.parseDouble(val);
 		if (unit == kmPerHour) {
@@ -56,7 +56,7 @@ public enum ValueUnits {
 		}
 		return convertedVal;
 	}
-
+	
 	public static Double convertVisibility(String val, ValueUnits unit) {
 		Double convertedVal = Double.parseDouble(val);
 		if (unit == mile) {

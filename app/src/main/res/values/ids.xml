@@ -9,4 +9,5 @@
     <item name="sunSetRiseType3View" type="id" />
     <item name="locationTypeTagInFavLocItemViewInSideNav" type="id" />
     <item name="favoriteLocationDtoTagInFavLocItemViewInSideNav" type="id" />
+    <item name="begin_column_index" type="id" />
 </resources>

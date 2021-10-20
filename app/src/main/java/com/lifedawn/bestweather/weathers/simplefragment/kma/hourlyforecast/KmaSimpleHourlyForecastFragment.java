@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.ClockView;
@@ -52,8 +51,9 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				
 				String tag = getString(R.string.tag_comparison_fragment);
 				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
-				fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(
-						R.id.fragment_container, comparisonFragment, tag).addToBackStack(tag).commit();
+				fragmentManager.beginTransaction().hide(
+						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
+						comparisonFragment, tag).addToBackStack(tag).commit();
 			}
 		});
 	}
@@ -68,33 +68,31 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		//kma hourly forecast simple : 날짜, 시각, 날씨, 기온, 강수확률, 강수량
 		Context context = getContext();
 		
-		final int DATE_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.date_row_height_in_simple_forecast_view);
-		final int CLOCK_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.clock_row_height_in_simple_forecast_view);
-		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.weather_icon_row_height_in_simple_forecast_view);
-		final int DEFAULT_TEXT_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.default_row_height_in_simple_forecast_view);
-		final int MARGIN = (int) context.getResources().getDimension(R.dimen.row_top_bottom_margin_in_simple_forecast_view);
+		final int dateRowHeight = (int) context.getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
+		final int clockRowHeight = (int) context.getResources().getDimension(R.dimen.clockValueRowHeightInCOMMON);
+		final int weatherRowHeight = (int) context.getResources().getDimension(R.dimen.weatherIconValueRowHeightInSC);
+		final int defaultTextRowHeight = (int) context.getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 		
-		final int COLUMN_COUNT = finalHourlyForecastList.size();
-		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.column_width_in_simple_hourly_forecast_view);
-		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
+		final int columnCount = finalHourlyForecastList.size();
+		final int columnWidth = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCHourly);
+		final int viewWidth = columnCount * columnWidth;
 		
 		//label column 설정
-		final int LABEL_VIEW_WIDTH = (int) context.getResources().getDimension(R.dimen.label_view_width_in_simple_forecast_view);
+		final int labelViewWidth = (int) context.getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
 		
-		addLabelView(R.drawable.temp_icon, getString(R.string.date), LABEL_VIEW_WIDTH, DATE_ROW_HEIGHT, MARGIN);
-		addLabelView(R.drawable.temp_icon, getString(R.string.clock), LABEL_VIEW_WIDTH, CLOCK_ROW_HEIGHT, MARGIN);
-		addLabelView(R.drawable.temp_icon, getString(R.string.weather), LABEL_VIEW_WIDTH, WEATHER_ROW_HEIGHT, MARGIN);
-		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, MARGIN);
-		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT,
-				MARGIN);
-		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_volume), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, MARGIN);
+		addLabelView(R.drawable.temp_icon, getString(R.string.date), labelViewWidth, dateRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.clock), labelViewWidth, clockRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.weather), labelViewWidth, weatherRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), labelViewWidth, defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), labelViewWidth, defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_volume), labelViewWidth, defaultTextRowHeight);
 		
-		dateRow = new DateView(context, VIEW_WIDTH, DATE_ROW_HEIGHT, COLUMN_WIDTH);
-		ClockView clockRow = new ClockView(context, VIEW_WIDTH, CLOCK_ROW_HEIGHT, COLUMN_WIDTH);
-		WeatherIconView weatherIconRow = new WeatherIconView(context, VIEW_WIDTH, WEATHER_ROW_HEIGHT, COLUMN_WIDTH);
-		TextValueView tempRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
-		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
-		TextValueView precipitationVolumeRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
+		dateRow = new DateView(context, viewWidth, dateRowHeight, columnWidth);
+		ClockView clockRow = new ClockView(context, viewWidth, clockRowHeight, columnWidth);
+		WeatherIconView weatherIconRow = new WeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
+		TextValueView tempRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView precipitationVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		
 		//시각 --------------------------------------------------------------------------
 		List<Date> dateTimeList = new ArrayList<>();
@@ -123,8 +121,6 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		rowLayoutParams.topMargin = MARGIN;
-		rowLayoutParams.bottomMargin = MARGIN;
 		
 		binding.forecastView.addView(dateRow, rowLayoutParams);
 		binding.forecastView.addView(clockRow, rowLayoutParams);

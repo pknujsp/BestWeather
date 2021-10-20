@@ -20,10 +20,6 @@
         </attr>
     </declare-styleable>
 
-    <declare-styleable name="CustomProgressView">
-        <attr name="contentViewId" format="reference" />
-    </declare-styleable>
-
     <declare-styleable name="ViewPagerIndicator">
         <attr name="IndicatorUnselectedDotDrawable" format="reference" />
         <attr name="IndicatorSelectedDotDrawable" format="reference" />
@@ -34,4 +30,6 @@
     <attr name="toolbarTextColor" format="color" />
     <attr name="toolbarIconColor" format="color" />
     <attr name="backgroundColor" format="color" />
+    <attr name="progressViewBackgroundColor" format="color" />
+    <attr name="textColorInProgressView" format="color" />
 </resources>

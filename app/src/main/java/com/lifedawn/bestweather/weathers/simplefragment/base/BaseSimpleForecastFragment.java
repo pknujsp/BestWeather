@@ -84,7 +84,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	
 	}
 	
-	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewWidth, int viewHeight, int margin) {
+	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewWidth, int viewHeight) {
 		ImageView labelView = new ImageView(getContext());
 		labelView.setImageDrawable(ContextCompat.getDrawable(getContext(), labelImgId));
 		labelView.setClickable(true);
@@ -98,8 +98,6 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 		
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(viewWidth, viewHeight);
 		layoutParams.gravity = Gravity.CENTER;
-		layoutParams.topMargin = margin;
-		layoutParams.bottomMargin = margin;
 		labelView.setLayoutParams(layoutParams);
 		
 		binding.labels.addView(labelView);

@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.theme.AppTheme;
 
 public class CustomProgressView extends LinearLayout implements OnProgressViewListener, CheckSuccess {
 	private TextView progressStatusTextView;
@@ -26,22 +27,23 @@ public class CustomProgressView extends LinearLayout implements OnProgressViewLi
 	
 	public CustomProgressView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CustomProgressView, 0, 0);
-		init(typedArray);
+		init();
 	}
 	
 	
-	private void init(TypedArray typedArray) {
-		final int contentViewId = typedArray.getResourceId(R.styleable.CustomProgressView_contentViewId, 0);
-		typedArray.recycle();
-		
+	private void init() {
 		setOrientation(VERTICAL);
+		int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, getResources().getDisplayMetrics());
+		setPadding(padding, padding, padding, padding);
+		setBackgroundResource(R.drawable.progressview_background);
+		setGravity(Gravity.CENTER);
 		
 		progressStatusTextView = new TextView(getContext());
-		progressStatusTextView.setGravity(Gravity.CENTER);
-		progressStatusTextView.setText(null);
-		progressStatusTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f);
 		progressStatusTextView.setId(R.id.progress_status_textview);
+		progressStatusTextView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
+		progressStatusTextView.setText(null);
+		progressStatusTextView.setTextColor(AppTheme.getColor(getContext(), R.attr.textColorInProgressView));
+		progressStatusTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
 		
 		progressView = new CircularProgressIndicator(getContext());
 		progressView.setIndicatorColor(ContextCompat.getColor(getContext(), R.color.design_default_color_primary));
@@ -49,13 +51,11 @@ public class CustomProgressView extends LinearLayout implements OnProgressViewLi
 		
 		LinearLayout.LayoutParams statusTextViewLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		statusTextViewLayoutParams.gravity = Gravity.CENTER;
 		
 		LinearLayout.LayoutParams progressViewLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		progressViewLayoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f,
+		progressViewLayoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f,
 				getResources().getDisplayMetrics());
-		progressViewLayoutParams.gravity = Gravity.CENTER;
 		
 		progressStatusTextView.setLayoutParams(statusTextViewLayoutParams);
 		progressView.setLayoutParams(progressViewLayoutParams);

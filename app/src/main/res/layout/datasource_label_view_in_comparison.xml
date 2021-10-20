@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <include
+            android:id="@+id/weather_data_source_icon_view"
+            layout="@layout/weather_data_source_icon_view"
+            android:layout_width="@dimen/weatherDataSourceIconSize"
+            android:layout_height="@dimen/weatherDataSourceIconSize"
+            android:layout_gravity="center"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/weather_label"
+                android:layout_width="@dimen/labelIconColumnWidthInCOMMON"
+                android:layout_height="@dimen/weatherIconValueRowHeightInSC"
+                android:contentDescription="@string/weather"
+                android:scaleType="center"
+                android:src="@drawable/temp_icon" />
+
+
+            <ImageView
+                android:id="@+id/temperature_label"
+                android:layout_width="@dimen/labelIconColumnWidthInCOMMON"
+                android:layout_height="@dimen/defaultValueRowHeightInSC"
+                android:contentDescription="@string/temperature"
+                android:scaleType="center"
+                android:src="@drawable/temp_icon" />
+
+
+            <ImageView
+                android:id="@+id/precipitation_volume_label"
+                android:layout_width="@dimen/labelIconColumnWidthInCOMMON"
+                android:layout_height="@dimen/defaultValueRowHeightInSC"
+                android:contentDescription="@string/precipitation_volume"
+                android:scaleType="center"
+                android:src="@drawable/temp_icon" />
+
+
+            <ImageView
+                android:id="@+id/pop_label"
+                android:layout_width="@dimen/labelIconColumnWidthInCOMMON"
+                android:layout_height="@dimen/defaultValueRowHeightInSC"
+                android:contentDescription="@string/probability_of_precipitation"
+                android:scaleType="center"
+                android:src="@drawable/temp_icon" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>

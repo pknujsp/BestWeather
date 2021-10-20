@@ -41,7 +41,7 @@ public class DetailDoubleTemperatureView extends View {
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;
 
-		circleRadius = (int) getResources().getDimension(R.dimen.circle_radius_in_detail_temperature_view);
+		circleRadius = (int) getResources().getDimension(R.dimen.circleRadiusInDoubleTemperature);
 
 		tempPaint = new TextPaint();
 		tempPaint.setTextAlign(Paint.Align.CENTER);

@@ -24,7 +24,7 @@ public class DateView extends View {
 	private final int viewHeight;
 	private final int columnWidth;
 	private final int textHeight;
-	private final SimpleDateFormat MdE = new SimpleDateFormat("M/d E", Locale.getDefault());
+	private final SimpleDateFormat MdE = new SimpleDateFormat("M.d E", Locale.getDefault());
 	private List<DateValue> dateValueList;
 	private int currentX;
 	private int firstColX;
@@ -37,7 +37,7 @@ public class DateView extends View {
 		
 		dateTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		dateTextPaint.setTextAlign(Paint.Align.CENTER);
-		dateTextPaint.setTextSize(context.getResources().getDimension(R.dimen.date_text_size_in_simple_forecast_view));
+		dateTextPaint.setTextSize(context.getResources().getDimension(R.dimen.dateValueTextSizeInSCD));
 		dateTextPaint.setColor(AppTheme.getColor(context,R.attr.textColorInWeatherCard));
 		
 		Rect rect = new Rect();

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="@dimen/label_icon_size"
-    android:layout_height="@dimen/label_icon_size"
+    android:id="@+id/weather_data_source_icon"
+    android:layout_width="@dimen/weatherDataSourceIconSize"
+    android:layout_height="@dimen/weatherDataSourceIconSize"
     android:background="@drawable/weather_data_source_icon_background"
     android:gravity="center"
     android:text="O"
     android:textAlignment="center"
-    android:textColor="@color/white"
-    android:textSize="14sp">
-
-</TextView>
+    android:textColor="@color/white" />

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -50,28 +51,26 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		//accu hourly forecast simple : 날짜, 시각, 날씨, 기온, 강수확률, 강수량
 		Context context = getContext();
 		
-		final int DATE_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.date_row_height_in_simple_forecast_view);
-		final int CLOCK_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.clock_row_height_in_simple_forecast_view);
-		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.weather_icon_row_height_in_simple_forecast_view);
-		final int DEFAULT_TEXT_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.default_row_height_in_simple_forecast_view);
-		final int MARGIN = (int) context.getResources().getDimension(R.dimen.row_top_bottom_margin_in_simple_forecast_view);
+		final int DATE_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
+		final int CLOCK_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.clockValueRowHeightInCOMMON);
+		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.weatherIconValueRowHeightInSC);
+		final int DEFAULT_TEXT_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 		
 		List<TwelveHoursOfHourlyForecastsResponse.Item> items = twelveHoursOfHourlyForecastsResponse.getItems();
 		
 		final int COLUMN_COUNT = items.size();
-		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.column_width_in_simple_hourly_forecast_view);
+		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCHourly);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 		
 		//label column 설정
-		final int LABEL_VIEW_WIDTH = (int) context.getResources().getDimension(R.dimen.label_view_width_in_simple_forecast_view);
+		final int LABEL_VIEW_WIDTH = (int) context.getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
 		
-		addLabelView(R.drawable.temp_icon, getString(R.string.date), LABEL_VIEW_WIDTH, DATE_ROW_HEIGHT, MARGIN);
-		addLabelView(R.drawable.temp_icon, getString(R.string.clock), LABEL_VIEW_WIDTH, CLOCK_ROW_HEIGHT, MARGIN);
-		addLabelView(R.drawable.temp_icon, getString(R.string.weather), LABEL_VIEW_WIDTH, WEATHER_ROW_HEIGHT, MARGIN);
-		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, MARGIN);
-		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT,
-				MARGIN);
-		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_volume), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, MARGIN);
+		addLabelView(R.drawable.temp_icon, getString(R.string.date), LABEL_VIEW_WIDTH, DATE_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.clock), LABEL_VIEW_WIDTH, CLOCK_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.weather), LABEL_VIEW_WIDTH, WEATHER_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_volume), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT);
 		
 		dateRow = new DateView(context, VIEW_WIDTH, DATE_ROW_HEIGHT, COLUMN_WIDTH);
 		ClockView clockRow = new ClockView(context, VIEW_WIDTH, CLOCK_ROW_HEIGHT, COLUMN_WIDTH);
@@ -107,8 +106,7 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		rowLayoutParams.topMargin = MARGIN;
-		rowLayoutParams.bottomMargin = MARGIN;
+		rowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 		
 		binding.forecastView.addView(dateRow, rowLayoutParams);
 		binding.forecastView.addView(clockRow, rowLayoutParams);

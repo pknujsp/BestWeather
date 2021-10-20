@@ -33,8 +33,8 @@ public class ClockView extends View {
 		this.columnWidth = columnWidth;
 		clockPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		clockPaint.setTextAlign(Paint.Align.CENTER);
-		clockPaint.setTextSize(context.getResources().getDimension(R.dimen.clock_text_size_in_simple_forecast_view));
-		clockPaint.setColor(AppTheme.getColor(context,R.attr.textColorInWeatherCard));
+		clockPaint.setTextSize(context.getResources().getDimension(R.dimen.clockValueTextSizeInSCD));
+		clockPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
 		
 		Rect rect = new Rect();
 		clockPaint.getTextBounds("0", 0, 1, rect);

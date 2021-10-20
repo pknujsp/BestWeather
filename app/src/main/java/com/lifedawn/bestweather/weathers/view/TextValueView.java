@@ -30,7 +30,7 @@ public class TextValueView extends View {
 		this.columnWidth = columnWidth;
 		valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		valueTextPaint.setTextAlign(Paint.Align.CENTER);
-		valueTextPaint.setTextSize(context.getResources().getDimension(R.dimen.default_value_text_size_in_simple_forecast_view));
+		valueTextPaint.setTextSize(context.getResources().getDimension(R.dimen.valueTextSizeInSCD));
 		valueTextPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
 		
 		Rect rect = new Rect();

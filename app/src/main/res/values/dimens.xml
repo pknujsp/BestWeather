@@ -6,30 +6,40 @@
     <dimen name="toolbar_page_title_margin">28dp</dimen>
     <dimen name="toolbar_image_size">24dp</dimen>
 
-    <dimen name="label_view_width_in_simple_forecast_view">24dp</dimen>
-    <dimen name="row_top_bottom_margin_in_simple_forecast_view">4dp</dimen>
-    <dimen name="column_width_in_simple_hourly_forecast_view">62dp</dimen>
-    <dimen name="column_width_in_comparison_hourly_forecast_view">62dp</dimen>
-    <dimen name="column_width_in_simple_daily_forecast_view">90dp</dimen>
 
+    <!-- forecast view 내의 길이, 크기 값
+    label, value로 분류
+    -->
 
-    <dimen name="clock_text_size_in_simple_forecast_view">13sp</dimen>
-    <dimen name="date_text_size_in_simple_forecast_view">12sp</dimen>
-    <dimen name="default_value_text_size_in_simple_forecast_view">13sp</dimen>
-    <dimen name="wind_direction_img_size_in_simple_forecast_view">26dp</dimen>
-    <dimen name="weather_icon_size_in_simple_forecast_view">38dp</dimen>
+    <!-- 필요한 값 : 라벨 아이콘 크기, 라벨 아이콘 열의 폭, 값 열의 폭, 날짜/시각 행의 높이,
+    값 행의 최소(기본) 높이
+    -->
+    <!-- common -->
+    <dimen name="dateValueRowHeightInCOMMON">30dp</dimen>
+    <dimen name="clockValueRowHeightInCOMMON">30dp</dimen>
+    <dimen name="labelIconSizeInCOMMON">30dp</dimen>
+    <dimen name="labelIconColumnWidthInCOMMON">38dp</dimen>
 
+    <!-- simple, comparison : sc로 축약 -->
+    <dimen name="defaultValueRowHeightInSC">34dp</dimen>
+    <dimen name="doubleTemperatureRowHeightInSC">90dp</dimen>
+    <dimen name="circleRadiusInDoubleTemperature">4dp</dimen>
 
-    <!-- forecast view 내의 value view의 height -->
-    <dimen name="date_row_height_in_simple_forecast_view">24dp</dimen>
-    <dimen name="clock_row_height_in_simple_forecast_view">24dp</dimen>
-    <dimen name="weather_icon_row_height_in_simple_forecast_view">38dp</dimen>
-    <dimen name="default_row_height_in_simple_forecast_view">24dp</dimen>
-    <dimen name="detail_temperature_row_height_in_simple_forecast_view">90dp</dimen>
-    <dimen name="circle_radius_in_detail_temperature_view">4dp</dimen>
-    <dimen name="label_icon_size">32dp</dimen>
-    <dimen name="label_icon_top_bottom_space">6dp</dimen>
-    <dimen name="space_between_value_type_icon_and_data_source_icon_in_comparison">3dp</dimen>
-    <dimen name="label_icon_left_right_space">4dp</dimen>
-    <dimen name="label_icon_min_height">44dp</dimen>
+    <dimen name="valueColumnWidthInSCHourly">60dp</dimen>
+    <dimen name="valueColumnWidthInSCDaily">85dp</dimen>
+    <dimen name="windDirectionIconSizeInSC">26dp</dimen>
+    <dimen name="windDirectionIconValueRowHeightInSC">30dp</dimen>
+    <dimen name="weatherIconSizeInSC">38dp</dimen>
+    <dimen name="weatherIconValueRowHeightInSC">42dp</dimen>
+    <!-- detail -->
+
+    <!-- weather data source icon size -->
+    <dimen name="weatherDataSourceIconSize">34dp</dimen>
+
+    <!-- simple, comparison, detail내 값 텍스트 크기 -->
+    <dimen name="clockValueTextSizeInSCD">13sp</dimen>
+    <dimen name="dateValueTextSizeInSCD">13sp</dimen>
+    <dimen name="valueTextSizeInSCD">14sp</dimen>
+    <dimen name="lastRowInForecastTableMargin">6dp</dimen>
+    <dimen name="cornerRadius">16dp</dimen>
 </resources>
