@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.Gravity;
 import android.view.View;
@@ -14,6 +15,9 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.hourlyforecast.OwmDetailHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
@@ -38,6 +42,39 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.hourly_forecast);
+		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				HourlyForecastComparisonFragment comparisonFragment = new HourlyForecastComparisonFragment();
+				comparisonFragment.setArguments(getArguments());
+				
+				String tag = getString(R.string.tag_comparison_fragment);
+				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
+				fragmentManager.beginTransaction().hide(
+						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
+						comparisonFragment, tag).addToBackStack(tag).commit();
+			}
+		});
+		
+		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				OwmDetailHourlyForecastFragment detailHourlyForecastFragment = new OwmDetailHourlyForecastFragment();
+				detailHourlyForecastFragment.setHourlyList(oneCallResponse.getHourly());
+				
+				Bundle bundle = new Bundle();
+				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
+				detailHourlyForecastFragment.setArguments(bundle);
+				
+				String tag = getString(R.string.tag_detail_hourly_forecast_fragment);
+				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
+				fragmentManager.beginTransaction().hide(
+						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
+						detailHourlyForecastFragment, tag).addToBackStack(tag).commit();
+			}
+		});
+		
+		setValuesToViews();
 	}
 	
 	public OwmSimpleHourlyForecastFragment setOneCallResponse(OneCallResponse oneCallResponse) {
@@ -64,14 +101,13 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		//label column 설정
 		final int LABEL_VIEW_WIDTH = (int) context.getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
 		
-		addLabelView(R.drawable.temp_icon, getString(R.string.date), LABEL_VIEW_WIDTH, DATE_ROW_HEIGHT);
-		addLabelView(R.drawable.temp_icon, getString(R.string.clock), LABEL_VIEW_WIDTH, CLOCK_ROW_HEIGHT);
-		addLabelView(R.drawable.temp_icon, getString(R.string.weather), LABEL_VIEW_WIDTH, WEATHER_ROW_HEIGHT);
-		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT);
-		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT);
-		addLabelView(R.drawable.temp_icon, getString(R.string.rain_volume), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT);
-		ImageView snowVolumeLabel = addLabelView(R.drawable.temp_icon, getString(R.string.snow_volume), LABEL_VIEW_WIDTH,
-				DEFAULT_TEXT_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.date), DATE_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.clock), CLOCK_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.weather), WEATHER_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), DEFAULT_TEXT_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), DEFAULT_TEXT_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.rain_volume), DEFAULT_TEXT_ROW_HEIGHT);
+		ImageView snowVolumeLabel = addLabelView(R.drawable.temp_icon, getString(R.string.snow_volume), DEFAULT_TEXT_ROW_HEIGHT);
 		
 		dateRow = new DateView(context, VIEW_WIDTH, DATE_ROW_HEIGHT, COLUMN_WIDTH);
 		ClockView clockRow = new ClockView(context, VIEW_WIDTH, CLOCK_ROW_HEIGHT, COLUMN_WIDTH);
@@ -84,7 +120,8 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		//시각 --------------------------------------------------------------------------
 		List<Date> dateTimeList = new ArrayList<>();
 		for (OneCallResponse.Hourly item : items) {
-			dateTimeList.add(new Date(Long.parseLong(item.getDt())));
+			dateTimeList.add(
+					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(String.valueOf(Long.parseLong(item.getDt()) * 1000L)));
 		}
 		dateRow.init(dateTimeList);
 		clockRow.setClockList(dateTimeList);

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
@@ -32,6 +33,7 @@ public class OwmSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		setValuesToViews();
 	}
 	
 	public OwmSimpleCurrentConditionsFragment setOneCallResponse(OneCallResponse oneCallResponse) {
@@ -59,7 +61,8 @@ public class OwmSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 			binding.precipitation.setVisibility(View.GONE);
 		}
 		
-		binding.sky.setText(OpenWeatherMapResponseProcessor.getWeatherIconDescription(current.getWeather().get(0).getIcon()));
-		binding.temperature.setText(current.getTemp());
+		binding.sky.setText(OpenWeatherMapResponseProcessor.getWeatherIconDescription(current.getWeather().get(0).getId()));
+		binding.temperature.setText(
+				ValueUnits.convertTemperature(current.getTemp(), tempUnit).toString() + ValueUnits.convertToStr(getContext(), tempUnit));
 	}
 }

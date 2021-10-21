@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.Gravity;
 import android.view.View;
@@ -13,7 +14,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.dailyforecast.OwmDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
@@ -39,6 +44,39 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);
+		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				DailyForecastComparisonFragment comparisonFragment = new DailyForecastComparisonFragment();
+				comparisonFragment.setArguments(getArguments());
+				
+				String tag = getString(R.string.tag_comparison_fragment);
+				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
+				fragmentManager.beginTransaction().hide(
+						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
+						comparisonFragment, tag).addToBackStack(tag).commit();
+			}
+		});
+		
+		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				OwmDetailDailyForecastFragment detailDailyForecastFragment = new OwmDetailDailyForecastFragment();
+				detailDailyForecastFragment.setDailyList(oneCallResponse.getDaily());
+				
+				Bundle bundle = new Bundle();
+				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
+				detailDailyForecastFragment.setArguments(bundle);
+				
+				String tag = getString(R.string.tag_detail_daily_forecast_fragment);
+				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
+				fragmentManager.beginTransaction().hide(
+						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
+						detailDailyForecastFragment, tag).addToBackStack(tag).commit();
+			}
+		});
+		
+		setValuesToViews();
 	}
 	
 	public OwmSimpleDailyForecastFragment setOneCallResponse(OneCallResponse oneCallResponse) {
@@ -63,16 +101,12 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCDaily);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 		
-		//label column 설정
-		final int LABEL_VIEW_WIDTH = (int) context.getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
-		
-		addLabelView(R.drawable.temp_icon, getString(R.string.date), LABEL_VIEW_WIDTH, DATE_ROW_HEIGHT);
-		addLabelView(R.drawable.temp_icon, getString(R.string.weather), LABEL_VIEW_WIDTH, WEATHER_ROW_HEIGHT);
-		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT);
-		addLabelView(R.drawable.temp_icon, getString(R.string.rain_volume), LABEL_VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT);
-		ImageView snowVolumeLabel = addLabelView(R.drawable.temp_icon, getString(R.string.snow_volume), LABEL_VIEW_WIDTH,
-				DEFAULT_TEXT_ROW_HEIGHT);
-		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), LABEL_VIEW_WIDTH, TEMP_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.date), DATE_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.weather), WEATHER_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), DEFAULT_TEXT_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.rain_volume), DEFAULT_TEXT_ROW_HEIGHT);
+		ImageView snowVolumeLabel = addLabelView(R.drawable.temp_icon, getString(R.string.snow_volume), DEFAULT_TEXT_ROW_HEIGHT);
+		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), TEMP_ROW_HEIGHT);
 		
 		TextValueView dateRow = new TextValueView(context, VIEW_WIDTH, DATE_ROW_HEIGHT, COLUMN_WIDTH);
 		WeatherIconView weatherIconRow = new WeatherIconView(context, VIEW_WIDTH, WEATHER_ROW_HEIGHT, COLUMN_WIDTH);
@@ -82,12 +116,10 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		
 		//시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
-		Date date = new Date();
-		SimpleDateFormat MdE = new SimpleDateFormat("M/d E", Locale.getDefault());
+		SimpleDateFormat dateFormat = new SimpleDateFormat("M/d E", Locale.getDefault());
 		
 		for (OneCallResponse.Daily item : items) {
-			date.setTime(Long.parseLong(item.getDt()));
-			dateList.add(MdE.format(date));
+			dateList.add(dateFormat.format(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getDt()) * 1000L)));
 		}
 		dateRow.setValueList(dateList);
 		
@@ -106,8 +138,8 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		boolean haveSnowVolumes = false;
 		
 		for (OneCallResponse.Daily item : items) {
-			minTempList.add(Integer.parseInt(item.getTemp().getMin()));
-			maxTempList.add(Integer.parseInt(item.getTemp().getMax()));
+			minTempList.add(ValueUnits.convertTemperature(item.getTemp().getMin(), tempUnit));
+			maxTempList.add(ValueUnits.convertTemperature(item.getTemp().getMax(), tempUnit));
 			
 			rainVolume = item.getRain() == null ? "-" : item.getRain();
 			if (item.getSnow() != null) {

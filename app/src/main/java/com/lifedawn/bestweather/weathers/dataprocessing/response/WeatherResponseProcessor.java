@@ -67,4 +67,13 @@ public class WeatherResponseProcessor {
 		return calendar.getTime();
 	}
 	
+	
+	public static Date convertDateTimeOfHourlyForecast(String millis) {
+		calendar.setTimeInMillis(Long.parseLong(millis));
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		
+		return calendar.getTime();
+	}
 }

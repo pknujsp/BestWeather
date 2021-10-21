@@ -13,6 +13,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunsetriseUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class WeatherIconView extends View {
@@ -69,8 +70,8 @@ public class WeatherIconView extends View {
 		boolean day = false;
 		for (WeatherIconObj weatherIconObj : weatherIconObjs) {
 			for (SunsetriseUtil.SunSetRiseData sunSetRiseData : setRiseDataList) {
-				if (ClockUtil.areSameDate(sunSetRiseData.getDate().getTime(), weatherIconObj.fcstDateTime)) {
-					day = weatherIconObj.fcstDateTime > sunSetRiseData.getSunrise().getTime() && weatherIconObj.fcstDateTime < sunSetRiseData.getSunset().getTime();
+				if (ClockUtil.areSameDate(sunSetRiseData.getDate().getTime(), weatherIconObj.fcstDateTime.getTime())) {
+					day = weatherIconObj.fcstDateTime.getTime() > sunSetRiseData.getSunrise().getTime() && weatherIconObj.fcstDateTime.getTime() < sunSetRiseData.getSunset().getTime();
 					// add drawable to list
 					
 					break;
@@ -82,9 +83,9 @@ public class WeatherIconView extends View {
 	
 	public static class WeatherIconObj {
 		final String code;
-		final long fcstDateTime;
+		final Date fcstDateTime;
 		
-		public WeatherIconObj(String code, long fcstDateTime) {
+		public WeatherIconObj(String code, Date fcstDateTime) {
 			this.code = code;
 			this.fcstDateTime = fcstDateTime;
 		}

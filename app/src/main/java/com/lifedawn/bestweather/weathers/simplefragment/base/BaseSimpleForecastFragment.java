@@ -40,17 +40,17 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	protected String addressName;
 	protected String countryCode;
 	protected MainProcessing.WeatherSourceType mainWeatherSourceType;
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-
+		
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
 		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.mPerSec.name()));
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.km.name()));
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.clock24.name()));
-
+		
 		Bundle bundle = getArguments();
 		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
 		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
@@ -59,17 +59,17 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 		mainWeatherSourceType = (MainProcessing.WeatherSourceType) bundle.getSerializable(
 				getString(R.string.bundle_key_main_weather_data_source));
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = BaseLayoutSimpleForecastBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-
+	
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
+		
 		binding.scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
@@ -78,15 +78,15 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 				}
 			}
 		});
-
+		
 	}
-
+	
 	@Override
 	public void setValuesToViews() {
-
+	
 	}
-
-	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewWidth, int viewHeight) {
+	
+	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewHeight) {
 		ImageView labelView = new ImageView(getContext());
 		labelView.setImageDrawable(ContextCompat.getDrawable(getContext(), labelImgId));
 		labelView.setClickable(true);
@@ -98,11 +98,12 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 				Toast.makeText(getContext(), labelDescription, Toast.LENGTH_SHORT).show();
 			}
 		});
-
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(viewWidth, viewHeight);
+		
+		int width = (int) getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, viewHeight);
 		layoutParams.gravity = Gravity.CENTER;
 		labelView.setLayoutParams(layoutParams);
-
+		
 		binding.labels.addView(labelView);
 		return labelView;
 	}

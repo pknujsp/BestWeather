@@ -99,12 +99,12 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		//label column 설정
 		final int labelViewWidth = (int) context.getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
 
-		addLabelView(R.drawable.date, getString(R.string.date), labelViewWidth, dateRowHeight);
-		addLabelView(R.drawable.time, getString(R.string.clock), labelViewWidth, clockRowHeight);
-		addLabelView(R.drawable.temp_icon, getString(R.string.weather), labelViewWidth, weatherRowHeight);
-		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), labelViewWidth, defaultTextRowHeight);
-		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), labelViewWidth, defaultTextRowHeight);
-		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_volume), labelViewWidth, defaultTextRowHeight);
+		addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
+		addLabelView(R.drawable.time, getString(R.string.clock), clockRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.weather), weatherRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_volume), defaultTextRowHeight);
 
 		dateRow = new DateView(context, viewWidth, dateRowHeight, columnWidth);
 		ClockView clockRow = new ClockView(context, viewWidth, clockRowHeight, columnWidth);
