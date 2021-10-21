@@ -16,6 +16,8 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
+import com.lifedawn.bestweather.weathers.detailfragment.kma.dailyforecast.KmaDetailDailyForecastFragment;
+import com.lifedawn.bestweather.weathers.detailfragment.kma.hourlyforecast.KmaDetailHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
@@ -55,6 +57,24 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				fragmentManager.beginTransaction().hide(
 						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
 						comparisonFragment, tag).addToBackStack(tag).commit();
+			}
+		});
+		
+		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				KmaDetailDailyForecastFragment detailDailyForecastFragment = new KmaDetailDailyForecastFragment();
+				detailDailyForecastFragment.setFinalDailyForecastList(finalDailyForecastList);
+				
+				Bundle bundle = new Bundle();
+				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
+				detailDailyForecastFragment.setArguments(bundle);
+				
+				String tag = getString(R.string.tag_detail_daily_forecast_fragment);
+				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
+				fragmentManager.beginTransaction().hide(
+						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
+						detailDailyForecastFragment, tag).addToBackStack(tag).commit();
 			}
 		});
 		

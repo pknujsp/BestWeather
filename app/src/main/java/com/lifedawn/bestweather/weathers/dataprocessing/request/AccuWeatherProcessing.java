@@ -104,7 +104,7 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				if (response.code() == 400) {
+				if (response.body() != null) {
 					callback.onResponseResult(response);
 				} else {
 					callback.onResponseResult(new Exception());

@@ -119,10 +119,10 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		
 		if (kmaFinalHourlyForecasts != null) {
 			if (kmaFinalHourlyForecasts.get(0).dateTime.before(firstDateTime)) {
-				firstDateTime = kmaFinalHourlyForecasts.get(0).dateTime;
+				firstDateTime.setTime(kmaFinalHourlyForecasts.get(0).dateTime.getTime());
 			}
 			if (kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.after(lastDateTime)) {
-				lastDateTime = kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime;
+				lastDateTime.setTime(kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.getTime());
 			}
 		}
 		if (accuFinalHourlyForecasts != null) {

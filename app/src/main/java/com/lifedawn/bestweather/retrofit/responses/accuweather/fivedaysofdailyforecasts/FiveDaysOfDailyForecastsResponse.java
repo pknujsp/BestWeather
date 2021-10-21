@@ -224,25 +224,25 @@ public class FiveDaysOfDailyForecastsResponse {
 		public static class Temperature {
 			@Expose
 			@SerializedName("Minimum")
-			private Minimum minimum;
+			private ValueUnit minimum;
 
 			@Expose
 			@SerializedName("Maximum")
-			private Maximum maximum;
-
-			public Minimum getMinimum() {
+			private ValueUnit maximum;
+			
+			public ValueUnit getMinimum() {
 				return minimum;
 			}
-
-			public void setMinimum(Minimum minimum) {
+			
+			public void setMinimum(ValueUnit minimum) {
 				this.minimum = minimum;
 			}
-
-			public Maximum getMaximum() {
+			
+			public ValueUnit getMaximum() {
 				return maximum;
 			}
-
-			public void setMaximum(Maximum maximum) {
+			
+			public void setMaximum(ValueUnit maximum) {
 				this.maximum = maximum;
 			}
 		}
@@ -250,25 +250,25 @@ public class FiveDaysOfDailyForecastsResponse {
 		public static class RealFeelTemperature {
 			@Expose
 			@SerializedName("Minimum")
-			private Minimum minimum;
-
+			private ValueUnit minimum;
+			
 			@Expose
 			@SerializedName("Maximum")
-			private Maximum maximum;
-
-			public Minimum getMinimum() {
+			private ValueUnit maximum;
+			
+			public ValueUnit getMinimum() {
 				return minimum;
 			}
-
-			public void setMinimum(Minimum minimum) {
+			
+			public void setMinimum(ValueUnit minimum) {
 				this.minimum = minimum;
 			}
-
-			public Maximum getMaximum() {
+			
+			public ValueUnit getMaximum() {
 				return maximum;
 			}
-
-			public void setMaximum(Maximum maximum) {
+			
+			public void setMaximum(ValueUnit maximum) {
 				this.maximum = maximum;
 			}
 		}
@@ -276,25 +276,25 @@ public class FiveDaysOfDailyForecastsResponse {
 		public static class RealFeelTemperatureShade {
 			@Expose
 			@SerializedName("Minimum")
-			private Minimum minimum;
-
+			private ValueUnit minimum;
+			
 			@Expose
 			@SerializedName("Maximum")
-			private Maximum maximum;
-
-			public Minimum getMinimum() {
+			private ValueUnit maximum;
+			
+			public ValueUnit getMinimum() {
 				return minimum;
 			}
-
-			public void setMinimum(Minimum minimum) {
+			
+			public void setMinimum(ValueUnit minimum) {
 				this.minimum = minimum;
 			}
-
-			public Maximum getMaximum() {
+			
+			public ValueUnit getMaximum() {
 				return maximum;
 			}
-
-			public void setMaximum(Maximum maximum) {
+			
+			public void setMaximum(ValueUnit maximum) {
 				this.maximum = maximum;
 			}
 		}

@@ -88,7 +88,7 @@ public class SunSetRiseViewGroup extends ViewGroup {
 				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock),
 						ValueUnits.clock12.name()));
 		dateFormat = new SimpleDateFormat(clockUnit == ValueUnits.clock12
-				? "M.d E a h:m" : "M.d E HH:m", Locale.getDefault());
+				? "M.d E a h:mm" : "M.d E HH:mm", Locale.getDefault());
 
 		String currentDateTime = dateFormat.format(calendar.getTime());
 		timeTextPaint.getTextBounds(currentDateTime, 0, currentDateTime.length(), timeTextRect);

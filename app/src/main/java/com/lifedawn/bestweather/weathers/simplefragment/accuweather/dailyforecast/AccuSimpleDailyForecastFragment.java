@@ -101,8 +101,8 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		String volume = null;
 		
 		for (FiveDaysOfDailyForecastsResponse.DailyForecasts dailyForecasts : items) {
-			minTempList.add(Integer.parseInt(dailyForecasts.getTemperature().getMinimum().getMetric().getValue()));
-			maxTempList.add(Integer.parseInt(dailyForecasts.getTemperature().getMaximum().getMetric().getValue()));
+			minTempList.add(Integer.parseInt(dailyForecasts.getTemperature().getMinimum().getValue()));
+			maxTempList.add(Integer.parseInt(dailyForecasts.getTemperature().getMaximum().getValue()));
 			
 			if (dailyForecasts.getDay().getPrecipitationProbability() != null) {
 				pop = dailyForecasts.getDay().getPrecipitationProbability();

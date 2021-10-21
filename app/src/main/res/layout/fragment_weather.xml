@@ -18,19 +18,35 @@
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/address_name"
+                    android:id="@+id/datasource"
                     style="@style/text_shadow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:drawableRight="@drawable/expand_more"
+                    android:drawableTint="@color/purple_500"
+                    android:text="weatherDataSource"
+                    android:textAlignment="center"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/address_name"
+                    style="@style/text_shadow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/datasource"
+                    android:layout_centerHorizontal="true"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginTop="36dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="4dp"
                     android:text="주소명"
                     android:textAlignment="center"
-                    android:textSize="18sp" />
+                    android:textSize="19sp" />
 
                 <TextView
                     android:id="@+id/updated_datetime"
@@ -39,10 +55,10 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/address_name"
                     android:layout_alignRight="@id/address_name"
-                    android:layout_marginBottom="160dp"
+                    android:layout_marginBottom="150dp"
                     android:text="업데이트 시각"
                     android:textAlignment="viewEnd"
-                    android:textSize="13sp" />
+                    android:textSize="14sp" />
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/simple_current_conditions"

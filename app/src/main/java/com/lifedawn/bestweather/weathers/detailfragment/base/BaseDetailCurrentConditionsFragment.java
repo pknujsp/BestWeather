@@ -60,6 +60,7 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.current_conditions);
 		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
+		binding.weatherCardViewHeader.detailForecast.setVisibility(View.GONE);
 		layoutInflater = getLayoutInflater();
 	}
 
