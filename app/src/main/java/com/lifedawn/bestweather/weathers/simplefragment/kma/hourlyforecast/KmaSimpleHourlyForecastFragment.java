@@ -20,7 +20,7 @@ import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastF
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
-import com.lifedawn.bestweather.weathers.view.WeatherIconView;
+import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -89,7 +89,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 		final int dateRowHeight = (int) context.getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
 		final int clockRowHeight = (int) context.getResources().getDimension(R.dimen.clockValueRowHeightInCOMMON);
-		final int weatherRowHeight = (int) context.getResources().getDimension(R.dimen.weatherIconValueRowHeightInSC);
+		final int weatherRowHeight = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int defaultTextRowHeight = (int) context.getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
 		final int columnCount = finalHourlyForecastList.size();
@@ -108,7 +108,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 		dateRow = new DateView(context, viewWidth, dateRowHeight, columnWidth);
 		ClockView clockRow = new ClockView(context, viewWidth, clockRowHeight, columnWidth);
-		WeatherIconView weatherIconRow = new WeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
+		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
 		TextValueView tempRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView precipitationVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);

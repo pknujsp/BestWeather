@@ -349,6 +349,12 @@
     <string name="precipitation_of_rain">강우확률</string>
     <string name="hours_of_precipitation">강수지속시간</string>
     <string name="hours_of_rain">강우지속시간</string>
+    <string name="precipitation_intensity">강수강도</string>
+    <string name="measuring_station_name">측정소</string>
+    <string name="address_name">주소</string>
+    <string name="updated_time">갱신 시각</string>
+    <string name="detail_air_quality">세부 대기 상태</string>
+    <string name="tag_detail_air_quality_fragment">tag_detail_air_quality_fragment</string>
 
 
 </resources>

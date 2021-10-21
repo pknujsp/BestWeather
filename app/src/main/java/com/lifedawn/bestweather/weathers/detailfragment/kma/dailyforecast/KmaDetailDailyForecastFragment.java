@@ -11,25 +11,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.ForecastObj;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
-import com.lifedawn.bestweather.weathers.view.ClockView;
-import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
-import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
-import com.lifedawn.bestweather.weathers.view.WeatherIconView;
-import com.lifedawn.bestweather.weathers.view.WindDirectionView;
+import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,7 +55,7 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		Context context = getContext();
 		
 		final int dateRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
-		final int weatherRowHeight = (int) getResources().getDimension(R.dimen.weatherIconValueRowHeightInD);
+		final int weatherRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInD);
 		final int tempRowHeight = (int) getResources().getDimension(R.dimen.doubleTemperatureRowHeightInD);
 		final int defaultTextRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInD);
 		
@@ -77,7 +69,7 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), tempRowHeight);
 		
 		TextValueView dateRow = new TextValueView(context, viewWidth, dateRowHeight, columnWidth);
-		WeatherIconView weatherIconRow = new WeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
+		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
 		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		
 		//날짜, 시각 --------------------------------------------------------------------------

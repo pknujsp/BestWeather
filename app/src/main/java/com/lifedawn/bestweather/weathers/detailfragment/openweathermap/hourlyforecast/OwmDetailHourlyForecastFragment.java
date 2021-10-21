@@ -13,16 +13,14 @@ import androidx.annotation.Nullable;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
-import com.lifedawn.bestweather.weathers.view.WeatherIconView;
-import com.lifedawn.bestweather.weathers.view.WindDirectionView;
+import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
+import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -32,43 +30,42 @@ import java.util.List;
 
 public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment {
 	private List<OneCallResponse.Hourly> hourlyList;
-	
+
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.toolbar.fragmentTitle.setText(R.string.detail_hourly_forecast);
 		setValuesToViews();
 	}
-	
+
 	public OwmDetailHourlyForecastFragment setHourlyList(List<OneCallResponse.Hourly> hourlyList) {
 		this.hourlyList = hourlyList;
 		return this;
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
 		binding.forecastView.removeAllViews();
 		binding.labels.removeAllViews();
-		
+
 		Context context = getContext();
-		
-		
+
 		final int dateRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
 		final int clockRowHeight = (int) getResources().getDimension(R.dimen.clockValueRowHeightInCOMMON);
-		final int weatherRowHeight = (int) getResources().getDimension(R.dimen.weatherIconValueRowHeightInD);
+		final int weatherRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInD);
 		final int tempRowHeight = (int) getResources().getDimension(R.dimen.singleTemperatureRowHeightInCOMMON);
-		final int windDirectionRowHeight = (int) getResources().getDimension(R.dimen.windDirectionIconValueRowHeightInD);
+		final int windDirectionRowHeight = (int) getResources().getDimension(R.dimen.singleWindDirectionIconValueRowHeightInD);
 		final int defaultTextRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInD);
-		
+
 		final int columnsCount = hourlyList.size();
 		final int columnWidth = (int) getResources().getDimension(R.dimen.valueColumnWidthInDHourly);
 		final int viewWidth = columnsCount * columnWidth;
-		
+
 		//순서 : 날짜, 시각, 날씨상태, 기온, 체감기온, 강수확률, 강우량, 강설량, 풍향, 풍속, 바람세기, 돌풍
 		//기압, 습도, 이슬점, 운량, 시정, 자외선
 		addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
@@ -89,15 +86,15 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		addLabelView(R.drawable.temp_icon, getString(R.string.cloud_cover), defaultTextRowHeight);
 		addLabelView(R.drawable.temp_icon, getString(R.string.visibility), defaultTextRowHeight);
 		addLabelView(R.drawable.temp_icon, getString(R.string.uv_index), defaultTextRowHeight);
-		
+
 		dateRow = new DateView(context, viewWidth, dateRowHeight, columnWidth);
 		ClockView clockRow = new ClockView(context, viewWidth, clockRowHeight, columnWidth);
-		WeatherIconView weatherIconRow = new WeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
+		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
 		TextValueView realFeelTempRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView popRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView rainVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView snowVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		WindDirectionView windDirectionRow = new WindDirectionView(context, viewWidth, windDirectionRowHeight, columnWidth);
+		SingleWindDirectionView windDirectionRow = new SingleWindDirectionView(context, viewWidth, windDirectionRowHeight, columnWidth);
 		TextValueView windSpeedRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView windStrengthRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView windGustRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
@@ -107,15 +104,15 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		TextValueView cloudCoverRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView visibilityRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView uvIndexRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		
+
 		List<Date> dateTimeList = new ArrayList<>();
-		List<WeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
+		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		List<Integer> tempList = new ArrayList<>();
 		List<String> realFeelTempList = new ArrayList<>();
 		List<String> popList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
-		List<Integer> windDirectionList = new ArrayList<>();
+		List<SingleWindDirectionView.WindDirectionObj> windDirectionList = new ArrayList<>();
 		List<String> windSpeedList = new ArrayList<>();
 		List<String> windStrengthList = new ArrayList<>();
 		List<String> windGustList = new ArrayList<>();
@@ -125,21 +122,21 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		List<String> cloudCoverList = new ArrayList<>();
 		List<String> visibilityList = new ArrayList<>();
 		List<String> uvIndexList = new ArrayList<>();
-		
+
 		//순서 : 날짜, 시각, 날씨상태, 기온, 체감기온, 강수확률, 강우량(nullable), 강설량(nullable), 풍향, 풍속, 바람세기, 돌풍(nullable)
 		//기압, 습도, 이슬점, 운량, 시정, 자외선
-		
+
 		int index = 0;
 		for (OneCallResponse.Hourly hourly : hourlyList) {
 			dateTimeList.add(
 					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(String.valueOf(Long.parseLong(hourly.getDt()) * 1000L)));
-			weatherIconObjList.add(new WeatherIconView.WeatherIconObj(hourly.getWeather().get(0).getIcon(), dateTimeList.get(index)));
+			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(hourly.getWeather().get(0).getIcon(), dateTimeList.get(index)));
 			tempList.add(ValueUnits.convertTemperature(hourly.getTemp(), tempUnit));
 			realFeelTempList.add(ValueUnits.convertTemperature(hourly.getFeelsLike(), tempUnit).toString());
 			popList.add(String.valueOf((int) (Double.parseDouble(hourly.getPop()) * 100.0)));
 			rainVolumeList.add(hourly.getRain() == null ? "-" : hourly.getRain().getPrecipitation1Hour());
 			snowVolumeList.add(hourly.getSnow() == null ? "-" : hourly.getSnow().getPrecipitation1Hour());
-			windDirectionList.add(Integer.parseInt(hourly.getWind_deg()));
+			windDirectionList.add(new SingleWindDirectionView.WindDirectionObj(Integer.parseInt(hourly.getWind_deg())));
 			windSpeedList.add(ValueUnits.convertWindSpeed(hourly.getWind_speed(), windUnit).toString());
 			windStrengthList.add(WeatherResponseProcessor.getSimpleWindSpeedDescription(hourly.getWind_speed()));
 			windGustList.add(hourly.getWindGust() == null ? "-" : hourly.getWindGust());
@@ -149,7 +146,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 			cloudCoverList.add(hourly.getClouds());
 			visibilityList.add(ValueUnits.convertVisibility(hourly.getVisibility(), visibilityUnit).toString());
 			uvIndexList.add(hourly.getUvi());
-			
+
 			index++;
 		}
 		dateRow.init(dateTimeList);
@@ -158,7 +155,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		popRow.setValueList(popList);
 		rainVolumeRow.setValueList(rainVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);
-		windDirectionRow.setDirectionValueList(windDirectionList);
+		windDirectionRow.setIcons(windDirectionList);
 		windSpeedRow.setValueList(windSpeedList);
 		windStrengthRow.setValueList(windStrengthList);
 		windGustRow.setValueList(windGustList);
@@ -168,13 +165,13 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		cloudCoverRow.setValueList(cloudCoverList);
 		visibilityRow.setValueList(visibilityList);
 		uvIndexRow.setValueList(uvIndexList);
-		
+
 		DetailSingleTemperatureView tempRow = new DetailSingleTemperatureView(context, tempList, viewWidth, tempRowHeight, columnWidth);
-		
+
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		rowLayoutParams.gravity = Gravity.CENTER;
-		
+
 		//순서 : 날짜, 시각, 날씨상태, 기온, 체감기온, 강수확률, 강우량, 강설량, 풍향, 풍속, 바람세기, 돌풍
 		//기압, 습도, 이슬점, 운량, 시정, 자외선
 		binding.forecastView.addView(dateRow, rowLayoutParams);
@@ -195,6 +192,6 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		binding.forecastView.addView(cloudCoverRow, rowLayoutParams);
 		binding.forecastView.addView(visibilityRow, rowLayoutParams);
 		binding.forecastView.addView(uvIndexRow, rowLayoutParams);
-		
+
 	}
 }

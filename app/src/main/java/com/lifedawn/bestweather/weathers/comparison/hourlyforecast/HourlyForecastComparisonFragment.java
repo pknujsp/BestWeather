@@ -20,7 +20,6 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtfcstresponse.UltraSrtFcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse.VilageFcstRoot;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast.HourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.comparison.base.BaseForecastComparisonFragment;
@@ -32,7 +31,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.F
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
-import com.lifedawn.bestweather.weathers.view.WeatherIconView;
+import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -157,13 +156,13 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		
 		final int dateValueRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
 		final int clockValueRowHeight = (int) getResources().getDimension(R.dimen.clockValueRowHeightInCOMMON);
-		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.weatherIconValueRowHeightInSC);
+		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int defaultValueRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 		
 		//날짜, 시각, 날씨, 기온, 강수량, 강수확률
 		dateRow = new DateView(getContext(), valueRowWidth, dateValueRowHeight, columnWidth);
 		ClockView clockRow = new ClockView(getContext(), valueRowWidth, clockValueRowHeight, columnWidth);
-		WeatherIconView[] weatherIconRows = new WeatherIconView[columnsCount];
+		SingleWeatherIconView[] weatherIconRows = new SingleWeatherIconView[columnsCount];
 		TextValueView[] tempRows = new TextValueView[columnsCount];
 		TextValueView[] precipitationVolumeRows = new TextValueView[columnsCount];
 		TextValueView[] probabilityOfPrecipitationRows = new TextValueView[columnsCount];
@@ -201,7 +200,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				}
 			}
 			
-			weatherIconRows[i] = new WeatherIconView(getContext(), specificRowWidth, weatherValueRowHeight, columnWidth);
+			weatherIconRows[i] = new SingleWeatherIconView(getContext(), specificRowWidth, weatherValueRowHeight, columnWidth);
 			weatherIconRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 			
 			tempRows[i] = new TextValueView(getContext(), specificRowWidth, defaultValueRowHeight, columnWidth);

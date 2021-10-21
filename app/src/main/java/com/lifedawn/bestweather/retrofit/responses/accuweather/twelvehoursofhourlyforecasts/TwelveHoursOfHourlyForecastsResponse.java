@@ -60,6 +60,14 @@ public class TwelveHoursOfHourlyForecastsResponse {
 		private String hasPrecipitation;
 
 		@Expose
+		@SerializedName("PrecipitationType")
+		private String precipitationType;
+
+		@Expose
+		@SerializedName("PrecipitationIntensity")
+		private String precipitationIntensity;
+
+		@Expose
 		@SerializedName("IsDaylight")
 		private String isDaylight;
 
@@ -155,6 +163,22 @@ public class TwelveHoursOfHourlyForecastsResponse {
 		@Expose
 		@SerializedName("Ceiling")
 		private ValueUnit ceiling;
+
+		public String getPrecipitationType() {
+			return precipitationType;
+		}
+
+		public void setPrecipitationType(String precipitationType) {
+			this.precipitationType = precipitationType;
+		}
+
+		public String getPrecipitationIntensity() {
+			return precipitationIntensity;
+		}
+
+		public void setPrecipitationIntensity(String precipitationIntensity) {
+			this.precipitationIntensity = precipitationIntensity;
+		}
 
 		public Drawable getWeatherImg() {
 			return weatherImg;

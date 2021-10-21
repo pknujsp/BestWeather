@@ -279,7 +279,7 @@ public class WeatherFragment extends Fragment implements IGps {
 								
 								if (weatherSourceType == mainWeatherSourceType) {
 									for (ResponseResult<JsonElement> responseResult : entry.getValue().values()) {
-										if (responseResult.getResponse().body() == null) {
+										if (responseResult.getResponse() == null) {
 											mainWeatherSourceType = finalSecondWeatherSourceType;
 											refresh(latitude, longitude);
 											return;
@@ -411,7 +411,7 @@ public class WeatherFragment extends Fragment implements IGps {
 				simpleDailyForecastFragment = owmSimpleDailyForecastFragment;
 				detailCurrentConditionsFragment = owmDetailCurrentConditionsFragment;
 				
-				currentConditionsWeatherVal = oneCallResponse.getCurrent().getWeather().get(0).getIcon();
+				currentConditionsWeatherVal = oneCallResponse.getCurrent().getWeather().get(0).getId();
 				break;
 		}
 		iLoadImgOfCurrentConditions.loadImgOfCurrentConditions(mainWeatherSourceType, currentConditionsWeatherVal, latitude, longitude);

@@ -5,6 +5,7 @@
     <dimen name="toolbar_start_end_margin">16dp</dimen>
     <dimen name="toolbar_page_title_margin">28dp</dimen>
     <dimen name="toolbar_image_size">28dp</dimen>
+    <dimen name="cornerRadius">16dp</dimen>
 
 
     <!-- forecast view 내의 길이, 크기 값
@@ -20,30 +21,30 @@
     <dimen name="labelIconSizeInCOMMON">30dp</dimen>
     <dimen name="labelIconColumnWidthInCOMMON">38dp</dimen>
     <dimen name="singleTemperatureRowHeightInCOMMON">80dp</dimen>
-
-    <!-- simple, comparison : SC로 축약 -->
-    <dimen name="defaultValueRowHeightInSC">34dp</dimen>
-    <dimen name="doubleTemperatureRowHeightInSC">90dp</dimen>
     <dimen name="circleRadiusInSingleTemperature">4dp</dimen>
     <dimen name="circleRadiusInDoubleTemperature">4dp</dimen>
 
+    <!-- simple, comparison : SC로 축약 -->
     <dimen name="valueColumnWidthInSCHourly">60dp</dimen>
-    <dimen name="valueColumnWidthInSCDaily">85dp</dimen>
-    <dimen name="windDirectionIconSizeInSC">26dp</dimen>
-    <dimen name="windDirectionIconValueRowHeightInSC">30dp</dimen>
-    <dimen name="weatherIconSizeInSC">38dp</dimen>
-    <dimen name="weatherIconValueRowHeightInSC">42dp</dimen>
+    <dimen name="valueColumnWidthInSCDaily">83dp</dimen>
+    <dimen name="defaultValueRowHeightInSC">34dp</dimen>
+
+    <dimen name="doubleTemperatureRowHeightInSC">90dp</dimen>
+    <dimen name="singleWindDirectionIconValueRowHeightInSC">36dp</dimen>
+    <dimen name="doubleWindDirectionIconValueRowHeightInSC">45dp</dimen>
+    <dimen name="singleWeatherIconValueRowHeightInSC">38dp</dimen>
+    <dimen name="doubleWeatherIconValueRowHeightInSC">47dp</dimen>
 
     <!-- detail : D로 축약 -->
+    <dimen name="valueColumnWidthInDHourly">63dp</dimen>
+    <dimen name="valueColumnWidthInDDaily">87dp</dimen>
     <dimen name="defaultValueRowHeightInD">38dp</dimen>
-    <dimen name="doubleTemperatureRowHeightInD">100dp</dimen>
 
-    <dimen name="valueColumnWidthInDHourly">64dp</dimen>
-    <dimen name="valueColumnWidthInDDaily">90dp</dimen>
-    <dimen name="windDirectionIconSizeInD">28dp</dimen>
-    <dimen name="windDirectionIconValueRowHeightInD">32dp</dimen>
-    <dimen name="weatherIconSizeInD">40dp</dimen>
-    <dimen name="weatherIconValueRowHeightInD">44dp</dimen>
+    <dimen name="doubleTemperatureRowHeightInD">95dp</dimen>
+    <dimen name="singleWindDirectionIconValueRowHeightInD">37dp</dimen>
+    <dimen name="doubleWindDirectionIconValueRowHeightInD">47dp</dimen>
+    <dimen name="singleWeatherIconValueRowHeightInD">38dp</dimen>
+    <dimen name="doubleWeatherIconValueRowHeightInD">50dp</dimen>
 
     <!-- weather data source icon size -->
     <dimen name="weatherDataSourceIconSize">34dp</dimen>
@@ -53,5 +54,12 @@
     <dimen name="dateValueTextSizeInSCD">13sp</dimen>
     <dimen name="valueTextSizeInSCD">14sp</dimen>
     <dimen name="lastRowInForecastTableMargin">6dp</dimen>
-    <dimen name="cornerRadius">16dp</dimen>
+
+    <!-- detail air quality -->
+    <dimen name="gradeValueTextSizeInAirQualityBarView">13sp</dimen>
+    <dimen name="gradeTextSizeInAirQualityBarView">13sp</dimen>
+    <dimen name="barWidthInAirQualityBarView">24dp</dimen>
+    <dimen name="columnWidthInAirQualityBarView">65dp</dimen>
+    <dimen name="viewHeightOfAirQualityBarView">90dp</dimen>
+
 </resources>

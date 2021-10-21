@@ -18,27 +18,19 @@ import com.lifedawn.bestweather.commons.classes.ForecastObj;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaRoot;
-import com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtfcstresponse.UltraSrtFcstRoot;
-import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse.VilageFcstRoot;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast.HourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.comparison.base.BaseForecastComparisonFragment;
-import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
-import com.lifedawn.bestweather.weathers.view.ClockView;
-import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
-import com.lifedawn.bestweather.weathers.view.WeatherIconView;
+import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -165,12 +157,12 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		final int lastRowMargin = (int) getResources().getDimension(R.dimen.lastRowInForecastTableMargin);
 		
 		final int dateValueRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
-		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.weatherIconValueRowHeightInSC);
+		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int defaultValueRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 		
 		//날짜, 날씨, 기온, 강수량, 강수확률
 		TextValueView dateRow = new TextValueView(getContext(), valueRowWidth, dateValueRowHeight, columnWidth);
-		List<WeatherIconView> weatherIconRows = new ArrayList<>();
+		List<SingleWeatherIconView> weatherIconRows = new ArrayList<>();
 		List<TextValueView> tempRows = new ArrayList<>();
 		List<TextValueView> precipitationVolumeRows = new ArrayList<>();
 		List<TextValueView> probabilityOfPrecipitationRows = new ArrayList<>();
@@ -207,7 +199,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 					}
 				}
 			}
-			weatherIconRows.add(new WeatherIconView(getContext(), specificRowWidth, weatherValueRowHeight, columnWidth));
+			weatherIconRows.add(new SingleWeatherIconView(getContext(), specificRowWidth, weatherValueRowHeight, columnWidth));
 			weatherIconRows.get(i).setTag(R.id.begin_column_index, beginColumnIndex);
 			
 			tempRows.add(new TextValueView(getContext(), specificRowWidth, defaultValueRowHeight, columnWidth));

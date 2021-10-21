@@ -19,8 +19,8 @@ import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
-import com.lifedawn.bestweather.weathers.view.WeatherIconView;
-import com.lifedawn.bestweather.weathers.view.WindDirectionView;
+import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
+import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -60,9 +60,9 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 
 		final int dateRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
 		final int clockRowHeight = (int) getResources().getDimension(R.dimen.clockValueRowHeightInCOMMON);
-		final int weatherRowHeight = (int) getResources().getDimension(R.dimen.weatherIconValueRowHeightInSC);
+		final int weatherRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int tempRowHeight = (int) getResources().getDimension(R.dimen.singleTemperatureRowHeightInCOMMON);
-		final int windDirectionRowHeight = (int) getResources().getDimension(R.dimen.windDirectionIconValueRowHeightInD);
+		final int windDirectionRowHeight = (int) getResources().getDimension(R.dimen.singleWindDirectionIconValueRowHeightInD);
 		final int defaultTextRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
 		final int columnsCount = finalHourlyForecastList.size();
@@ -84,13 +84,13 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 
 		dateRow = new DateView(context, viewWidth, dateRowHeight, columnWidth);
 		ClockView clockRow = new ClockView(context, viewWidth, clockRowHeight, columnWidth);
-		WeatherIconView weatherIconRow = new WeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
+		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
 		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView precipitationVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView freshSnowCoverRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView thunderstormRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView humidityRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		WindDirectionView windDirectionRow = new WindDirectionView(context, viewWidth, windDirectionRowHeight, columnWidth);
+		SingleWindDirectionView windDirectionRow = new SingleWindDirectionView(context, viewWidth, windDirectionRowHeight, columnWidth);
 		TextValueView windSpeedRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView windStrengthRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 
@@ -109,7 +109,7 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		List<String> precipitationVolumeList = new ArrayList<>();
 		List<String> freshSnowCoverList = new ArrayList<>();
 		List<String> thunderStormList = new ArrayList<>();
-		List<Integer> windDirectionList = new ArrayList<>();
+		List<SingleWindDirectionView.WindDirectionObj> windDirectionList = new ArrayList<>();
 		List<String> windSpeedList = new ArrayList<>();
 		List<String> windStrengthList = new ArrayList<>();
 		List<String> humidityList = new ArrayList<>();
@@ -126,7 +126,7 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 			//낙뢰
 			thunderStormList.add(finalHourlyForecast.getLightning() == null ? "" : "O");
 			//풍향
-			windDirectionList.add(Integer.parseInt(finalHourlyForecast.getWindDirection()));
+			windDirectionList.add(new SingleWindDirectionView.WindDirectionObj(Integer.parseInt(finalHourlyForecast.getWindDirection())));
 			//풍속
 			windSpeedList.add(ValueUnits.convertWindSpeed(finalHourlyForecast.getWindSpeed(), windUnit).toString());
 			//바람세기
@@ -142,7 +142,7 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		freshSnowCoverRow.setValueList(freshSnowCoverList);
 		thunderstormRow.setValueList(thunderStormList);
 		humidityRow.setValueList(humidityList);
-		windDirectionRow.setDirectionValueList(windDirectionList);
+		windDirectionRow.setIcons(windDirectionList);
 		windSpeedRow.setValueList(windSpeedList);
 		windStrengthRow.setValueList(windStrengthList);
 

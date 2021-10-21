@@ -5,33 +5,25 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
-import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.ClockUtil;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.detailfragment.aqicn.DetailAirQualityFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 
 public class SimpleAirQualityFragment extends Fragment implements IWeatherValues {
@@ -58,7 +50,14 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				// GeolocalizedFeedResponse 전달
+				DetailAirQualityFragment detailAirQualityFragment = new DetailAirQualityFragment();
+				detailAirQualityFragment.setResponse(geolocalizedFeedResponse);
+
+				String tag = getString(R.string.tag_detail_air_quality_fragment);
+				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
+				fragmentManager.beginTransaction().hide(
+						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
+						detailAirQualityFragment, tag).addToBackStack(tag).commit();
 			}
 		});
 
@@ -93,42 +92,6 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		binding.o3.setText(AqicnResponseProcessor.getGradeDescription(o3Val.intValue()));
 		binding.so2.setText(AqicnResponseProcessor.getGradeDescription(so2Val.intValue()));
 
-		ArrayMap<String, ForecastObj> forecastObjMap = new ArrayMap<>();
-
-		// 2021-10-13
-		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm10Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm10();
-		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm10Forecast) {
-			if (!forecastObjMap.containsKey(valueMap.getDay())) {
-				forecastObjMap.put(valueMap.getDay(), new ForecastObj(valueMap.getDay()));
-			}
-			forecastObjMap.get(valueMap.getDay()).pm10 = AqicnResponseProcessor.getGradeDescription(Integer.parseInt(valueMap.getAvg()));
-		}
-
-		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm25Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm25();
-		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm25Forecast) {
-			if (!forecastObjMap.containsKey(valueMap.getDay())) {
-				forecastObjMap.put(valueMap.getDay(), new ForecastObj(valueMap.getDay()));
-			}
-			forecastObjMap.get(valueMap.getDay()).pm25 = AqicnResponseProcessor.getGradeDescription(Integer.parseInt(valueMap.getAvg()));
-		}
-
-		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> o3Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getO3();
-		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : o3Forecast) {
-			if (!forecastObjMap.containsKey(valueMap.getDay())) {
-				forecastObjMap.put(valueMap.getDay(), new ForecastObj(valueMap.getDay()));
-			}
-			forecastObjMap.get(valueMap.getDay()).o3 = AqicnResponseProcessor.getGradeDescription(Integer.parseInt(valueMap.getAvg()));
-		}
-
-		ForecastObj[] forecastObjArr = new ForecastObj[1];
-		List<ForecastObj> forecastObjList = Arrays.asList(forecastObjMap.values().toArray(forecastObjArr));
-		Collections.sort(forecastObjList, new Comparator<ForecastObj>() {
-			@Override
-			public int compare(ForecastObj forecastObj, ForecastObj t1) {
-				return forecastObj.date.compareTo(t1.date);
-			}
-		});
-
 		SimpleDateFormat dateFormat = new SimpleDateFormat("M.d E", Locale.getDefault());
 		LayoutInflater layoutInflater = LayoutInflater.from(getContext());
 
@@ -139,41 +102,17 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		((TextView) labelView.findViewById(R.id.pm25)).setText(getString(R.string.pm25_str));
 		((TextView) labelView.findViewById(R.id.o3)).setText(getString(R.string.o3_str));
 
-		binding.forecast.addView(labelView);
-		Calendar today = Calendar.getInstance();
-		today.set(Calendar.HOUR_OF_DAY, 0);
-		today.set(Calendar.MINUTE, 0);
-		today.set(Calendar.SECOND, 0);
-		today.set(Calendar.MILLISECOND, 0);
-
-		for (ForecastObj forecastObj : forecastObjList) {
-			if (forecastObj.date.before(today.getTime())) {
-				continue;
-			}
+		List<AirQualityForecastObj> forecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(geolocalizedFeedResponse);
+		for (AirQualityForecastObj forecastObj : forecastObjList) {
 			View forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 			((TextView) forecastItemView.findViewById(R.id.date)).setText(dateFormat.format(forecastObj.date));
-			((TextView) forecastItemView.findViewById(R.id.pm10)).setText(forecastObj.pm10 == null ? notData : forecastObj.pm10);
-			((TextView) forecastItemView.findViewById(R.id.pm25)).setText(forecastObj.pm25 == null ? notData : forecastObj.pm25);
-			((TextView) forecastItemView.findViewById(R.id.o3)).setText(forecastObj.o3 == null ? notData : forecastObj.o3);
+			((TextView) forecastItemView.findViewById(R.id.pm10)).setText(forecastObj.pm10Str == null ? notData : forecastObj.pm10Str);
+			((TextView) forecastItemView.findViewById(R.id.pm25)).setText(forecastObj.pm25Str == null ? notData : forecastObj.pm25Str);
+			((TextView) forecastItemView.findViewById(R.id.o3)).setText(forecastObj.o3Str == null ? notData : forecastObj.o3Str);
 
 			binding.forecast.addView(forecastItemView);
 		}
 	}
 
-	static class ForecastObj {
-		Date date;
-		String pm10;
-		String pm25;
-		String o3;
-
-		public ForecastObj(String day) {
-			try {
-				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-				this.date = dateFormat.parse(day);
-			} catch (Exception e) {
-
-			}
-		}
-	}
 
 }

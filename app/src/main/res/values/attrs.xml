@@ -34,4 +34,5 @@
     <attr name="progressViewIndicatorColor" format="color" />
     <attr name="textColorInProgressView" format="color" />
     <attr name="iconColor" format="color" />
+    <attr name="lineColor" format="color" />
 </resources>

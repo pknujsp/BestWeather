@@ -22,7 +22,7 @@
             <ImageView
                 android:id="@+id/weather_label"
                 android:layout_width="@dimen/labelIconColumnWidthInCOMMON"
-                android:layout_height="@dimen/weatherIconValueRowHeightInSC"
+                android:layout_height="@dimen/singleWeatherIconValueRowHeightInSC"
                 android:contentDescription="@string/weather"
                 android:scaleType="center"
                 android:src="@drawable/temp_icon" />
