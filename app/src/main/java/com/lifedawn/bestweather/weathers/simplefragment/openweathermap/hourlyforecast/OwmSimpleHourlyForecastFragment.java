@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -137,8 +138,8 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		boolean haveSnowVolumes = false;
 		
 		for (OneCallResponse.Hourly item : items) {
-			tempList.add(item.getTemp());
-			probabilityOfPrecipitationList.add(item.getPop());
+			tempList.add(ValueUnits.convertTemperature(item.getTemp(), tempUnit).toString());
+			probabilityOfPrecipitationList.add(String.valueOf((int) (Double.parseDouble(item.getPop()) * 100.0)));
 			rainVolumeList.add(item.getRain() == null ? "-" : item.getRain().getPrecipitation1Hour());
 			if (item.getSnow() != null) {
 				if (!haveSnowVolumes) {

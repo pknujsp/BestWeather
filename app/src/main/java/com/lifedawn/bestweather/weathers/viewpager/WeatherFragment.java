@@ -498,25 +498,28 @@ public class WeatherFragment extends Fragment implements IGps {
 					items[1] = getString(R.string.owm);
 					checkedItemIdx = mainWeatherSourceType == MainProcessing.WeatherSourceType.ACCU_WEATHER ? 0 : 1;
 				}
+				final int finalCheckedItemIdx = checkedItemIdx;
 				
 				new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.title_pick_weather_data_source).setSingleChoiceItems(items,
 						checkedItemIdx, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialogInterface, int index) {
-								if (!items[index].equals(getString(R.string.kma))) {
-									// 선택된 제공사가 accu, owm 둘 중 하나이면 우선순위 변경
-									boolean accu = items[index].equals(getString(R.string.accu_weather));
-									
-									SharedPreferences.Editor editor = sharedPreferences.edit();
-									editor.putBoolean(getString(R.string.pref_key_accu_weather), accu);
-									editor.putBoolean(getString(R.string.pref_key_open_weather_map), !accu);
-									editor.apply();
-									
-									mainWeatherSourceType = accu ? MainProcessing.WeatherSourceType.ACCU_WEATHER : MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP;
-								} else {
-									mainWeatherSourceType = MainProcessing.WeatherSourceType.KMA;
+								if (finalCheckedItemIdx != index) {
+									if (!items[index].equals(getString(R.string.kma))) {
+										// 선택된 제공사가 accu, owm 둘 중 하나이면 우선순위 변경
+										boolean accu = items[index].equals(getString(R.string.accu_weather));
+										
+										SharedPreferences.Editor editor = sharedPreferences.edit();
+										editor.putBoolean(getString(R.string.pref_key_accu_weather), accu);
+										editor.putBoolean(getString(R.string.pref_key_open_weather_map), !accu);
+										editor.apply();
+										
+										mainWeatherSourceType = accu ? MainProcessing.WeatherSourceType.ACCU_WEATHER : MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP;
+									} else {
+										mainWeatherSourceType = MainProcessing.WeatherSourceType.KMA;
+									}
+									refresh();
 								}
-								refresh();
 								dialogInterface.dismiss();
 							}
 						}).create().show();

@@ -149,7 +149,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			}
 			snowVolume = item.getSnow() == null ? "-" : item.getSnow();
 			
-			probabilityOfPrecipitationList.add(item.getPop());
+			probabilityOfPrecipitationList.add(String.valueOf((int) (Double.parseDouble(item.getPop()) * 100.0)));
 			rainVolumeList.add(rainVolume);
 			snowVolumeList.add(snowVolume);
 		}

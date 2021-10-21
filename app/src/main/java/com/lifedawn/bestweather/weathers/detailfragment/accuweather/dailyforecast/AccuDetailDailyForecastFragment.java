@@ -1,3 +1,206 @@
 package com.lifedawn.bestweather.weathers.detailfragment.accuweather.dailyforecast;
 
-class AccuDetailDailyForecastFragment {}
+import android.content.Context;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
+import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
+import com.lifedawn.bestweather.weathers.view.TextValueView;
+import com.lifedawn.bestweather.weathers.view.WeatherIconView;
+import com.lifedawn.bestweather.weathers.view.WindDirectionView;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment {
+	private List<FiveDaysOfDailyForecastsResponse.DailyForecasts> dailyForecastsList;
+	
+	@Override
+	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	}
+	
+	@Override
+	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		binding.toolbar.fragmentTitle.setText(R.string.detail_daily_forecast);
+		setValuesToViews();
+	}
+	
+	public AccuDetailDailyForecastFragment setDailyForecastsList(List<FiveDaysOfDailyForecastsResponse.DailyForecasts> dailyForecastsList) {
+		this.dailyForecastsList = dailyForecastsList;
+		return this;
+	}
+	
+	@Override
+	public void setValuesToViews() {
+		// 최저/최고기온,최저/최고체감기온,(낮과 밤의날씨상태,강수여부,강수형태,강수강도,강수확률(nullable),천둥번개확률(nullable)
+		// 강우확률(nullable),강설확률(nullable),풍속(nullable),풍향,돌풍(nullable)
+		// 강우량(nullable),강설량(nullable),비내리는시간(강우시간),강수시간,운량,강수량)
+		
+		//accu 순서 : 날짜, 낮/밤의 날씨, 최저/최고 기온, 낮/밤의 강수확률, 강수량, 강우확률, 강우량, 강설확률, 강설량
+		//풍향, 풍속, 바람세기, 돌풍, 강수지속시간, 강우지속시간, 운량
+		final int dateRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
+		final int weatherRowHeight = (int) getResources().getDimension(R.dimen.weatherIconValueRowHeightInD);
+		final int tempRowHeight = (int) getResources().getDimension(R.dimen.doubleTemperatureRowHeightInD);
+		final int windDirectionRowHeight = (int) getResources().getDimension(R.dimen.windDirectionIconValueRowHeightInD);
+		final int defaultTextRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInD);
+		
+		final int columnsCount = dailyForecastsList.size();
+		final int columnWidth = (int) getResources().getDimension(R.dimen.valueColumnWidthInDDaily);
+		final int viewWidth = columnsCount * columnWidth;
+		final SimpleDateFormat dateFormat = new SimpleDateFormat("M.d E", Locale.getDefault());
+		
+		List<String> dateList = new ArrayList<>();
+		List<Integer> minTempList = new ArrayList<>();
+		List<Integer> maxTempList = new ArrayList<>();
+		List<String> popList = new ArrayList<>();
+		List<String> precipitationVolumeList = new ArrayList<>();
+		List<String> precipitationOfRainList = new ArrayList<>();
+		List<String> rainVolumeList = new ArrayList<>();
+		List<String> precipitationOfSnowList = new ArrayList<>();
+		List<String> snowVolumeList = new ArrayList<>();
+		List<Integer> windDirectionList = new ArrayList<>();
+		List<String> windSpeedList = new ArrayList<>();
+		List<String> windStrengthList = new ArrayList<>();
+		List<String> windGustList = new ArrayList<>();
+		List<String> hoursOfPrecipitationList = new ArrayList<>();
+		List<String> hoursOfRainList = new ArrayList<>();
+		List<String> cloudinessList = new ArrayList<>();
+		List<String> humidityList = new ArrayList<>();
+		
+		for (FiveDaysOfDailyForecastsResponse.DailyForecasts daily : dailyForecastsList) {
+			dateList.add(dateFormat.format(
+					WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L)));
+			minTempList.add(ValueUnits.convertTemperature(daily.getTemperature().getMinimum().getValue(), tempUnit));
+			maxTempList.add(ValueUnits.convertTemperature(daily.getTemperature().getMaximum().getValue(), tempUnit));
+			popList.add(getDayNightValueStr(daily.getDay().getPrecipitationProbability(), daily.getNight().getPrecipitationProbability()));
+			precipitationVolumeList.add(
+					getDayNightValueStr(daily.getDay().getTotalLiquid().getValue(), daily.getNight().getTotalLiquid().getValue()));
+			precipitationOfRainList.add(getDayNightValueStr(daily.getDay().getRainProbability(), daily.getNight().getRainProbability()));
+			rainVolumeList.add(getDayNightValueStr(daily.getDay().getRain().getValue(), daily.getNight().getRain().getValue()));
+			precipitationOfSnowList.add(getDayNightValueStr(daily.getDay().getSnowProbability(), daily.getNight().getSnowProbability()));
+			snowVolumeList.add(getDayNightValueStr(daily.getDay().getSnow().getValue(), daily.getNight().getSnow().getValue()));
+			//windDirectionList.add(Integer.parseInt(daily.getWindDeg()));
+			windSpeedList.add(getDayNightValueStr(
+					ValueUnits.convertWindSpeed(daily.getDay().getWind().getSpeed().getMetric().getValue(), windUnit).toString(),
+					ValueUnits.convertWindSpeed(daily.getNight().getWind().getSpeed().getMetric().getValue(), windUnit).toString()));
+			windStrengthList.add(getDayNightValueStr(
+					WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getDay().getWind().getSpeed().getMetric().getValue()),
+					WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getNight().getWind().getSpeed().getMetric().getValue())));
+			windGustList.add(getDayNightValueStr(
+					ValueUnits.convertWindSpeed(daily.getDay().getWindGust().getSpeed().getMetric().getValue(), windUnit).toString(),
+					ValueUnits.convertWindSpeed(daily.getNight().getWindGust().getSpeed().getMetric().getValue(), windUnit).toString()));
+			hoursOfPrecipitationList.add(
+					getDayNightValueStr(daily.getDay().getHoursOfPrecipitation(), daily.getNight().getHoursOfPrecipitation()));
+			hoursOfRainList.add(getDayNightValueStr(daily.getDay().getHoursOfRain(), daily.getNight().getHoursOfRain()));
+			cloudinessList.add(getDayNightValueStr(daily.getDay().getCloudCover(), daily.getNight().getCloudCover()));
+		}
+		
+		addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.weather), weatherRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), tempRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_volume), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_of_rain), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.rain_volume), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_of_snow), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.snow_volume), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.wind_direction), windDirectionRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.wind_speed), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.wind_strength), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.wind_gust), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.hours_of_precipitation), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.hours_of_rain), defaultTextRowHeight);
+		addLabelView(R.drawable.temp_icon, getString(R.string.cloud_cover), defaultTextRowHeight);
+		
+		//accu 순서 : 날짜, 낮/밤의 날씨, 최저/최고 기온, 낮/밤의 강수확률, 강수량, 강우확률, 강우량, 강설확률, 강설량
+		//풍향, 풍속, 바람세기, 돌풍, 강수지속시간, 강우지속시간, 운량
+		Context context = getContext();
+		
+		TextValueView dateRow = new TextValueView(context, viewWidth, dateRowHeight, columnWidth);
+		WeatherIconView weatherIconRow = new WeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
+		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(context, viewWidth, tempRowHeight, columnWidth, minTempList,
+				maxTempList);
+		TextValueView popRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView precipitationVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView precipitationOfRainRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView rainVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView precipitationOfSnowRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView snowVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		WindDirectionView windDirectionRow = new WindDirectionView(context, viewWidth, windDirectionRowHeight, columnWidth);
+		TextValueView windSpeedRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView windStrengthRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView windGustRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView hoursOfPrecipitationRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView hoursOfRainRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView cloudCoverRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		
+		dateRow.setValueList(dateList);
+		popRow.setValueList(popList);
+		rainVolumeRow.setValueList(rainVolumeList);
+		snowVolumeRow.setValueList(snowVolumeList);
+		windDirectionRow.setDirectionValueList(windDirectionList);
+		windSpeedRow.setValueList(windSpeedList);
+		windStrengthRow.setValueList(windStrengthList);
+		windGustRow.setValueList(windGustList);
+		cloudCoverRow.setValueList(cloudinessList);
+		precipitationVolumeRow.setValueList(precipitationVolumeList);
+		precipitationOfRainRow.setValueList(precipitationOfRainList);
+		precipitationOfSnowRow.setValueList(precipitationOfSnowList);
+		hoursOfPrecipitationRow.setValueList(hoursOfPrecipitationList);
+		hoursOfRainRow.setValueList(hoursOfRainList);
+		
+		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		rowLayoutParams.gravity = Gravity.CENTER;
+		
+		binding.forecastView.addView(dateRow, rowLayoutParams);
+		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
+		binding.forecastView.addView(tempRow, rowLayoutParams);
+		binding.forecastView.addView(popRow, rowLayoutParams);
+		binding.forecastView.addView(precipitationVolumeRow, rowLayoutParams);
+		binding.forecastView.addView(precipitationOfRainRow, rowLayoutParams);
+		binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
+		binding.forecastView.addView(precipitationOfSnowRow, rowLayoutParams);
+		binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
+		binding.forecastView.addView(windDirectionRow, rowLayoutParams);
+		binding.forecastView.addView(windSpeedRow, rowLayoutParams);
+		binding.forecastView.addView(windStrengthRow, rowLayoutParams);
+		binding.forecastView.addView(windGustRow, rowLayoutParams);
+		binding.forecastView.addView(hoursOfPrecipitationRow, rowLayoutParams);
+		binding.forecastView.addView(hoursOfRainRow, rowLayoutParams);
+		binding.forecastView.addView(cloudCoverRow, rowLayoutParams);
+	}
+	
+	private String getDayNightValueStr(String day, String night) {
+		String v = "";
+		if (day != null) {
+			v += day + " / ";
+		} else {
+			v += " / ";
+		}
+		if (night != null) {
+			v += night;
+		} else {
+			v += "";
+		}
+		return v;
+	}
+}

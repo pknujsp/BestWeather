@@ -57,12 +57,12 @@ public enum ValueUnits {
 		return convertedVal;
 	}
 	
-	public static Double convertVisibility(String val, ValueUnits unit) {
-		Double convertedVal = Double.parseDouble(val);
+	public static String convertVisibility(String val, ValueUnits unit) {
+		Integer convertedVal = Integer.parseInt(val);
 		if (unit == mile) {
 			//km -> mile  n / 1.609 = c
-			convertedVal = convertedVal / 1.609;
+			convertedVal = (int) (convertedVal / 1.609);
 		}
-		return convertedVal;
+		return convertedVal.toString();
 	}
 }

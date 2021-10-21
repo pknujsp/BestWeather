@@ -136,7 +136,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 			weatherIconObjList.add(new WeatherIconView.WeatherIconObj(hourly.getWeather().get(0).getIcon(), dateTimeList.get(index)));
 			tempList.add(ValueUnits.convertTemperature(hourly.getTemp(), tempUnit));
 			realFeelTempList.add(ValueUnits.convertTemperature(hourly.getFeelsLike(), tempUnit).toString());
-			popList.add(String.valueOf(Double.parseDouble(hourly.getPop()) * 100.0));
+			popList.add(String.valueOf((int) (Double.parseDouble(hourly.getPop()) * 100.0)));
 			rainVolumeList.add(hourly.getRain() == null ? "-" : hourly.getRain().getPrecipitation1Hour());
 			snowVolumeList.add(hourly.getSnow() == null ? "-" : hourly.getSnow().getPrecipitation1Hour());
 			windDirectionList.add(Integer.parseInt(hourly.getWind_deg()));

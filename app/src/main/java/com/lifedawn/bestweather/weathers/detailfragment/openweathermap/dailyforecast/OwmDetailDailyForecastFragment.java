@@ -83,7 +83,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 			dateList.add(dateFormat.format(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L)));
 			minTempList.add(ValueUnits.convertTemperature(daily.getTemp().getMin(), tempUnit));
 			maxTempList.add(ValueUnits.convertTemperature(daily.getTemp().getMax(), tempUnit));
-			popList.add(String.valueOf(Double.parseDouble(daily.getPop()) * 100.0));
+			popList.add(String.valueOf((int) (Double.parseDouble(daily.getPop()) * 100.0)));
 			rainVolumeList.add(daily.getRain() == null ? "-" : daily.getRain());
 			snowVolumeList.add(daily.getSnow() == null ? "-" : daily.getSnow());
 			windDirectionList.add(Integer.parseInt(daily.getWindDeg()));
