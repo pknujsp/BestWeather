@@ -26,6 +26,7 @@ import com.lifedawn.bestweather.commons.classes.CloseWindow;
 import com.lifedawn.bestweather.commons.enums.FavoriteAddressType;
 import com.lifedawn.bestweather.databinding.FragmentMainBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
+import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.settings.fragments.SettingsMainFragment;
@@ -40,20 +41,20 @@ public class MainFragment extends Fragment {
 	private FragmentMainBinding binding;
 	private WeatherViewModel weatherViewModel;
 	private boolean initializing = true;
-
+	
 	private WeatherMainFragment weatherMainFragment;
 	private SharedPreferences sharedPreferences;
-
+	
 	private static final int favTypeTagInFavLocItemView = R.id.locationTypeTagInFavLocItemViewInSideNav;
 	private static final int favDtoTagInFavLocItemView = R.id.favoriteLocationDtoTagInFavLocItemViewInSideNav;
-
+	
 	private CloseWindow closeWindow = new CloseWindow(new CloseWindow.OnBackKeyDoubleClickedListener() {
 		@Override
 		public void onDoubleClicked() {
 			requireActivity().finish();
 		}
 	});
-
+	
 	private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
 		@Override
 		public void handleOnBackPressed() {
@@ -64,27 +65,27 @@ public class MainFragment extends Fragment {
 			}
 		}
 	};
-
+	
 	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
 		private boolean originalUsingCurrentLocation = false;
-
+		
 		@Override
-		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
+				@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 			super.onFragmentCreated(fm, f, savedInstanceState);
 			if (f instanceof SettingsMainFragment) {
 				originalUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), true);
 			}
 		}
-
+		
 		@Override
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
 			if (f instanceof FavoritesFragment) {
-
+			
 			} else if (f instanceof SettingsMainFragment) {
-				boolean newUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location),
-						true);
-
+				boolean newUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), true);
+				
 				if (originalUsingCurrentLocation != newUsingCurrentLocation) {
 					if (newUsingCurrentLocation) {
 						addFavoriteLocationItemView(FavoriteAddressType.CurrentLocation, null);
@@ -93,23 +94,27 @@ public class MainFragment extends Fragment {
 						init();
 					}
 				}
+			} else if (f instanceof FindAddressFragment) {
+				if (((FindAddressFragment) f).isSelectedAddress()) {
+				
+				}
 			}
 		}
 	};
-
+	
 	@Override
 	public void onAttach(@NonNull @NotNull Context context) {
 		super.onAttach(context);
 		requireActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
 	}
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
+		
 		weatherViewModel.getAddAddressesLiveData().observe(this, new Observer<FavoriteAddressDto>() {
 			@Override
 			public void onChanged(FavoriteAddressDto favoriteAddressDto) {
@@ -119,16 +124,16 @@ public class MainFragment extends Fragment {
 							@Override
 							public void run() {
 								addFavoriteLocationItemView(FavoriteAddressType.SelectedAddress, favoriteAddressDto);
-
+								
 								View itemView = null;
 								FavoriteAddressType favoriteAddressTypeInView = null;
 								FavoriteAddressDto favoriteAddressDtoInView = null;
-
+								
 								int childCount = binding.sideNavMenu.favoriteAddressLayout.getChildCount();
 								for (int child = 0; child < childCount; child++) {
 									itemView = binding.sideNavMenu.favoriteAddressLayout.getChildAt(child);
 									favoriteAddressTypeInView = (FavoriteAddressType) itemView.getTag(favTypeTagInFavLocItemView);
-
+									
 									if (favoriteAddressTypeInView == FavoriteAddressType.SelectedAddress) {
 										favoriteAddressDtoInView = (FavoriteAddressDto) itemView.getTag(favDtoTagInFavLocItemView);
 										if (favoriteAddressDtoInView.getId().equals(favoriteAddressDto.getId())) {
@@ -139,12 +144,12 @@ public class MainFragment extends Fragment {
 								}
 							}
 						});
-
+						
 					}
 				}
 			}
 		});
-
+		
 		weatherViewModel.getDeleteAddressesLiveData().observe(this, new Observer<FavoriteAddressDto>() {
 			@Override
 			public void onChanged(FavoriteAddressDto favoriteAddressDto) {
@@ -157,12 +162,12 @@ public class MainFragment extends Fragment {
 								View itemView = null;
 								FavoriteAddressType favoriteAddressTypeInView = null;
 								FavoriteAddressDto favoriteAddressDtoInView = null;
-
+								
 								int childCount = binding.sideNavMenu.favoriteAddressLayout.getChildCount();
 								for (int child = 0; child < childCount; child++) {
 									itemView = binding.sideNavMenu.favoriteAddressLayout.getChildAt(child);
 									favoriteAddressTypeInView = (FavoriteAddressType) itemView.getTag(favTypeTagInFavLocItemView);
-
+									
 									if (favoriteAddressTypeInView == FavoriteAddressType.SelectedAddress) {
 										favoriteAddressDtoInView = (FavoriteAddressDto) itemView.getTag(favDtoTagInFavLocItemView);
 										if (favoriteAddressDtoInView.getId() == deletedId) {
@@ -171,23 +176,24 @@ public class MainFragment extends Fragment {
 										}
 									}
 								}
-
+								
 								//현재 표시된 날씨의 위치정보가 삭제한 것과 일치하면 현재 날씨 프래그먼트 제거
 								if (weatherMainFragment.getFavoriteAddressTypeOfWeatherFragment() == FavoriteAddressType.SelectedAddress) {
-									if (favoriteAddressDto.getId().equals(weatherMainFragment.getFavoriteAddressDtoOfWeatherFragment().getId())) {
-										sharedPreferences.edit().putString(getString(R.string.pref_key_last_selected_favorite_address_id)
-												, "").apply();
+									if (favoriteAddressDto.getId().equals(
+											weatherMainFragment.getFavoriteAddressDtoOfWeatherFragment().getId())) {
+										sharedPreferences.edit().putString(getString(R.string.pref_key_last_selected_favorite_address_id),
+												"").apply();
 										init();
 									}
 								}
 							}
 						});
-
+						
 					}
 				}
 			}
 		});
-
+		
 		weatherViewModel.getCurrentLocationLiveData().observe(this, new Observer<String>() {
 			@Override
 			public void onChanged(String addressName) {
@@ -199,34 +205,34 @@ public class MainFragment extends Fragment {
 			}
 		});
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentMainBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-
+	
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
+		
 		binding.sideNavMenu.favorites.setOnClickListener(sideNavOnClickListener);
 		binding.sideNavMenu.settings.setOnClickListener(sideNavOnClickListener);
-
+		
 		weatherMainFragment = new WeatherMainFragment(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				binding.drawerLayout.openDrawer(binding.sideNavigation);
 			}
 		});
-
+		
 		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), weatherMainFragment,
 				getString(R.string.tag_weather_main_fragment)).commit();
-
+		
 		init();
 		initializing = false;
 	}
-
+	
 	private void init() {
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
@@ -237,12 +243,12 @@ public class MainFragment extends Fragment {
 						public void run() {
 							final boolean usingCurrentLocation = sharedPreferences.getBoolean(
 									getString(R.string.pref_key_use_current_location), false);
-
+							
 							if (binding.sideNavMenu.favoriteAddressLayout.getChildCount() == 0) {
 								if (usingCurrentLocation) {
 									addFavoriteLocationItemView(FavoriteAddressType.CurrentLocation, null);
 								}
-
+								
 								for (FavoriteAddressDto favoriteAddressDto : result) {
 									addFavoriteLocationItemView(FavoriteAddressType.SelectedAddress, favoriteAddressDto);
 								}
@@ -259,8 +265,9 @@ public class MainFragment extends Fragment {
 							즐겨찾기에 없는 경우 : 현재 위치가 on인 경우에 현재위치사용, off이면 즐겨찾기에서 첫번째 주소선택
 							즐겨찾기가 빈 경우 :  주소 추가 화면 표시
 							 */
-
-							if (lastSelectedFavoriteAddressId.equals(FavoriteAddressType.CurrentLocation.name()) || lastSelectedFavoriteAddressId.isEmpty()) {
+							
+							if (lastSelectedFavoriteAddressId.equals(
+									FavoriteAddressType.CurrentLocation.name()) || lastSelectedFavoriteAddressId.isEmpty()) {
 								//현재 위치
 								if (usingCurrentLocation) {
 									weatherMainFragment.setWeatherFragment(FavoriteAddressType.CurrentLocation, null);
@@ -277,14 +284,14 @@ public class MainFragment extends Fragment {
 								//즐겨찾기
 								int selectedId = Integer.parseInt(lastSelectedFavoriteAddressId);
 								FavoriteAddressDto selectedFavoriteAddressDto = null;
-
+								
 								for (FavoriteAddressDto favoriteAddressDto : result) {
 									if (favoriteAddressDto.getId() == selectedId) {
 										selectedFavoriteAddressDto = favoriteAddressDto;
 										break;
 									}
 								}
-
+								
 								if (selectedFavoriteAddressDto != null) {
 									//즐겨찾기에 있으므로 해당 주소선택
 									weatherMainFragment.setWeatherFragment(FavoriteAddressType.SelectedAddress, selectedFavoriteAddressDto);
@@ -303,24 +310,23 @@ public class MainFragment extends Fragment {
 										}
 									}
 								}
-
+								
 							}
-
+							
 						}
 					});
 				}
 			}
-
+			
 			@Override
 			public void onResultNoData() {
-
+			
 			}
 		});
 	}
-
+	
 	private void addFavoriteLocationItemView(FavoriteAddressType favoriteAddressType, @Nullable FavoriteAddressDto favoriteAddressDto) {
-		TextView locationItemView = (TextView) getLayoutInflater().inflate(R.layout.favorite_address_item_in_side_nav,
-				null);
+		TextView locationItemView = (TextView) getLayoutInflater().inflate(R.layout.favorite_address_item_in_side_nav, null);
 		locationItemView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -328,7 +334,7 @@ public class MainFragment extends Fragment {
 				binding.drawerLayout.closeDrawer(binding.sideNavigation);
 			}
 		});
-
+		
 		if (favoriteAddressType == FavoriteAddressType.CurrentLocation) {
 			locationItemView.setText(getString(R.string.current_location));
 		} else {
@@ -336,25 +342,25 @@ public class MainFragment extends Fragment {
 			locationItemView.setTag(favDtoTagInFavLocItemView, favoriteAddressDto);
 		}
 		locationItemView.setTag(favTypeTagInFavLocItemView, favoriteAddressType);
-
+		
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		layoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
-
+		
 		if (favoriteAddressType == FavoriteAddressType.CurrentLocation) {
 			binding.sideNavMenu.favoriteAddressLayout.addView(locationItemView, 0, layoutParams);
 		} else {
 			binding.sideNavMenu.favoriteAddressLayout.addView(locationItemView, layoutParams);
 		}
 	}
-
+	
 	@Override
 	public void onDestroy() {
 		onBackPressedCallback.remove();
 		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		super.onDestroy();
 	}
-
+	
 	private final View.OnClickListener sideNavOnClickListener = new View.OnClickListener() {
 		@SuppressLint("NonConstantResourceId")
 		@Override

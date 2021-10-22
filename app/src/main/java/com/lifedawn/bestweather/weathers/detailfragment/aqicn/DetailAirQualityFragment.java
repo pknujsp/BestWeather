@@ -84,7 +84,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		
 		final int columnWidth = (int) getResources().getDimension(R.dimen.columnWidthInAirQualityBarView);
 		final int viewHeight = (int) getResources().getDimension(R.dimen.viewHeightOfAirQualityBarView);
-		final int columnsCount = airQualityForecastObjList.size();
+		final int columnsCount = airQualityForecastObjList.size()+1;
 		final int viewWidth = columnWidth * columnsCount;
 		
 		List<AirQualityBarView.AirQualityObj> pm10AirQualityObjList = new ArrayList<>();

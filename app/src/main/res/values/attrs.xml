@@ -35,4 +35,5 @@
     <attr name="textColorInProgressView" format="color" />
     <attr name="iconColor" format="color" />
     <attr name="lineColor" format="color" />
+    <attr name="alertDialogStyle" format="reference" />
 </resources>
