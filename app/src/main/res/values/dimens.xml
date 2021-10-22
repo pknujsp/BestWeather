@@ -58,8 +58,8 @@
     <!-- detail air quality -->
     <dimen name="gradeValueTextSizeInAirQualityBarView">13sp</dimen>
     <dimen name="gradeTextSizeInAirQualityBarView">13sp</dimen>
-    <dimen name="barWidthInAirQualityBarView">24dp</dimen>
-    <dimen name="columnWidthInAirQualityBarView">65dp</dimen>
-    <dimen name="viewHeightOfAirQualityBarView">90dp</dimen>
+    <dimen name="barWidthInAirQualityBarView">26dp</dimen>
+    <dimen name="columnWidthInAirQualityBarView">60dp</dimen>
+    <dimen name="viewHeightOfAirQualityBarView">100dp</dimen>
 
 </resources>

@@ -37,7 +37,8 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);
+		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);		setValuesToViews();
+		
 	}
 	
 	public AccuSimpleDailyForecastFragment setFiveDaysOfDailyForecastsResponse(

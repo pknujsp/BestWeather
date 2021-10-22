@@ -24,22 +24,22 @@ public class AirQualityBarView extends View {
 	private final int barWidth;
 	private final int barTopBottomMargin;
 	private final int barMinHeight;
-
+	
 	private Paint barPaint;
-	private TextPaint gradeValuePaint;
-	private TextPaint gradePaint;
-
+	private TextPaint gradeValueIntPaint;
+	private TextPaint gradeStrPaint;
+	
 	private Rect barRect = new Rect();
-	private Rect gradeValueRect = new Rect();
-	private Point gradeValuePoint = new Point();
-	private Rect gradeRect = new Rect();
-	private Point gradePoint = new Point();
-
+	private Rect gradeValueIntRect = new Rect();
+	private Point gradeValueIntPoint = new Point();
+	private Rect gradeStrRect = new Rect();
+	private Point gradeStrPoint = new Point();
+	
 	private final int minGradeValue;
 	private final int maxGradeValue;
-
+	
 	private List<AirQualityObj> airQualityObjList = new ArrayList<>();
-
+	
 	public AirQualityBarView(Context context, int viewWidth, int viewHeight, int columnWidth, List<AirQualityObj> airQualityObjList) {
 		super(context);
 		this.viewWidth = viewWidth;
@@ -49,94 +49,99 @@ public class AirQualityBarView extends View {
 		this.barWidth = (int) getResources().getDimension(R.dimen.barWidthInAirQualityBarView);
 		this.barTopBottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, getResources().getDisplayMetrics());
 		this.barMinHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, getResources().getDisplayMetrics());
-
-		String tempStr = "1";
-
+		
+		String gradeValueIntStr = "10";
+		String gradeStr = context.getString(R.string.good);
 		barPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		barPaint.setColor(Color.WHITE);
-
-		gradeValuePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-		gradeValuePaint.setTextAlign(Paint.Align.CENTER);
-		gradeValuePaint.setColor(AppTheme.getColor(context, R.attr.textColor));
-		gradeValuePaint.setTextSize(getResources().getDimension(R.dimen.gradeValueTextSizeInAirQualityBarView));
-		gradeValuePaint.getTextBounds(tempStr, 0, tempStr.length(), gradeValueRect);
-
-		gradePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-		gradePaint.setTextAlign(Paint.Align.CENTER);
-		gradePaint.setColor(AppTheme.getColor(context, R.attr.textColor));
-		gradePaint.setTextSize(getResources().getDimension(R.dimen.gradeTextSizeInAirQualityBarView));
-		gradePaint.getTextBounds(tempStr, 0, tempStr.length(), gradeRect);
-
+		
+		gradeValueIntPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+		gradeValueIntPaint.setTextAlign(Paint.Align.CENTER);
+		gradeValueIntPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
+		gradeValueIntPaint.setTextSize(getResources().getDimension(R.dimen.gradeValueTextSizeInAirQualityBarView));
+		gradeValueIntPaint.getTextBounds(gradeValueIntStr, 0, gradeValueIntStr.length(), gradeValueIntRect);
+		
+		gradeStrPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+		gradeStrPaint.setTextAlign(Paint.Align.CENTER);
+		gradeStrPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
+		gradeStrPaint.setTextSize(getResources().getDimension(R.dimen.gradeTextSizeInAirQualityBarView));
+		gradeStrPaint.getTextBounds(gradeStr, 0, gradeStr.length(), gradeStrRect);
+		
 		int min = Integer.MAX_VALUE;
 		int max = Integer.MIN_VALUE;
-
+		
 		for (AirQualityObj airQualityObj : airQualityObjList) {
 			if (airQualityObj.val == null) {
 				airQualityObj.grade = "?";
-				airQualityObj.gradeColor = AqicnResponseProcessor.getGradeColorId(0);
+				airQualityObj.gradeColor = Color.GRAY;
 				continue;
 			}
-
+			
 			if (airQualityObj.val < min) {
 				min = airQualityObj.val;
 			}
 			if (airQualityObj.val > max) {
 				max = airQualityObj.val;
 			}
-
+			
 			//color, gradeDescription
 			airQualityObj.grade = AqicnResponseProcessor.getGradeDescription(airQualityObj.val);
 			airQualityObj.gradeColor = AqicnResponseProcessor.getGradeColorId(airQualityObj.val);
 		}
-
+		
 		this.minGradeValue = min;
 		this.maxGradeValue = max;
 	}
-
+	
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		setMeasuredDimension(viewWidth, viewHeight);
 	}
-
+	
 	@Override
 	protected void onDraw(Canvas canvas) {
-		final int topFreeSpaceHeight = gradeValueRect.height() + barTopBottomMargin;
-		final int bottomFreeSpaceHeight = getHeight() - gradeValueRect.height() - topFreeSpaceHeight;
-		barRect.set(columnWidth / 2 - barWidth / 2, topFreeSpaceHeight, columnWidth / 2 + barWidth / 2, bottomFreeSpaceHeight);
-
-		final int barMaxHeight = bottomFreeSpaceHeight - topFreeSpaceHeight;
+		final int topFreeSpaceHeight = barTopBottomMargin * 2 + gradeValueIntRect.height();
+		final int bottomFreeSpaceHeight = gradeStrRect.height() + barTopBottomMargin * 2;
+		barRect.set(columnWidth / 2 - barWidth / 2, topFreeSpaceHeight, columnWidth / 2 + barWidth / 2,
+				getHeight() - bottomFreeSpaceHeight);
+		
+		gradeStrPoint.y = barRect.bottom + barTopBottomMargin - (int) gradeStrPaint.ascent();
+		
+		final int barMaxHeight = getHeight() - bottomFreeSpaceHeight - topFreeSpaceHeight;
 		final int barAvailableHeight = barMaxHeight - barMinHeight;
 		final int heightPer1 = barAvailableHeight / (maxGradeValue - minGradeValue);
-
+		
 		int i = 0;
-		int newTop = 0;
-
+		final int barCenterXInColumn = barRect.centerX();
+		
 		for (AirQualityObj airQualityObj : airQualityObjList) {
 			if (airQualityObj.val == null) {
-				newTop = barRect.bottom - barMinHeight;
+				barRect.top = barRect.bottom - barMinHeight;
 			} else {
-				newTop = barRect.bottom - barMinHeight - (barAvailableHeight - heightPer1 * (maxGradeValue - airQualityObj.val));
+				barRect.top = barRect.bottom - barMinHeight - (barAvailableHeight - heightPer1 * (maxGradeValue - airQualityObj.val));
 			}
-
-			barRect.set(barRect.left + (columnWidth * i), newTop, barRect.right + (columnWidth * i), barRect.bottom);
-			gradeValuePoint.set(barRect.centerX(), barRect.bottom + barTopBottomMargin + gradeValueRect.height() / 2);
-			gradePoint.set(barRect.centerX(), barRect.top - barTopBottomMargin - gradeValueRect.height() / 2);
-
-			gradePaint.setColor(airQualityObj.gradeColor);
-
+			barRect.left = (columnWidth * i) + barCenterXInColumn - barWidth / 2;
+			barRect.right = (columnWidth * i) + barCenterXInColumn + barWidth / 2;
+			
+			gradeStrPoint.x = barRect.centerX();
+			gradeValueIntPoint.x = barRect.centerX();
+			gradeValueIntPoint.y = barRect.top - barTopBottomMargin - (int) gradeValueIntPaint.descent();
+			
+			barPaint.setColor(airQualityObj.gradeColor);
+			
 			canvas.drawRect(barRect, barPaint);
-			canvas.drawText(airQualityObj.val == null ? "?" : airQualityObj.val.toString(), gradeValuePoint.x, gradeValuePoint.y,
-					gradeValuePaint);
-			canvas.drawText(airQualityObj.grade, gradePoint.x, gradePoint.y, gradePaint);
+			canvas.drawText(airQualityObj.val == null ? "?" : airQualityObj.val.toString(), gradeValueIntPoint.x, gradeValueIntPoint.y,
+					gradeValueIntPaint);
+			canvas.drawText(airQualityObj.grade, gradeStrPoint.x, gradeStrPoint.y, gradeStrPaint);
 			i++;
 		}
 	}
-
+	
 	public static class AirQualityObj {
 		final Integer val;
 		int gradeColor;
 		String grade;
-
+		
 		public AirQualityObj(String valStr) {
 			if (valStr != null) {
 				val = (int) Double.parseDouble(valStr);

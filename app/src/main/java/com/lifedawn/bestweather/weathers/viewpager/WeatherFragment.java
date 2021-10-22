@@ -184,7 +184,7 @@ public class WeatherFragment extends Fragment implements IGps {
 		});
 	}
 	
-	private MainProcessing.WeatherSourceType getMainWeatherSourceType(String countryCode) {
+	private MainProcessing.WeatherSourceType getMainWeatherSourceType(@NonNull String countryCode) {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		MainProcessing.WeatherSourceType mainWeatherSourceType = null;
 		
@@ -255,6 +255,9 @@ public class WeatherFragment extends Fragment implements IGps {
 			MainProcessing.WeatherSourceType secondWeatherSourceType = null;
 			switch (mainWeatherSourceType) {
 				case KMA:
+					MainProcessing.WeatherSourceType defaultWeatherSourceType = getMainWeatherSourceType("");
+					secondWeatherSourceType = defaultWeatherSourceType;
+					break;
 				case OPEN_WEATHER_MAP:
 					secondWeatherSourceType = MainProcessing.WeatherSourceType.ACCU_WEATHER;
 					break;

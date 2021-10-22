@@ -38,6 +38,8 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.hourly_forecast);
+		setValuesToViews();
+		
 	}
 	
 	public AccuSimpleHourlyForecastFragment setTwelveHoursOfHourlyForecastsResponse(

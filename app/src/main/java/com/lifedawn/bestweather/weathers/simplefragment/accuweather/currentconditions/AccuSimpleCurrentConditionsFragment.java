@@ -34,6 +34,7 @@ public class AccuSimpleCurrentConditionsFragment extends BaseSimpleCurrentCondit
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		setValuesToViews();
 	}
 	
 	public AccuSimpleCurrentConditionsFragment setCurrentConditionsResponse(CurrentConditionsResponse currentConditionsResponse) {

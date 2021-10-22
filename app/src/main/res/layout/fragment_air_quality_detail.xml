@@ -26,33 +26,45 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <HorizontalScrollView
-                    android:id="@+id/scroll_view"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
-                    android:overScrollMode="never"
-                    android:scrollbars="none">
+                    android:orientation="horizontal">
 
                     <LinearLayout
-                        android:id="@+id/forecast_view"
+                        android:id="@+id/labels"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="vertical" />
 
-                </HorizontalScrollView>
+                    <HorizontalScrollView
+                        android:id="@+id/scroll_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:overScrollMode="never"
+                        android:scrollbars="none">
+
+                        <LinearLayout
+                            android:id="@+id/forecast_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" />
+
+                    </HorizontalScrollView>
+                </LinearLayout>
 
                 <androidx.gridlayout.widget.GridLayout
                     android:id="@+id/grid"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginBottom="24dp"
                     app:alignmentMode="alignBounds"
-                    app:columnCount="3"
+                    app:columnCount="2"
                     app:orientation="horizontal"
-                    app:rowCount="1" />
+                    app:rowCount="3" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -71,22 +83,6 @@
                     android:textColor="?attr/textColor"
                     android:textSize="15sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/address_name"
-                    android:textColor="?attr/textColor"
-                    android:textSize="17sp" />
-
-                <TextView
-                    android:id="@+id/address_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="address_name"
-                    android:textColor="?attr/textColor"
-                    android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
