@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 		if (appTheme == AppThemes.BLACK) {
 			setTheme(R.style.AppTheme_Black);
 		} else {
-			setTheme(R.style.AppTheme_White);
+		//	setTheme(R.style.AppTheme_White);
 		}
 
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);

@@ -107,7 +107,8 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 											break;
 										//검정
 										case 1:
-											sharedPreferences.edit().putString(appThemePreference.getKey(), AppThemes.WHITE.name()).apply();
+											//sharedPreferences.edit().putString(appThemePreference.getKey(), AppThemes.WHITE.name())
+											// .apply();
 											break;
 										//하양
 									}

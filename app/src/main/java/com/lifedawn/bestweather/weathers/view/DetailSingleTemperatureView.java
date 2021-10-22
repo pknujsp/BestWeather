@@ -36,13 +36,13 @@ public class DetailSingleTemperatureView extends View {
 		TEMP_PAINT = new TextPaint();
 		TEMP_PAINT.setTextAlign(Paint.Align.CENTER);
 		TEMP_PAINT.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics()));
-		TEMP_PAINT.setColor(AppTheme.getColor(context, R.attr.textColor));
+		TEMP_PAINT.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
 
 		LINE_PAINT = new Paint();
 		LINE_PAINT.setAntiAlias(true);
 		LINE_PAINT.setStyle(Paint.Style.FILL);
 		LINE_PAINT.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.3f, getResources().getDisplayMetrics()));
-		LINE_PAINT.setColor(AppTheme.getColor(context, R.attr.textColor));
+		LINE_PAINT.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
 
 		MIN_MAX_TEMP_LINE_PAINT = new Paint();
 		MIN_MAX_TEMP_LINE_PAINT.setAntiAlias(true);

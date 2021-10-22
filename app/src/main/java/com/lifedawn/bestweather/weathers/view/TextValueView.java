@@ -31,7 +31,7 @@ public class TextValueView extends View {
 		valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		valueTextPaint.setTextAlign(Paint.Align.CENTER);
 		valueTextPaint.setTextSize(context.getResources().getDimension(R.dimen.valueTextSizeInSCD));
-		valueTextPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
+		valueTextPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
 		
 		Rect rect = new Rect();
 		valueTextPaint.getTextBounds("0", 0, 1, rect);

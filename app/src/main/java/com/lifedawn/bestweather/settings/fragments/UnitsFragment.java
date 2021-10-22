@@ -41,6 +41,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 	}
 
 	private void initPreferences() {
+		//좌측 여백 없애기 :  app:iconSpaceReserved="false"
 		PreferenceScreen preferenceScreen = getPreferenceManager().getPreferenceScreen();
 		//기온
 		tempPreference = new UnitPreference(getContext());
@@ -48,6 +49,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		tempPreference.setTitle(R.string.pref_title_unit_temp);
 		tempPreference.setUnit(ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), "")));
 		tempPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
+		tempPreference.setIconSpaceReserved(false);
 
 		tempPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
@@ -86,6 +88,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		windPreference.setTitle(R.string.pref_title_unit_wind);
 		windPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
 		windPreference.setUnit(ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), "")));
+		windPreference.setIconSpaceReserved(false);
 
 		windPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
@@ -124,6 +127,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		visibilityPreference.setTitle(R.string.pref_title_unit_visibility);
 		visibilityPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
 		visibilityPreference.setUnit(ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), "")));
+		visibilityPreference.setIconSpaceReserved(false);
 
 		visibilityPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
@@ -162,6 +166,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		clockPreference.setTitle(R.string.pref_title_unit_clock);
 		clockPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
 		clockPreference.setUnit(ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), "")));
+		clockPreference.setIconSpaceReserved(false);
 
 		clockPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
