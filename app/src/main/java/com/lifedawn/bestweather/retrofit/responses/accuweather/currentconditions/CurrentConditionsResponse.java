@@ -7,10 +7,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.Direction;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Maximum;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Minimum;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.ValueUnit;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.ValuesUnit;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Wind;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.WindGust;
 
@@ -53,9 +53,6 @@ public class CurrentConditionsResponse {
 		@SerializedName("WeatherIcon")
 		private String weatherIcon;
 		
-		private Drawable weatherImg;
-		
-		
 		@Expose
 		@SerializedName("HasPrecipitation")
 		private String hasPrecipitation;
@@ -94,21 +91,21 @@ public class CurrentConditionsResponse {
 		
 		@Expose
 		@SerializedName("Temperature")
-		private ValueUnit temperature;
+		private ValuesUnit temperature;
 		
 		@Expose
 		@SerializedName("RealFeelTemperature")
-		private ValueUnit realFeelTemperature;
+		private ValuesUnit realFeelTemperature;
 		
 		
 		@Expose
 		@SerializedName("RealFeelTemperatureShade")
-		private ValueUnit realFeelTemperatureShade;
+		private ValuesUnit realFeelTemperatureShade;
 		
 		
 		@Expose
 		@SerializedName("DewPoint")
-		private ValueUnit dewPoint;
+		private ValuesUnit dewPoint;
 		
 		
 		@Expose
@@ -123,17 +120,17 @@ public class CurrentConditionsResponse {
 		
 		@Expose
 		@SerializedName("Visibility")
-		private Visibility visibility;
+		private ValuesUnit visibility;
 		
 		
 		@Expose
 		@SerializedName("Ceiling")
-		private Ceiling ceiling;
+		private ValuesUnit ceiling;
 		
 		
 		@Expose
 		@SerializedName("Pressure")
-		private Pressure pressure;
+		private ValuesUnit pressure;
 		
 		
 		@Expose
@@ -143,27 +140,27 @@ public class CurrentConditionsResponse {
 		
 		@Expose
 		@SerializedName("Past24HourTemperatureDeparture")
-		private Past24HourTemperatureDeparture past24HourTemperatureDeparture;
+		private ValuesUnit past24HourTemperatureDeparture;
 		
 		
 		@Expose
 		@SerializedName("ApparentTemperature")
-		private ApparentTemperature apparentTemperature;
+		private ValuesUnit apparentTemperature;
 		
 		
 		@Expose
 		@SerializedName("WindChillTemperature")
-		private WindChillTemperature windChillTemperature;
+		private ValuesUnit windChillTemperature;
 		
 		
 		@Expose
 		@SerializedName("WetBulbTemperature")
-		private WetBulbTemperature wetBulbTemperature;
+		private ValuesUnit wetBulbTemperature;
 		
 		
 		@Expose
 		@SerializedName("Precip1hr")
-		private Precip1hr precip1hr;
+		private ValuesUnit precip1hr;
 		
 		
 		@Expose
@@ -205,14 +202,6 @@ public class CurrentConditionsResponse {
 		
 		public void setWeatherIcon(String weatherIcon) {
 			this.weatherIcon = weatherIcon;
-		}
-		
-		public Drawable getWeatherImg() {
-			return weatherImg;
-		}
-		
-		public void setWeatherImg(Drawable weatherImg) {
-			this.weatherImg = weatherImg;
 		}
 		
 		public String getHasPrecipitation() {
@@ -287,35 +276,35 @@ public class CurrentConditionsResponse {
 			this.cloudCover = cloudCover;
 		}
 		
-		public ValueUnit getTemperature() {
+		public ValuesUnit getTemperature() {
 			return temperature;
 		}
 		
-		public void setTemperature(ValueUnit temperature) {
+		public void setTemperature(ValuesUnit temperature) {
 			this.temperature = temperature;
 		}
 		
-		public ValueUnit getRealFeelTemperature() {
+		public ValuesUnit getRealFeelTemperature() {
 			return realFeelTemperature;
 		}
 		
-		public void setRealFeelTemperature(ValueUnit realFeelTemperature) {
+		public void setRealFeelTemperature(ValuesUnit realFeelTemperature) {
 			this.realFeelTemperature = realFeelTemperature;
 		}
 		
-		public ValueUnit getRealFeelTemperatureShade() {
+		public ValuesUnit getRealFeelTemperatureShade() {
 			return realFeelTemperatureShade;
 		}
 		
-		public void setRealFeelTemperatureShade(ValueUnit realFeelTemperatureShade) {
+		public void setRealFeelTemperatureShade(ValuesUnit realFeelTemperatureShade) {
 			this.realFeelTemperatureShade = realFeelTemperatureShade;
 		}
 		
-		public ValueUnit getDewPoint() {
+		public ValuesUnit getDewPoint() {
 			return dewPoint;
 		}
 		
-		public void setDewPoint(ValueUnit dewPoint) {
+		public void setDewPoint(ValuesUnit dewPoint) {
 			this.dewPoint = dewPoint;
 		}
 		
@@ -335,27 +324,27 @@ public class CurrentConditionsResponse {
 			this.windGust = windGust;
 		}
 		
-		public Visibility getVisibility() {
+		public ValuesUnit getVisibility() {
 			return visibility;
 		}
 		
-		public void setVisibility(Visibility visibility) {
+		public void setVisibility(ValuesUnit visibility) {
 			this.visibility = visibility;
 		}
 		
-		public Ceiling getCeiling() {
+		public ValuesUnit getCeiling() {
 			return ceiling;
 		}
 		
-		public void setCeiling(Ceiling ceiling) {
+		public void setCeiling(ValuesUnit ceiling) {
 			this.ceiling = ceiling;
 		}
 		
-		public Pressure getPressure() {
+		public ValuesUnit getPressure() {
 			return pressure;
 		}
 		
-		public void setPressure(Pressure pressure) {
+		public void setPressure(ValuesUnit pressure) {
 			this.pressure = pressure;
 		}
 		
@@ -367,43 +356,43 @@ public class CurrentConditionsResponse {
 			this.pressureTendency = pressureTendency;
 		}
 		
-		public Past24HourTemperatureDeparture getPast24HourTemperatureDeparture() {
+		public ValuesUnit getPast24HourTemperatureDeparture() {
 			return past24HourTemperatureDeparture;
 		}
 		
-		public void setPast24HourTemperatureDeparture(Past24HourTemperatureDeparture past24HourTemperatureDeparture) {
+		public void setPast24HourTemperatureDeparture(ValuesUnit past24HourTemperatureDeparture) {
 			this.past24HourTemperatureDeparture = past24HourTemperatureDeparture;
 		}
 		
-		public ApparentTemperature getApparentTemperature() {
+		public ValuesUnit getApparentTemperature() {
 			return apparentTemperature;
 		}
 		
-		public void setApparentTemperature(ApparentTemperature apparentTemperature) {
+		public void setApparentTemperature(ValuesUnit apparentTemperature) {
 			this.apparentTemperature = apparentTemperature;
 		}
 		
-		public WindChillTemperature getWindChillTemperature() {
+		public ValuesUnit getWindChillTemperature() {
 			return windChillTemperature;
 		}
 		
-		public void setWindChillTemperature(WindChillTemperature windChillTemperature) {
+		public void setWindChillTemperature(ValuesUnit windChillTemperature) {
 			this.windChillTemperature = windChillTemperature;
 		}
 		
-		public WetBulbTemperature getWetBulbTemperature() {
+		public ValuesUnit getWetBulbTemperature() {
 			return wetBulbTemperature;
 		}
 		
-		public void setWetBulbTemperature(WetBulbTemperature wetBulbTemperature) {
+		public void setWetBulbTemperature(ValuesUnit wetBulbTemperature) {
 			this.wetBulbTemperature = wetBulbTemperature;
 		}
 		
-		public Precip1hr getPrecip1hr() {
+		public ValuesUnit getPrecip1hr() {
 			return precip1hr;
 		}
 		
-		public void setPrecip1hr(Precip1hr precip1hr) {
+		public void setPrecip1hr(ValuesUnit precip1hr) {
 			this.precip1hr = precip1hr;
 		}
 		
@@ -421,84 +410,6 @@ public class CurrentConditionsResponse {
 		
 		public void setTemperatureSummary(TemperatureSummary temperatureSummary) {
 			this.temperatureSummary = temperatureSummary;
-		}
-		
-		public static class Visibility {
-			@Expose
-			@SerializedName("Metric")
-			private ValueUnit metric;
-			
-			@Expose
-			@SerializedName("Imperial")
-			private ValueUnit imperial;
-			
-			public ValueUnit getMetric() {
-				return metric;
-			}
-			
-			public void setMetric(ValueUnit metric) {
-				this.metric = metric;
-			}
-			
-			public ValueUnit getImperial() {
-				return imperial;
-			}
-			
-			public void setImperial(ValueUnit imperial) {
-				this.imperial = imperial;
-			}
-		}
-		
-		public static class Ceiling {
-			@Expose
-			@SerializedName("Metric")
-			private ValueUnit metric;
-			
-			@Expose
-			@SerializedName("Imperial")
-			private ValueUnit imperial;
-			
-			public ValueUnit getMetric() {
-				return metric;
-			}
-			
-			public void setMetric(ValueUnit metric) {
-				this.metric = metric;
-			}
-			
-			public ValueUnit getImperial() {
-				return imperial;
-			}
-			
-			public void setImperial(ValueUnit imperial) {
-				this.imperial = imperial;
-			}
-		}
-		
-		public static class Pressure {
-			@Expose
-			@SerializedName("Metric")
-			private ValueUnit metric;
-			
-			@Expose
-			@SerializedName("Imperial")
-			private ValueUnit imperial;
-			
-			public ValueUnit getMetric() {
-				return metric;
-			}
-			
-			public void setMetric(ValueUnit metric) {
-				this.metric = metric;
-			}
-			
-			public ValueUnit getImperial() {
-				return imperial;
-			}
-			
-			public void setImperial(ValueUnit imperial) {
-				this.imperial = imperial;
-			}
 		}
 		
 		public static class PressureTendency {
@@ -527,440 +438,111 @@ public class CurrentConditionsResponse {
 			}
 		}
 		
-		public static class Past24HourTemperatureDeparture {
-			@Expose
-			@SerializedName("Metric")
-			private ValueUnit metric;
-			
-			@Expose
-			@SerializedName("Imperial")
-			private ValueUnit imperial;
-			
-			public ValueUnit getMetric() {
-				return metric;
-			}
-			
-			public void setMetric(ValueUnit metric) {
-				this.metric = metric;
-			}
-			
-			public ValueUnit getImperial() {
-				return imperial;
-			}
-			
-			public void setImperial(ValueUnit imperial) {
-				this.imperial = imperial;
-			}
-		}
-		
-		public static class ApparentTemperature {
-			@Expose
-			@SerializedName("Metric")
-			private ValueUnit metric;
-			
-			@Expose
-			@SerializedName("Imperial")
-			private ValueUnit imperial;
-			
-			public ValueUnit getMetric() {
-				return metric;
-			}
-			
-			public void setMetric(ValueUnit metric) {
-				this.metric = metric;
-			}
-			
-			public ValueUnit getImperial() {
-				return imperial;
-			}
-			
-			public void setImperial(ValueUnit imperial) {
-				this.imperial = imperial;
-			}
-		}
-		
-		public static class WindChillTemperature {
-			@Expose
-			@SerializedName("Metric")
-			private ValueUnit metric;
-			
-			@Expose
-			@SerializedName("Imperial")
-			private ValueUnit imperial;
-			
-			public ValueUnit getMetric() {
-				return metric;
-			}
-			
-			public void setMetric(ValueUnit metric) {
-				this.metric = metric;
-			}
-			
-			public ValueUnit getImperial() {
-				return imperial;
-			}
-			
-			public void setImperial(ValueUnit imperial) {
-				this.imperial = imperial;
-			}
-		}
-		
-		public static class WetBulbTemperature {
-			@Expose
-			@SerializedName("Metric")
-			private ValueUnit metric;
-			
-			@Expose
-			@SerializedName("Imperial")
-			private ValueUnit imperial;
-			
-			public ValueUnit getMetric() {
-				return metric;
-			}
-			
-			public void setMetric(ValueUnit metric) {
-				this.metric = metric;
-			}
-			
-			public ValueUnit getImperial() {
-				return imperial;
-			}
-			
-			public void setImperial(ValueUnit imperial) {
-				this.imperial = imperial;
-			}
-		}
-		
-		public static class Precip1hr {
-			@Expose
-			@SerializedName("Metric")
-			private ValueUnit metric;
-			
-			@Expose
-			@SerializedName("Imperial")
-			private ValueUnit imperial;
-			
-			public ValueUnit getMetric() {
-				return metric;
-			}
-			
-			public void setMetric(ValueUnit metric) {
-				this.metric = metric;
-			}
-			
-			public ValueUnit getImperial() {
-				return imperial;
-			}
-			
-			public void setImperial(ValueUnit imperial) {
-				this.imperial = imperial;
-			}
-		}
 		
 		public static class PrecipitationSummary {
 			
 			@Expose
 			@SerializedName("Precipitation")
-			private Precipitation precipitation;
+			private ValuesUnit precipitation;
 			
 			@Expose
 			@SerializedName("PastHour")
-			private PastHour pastHour;
+			private ValuesUnit pastHour;
 			
 			@Expose
 			@SerializedName("Past3Hours")
-			private Past3Hours past3Hours;
+			private ValuesUnit past3Hours;
 			
 			@Expose
 			@SerializedName("Past6Hours")
-			private Past6Hours past6Hours;
+			private ValuesUnit past6Hours;
 			
 			@Expose
 			@SerializedName("Past9Hours")
-			private Past9Hours past9Hours;
+			private ValuesUnit past9Hours;
 			
 			@Expose
 			@SerializedName("Past12Hours")
-			private Past12Hours past12Hours;
+			private ValuesUnit past12Hours;
 			
 			@Expose
 			@SerializedName("Past18Hours")
-			private Past18Hours past18Hours;
+			private ValuesUnit past18Hours;
 			
 			@Expose
 			@SerializedName("Past24Hours")
-			private Past24Hours past24Hours;
+			private ValuesUnit past24Hours;
 			
-			public Precipitation getPrecipitation() {
+			public ValuesUnit getPrecipitation() {
 				return precipitation;
 			}
 			
-			public void setPrecipitation(Precipitation precipitation) {
+			public PrecipitationSummary setPrecipitation(ValuesUnit precipitation) {
 				this.precipitation = precipitation;
+				return this;
 			}
 			
-			public PastHour getPastHour() {
+			public ValuesUnit getPastHour() {
 				return pastHour;
 			}
 			
-			public void setPastHour(PastHour pastHour) {
+			public PrecipitationSummary setPastHour(ValuesUnit pastHour) {
 				this.pastHour = pastHour;
+				return this;
 			}
 			
-			public Past3Hours getPast3Hours() {
+			public ValuesUnit getPast3Hours() {
 				return past3Hours;
 			}
 			
-			public void setPast3Hours(Past3Hours past3Hours) {
+			public PrecipitationSummary setPast3Hours(ValuesUnit past3Hours) {
 				this.past3Hours = past3Hours;
+				return this;
 			}
 			
-			public Past6Hours getPast6Hours() {
+			public ValuesUnit getPast6Hours() {
 				return past6Hours;
 			}
 			
-			public void setPast6Hours(Past6Hours past6Hours) {
+			public PrecipitationSummary setPast6Hours(ValuesUnit past6Hours) {
 				this.past6Hours = past6Hours;
+				return this;
 			}
 			
-			public Past9Hours getPast9Hours() {
+			public ValuesUnit getPast9Hours() {
 				return past9Hours;
 			}
 			
-			public void setPast9Hours(Past9Hours past9Hours) {
+			public PrecipitationSummary setPast9Hours(ValuesUnit past9Hours) {
 				this.past9Hours = past9Hours;
+				return this;
 			}
 			
-			public Past12Hours getPast12Hours() {
+			public ValuesUnit getPast12Hours() {
 				return past12Hours;
 			}
 			
-			public void setPast12Hours(Past12Hours past12Hours) {
+			public PrecipitationSummary setPast12Hours(ValuesUnit past12Hours) {
 				this.past12Hours = past12Hours;
+				return this;
 			}
 			
-			public Past18Hours getPast18Hours() {
+			public ValuesUnit getPast18Hours() {
 				return past18Hours;
 			}
 			
-			public void setPast18Hours(Past18Hours past18Hours) {
+			public PrecipitationSummary setPast18Hours(ValuesUnit past18Hours) {
 				this.past18Hours = past18Hours;
+				return this;
 			}
 			
-			public Past24Hours getPast24Hours() {
+			public ValuesUnit getPast24Hours() {
 				return past24Hours;
 			}
 			
-			public void setPast24Hours(Past24Hours past24Hours) {
+			public PrecipitationSummary setPast24Hours(ValuesUnit past24Hours) {
 				this.past24Hours = past24Hours;
-			}
-			
-			public static class Precipitation {
-				@Expose
-				@SerializedName("Metric")
-				private ValueUnit metric;
-				
-				@Expose
-				@SerializedName("Imperial")
-				private ValueUnit imperial;
-				
-				public ValueUnit getMetric() {
-					return metric;
-				}
-				
-				public void setMetric(ValueUnit metric) {
-					this.metric = metric;
-				}
-				
-				public ValueUnit getImperial() {
-					return imperial;
-				}
-				
-				public void setImperial(ValueUnit imperial) {
-					this.imperial = imperial;
-				}
-			}
-			
-			public static class PastHour {
-				@Expose
-				@SerializedName("Metric")
-				private ValueUnit metric;
-				
-				@Expose
-				@SerializedName("Imperial")
-				private ValueUnit imperial;
-				
-				public ValueUnit getMetric() {
-					return metric;
-				}
-				
-				public void setMetric(ValueUnit metric) {
-					this.metric = metric;
-				}
-				
-				public ValueUnit getImperial() {
-					return imperial;
-				}
-				
-				public void setImperial(ValueUnit imperial) {
-					this.imperial = imperial;
-				}
-			}
-			
-			public static class Past3Hours {
-				@Expose
-				@SerializedName("Metric")
-				private ValueUnit metric;
-				
-				@Expose
-				@SerializedName("Imperial")
-				private ValueUnit imperial;
-				
-				public ValueUnit getMetric() {
-					return metric;
-				}
-				
-				public void setMetric(ValueUnit metric) {
-					this.metric = metric;
-				}
-				
-				public ValueUnit getImperial() {
-					return imperial;
-				}
-				
-				public void setImperial(ValueUnit imperial) {
-					this.imperial = imperial;
-				}
-			}
-			
-			public static class Past6Hours {
-				@Expose
-				@SerializedName("Metric")
-				private ValueUnit metric;
-				
-				@Expose
-				@SerializedName("Imperial")
-				private ValueUnit imperial;
-				
-				public ValueUnit getMetric() {
-					return metric;
-				}
-				
-				public void setMetric(ValueUnit metric) {
-					this.metric = metric;
-				}
-				
-				public ValueUnit getImperial() {
-					return imperial;
-				}
-				
-				public void setImperial(ValueUnit imperial) {
-					this.imperial = imperial;
-				}
-			}
-			
-			public static class Past9Hours {
-				@Expose
-				@SerializedName("Metric")
-				private ValueUnit metric;
-				
-				@Expose
-				@SerializedName("Imperial")
-				private ValueUnit imperial;
-				
-				public ValueUnit getMetric() {
-					return metric;
-				}
-				
-				public void setMetric(ValueUnit metric) {
-					this.metric = metric;
-				}
-				
-				public ValueUnit getImperial() {
-					return imperial;
-				}
-				
-				public void setImperial(ValueUnit imperial) {
-					this.imperial = imperial;
-				}
-			}
-			
-			public static class Past12Hours {
-				@Expose
-				@SerializedName("Metric")
-				private ValueUnit metric;
-				
-				@Expose
-				@SerializedName("Imperial")
-				private ValueUnit imperial;
-				
-				public ValueUnit getMetric() {
-					return metric;
-				}
-				
-				public void setMetric(ValueUnit metric) {
-					this.metric = metric;
-				}
-				
-				public ValueUnit getImperial() {
-					return imperial;
-				}
-				
-				public void setImperial(ValueUnit imperial) {
-					this.imperial = imperial;
-				}
-			}
-			
-			public static class Past18Hours {
-				@Expose
-				@SerializedName("Metric")
-				private ValueUnit metric;
-				
-				@Expose
-				@SerializedName("Imperial")
-				private ValueUnit imperial;
-				
-				public ValueUnit getMetric() {
-					return metric;
-				}
-				
-				public void setMetric(ValueUnit metric) {
-					this.metric = metric;
-				}
-				
-				public ValueUnit getImperial() {
-					return imperial;
-				}
-				
-				public void setImperial(ValueUnit imperial) {
-					this.imperial = imperial;
-				}
-			}
-			
-			public static class Past24Hours {
-				@Expose
-				@SerializedName("Metric")
-				private ValueUnit metric;
-				
-				@Expose
-				@SerializedName("Imperial")
-				private ValueUnit imperial;
-				
-				public ValueUnit getMetric() {
-					return metric;
-				}
-				
-				public void setMetric(ValueUnit metric) {
-					this.metric = metric;
-				}
-				
-				public ValueUnit getImperial() {
-					return imperial;
-				}
-				
-				public void setImperial(ValueUnit imperial) {
-					this.imperial = imperial;
-				}
+				return this;
 			}
 		}
 		
@@ -968,120 +550,48 @@ public class CurrentConditionsResponse {
 			
 			@Expose
 			@SerializedName("Past6HourRange")
-			private Past6HourRange past6HourRange;
+			private PastHourRange pastHourRange;
 			
 			@Expose
 			@SerializedName("Past12HourRange")
-			private Past12HourRange past12HourRange;
+			private PastHourRange past12HourRange;
 			
 			@Expose
 			@SerializedName("Past24HourRange")
-			private Past24HourRange past24HourRange;
+			private PastHourRange past24HourRange;
 			
-			public Past6HourRange getPast6HourRange() {
-				return past6HourRange;
-			}
 			
-			public void setPast6HourRange(Past6HourRange past6HourRange) {
-				this.past6HourRange = past6HourRange;
-			}
-			
-			public Past12HourRange getPast12HourRange() {
-				return past12HourRange;
-			}
-			
-			public void setPast12HourRange(Past12HourRange past12HourRange) {
-				this.past12HourRange = past12HourRange;
-			}
-			
-			public Past24HourRange getPast24HourRange() {
-				return past24HourRange;
-			}
-			
-			public void setPast24HourRange(Past24HourRange past24HourRange) {
-				this.past24HourRange = past24HourRange;
-			}
-			
-			public static class Past6HourRange {
+			public static class PastHourRange {
 				@Expose
 				@SerializedName("Minimum")
-				private Minimum minimum;
+				private ValuesUnit minimum;
 				
 				@Expose
 				@SerializedName("Maximum")
-				private Maximum maximum;
+				private ValuesUnit maximum;
 				
-				public Minimum getMinimum() {
+				public ValuesUnit getMinimum() {
 					return minimum;
 				}
 				
-				public void setMinimum(Minimum minimum) {
+				public PastHourRange setMinimum(ValuesUnit minimum) {
 					this.minimum = minimum;
+					return this;
 				}
 				
-				public Maximum getMaximum() {
+				public ValuesUnit getMaximum() {
 					return maximum;
 				}
 				
-				public void setMaximum(Maximum maximum) {
+				public PastHourRange setMaximum(ValuesUnit maximum) {
 					this.maximum = maximum;
-				}
-			}
-			
-			public static class Past12HourRange {
-				@Expose
-				@SerializedName("Minimum")
-				private Minimum minimum;
-				
-				@Expose
-				@SerializedName("Maximum")
-				private Maximum maximum;
-				
-				public Minimum getMinimum() {
-					return minimum;
-				}
-				
-				public void setMinimum(Minimum minimum) {
-					this.minimum = minimum;
-				}
-				
-				public Maximum getMaximum() {
-					return maximum;
-				}
-				
-				public void setMaximum(Maximum maximum) {
-					this.maximum = maximum;
-				}
-			}
-			
-			
-			public static class Past24HourRange {
-				@Expose
-				@SerializedName("Minimum")
-				private Minimum minimum;
-				
-				@Expose
-				@SerializedName("Maximum")
-				private Maximum maximum;
-				
-				public Minimum getMinimum() {
-					return minimum;
-				}
-				
-				public void setMinimum(Minimum minimum) {
-					this.minimum = minimum;
-				}
-				
-				public Maximum getMaximum() {
-					return maximum;
-				}
-				
-				public void setMaximum(Maximum maximum) {
-					this.maximum = maximum;
+					return this;
 				}
 			}
 			
 		}
+		
+		
 	}
 	
 	

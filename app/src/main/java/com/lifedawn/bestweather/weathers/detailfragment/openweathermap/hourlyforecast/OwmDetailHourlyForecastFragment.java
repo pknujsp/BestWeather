@@ -129,7 +129,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		int index = 0;
 		for (OneCallResponse.Hourly hourly : hourlyList) {
 			dateTimeList.add(
-					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(String.valueOf(Long.parseLong(hourly.getDt()) * 1000L)));
+					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getDt()) * 1000L));
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(hourly.getWeather().get(0).getIcon(), dateTimeList.get(index)));
 			tempList.add(ValueUnits.convertTemperature(hourly.getTemp(), tempUnit));
 			realFeelTempList.add(ValueUnits.convertTemperature(hourly.getFeelsLike(), tempUnit).toString());

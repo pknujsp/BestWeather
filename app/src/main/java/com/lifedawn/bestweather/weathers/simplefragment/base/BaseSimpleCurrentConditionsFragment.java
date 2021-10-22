@@ -63,10 +63,19 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	
 	public void setAqiValuesToViews() {
 		if (airQualityResponse.getStatus().equals("ok")) {
-			binding.pm10Grade.setText(AqicnResponseProcessor.getGradeDescription(
-					Integer.parseInt(airQualityResponse.getData().getIaqi().getPm10().getValue())));
-			binding.pm25Grade.setText(AqicnResponseProcessor.getGradeDescription(
-					Integer.parseInt(airQualityResponse.getData().getIaqi().getPm25().getValue())));
+			if (airQualityResponse.getData().getIaqi().getPm10() == null) {
+				binding.pm10Grade.setText(R.string.not_data);
+			} else {
+				binding.pm10Grade.setText(AqicnResponseProcessor.getGradeDescription(
+						Integer.parseInt(airQualityResponse.getData().getIaqi().getPm10().getValue())));
+			}
+			if (airQualityResponse.getData().getIaqi().getPm25() == null) {
+				binding.pm25Grade.setText(R.string.not_data);
+			} else {
+				binding.pm25Grade.setText(AqicnResponseProcessor.getGradeDescription(
+						Integer.parseInt(airQualityResponse.getData().getIaqi().getPm25().getValue())));
+			}
+			
 		} else {
 			binding.pm10Grade.setText(R.string.not_data);
 			binding.pm25Grade.setText(R.string.not_data);

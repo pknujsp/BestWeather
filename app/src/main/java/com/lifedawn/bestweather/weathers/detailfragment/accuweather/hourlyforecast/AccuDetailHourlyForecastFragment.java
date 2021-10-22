@@ -132,7 +132,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 		int index = 0;
 		for (TwelveHoursOfHourlyForecastsResponse.Item hourly : hourlyItemList) {
 			dateTimeList.add(
-					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(String.valueOf(Long.parseLong(hourly.getEpochDateTime()) * 1000L)));
+					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L));
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(hourly.getWeatherIcon(), dateTimeList.get(index)));
 
 			tempList.add(ValueUnits.convertTemperature(hourly.getTemperature().getValue(), tempUnit));

@@ -355,6 +355,7 @@
     <string name="updated_time">갱신 시각</string>
     <string name="detail_air_quality">세부 대기 상태</string>
     <string name="tag_detail_air_quality_fragment">tag_detail_air_quality_fragment</string>
+    <string name="not_precipitation">강수없음</string>
 
 
 </resources>

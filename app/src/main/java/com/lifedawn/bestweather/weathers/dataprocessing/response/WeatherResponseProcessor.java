@@ -68,8 +68,8 @@ public class WeatherResponseProcessor {
 	}
 	
 	
-	public static Date convertDateTimeOfHourlyForecast(String millis) {
-		calendar.setTimeInMillis(Long.parseLong(millis));
+	public static Date convertDateTimeOfHourlyForecast(long millis) {
+		calendar.setTimeInMillis(millis);
 		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);

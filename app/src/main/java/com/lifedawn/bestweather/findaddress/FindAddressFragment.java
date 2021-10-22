@@ -81,7 +81,7 @@ public class FindAddressFragment extends Fragment {
 							getActivity().runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									getParentFragmentManager().popBackStackImmediate();
+									getParentFragmentManager().popBackStack();
 								}
 							});
 						}

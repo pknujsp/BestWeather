@@ -118,18 +118,8 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		TextValueView rainVolumeRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
 		TextValueView snowVolumeRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
 		
-		//시각 --------------------------------------------------------------------------
+		//시각, 기온, 강수확률, 강수량
 		List<Date> dateTimeList = new ArrayList<>();
-		for (OneCallResponse.Hourly item : items) {
-			dateTimeList.add(
-					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(String.valueOf(Long.parseLong(item.getDt()) * 1000L)));
-		}
-		dateRow.init(dateTimeList);
-		clockRow.setClockList(dateTimeList);
-		
-		//날씨 아이콘
-		
-		//기온, 강수확률, 강수량
 		List<String> tempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
@@ -138,9 +128,11 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		boolean haveSnowVolumes = false;
 		
 		for (OneCallResponse.Hourly item : items) {
+			dateTimeList.add(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getDt()) * 1000L));
 			tempList.add(ValueUnits.convertTemperature(item.getTemp(), tempUnit).toString());
 			probabilityOfPrecipitationList.add(String.valueOf((int) (Double.parseDouble(item.getPop()) * 100.0)));
 			rainVolumeList.add(item.getRain() == null ? "-" : item.getRain().getPrecipitation1Hour());
+		
 			if (item.getSnow() != null) {
 				if (!haveSnowVolumes) {
 					haveSnowVolumes = true;
@@ -148,7 +140,8 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			}
 			snowVolumeList.add(item.getSnow() == null ? "-" : item.getSnow().getPrecipitation1Hour());
 		}
-		
+		dateRow.init(dateTimeList);
+		clockRow.setClockList(dateTimeList);
 		tempRow.setValueList(tempList);
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 		rainVolumeRow.setValueList(rainVolumeList);

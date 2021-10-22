@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
@@ -48,19 +50,19 @@ public class AccuSimpleCurrentConditionsFragment extends BaseSimpleCurrentCondit
 		
 		List<CurrentConditionsResponse.Item> items = currentConditionsResponse.getItems();
 		CurrentConditionsResponse.Item item = items.get(0);
-		
-		if (item.getHasPrecipitation() != null) {
+		String precipitation = null;
+		if (item.getHasPrecipitation().equals("true")) {
 			// precipitation type 값 종류 : Rain, Snow, Ice, Null(Not), or Mixed
-			String precipitation = AccuWeatherResponseProcessor.getPty(
+			precipitation = AccuWeatherResponseProcessor.getPty(
 					item.getPrecipitationType()) + ", " + item.getPrecip1hr().getMetric().getValue();
-			
-			binding.precipitation.setText(precipitation);
-			binding.precipitation.setVisibility(View.VISIBLE);
 		} else {
-			binding.precipitation.setVisibility(View.GONE);
+			precipitation = getString(R.string.not_precipitation);
 		}
+		binding.precipitation.setText(precipitation);
 		
 		binding.sky.setText(AccuWeatherResponseProcessor.getWeatherIconDescription(item.getWeatherIcon()));
-		binding.temperature.setText(item.getTemperature().getValue());
+		String temp = ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(), tempUnit) + ValueUnits.convertToStr(
+				getContext(), tempUnit);
+		binding.temperature.setText(temp);
 	}
 }

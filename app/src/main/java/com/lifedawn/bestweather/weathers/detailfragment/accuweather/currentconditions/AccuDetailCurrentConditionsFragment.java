@@ -38,12 +38,13 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 		//운량, 강수량, 강수형태
 		CurrentConditionsResponse.Item item = currentConditionsResponse.getItems().get(0);
 		
-		addGridItem(R.string.temperature, ValueUnits.convertTemperature(item.getTemperature().getValue(), tempUnit).toString(),
+		addGridItem(R.string.temperature, ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(), tempUnit).toString(),
 				R.drawable.temp_icon, null);
 		addGridItem(R.string.real_feel_temperature,
-				ValueUnits.convertTemperature(item.getRealFeelTemperature().getValue(), tempUnit).toString(), R.drawable.temp_icon, null);
+				ValueUnits.convertTemperature(item.getRealFeelTemperature().getMetric().getValue(), tempUnit).toString(), R.drawable.temp_icon,
+				null);
 		addGridItem(R.string.humidity, item.getRelativeHumidity(), R.drawable.temp_icon, null);
-		addGridItem(R.string.dew_point, item.getDewPoint().getValue(), R.drawable.temp_icon, null);
+		addGridItem(R.string.dew_point, item.getDewPoint().getMetric().getValue(), R.drawable.temp_icon, null);
 		addGridItem(R.string.wind_direction, item.getWind().getDirection().getDegrees(), R.drawable.temp_icon, null);
 		addGridItem(R.string.wind_speed, ValueUnits.convertWindSpeed(item.getWind().getSpeed().getMetric().getValue(), windUnit).toString(),
 				R.drawable.temp_icon, null);
