@@ -13,7 +13,6 @@ import androidx.annotation.Nullable;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
 import com.lifedawn.bestweather.weathers.view.ClockView;
@@ -25,6 +24,8 @@ import com.lifedawn.bestweather.weathers.view.TextValueView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -108,7 +109,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 		TextValueView dewPointRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView cloudCoverRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 
-		List<Date> dateTimeList = new ArrayList<>();
+		List<LocalDateTime> dateTimeList = new ArrayList<>();
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		List<Integer> tempList = new ArrayList<>();
 		List<String> realFeelTempList = new ArrayList<>();
@@ -132,7 +133,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 		int index = 0;
 		for (TwelveHoursOfHourlyForecastsResponse.Item hourly : hourlyItemList) {
 			dateTimeList.add(
-					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L));
+					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L, timeZone));
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(hourly.getWeatherIcon(), dateTimeList.get(index)));
 
 			tempList.add(ValueUnits.convertTemperature(hourly.getTemperature().getValue(), tempUnit));

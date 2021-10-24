@@ -17,14 +17,18 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.theme.AppTheme;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Locale;
 
 public class SunSetRiseInfoView extends View {
 	private Drawable typeIcon;
-	private Calendar calendar;
+	private ZonedDateTime dateTime;
 	private String type;
-	private SimpleDateFormat dateFormat;
+	private DateTimeFormatter dateTimeFormatter;
 
 	private TextPaint typeTextPaint;
 	private TextPaint timeTextPaint;
@@ -35,24 +39,24 @@ public class SunSetRiseInfoView extends View {
 	private int pixelWidth;
 	private int pixelHeight;
 
-	public SunSetRiseInfoView(Context context, Calendar calendar, SunsetriseFragment.SunSetRiseType sunSetRiseType) {
+	public SunSetRiseInfoView(Context context, ZonedDateTime dateTime, SunsetriseFragment.SunSetRiseType sunSetRiseType) {
 		super(context);
-		init(context, calendar, sunSetRiseType);
+		init(dateTime, sunSetRiseType);
 	}
 
-	private void init(Context context, Calendar calendar, SunsetriseFragment.SunSetRiseType sunSetRiseType) {
-		this.calendar = calendar;
+	private void init(ZonedDateTime dateTime, SunsetriseFragment.SunSetRiseType sunSetRiseType) {
+		this.dateTime = dateTime;
 		this.typeIcon = ContextCompat.getDrawable(getContext(), sunSetRiseType == SunsetriseFragment.SunSetRiseType.RISE ?
 				R.drawable.temp_icon : R.drawable.temp_icon);
 		this.type = getContext().getString(sunSetRiseType == SunsetriseFragment.SunSetRiseType.RISE ? R.string.sunrise : R.string.sunset);
 
 		typeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		typeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 15f, getResources().getDisplayMetrics()));
-		typeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
+		typeTextPaint.setColor(AppTheme.getColor(getContext(), R.attr.textColor));
 
 		timeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		timeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, getResources().getDisplayMetrics()));
-		timeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
+		timeTextPaint.setColor(AppTheme.getColor(getContext(), R.attr.textColor));
 
 		typeTextRect = new Rect();
 		timeTextRect = new Rect();
@@ -60,13 +64,15 @@ public class SunSetRiseInfoView extends View {
 		typeTextPaint.getTextBounds(type, 0, type.length(), typeTextRect);
 
 		ValueUnits clockUnit =
-				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock),
+				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(getContext()).getString(getContext().getString(R.string.pref_key_unit_clock),
 						ValueUnits.clock12.name()));
-		dateFormat = new SimpleDateFormat(clockUnit == ValueUnits.clock12
+
+		dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12
 				? "M.d E a h:mm" : "M.d E HH:mm", Locale.getDefault());
 
-		String dateTime = dateFormat.format(calendar.getTime());
-		timeTextPaint.getTextBounds(dateTime, 0, dateTime.length(), timeTextRect);
+
+		String dateTimeStr = this.dateTime.format(dateTimeFormatter);
+		timeTextPaint.getTextBounds(dateTimeStr, 0, dateTimeStr.length(), timeTextRect);
 
 		int typeTextLeftMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
 		int timeTextTopMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
@@ -93,7 +99,7 @@ public class SunSetRiseInfoView extends View {
 	protected void onDraw(Canvas canvas) {
 		typeIcon.draw(canvas);
 		canvas.drawText(type, typeTextRect.left, typeTextRect.top, typeTextPaint);
-		canvas.drawText(dateFormat.format(calendar.getTime()), timeTextRect.left, timeTextRect.top, timeTextPaint);
+		canvas.drawText(dateTime.format(dateTimeFormatter), timeTextRect.left, timeTextRect.top, timeTextPaint);
 	}
 
 	public int getPixelWidth() {
@@ -104,7 +110,7 @@ public class SunSetRiseInfoView extends View {
 		return pixelHeight;
 	}
 
-	public Calendar getCalendar() {
-		return calendar;
+	public ZonedDateTime getDateTime() {
+		return dateTime;
 	}
 }

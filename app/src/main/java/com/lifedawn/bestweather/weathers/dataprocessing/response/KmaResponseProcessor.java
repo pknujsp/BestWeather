@@ -178,7 +178,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		}
 		
 		List<FinalHourlyForecast> finalHourlyForecastList = new ArrayList<>();
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
 		calendar.set(Calendar.MILLISECOND, 0);
 		String fcstDate = null;
 		
@@ -239,7 +239,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	
 	public static List<FinalDailyForecast> getFinalDailyForecastList(MidLandFcstRoot midLandFcstRoot, MidTaRoot midTaRoot, Long tmFc) {
 		//중기예보 데이터 생성 3~10일후
-		Calendar calendar = Calendar.getInstance(ClockUtil.KR_TIMEZONE);
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMddhhmm", Locale.US);
 		try {
 			calendar.setTime(format.parse(tmFc.toString()));

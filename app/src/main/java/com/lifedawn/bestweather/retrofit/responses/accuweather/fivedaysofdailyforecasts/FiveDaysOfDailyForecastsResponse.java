@@ -4,9 +4,6 @@ import android.graphics.drawable.Drawable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.Direction;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.Maximum;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.Minimum;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.ValueUnit;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Wind;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.WindGust;
@@ -126,8 +123,8 @@ public class FiveDaysOfDailyForecastsResponse {
 
 	public static class DailyForecasts {
 		@Expose
-		@SerializedName("Date")
-		private String date;
+		@SerializedName("DateTime")
+		private String dateTime;
 
 		@Expose
 		@SerializedName("EpochDate")
@@ -157,12 +154,12 @@ public class FiveDaysOfDailyForecastsResponse {
 		@SerializedName("Night")
 		private DayOrNightValues night;
 
-		public String getDate() {
-			return date;
+		public String getDateTime() {
+			return dateTime;
 		}
 
-		public void setDate(String date) {
-			this.date = date;
+		public void setDateTime(String dateTime) {
+			this.dateTime = dateTime;
 		}
 
 		public String getEpochDate() {

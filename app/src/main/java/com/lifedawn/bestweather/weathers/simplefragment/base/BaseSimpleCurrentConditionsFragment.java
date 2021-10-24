@@ -15,10 +15,13 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.TimeZone;
 
 public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutSimpleCurrentConditionsBinding binding;
@@ -28,7 +31,13 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	protected ValueUnits windUnit;
 	protected ValueUnits visibilityUnit;
 	protected ValueUnits clockUnit;
-	
+	protected Double latitude;
+	protected Double longitude;
+	protected String addressName;
+	protected String countryCode;
+	protected MainProcessing.WeatherSourceType mainWeatherSourceType;
+	protected TimeZone timeZone;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -38,6 +47,15 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.mPerSec.name()));
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.km.name()));
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.clock24.name()));
+
+		Bundle bundle = getArguments();
+		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
+		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
+		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
+		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
+		mainWeatherSourceType = (MainProcessing.WeatherSourceType) bundle.getSerializable(
+				getString(R.string.bundle_key_main_weather_data_source));
+		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 	}
 	
 	@Override

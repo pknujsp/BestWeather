@@ -31,25 +31,25 @@ import java.util.Locale;
 
 public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	private List<FinalDailyForecast> finalDailyForecastList;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);
 		setValuesToViews();
-		
-		
+
+
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				DailyForecastComparisonFragment comparisonFragment = new DailyForecastComparisonFragment();
 				comparisonFragment.setArguments(getArguments());
-				
+
 				String tag = getString(R.string.tag_comparison_fragment);
 				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
 				fragmentManager.beginTransaction().hide(
@@ -57,17 +57,19 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 						comparisonFragment, tag).addToBackStack(tag).commit();
 			}
 		});
-		
+
 		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				KmaDetailDailyForecastFragment detailDailyForecastFragment = new KmaDetailDailyForecastFragment();
 				detailDailyForecastFragment.setFinalDailyForecastList(finalDailyForecastList);
-				
+
 				Bundle bundle = new Bundle();
 				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
+				bundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+
 				detailDailyForecastFragment.setArguments(bundle);
-				
+
 				String tag = getString(R.string.tag_detail_daily_forecast_fragment);
 				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
 				fragmentManager.beginTransaction().hide(
@@ -75,62 +77,62 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 						detailDailyForecastFragment, tag).addToBackStack(tag).commit();
 			}
 		});
-		
+
 	}
-	
+
 	public KmaSimpleDailyForecastFragment setFinalDailyForecastList(List<FinalDailyForecast> finalDailyForecastList) {
 		this.finalDailyForecastList = finalDailyForecastList;
 		return this;
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
 		super.setValuesToViews();
 		// 날짜, 최저/최고 기온 ,낮과 밤의 날씨상태, 강수확률
 		Context context = getContext();
-		
+
 		final int DATE_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int DEFAULT_TEXT_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
-		
+
 		final int COLUMN_COUNT = finalDailyForecastList.size();
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCDaily);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
-		
+
 		//label column 설정
 		final int LABEL_VIEW_WIDTH = (int) context.getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
-		
+
 		addLabelView(R.drawable.date, getString(R.string.date), DATE_ROW_HEIGHT);
 		addLabelView(R.drawable.temp_icon, getString(R.string.weather), WEATHER_ROW_HEIGHT);
 		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), DEFAULT_TEXT_ROW_HEIGHT);
 		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), TEMP_ROW_HEIGHT);
-		
+
 		TextValueView dateRow = new TextValueView(context, VIEW_WIDTH, DATE_ROW_HEIGHT, COLUMN_WIDTH);
 		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, VIEW_WIDTH, WEATHER_ROW_HEIGHT, COLUMN_WIDTH);
 		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
-		
+
 		//시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
 		SimpleDateFormat MdE = new SimpleDateFormat("M.d E", Locale.getDefault());
-		
+
 		for (FinalDailyForecast forecast : finalDailyForecastList) {
 			dateList.add(MdE.format(forecast.getDate()));
 		}
 		dateRow.setValueList(dateList);
-		
+
 		//날씨 아이콘
-		
+
 		//기온, 강수확률, 강수량
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
-		
+
 		int index = 0;
 		for (; index < 5; index++) {
 			minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
 			maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
-			
+
 			probabilityOfPrecipitationList.add(
 					finalDailyForecastList.get(index).getAmProbabilityOfPrecipitation() + " / " + finalDailyForecastList.get(
 							index).getPmProbabilityOfPrecipitation());
@@ -138,22 +140,22 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		for (; index < finalDailyForecastList.size(); index++) {
 			minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
 			maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
-			
+
 			probabilityOfPrecipitationList.add(finalDailyForecastList.get(index).getProbabilityOfPrecipitation());
 		}
-		
+
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(getContext(), VIEW_WIDTH, TEMP_ROW_HEIGHT, COLUMN_WIDTH,
 				minTempList, maxTempList);
-		
+
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		rowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-		
+
 		binding.forecastView.addView(dateRow, rowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
 		binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
 		binding.forecastView.addView(tempRow, rowLayoutParams);
-		
+
 	}
 }

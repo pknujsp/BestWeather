@@ -28,6 +28,8 @@ import com.lifedawn.bestweather.weathers.view.DateView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.TimeZone;
+
 public class BaseForecastComparisonFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutForecastComparisonBinding binding;
 	protected DateView dateRow;
@@ -36,38 +38,40 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 	protected ValueUnits windUnit;
 	protected ValueUnits visibilityUnit;
 	protected ValueUnits clockUnit;
-	
+
 	protected Double latitude;
 	protected Double longitude;
 	protected String addressName;
 	protected String countryCode;
 	protected MainProcessing.WeatherSourceType mainWeatherSourceType;
-	
+	protected TimeZone timeZone;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		
+
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
 		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.mPerSec.name()));
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.km.name()));
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.clock24.name()));
-		
+
 		Bundle bundle = getArguments();
 		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
 		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
 		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
 		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
+		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 		mainWeatherSourceType = (MainProcessing.WeatherSourceType) bundle.getSerializable(
 				getString(R.string.bundle_key_main_weather_data_source));
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = BaseLayoutForecastComparisonBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -77,42 +81,42 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 				getParentFragmentManager().popBackStackImmediate();
 			}
 		});
-		
+
 		binding.customProgressView.setContentView(binding.rootScrollView);
 		binding.kmaLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setText("K");
 		binding.kmaLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setBackgroundTintList(
 				getContext().getColorStateList(R.color.kma_icon_color));
-		
+
 		binding.accuLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setText("A");
 		binding.accuLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setBackgroundTintList(
 				getContext().getColorStateList(R.color.accu_icon_color));
-		
+
 		binding.owmLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setText("O");
 		binding.owmLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setBackgroundTintList(
 				getContext().getColorStateList(R.color.owm_icon_color));
-		
+
 		final View.OnClickListener labelIconOnClickListener = new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				Toast.makeText(getContext(), view.getContentDescription(), Toast.LENGTH_SHORT).show();
 			}
 		};
-		
+
 		binding.kmaLabelLayout.weatherLabel.setOnClickListener(labelIconOnClickListener);
 		binding.kmaLabelLayout.temperatureLabel.setOnClickListener(labelIconOnClickListener);
 		binding.kmaLabelLayout.precipitationVolumeLabel.setOnClickListener(labelIconOnClickListener);
 		binding.kmaLabelLayout.popLabel.setOnClickListener(labelIconOnClickListener);
-		
+
 		binding.accuLabelLayout.weatherLabel.setOnClickListener(labelIconOnClickListener);
 		binding.accuLabelLayout.temperatureLabel.setOnClickListener(labelIconOnClickListener);
 		binding.accuLabelLayout.precipitationVolumeLabel.setOnClickListener(labelIconOnClickListener);
 		binding.accuLabelLayout.popLabel.setOnClickListener(labelIconOnClickListener);
-		
+
 		binding.owmLabelLayout.weatherLabel.setOnClickListener(labelIconOnClickListener);
 		binding.owmLabelLayout.temperatureLabel.setOnClickListener(labelIconOnClickListener);
 		binding.owmLabelLayout.precipitationVolumeLabel.setOnClickListener(labelIconOnClickListener);
 		binding.owmLabelLayout.popLabel.setOnClickListener(labelIconOnClickListener);
-		
+
 		binding.scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
@@ -122,10 +126,10 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 			}
 		});
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
-	
+
 	}
-	
+
 }

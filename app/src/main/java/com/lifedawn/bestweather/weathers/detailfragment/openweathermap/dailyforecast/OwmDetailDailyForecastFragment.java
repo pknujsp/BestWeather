@@ -16,7 +16,6 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCal
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
-import com.lifedawn.bestweather.weathers.view.DoubleWindDirectionView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
@@ -80,7 +79,8 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		List<String> uvMaxIndexList = new ArrayList<>();
 
 		for (OneCallResponse.Daily daily : dailyList) {
-			dateList.add(dateFormat.format(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L)));
+			dateList.add(dateFormat.format(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L,
+					timeZone)));
 			minTempList.add(ValueUnits.convertTemperature(daily.getTemp().getMin(), tempUnit));
 			maxTempList.add(ValueUnits.convertTemperature(daily.getTemp().getMax(), tempUnit));
 			popList.add(String.valueOf((int) (Double.parseDouble(daily.getPop()) * 100.0)));

@@ -1,13 +1,16 @@
 package com.lifedawn.bestweather.commons.classes;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
 public class ClockUtil {
-	public static final TimeZone KR_TIMEZONE = TimeZone.getTimeZone("Asia/Seoul");
+	public static final SimpleDateFormat iso8061Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
+
 
 	private ClockUtil() {
 	}
@@ -33,6 +36,12 @@ public class ClockUtil {
 		} else {
 			return false;
 		}
+	}
+
+	public static Calendar convertISO8061Format(String dateTime) throws ParseException {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(iso8061Format.parse(dateTime));
+		return calendar;
 	}
 
 }

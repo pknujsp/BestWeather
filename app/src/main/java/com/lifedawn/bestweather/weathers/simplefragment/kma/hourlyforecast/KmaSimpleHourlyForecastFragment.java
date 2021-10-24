@@ -66,6 +66,8 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 				Bundle bundle = new Bundle();
 				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
+				bundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+
 				detailHourlyForecastFragment.setArguments(bundle);
 
 				String tag = getString(R.string.tag_detail_hourly_forecast_fragment);
@@ -95,9 +97,6 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		final int columnCount = finalHourlyForecastList.size();
 		final int columnWidth = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCHourly);
 		final int viewWidth = columnCount * columnWidth;
-
-		//label column 설정
-		final int labelViewWidth = (int) context.getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
 
 		addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
 		addLabelView(R.drawable.time, getString(R.string.clock), clockRowHeight);

@@ -44,6 +44,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -217,8 +218,8 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 
 	@Override
 	public void loadImgOfCurrentConditions(MainProcessing.WeatherSourceType weatherSourceType, String val, Double latitude,
-	                                       Double longitude) {
-		Calendar calendar = Calendar.getInstance();
+	                                       Double longitude, TimeZone timeZone) {
+		Calendar calendar = Calendar.getInstance(timeZone);
 		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(
 				new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), calendar.getTimeZone());
 		Calendar sunRiseCalendar = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(calendar);

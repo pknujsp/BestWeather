@@ -11,6 +11,7 @@ import com.lifedawn.bestweather.commons.classes.ClockUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunsetriseUtil;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -57,6 +58,7 @@ public class SingleWeatherIconView extends View {
 	}
 
 
+	/*
 	public void setWeatherImgs(MainProcessing.WeatherSourceType weatherSourceType, List<WeatherIconObj> weatherIconObjList,
 	                           long firstFcstDateTime, long lastFcstDateTime, double latitude, double longitude) {
 		this.weatherIconObjList = weatherIconObjList;
@@ -76,13 +78,15 @@ public class SingleWeatherIconView extends View {
 		}
 	}
 
+	 */
+
 
 	public static class WeatherIconObj {
 		final String code;
-		final Date dateTime;
+		final LocalDateTime dateTime;
 		Drawable img;
 
-		public WeatherIconObj(String code, Date dateTime) {
+		public WeatherIconObj(String code, LocalDateTime dateTime) {
 			this.code = code;
 			this.dateTime = dateTime;
 		}

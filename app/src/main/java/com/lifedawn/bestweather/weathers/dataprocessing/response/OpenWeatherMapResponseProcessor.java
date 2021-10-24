@@ -13,6 +13,7 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCal
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import retrofit2.Response;
 
@@ -67,5 +68,9 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	
 	public static String getFlickrGalleryName(String code) {
 		return FLICKR_MAP.get(code);
+	}
+
+	public static TimeZone getTimeZone(OneCallResponse oneCallResponse) {
+		return TimeZone.getTimeZone(oneCallResponse.getTimezone());
 	}
 }

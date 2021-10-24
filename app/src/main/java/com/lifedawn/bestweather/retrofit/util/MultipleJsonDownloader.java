@@ -79,11 +79,15 @@ public abstract class MultipleJsonDownloader<T> {
 		if (!responseMap.containsKey(weatherSourceType)) {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
 		}
-		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult<T>(t));
 
-		if (requestCount == ++responseCount) {
-			onResult();
+		if (!responseMap.get(weatherSourceType).containsKey(serviceType)) {
+			responseMap.get(weatherSourceType).put(serviceType, new ResponseResult<T>(t));
+
+			if (requestCount == ++responseCount) {
+				onResult();
+			}
 		}
+		
 	}
 
 	public static class ResponseResult<T> {

@@ -343,6 +343,11 @@
     <string name="bundle_key_address_name">bundle_key_address_name</string>
     <string name="bundle_key_country_code">bundle_key_country_code</string>
     <string name="bundle_key_main_weather_data_source">bundle_key_main_weather_data_source</string>
+    <string name="bundle_key_timezone">bundle_key_timezone</string>
+
+
+
+
     <string name="title_pick_weather_data_source">날씨 제공사 선택</string>
     <string name="tag_detail_daily_forecast_fragment">tag_detail_daily_forecast_fragment</string>
     <string name="precipitation_of_snow">강설확률</string>

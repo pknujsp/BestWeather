@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import retrofit2.Response;
 
@@ -82,9 +83,9 @@ public class AqicnResponseProcessor {
 		return new Gson().fromJson(response.body().toString(), GeolocalizedFeedResponse.class);
 	}
 
-	public static List<AirQualityForecastObj> getAirQualityForecastObjList(GeolocalizedFeedResponse geolocalizedFeedResponse) {
+	public static List<AirQualityForecastObj> getAirQualityForecastObjList(GeolocalizedFeedResponse geolocalizedFeedResponse, TimeZone timeZone) {
 		ArrayMap<String, AirQualityForecastObj> forecastObjMap = new ArrayMap<>();
-		Calendar today = Calendar.getInstance();
+		Calendar today = Calendar.getInstance(timeZone);
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.SECOND, 0);

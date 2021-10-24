@@ -20,8 +20,6 @@ import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.DoubleWindDirectionView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
-import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
-import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -89,7 +87,7 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 
 		for (FiveDaysOfDailyForecastsResponse.DailyForecasts daily : dailyForecastsList) {
 			dateList.add(dateFormat.format(
-					WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L)));
+					WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, timeZone)));
 			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(daily.getDay().getIcon(), daily.getNight().getIcon()));
 			minTempList.add(ValueUnits.convertTemperature(daily.getTemperature().getMinimum().getValue(), tempUnit));
 			maxTempList.add(ValueUnits.convertTemperature(daily.getTemperature().getMaximum().getValue(), tempUnit));

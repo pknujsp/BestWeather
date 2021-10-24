@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.aqicn.DetailAirQualityFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
@@ -24,27 +25,42 @@ import org.jetbrains.annotations.NotNull;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 
 public class SimpleAirQualityFragment extends Fragment implements IWeatherValues {
 	private FragmentAirQualitySimpleBinding binding;
 	private GeolocalizedFeedResponse geolocalizedFeedResponse;
-	
+	private Double latitude;
+	private Double longitude;
+	private String addressName;
+	private String countryCode;
+	private MainProcessing.WeatherSourceType mainWeatherSourceType;
+	private TimeZone timeZone;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Bundle bundle = getArguments();
+		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
+		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
+		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
+		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
+		mainWeatherSourceType = (MainProcessing.WeatherSourceType) bundle.getSerializable(
+				getString(R.string.bundle_key_main_weather_data_source));
+		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentAirQualitySimpleBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		
+
 		binding.weatherCardViewHeader.forecastName.setText(R.string.air_quality);
 		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
 		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
@@ -52,7 +68,11 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			public void onClick(View view) {
 				DetailAirQualityFragment detailAirQualityFragment = new DetailAirQualityFragment();
 				detailAirQualityFragment.setResponse(geolocalizedFeedResponse);
-				
+
+				Bundle bundle = new Bundle();
+				bundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+				detailAirQualityFragment.setArguments(bundle);
+
 				String tag = getString(R.string.tag_detail_air_quality_fragment);
 				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
 				fragmentManager.beginTransaction().hide(
@@ -60,15 +80,15 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 						detailAirQualityFragment, tag).addToBackStack(tag).commit();
 			}
 		});
-		
+
 		setValuesToViews();
 	}
-	
+
 	public SimpleAirQualityFragment setGeolocalizedFeedResponse(GeolocalizedFeedResponse geolocalizedFeedResponse) {
 		this.geolocalizedFeedResponse = geolocalizedFeedResponse;
 		return this;
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
 		Integer pm10Val = null;
@@ -77,7 +97,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		Integer no2Val = null;
 		Integer o3Val = null;
 		Integer so2Val = null;
-		
+
 		if (geolocalizedFeedResponse.getData().getIaqi().getPm10() == null) {
 			binding.pm10.setText(R.string.not_data);
 		} else {
@@ -120,29 +140,29 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			binding.so2.setTextColor(AqicnResponseProcessor.getGradeColorId(so2Val.intValue()));
 			binding.so2.setText(AqicnResponseProcessor.getGradeDescription(so2Val.intValue()));
 		}
-		
-		
+
+
 		SimpleDateFormat dateFormat = new SimpleDateFormat("M.d E", Locale.getDefault());
 		LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-		
+
 		String notData = getString(R.string.not_data);
 		View labelView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 		((TextView) labelView.findViewById(R.id.date)).setText(null);
 		((TextView) labelView.findViewById(R.id.pm10)).setText(getString(R.string.pm10_str));
 		((TextView) labelView.findViewById(R.id.pm25)).setText(getString(R.string.pm25_str));
 		((TextView) labelView.findViewById(R.id.o3)).setText(getString(R.string.o3_str));
-		
-		List<AirQualityForecastObj> forecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(geolocalizedFeedResponse);
+
+		List<AirQualityForecastObj> forecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(geolocalizedFeedResponse, timeZone);
 		for (AirQualityForecastObj forecastObj : forecastObjList) {
 			View forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 			((TextView) forecastItemView.findViewById(R.id.date)).setText(dateFormat.format(forecastObj.date));
 			((TextView) forecastItemView.findViewById(R.id.pm10)).setText(forecastObj.pm10Str == null ? notData : forecastObj.pm10Str);
 			((TextView) forecastItemView.findViewById(R.id.pm25)).setText(forecastObj.pm25Str == null ? notData : forecastObj.pm25Str);
 			((TextView) forecastItemView.findViewById(R.id.o3)).setText(forecastObj.o3Str == null ? notData : forecastObj.o3Str);
-			
+
 			binding.forecast.addView(forecastItemView);
 		}
 	}
-	
-	
+
+
 }

@@ -16,6 +16,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.TimeZone;
 
 public class WeatherViewModel extends AndroidViewModel implements FavoriteAddressQuery {
 	private ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions;
@@ -77,6 +78,6 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	}
 	
 	public interface ILoadImgOfCurrentConditions {
-		void loadImgOfCurrentConditions(MainProcessing.WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude);
+		void loadImgOfCurrentConditions(MainProcessing.WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude, TimeZone timeZone);
 	}
 }

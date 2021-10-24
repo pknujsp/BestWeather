@@ -13,27 +13,28 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.ClockUtil;
 import com.lifedawn.bestweather.databinding.FragmentSunsetriseBinding;
+import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
-import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 import java.util.TimeZone;
 
 public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	private FragmentSunsetriseBinding binding;
 	private SunSetRiseViewGroup sunSetRiseViewGroup;
 	private Location location;
+	private Double latitude;
+	private Double longitude;
+	private String addressName;
+	private String countryCode;
+	private MainProcessing.WeatherSourceType mainWeatherSourceType;
+	private TimeZone timeZone;
 
 	public enum SunSetRiseType {
 		RISE, SET
@@ -44,7 +45,15 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 		super.onCreate(savedInstanceState);
 
 		Bundle bundle = getArguments();
-		location = new Location(bundle.getDouble("latitude"), bundle.getDouble("longitude"));
+		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
+		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
+		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
+		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
+		mainWeatherSourceType = (MainProcessing.WeatherSourceType) bundle.getSerializable(
+				getString(R.string.bundle_key_main_weather_data_source));
+		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+
+		location = new Location(latitude, longitude);
 	}
 
 	@Nullable
@@ -64,7 +73,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.sun_set_rise);
 
-		sunSetRiseViewGroup = new SunSetRiseViewGroup(getContext(), location);
+		sunSetRiseViewGroup = new SunSetRiseViewGroup(getContext(), location, timeZone);
 		binding.rootLayout.addView(sunSetRiseViewGroup, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 		setValuesToViews();
 

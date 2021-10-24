@@ -26,6 +26,8 @@ import com.lifedawn.bestweather.weathers.view.DateView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.TimeZone;
+
 public class BaseDetailForecastFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutDetailForecastBinding binding;
 	protected SharedPreferences sharedPreferences;
@@ -35,6 +37,7 @@ public class BaseDetailForecastFragment extends Fragment implements IWeatherValu
 	protected ValueUnits clockUnit;
 	protected String addressName;
 	protected DateView dateRow;
+	protected TimeZone timeZone;
 
 
 	@Override
@@ -49,6 +52,7 @@ public class BaseDetailForecastFragment extends Fragment implements IWeatherValu
 
 		Bundle bundle = getArguments();
 		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
+		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 	}
 
 	@Nullable

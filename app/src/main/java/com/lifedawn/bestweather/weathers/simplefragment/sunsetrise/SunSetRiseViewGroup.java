@@ -19,14 +19,23 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 public class SunSetRiseViewGroup extends ViewGroup {
-	private SimpleDateFormat dateFormat;
+	private DateTimeFormatter dateTimeFormatter;
 	private Location location;
+	private TimeZone timeZone;
 
 	private SunSetRiseInfoView type1View;
 	private SunSetRiseInfoView type2View;
@@ -51,9 +60,10 @@ public class SunSetRiseViewGroup extends ViewGroup {
 
 	private String current;
 
-	public SunSetRiseViewGroup(Context context, Location location) {
+	public SunSetRiseViewGroup(Context context, Location location, TimeZone timeZone) {
 		super(context);
 		this.location = location;
+		this.timeZone = timeZone;
 		init(context);
 	}
 
@@ -81,16 +91,17 @@ public class SunSetRiseViewGroup extends ViewGroup {
 		timeCirclePoint = new Point();
 		currentTextRect = new Rect();
 
-		Calendar calendar = Calendar.getInstance();
 		current = context.getString(R.string.current);
 
 		ValueUnits clockUnit =
 				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock),
 						ValueUnits.clock12.name()));
-		dateFormat = new SimpleDateFormat(clockUnit == ValueUnits.clock12
-				? "M.d E a h:mm" : "M.d E HH:mm", Locale.getDefault());
+		String dateTimeFormat = clockUnit == ValueUnits.clock12
+				? "M.d E a h:mm" : "M.d E HH:mm";
 
-		String currentDateTime = dateFormat.format(calendar.getTime());
+		LocalDateTime now = LocalDateTime.now(ZoneId.of(timeZone.getID()));
+		dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimeFormat);
+		String currentDateTime = now.format(dateTimeFormatter);
 		timeTextPaint.getTextBounds(currentDateTime, 0, currentDateTime.length(), timeTextRect);
 
 		type1PointOnLine = new Point();
@@ -147,22 +158,31 @@ public class SunSetRiseViewGroup extends ViewGroup {
 	protected void onDraw(Canvas canvas) {
 		canvas.drawRect(lineRect.left, lineRect.top, lineRect.right, lineRect.bottom, linePaint);
 
-		Calendar calendar = Calendar.getInstance();
-		long currentTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(calendar.getTimeInMillis());
-		long type1Minutes = TimeUnit.MILLISECONDS.toMinutes(type1View.getCalendar().getTimeInMillis());
-		long type2Minutes = TimeUnit.MILLISECONDS.toMinutes(type2View.getCalendar().getTimeInMillis());
+		LocalDateTime now = LocalDateTime.now(ZoneId.of(timeZone.getID()));
+
+		long millis = now.atZone(ZoneId.of(timeZone.getID())).toInstant().toEpochMilli();
+
+		long nowTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+		millis = type1View.getDateTime().toInstant().toEpochMilli();
+
+		long type1Minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+		millis = type2View.getDateTime().toInstant().toEpochMilli();
+
+		long type2Minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
 
 		long diff = type2Minutes - type1Minutes;
 
 		float heightPerMinute = (float) (type2PointOnLine.y - type1PointOnLine.y) / (float) diff;
-		float currentTimeY = type1PointOnLine.y + (heightPerMinute * (currentTimeMinutes - type1Minutes));
+		float currentTimeY = type1PointOnLine.y + (heightPerMinute * (nowTimeMinutes - type1Minutes));
 		timeCirclePoint.x = type1PointOnLine.x;
 		timeCirclePoint.y = (int) currentTimeY;
 		canvas.drawCircle(timeCirclePoint.x, timeCirclePoint.y, circleRadius, timeCirclePaint);
 
 		timeTextRect.offsetTo(timeCirclePoint.x - lineMargin - lineWidth / 2, timeCirclePoint.y);
 		timeTextPaint.setTextAlign(Paint.Align.RIGHT);
-		String currentDateTime = dateFormat.format(calendar.getTime());
+
+		String currentDateTime = now.format(dateTimeFormatter);
+
 		canvas.drawText(currentDateTime, timeTextRect.left, timeTextRect.top + timeTextPaint.descent() - timeTextPaint.ascent(),
 				timeTextPaint);
 
@@ -175,8 +195,8 @@ public class SunSetRiseViewGroup extends ViewGroup {
 	}
 
 	public void refresh() {
-		Calendar calendar = Calendar.getInstance();
-		if (type2View.getCalendar().before(calendar)) {
+		ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timeZone.getID()));
+		if (type2View.getDateTime().isBefore(now)) {
 			setViews();
 			invalidate();
 			requestLayout();
@@ -187,9 +207,9 @@ public class SunSetRiseViewGroup extends ViewGroup {
 
 
 	public void setViews() {
-		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(location, TimeZone.getDefault());
+		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(location, timeZone);
 
-		final Calendar todayCalendar = Calendar.getInstance();
+		final Calendar todayCalendar = Calendar.getInstance(timeZone);
 		final Calendar yesterdayCalendar = (Calendar) todayCalendar.clone();
 		final Calendar tomorrowCalendar = (Calendar) todayCalendar.clone();
 
@@ -242,9 +262,16 @@ public class SunSetRiseViewGroup extends ViewGroup {
 			type3 = SunsetriseFragment.SunSetRiseType.SET;
 		}
 
-		type1View = new SunSetRiseInfoView(getContext(), type1Calendar, type1);
-		type2View = new SunSetRiseInfoView(getContext(), type2Calendar, type2);
-		type3View = new SunSetRiseInfoView(getContext(), type3Calendar, type3);
+		ZonedDateTime type1ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(type1Calendar.getTimeInMillis()),
+				ZoneId.of(timeZone.getID()));
+		ZonedDateTime type2ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(type2Calendar.getTimeInMillis()),
+				ZoneId.of(timeZone.getID()));
+		ZonedDateTime type3ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(type3Calendar.getTimeInMillis()),
+				ZoneId.of(timeZone.getID()));
+
+		type1View = new SunSetRiseInfoView(getContext(), type1ZonedDateTime, type1);
+		type2View = new SunSetRiseInfoView(getContext(), type2ZonedDateTime, type2);
+		type3View = new SunSetRiseInfoView(getContext(), type3ZonedDateTime, type3);
 
 		removeAllViews();
 

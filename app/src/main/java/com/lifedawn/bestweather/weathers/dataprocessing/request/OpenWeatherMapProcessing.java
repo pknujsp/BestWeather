@@ -9,10 +9,12 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.CurrentWeatherParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.DailyForecastParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 
 import java.util.Set;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -113,4 +115,6 @@ public class OpenWeatherMapProcessing {
 			});
 		}
 	}
+
+
 }
