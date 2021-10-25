@@ -35,6 +35,10 @@ import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -76,7 +80,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			weatherSourceTypeList.add(MainProcessing.WeatherSourceType.KMA);
 			binding.kmaLabelLayout.getRoot().setVisibility(View.VISIBLE);
-		} else if (dailyForecastResponse.kmaThrowable != null) {
+		} else {
 			binding.kmaLabelLayout.getRoot().setVisibility(View.GONE);
 		}
 
@@ -88,7 +92,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			}
 			weatherSourceTypeList.add(MainProcessing.WeatherSourceType.ACCU_WEATHER);
 			binding.accuLabelLayout.getRoot().setVisibility(View.VISIBLE);
-		} else if (dailyForecastResponse.accuThrowable != null) {
+		} else {
 			binding.accuLabelLayout.getRoot().setVisibility(View.GONE);
 		}
 
@@ -101,54 +105,53 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			}
 			weatherSourceTypeList.add(MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP);
 			binding.owmLabelLayout.getRoot().setVisibility(View.VISIBLE);
-		} else if (dailyForecastResponse.owmThrowable != null) {
+		} else{
 			binding.owmLabelLayout.getRoot().setVisibility(View.GONE);
 		}
 
-		binding.forecastView.removeAllViews();
+		LocalDateTime now = LocalDateTime.now(ZoneId.of(timeZone.getID())).plusDays(10).withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-		Calendar calendar = Calendar.getInstance(timeZone);
-		calendar.add(Calendar.DATE, 10);
-		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
-
-		Date firstDateTime = calendar.getTime();
-		calendar.add(Calendar.DATE, -20);
-		Date lastDateTime = calendar.getTime();
+		LocalDateTime firstDateTime = LocalDateTime.of(now.toLocalDate(), now.toLocalTime());
+		now = now.minusDays(20);
+		LocalDateTime lastDateTime = LocalDateTime.of(now.toLocalDate(), now.toLocalTime());
 
 		if (kmaFinalDailyForecasts != null) {
-			if (kmaFinalDailyForecasts.get(0).dateTime.before(firstDateTime)) {
-				firstDateTime.setTime(kmaFinalDailyForecasts.get(0).dateTime.getTime());
+			if (kmaFinalDailyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
+				firstDateTime = LocalDateTime.of(kmaFinalDailyForecasts.get(0).dateTime.toLocalDate(),
+						kmaFinalDailyForecasts.get(0).dateTime.toLocalTime());
 			}
-			if (kmaFinalDailyForecasts.get(kmaFinalDailyForecasts.size() - 1).dateTime.after(lastDateTime)) {
-				lastDateTime.setTime(kmaFinalDailyForecasts.get(kmaFinalDailyForecasts.size() - 1).dateTime.getTime());
+			if (kmaFinalDailyForecasts.get(kmaFinalDailyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
+				lastDateTime = LocalDateTime.of(kmaFinalDailyForecasts.get(kmaFinalDailyForecasts.size() - 1).dateTime.toLocalDate(),
+						kmaFinalDailyForecasts.get(kmaFinalDailyForecasts.size() - 1).dateTime.toLocalTime());
 			}
 		}
 		if (accuFinalDailyForecasts != null) {
-			if (accuFinalDailyForecasts.get(0).dateTime.before(firstDateTime)) {
-				firstDateTime.setTime(accuFinalDailyForecasts.get(0).dateTime.getTime());
+			if (accuFinalDailyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
+				firstDateTime = LocalDateTime.of(accuFinalDailyForecasts.get(0).dateTime.toLocalDate(),
+						accuFinalDailyForecasts.get(0).dateTime.toLocalTime());
 			}
-			if (accuFinalDailyForecasts.get(accuFinalDailyForecasts.size() - 1).dateTime.after(lastDateTime)) {
-				lastDateTime.setTime(accuFinalDailyForecasts.get(accuFinalDailyForecasts.size() - 1).dateTime.getTime());
+			if (accuFinalDailyForecasts.get(accuFinalDailyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
+				lastDateTime = LocalDateTime.of(accuFinalDailyForecasts.get(accuFinalDailyForecasts.size() - 1).dateTime.toLocalDate(),
+						accuFinalDailyForecasts.get(accuFinalDailyForecasts.size() - 1).dateTime.toLocalTime());
 			}
 		}
 		if (owmFinalDailyForecasts != null) {
-			if (owmFinalDailyForecasts.get(0).dateTime.before(firstDateTime)) {
-				firstDateTime.setTime(owmFinalDailyForecasts.get(0).dateTime.getTime());
+			if (owmFinalDailyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
+				firstDateTime = LocalDateTime.of(owmFinalDailyForecasts.get(0).dateTime.toLocalDate(),
+						owmFinalDailyForecasts.get(0).dateTime.toLocalTime());
 			}
-			if (owmFinalDailyForecasts.get(owmFinalDailyForecasts.size() - 1).dateTime.after(lastDateTime)) {
-				lastDateTime.setTime(owmFinalDailyForecasts.get(owmFinalDailyForecasts.size() - 1).dateTime.getTime());
+			if (owmFinalDailyForecasts.get(owmFinalDailyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
+				lastDateTime = LocalDateTime.of(owmFinalDailyForecasts.get(owmFinalDailyForecasts.size() - 1).dateTime.toLocalDate(),
+						owmFinalDailyForecasts.get(owmFinalDailyForecasts.size() - 1).dateTime.toLocalTime());
 			}
 		}
 
-		List<Date> dateTimeList = new ArrayList<>();
+		List<LocalDateTime> dateTimeList = new ArrayList<>();
 		//firstDateTime부터 lastDateTime까지 추가
-		calendar.setTime(firstDateTime);
-		while (!calendar.getTime().after(lastDateTime)) {
-			dateTimeList.add(calendar.getTime());
-			calendar.add(Calendar.DATE, 1);
+		now = LocalDateTime.of(firstDateTime.toLocalDate(), firstDateTime.toLocalTime());
+		while (!now.isAfter(lastDateTime)) {
+			dateTimeList.add(now);
+			now = now.plusDays(1);
 		}
 
 		final int columnsCount = dateTimeList.size();
@@ -214,10 +217,10 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 		//날짜
 		List<String> dateList = new ArrayList<>();
-		SimpleDateFormat MdE = new SimpleDateFormat("M.d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 
-		for (Date date : dateTimeList) {
-			dateList.add(MdE.format(date));
+		for (LocalDateTime date : dateTimeList) {
+			dateList.add(date.format(dateTimeFormatter));
 		}
 		dateRow.setValueList(dateList);
 

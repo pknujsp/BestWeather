@@ -24,6 +24,7 @@ import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -105,7 +106,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		TextValueView visibilityRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView uvIndexRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 
-		List<Date> dateTimeList = new ArrayList<>();
+		List<LocalDateTime> dateTimeList = new ArrayList<>();
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		List<Integer> tempList = new ArrayList<>();
 		List<String> realFeelTempList = new ArrayList<>();

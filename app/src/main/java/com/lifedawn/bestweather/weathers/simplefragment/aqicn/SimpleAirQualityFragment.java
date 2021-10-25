@@ -1,28 +1,36 @@
 package com.lifedawn.bestweather.weathers.simplefragment.aqicn;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.detailfragment.aqicn.DetailAirQualityFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -37,6 +45,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	private String countryCode;
 	private MainProcessing.WeatherSourceType mainWeatherSourceType;
 	private TimeZone timeZone;
+	private ValueUnits clockUnit;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +58,9 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		mainWeatherSourceType = (MainProcessing.WeatherSourceType) bundle.getSerializable(
 				getString(R.string.bundle_key_main_weather_data_source));
 		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
 	}
 
 	@Override
@@ -91,61 +103,95 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 	@Override
 	public void setValuesToViews() {
-		Integer pm10Val = null;
-		Integer pm25Val = null;
-		Integer coVal = null;
-		Integer no2Val = null;
-		Integer o3Val = null;
-		Integer so2Val = null;
+		Context context = getContext();
 
-		if (geolocalizedFeedResponse.getData().getIaqi().getPm10() == null) {
-			binding.pm10.setText(R.string.not_data);
-		} else {
-			pm10Val = (int) Double.parseDouble(geolocalizedFeedResponse.getData().getIaqi().getPm10().getValue());
-			binding.pm10.setTextColor(AqicnResponseProcessor.getGradeColorId(pm10Val.intValue()));
-			binding.pm10.setText(AqicnResponseProcessor.getGradeDescription(pm10Val.intValue()));
-		}
-		if (geolocalizedFeedResponse.getData().getIaqi().getPm25() == null) {
-			binding.pm25.setText(R.string.not_data);
-		} else {
-			pm25Val = (int) Double.parseDouble(geolocalizedFeedResponse.getData().getIaqi().getPm25().getValue());
-			binding.pm25.setTextColor(AqicnResponseProcessor.getGradeColorId(pm25Val.intValue()));
-			binding.pm25.setText(AqicnResponseProcessor.getGradeDescription(pm25Val.intValue()));
-		}
-		if (geolocalizedFeedResponse.getData().getIaqi().getCo() == null) {
-			binding.co.setText(R.string.not_data);
-		} else {
-			coVal = (int) Double.parseDouble(geolocalizedFeedResponse.getData().getIaqi().getCo().getValue());
-			binding.co.setTextColor(AqicnResponseProcessor.getGradeColorId(coVal.intValue()));
-			binding.co.setText(AqicnResponseProcessor.getGradeDescription(coVal.intValue()));
-		}
-		if (geolocalizedFeedResponse.getData().getIaqi().getNo2() == null) {
-			binding.no2.setText(R.string.not_data);
-		} else {
-			no2Val = (int) Double.parseDouble(geolocalizedFeedResponse.getData().getIaqi().getNo2().getValue());
-			binding.no2.setTextColor(AqicnResponseProcessor.getGradeColorId(no2Val.intValue()));
-			binding.no2.setText(AqicnResponseProcessor.getGradeDescription(no2Val.intValue()));
-		}
-		if (geolocalizedFeedResponse.getData().getIaqi().getO3() == null) {
-			binding.o3.setText(R.string.not_data);
-		} else {
-			o3Val = (int) Double.parseDouble(geolocalizedFeedResponse.getData().getIaqi().getO3().getValue());
-			binding.o3.setTextColor(AqicnResponseProcessor.getGradeColorId(o3Val.intValue()));
-			binding.o3.setText(AqicnResponseProcessor.getGradeDescription(o3Val.intValue()));
-		}
-		if (geolocalizedFeedResponse.getData().getIaqi().getSo2() == null) {
-			binding.so2.setText(R.string.not_data);
-		} else {
-			so2Val = (int) Double.parseDouble(geolocalizedFeedResponse.getData().getIaqi().getSo2().getValue());
-			binding.so2.setTextColor(AqicnResponseProcessor.getGradeColorId(so2Val.intValue()));
-			binding.so2.setText(AqicnResponseProcessor.getGradeDescription(so2Val.intValue()));
-		}
-
-
-		SimpleDateFormat dateFormat = new SimpleDateFormat("M.d E", Locale.getDefault());
-		LayoutInflater layoutInflater = LayoutInflater.from(getContext());
+		//측정소와의 거리 계산 후 50km이상의 거리에 있으면 표시보류
+		final Double distance = LocationDistance.distance(latitude, longitude,
+				Double.parseDouble(geolocalizedFeedResponse.getData().getCity().getGeo().get(0)),
+				Double.parseDouble(geolocalizedFeedResponse.getData().getCity().getGeo().get(1)),
+				LocationDistance.Unit.KM);
 
 		String notData = getString(R.string.not_data);
+
+		if (distance > 50.0) {
+			String msg = getString(R.string.the_measuring_station_is_very_far_away) + "\n"
+					+ String.format("%.2f", distance) + getString(R.string.km);
+			binding.message.setText(msg);
+			binding.message.setVisibility(View.VISIBLE);
+		} else {
+			binding.message.setVisibility(View.GONE);
+		}
+		binding.distanceToMeasuringStation.setText(String.format("%.2f", distance) + getString(R.string.km));
+
+		if (geolocalizedFeedResponse.getData().getCity().getName() != null) {
+			binding.measuringStationName.setText(geolocalizedFeedResponse.getData().getCity().getName());
+		} else {
+			binding.measuringStationName.setText(notData);
+		}
+		if (geolocalizedFeedResponse.getData().getTime().getIso() != null) {
+			// time : 2021-10-22T11:16:41+09:00
+			ZonedDateTime syncDateTime = null;
+			try {
+				syncDateTime = ZonedDateTime.parse(geolocalizedFeedResponse.getData().getTime().getIso());
+			} catch (Exception e) {
+
+			}
+			DateTimeFormatter syncDateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "M.d E a h:mm" : "M.d" +
+							" E HH:mm",
+					Locale.getDefault());
+			binding.updatedTime.setText(syncDateTime.format(syncDateTimeFormatter));
+		} else {
+			binding.updatedTime.setText(notData);
+		}
+
+		GeolocalizedFeedResponse.Data.IAqi iAqi = geolocalizedFeedResponse.getData().getIaqi();
+		if (iAqi.getPm10() == null) {
+			addGridItem(null, R.string.pm10_str, R.drawable.temp_icon);
+		} else {
+			Integer pm10 = (int) Double.parseDouble(iAqi.getPm10().getValue());
+			addGridItem(pm10, R.string.pm10_str, R.drawable.temp_icon);
+		}
+
+		if (iAqi.getPm25() == null) {
+			addGridItem(null, R.string.pm25_str, R.drawable.temp_icon);
+		} else {
+			Integer pm25 = (int) Double.parseDouble(iAqi.getPm25().getValue());
+			addGridItem(pm25, R.string.pm25_str, R.drawable.temp_icon);
+		}
+
+
+		if (iAqi.getO3() == null) {
+			addGridItem(null, R.string.o3_str, R.drawable.temp_icon);
+		} else {
+			Integer o3 = (int) Double.parseDouble(iAqi.getO3().getValue());
+			addGridItem(o3, R.string.o3_str, R.drawable.temp_icon);
+		}
+
+
+		if (iAqi.getCo() == null) {
+			addGridItem(null, R.string.co_str, R.drawable.temp_icon);
+		} else {
+			Integer co = (int) Double.parseDouble(iAqi.getCo().getValue());
+			addGridItem(co, R.string.co_str, R.drawable.temp_icon);
+		}
+
+		if (iAqi.getSo2() == null) {
+			addGridItem(null, R.string.so2_str, R.drawable.temp_icon);
+		} else {
+			Integer so2 = (int) Double.parseDouble(iAqi.getSo2().getValue());
+			addGridItem(so2, R.string.so2_str, R.drawable.temp_icon);
+		}
+
+		if (iAqi.getNo2() == null) {
+			addGridItem(null, R.string.no2_str, R.drawable.temp_icon);
+		} else {
+			Integer no2 = (int) Double.parseDouble(iAqi.getCo().getValue());
+			addGridItem(no2, R.string.no2_str, R.drawable.temp_icon);
+		}
+
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
+		LayoutInflater layoutInflater = LayoutInflater.from(getContext());
+
 		View labelView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 		((TextView) labelView.findViewById(R.id.date)).setText(null);
 		((TextView) labelView.findViewById(R.id.pm10)).setText(getString(R.string.pm10_str));
@@ -155,14 +201,41 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		List<AirQualityForecastObj> forecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(geolocalizedFeedResponse, timeZone);
 		for (AirQualityForecastObj forecastObj : forecastObjList) {
 			View forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
-			((TextView) forecastItemView.findViewById(R.id.date)).setText(dateFormat.format(forecastObj.date));
-			((TextView) forecastItemView.findViewById(R.id.pm10)).setText(forecastObj.pm10Str == null ? notData : forecastObj.pm10Str);
-			((TextView) forecastItemView.findViewById(R.id.pm25)).setText(forecastObj.pm25Str == null ? notData : forecastObj.pm25Str);
-			((TextView) forecastItemView.findViewById(R.id.o3)).setText(forecastObj.o3Str == null ? notData : forecastObj.o3Str);
+			((TextView) forecastItemView.findViewById(R.id.date)).setText(forecastObj.date.format(dateTimeFormatter));
+
+			((TextView) forecastItemView.findViewById(R.id.pm10)).setText(forecastObj.pm10 == null ? notData :
+					AqicnResponseProcessor.getGradeDescription(forecastObj.pm10));
+			((TextView) forecastItemView.findViewById(R.id.pm10)).setTextColor(forecastObj.pm10 == null ?
+					ContextCompat.getColor(context, R.color.not_data_color)
+					: AqicnResponseProcessor.getGradeColorId(forecastObj.pm10));
+
+			((TextView) forecastItemView.findViewById(R.id.pm25)).setText(forecastObj.pm25 == null ? notData :
+					AqicnResponseProcessor.getGradeDescription(forecastObj.pm25));
+			((TextView) forecastItemView.findViewById(R.id.pm25)).setTextColor(forecastObj.pm25 == null ?
+					ContextCompat.getColor(context, R.color.not_data_color)
+					: AqicnResponseProcessor.getGradeColorId(forecastObj.pm25));
+
+			((TextView) forecastItemView.findViewById(R.id.o3)).setText(forecastObj.o3 == null ? notData :
+					AqicnResponseProcessor.getGradeDescription(forecastObj.o3));
+			((TextView) forecastItemView.findViewById(R.id.o3)).setTextColor(forecastObj.o3 == null ?
+					ContextCompat.getColor(context, R.color.not_data_color)
+					: AqicnResponseProcessor.getGradeColorId(forecastObj.o3));
 
 			binding.forecast.addView(forecastItemView);
 		}
 	}
 
+	protected final View addGridItem(@Nullable Integer value, int labelDescriptionId, @NonNull Integer labelIconId) {
+		View gridItem = getLayoutInflater().inflate(R.layout.air_quality_item, null);
+		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
+		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
+		((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
+		((TextView) gridItem.findViewById(R.id.value_str)).setText(value == null ? getString(R.string.not_data) :
+				AqicnResponseProcessor.getGradeDescription(value));
+		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(value == null ? ContextCompat.getColor(getContext(), R.color.not_data_color)
+				: AqicnResponseProcessor.getGradeColorId(value));
 
+		binding.grid.addView(gridItem);
+		return gridItem;
+	}
 }

@@ -27,6 +27,7 @@ import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -117,11 +118,11 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 		//시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("M/d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 
 		for (OneCallResponse.Daily item : items) {
-			dateList.add(dateFormat.format(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getDt()) * 1000L,
-					timeZone)));
+			dateList.add((WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getDt()) * 1000L,
+					timeZone).format(dateTimeFormatter)));
 		}
 		dateRow.setValueList(dateList);
 

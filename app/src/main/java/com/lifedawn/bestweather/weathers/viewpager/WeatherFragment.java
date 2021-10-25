@@ -68,6 +68,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -470,11 +472,10 @@ public class WeatherFragment extends Fragment implements IGps {
 				@Override
 				public void run() {
 					createWeatherDataSourcePicker(countryCode);
-					Calendar calendar = multipleJsonDownloader.getRequestCalendar();
-					SimpleDateFormat weatherUpdatedTimeFormat = new SimpleDateFormat(
-							clockUnit == ValueUnits.clock12 ? "M.d E a h:mm" : "M.d E HH:mm", Locale.getDefault());
-
-					binding.updatedDatetime.setText(weatherUpdatedTimeFormat.format(calendar.getTime()));
+					LocalDateTime localDateTime = multipleJsonDownloader.getLocalDateTime();
+					DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "M.d E a h:mm"
+							: "M.d E HH:mm", Locale.getDefault());
+					binding.updatedDatetime.setText(localDateTime.format(dateTimeFormatter));
 
 					getChildFragmentManager().beginTransaction().replace(binding.simpleCurrentConditions.getId(),
 							finalSimpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment)).replace(

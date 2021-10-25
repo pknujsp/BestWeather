@@ -16,28 +16,28 @@ import org.jetbrains.annotations.NotNull;
 
 public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
 	private CurrentConditionsResponse currentConditionsResponse;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 	}
-	
+
 	public AccuDetailCurrentConditionsFragment setCurrentConditionsResponse(CurrentConditionsResponse currentConditionsResponse) {
 		this.currentConditionsResponse = currentConditionsResponse;
 		return this;
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
 		//날씨 아이콘, 기온, 체감기온, 습도, 이슬점, 풍향, 풍속, 돌풍, 바람세기, 기압, 자외선, 시정거리,
 		//운량, 강수량, 강수형태
 		CurrentConditionsResponse.Item item = currentConditionsResponse.getItems().get(0);
-		
+
 		addGridItem(R.string.temperature, ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(), tempUnit).toString(),
 				R.drawable.temp_icon, null);
 		addGridItem(R.string.real_feel_temperature,
@@ -46,16 +46,19 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 		addGridItem(R.string.humidity, item.getRelativeHumidity(), R.drawable.temp_icon, null);
 		addGridItem(R.string.dew_point, item.getDewPoint().getMetric().getValue(), R.drawable.temp_icon, null);
 		addGridItem(R.string.wind_direction, item.getWind().getDirection().getDegrees(), R.drawable.temp_icon, null);
-		addGridItem(R.string.wind_speed, ValueUnits.convertWindSpeed(item.getWind().getSpeed().getMetric().getValue(), windUnit).toString(),
+		addGridItem(R.string.wind_speed,
+				ValueUnits.convertWindSpeedForAccu(item.getWind().getSpeed().getMetric().getValue(), windUnit).toString(),
 				R.drawable.temp_icon, null);
-		addGridItem(R.string.wind_gust, item.getWindGust().getSpeed().getMetric().getValue(), R.drawable.temp_icon, null);
+		addGridItem(R.string.wind_gust,
+				ValueUnits.convertWindSpeedForAccu(item.getWindGust().getSpeed().getMetric().getValue(), windUnit).toString(),
+				R.drawable.temp_icon, null);
 		addGridItem(R.string.wind_strength,
 				WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()),
 				R.drawable.temp_icon, null);
 		addGridItem(R.string.pressure, item.getPressure().getMetric().getValue(), R.drawable.temp_icon, null);
 		addGridItem(R.string.uv_index, item.getuVIndexText(), R.drawable.temp_icon, null);
 		addGridItem(R.string.visibility,
-				ValueUnits.convertVisibility(item.getVisibility().getMetric().getValue(), visibilityUnit).toString(), R.drawable.temp_icon,
+				ValueUnits.convertVisibility(item.getVisibility().getMetric().getValue(), visibilityUnit), R.drawable.temp_icon,
 				null);
 		addGridItem(R.string.cloud_cover, item.getCloudCover(), R.drawable.temp_icon, null);
 		addGridItem(R.string.precipitation_volume, item.getPrecip1hr().getMetric().getValue(), R.drawable.temp_icon, null);

@@ -10,6 +10,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,7 @@ public abstract class MultipleJsonDownloader<T> {
 	private int requestCount;
 	private int responseCount;
 	private Map<String, String> valueMap = new HashMap<>();
-	private Calendar requestCalendar = Calendar.getInstance();
+	private LocalDateTime localDateTime = LocalDateTime.now();
 
 	protected Map<MainProcessing.WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<T>>> responseMap = new ArrayMap<>();
 
@@ -35,8 +36,8 @@ public abstract class MultipleJsonDownloader<T> {
 		this.requestCount = requestCount;
 	}
 
-	public Calendar getRequestCalendar() {
-		return (Calendar) requestCalendar.clone();
+	public LocalDateTime getLocalDateTime() {
+		return localDateTime;
 	}
 
 	public void setRequestCount(int requestCount) {
@@ -87,7 +88,7 @@ public abstract class MultipleJsonDownloader<T> {
 				onResult();
 			}
 		}
-		
+
 	}
 
 	public static class ResponseResult<T> {

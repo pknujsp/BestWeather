@@ -380,4 +380,26 @@
         <item>@string/aqi_6_hazardous</item>
     </string-array>
 
+    <integer-array name="UvIndexGrades">
+        <item>2</item>
+        <item>5</item>
+        <item>7</item>
+        <item>10</item>
+    </integer-array>
+
+    <string-array name="UvIndexGradeColors">
+        <item>@color/uv_index_1_low</item>
+        <item>@color/uv_index_2_moderate</item>
+        <item>@color/uv_index_3_high</item>
+        <item>@color/uv_index_4_very_high</item>
+        <item>@color/uv_index_5_extreme</item>
+    </string-array>
+
+    <string-array name="UvIndexGradeDescriptions">
+        <item>@string/uv_index_1_low</item>
+        <item>@string/uv_index_2_moderate</item>
+        <item>@string/uv_index_3_high</item>
+        <item>@string/uv_index_4_very_high</item>
+        <item>@string/uv_index_5_extreme</item>
+    </string-array>
 </resources>

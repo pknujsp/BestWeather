@@ -33,6 +33,11 @@ import com.lifedawn.bestweather.weathers.view.TextValueView;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -97,16 +102,19 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		List<AirQualityBarView.AirQualityObj> o3AirQualityObjList = new ArrayList<>();
 
 		List<String> dateList = new ArrayList<>();
-
-		pm10AirQualityObjList.add(new AirQualityBarView.AirQualityObj(response.getData().getIaqi().getPm10().getValue()));
-		pm25AirQualityObjList.add(new AirQualityBarView.AirQualityObj(response.getData().getIaqi().getPm25().getValue()));
-		o3AirQualityObjList.add(new AirQualityBarView.AirQualityObj(response.getData().getIaqi().getO3().getValue()));
+		GeolocalizedFeedResponse.Data.IAqi iAqi = response.getData().getIaqi();
+		pm10AirQualityObjList.add(new AirQualityBarView.AirQualityObj(iAqi.getPm10() == null ? null :
+				(int) Double.parseDouble(iAqi.getPm10().getValue())));
+		pm25AirQualityObjList.add(new AirQualityBarView.AirQualityObj(iAqi.getPm25() == null ? null :
+				(int) Double.parseDouble(iAqi.getPm25().getValue())));
+		o3AirQualityObjList.add(new AirQualityBarView.AirQualityObj(iAqi.getO3() == null ? null :
+				(int) Double.parseDouble(iAqi.getO3().getValue())));
 		dateList.add(getString(R.string.current));
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("M.d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 
 		for (AirQualityForecastObj airQualityForecastObj : airQualityForecastObjList) {
-			dateList.add(dateFormat.format(airQualityForecastObj.date));
+			dateList.add(airQualityForecastObj.date.format(dateTimeFormatter));
 			pm10AirQualityObjList.add(new AirQualityBarView.AirQualityObj(airQualityForecastObj.pm10));
 			pm25AirQualityObjList.add(new AirQualityBarView.AirQualityObj(airQualityForecastObj.pm25));
 			o3AirQualityObjList.add(new AirQualityBarView.AirQualityObj(airQualityForecastObj.o3));
@@ -134,31 +142,48 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		binding.forecastView.addView(pm25BarView, layoutParams);
 		binding.forecastView.addView(o3BarView, layoutParams);
 
-		GeolocalizedFeedResponse.Data.IAqi iAqi = response.getData().getIaqi();
-		Integer co = (int) Double.parseDouble(iAqi.getCo().getValue());
-		Integer so2 = (int) Double.parseDouble(iAqi.getSo2().getValue());
-		Integer no2 = (int) Double.parseDouble(iAqi.getNo2().getValue());
-
-		addGridItem(co, AqicnResponseProcessor.getGradeDescription(co), R.string.co_str, R.drawable.temp_icon);
-		addGridItem(so2, AqicnResponseProcessor.getGradeDescription(so2), R.string.so2_str, R.drawable.temp_icon);
-		addGridItem(no2, AqicnResponseProcessor.getGradeDescription(no2), R.string.no2_str, R.drawable.temp_icon);
-
-		binding.measuringStationName.setText(response.getData().getCity().getName());
-		binding.updatedTime.setText(response.getData().getCity().getName());
-
-		// time : 2021-10-22T11:16:41+09:00
-		SimpleDateFormat syncDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
-		Date syncDateTime = new Date();
-		try {
-			syncDateTime = syncDateTimeFormat.parse(response.getData().getTime().getIso());
-		} catch (Exception e) {
-
+		String notData = getString(R.string.not_data);
+		if (iAqi.getCo() == null) {
+			addGridItem(null, R.string.co_str, R.drawable.temp_icon);
+		} else {
+			Integer co = (int) Double.parseDouble(iAqi.getCo().getValue());
+			addGridItem(co, R.string.co_str, R.drawable.temp_icon);
 		}
-		Calendar sync = Calendar.getInstance();
-		sync.setTimeInMillis(syncDateTime.getTime());
-		SimpleDateFormat updatedTimeFormat = new SimpleDateFormat(clockUnit == ValueUnits.clock12 ? "M.d E a H:mm" : "M.d E HH:mm",
-				Locale.getDefault());
-		binding.updatedTime.setText(updatedTimeFormat.format(sync.getTime()));
+
+		if (iAqi.getSo2() == null) {
+			addGridItem(null, R.string.so2_str, R.drawable.temp_icon);
+		} else {
+			Integer so2 = (int) Double.parseDouble(iAqi.getSo2().getValue());
+			addGridItem(so2, R.string.so2_str, R.drawable.temp_icon);
+		}
+
+		if (iAqi.getNo2() == null) {
+			addGridItem(null, R.string.no2_str, R.drawable.temp_icon);
+		} else {
+			Integer no2 = (int) Double.parseDouble(iAqi.getCo().getValue());
+			addGridItem(no2, R.string.no2_str, R.drawable.temp_icon);
+		}
+
+		if (response.getData().getCity().getName() != null) {
+			binding.measuringStationName.setText(response.getData().getCity().getName());
+		} else {
+			binding.measuringStationName.setText(notData);
+		}
+		if (response.getData().getTime().getIso() != null) {
+			// time : 2021-10-22T11:16:41+09:00
+			ZonedDateTime syncDateTime = null;
+			try {
+				syncDateTime = ZonedDateTime.parse(response.getData().getTime().getIso());
+			} catch (Exception e) {
+
+			}
+			DateTimeFormatter syncDateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "M.d E a h:mm" : "M.d" +
+							" E HH:mm",
+					Locale.getDefault());
+			binding.updatedTime.setText(syncDateTime.format(syncDateTimeFormatter));
+		} else {
+			binding.updatedTime.setText(notData);
+		}
 	}
 
 	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewHeight) {
@@ -184,12 +209,14 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		return labelView;
 	}
 
-	protected final View addGridItem(Integer valueInt, String valueStr, int labelDescriptionId, @NonNull Integer labelIconId) {
+	protected final View addGridItem(@Nullable Integer value, int labelDescriptionId, @NonNull Integer labelIconId) {
 		View gridItem = getLayoutInflater().inflate(R.layout.air_quality_item, null);
 		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
 		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
-		((TextView) gridItem.findViewById(R.id.value_int)).setText(valueInt.toString());
-		((TextView) gridItem.findViewById(R.id.value_str)).setText(valueStr);
+		((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
+		((TextView) gridItem.findViewById(R.id.value_str)).setText(value == null ? getString(R.string.not_data) : AqicnResponseProcessor.getGradeDescription(value));
+		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(value == null ? ContextCompat.getColor(getContext(), R.color.not_data_color)
+				: AqicnResponseProcessor.getGradeColorId(value));
 
 		binding.grid.addView(gridItem);
 		return gridItem;

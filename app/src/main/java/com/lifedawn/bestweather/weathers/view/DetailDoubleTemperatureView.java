@@ -72,12 +72,8 @@ public class DetailDoubleTemperatureView extends View {
 		ValueUnits tempUnit =
 				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
 
-		for (Integer temp : maxTempList) {
-			this.maxTempList.add(ValueUnits.convertTemperature(temp.toString(), tempUnit).intValue());
-		}
-		for (Integer temp : minTempList) {
-			this.minTempList.add(ValueUnits.convertTemperature(temp.toString(), tempUnit).intValue());
-		}
+		this.minTempList.addAll(minTempList);
+		this.maxTempList.addAll(maxTempList);
 
 		int max = Integer.MIN_VALUE;
 		int min = Integer.MAX_VALUE;

@@ -24,6 +24,7 @@ import com.lifedawn.bestweather.weathers.view.TextValueView;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -65,7 +66,7 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 		final int columnsCount = dailyForecastsList.size();
 		final int columnWidth = (int) getResources().getDimension(R.dimen.valueColumnWidthInDDaily);
 		final int viewWidth = columnsCount * columnWidth;
-		final SimpleDateFormat dateFormat = new SimpleDateFormat("M.d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 
 		List<String> dateList = new ArrayList<>();
 		List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
@@ -86,8 +87,8 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 		List<String> cloudinessList = new ArrayList<>();
 
 		for (FiveDaysOfDailyForecastsResponse.DailyForecasts daily : dailyForecastsList) {
-			dateList.add(dateFormat.format(
-					WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, timeZone)));
+			dateList.add(
+					WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, timeZone).format(dateTimeFormatter));
 			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(daily.getDay().getIcon(), daily.getNight().getIcon()));
 			minTempList.add(ValueUnits.convertTemperature(daily.getTemperature().getMinimum().getValue(), tempUnit));
 			maxTempList.add(ValueUnits.convertTemperature(daily.getTemperature().getMaximum().getValue(), tempUnit));
@@ -100,19 +101,20 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 			rainVolumeList.add(getDayNightValueStr(daily.getDay().getRain().getValue(), daily.getNight().getRain().getValue()));
 
 			precipitationOfSnowList.add(getDayNightValueStr(daily.getDay().getSnowProbability(), daily.getNight().getSnowProbability()));
-			snowVolumeList.add(getDayNightValueStr(daily.getDay().getSnow().getValue(), daily.getNight().getSnow().getValue()));
+			snowVolumeList.add(getDayNightValueStr(ValueUnits.convertCMToMM(daily.getDay().getSnow().getValue()).toString(),
+					ValueUnits.convertCMToMM(daily.getNight().getSnow().getValue()).toString()));
 
 			windDirectionList.add(new DoubleWindDirectionView.WindDirectionObj(Integer.parseInt(daily.getDay().getWind().getDirection().getDegrees()),
 					Integer.parseInt(daily.getNight().getWind().getDirection().getDegrees())));
 			windSpeedList.add(getDayNightValueStr(
-					ValueUnits.convertWindSpeed(daily.getDay().getWind().getSpeed().getMetric().getValue(), windUnit).toString(),
-					ValueUnits.convertWindSpeed(daily.getNight().getWind().getSpeed().getMetric().getValue(), windUnit).toString()));
+					ValueUnits.convertWindSpeedForAccu(daily.getDay().getWind().getSpeed().getValue(), windUnit).toString(),
+					ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), windUnit).toString()));
 			windStrengthList.add(getDayNightValueStr(
-					WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getDay().getWind().getSpeed().getMetric().getValue()),
-					WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getNight().getWind().getSpeed().getMetric().getValue())));
+					WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getDay().getWind().getSpeed().getValue()),
+					WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getNight().getWind().getSpeed().getValue())));
 			windGustList.add(getDayNightValueStr(
-					ValueUnits.convertWindSpeed(daily.getDay().getWindGust().getSpeed().getMetric().getValue(), windUnit).toString(),
-					ValueUnits.convertWindSpeed(daily.getNight().getWindGust().getSpeed().getMetric().getValue(), windUnit).toString()));
+					ValueUnits.convertWindSpeedForAccu(daily.getDay().getWindGust().getSpeed().getValue(), windUnit).toString(),
+					ValueUnits.convertWindSpeedForAccu(daily.getNight().getWindGust().getSpeed().getValue(), windUnit).toString()));
 
 			hoursOfPrecipitationList.add(
 					getDayNightValueStr(daily.getDay().getHoursOfPrecipitation(), daily.getNight().getHoursOfPrecipitation()));

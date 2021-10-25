@@ -55,7 +55,7 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	}
 	
 	@Override
-	public void contains(String latitude, String longitude, DbQueryCallback<Integer> callback) {
+	public void contains(String latitude, String longitude, DbQueryCallback<Boolean> callback) {
 		favoriteAddressRepository.contains(latitude, longitude, callback);
 	}
 	

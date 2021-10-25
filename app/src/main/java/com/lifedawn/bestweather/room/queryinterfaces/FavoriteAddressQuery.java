@@ -8,7 +8,7 @@ import java.util.List;
 public interface FavoriteAddressQuery {
 	void getAll(DbQueryCallback<List<FavoriteAddressDto>> callback);
 
-	void contains(String latitude, String longitude, DbQueryCallback<Integer> callback);
+	void contains(String latitude, String longitude, DbQueryCallback<Boolean> callback);
 
 	void add(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Long> callback);
 

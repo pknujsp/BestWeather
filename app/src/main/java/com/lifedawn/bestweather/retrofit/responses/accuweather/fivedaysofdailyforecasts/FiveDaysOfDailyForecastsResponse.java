@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.Direction;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.ValueUnit;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Wind;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.WindGust;
@@ -226,19 +227,19 @@ public class FiveDaysOfDailyForecastsResponse {
 			@Expose
 			@SerializedName("Maximum")
 			private ValueUnit maximum;
-			
+
 			public ValueUnit getMinimum() {
 				return minimum;
 			}
-			
+
 			public void setMinimum(ValueUnit minimum) {
 				this.minimum = minimum;
 			}
-			
+
 			public ValueUnit getMaximum() {
 				return maximum;
 			}
-			
+
 			public void setMaximum(ValueUnit maximum) {
 				this.maximum = maximum;
 			}
@@ -248,23 +249,23 @@ public class FiveDaysOfDailyForecastsResponse {
 			@Expose
 			@SerializedName("Minimum")
 			private ValueUnit minimum;
-			
+
 			@Expose
 			@SerializedName("Maximum")
 			private ValueUnit maximum;
-			
+
 			public ValueUnit getMinimum() {
 				return minimum;
 			}
-			
+
 			public void setMinimum(ValueUnit minimum) {
 				this.minimum = minimum;
 			}
-			
+
 			public ValueUnit getMaximum() {
 				return maximum;
 			}
-			
+
 			public void setMaximum(ValueUnit maximum) {
 				this.maximum = maximum;
 			}
@@ -274,23 +275,23 @@ public class FiveDaysOfDailyForecastsResponse {
 			@Expose
 			@SerializedName("Minimum")
 			private ValueUnit minimum;
-			
+
 			@Expose
 			@SerializedName("Maximum")
 			private ValueUnit maximum;
-			
+
 			public ValueUnit getMinimum() {
 				return minimum;
 			}
-			
+
 			public void setMinimum(ValueUnit minimum) {
 				this.minimum = minimum;
 			}
-			
+
 			public ValueUnit getMaximum() {
 				return maximum;
 			}
-			
+
 			public void setMaximum(ValueUnit maximum) {
 				this.maximum = maximum;
 			}
@@ -357,7 +358,7 @@ public class FiveDaysOfDailyForecastsResponse {
 
 			@Expose
 			@SerializedName("WindGust")
-			private WindGust windGust;
+			private Wind windGust;
 
 			@Expose
 			@SerializedName("TotalLiquid")
@@ -375,20 +376,20 @@ public class FiveDaysOfDailyForecastsResponse {
 			@SerializedName("Ice")
 			private ValueUnit ice;
 
-			public void setWeatherImg(Drawable weatherImg) {
-				this.weatherImg = weatherImg;
-			}
-
-			public Drawable getWeatherImg() {
-				return weatherImg;
-			}
-
 			public String getIcon() {
 				return icon;
 			}
 
 			public void setIcon(String icon) {
 				this.icon = icon;
+			}
+
+			public Drawable getWeatherImg() {
+				return weatherImg;
+			}
+
+			public void setWeatherImg(Drawable weatherImg) {
+				this.weatherImg = weatherImg;
 			}
 
 			public String getIconPhrase() {
@@ -495,11 +496,11 @@ public class FiveDaysOfDailyForecastsResponse {
 				this.wind = wind;
 			}
 
-			public WindGust getWindGust() {
+			public Wind getWindGust() {
 				return windGust;
 			}
 
-			public void setWindGust(WindGust windGust) {
+			public void setWindGust(Wind windGust) {
 				this.windGust = windGust;
 			}
 
@@ -535,7 +536,31 @@ public class FiveDaysOfDailyForecastsResponse {
 				this.ice = ice;
 			}
 
+			public static class Wind {
+				@Expose
+				@SerializedName("Speed")
+				private ValueUnit speed;
 
+				@Expose
+				@SerializedName("Direction")
+				private Direction direction;
+
+				public ValueUnit getSpeed() {
+					return speed;
+				}
+
+				public void setSpeed(ValueUnit speed) {
+					this.speed = speed;
+				}
+
+				public Direction getDirection() {
+					return direction;
+				}
+
+				public void setDirection(Direction direction) {
+					this.direction = direction;
+				}
+			}
 		}
 	}
 }

@@ -24,7 +24,9 @@ import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -100,9 +102,6 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCDaily);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 
-		//label column 설정
-		final int LABEL_VIEW_WIDTH = (int) context.getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
-
 		addLabelView(R.drawable.date, getString(R.string.date), DATE_ROW_HEIGHT);
 		addLabelView(R.drawable.temp_icon, getString(R.string.weather), WEATHER_ROW_HEIGHT);
 		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), DEFAULT_TEXT_ROW_HEIGHT);
@@ -114,10 +113,10 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 		//시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
-		SimpleDateFormat MdE = new SimpleDateFormat("M.d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 
 		for (FinalDailyForecast forecast : finalDailyForecastList) {
-			dateList.add(MdE.format(forecast.getDate()));
+			dateList.add(forecast.getDate().format(dateTimeFormatter));
 		}
 		dateRow.setValueList(dateList);
 

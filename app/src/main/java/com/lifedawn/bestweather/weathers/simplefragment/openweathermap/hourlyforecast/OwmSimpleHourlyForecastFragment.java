@@ -27,6 +27,7 @@ import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -101,9 +102,6 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCHourly);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 
-		//label column 설정
-		final int LABEL_VIEW_WIDTH = (int) context.getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
-
 		addLabelView(R.drawable.temp_icon, getString(R.string.date), DATE_ROW_HEIGHT);
 		addLabelView(R.drawable.temp_icon, getString(R.string.clock), CLOCK_ROW_HEIGHT);
 		addLabelView(R.drawable.temp_icon, getString(R.string.weather), WEATHER_ROW_HEIGHT);
@@ -121,7 +119,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		TextValueView snowVolumeRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
 
 		//시각, 기온, 강수확률, 강수량
-		List<Date> dateTimeList = new ArrayList<>();
+		List<LocalDateTime> dateTimeList = new ArrayList<>();
 		List<String> tempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();

@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.lifedawn.bestweather.commons.classes.ClockUtil;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.FiveDaysOfDailyForecastsParameter;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.GeoPositionSearchParameter;
@@ -25,6 +24,8 @@ import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
@@ -62,8 +63,8 @@ public class MainProcessing {
 			totalRequestCount += 1;
 		}
 
-		final Calendar calendar = Calendar.getInstance();
-		multipleJsonDownloader.put("calendar", String.valueOf(calendar.getTimeInMillis()));
+		final LocalDateTime localDateTime = LocalDateTime.now();
+		multipleJsonDownloader.put("localDateTime", localDateTime.toString());
 
 		multipleJsonDownloader.setRequestCount(totalRequestCount);
 
@@ -93,7 +94,10 @@ public class MainProcessing {
 									nearbyKmaAreaCodeDto = weatherAreaCodeDTO;
 								}
 							}
-							KmaProcessing.getKmaForecasts(nearbyKmaAreaCodeDto, calendar, multipleJsonDownloader);
+							LocalDateTime koreaLocalDateTime = LocalDateTime.now(ZoneId.of(TimeZone.getTimeZone("Asia/Seoul").getID()));
+							multipleJsonDownloader.put("koreaLocalDateTime", koreaLocalDateTime.toString());
+
+							KmaProcessing.getKmaForecasts(nearbyKmaAreaCodeDto, multipleJsonDownloader);
 						}
 
 						@Override
@@ -135,8 +139,8 @@ public class MainProcessing {
 		}
 
 		multipleJsonDownloader.setRequestCount(totalRequestCount);
-		final Calendar calendar = Calendar.getInstance();
-		multipleJsonDownloader.put("calendar", String.valueOf(calendar.getTimeInMillis()));
+		final LocalDateTime localDateTime = LocalDateTime.now();
+		multipleJsonDownloader.put("localDateTime", localDateTime.toString());
 
 		//request
 		if (requestWeatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
@@ -162,13 +166,17 @@ public class MainProcessing {
 						}
 					}
 
+					LocalDateTime koreaLocalDateTime = LocalDateTime.now(ZoneId.of(TimeZone.getTimeZone("Asia/Seoul").getID()));
+					multipleJsonDownloader.put("koreaLocalDateTime", koreaLocalDateTime.toString());
+
 					UltraSrtFcstParameter ultraSrtFcstParameter = new UltraSrtFcstParameter();
 					VilageFcstParameter vilageFcstParameter = new VilageFcstParameter();
 					ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
 					vilageFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
 
 					Call<JsonElement> ultraSrtFcstCall = KmaProcessing.getUltraSrtFcstData(ultraSrtFcstParameter,
-							(Calendar) calendar.clone(), new JsonDownloader<JsonElement>() {
+							LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
+									koreaLocalDateTime.toLocalTime()), new JsonDownloader<JsonElement>() {
 								@Override
 								public void onResponseResult(Response<? extends JsonElement> response) {
 									Log.e(RetrofitClient.LOG_TAG, "kma ultra srt fcst 성공");
@@ -184,7 +192,9 @@ public class MainProcessing {
 								}
 							});
 
-					Call<JsonElement> vilageFcstCall = KmaProcessing.getVilageFcstData(vilageFcstParameter, (Calendar) calendar.clone(),
+					Call<JsonElement> vilageFcstCall = KmaProcessing.getVilageFcstData(vilageFcstParameter,
+							LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
+									koreaLocalDateTime.toLocalTime()),
 							new JsonDownloader<JsonElement>() {
 								@Override
 								public void onResponseResult(Response<? extends JsonElement> response) {
@@ -329,8 +339,8 @@ public class MainProcessing {
 		}
 
 		multipleJsonDownloader.setRequestCount(totalRequestCount);
-		final Calendar calendar = Calendar.getInstance();
-		multipleJsonDownloader.put("calendar", String.valueOf(calendar.getTimeInMillis()));
+		final LocalDateTime localDateTime = LocalDateTime.now();
+		multipleJsonDownloader.put("localDateTime", localDateTime.toString());
 
 		//request
 		if (requestWeatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
@@ -355,15 +365,17 @@ public class MainProcessing {
 							nearbyKmaAreaCodeDto = weatherAreaCodeDTO;
 						}
 					}
-					Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"));
-					multipleJsonDownloader.put("calendar", String.valueOf(calendar.getTimeInMillis()));
 
 					MidTaParameter midTaParameter = new MidTaParameter();
 					MidLandParameter midLandParameter = new MidLandParameter();
 					midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode());
 					midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode());
 
-					String tmFc = KmaProcessing.getTmFc((Calendar) calendar.clone());
+					LocalDateTime koreaLocalDateTime = LocalDateTime.now(ZoneId.of(TimeZone.getTimeZone("Asia/Seoul").getID()));
+					multipleJsonDownloader.put("koreaLocalDateTime", koreaLocalDateTime.toString());
+
+					String tmFc = KmaProcessing.getTmFc(LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
+							koreaLocalDateTime.toLocalTime()));
 					multipleJsonDownloader.put("tmFc", tmFc);
 
 					midLandParameter.setTmFc(tmFc);
@@ -423,7 +435,6 @@ public class MainProcessing {
 
 							@Override
 							public void onResponseResult(Response<? extends JsonElement> response) {
-								Log.e(RetrofitClient.LOG_TAG, "accu weather geoposition search 성공");
 								multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
 										RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH, response);
 
@@ -493,14 +504,12 @@ public class MainProcessing {
 			Call<JsonElement> oneCallCall = OpenWeatherMapProcessing.getOneCall(oneCallParameter, new JsonDownloader<JsonElement>() {
 				@Override
 				public void onResponseResult(Response<? extends JsonElement> response) {
-					Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
 					multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP,
 							RetrofitClient.ServiceType.OWM_ONE_CALL, response);
 				}
 
 				@Override
 				public void onResponseResult(Throwable t) {
-					Log.e(RetrofitClient.LOG_TAG, "own one call 실패");
 					multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP,
 							RetrofitClient.ServiceType.OWM_ONE_CALL, t);
 				}

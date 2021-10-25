@@ -16,11 +16,11 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 	private FavoriteAddressDao favoriteAddressDao;
 	private MutableLiveData<FavoriteAddressDto> addAddressesLiveData = new MutableLiveData<>();
 	private MutableLiveData<FavoriteAddressDto> deleteAddressesLiveData = new MutableLiveData<>();
-	
+
 	public FavoriteAddressRepository(Context context) {
 		favoriteAddressDao = AppDb.getInstance(context).favoriteAddressDao();
 	}
-	
+
 	@Override
 	public void getAll(DbQueryCallback<List<FavoriteAddressDto>> callback) {
 		new Thread(new Runnable() {
@@ -30,17 +30,17 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 			}
 		}).start();
 	}
-	
+
 	@Override
-	public void contains(String latitude, String longitude, DbQueryCallback<Integer> callback) {
+	public void contains(String latitude, String longitude, DbQueryCallback<Boolean> callback) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				callback.processResult(favoriteAddressDao.contains(latitude, longitude));
+				callback.processResult(favoriteAddressDao.contains(latitude, longitude) == 1);
 			}
 		}).start();
 	}
-	
+
 	@Override
 	public void add(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Long> callback) {
 		new Thread(new Runnable() {
@@ -52,7 +52,7 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 			}
 		}).start();
 	}
-	
+
 	@Override
 	public void delete(FavoriteAddressDto favoriteAddressDto) {
 		new Thread(new Runnable() {
@@ -63,11 +63,11 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 			}
 		}).start();
 	}
-	
+
 	public MutableLiveData<FavoriteAddressDto> getAddAddressesLiveData() {
 		return addAddressesLiveData;
 	}
-	
+
 	public MutableLiveData<FavoriteAddressDto> getDeleteAddressesLiveData() {
 		return deleteAddressesLiveData;
 	}

@@ -24,6 +24,7 @@ import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -113,7 +114,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		TextValueView precipitationVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 
 		//시각 --------------------------------------------------------------------------
-		List<Date> dateTimeList = new ArrayList<>();
+		List<LocalDateTime> dateTimeList = new ArrayList<>();
 		for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
 			dateTimeList.add(finalHourlyForecast.getFcstDateTime());
 		}

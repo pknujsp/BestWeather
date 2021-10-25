@@ -23,6 +23,7 @@ import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -60,7 +61,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		final int columnsCount = dailyList.size();
 		final int columnWidth = (int) getResources().getDimension(R.dimen.valueColumnWidthInDDaily);
 		final int viewWidth = columnsCount * columnWidth;
-		SimpleDateFormat dateFormat = new SimpleDateFormat("M.d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 
 		List<String> dateList = new ArrayList<>();
 		List<Integer> minTempList = new ArrayList<>();
@@ -79,8 +80,8 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		List<String> uvMaxIndexList = new ArrayList<>();
 
 		for (OneCallResponse.Daily daily : dailyList) {
-			dateList.add(dateFormat.format(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L,
-					timeZone)));
+			dateList.add(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L,
+					timeZone).format(dateTimeFormatter));
 			minTempList.add(ValueUnits.convertTemperature(daily.getTemp().getMin(), tempUnit));
 			maxTempList.add(ValueUnits.convertTemperature(daily.getTemp().getMax(), tempUnit));
 			popList.add(String.valueOf((int) (Double.parseDouble(daily.getPop()) * 100.0)));

@@ -10,6 +10,10 @@ import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedRespons
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -85,55 +89,46 @@ public class AqicnResponseProcessor {
 
 	public static List<AirQualityForecastObj> getAirQualityForecastObjList(GeolocalizedFeedResponse geolocalizedFeedResponse, TimeZone timeZone) {
 		ArrayMap<String, AirQualityForecastObj> forecastObjMap = new ArrayMap<>();
-		Calendar today = Calendar.getInstance(timeZone);
-		today.set(Calendar.HOUR_OF_DAY, 0);
-		today.set(Calendar.MINUTE, 0);
-		today.set(Calendar.SECOND, 0);
-		today.set(Calendar.MILLISECOND, 0);
-
-		final Date todayDate = today.getTime();
-		Date date = null;
+		final LocalDate todayDate = LocalDate.now(ZoneId.of(timeZone.getID()));
+		LocalDate date = null;
 
 		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm10Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm10();
 		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm10Forecast) {
 			date = getDate(valueMap.getDay());
-			if (date.before(todayDate)) {
+			if (date.isBefore(todayDate)) {
 				continue;
 			}
 
 			if (!forecastObjMap.containsKey(valueMap.getDay())) {
 				forecastObjMap.put(valueMap.getDay(), new AirQualityForecastObj(date));
 			}
-			forecastObjMap.get(valueMap.getDay()).pm10Str = AqicnResponseProcessor.getGradeDescription(Integer.parseInt(valueMap.getAvg()));
-			forecastObjMap.get(valueMap.getDay()).pm10 = valueMap.getAvg();
+			forecastObjMap.get(valueMap.getDay()).pm10 = Integer.parseInt(valueMap.getAvg());
 		}
 
 		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm25Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm25();
 		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm25Forecast) {
 			date = getDate(valueMap.getDay());
-			if (date.before(todayDate)) {
+			if (date.isBefore(todayDate)) {
 				continue;
 			}
 
 			if (!forecastObjMap.containsKey(valueMap.getDay())) {
 				forecastObjMap.put(valueMap.getDay(), new AirQualityForecastObj(date));
 			}
-			forecastObjMap.get(valueMap.getDay()).pm25Str = AqicnResponseProcessor.getGradeDescription(Integer.parseInt(valueMap.getAvg()));
-			forecastObjMap.get(valueMap.getDay()).pm25 = valueMap.getAvg();
+			forecastObjMap.get(valueMap.getDay()).pm25 = Integer.parseInt(valueMap.getAvg());
 		}
 
 		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> o3Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getO3();
 		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : o3Forecast) {
 			date = getDate(valueMap.getDay());
-			if (date.before(todayDate)) {
+			if (date.isBefore(todayDate)) {
 				continue;
 			}
 
 			if (!forecastObjMap.containsKey(valueMap.getDay())) {
 				forecastObjMap.put(valueMap.getDay(), new AirQualityForecastObj(date));
 			}
-			forecastObjMap.get(valueMap.getDay()).o3Str = AqicnResponseProcessor.getGradeDescription(Integer.parseInt(valueMap.getAvg()));
-			forecastObjMap.get(valueMap.getDay()).o3 = valueMap.getAvg();
+			forecastObjMap.get(valueMap.getDay()).o3 = Integer.parseInt(valueMap.getAvg());
 		}
 
 		AirQualityForecastObj[] forecastObjArr = new AirQualityForecastObj[1];
@@ -148,13 +143,13 @@ public class AqicnResponseProcessor {
 		return forecastObjList;
 	}
 
-	private static Date getDate(String day) {
-		Date date = null;
+	private static LocalDate getDate(String day) {
+		LocalDate date = null;
 		try {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-			date = dateFormat.parse(day);
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			date = LocalDate.parse(day, dateTimeFormatter);
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 		return date;
 	}

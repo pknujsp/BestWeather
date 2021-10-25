@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
@@ -66,22 +67,44 @@ public class FindAddressFragment extends Fragment {
 		addressesAdapter.setOnClickedAddressListener(new FoundAddressesAdapter.OnClickedAddressListener() {
 			@Override
 			public void onClickedAddress(Address address) {
-				FavoriteAddressDto favoriteAddressDto = new FavoriteAddressDto();
+				final FavoriteAddressDto favoriteAddressDto = new FavoriteAddressDto();
 				favoriteAddressDto.setCountryName(address.getCountryName());
 				favoriteAddressDto.setCountryCode(address.getCountryCode());
 				favoriteAddressDto.setAddress(address.getAddressLine(0));
 				favoriteAddressDto.setLatitude(String.valueOf(address.getLatitude()));
 				favoriteAddressDto.setLongitude(String.valueOf(address.getLongitude()));
 
-				weatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
+				weatherViewModel.contains(favoriteAddressDto.getLatitude(), favoriteAddressDto.getLongitude(), new DbQueryCallback<Boolean>() {
 					@Override
-					public void onResultSuccessful(Long result) {
-						if (getActivity() != null) {
-							selectedAddress = true;
-							getActivity().runOnUiThread(new Runnable() {
+					public void onResultSuccessful(Boolean contains) {
+						if (contains) {
+							if (getActivity() != null) {
+								selectedAddress = false;
+								getActivity().runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										Toast.makeText(getContext(), R.string.duplicate_address, Toast.LENGTH_SHORT).show();
+									}
+								});
+							}
+						} else {
+							weatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
 								@Override
-								public void run() {
-									getParentFragmentManager().popBackStack();
+								public void onResultSuccessful(Long result) {
+									if (getActivity() != null) {
+										selectedAddress = true;
+										getActivity().runOnUiThread(new Runnable() {
+											@Override
+											public void run() {
+												getParentFragmentManager().popBackStack();
+											}
+										});
+									}
+								}
+
+								@Override
+								public void onResultNoData() {
+
 								}
 							});
 						}
@@ -92,6 +115,8 @@ public class FindAddressFragment extends Fragment {
 
 					}
 				});
+
+
 			}
 		});
 

@@ -27,6 +27,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
@@ -35,6 +36,9 @@ import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -78,75 +82,75 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			weatherSourceTypeList.add(MainProcessing.WeatherSourceType.KMA);
 			binding.kmaLabelLayout.getRoot().setVisibility(View.VISIBLE);
-		} else if (hourlyForecastResponse.kmaThrowable != null) {
+		} else {
 			binding.kmaLabelLayout.getRoot().setVisibility(View.GONE);
 		}
 
 		if (hourlyForecastResponse.accuHourlyForecastsResponse != null) {
 			accuFinalHourlyForecasts = new ArrayList<>();
 			for (TwelveHoursOfHourlyForecastsResponse.Item item : hourlyForecastResponse.accuHourlyForecastsResponse.getItems()) {
-				accuFinalHourlyForecasts.add(new ForecastObj<>(new Date(Long.parseLong(item.getEpochDateTime()) * 1000L), item));
+				accuFinalHourlyForecasts.add(new ForecastObj<>(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getEpochDateTime()) * 1000L, timeZone), item));
 			}
 			weatherSourceTypeList.add(MainProcessing.WeatherSourceType.ACCU_WEATHER);
 			binding.accuLabelLayout.getRoot().setVisibility(View.VISIBLE);
-		} else if (hourlyForecastResponse.accuThrowable != null) {
+		} else {
 			binding.accuLabelLayout.getRoot().setVisibility(View.GONE);
 		}
 
 		if (hourlyForecastResponse.owmOneCallResponse != null) {
 			owmFinalHourlyForecasts = new ArrayList<>();
 			for (OneCallResponse.Hourly hourly : hourlyForecastResponse.owmOneCallResponse.getHourly()) {
-				owmFinalHourlyForecasts.add(new ForecastObj<>(new Date(Long.parseLong(hourly.getDt()) * 1000L), hourly));
+				owmFinalHourlyForecasts.add(new ForecastObj<>(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getDt()) * 1000L, timeZone), hourly));
 			}
 			weatherSourceTypeList.add(MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP);
 			binding.owmLabelLayout.getRoot().setVisibility(View.VISIBLE);
-		} else if (hourlyForecastResponse.owmThrowable != null) {
+		} else {
 			binding.owmLabelLayout.getRoot().setVisibility(View.GONE);
 		}
 
-		binding.forecastView.removeAllViews();
+		LocalDateTime now = LocalDateTime.now(ZoneId.of(timeZone.getID())).plusDays(2).withMinute(0).withSecond(0).withNano(0);
 
-		Calendar calendar = Calendar.getInstance(timeZone);
-		calendar.add(Calendar.DATE, 2);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
-
-		Date firstDateTime = calendar.getTime();
-		calendar.add(Calendar.DATE, -4);
-		Date lastDateTime = calendar.getTime();
+		LocalDateTime firstDateTime = LocalDateTime.of(now.toLocalDate(), now.toLocalTime());
+		now = now.minusDays(5);
+		LocalDateTime lastDateTime = LocalDateTime.of(now.toLocalDate(), now.toLocalTime());
 
 		if (kmaFinalHourlyForecasts != null) {
-			if (kmaFinalHourlyForecasts.get(0).dateTime.before(firstDateTime)) {
-				firstDateTime.setTime(kmaFinalHourlyForecasts.get(0).dateTime.getTime());
+			if (kmaFinalHourlyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
+				firstDateTime = LocalDateTime.of(kmaFinalHourlyForecasts.get(0).dateTime.toLocalDate(),
+						kmaFinalHourlyForecasts.get(0).dateTime.toLocalTime());
 			}
-			if (kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.after(lastDateTime)) {
-				lastDateTime.setTime(kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.getTime());
+			if (kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
+				lastDateTime = LocalDateTime.of(kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.toLocalDate(),
+						kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.toLocalTime());
 			}
 		}
 		if (accuFinalHourlyForecasts != null) {
-			if (accuFinalHourlyForecasts.get(0).dateTime.before(firstDateTime)) {
-				firstDateTime.setTime(accuFinalHourlyForecasts.get(0).dateTime.getTime());
+			if (accuFinalHourlyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
+				firstDateTime = LocalDateTime.of(accuFinalHourlyForecasts.get(0).dateTime.toLocalDate(),
+						accuFinalHourlyForecasts.get(0).dateTime.toLocalTime());
 			}
-			if (accuFinalHourlyForecasts.get(accuFinalHourlyForecasts.size() - 1).dateTime.after(lastDateTime)) {
-				lastDateTime.setTime(accuFinalHourlyForecasts.get(accuFinalHourlyForecasts.size() - 1).dateTime.getTime());
+			if (accuFinalHourlyForecasts.get(accuFinalHourlyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
+				lastDateTime = LocalDateTime.of(accuFinalHourlyForecasts.get(accuFinalHourlyForecasts.size() - 1).dateTime.toLocalDate(),
+						accuFinalHourlyForecasts.get(accuFinalHourlyForecasts.size() - 1).dateTime.toLocalTime());
 			}
 		}
 		if (owmFinalHourlyForecasts != null) {
-			if (owmFinalHourlyForecasts.get(0).dateTime.before(firstDateTime)) {
-				firstDateTime.setTime(owmFinalHourlyForecasts.get(0).dateTime.getTime());
+			if (owmFinalHourlyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
+				firstDateTime = LocalDateTime.of(owmFinalHourlyForecasts.get(0).dateTime.toLocalDate(),
+						owmFinalHourlyForecasts.get(0).dateTime.toLocalTime());
 			}
-			if (owmFinalHourlyForecasts.get(owmFinalHourlyForecasts.size() - 1).dateTime.after(lastDateTime)) {
-				lastDateTime.setTime(owmFinalHourlyForecasts.get(owmFinalHourlyForecasts.size() - 1).dateTime.getTime());
+			if (owmFinalHourlyForecasts.get(owmFinalHourlyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
+				lastDateTime = LocalDateTime.of(owmFinalHourlyForecasts.get(owmFinalHourlyForecasts.size() - 1).dateTime.toLocalDate(),
+						owmFinalHourlyForecasts.get(owmFinalHourlyForecasts.size() - 1).dateTime.toLocalTime());
 			}
 		}
 
-		List<Date> dateTimeList = new ArrayList<>();
+		List<LocalDateTime> dateTimeList = new ArrayList<>();
 		//firstDateTime부터 lastDateTime까지 추가
-		calendar.setTime(firstDateTime);
-		while (!calendar.getTime().after(lastDateTime)) {
-			dateTimeList.add(calendar.getTime());
-			calendar.add(Calendar.HOUR_OF_DAY, 1);
+		now = LocalDateTime.of(firstDateTime.toLocalDate(), firstDateTime.toLocalTime());
+		while (!now.isAfter(lastDateTime)) {
+			dateTimeList.add(now);
+			now = now.plusHours(1);
 		}
 
 		final int columnsCount = dateTimeList.size();
@@ -334,17 +338,15 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		//accu
 		if (responseMap.containsKey(MainProcessing.WeatherSourceType.ACCU_WEATHER)) {
 			arrayMap = responseMap.get(MainProcessing.WeatherSourceType.ACCU_WEATHER);
-			MultipleJsonDownloader.ResponseResult<JsonElement> geoCodingResponse = arrayMap.get(
-					RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH);
 			MultipleJsonDownloader.ResponseResult<JsonElement> accuHourlyForecastResponse = arrayMap.get(
 					RetrofitClient.ServiceType.ACCU_12_HOURLY);
 
-			if (geoCodingResponse.getT() == null && accuHourlyForecastResponse.getT() == null) {
+			if (accuHourlyForecastResponse.getT() == null) {
 
 				hourlyForecastResponse.accuHourlyForecastsResponse = AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
 						arrayMap.get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponse().body());
 			} else {
-				hourlyForecastResponse.accuThrowable = geoCodingResponse.getT() != null ? geoCodingResponse.getT() : accuHourlyForecastResponse.getT();
+				hourlyForecastResponse.accuThrowable = accuHourlyForecastResponse.getT();
 			}
 		}
 		//owm

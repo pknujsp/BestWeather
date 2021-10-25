@@ -143,20 +143,21 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 			probabilityOfRainList.add(String.valueOf((int) (Double.parseDouble(hourly.getRainProbability()) * 100.0)));
 			rainVolumeList.add(hourly.getRain() == null ? "-" : hourly.getRain().getValue());
 			probabilityOfSnowList.add(String.valueOf((int) (Double.parseDouble(hourly.getSnowProbability()) * 100.0)));
-			snowVolumeList.add(hourly.getSnow() == null ? "-" : hourly.getSnow().getValue());
+			snowVolumeList.add(hourly.getSnow() == null ? "-" : ValueUnits.convertCMToMM(hourly.getSnow().getValue()).toString());
 
 			precipitationTypeList.add(hourly.getPrecipitationType());
 			precipitationIntensityList.add(hourly.getPrecipitationIntensity());
 			windDirectionList.add(new SingleWindDirectionView.WindDirectionObj(Integer.parseInt(hourly.getWind().getDirection().getDegrees())));
-			windSpeedList.add(ValueUnits.convertWindSpeed(hourly.getWind().getSpeed().getMetric().getValue(), windUnit).toString());
-			windStrengthList.add(WeatherResponseProcessor.getSimpleWindSpeedDescription(hourly.getWind().getSpeed().getMetric().getValue()));
-			windGustList.add(hourly.getWindGust() == null ? "-" : hourly.getWindGust().getSpeed().getMetric().getValue());
+			windSpeedList.add(ValueUnits.convertWindSpeedForAccu(hourly.getWind().getSpeed().getValue(), windUnit).toString());
+			windStrengthList.add(WeatherResponseProcessor.getSimpleWindSpeedDescription(hourly.getWind().getSpeed().getValue()));
+			windGustList.add(hourly.getWindGust() == null ? "-" :
+					ValueUnits.convertWindSpeedForAccu(hourly.getWindGust().getSpeed().getValue(), windUnit).toString());
 
 			humidityList.add(hourly.getRelativeHumidity());
 			dewPointList.add(hourly.getDewPoint().getValue());
 			cloudCoverList.add(hourly.getCloudCover());
 			visibilityList.add(ValueUnits.convertVisibility(hourly.getVisibility().getValue(), visibilityUnit));
-			uvIndexList.add(hourly.getuVIndexText());
+			uvIndexList.add(hourly.getuVIndex());
 
 			index++;
 		}

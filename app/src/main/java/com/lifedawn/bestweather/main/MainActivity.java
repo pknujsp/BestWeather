@@ -20,6 +20,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.UvIndexProcessor;
 
 import java.util.Locale;
 
@@ -39,12 +40,13 @@ public class MainActivity extends AppCompatActivity {
 		KmaResponseProcessor.init(getApplicationContext());
 		OpenWeatherMapResponseProcessor.init(getApplicationContext());
 		FlickrUtil.init(getApplicationContext());
+		UvIndexProcessor.init(getApplicationContext());
 
 		AppThemes appTheme = AppThemes.enumOf(sharedPreferences.getString(getString(R.string.pref_key_app_theme), AppThemes.BLACK.name()));
 		if (appTheme == AppThemes.BLACK) {
-			setTheme(R.style.AppTheme_Black);
+			setTheme(R.style.AppTheme_White);
 		} else {
-		//	setTheme(R.style.AppTheme_White);
+			//	setTheme(R.style.AppTheme_White);
 		}
 
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);

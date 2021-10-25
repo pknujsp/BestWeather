@@ -59,7 +59,6 @@ public class TextValueView extends View {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		
-		valueTextPaint.setColor(ContextCompat.getColor(getContext(), R.color.white));
 		float x = 0f;
 		final float columnCenterX = columnWidth / 2f;
 		final float y = getHeight() / 2f + valueTextHeight / 2f;

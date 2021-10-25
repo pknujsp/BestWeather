@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -113,17 +114,19 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, viewWidth, DEFAULT_TEXT_ROW_HEIGHT, columnWidth);
 		TextValueView precipitationVolumeRow = new TextValueView(context, viewWidth, DEFAULT_TEXT_ROW_HEIGHT, columnWidth);
 
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
+
 		//시각, 기온, 강수확률, 강수량--------------------------------
 		List<String> dateList = new ArrayList<>();
-		SimpleDateFormat MdE = new SimpleDateFormat("M.d E", Locale.getDefault());
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> precipitationVolumeList = new ArrayList<>();
 
 		for (FiveDaysOfDailyForecastsResponse.DailyForecasts dailyForecasts : items) {
-			dateList.add(MdE.format(
-					WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(dailyForecasts.getEpochDate()) * 1000L, timeZone)));
+			dateList.add(
+					WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(dailyForecasts.getEpochDate()) * 1000L,
+							timeZone).format(dateTimeFormatter));
 			minTempList.add((int) Double.parseDouble(dailyForecasts.getTemperature().getMinimum().getValue()));
 			maxTempList.add((int) Double.parseDouble(dailyForecasts.getTemperature().getMaximum().getValue()));
 

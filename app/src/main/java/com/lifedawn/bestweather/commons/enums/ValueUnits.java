@@ -6,7 +6,18 @@ import com.lifedawn.bestweather.R;
 
 public enum ValueUnits {
 	celsius, fahrenheit, mPerSec, kmPerHour, km, mile, clock12, clock24;
-	
+
+	/*
+	accu weather 기본 단위
+	바람 : km/h, 비 : mm, 눈 : cm, 기온 : C, 기압 : mb
+
+	owm
+	바람 : m/s, 비 : mm, 눈 : mm, 기온 : C, 기압 : mb
+
+	기상청
+	바람 : m/s, 비 : mm, 눈 : mm, 기온 : C
+	 */
+
 	public static ValueUnits enumOf(String value) throws IllegalArgumentException {
 		for (ValueUnits valueUnit : values()) {
 			if (value.equals(valueUnit.name())) {
@@ -15,7 +26,7 @@ public enum ValueUnits {
 		}
 		throw new IllegalArgumentException();
 	}
-	
+
 	public static String convertToStr(Context context, ValueUnits valueUnit) {
 		switch (valueUnit) {
 			case celsius:
@@ -38,16 +49,16 @@ public enum ValueUnits {
 				return null;
 		}
 	}
-	
+
 	public static Integer convertTemperature(String val, ValueUnits unit) {
-		Integer convertedVal = (int) Double.parseDouble(val);
+		Integer convertedVal = (int) Math.round(Double.parseDouble(val));
 		if (unit == fahrenheit) {
 			//화씨 (1°C × 9/5) + 32°F
-			convertedVal = (int) (convertedVal * (9.0 / 5.0)) + 32;
+			convertedVal = (int) Math.round((convertedVal * (9.0 / 5.0) + 32));
 		}
 		return convertedVal;
 	}
-	
+
 	public static Double convertWindSpeed(String val, ValueUnits unit) {
 		Double convertedVal = Double.parseDouble(val);
 		if (unit == kmPerHour) {
@@ -56,13 +67,26 @@ public enum ValueUnits {
 		}
 		return convertedVal;
 	}
-	
+
+	public static Double convertWindSpeedForAccu(String val, ValueUnits unit) {
+		Double convertedVal = Double.parseDouble(val);
+		if (unit == mPerSec) {
+			//m/s -> km/h n x 3.6 = c
+			convertedVal = convertedVal / 3.6;
+		}
+		return convertedVal;
+	}
+
 	public static String convertVisibility(String val, ValueUnits unit) {
-		Integer convertedVal = Integer.parseInt(val);
+		Double convertedVal = Double.parseDouble(val) / 1000.0;
 		if (unit == mile) {
 			//km -> mile  n / 1.609 = c
-			convertedVal = (int) (convertedVal / 1.609);
+			convertedVal = convertedVal / 1.609;
 		}
-		return convertedVal.toString();
+		return String.format("%.1f", convertedVal);
+	}
+
+	public static Integer convertCMToMM(String val) {
+		return (int) (Double.parseDouble(val) * 10.0);
 	}
 }

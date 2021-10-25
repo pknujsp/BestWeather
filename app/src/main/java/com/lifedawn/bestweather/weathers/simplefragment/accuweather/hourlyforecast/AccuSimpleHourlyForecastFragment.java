@@ -28,6 +28,7 @@ import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -119,8 +120,9 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView precipitationVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 
+
 		//시각, 기온, 강수확률, 강수량-----
-		List<Date> dateTimeList = new ArrayList<>();
+		List<LocalDateTime> dateTimeList = new ArrayList<>();
 		List<String> tempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> precipitationVolumeList = new ArrayList<>();

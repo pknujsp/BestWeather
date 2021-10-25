@@ -20,10 +20,19 @@
     <color name="aqi_5_very_unhealthy">#660099</color>
     <color name="aqi_6_hazardous">#7e0023</color>
 
+    <!-- uv index grade color -->
+    <color name="uv_index_1_low">#009966</color>
+    <color name="uv_index_2_moderate">#ffde33</color>
+    <color name="uv_index_3_high">#cc0033</color>
+    <color name="uv_index_4_very_high">#660099</color>
+    <color name="uv_index_5_extreme">#7e0023</color>
+
     <color name="favorite_location_background_color">#039BE5</color>
 
     <!-- weather data source icon color -->
     <color name="kma_icon_color">#836eff</color>
     <color name="accu_icon_color">#f2b035</color>
     <color name="owm_icon_color">#958888</color>
+
+    <color name="not_data_color">#777777</color>
 </resources>
