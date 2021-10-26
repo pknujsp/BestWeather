@@ -52,9 +52,9 @@ public class MainActivity extends AppCompatActivity {
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
 
-		MainFragment mainFragment = new MainFragment();
+		MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-		fragmentTransaction.add(binding.fragmentContainer.getId(), mainFragment, mainFragment.getTag()).commit();
+		fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, mainTransactionFragment.getTag()).commit();
 	}
 
 	private void initPreferences() {

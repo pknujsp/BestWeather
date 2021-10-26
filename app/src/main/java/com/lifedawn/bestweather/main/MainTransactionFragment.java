@@ -37,7 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class MainFragment extends Fragment {
+public class MainTransactionFragment extends Fragment {
 	private FragmentMainBinding binding;
 	private WeatherViewModel weatherViewModel;
 	private boolean initializing = true;
@@ -82,7 +82,10 @@ public class MainFragment extends Fragment {
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
 			if (f instanceof FavoritesFragment) {
-			
+				//즐겨찾기 없고 현재 위치 미 사용인 경우 처리할 내용
+				if (((FavoritesFragment) f).isEnableCurrentLocation()) {
+					init();
+				}
 			} else if (f instanceof SettingsMainFragment) {
 				boolean newUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), true);
 				
