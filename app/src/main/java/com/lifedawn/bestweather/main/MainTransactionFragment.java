@@ -89,7 +89,7 @@ public class MainTransactionFragment extends Fragment {
 				List<FavoriteAddressDto> newFavoriteAddressDtoList = ((FavoritesFragment)f).getFavoriteAddressDtoList();
 				
 				for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
-					
+				
 				}
 				init(true);
 			} else if (f instanceof SettingsMainFragment) {
