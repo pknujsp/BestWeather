@@ -46,7 +46,11 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 	public int getItemCount() {
 		return favoriteAddressDtoList.size();
 	}
-
+	
+	public List<FavoriteAddressDto> getFavoriteAddressDtoList() {
+		return favoriteAddressDtoList;
+	}
+	
 	class ViewHolder extends RecyclerView.ViewHolder {
 		private TextView addressTextView;
 		private ImageButton deleteBtn;

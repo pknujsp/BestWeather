@@ -55,13 +55,6 @@ public class FavoritesFragment extends Fragment {
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
 			
-			if (f instanceof FindAddressFragment) {
-				if (((FindAddressFragment) f).isSelectedAddress()) {
-					onBackPressedCallback.handleOnBackPressed();
-				} else {
-				
-				}
-			}
 		}
 	};
 	
@@ -204,11 +197,17 @@ public class FavoritesFragment extends Fragment {
 							getParentFragmentManager().popBackStack();
 							dialogInterface.dismiss();
 						}
-					}).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+					}).setNegativeButton(R.string.close_app, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialogInterface, int i) {
 					dialogInterface.dismiss();
 					getActivity().finish();
+				}
+			}).setNeutralButton(R.string.add_favorite, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialogInterface, int i) {
+					dialogInterface.dismiss();
+					binding.addFavorite.callOnClick();
 				}
 			}).create().show();
 			
@@ -220,4 +219,9 @@ public class FavoritesFragment extends Fragment {
 	public boolean isEnableCurrentLocation() {
 		return enableCurrentLocation;
 	}
+	
+	public List<FavoriteAddressDto> getFavoriteAddressDtoList() {
+		return adapter.getFavoriteAddressDtoList();
+	}
+	
 }
