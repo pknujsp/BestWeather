@@ -98,7 +98,7 @@ public class Gps {
 				.setNegativeButton(activity.getString(R.string.no), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialogInterface, int i) {
-						callback.onFailed();
+						callback.onFailed(LocationCallback.Fail.DISABLED_GPS);
 					}
 				})
 				.setCancelable(false)
@@ -118,8 +118,12 @@ public class Gps {
 	}
 
 	public interface LocationCallback {
+		public enum Fail {
+			DISABLED_GPS, REJECT_PERMISSION
+		}
+
 		void onSuccessful(Location location);
 
-		void onFailed();
+		void onFailed(Fail fail);
 	}
 }

@@ -185,7 +185,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		if (iAqi.getNo2() == null) {
 			addGridItem(null, R.string.no2_str, R.drawable.temp_icon);
 		} else {
-			Integer no2 = (int) Double.parseDouble(iAqi.getCo().getValue());
+			Integer no2 = (int) Double.parseDouble(iAqi.getNo2().getValue());
 			addGridItem(no2, R.string.no2_str, R.drawable.temp_icon);
 		}
 

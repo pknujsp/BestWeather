@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.queryinterfaces.FavoriteAddressQuery;
@@ -20,6 +21,7 @@ import java.util.TimeZone;
 
 public class WeatherViewModel extends AndroidViewModel implements FavoriteAddressQuery {
 	private ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions;
+	private Gps.LocationCallback locationCallback;
 	private FavoriteAddressRepository favoriteAddressRepository;
 	
 	private MutableLiveData<FavoriteAddressDto> addAddressesLiveData;
@@ -36,7 +38,15 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	public void setiLoadImgOfCurrentConditions(ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions) {
 		this.iLoadImgOfCurrentConditions = iLoadImgOfCurrentConditions;
 	}
-	
+
+	public void setLocationCallback(Gps.LocationCallback locationCallback) {
+		this.locationCallback = locationCallback;
+	}
+
+	public Gps.LocationCallback getLocationCallback() {
+		return locationCallback;
+	}
+
 	public ILoadImgOfCurrentConditions getiLoadImgOfCurrentConditions() {
 		return iLoadImgOfCurrentConditions;
 	}
@@ -80,4 +90,5 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	public interface ILoadImgOfCurrentConditions {
 		void loadImgOfCurrentConditions(MainProcessing.WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude, TimeZone timeZone);
 	}
+
 }

@@ -105,7 +105,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			}
 			weatherSourceTypeList.add(MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP);
 			binding.owmLabelLayout.getRoot().setVisibility(View.VISIBLE);
-		} else{
+		} else {
 			binding.owmLabelLayout.getRoot().setVisibility(View.GONE);
 		}
 
@@ -360,17 +360,14 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		//accu
 		if (responseMap.containsKey(MainProcessing.WeatherSourceType.ACCU_WEATHER)) {
 			arrayMap = responseMap.get(MainProcessing.WeatherSourceType.ACCU_WEATHER);
-			MultipleJsonDownloader.ResponseResult<JsonElement> geoCodingResponse = arrayMap.get(
-					RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH);
 			MultipleJsonDownloader.ResponseResult<JsonElement> accuDailyForecastResponse = arrayMap.get(
 					RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY);
 
-			if (geoCodingResponse.getT() == null && accuDailyForecastResponse.getT() == null) {
-
+			if (accuDailyForecastResponse.getT() == null) {
 				dailyForecastResponse.accuDailyForecastsResponse = AccuWeatherResponseProcessor.getDailyForecastObjFromJson(
 						arrayMap.get(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY).getResponse().body().toString());
 			} else {
-				dailyForecastResponse.accuThrowable = geoCodingResponse.getT() != null ? geoCodingResponse.getT() : accuDailyForecastResponse.getT();
+				dailyForecastResponse.accuThrowable = accuDailyForecastResponse.getT();
 			}
 		}
 		//owm

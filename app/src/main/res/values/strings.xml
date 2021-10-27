@@ -372,5 +372,19 @@
     <string name="close_app">앱 종료</string>
     <string name="add_favorite">위치 추가</string>
 
+    <!-- fragment result key -->
+    <string name="key_from_favorite_to_find_address">key_from_favorite_to_find_address</string>
+    <string name="key_from_main_to_find_address">key_from_main_to_find_address</string>
+    <string name="key_from_main_to_favorite">key_from_main_to_favorite</string>
+    <string name="key_back_from_find_address_to_main">key_back_from_find_address_to_main</string>
+    <string name="key_back_from_favorite_to_main">key_back_from_favorite_to_main</string>
+    <string name="key_back_from_find_address_to_favorite">key_back_from_find_address_to_favorite</string>
+    <string name="bundle_key_new_favorite_address_dto_id">bundle_key_new_favorite_address_dto_id</string>
+    <string name="bundle_key_new_favorite_address_list">bundle_key_new_favorite_address_list</string>
+    <string name="bundle_key_changed_use_current_location">bundle_key_changed_use_current_location</string>
+    <string name="disabled_use_current_location">현재 위치 미사용</string>
+    <string name="enabled_use_current_location">현재 위치 사용</string>
+    <string name="unavailable_update">업데이트 불가</string>
+
 
 </resources>

@@ -250,7 +250,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 		}
 		//3일 후로 이동
-		now = now.withHour(0).plusDays(3);
+		now = now.plusDays(3).withHour(0).withMinute(0).withSecond(0).withNano(0);
 
 		MidLandFcstItem midLandFcstData = midLandFcstRoot.getResponse().getBody().getItems().getItem().get(0);
 		MidTaItem midTaFcstData = midTaRoot.getResponse().getBody().getItems().getItem().get(0);

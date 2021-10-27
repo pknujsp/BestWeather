@@ -1,9 +1,12 @@
 package com.lifedawn.bestweather.room.repository;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import androidx.lifecycle.MutableLiveData;
+import androidx.preference.PreferenceManager;
 
+import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.room.AppDb;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dao.FavoriteAddressDao;
@@ -16,8 +19,12 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 	private FavoriteAddressDao favoriteAddressDao;
 	private MutableLiveData<FavoriteAddressDto> addAddressesLiveData = new MutableLiveData<>();
 	private MutableLiveData<FavoriteAddressDto> deleteAddressesLiveData = new MutableLiveData<>();
+	private SharedPreferences sharedPreferences;
+	private Context context;
 
 	public FavoriteAddressRepository(Context context) {
+		this.context = context;
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		favoriteAddressDao = AppDb.getInstance(context).favoriteAddressDao();
 	}
 
@@ -58,6 +65,9 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
+				if (sharedPreferences.getString(context.getString(R.string.pref_key_last_selected_favorite_address_id), "").equals(favoriteAddressDto.getId().toString())) {
+					sharedPreferences.edit().putString(context.getString(R.string.pref_key_last_selected_favorite_address_id), "").apply();
+				}
 				favoriteAddressDao.delete(favoriteAddressDto);
 				deleteAddressesLiveData.postValue(favoriteAddressDto);
 			}

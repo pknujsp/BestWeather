@@ -25,6 +25,7 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		setValuesToViews();
 	}
 
 	public AccuDetailCurrentConditionsFragment setCurrentConditionsResponse(CurrentConditionsResponse currentConditionsResponse) {
