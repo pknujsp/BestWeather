@@ -70,6 +70,7 @@
     <string name="pref_key_main_weather_data_source">pref_key_main_weather_data_source</string>
 
     <string name="pref_key_last_selected_favorite_address_id">pref_key_last_selected_favorite_address_id</string>
+    <string name="pref_key_last_selected_location_type">pref_key_last_selected_location_type</string>
 
     <!-- appthemes -->
     <string name="black">검정</string>
@@ -317,8 +318,6 @@
     <string name="find_address">주소 검색</string>
     <string name="not_search_result">검색결과가 없습니다</string>
     <string name="empty_favorite_addresses">즐겨찾기가 비어있습니다</string>
-    <string name="bundle_key_selected_address">bundle_key_selected_address</string>
-    <string name="bundle_key_favorite_address_type">bundle_key_favorite_address_type</string>
     <string name="current_location">현재 위치</string>
     <string name="request_to_make_gps_on">GPS를 켜주세요</string>
     <string name="check">확인</string>
@@ -353,6 +352,8 @@
     <string name="msg_request_enable_current_location_because_empty_locations">표시할 위치가 없습니다. 현재 위치의 날씨를 표시하시겠습니까?</string>
     <string name="use">사용</string>
     <string name="cancel">취소</string>
+    <string name="close_app">앱 종료</string>
+    <string name="add_favorite">위치 추가</string>
 
     <!-- flickr weather -->
     <string name="flickr_clear">clear</string>
@@ -369,8 +370,8 @@
     <string name="bundle_key_country_code">bundle_key_country_code</string>
     <string name="bundle_key_main_weather_data_source">bundle_key_main_weather_data_source</string>
     <string name="bundle_key_timezone">bundle_key_timezone</string>
-    <string name="close_app">앱 종료</string>
-    <string name="add_favorite">위치 추가</string>
+    <string name="bundle_key_selected_address_dto">bundle_key_selected_address_dto</string>
+    <string name="bundle_key_location_type">bundle_key_location_type</string>
 
     <!-- fragment result key -->
     <string name="key_from_favorite_to_find_address">key_from_favorite_to_find_address</string>
@@ -385,6 +386,9 @@
     <string name="disabled_use_current_location">현재 위치 미사용</string>
     <string name="enabled_use_current_location">현재 위치 사용</string>
     <string name="unavailable_update">업데이트 불가</string>
+    <string name="key_current_location">key_current_location</string>
+    <string name="key_selected_location">key_selected_location</string>
+    <string name="bundle_key_igps">bundle_key_igps</string>
 
 
 </resources>

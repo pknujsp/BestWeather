@@ -13,26 +13,30 @@ import android.os.Bundle;
 import android.provider.Settings;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.views.ProgressDialog;
 
 public class Gps {
 	private LocationManager locationManager;
 	private LocationListener locationListener;
+	private AlertDialog dialog;
 
 	public void runGps(Activity activity, LocationCallback callback, ActivityResultLauncher<Intent> requestOnGpsLauncher
 			, ActivityResultLauncher<String> requestLocationPermissionLauncher) {
 		//권한 확인
+		dialog = ProgressDialog.show(activity, activity.getString(R.string.msg_finding_current_location));
 		Context context = activity.getApplicationContext();
 
 		if (locationManager == null) {
 			locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		}
 
-		boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-		boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+		final boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+		final boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
 		if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 			if (isGpsEnabled) {
@@ -103,22 +107,26 @@ public class Gps {
 				})
 				.setCancelable(false)
 				.show();
-		clear();
+	}
+
+	public void closeDialog() {
+		if (dialog != null) {
+			dialog.dismiss();
+			dialog = null;
+		}
 	}
 
 	public void clear() {
+		closeDialog();
 		if (locationListener != null) {
 			locationManager.removeUpdates(locationListener);
+			locationListener = null;
 		}
-		locationManager = null;
 	}
 
-	public boolean isProcessing() {
-		return locationManager != null;
-	}
 
 	public interface LocationCallback {
-		public enum Fail {
+		enum Fail {
 			DISABLED_GPS, REJECT_PERMISSION
 		}
 

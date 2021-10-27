@@ -180,7 +180,7 @@ public class FindAddressFragment extends Fragment {
 	@Override
 	public void onDestroy() {
 		Bundle bundle = new Bundle();
-		bundle.putBoolean(getString(R.string.bundle_key_selected_address), isSelectedAddress());
+		bundle.putBoolean(getString(R.string.bundle_key_selected_address_dto), isSelectedAddress());
 		if (isSelectedAddress()) {
 			bundle.putInt(getString(R.string.bundle_key_new_favorite_address_dto_id), newFavoriteAddressDto.getId());
 		}

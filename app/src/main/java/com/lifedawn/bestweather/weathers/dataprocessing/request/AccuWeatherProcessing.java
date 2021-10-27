@@ -24,6 +24,16 @@ import retrofit2.Response;
 
 public class AccuWeatherProcessing {
 
+	public static boolean checkResponse(Response<JsonElement> response) {
+		if (response.body() == null) {
+			return false;
+		} else if (response.isSuccessful()) {
+			return true;
+		} else {
+			return true;
+		}
+	}
+
 
 	/**
 	 * Current Conditions
@@ -37,8 +47,14 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.onResponseResult(response);
-				Log.e(RetrofitClient.LOG_TAG, "accu weather current conditions 성공");
+				if (checkResponse(response)) {
+					callback.onResponseResult(response);
+					Log.e(RetrofitClient.LOG_TAG, "accu weather current conditions 성공");
+
+				} else {
+					callback.onResponseResult(new Exception());
+					Log.e(RetrofitClient.LOG_TAG, "accu weather current conditions 실패");
+				}
 			}
 
 			@Override
@@ -62,8 +78,15 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.onResponseResult(response);
-				Log.e(RetrofitClient.LOG_TAG, "accu weather daily forecast 성공");
+				if (checkResponse(response)) {
+					callback.onResponseResult(response);
+					Log.e(RetrofitClient.LOG_TAG, "accu weather daily forecast 성공");
+
+				} else {
+					callback.onResponseResult(new Exception());
+					Log.e(RetrofitClient.LOG_TAG, "accu weather daily forecast 실패");
+
+				}
 			}
 
 			@Override
@@ -88,8 +111,15 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.onResponseResult(response);
-				Log.e(RetrofitClient.LOG_TAG, "accu weather hourly forecast 성공");
+				if (checkResponse(response)) {
+					callback.onResponseResult(response);
+					Log.e(RetrofitClient.LOG_TAG, "accu weather hourly forecast 성공");
+
+				} else {
+					callback.onResponseResult(new Exception());
+					Log.e(RetrofitClient.LOG_TAG, "accu weather hourly forecast 실패");
+
+				}
 
 			}
 
@@ -118,7 +148,7 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				if (response.body() != null) {
+				if (checkResponse(response)) {
 					GeoPositionResponse geoPositionResponse =
 							AccuWeatherResponseProcessor.getGeoPositionObjFromJson(response.body().toString());
 
@@ -127,10 +157,11 @@ public class AccuWeatherProcessing {
 							geoPositionResponse.getKey()).apply();
 
 					callback.onResponseResult(response);
+					Log.e(RetrofitClient.LOG_TAG, "accu weather geoposition search 성공");
 				} else {
 					callback.onResponseResult(new Exception());
+					Log.e(RetrofitClient.LOG_TAG, "accu weather geoposition search 실패");
 				}
-				Log.e(RetrofitClient.LOG_TAG, "accu weather geoposition search 성공");
 			}
 
 			@Override

@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.commons.views;
 
 import android.app.Activity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -17,7 +18,7 @@ public class ProgressDialog {
 	}
 
 	public static AlertDialog show(Activity activity, String msg) {
-		View progressView = activity.getLayoutInflater().inflate(R.layout.progress_view, null);
+		View progressView = LayoutInflater.from(activity.getApplicationContext()).inflate(R.layout.progress_view, null);
 		((TextView) progressView.findViewById(R.id.progress_msg)).setText(msg);
 
 		AlertDialog dialog = new MaterialAlertDialogBuilder(activity).setCancelable(false).setView(progressView).create();

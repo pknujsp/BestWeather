@@ -1,20 +1,16 @@
-package com.lifedawn.bestweather.weathers.viewpager;
+package com.lifedawn.bestweather.weathers;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
@@ -24,15 +20,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.classes.Gps;
-import com.lifedawn.bestweather.commons.enums.FavoriteAddressType;
+import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
@@ -45,6 +39,7 @@ import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
@@ -78,21 +73,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import retrofit2.Response;
 
-public class WeatherFragment extends Fragment implements IGps {
+
+public class WeatherFragment extends Fragment {
 	private FragmentWeatherBinding binding;
 	private FavoriteAddressDto selectedFavoriteAddressDto;
-	private FavoriteAddressType favoriteAddressType;
-	private Gps gps;
+	private LocationType locationType;
 	private WeatherViewModel.ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions;
 	private WeatherViewModel weatherViewModel;
+
 	private MainProcessing.WeatherSourceType mainWeatherSourceType;
-	private Double currentLocationLatitude;
-	private Double currentLocationLongitude;
+	private Double latitude;
+	private Double longitude;
 	private String countryCode;
 	private String addressName;
 	private SharedPreferences sharedPreferences;
-	private Gps.LocationCallback locationCallbackInMainFragment;
+
+	private IGps iGps;
 
 	public static final Map<String, MultipleJsonDownloader<JsonElement>> finalResponseMap = new HashMap<>();
 
@@ -100,25 +98,8 @@ public class WeatherFragment extends Fragment implements IGps {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-
-		Bundle bundle = getArguments();
-		favoriteAddressType = (FavoriteAddressType) bundle.getSerializable(getString(R.string.bundle_key_favorite_address_type));
-		String newSelectedAddressId = null;
-
-		if (favoriteAddressType == FavoriteAddressType.SelectedAddress) {
-			selectedFavoriteAddressDto = (FavoriteAddressDto) bundle.getSerializable(getString(R.string.bundle_key_selected_address));
-			newSelectedAddressId = selectedFavoriteAddressDto.getId().toString();
-		} else {
-			gps = new Gps();
-			newSelectedAddressId = FavoriteAddressType.CurrentLocation.name();
-		}
-
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		sharedPreferences.edit().putString(getString(R.string.pref_key_last_selected_favorite_address_id), newSelectedAddressId).apply();
-
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		iLoadImgOfCurrentConditions = weatherViewModel.getiLoadImgOfCurrentConditions();
-		locationCallbackInMainFragment = weatherViewModel.getLocationCallback();
 	}
 
 	@Override
@@ -130,65 +111,94 @@ public class WeatherFragment extends Fragment implements IGps {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		binding.customProgressView.setContentView(binding.scrollView);
+		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_current_location), this, new FragmentResultListener() {
+			@Override
+			public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
+				getParentFragmentManager().clearFragmentResultListener(requestKey);
+				getParentFragmentManager().clearFragmentResult(requestKey);
 
-		if (favoriteAddressType == FavoriteAddressType.SelectedAddress) {
-			binding.addressName.setText(selectedFavoriteAddressDto.getAddress());
-			mainWeatherSourceType = getMainWeatherSourceType(selectedFavoriteAddressDto.getCountryCode());
-			countryCode = selectedFavoriteAddressDto.getCountryCode();
-			addressName = selectedFavoriteAddressDto.getAddress();
-			this.currentLocationLatitude = Double.parseDouble(selectedFavoriteAddressDto.getLatitude());
-			this.currentLocationLongitude = Double.parseDouble(selectedFavoriteAddressDto.getLongitude());
-			refreshForSelectedLocation();
-		} else if (favoriteAddressType == FavoriteAddressType.CurrentLocation) {
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-			final Double lastLatitude = Double.parseDouble(
-					sharedPreferences.getString(getString(R.string.pref_key_last_current_location_latitude), "0"));
-			final Double lastLongitude = Double.parseDouble(
-					sharedPreferences.getString(getString(R.string.pref_key_last_current_location_longitude), "0"));
+				locationType = LocationType.CurrentLocation;
+				sharedPreferences.edit().putString(getString(R.string.pref_key_last_selected_favorite_address_id), "")
+						.putString(getString(R.string.pref_key_last_selected_location_type), locationType.name()).apply();
+				iGps = (IGps) result.getSerializable(getString(R.string.bundle_key_igps));
 
-			if (lastLatitude == 0 && lastLongitude == 0) {
-				requestCurrentLocation();
-			} else {
-				this.currentLocationLatitude = lastLatitude;
-				this.currentLocationLongitude = lastLongitude;
-				setCurrentLocationAddressName(lastLatitude, lastLongitude, true);
+				latitude = Double.parseDouble(
+						sharedPreferences.getString(getString(R.string.pref_key_last_current_location_latitude), "0.0"));
+				longitude = Double.parseDouble(
+						sharedPreferences.getString(getString(R.string.pref_key_last_current_location_longitude), "0.0"));
+
+				if (latitude == 0.0 && longitude == 0.0) {
+					//최근에 현재위치로 잡힌 위치가 없으므로 현재 위치 요청
+					iGps.requestCurrentLocation();
+				} else {
+					//위/경도에 해당하는 지역명을 불러오고, 날씨 데이터 다운로드
+					//이미 존재하는 날씨 데이터면 다운로드X
+					requestAddressOfLocation(latitude, longitude, true);
+				}
 			}
-		}
+		});
+		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_selected_location), this, new FragmentResultListener() {
+			@Override
+			public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
+				getParentFragmentManager().clearFragmentResultListener(requestKey);
+				getParentFragmentManager().clearFragmentResult(requestKey);
+
+				locationType = LocationType.SelectedAddress;
+				selectedFavoriteAddressDto = (FavoriteAddressDto) result.getSerializable(getString(R.string.bundle_key_selected_address_dto));
+				iGps = (IGps) result.getSerializable(getString(R.string.bundle_key_igps));
+
+				sharedPreferences.edit().putString(getString(R.string.pref_key_last_selected_favorite_address_id), selectedFavoriteAddressDto.getId().toString())
+						.putString(getString(R.string.pref_key_last_selected_location_type), locationType.name()).apply();
+
+				mainWeatherSourceType = getMainWeatherSourceType(selectedFavoriteAddressDto.getCountryCode());
+				countryCode = selectedFavoriteAddressDto.getCountryCode();
+				addressName = selectedFavoriteAddressDto.getAddress();
+				latitude = Double.parseDouble(selectedFavoriteAddressDto.getLatitude());
+				longitude = Double.parseDouble(selectedFavoriteAddressDto.getLongitude());
+
+				binding.addressName.setText(addressName);
+				refresh(latitude, longitude);
+			}
+		});
+	}
+
+	private boolean containWeatherData(Double latitude, Double longitude) {
+		return finalResponseMap.containsKey(latitude.toString() + longitude.toString());
 	}
 
 
-	private void setCurrentLocationAddressName(Double latitude, Double longitude, boolean refresh) {
+	private void requestAddressOfLocation(Double latitude, Double longitude, boolean refresh) {
 		Geocoding.geocoding(getContext(), latitude, longitude, new Geocoding.GeocodingCallback() {
 			@Override
 			public void onGeocodingResult(List<Address> addressList) {
-				if (addressList.isEmpty()) {
-
-				} else {
-					Address address = addressList.get(0);
-					String addressName = address.getAddressLine(0);
-					if (getActivity() != null) {
-						getActivity().runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								binding.addressName.setText(addressName);
-								weatherViewModel.setCurrentLocationAddressName(addressName);
-
-								if (refresh) {
-									mainWeatherSourceType = getMainWeatherSourceType(address.getCountryCode());
-									countryCode = address.getCountryCode();
-									WeatherFragment.this.addressName = address.getAddressLine(0);
-									finalResponseMap.remove(latitude.toString() + longitude.toString());
-									refresh(latitude, longitude);
-								}
-							}
-						});
-
-					}
+				setAddressNameOfLocation(addressList);
+				if (refresh) {
+					refresh(latitude, longitude);
 				}
-
 			}
 		});
+	}
+
+	private void setAddressNameOfLocation(List<Address> addressList) {
+		if (addressList.isEmpty()) {
+			//검색 결과가 없으면 미 표시
+		} else {
+			Address address = addressList.get(0);
+			addressName = address.getAddressLine(0);
+			mainWeatherSourceType = getMainWeatherSourceType(address.getCountryCode());
+			countryCode = address.getCountryCode();
+
+			if (getActivity() != null) {
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						binding.addressName.setText(addressName);
+						weatherViewModel.setCurrentLocationAddressName(addressName);
+					}
+				});
+
+			}
+		}
 	}
 
 	private MainProcessing.WeatherSourceType getMainWeatherSourceType(@NonNull String countryCode) {
@@ -212,48 +222,28 @@ public class WeatherFragment extends Fragment implements IGps {
 	}
 
 	public void reDraw() {
-		if (favoriteAddressType == FavoriteAddressType.SelectedAddress) {
-			refreshForSelectedLocation();
-		} else {
-			refresh(currentLocationLatitude, currentLocationLongitude);
+		if (latitude == 0.0 || longitude == 0.0) {
+			return;
 		}
+		refresh(latitude, longitude);
 	}
 
-	public void refresh() {
-		if (favoriteAddressType == FavoriteAddressType.SelectedAddress) {
-			finalResponseMap.remove(selectedFavoriteAddressDto.getLatitude() + selectedFavoriteAddressDto.getLongitude());
-			refreshForSelectedLocation();
-		} else {
-			if (currentLocationLatitude == null) {
-				Toast.makeText(getContext(), R.string.unavailable_update, Toast.LENGTH_SHORT).show();
-			} else {
-				finalResponseMap.remove(currentLocationLatitude.toString() + currentLocationLongitude.toString());
-				refresh(currentLocationLatitude, currentLocationLongitude);
-			}
-		}
+	public void onChangedCurrentLocation(Location currentLocation) {
+		this.latitude = currentLocation.getLatitude();
+		this.longitude = currentLocation.getLongitude();
+		requestAddressOfLocation(latitude, longitude, true);
 	}
 
-	public void refreshForCurrentLocation(Location currentLocation) {
-		if (currentLocationLatitude != null) {
-			finalResponseMap.remove(currentLocationLatitude.toString() + currentLocationLongitude.toString());
-		}
-
-		this.currentLocationLatitude = currentLocation.getLatitude();
-		this.currentLocationLongitude = currentLocation.getLongitude();
-		setCurrentLocationAddressName(currentLocation.getLatitude(), currentLocation.getLongitude(), true);
-	}
-
-	public void refreshForSelectedLocation() {
-		refresh(Double.parseDouble(selectedFavoriteAddressDto.getLatitude()),
-				Double.parseDouble(selectedFavoriteAddressDto.getLongitude()));
+	public void forceRefresh() {
+		finalResponseMap.remove(latitude.toString() + longitude.toString());
+		refresh(latitude, longitude);
 	}
 
 	private void refresh(Double latitude, Double longitude) {
 		String latLon = latitude.toString() + longitude.toString();
-		if (finalResponseMap.containsKey(latLon)) {
-			setWeatherFragments(finalResponseMap.get(latLon), latitude, longitude);
+		if (containWeatherData(latitude, longitude)) {
+			setWeatherFragments(finalResponseMap.get(latLon), latitude, longitude, null);
 		} else {
-			binding.customProgressView.onStartedProcessingData(getString(R.string.msg_refreshing_weather_data));
 			AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data));
 
 			Set<MainProcessing.WeatherSourceType> weatherSourceTypeSet = new ArraySet<>();
@@ -293,25 +283,15 @@ public class WeatherFragment extends Fragment implements IGps {
 									for (ResponseResult<JsonElement> responseResult : entry.getValue().values()) {
 										if (responseResult.getResponse() == null) {
 											mainWeatherSourceType = finalSecondWeatherSourceType;
+											dialog.dismiss();
 											refresh(latitude, longitude);
 											return;
 										}
 									}
 								}
 							}
-
-							if (getActivity() != null) {
-								finalResponseMap.put(latLon, this);
-								setWeatherFragments(this, latitude, longitude);
-
-								getActivity().runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										binding.customProgressView.onSuccessfulProcessingData();
-										dialog.dismiss();
-									}
-								});
-							}
+							finalResponseMap.put(latLon, this);
+							setWeatherFragments(this, latitude, longitude, dialog);
 						}
 					});
 
@@ -320,16 +300,15 @@ public class WeatherFragment extends Fragment implements IGps {
 
 	}
 
-	private void setWeatherFragments(MultipleJsonDownloader<JsonElement> multipleJsonDownloader, Double latitude, Double longitude) {
+	private void setWeatherFragments(MultipleJsonDownloader<JsonElement> multipleJsonDownloader, Double latitude, Double longitude,
+	                                 @Nullable AlertDialog dialog) {
 		Map<MainProcessing.WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>>> responseMap = multipleJsonDownloader.getResponseMap();
-		Gson gson = new Gson();
 
 		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> aqiArrayMap = responseMap.get(
 				MainProcessing.WeatherSourceType.AQICN);
 		MultipleJsonDownloader.ResponseResult<JsonElement> aqicnResponse = aqiArrayMap.get(
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
-		GeolocalizedFeedResponse airQualityResponse = gson.fromJson(aqicnResponse.getResponse().body().toString(),
-				GeolocalizedFeedResponse.class);
+		GeolocalizedFeedResponse airQualityResponse = AqicnResponseProcessor.getAirQualityObjFromJson((Response<JsonElement>) aqicnResponse.getResponse());
 
 		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> arrayMap = responseMap.get(
 				mainWeatherSourceType);
@@ -340,7 +319,6 @@ public class WeatherFragment extends Fragment implements IGps {
 		Fragment detailCurrentConditionsFragment = null;
 
 		String currentConditionsWeatherVal = null;
-
 		TimeZone timeZone = TimeZone.getDefault();
 
 		switch (mainWeatherSourceType) {
@@ -380,7 +358,6 @@ public class WeatherFragment extends Fragment implements IGps {
 				String pty = finalCurrentConditions.getPrecipitationType();
 
 				currentConditionsWeatherVal = pty.equals("0") ? sky + "_sky" : pty + "_pty";
-
 				timeZone = TimeZone.getTimeZone("Asia/Seoul");
 				break;
 			case ACCU_WEATHER:
@@ -445,13 +422,12 @@ public class WeatherFragment extends Fragment implements IGps {
 
 
 		final Bundle defaultBundle = new Bundle();
-		defaultBundle.putDouble(getString(R.string.bundle_key_latitude), currentLocationLatitude);
-		defaultBundle.putDouble(getString(R.string.bundle_key_longitude), currentLocationLongitude);
+		defaultBundle.putDouble(getString(R.string.bundle_key_latitude), this.latitude);
+		defaultBundle.putDouble(getString(R.string.bundle_key_longitude), this.longitude);
 		defaultBundle.putString(getString(R.string.bundle_key_address_name), addressName);
 		defaultBundle.putString(getString(R.string.bundle_key_country_code), countryCode);
 		defaultBundle.putSerializable(getString(R.string.bundle_key_main_weather_data_source), mainWeatherSourceType);
 		defaultBundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
-
 
 		SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
 		simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);
@@ -491,6 +467,10 @@ public class WeatherFragment extends Fragment implements IGps {
 							getString(R.string.tag_detail_current_conditions_fragment)).replace(binding.simpleAirQuality.getId(),
 							simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment)).replace(
 							binding.sunSetRise.getId(), sunSetRiseFragment, getString(R.string.tag_sun_set_rise_fragment)).commit();
+
+					if (dialog != null) {
+						dialog.dismiss();
+					}
 				}
 			});
 
@@ -547,7 +527,7 @@ public class WeatherFragment extends Fragment implements IGps {
 									} else {
 										mainWeatherSourceType = MainProcessing.WeatherSourceType.KMA;
 									}
-									refresh();
+									refresh(latitude, longitude);
 								}
 								dialogInterface.dismiss();
 							}
@@ -556,74 +536,12 @@ public class WeatherFragment extends Fragment implements IGps {
 		});
 	}
 
-	public FavoriteAddressType getFavoriteAddressType() {
-		return favoriteAddressType;
+	public LocationType getLocationType() {
+		return locationType;
 	}
 
 	public FavoriteAddressDto getSelectedFavoriteAddressDto() {
 		return selectedFavoriteAddressDto;
 	}
-
-	public boolean isFragmentUsingCurrentLocation() {
-		return favoriteAddressType == FavoriteAddressType.CurrentLocation;
-	}
-
-	@Override
-	public void requestCurrentLocation() {
-		if (!gps.isProcessing()) {
-			binding.customProgressView.onStartedProcessingData(getString(R.string.msg_finding_current_location));
-			gps.runGps(requireActivity(), locationCallback, requestOnGpsLauncher, requestLocationPermissionLauncher);
-		}
-	}
-
-	private final ActivityResultCallback<ActivityResult> requestOnGpsResultCallback = new ActivityResultCallback<ActivityResult>() {
-		@Override
-		public void onActivityResult(ActivityResult result) {
-			requestCurrentLocation();
-		}
-	};
-
-	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(
-			new ActivityResultContracts.StartActivityForResult(), requestOnGpsResultCallback);
-
-	private final ActivityResultLauncher<String> requestLocationPermissionLauncher = registerForActivityResult(
-			new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
-				@Override
-				public void onActivityResult(Boolean isGranted) {
-					onResultLocationPermission(isGranted);
-				}
-			});
-
-	protected void onResultLocationPermission(boolean isGranted) {
-		if (isGranted) {
-			gps.clear();
-			requestCurrentLocation();
-		} else {
-			Toast.makeText(getContext(), R.string.message_needs_location_permission, Toast.LENGTH_SHORT).show();
-			locationCallback.onFailed(Gps.LocationCallback.Fail.REJECT_PERMISSION);
-		}
-	}
-
-	private final Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
-		@Override
-		public void onSuccessful(Location location) {
-			SharedPreferences.Editor editor = sharedPreferences.edit();
-			editor.putString(getString(R.string.pref_key_last_current_location_latitude), String.valueOf(location.getLatitude())).putString(
-					getString(R.string.pref_key_last_current_location_longitude), String.valueOf(location.getLongitude())).apply();
-
-			locationCallbackInMainFragment.onSuccessful(location);
-			refreshForCurrentLocation(location);
-		}
-
-		@Override
-		public void onFailed(Fail fail) {
-			if (getChildFragmentManager().getFragments().size() > 0) {
-				binding.customProgressView.onSuccessfulProcessingData();
-			} else {
-				locationCallbackInMainFragment.onFailed(fail);
-				binding.customProgressView.onFailedProcessingData(getString(R.string.update_failed));
-			}
-		}
-	};
 
 }

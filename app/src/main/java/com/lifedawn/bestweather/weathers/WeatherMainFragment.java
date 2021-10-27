@@ -1,17 +1,26 @@
 package com.lifedawn.bestweather.weathers;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
@@ -20,7 +29,8 @@ import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.FavoriteAddressType;
+import com.lifedawn.bestweather.commons.classes.Gps;
+import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.databinding.FragmentWeatherMainBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
@@ -29,14 +39,12 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.flickr.FlickrGetPhotosFromGalleryParameter;
 import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.settings.fragments.SettingsMainFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
-import com.lifedawn.bestweather.weathers.viewpager.WeatherFragment;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import org.jetbrains.annotations.NotNull;
@@ -52,15 +60,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class WeatherMainFragment extends Fragment implements WeatherViewModel.ILoadImgOfCurrentConditions {
+public class WeatherMainFragment extends Fragment implements WeatherViewModel.ILoadImgOfCurrentConditions, IGps {
+	private static final Map<String, Drawable> backgroundImgMap = new HashMap<>();
+
 	private FragmentWeatherMainBinding binding;
 	private View.OnClickListener menuOnClickListener;
-	// private WeatherViewPagerAdapter weatherViewPagerAdapter;
 	private WeatherViewModel weatherViewModel;
-	private IGps iGps;
 	private WeatherFragment weatherFragment;
-	private boolean initializing = true;
-	private static final Map<String, Drawable> backgroundImgMap = new HashMap<>();
+	private Gps gps;
+	private SharedPreferences sharedPreferences;
+	private Gps.LocationCallback locationCallbackInMainFragment;
 
 	public WeatherMainFragment(View.OnClickListener menuOnClickListener) {
 		this.menuOnClickListener = menuOnClickListener;
@@ -86,6 +95,10 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		weatherViewModel.setiLoadImgOfCurrentConditions(this);
+		locationCallbackInMainFragment = weatherViewModel.getLocationCallback();
+
+		gps = new Gps();
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 	}
 
 	@Override
@@ -116,7 +129,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		binding.mainToolbar.gps.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				iGps.requestCurrentLocation();
+				gps.runGps(requireActivity(), locationCallback, requestOnGpsLauncher, requestLocationPermissionLauncher);
 			}
 		});
 
@@ -134,98 +147,36 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		binding.mainToolbar.refresh.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				weatherFragment.refresh();
+				weatherFragment.forceRefresh();
 			}
 		});
-		
-		/*
-		binding.viewPager.registerOnPageChangeCallback(onPageChangeCallback);
-		weatherViewPagerAdapter = new WeatherViewPagerAdapter(this);
-		binding.viewPager.setAdapter(weatherViewPagerAdapter);
-		
-		favoriteAddressRepository.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
-			@Override
-			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				if (getActivity() != null) {
-					getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-							final boolean usingCurrentLocation = sharedPreferences.getBoolean(
-									getString(R.string.pref_key_use_current_location), true);
-							
-							weatherViewPagerAdapter.setWeatherFragments(getContext(), usingCurrentLocation, result);
-							WeatherMainFragment.this.iGps = weatherViewPagerAdapter.getiGps();
-							binding.viewpagerIndicator.createDot(0, usingCurrentLocation ? result.size() + 1 : result.size());
-						}
-					});
-				}
-			}
-			
-			@Override
-			public void onResultNoData() {
-			
-			}
-		});
-		
-		 */
+
 	}
-	
-	/*
-	private ViewPager2.OnPageChangeCallback onPageChangeCallback = new ViewPager2.OnPageChangeCallback() {
-		public int lastPosition = 0;
-		
-		@Override
-		public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-			super.onPageScrolled(position, positionOffset, positionOffsetPixels);
-		}
-		
-		@Override
-		public void onPageSelected(int position) {
-			super.onPageSelected(position);
-			if (lastPosition != position) {
-				lastPosition = position;
-				binding.viewpagerIndicator.selectDot(position);
-			}
-			
-			if (weatherViewPagerAdapter.isFragmentUsingCurrentLocation(position)) {
-				binding.mainToolbar.gps.setVisibility(View.VISIBLE);
-				binding.mainToolbar.find.setVisibility(View.GONE);
-			} else {
-				binding.mainToolbar.gps.setVisibility(View.GONE);
-				binding.mainToolbar.find.setVisibility(View.VISIBLE);
-			}
-		}
-		
-		@Override
-		public void onPageScrollStateChanged(int state) {
-			super.onPageScrollStateChanged(state);
-		}
-	};
-	 */
 
-	public void setWeatherFragment(FavoriteAddressType favoriteAddressType, @Nullable FavoriteAddressDto favoriteAddressDto) {
-		weatherFragment = new WeatherFragment();
+	public void setWeatherFragment(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
+		if (weatherFragment != null) {
+			if (locationType == LocationType.CurrentLocation && locationType == weatherFragment.getLocationType()) {
+				return;
+			}
+		}
+
+		binding.mainToolbar.gps.setVisibility(locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
+		binding.mainToolbar.find.setVisibility(locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
+
 		Bundle bundle = new Bundle();
+		bundle.putSerializable(getString(R.string.bundle_key_selected_address_dto), favoriteAddressDto);
+		bundle.putSerializable(getString(R.string.bundle_key_igps), (IGps) this);
 
-		if (favoriteAddressType == FavoriteAddressType.CurrentLocation) {
-			bundle.putSerializable(getString(R.string.bundle_key_favorite_address_type), FavoriteAddressType.CurrentLocation);
-			bundle.putSerializable(getString(R.string.bundle_key_favorite_address_type), FavoriteAddressType.CurrentLocation);
-			iGps = weatherFragment;
+		String requestKey = locationType == LocationType.CurrentLocation
+				? getString(R.string.key_current_location) : getString(R.string.key_selected_location);
 
-			binding.mainToolbar.gps.setVisibility(View.VISIBLE);
-			binding.mainToolbar.find.setVisibility(View.GONE);
-		} else {
-			bundle.putSerializable(getString(R.string.bundle_key_favorite_address_type), FavoriteAddressType.SelectedAddress);
-			bundle.putSerializable(getString(R.string.bundle_key_selected_address), favoriteAddressDto);
-
-			binding.mainToolbar.gps.setVisibility(View.GONE);
-			binding.mainToolbar.find.setVisibility(View.VISIBLE);
-		}
-		weatherFragment.setArguments(bundle);
-
+		weatherFragment = new WeatherFragment();
+		getChildFragmentManager().clearFragmentResult(requestKey);
+		getChildFragmentManager().clearFragmentResultListener(requestKey);
+		getChildFragmentManager().setFragmentResult(requestKey, bundle);
 		getChildFragmentManager().beginTransaction().replace(binding.weatherFragmentsContainer.getId(), weatherFragment,
 				getString(R.string.tag_weather_fragment)).commit();
+
 	}
 
 	public void removeFragment() {
@@ -352,12 +303,65 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		}
 	}
 
-	public FavoriteAddressType getFavoriteAddressTypeOfWeatherFragment() {
-		return weatherFragment.getFavoriteAddressType();
+	public LocationType getFavoriteAddressTypeOfWeatherFragment() {
+		return weatherFragment.getLocationType();
 	}
 
 	public FavoriteAddressDto getFavoriteAddressDtoOfWeatherFragment() {
 		return weatherFragment.getSelectedFavoriteAddressDto();
 	}
 
+
+	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(
+			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+				@Override
+				public void onActivityResult(ActivityResult result) {
+					//gps 사용확인 화면에서 나온뒤 현재 위치 다시 파악
+					binding.mainToolbar.gps.callOnClick();
+				}
+			});
+
+	private final ActivityResultLauncher<String> requestLocationPermissionLauncher = registerForActivityResult(
+			new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+				@Override
+				public void onActivityResult(Boolean isGranted) {
+					//gps사용 권한
+					//허가남 : 현재 위치 다시 파악
+					//거부됨 : 작업 취소
+					if (isGranted) {
+						binding.mainToolbar.gps.callOnClick();
+					} else {
+						locationCallback.onFailed(Gps.LocationCallback.Fail.REJECT_PERMISSION);
+					}
+				}
+			});
+
+	private final Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
+		@Override
+		public void onSuccessful(Location location) {
+			//현재 위치 파악 성공
+			//현재 위/경도 좌표를 최근 현재위치의 위/경도로 등록
+			//날씨 데이터 요청
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putString(getString(R.string.pref_key_last_current_location_latitude), String.valueOf(location.getLatitude())).putString(
+					getString(R.string.pref_key_last_current_location_longitude), String.valueOf(location.getLongitude())).apply();
+			weatherFragment.onChangedCurrentLocation(location);
+			locationCallbackInMainFragment.onSuccessful(location);
+		}
+
+		@Override
+		public void onFailed(Fail fail) {
+			locationCallbackInMainFragment.onFailed(fail);
+			if (fail == Fail.DISABLED_GPS) {
+				Toast.makeText(getContext(), R.string.request_to_make_gps_on, Toast.LENGTH_SHORT).show();
+			} else if (fail == Fail.REJECT_PERMISSION) {
+				Toast.makeText(getContext(), R.string.message_needs_location_permission, Toast.LENGTH_SHORT).show();
+			}
+		}
+	};
+
+	@Override
+	public void requestCurrentLocation() {
+		binding.mainToolbar.gps.callOnClick();
+	}
 }

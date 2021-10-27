@@ -27,28 +27,6 @@
                 android:layout_height="?attr/actionBarSize"
                 android:layout_gravity="top" />
 
-            <!--
-            <com.lifedawn.bestweather.commons.views.ViewPagerIndicator
-                android:id="@+id/viewpager_indicator"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
-                app:IndicatorSelectedDotDrawable="@drawable/selected_dot_indicator"
-                app:IndicatorUnselectedDotDrawable="@drawable/unselected_dot_indicator" />
-
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/view_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:background="@color/transparent"
-                android:orientation="horizontal"
-                android:overScrollMode="never" />
-            -->
-
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/weather_fragments_container"
                 android:layout_width="match_parent"
