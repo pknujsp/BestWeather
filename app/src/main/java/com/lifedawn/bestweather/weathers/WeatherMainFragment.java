@@ -1,9 +1,13 @@
 package com.lifedawn.bestweather.weathers;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -12,6 +16,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
@@ -23,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
@@ -66,7 +72,6 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	private FragmentWeatherMainBinding binding;
 	private View.OnClickListener menuOnClickListener;
 	private WeatherViewModel weatherViewModel;
-	private WeatherFragment weatherFragment;
 	private Gps gps;
 	private SharedPreferences sharedPreferences;
 	private Gps.LocationCallback locationCallbackInMainFragment;
@@ -129,7 +134,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		binding.mainToolbar.gps.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				gps.runGps(requireActivity(), locationCallback, requestOnGpsLauncher, requestLocationPermissionLauncher);
+				gps.runGps(requireActivity(), locationCallback, requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
 			}
 		});
 
@@ -147,6 +152,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		binding.mainToolbar.refresh.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				WeatherFragment weatherFragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(getString(R.string.tag_weather_fragment));
 				weatherFragment.forceRefresh();
 			}
 		});
@@ -154,11 +160,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	}
 
 	public void setWeatherFragment(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
-		if (weatherFragment != null) {
-			if (locationType == LocationType.CurrentLocation && locationType == weatherFragment.getLocationType()) {
-				return;
-			}
-		}
+		Glide.with(this).clear(binding.currentConditionsImg);
 
 		binding.mainToolbar.gps.setVisibility(locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
 		binding.mainToolbar.find.setVisibility(locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
@@ -170,23 +172,14 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		String requestKey = locationType == LocationType.CurrentLocation
 				? getString(R.string.key_current_location) : getString(R.string.key_selected_location);
 
-		weatherFragment = new WeatherFragment();
+		WeatherFragment weatherFragment = new WeatherFragment();
 		getChildFragmentManager().clearFragmentResult(requestKey);
 		getChildFragmentManager().clearFragmentResultListener(requestKey);
 		getChildFragmentManager().setFragmentResult(requestKey, bundle);
-		getChildFragmentManager().beginTransaction().replace(binding.weatherFragmentsContainer.getId(), weatherFragment,
+		getChildFragmentManager().beginTransaction().setPrimaryNavigationFragment(weatherFragment).replace(binding.weatherFragmentsContainer.getId(),
+				weatherFragment,
 				getString(R.string.tag_weather_fragment)).commit();
 
-	}
-
-	public void removeFragment() {
-		getChildFragmentManager().beginTransaction().remove(weatherFragment).commit();
-		weatherFragment = null;
-		binding.currentConditionsImg.setBackground(null);
-	}
-
-	public WeatherFragment getWeatherFragment() {
-		return weatherFragment;
 	}
 
 	@Override
@@ -242,7 +235,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 
 		//이미 다운로드 된 이미지가 있으면 다운로드 하지 않음
 		if (backgroundImgMap.containsKey(galleryName)) {
-			Glide.with(WeatherMainFragment.this).load(backgroundImgMap.get(galleryName)).into(binding.currentConditionsImg);
+			Glide.with(WeatherMainFragment.this).load(backgroundImgMap.get(galleryName)).transition(DrawableTransitionOptions.withCrossFade(500)).into(binding.currentConditionsImg);
 		} else {
 
 			FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
@@ -278,7 +271,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 										return;
 									}
 									backgroundImgMap.put(galleryName, resource);
-									Glide.with(WeatherMainFragment.this).load(resource).into(binding.currentConditionsImg);
+									Glide.with(WeatherMainFragment.this).load(resource).transition(DrawableTransitionOptions.withCrossFade(500)).into(binding.currentConditionsImg);
 								}
 
 								@Override
@@ -303,21 +296,26 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		}
 	}
 
-	public LocationType getFavoriteAddressTypeOfWeatherFragment() {
-		return weatherFragment.getLocationType();
-	}
-
-	public FavoriteAddressDto getFavoriteAddressDtoOfWeatherFragment() {
-		return weatherFragment.getSelectedFavoriteAddressDto();
-	}
-
-
 	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(
 			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
 				@Override
 				public void onActivityResult(ActivityResult result) {
 					//gps 사용확인 화면에서 나온뒤 현재 위치 다시 파악
-					binding.mainToolbar.gps.callOnClick();
+					LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+					boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+					if (isGpsEnabled) {
+						binding.mainToolbar.gps.callOnClick();
+					}
+				}
+			});
+
+	private final ActivityResultLauncher<Intent> moveToAppDetailSettingsLauncher = registerForActivityResult(
+			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+				@Override
+				public void onActivityResult(ActivityResult result) {
+					if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+						binding.mainToolbar.gps.callOnClick();
+					}
 				}
 			});
 
@@ -328,6 +326,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 					//gps사용 권한
 					//허가남 : 현재 위치 다시 파악
 					//거부됨 : 작업 취소
+					//계속 거부 체크됨 : 작업 취소
 					if (isGranted) {
 						binding.mainToolbar.gps.callOnClick();
 					} else {
@@ -345,6 +344,8 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString(getString(R.string.pref_key_last_current_location_latitude), String.valueOf(location.getLatitude())).putString(
 					getString(R.string.pref_key_last_current_location_longitude), String.valueOf(location.getLongitude())).apply();
+
+			WeatherFragment weatherFragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(getString(R.string.tag_weather_fragment));
 			weatherFragment.onChangedCurrentLocation(location);
 			locationCallbackInMainFragment.onSuccessful(location);
 		}
@@ -363,5 +364,15 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	@Override
 	public void requestCurrentLocation() {
 		binding.mainToolbar.gps.callOnClick();
+	}
+
+	public void reDraw() {
+		//날씨 프래그먼트 다시 그림
+		String tag = getString(R.string.tag_weather_fragment);
+		WeatherFragment fragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(tag);
+
+		if (fragment != null) {
+			fragment.reDraw();
+		}
 	}
 }

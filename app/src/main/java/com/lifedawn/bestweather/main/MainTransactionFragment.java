@@ -77,36 +77,54 @@ public class MainTransactionFragment extends Fragment {
 		private boolean originalUsingCurrentLocation = false;
 
 		@Override
-		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
-		                              @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-			super.onFragmentCreated(fm, f, savedInstanceState);
+		public void onFragmentAttached(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f, @NonNull @NotNull Context context) {
+			super.onFragmentAttached(fm, f, context);
 			if (f instanceof SettingsMainFragment) {
 				originalUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
 			}
 		}
 
 		@Override
+		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
+		                              @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+			super.onFragmentCreated(fm, f, savedInstanceState);
+		}
+
+		@Override
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
+
 			if (f instanceof SettingsMainFragment) {
+
 				final boolean newUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location),
 						true);
+				final LocationType lastSelectedLocationType =
+						LocationType.enumOf(sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
+								LocationType.CurrentLocation.name()));
+
 				if (originalUsingCurrentLocation != newUsingCurrentLocation) {
 					setCurrentLocationState(newUsingCurrentLocation);
-					if (!newUsingCurrentLocation && weatherMainFragment.getFavoriteAddressTypeOfWeatherFragment() == LocationType.CurrentLocation) {
-						if (favoriteAddressDtoList.size() > 0) {
-							binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+					if (newUsingCurrentLocation) {
+						//날씨 프래그먼트 다시 그림
+						weatherMainFragment.reDraw();
+
+					} else {
+						if (lastSelectedLocationType == LocationType.CurrentLocation) {
+							if (favoriteAddressDtoList.isEmpty()) {
+								binding.sideNavMenu.favorites.callOnClick();
+							} else {
+								binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+							}
 						} else {
-							weatherMainFragment.removeFragment();
-							binding.sideNavMenu.favorites.callOnClick();
-						}
-					} else if (newUsingCurrentLocation) {
-						if (weatherMainFragment.getWeatherFragment() == null) {
-							binding.sideNavMenu.currentLocationLayout.callOnClick();
+							//날씨 프래그먼트 다시 그림
+							weatherMainFragment.reDraw();
+
+
 						}
 					}
 				} else {
-					weatherMainFragment.getWeatherFragment().reDraw();
+					//날씨 프래그먼트 다시 그림
+					weatherMainFragment.reDraw();
 				}
 			}
 		}
@@ -114,11 +132,7 @@ public class MainTransactionFragment extends Fragment {
 
 	private void setCurrentLocationState(boolean newState) {
 		binding.sideNavMenu.currentLocationLayout.setClickable(newState);
-		if (!newState) {
-			binding.sideNavMenu.addressName.setText(getString(R.string.disabled_use_current_location));
-		} else {
-			binding.sideNavMenu.addressName.setText(getString(R.string.enabled_use_current_location));
-		}
+		binding.sideNavMenu.addressName.setText(newState ? R.string.enabled_use_current_location : R.string.disabled_use_current_location);
 	}
 
 	@Override
@@ -151,8 +165,6 @@ public class MainTransactionFragment extends Fragment {
 					@Override
 					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
 						//변경된 위치가 있는지 확인
-						final boolean usingCurrentLocation =
-								sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
 						List<FavoriteAddressDto> newFavoriteAddressDtoList =
 								(List<FavoriteAddressDto>) result.getSerializable(getString(R.string.bundle_key_new_favorite_address_list));
 
@@ -171,47 +183,12 @@ public class MainTransactionFragment extends Fragment {
 						Set<Integer> removedSet = new HashSet<>(lastSet);
 						removedSet.removeAll(newSet);
 
-						/*
-						<경우의 수>
-						1.현재 위치를 보여주는 경우 : 즐겨찾기에 변화가 생긴 경우, 그대로 인 경우
-						변화 생김 : 리스트 갱신
-						그대로 : 유지
-						
-						2.즐겨찾기의 위치를 보여주는 경우 : 기존 표시 장소가 삭제된 경우, 삭제 되지 않고 목록에 변화가 생긴 경우,
-						목록이 빈 경우
-						기존 표시 장소 삭제 : 리스트 갱신하고, 다른 장소 표시
-						기존 표시 장소 삭제없고 목록에 변화(목록이 비지 않음) : 리스트 갱신
-						목록이 빔 : 현재 위치 사용(즐겨찾기 화면에서 현재 위치 사용확인 후 나옴)
-
-						3.아무것도 표시하지 않는 경우 :
-						즐겨찾기가 빔 : 현재 위치 사용(즐겨찾기 화면에서 현재 위치 사용확인 후 나옴)
-						비지 않음 : 다른 장소 표시
-						 */
-						if (weatherMainFragment.getWeatherFragment() == null) {
-							if (newSet.isEmpty()) {
-								binding.sideNavMenu.currentLocationLayout.callOnClick();
-							} else {
-								init(true);
-							}
+						if (!addedSet.isEmpty() || !removedSet.isEmpty()) {
+							//즐겨찾기 변동 발생
+							refreshFavoriteLocationsList(requestKey, result);
 						} else {
-							FavoriteAddressDto currentLocationFavoriteAddressDto = weatherMainFragment.getFavoriteAddressDtoOfWeatherFragment();
-							LocationType currentLocationLocationType = weatherMainFragment.getFavoriteAddressTypeOfWeatherFragment();
-
-							if (currentLocationLocationType == LocationType.CurrentLocation) {
-								if (!addedSet.isEmpty() || !removedSet.isEmpty()) {
-									init(false);
-								}
-							} else {
-								if (removedSet.contains(currentLocationFavoriteAddressDto.getId())) {
-									init(true);
-								} else {
-									if (newSet.isEmpty()) {
-										binding.sideNavMenu.currentLocationLayout.callOnClick();
-									} else if (!addedSet.isEmpty() || !removedSet.isEmpty()) {
-										init(false);
-									}
-								}
-							}
+							//변동 없음
+							processIfPreviousFragmentIsFavorite(result);
 						}
 					}
 
@@ -220,13 +197,12 @@ public class MainTransactionFragment extends Fragment {
 				new FragmentResultListener() {
 					@Override
 					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
-						final boolean isSelectedAddress = result.getBoolean(getString(R.string.bundle_key_selected_address_dto));
+						final boolean isSelectedNewAddress = result.getBoolean(getString(R.string.bundle_key_selected_address_dto));
 
-						if (isSelectedAddress) {
+						if (isSelectedNewAddress) {
 							final int newFavoriteAddressDtoId = result.getInt(getString(R.string.bundle_key_new_favorite_address_dto_id));
-							sharedPreferences.edit().putString(getString(R.string.pref_key_last_selected_favorite_address_id),
-									String.valueOf(newFavoriteAddressDtoId)).apply();
-							init(true);
+							sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), newFavoriteAddressDtoId).apply();
+							refreshFavoriteLocationsList(requestKey, result);
 						}
 					}
 				});
@@ -239,15 +215,115 @@ public class MainTransactionFragment extends Fragment {
 
 			@Override
 			public void onFailed(Fail fail) {
-				weatherMainFragment.removeFragment();
+				//기존의 현재 위치 값이 없으면 즐겨찾기로 이동
+				Double latitude = Double.parseDouble(
+						sharedPreferences.getString(getString(R.string.pref_key_last_current_location_latitude), "0.0"));
+				Double longitude = Double.parseDouble(
+						sharedPreferences.getString(getString(R.string.pref_key_last_current_location_longitude), "0.0"));
 
-				if (fail == Fail.REJECT_PERMISSION) {
-					binding.sideNavMenu.favorites.callOnClick();
-				} else if (fail == Fail.DISABLED_GPS) {
+				if (latitude == 0.0 && longitude == 0.0) {
 					binding.sideNavMenu.favorites.callOnClick();
 				}
 			}
 		});
+	}
+
+	private void createFavoriteLocationsList(DbQueryCallback<List<FavoriteAddressDto>> callback) {
+		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
+			@Override
+			public void onResultSuccessful(List<FavoriteAddressDto> result) {
+				if (getActivity() != null) {
+					getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							favoriteAddressDtoList = result;
+							binding.sideNavMenu.favoriteAddressLayout.removeAllViews();
+
+							for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
+								addFavoriteLocationItemView(LocationType.SelectedAddress, favoriteAddressDto);
+							}
+
+							if (favoriteAddressDtoList.size() > 0) {
+								binding.sideNavMenu.favoriteAddressLayout.setVisibility(View.VISIBLE);
+							} else {
+								binding.sideNavMenu.favoriteAddressLayout.setVisibility(View.GONE);
+							}
+							callback.processResult(result);
+						}
+					});
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
+				if (getActivity() != null) {
+					getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							callback.onResultNoData();
+						}
+					});
+				}
+			}
+		});
+	}
+
+	/**
+	 * Always processing on ui-thread
+	 **/
+	private void refreshFavoriteLocationsList(String requestKey, Bundle bundle) {
+		createFavoriteLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
+			@Override
+			public void onResultSuccessful(List<FavoriteAddressDto> result) {
+				if (requestKey.equals(getString(R.string.key_back_from_find_address_to_main))) {
+					final int lastSelectedFavoriteAddressId =
+							sharedPreferences.getInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1);
+					clickLocationViewWithId(lastSelectedFavoriteAddressId);
+				} else if (requestKey.equals(getString(R.string.key_back_from_favorite_to_main))) {
+					processIfPreviousFragmentIsFavorite(bundle);
+				}
+
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
+	}
+
+	private void processIfPreviousFragmentIsFavorite(Bundle bundle) {
+		final int lastSelectedFavoriteAddressId =
+				Integer.parseInt(sharedPreferences.getString(getString(R.string.bundle_key_new_favorite_address_dto_id), "-1"));
+		final LocationType lastSelectedLocationType =
+				LocationType.enumOf(sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
+						LocationType.CurrentLocation.name()));
+
+		if (lastSelectedLocationType == LocationType.SelectedAddress) {
+			if (favoriteAddressDtoList.isEmpty()) {
+				setCurrentLocationState(true);
+				binding.sideNavMenu.currentLocationLayout.callOnClick();
+			} else {
+				boolean removed = true;
+				for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
+					if (favoriteAddressDto.getId() == lastSelectedFavoriteAddressId) {
+						removed = false;
+						break;
+					}
+				}
+
+				if (removed) {
+					binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+				}
+			}
+		} else {
+			//현재 위치
+			boolean enabledUseCurrentLocation = bundle.getBoolean(getString(R.string.bundle_key_changed_use_current_location));
+			if (enabledUseCurrentLocation) {
+				setCurrentLocationState(true);
+				binding.sideNavMenu.currentLocationLayout.callOnClick();
+			}
+		}
 	}
 
 	@Override
@@ -280,98 +356,28 @@ public class MainTransactionFragment extends Fragment {
 			}
 		});
 
-		init(true);
-		initializing = false;
-	}
-
-	private void init(boolean select) {
-		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
+		createFavoriteLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				if (getActivity() != null) {
-					getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							binding.sideNavMenu.favoriteAddressLayout.removeAllViews();
-							favoriteAddressDtoList = result;
+				final boolean usingCurrentLocation = sharedPreferences.getBoolean(
+						getString(R.string.pref_key_use_current_location), true);
+				final LocationType lastSelectedLocationType =
+						LocationType.enumOf(sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
+								LocationType.CurrentLocation.name()));
+				setCurrentLocationState(usingCurrentLocation);
 
-							for (FavoriteAddressDto favoriteAddressDto : result) {
-								addFavoriteLocationItemView(LocationType.SelectedAddress, favoriteAddressDto);
-							}
-
-							if (result.size() > 0) {
-								binding.sideNavMenu.favoriteAddressLayout.setVisibility(View.VISIBLE);
-							} else {
-								binding.sideNavMenu.favoriteAddressLayout.setVisibility(View.GONE);
-							}
-							/*
-							마지막으로 선택된 위치의 id값의 경우의 수 : 현재위치 또는 없음, 즐겨찾기에 추가한 주소
-							1. 현재 위치인 경우 : 현재 위치 on 이면 현재위치 사용, 아니면 즐겨찾기에서 첫번째 주소를 선택
-							즐겨찾기가 빈 경우 :  주소 추가 화면 표시
-
-							2. 즐겨찾기에 추가한 주소 : 즐겨찾기에 존재하는 id인 경우 해당 주소를 선택,
-							즐겨찾기에 없는 경우 : 현재 위치가 on인 경우에 현재위치사용, off이면 즐겨찾기에서 첫번째 주소선택
-							즐겨찾기가 빈 경우 :  주소 추가 화면 표시
-							 */
-
-							final boolean usingCurrentLocation = sharedPreferences.getBoolean(
-									getString(R.string.pref_key_use_current_location), true);
-							setCurrentLocationState(usingCurrentLocation);
-
-							if (select) {
-								final String lastSelectedFavoriteAddressId = sharedPreferences.getString(
-										getString(R.string.pref_key_last_selected_favorite_address_id), "");
-
-								if (lastSelectedFavoriteAddressId.equals(
-										LocationType.CurrentLocation.name()) || lastSelectedFavoriteAddressId.isEmpty()) {
-									//현재 위치 또는 없음
-									if (usingCurrentLocation) {
-										binding.sideNavMenu.currentLocationLayout.callOnClick();
-									} else {
-										if (result.isEmpty()) {
-											//주소 추가 화면 표시
-											binding.sideNavMenu.favorites.callOnClick();
-										} else {
-											//즐겨찾기에서 첫번째 주소 선택
-											weatherMainFragment.setWeatherFragment(LocationType.SelectedAddress, result.get(0));
-										}
-									}
-								} else {
-									//즐겨찾기
-									final int selectedId = Integer.parseInt(lastSelectedFavoriteAddressId);
-									FavoriteAddressDto selectedFavoriteAddressDto = null;
-
-									for (FavoriteAddressDto favoriteAddressDto : result) {
-										if (favoriteAddressDto.getId() == selectedId) {
-											selectedFavoriteAddressDto = favoriteAddressDto;
-											break;
-										}
-									}
-
-									if (selectedFavoriteAddressDto != null) {
-										//즐겨찾기에 있으므로 해당 주소선택
-										weatherMainFragment.setWeatherFragment(LocationType.SelectedAddress,
-												selectedFavoriteAddressDto);
-									} else {
-										//즐겨찾기에 없는 경우
-										if (usingCurrentLocation) {
-											//현재위치사용
-											binding.sideNavMenu.currentLocationLayout.callOnClick();
-										} else {
-											if (result.isEmpty()) {
-												//주소 추가 화면 표시
-												binding.sideNavMenu.favorites.callOnClick();
-											} else {
-												//즐겨찾기에서 첫번째 주소 선택
-												weatherMainFragment.setWeatherFragment(LocationType.SelectedAddress, result.get(0));
-											}
-										}
-									}
-
-								}
-							}
-						}
-					});
+				if (lastSelectedLocationType == LocationType.CurrentLocation) {
+					if (usingCurrentLocation) {
+						binding.sideNavMenu.currentLocationLayout.callOnClick();
+					} else {
+						binding.sideNavMenu.favorites.callOnClick();
+					}
+				} else {
+					final int lastSelectedFavoriteId =
+							sharedPreferences.getInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1);
+					if (!clickLocationViewWithId(lastSelectedFavoriteId)) {
+						binding.sideNavMenu.favorites.callOnClick();
+					}
 				}
 			}
 
@@ -380,7 +386,25 @@ public class MainTransactionFragment extends Fragment {
 
 			}
 		});
+		initializing = false;
 	}
+
+	private boolean clickLocationViewWithId(int id) {
+		View view = null;
+		FavoriteAddressDto favoriteAddressDto = null;
+
+		for (int childIdx = 0; childIdx < binding.sideNavMenu.favoriteAddressLayout.getChildCount(); childIdx++) {
+			view = binding.sideNavMenu.favoriteAddressLayout.getChildAt(childIdx);
+			favoriteAddressDto = (FavoriteAddressDto) view.getTag(favDtoTagInFavLocItemView);
+
+			if (favoriteAddressDto.getId() == id) {
+				binding.sideNavMenu.favoriteAddressLayout.getChildAt(childIdx).callOnClick();
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 	private void addFavoriteLocationItemView(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
 		TextView locationItemView = (TextView) getLayoutInflater().inflate(R.layout.favorite_address_item_in_side_nav, null);

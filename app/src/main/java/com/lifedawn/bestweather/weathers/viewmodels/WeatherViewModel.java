@@ -23,18 +23,18 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	private ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions;
 	private Gps.LocationCallback locationCallback;
 	private FavoriteAddressRepository favoriteAddressRepository;
-	
+
 	private MutableLiveData<FavoriteAddressDto> addAddressesLiveData;
 	private MutableLiveData<FavoriteAddressDto> deleteAddressesLiveData;
 	private MutableLiveData<String> currentLocationLiveData = new MutableLiveData<>();
-	
+
 	public WeatherViewModel(@NonNull @NotNull Application application) {
 		super(application);
 		favoriteAddressRepository = new FavoriteAddressRepository(application.getApplicationContext());
 		addAddressesLiveData = favoriteAddressRepository.getAddAddressesLiveData();
 		deleteAddressesLiveData = favoriteAddressRepository.getDeleteAddressesLiveData();
 	}
-	
+
 	public void setiLoadImgOfCurrentConditions(ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions) {
 		this.iLoadImgOfCurrentConditions = iLoadImgOfCurrentConditions;
 	}
@@ -50,43 +50,48 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	public ILoadImgOfCurrentConditions getiLoadImgOfCurrentConditions() {
 		return iLoadImgOfCurrentConditions;
 	}
-	
+
 	public LiveData<FavoriteAddressDto> getDeleteAddressesLiveData() {
 		return deleteAddressesLiveData;
 	}
-	
+
 	public LiveData<FavoriteAddressDto> getAddAddressesLiveData() {
 		return addAddressesLiveData;
 	}
-	
+
 	@Override
 	public void getAll(DbQueryCallback<List<FavoriteAddressDto>> callback) {
 		favoriteAddressRepository.getAll(callback);
 	}
-	
+
+	@Override
+	public void size(DbQueryCallback<Integer> callback) {
+		favoriteAddressRepository.size(callback);
+	}
+
 	@Override
 	public void contains(String latitude, String longitude, DbQueryCallback<Boolean> callback) {
 		favoriteAddressRepository.contains(latitude, longitude, callback);
 	}
-	
+
 	@Override
 	public void add(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Long> callback) {
 		favoriteAddressRepository.add(favoriteAddressDto, callback);
 	}
-	
+
 	@Override
 	public void delete(FavoriteAddressDto favoriteAddressDto) {
 		favoriteAddressRepository.delete(favoriteAddressDto);
 	}
-	
+
 	public LiveData<String> getCurrentLocationLiveData() {
 		return currentLocationLiveData;
 	}
-	
+
 	public void setCurrentLocationAddressName(String addressName) {
 		currentLocationLiveData.setValue(addressName);
 	}
-	
+
 	public interface ILoadImgOfCurrentConditions {
 		void loadImgOfCurrentConditions(MainProcessing.WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude, TimeZone timeZone);
 	}

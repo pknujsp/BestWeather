@@ -65,7 +65,7 @@ public enum ValueUnits {
 			//m/s -> km/h n x 3.6 = c
 			convertedVal = convertedVal * 3.6;
 		}
-		return convertedVal;
+		return Math.round(convertedVal * 10) / 10.0;
 	}
 
 	public static Double convertWindSpeedForAccu(String val, ValueUnits unit) {
@@ -74,7 +74,7 @@ public enum ValueUnits {
 			//m/s -> km/h n x 3.6 = c
 			convertedVal = convertedVal / 3.6;
 		}
-		return convertedVal;
+		return Math.round(convertedVal * 10) / 10.0;
 	}
 
 	public static String convertVisibility(String val, ValueUnits unit) {

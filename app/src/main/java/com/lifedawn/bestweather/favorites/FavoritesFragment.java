@@ -91,7 +91,7 @@ public class FavoritesFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		binding.customProgressView.setContentView(binding.favoriteAddressList);
+		binding.progressResultView.setContentView(binding.favoriteAddressList);
 
 		binding.toolbar.fragmentTitle.setText(R.string.favorite);
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
@@ -128,9 +128,9 @@ public class FavoritesFragment extends Fragment {
 				super.onChanged();
 
 				if (adapter.getItemCount() == 0) {
-					binding.customProgressView.onFailedProcessingData(getString(R.string.empty_favorite_addresses));
+					binding.progressResultView.onFailedProcessingData(getString(R.string.empty_favorite_addresses));
 				} else {
-					binding.customProgressView.onSuccessfulProcessingData();
+					binding.progressResultView.onSuccessfulProcessingData();
 				}
 			}
 		});
@@ -159,6 +159,7 @@ public class FavoritesFragment extends Fragment {
 	public void onDestroy() {
 		Bundle bundle = new Bundle();
 		bundle.putSerializable(getString(R.string.bundle_key_new_favorite_address_list), (Serializable) adapter.getFavoriteAddressDtoList());
+		bundle.putBoolean(getString(R.string.bundle_key_changed_use_current_location), enableCurrentLocation);
 
 		getParentFragmentManager().setFragmentResult(getString(R.string.key_back_from_favorite_to_main), bundle);
 		getParentFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
@@ -200,42 +201,34 @@ public class FavoritesFragment extends Fragment {
 			//즐겨찾기가 비었고, 현재 위치 사용이 꺼져있음
 			//현재 위치 사용 여부 다이얼로그 표시
 			//확인 : 현재 위치의 날씨 데이터로드, 취소 : 앱 종료
-			new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.pref_title_use_current_location).setMessage(
-					R.string.msg_request_enable_current_location_because_empty_locations).setPositiveButton(R.string.use,
+			new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.title_empty_locations).setMessage(
+					R.string.msg_empty_locations).setPositiveButton(R.string.use,
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialogInterface, int i) {
+							dialogInterface.dismiss();
 							PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(
 									getString(R.string.pref_key_use_current_location), true).apply();
 							enableCurrentLocation = true;
 							getParentFragmentManager().popBackStack();
-							dialogInterface.dismiss();
 						}
-					}).setNegativeButton(R.string.close_app, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialogInterface, int i) {
-					dialogInterface.dismiss();
-					getActivity().finish();
-				}
-			}).setNeutralButton(R.string.add_favorite, new DialogInterface.OnClickListener() {
+					}).setNegativeButton(R.string.add_favorite, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialogInterface, int i) {
 					dialogInterface.dismiss();
 					binding.addFavorite.callOnClick();
+				}
+			}).setNeutralButton(R.string.close_app, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialogInterface, int i) {
+					dialogInterface.dismiss();
+					getActivity().finish();
 				}
 			}).create().show();
 
 		} else {
 			getParentFragmentManager().popBackStack();
 		}
-	}
-
-	public boolean isEnableCurrentLocation() {
-		return enableCurrentLocation;
-	}
-
-	public List<FavoriteAddressDto> getFavoriteAddressDtoList() {
-		return adapter.getFavoriteAddressDtoList();
 	}
 
 }

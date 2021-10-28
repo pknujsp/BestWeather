@@ -140,7 +140,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 			windDirectionList.add(new SingleWindDirectionView.WindDirectionObj(Integer.parseInt(hourly.getWind_deg())));
 			windSpeedList.add(ValueUnits.convertWindSpeed(hourly.getWind_speed(), windUnit).toString());
 			windStrengthList.add(WeatherResponseProcessor.getSimpleWindSpeedDescription(hourly.getWind_speed()));
-			windGustList.add(hourly.getWindGust() == null ? "-" : hourly.getWindGust());
+			windGustList.add(hourly.getWindGust() == null ? "-" : ValueUnits.convertWindSpeed(hourly.getWindGust(), windUnit).toString());
 			pressureList.add(hourly.getPressure());
 			humidityList.add(hourly.getHumidity());
 			dewPointList.add(hourly.getDewPoint());

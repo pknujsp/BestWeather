@@ -349,7 +349,8 @@
     <string name="the_measuring_station_is_very_far_away">측정소가 매우 먼거리에 있습니다.</string>
     <string name="distance_to_measuring_station">측정소와의 거리</string>
     <string name="duplicate_address">이미 추가된 주소입니다</string>
-    <string name="msg_request_enable_current_location_because_empty_locations">표시할 위치가 없습니다. 현재 위치의 날씨를 표시하시겠습니까?</string>
+    <string name="msg_empty_locations">날씨를 표시할 위치가 없습니다. 현재 위치를 사용하거나, 즐겨찾기를 추가해주세요.</string>
+    <string name="title_empty_locations">표시할 위치없음</string>
     <string name="use">사용</string>
     <string name="cancel">취소</string>
     <string name="close_app">앱 종료</string>

@@ -56,6 +56,9 @@
                     android:layout_below="@id/address_name"
                     android:layout_alignRight="@id/address_name"
                     android:layout_marginBottom="150dp"
+                    android:drawableLeft="@drawable/refresh"
+                    android:drawableTint="@color/white"
+                    android:gravity="center_vertical"
                     android:text="업데이트 시각"
                     android:textAlignment="viewEnd"
                     android:textSize="14sp" />

@@ -52,9 +52,9 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
-		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.mPerSec.name()));
-		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.km.name()));
-		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.clock24.name()));
+		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));
+		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
+		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
 
 		Bundle bundle = getArguments();
 		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
@@ -82,7 +82,6 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 			}
 		});
 
-		binding.customProgressView.setContentView(binding.rootScrollView);
 		binding.kmaLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setText("K");
 		binding.kmaLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setBackgroundTintList(
 				getContext().getColorStateList(R.color.kma_icon_color));

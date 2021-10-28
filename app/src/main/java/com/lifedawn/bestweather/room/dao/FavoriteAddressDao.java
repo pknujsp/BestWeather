@@ -14,16 +14,19 @@ import java.util.List;
 public interface FavoriteAddressDao {
 	@Query("SELECT * FROM favorite_address_table")
 	List<FavoriteAddressDto> getAll();
-	
+
+	@Query("SELECT count(*) FROM favorite_address_table")
+	int size();
+
 	@Query("SELECT * FROM favorite_address_table WHERE id = :id")
 	FavoriteAddressDto get(int id);
-	
+
 	@Query("SELECT EXISTS (SELECT * FROM favorite_address_table WHERE latitude =:latitude AND longitude =:longitude) AS SUCCESS")
 	int contains(String latitude, String longitude);
-	
+
 	@Delete
 	void delete(FavoriteAddressDto favoriteAddressDto);
-	
+
 	@Insert(entity = FavoriteAddressDto.class)
 	long add(FavoriteAddressDto favoriteAddressDto);
 }

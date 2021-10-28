@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
+import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentFindAddressBinding;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -66,8 +68,7 @@ public class FindAddressFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		binding.customProgressView.setContentView(binding.addressList);
-		binding.customProgressView.onSuccessfulProcessingData();
+		binding.progressResultView.setContentView(binding.addressList);
 
 		binding.toolbar.fragmentTitle.setText(R.string.find_address);
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
@@ -143,7 +144,7 @@ public class FindAddressFragment extends Fragment {
 		binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				binding.customProgressView.onStartedProcessingData(getString(R.string.finding_address));
+				AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.finding_address));
 
 				Geocoding.reverseGeocoding(getContext(), query, new Geocoding.ReverseGeocodingCallback() {
 					@Override
@@ -155,11 +156,12 @@ public class FindAddressFragment extends Fragment {
 								@Override
 								public void run() {
 									addressesAdapter.notifyDataSetChanged();
+									dialog.dismiss();
 
 									if (addressList.isEmpty()) {
-										binding.customProgressView.onFailedProcessingData(getString(R.string.not_search_result));
+										binding.progressResultView.onFailedProcessingData(getString(R.string.not_search_result));
 									} else {
-										binding.customProgressView.onSuccessfulProcessingData();
+										binding.progressResultView.onSuccessfulProcessingData();
 									}
 								}
 							});
@@ -180,8 +182,8 @@ public class FindAddressFragment extends Fragment {
 	@Override
 	public void onDestroy() {
 		Bundle bundle = new Bundle();
-		bundle.putBoolean(getString(R.string.bundle_key_selected_address_dto), isSelectedAddress());
-		if (isSelectedAddress()) {
+		bundle.putBoolean(getString(R.string.bundle_key_selected_address_dto), selectedAddress);
+		if (selectedAddress) {
 			bundle.putInt(getString(R.string.bundle_key_new_favorite_address_dto_id), newFavoriteAddressDto.getId());
 		}
 		getParentFragmentManager().setFragmentResult(fragmentRequestKey, bundle);

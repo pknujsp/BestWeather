@@ -21,7 +21,7 @@ public class ProgressDialog {
 		View progressView = LayoutInflater.from(activity.getApplicationContext()).inflate(R.layout.progress_view, null);
 		((TextView) progressView.findViewById(R.id.progress_msg)).setText(msg);
 
-		AlertDialog dialog = new MaterialAlertDialogBuilder(activity).setCancelable(false).setView(progressView).create();
+		AlertDialog dialog = new AlertDialog.Builder(activity).setCancelable(false).setView(progressView).create();
 		dialog.show();
 
 		Window window = dialog.getWindow();

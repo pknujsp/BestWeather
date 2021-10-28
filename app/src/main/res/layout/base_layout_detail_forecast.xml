@@ -65,8 +65,8 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
-        <com.lifedawn.bestweather.commons.views.CustomProgressView
-            android:id="@+id/custom_progress_view"
+        <com.lifedawn.bestweather.commons.views.ProgressResultView
+            android:id="@+id/progress_result_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center" />

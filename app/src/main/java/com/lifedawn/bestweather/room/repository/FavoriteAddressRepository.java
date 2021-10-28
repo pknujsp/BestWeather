@@ -39,6 +39,16 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 	}
 
 	@Override
+	public void size(DbQueryCallback<Integer> callback) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				callback.processResult(favoriteAddressDao.size());
+			}
+		}).start();
+	}
+
+	@Override
 	public void contains(String latitude, String longitude, DbQueryCallback<Boolean> callback) {
 		new Thread(new Runnable() {
 			@Override
@@ -65,9 +75,6 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				if (sharedPreferences.getString(context.getString(R.string.pref_key_last_selected_favorite_address_id), "").equals(favoriteAddressDto.getId().toString())) {
-					sharedPreferences.edit().putString(context.getString(R.string.pref_key_last_selected_favorite_address_id), "").apply();
-				}
 				favoriteAddressDao.delete(favoriteAddressDto);
 				deleteAddressesLiveData.postValue(favoriteAddressDto);
 			}

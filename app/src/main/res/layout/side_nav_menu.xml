@@ -9,11 +9,10 @@
         android:id="@+id/current_location_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
-        android:background="@drawable/favorite_address_background_in_side_nav"
+        android:background="@color/favorite_location_background_color"
         android:clickable="true"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:padding="12dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
-            android:textSize="15sp"></TextView>
+            android:textSize="14sp" />
 
     </LinearLayout>
 

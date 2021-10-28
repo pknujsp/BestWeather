@@ -11,11 +11,13 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.ForecastObj;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstRoot;
@@ -34,14 +36,10 @@ import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -305,7 +303,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 	}
 
 	private void loadForecasts() {
-		binding.customProgressView.onStartedProcessingData(getString(R.string.msg_refreshing_weather_data));
+		AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data));
 
 		Set<MainProcessing.WeatherSourceType> requestWeatherSourceTypeSet = new ArraySet<>();
 
@@ -320,13 +318,13 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 				requestWeatherSourceTypeSet, new MultipleJsonDownloader<JsonElement>() {
 					@Override
 					public void onResult() {
-						setTable(this, latitude, longitude);
+						setTable(this, latitude, longitude, dialog);
 					}
 				});
 
 	}
 
-	private void setTable(MultipleJsonDownloader<JsonElement> multipleJsonDownloader, Double latitude, Double longitude) {
+	private void setTable(MultipleJsonDownloader<JsonElement> multipleJsonDownloader, Double latitude, Double longitude, AlertDialog dialog) {
 		Map<MainProcessing.WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>>> responseMap = multipleJsonDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> arrayMap;
 		DailyForecastResponse dailyForecastResponse = new DailyForecastResponse();
@@ -388,7 +386,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 				@Override
 				public void run() {
 					setValuesToViews(dailyForecastResponse);
-					binding.customProgressView.onSuccessfulProcessingData();
+					dialog.dismiss();
 				}
 			});
 

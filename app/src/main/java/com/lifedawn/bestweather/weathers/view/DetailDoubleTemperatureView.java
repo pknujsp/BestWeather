@@ -69,9 +69,6 @@ public class DetailDoubleTemperatureView extends View {
 		minCirclePaint.setStyle(Paint.Style.FILL);
 		minCirclePaint.setColor(Color.BLUE);
 
-		ValueUnits tempUnit =
-				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
-
 		this.minTempList.addAll(minTempList);
 		this.maxTempList.addAll(maxTempList);
 

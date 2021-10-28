@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
@@ -118,7 +117,7 @@ public class WeatherFragment extends Fragment {
 				getParentFragmentManager().clearFragmentResult(requestKey);
 
 				locationType = LocationType.CurrentLocation;
-				sharedPreferences.edit().putString(getString(R.string.pref_key_last_selected_favorite_address_id), "")
+				sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1)
 						.putString(getString(R.string.pref_key_last_selected_location_type), locationType.name()).apply();
 				iGps = (IGps) result.getSerializable(getString(R.string.bundle_key_igps));
 
@@ -133,7 +132,7 @@ public class WeatherFragment extends Fragment {
 				} else {
 					//위/경도에 해당하는 지역명을 불러오고, 날씨 데이터 다운로드
 					//이미 존재하는 날씨 데이터면 다운로드X
-					requestAddressOfLocation(latitude, longitude, true);
+					requestAddressOfLocation(latitude, longitude, false);
 				}
 			}
 		});
@@ -147,7 +146,8 @@ public class WeatherFragment extends Fragment {
 				selectedFavoriteAddressDto = (FavoriteAddressDto) result.getSerializable(getString(R.string.bundle_key_selected_address_dto));
 				iGps = (IGps) result.getSerializable(getString(R.string.bundle_key_igps));
 
-				sharedPreferences.edit().putString(getString(R.string.pref_key_last_selected_favorite_address_id), selectedFavoriteAddressDto.getId().toString())
+				sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
+						selectedFavoriteAddressDto.getId())
 						.putString(getString(R.string.pref_key_last_selected_location_type), locationType.name()).apply();
 
 				mainWeatherSourceType = getMainWeatherSourceType(selectedFavoriteAddressDto.getCountryCode());
@@ -167,14 +167,25 @@ public class WeatherFragment extends Fragment {
 	}
 
 
-	private void requestAddressOfLocation(Double latitude, Double longitude, boolean refresh) {
+	private void requestAddressOfLocation(Double latitude, Double longitude, boolean forceRefresh) {
 		Geocoding.geocoding(getContext(), latitude, longitude, new Geocoding.GeocodingCallback() {
 			@Override
 			public void onGeocodingResult(List<Address> addressList) {
 				setAddressNameOfLocation(addressList);
-				if (refresh) {
-					refresh(latitude, longitude);
+				if (getActivity() != null) {
+					getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							if (forceRefresh) {
+								forceRefresh();
+							} else {
+								refresh(latitude, longitude);
+							}
+						}
+					});
+
 				}
+
 			}
 		});
 	}
@@ -192,7 +203,8 @@ public class WeatherFragment extends Fragment {
 				getActivity().runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						binding.addressName.setText(addressName);
+						String ad = getString(R.string.current_location) + " : " + addressName;
+						binding.addressName.setText(ad);
 						weatherViewModel.setCurrentLocationAddressName(addressName);
 					}
 				});
@@ -527,7 +539,7 @@ public class WeatherFragment extends Fragment {
 									} else {
 										mainWeatherSourceType = MainProcessing.WeatherSourceType.KMA;
 									}
-									refresh(latitude, longitude);
+									forceRefresh();
 								}
 								dialogInterface.dismiss();
 							}

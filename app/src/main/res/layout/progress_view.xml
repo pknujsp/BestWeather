@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
         android:indeterminate="true"
-        android:progressTint="@color/design_default_color_primary" />
+        android:indeterminateTint="@color/design_default_color_primary" />
 
     <TextView
         android:id="@+id/progress_msg"

@@ -9,13 +9,17 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
@@ -26,10 +30,10 @@ public class Gps {
 	private AlertDialog dialog;
 
 	public void runGps(Activity activity, LocationCallback callback, ActivityResultLauncher<Intent> requestOnGpsLauncher
-			, ActivityResultLauncher<String> requestLocationPermissionLauncher) {
+			, ActivityResultLauncher<String> requestLocationPermissionLauncher, ActivityResultLauncher<Intent> moveToAppDetailSettingsLauncher) {
 		//권한 확인
-		dialog = ProgressDialog.show(activity, activity.getString(R.string.msg_finding_current_location));
 		Context context = activity.getApplicationContext();
+		dialog = ProgressDialog.show(activity, context.getString(R.string.msg_finding_current_location));
 
 		if (locationManager == null) {
 			locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -37,8 +41,9 @@ public class Gps {
 
 		final boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 		final boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+		int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
-		if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+		if (permission == PackageManager.PERMISSION_GRANTED) {
 			if (isGpsEnabled) {
 				locationListener = new LocationListener() {
 					boolean isCompleted = false;
@@ -83,7 +88,15 @@ public class Gps {
 			}
 		} else {
 			clear();
-			requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+			if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)) {
+				requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+			} else {
+				Toast.makeText(activity, R.string.message_needs_location_permission, Toast.LENGTH_SHORT).show();
+				Intent intent = new Intent();
+				intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+				intent.setData(Uri.fromParts("package", activity.getPackageName(), null));
+				moveToAppDetailSettingsLauncher.launch(intent);
+			}
 		}
 
 	}
@@ -109,7 +122,7 @@ public class Gps {
 				.show();
 	}
 
-	public void closeDialog() {
+	private void closeDialog() {
 		if (dialog != null) {
 			dialog.dismiss();
 			dialog = null;
@@ -117,11 +130,11 @@ public class Gps {
 	}
 
 	public void clear() {
-		closeDialog();
 		if (locationListener != null) {
 			locationManager.removeUpdates(locationListener);
 			locationListener = null;
 		}
+		closeDialog();
 	}
 
 
