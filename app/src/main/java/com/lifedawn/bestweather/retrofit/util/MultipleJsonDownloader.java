@@ -5,6 +5,7 @@ import android.util.ArrayMap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 
@@ -23,12 +24,12 @@ public abstract class MultipleJsonDownloader<T> {
 	private Map<String, String> valueMap = new HashMap<>();
 	private LocalDateTime localDateTime = LocalDateTime.now();
 
-	protected Map<MainProcessing.WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<T>>> responseMap = new ArrayMap<>();
+	protected Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<T>>> responseMap = new ArrayMap<>();
 
 	public MultipleJsonDownloader() {
 	}
 
-	public Map<MainProcessing.WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<T>>> getResponseMap() {
+	public Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<T>>> getResponseMap() {
 		return responseMap;
 	}
 
@@ -64,7 +65,7 @@ public abstract class MultipleJsonDownloader<T> {
 
 	public abstract void onResult();
 
-	public void processResult(MainProcessing.WeatherSourceType weatherSourceType, RetrofitClient.ServiceType serviceType,
+	public void processResult(WeatherSourceType weatherSourceType, RetrofitClient.ServiceType serviceType,
 	                          Response<? extends T> response) {
 		if (!responseMap.containsKey(weatherSourceType)) {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
@@ -76,7 +77,7 @@ public abstract class MultipleJsonDownloader<T> {
 		}
 	}
 
-	public void processResult(MainProcessing.WeatherSourceType weatherSourceType, RetrofitClient.ServiceType serviceType, Throwable t) {
+	public void processResult(WeatherSourceType weatherSourceType, RetrofitClient.ServiceType serviceType, Throwable t) {
 		if (!responseMap.containsKey(weatherSourceType)) {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
 		}

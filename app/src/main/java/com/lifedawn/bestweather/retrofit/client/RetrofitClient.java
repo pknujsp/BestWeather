@@ -36,7 +36,6 @@ public class RetrofitClient {
 	public static final String FLICKR_SECRET = "0112b42bf9b07200";
 
 	public static final String DATATYPE = "JSON";
-
 	public static final String LOG_TAG = "Retrofit Response";
 
 	public enum ServiceType {

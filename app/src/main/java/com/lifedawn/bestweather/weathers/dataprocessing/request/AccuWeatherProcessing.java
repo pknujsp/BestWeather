@@ -7,6 +7,8 @@ import android.util.Log;
 import androidx.preference.PreferenceManager;
 
 import com.google.gson.JsonElement;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.CurrentConditionsParameter;
@@ -17,6 +19,8 @@ import com.lifedawn.bestweather.retrofit.responses.accuweather.geopositionsearch
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
+
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -39,7 +43,7 @@ public class AccuWeatherProcessing {
 	 * Current Conditions
 	 */
 	public static Call<JsonElement> getCurrentConditions(CurrentConditionsParameter currentConditionsParameter,
-	                                                     JsonDownloader<JsonElement> callback) {
+	                                                     JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS);
 
 		Call<JsonElement> call = querys.getCurrentConditions(currentConditionsParameter.getLocationKey(),
@@ -70,7 +74,7 @@ public class AccuWeatherProcessing {
 	 * 5 Days Of Daily Forecast
 	 */
 	public static Call<JsonElement> get5DaysOfDailyForecasts(FiveDaysOfDailyForecastsParameter fiveDaysOfDailyForecastsParameter,
-	                                                         JsonDownloader<JsonElement> callback) {
+	                                                         JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY);
 
 		Call<JsonElement> call = querys.get5Days(fiveDaysOfDailyForecastsParameter.getLocationKey(),
@@ -103,7 +107,7 @@ public class AccuWeatherProcessing {
 	 * 12 Hours of Hourly Forecasts
 	 */
 	public static Call<JsonElement> get12HoursOfHourlyForecasts(TwelveHoursOfHourlyForecastsParameter twelveHoursOfHourlyForecastsParameter,
-	                                                            JsonDownloader<JsonElement> callback) {
+	                                                            JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_12_HOURLY);
 
 		Call<JsonElement> call = querys.get12Hourly(twelveHoursOfHourlyForecastsParameter.getLocationKey(),
@@ -118,7 +122,6 @@ public class AccuWeatherProcessing {
 				} else {
 					callback.onResponseResult(new Exception());
 					Log.e(RetrofitClient.LOG_TAG, "accu weather hourly forecast 실패");
-
 				}
 
 			}
@@ -132,8 +135,8 @@ public class AccuWeatherProcessing {
 		return call;
 	}
 
-	public static String getLocationKey(Context context, String latitude, String longitude) {
-		return PreferenceManager.getDefaultSharedPreferences(context).getString(latitude + longitude, "");
+	public static String getLocationKey(Context context, Double latitude, Double longitude) {
+		return PreferenceManager.getDefaultSharedPreferences(context).getString(latitude.toString() + longitude.toString(), "");
 	}
 
 
@@ -141,7 +144,7 @@ public class AccuWeatherProcessing {
 	 * GeoPosition Search
 	 */
 	public static Call<JsonElement> getGeoPositionSearch(Context context, GeoPositionSearchParameter geoPositionSearchParameter,
-	                                                     JsonDownloader<JsonElement> callback) {
+	                                                     JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH);
 
 		Call<JsonElement> call = querys.geoPositionSearch(geoPositionSearchParameter.getMap());
@@ -152,9 +155,9 @@ public class AccuWeatherProcessing {
 					GeoPositionResponse geoPositionResponse =
 							AccuWeatherResponseProcessor.getGeoPositionObjFromJson(response.body().toString());
 
-					SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-					sharedPreferences.edit().putString(geoPositionSearchParameter.getLatitude() + geoPositionSearchParameter.getLongitude(),
-							geoPositionResponse.getKey()).apply();
+					PreferenceManager.getDefaultSharedPreferences(context).edit()
+							.putString(geoPositionSearchParameter.getLatitude() + geoPositionSearchParameter.getLongitude(),
+									geoPositionResponse.getKey()).apply();
 
 					callback.onResponseResult(response);
 					Log.e(RetrofitClient.LOG_TAG, "accu weather geoposition search 성공");
@@ -174,184 +177,114 @@ public class AccuWeatherProcessing {
 		return call;
 	}
 
-
-	public static void getAccuWeatherForecasts(Context context, String latitude, String longitude,
-	                                           MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
-		GeoPositionSearchParameter geoPositionSearchParameter = new GeoPositionSearchParameter();
-		CurrentConditionsParameter currentConditionsParameter = new CurrentConditionsParameter();
-		FiveDaysOfDailyForecastsParameter fiveDaysOfDailyForecastsParameter = new FiveDaysOfDailyForecastsParameter();
-		TwelveHoursOfHourlyForecastsParameter twelveHoursOfHourlyForecastsParameter = new TwelveHoursOfHourlyForecastsParameter();
-
-		geoPositionSearchParameter.setLatitude(latitude).setLongitude(longitude);
+	public static void requestWeatherData(Context context, Double latitude, Double longitude,
+	                                      RequestAccu requestAccu,
+	                                      MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
 		final String locationKey = getLocationKey(context, latitude, longitude);
 
 		if (locationKey.isEmpty()) {
-			Call<JsonElement> geoPositionSearchCall = getGeoPositionSearch(context, geoPositionSearchParameter,
-					new JsonDownloader<JsonElement>() {
+			//locationKey 요청 후 처리
+			GeoPositionSearchParameter geoPositionSearchParameter = new GeoPositionSearchParameter();
+			geoPositionSearchParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString());
+			getGeoPositionSearch(context, geoPositionSearchParameter, new JsonDownloader() {
+				@Override
+				public void onResponseResult(Response<JsonElement> response) {
+					requestWeatherDataIfHasLocationKey(requestAccu, getLocationKey(context,
+							latitude, longitude), multipleJsonDownloader);
+				}
 
-						@Override
-						public void onResponseResult(Response<? extends JsonElement> response) {
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH, response);
+				@Override
+				public void onResponseResult(Throwable t) {
+					Set<RetrofitClient.ServiceType> requestTypeSet = requestAccu.getRequestServiceTypes();
 
-							GeoPositionResponse geoPositionResponse =
-									AccuWeatherResponseProcessor.getGeoPositionObjFromJson(response.body().toString());
-
-							final String locationKey = geoPositionResponse.getKey();
-							currentConditionsParameter.setLocationKey(locationKey);
-							fiveDaysOfDailyForecastsParameter.setLocationKey(locationKey);
-							twelveHoursOfHourlyForecastsParameter.setLocationKey(locationKey);
-
-							Call<JsonElement> currentConditionsCall = getCurrentConditions(currentConditionsParameter,
-									new JsonDownloader<JsonElement>() {
-										@Override
-										public void onResponseResult(Response<? extends JsonElement> response) {
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, response);
-										}
-
-										@Override
-										public void onResponseResult(Throwable t) {
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, t);
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_12_HOURLY, t);
-										}
-
-
-									});
-
-							Call<JsonElement> fiveDaysOfDailyForecastsCall = get5DaysOfDailyForecasts(fiveDaysOfDailyForecastsParameter,
-									new JsonDownloader<JsonElement>() {
-										@Override
-										public void onResponseResult(Response<? extends JsonElement> response) {
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, response);
-										}
-
-										@Override
-										public void onResponseResult(Throwable t) {
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, t);
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_12_HOURLY, t);
-
-										}
-
-									});
-
-							Call<JsonElement> twelveHoursOfHourlyForecastsCall = get12HoursOfHourlyForecasts(twelveHoursOfHourlyForecastsParameter,
-									new JsonDownloader<JsonElement>() {
-										@Override
-										public void onResponseResult(Response<? extends JsonElement> response) {
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_12_HOURLY, response);
-
-										}
-
-										@Override
-										public void onResponseResult(Throwable t) {
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, t);
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
-											multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-													RetrofitClient.ServiceType.ACCU_12_HOURLY, t);
-										}
-
-
-									});
-
-						}
-
-						@Override
-						public void onResponseResult(Throwable t) {
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH, t);
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, t);
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_12_HOURLY, t);
-						}
-
-
-					});
-
+					multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
+							RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH, t);
+					if (requestTypeSet.contains(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS)) {
+						multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
+								RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, t);
+					}
+					if (requestTypeSet.contains(RetrofitClient.ServiceType.ACCU_12_HOURLY)) {
+						multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
+								RetrofitClient.ServiceType.ACCU_12_HOURLY, t);
+					}
+					if (requestTypeSet.contains(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY)) {
+						multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
+								RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
+					}
+				}
+			});
 		} else {
-			currentConditionsParameter.setLocationKey(locationKey);
-			fiveDaysOfDailyForecastsParameter.setLocationKey(locationKey);
-			twelveHoursOfHourlyForecastsParameter.setLocationKey(locationKey);
+			requestWeatherDataIfHasLocationKey(requestAccu, locationKey, multipleJsonDownloader);
+		}
+	}
 
-			Call<JsonElement> currentConditionsCall = getCurrentConditions(currentConditionsParameter,
-					new JsonDownloader<JsonElement>() {
+	private static void requestWeatherDataIfHasLocationKey(RequestAccu requestAccu, String locationKey,
+	                                                       MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+		Set<RetrofitClient.ServiceType> requestTypeSet = requestAccu.getRequestServiceTypes();
+
+		if (requestTypeSet.contains(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS)) {
+			CurrentConditionsParameter currentConditionsParameter = new CurrentConditionsParameter();
+			currentConditionsParameter.setLocationKey(locationKey);
+
+			getCurrentConditions(currentConditionsParameter,
+					new JsonDownloader() {
 						@Override
-						public void onResponseResult(Response<? extends JsonElement> response) {
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+						public void onResponseResult(Response<JsonElement> response) {
+							multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
 									RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, response);
 						}
 
 						@Override
 						public void onResponseResult(Throwable t) {
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+							multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
 									RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, t);
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_12_HOURLY, t);
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
 						}
 
 					});
+		}
+		if (requestTypeSet.contains(RetrofitClient.ServiceType.ACCU_12_HOURLY)) {
+			TwelveHoursOfHourlyForecastsParameter twelveHoursOfHourlyForecastsParameter = new TwelveHoursOfHourlyForecastsParameter();
+			twelveHoursOfHourlyForecastsParameter.setLocationKey(locationKey);
 
-			Call<JsonElement> fiveDaysOfDailyForecastsCall = get5DaysOfDailyForecasts(fiveDaysOfDailyForecastsParameter,
-					new JsonDownloader<JsonElement>() {
+			get12HoursOfHourlyForecasts(twelveHoursOfHourlyForecastsParameter,
+					new JsonDownloader() {
 						@Override
-						public void onResponseResult(Response<? extends JsonElement> response) {
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, response);
-						}
-
-						@Override
-						public void onResponseResult(Throwable t) {
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, t);
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_12_HOURLY, t);
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
-
-						}
-
-					});
-
-			Call<JsonElement> twelveHoursOfHourlyForecastsCall = get12HoursOfHourlyForecasts(twelveHoursOfHourlyForecastsParameter,
-					new JsonDownloader<JsonElement>() {
-						@Override
-						public void onResponseResult(Response<? extends JsonElement> response) {
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+						public void onResponseResult(Response<JsonElement> response) {
+							multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
 									RetrofitClient.ServiceType.ACCU_12_HOURLY, response);
+
 						}
 
 						@Override
 						public void onResponseResult(Throwable t) {
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, t);
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
+							multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
 									RetrofitClient.ServiceType.ACCU_12_HOURLY, t);
-							multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.ACCU_WEATHER,
-									RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
 						}
 
 
 					});
 		}
+		if (requestTypeSet.contains(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY)) {
+			FiveDaysOfDailyForecastsParameter fiveDaysOfDailyForecastsParameter = new FiveDaysOfDailyForecastsParameter();
+			fiveDaysOfDailyForecastsParameter.setLocationKey(locationKey);
 
+			get5DaysOfDailyForecasts(fiveDaysOfDailyForecastsParameter,
+					new JsonDownloader() {
+						@Override
+						public void onResponseResult(Response<JsonElement> response) {
+							multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
+									RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, response);
+						}
 
+						@Override
+						public void onResponseResult(Throwable t) {
+							multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
+									RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, t);
+						}
+
+					});
+		}
 	}
+
 
 }

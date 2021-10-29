@@ -16,7 +16,7 @@ public class MetNorwayProcessing {
 	 * Location Forecast
 	 */
 	public static Call<JsonElement> getLocationForecast(LocationForecastParameter locationForecastParameter,
-	                                                   JsonDownloader<JsonElement> callback) {
+	                                                   JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
 
 		Call<JsonElement> call = querys.getLocationForecast(locationForecastParameter.getMap());
@@ -37,9 +37,9 @@ public class MetNorwayProcessing {
 	public static void getMetNorwayForecasts(String latitude, String longitude, MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
 		LocationForecastParameter locationForecastParameter = new LocationForecastParameter();
 		locationForecastParameter.setLatitude(latitude).setLongitude(longitude);
-		Call<JsonElement> locationForecastCall = getLocationForecast(locationForecastParameter, new JsonDownloader<JsonElement>() {
+		Call<JsonElement> locationForecastCall = getLocationForecast(locationForecastParameter, new JsonDownloader() {
 			@Override
-			public void onResponseResult(Response<? extends JsonElement> response) {
+			public void onResponseResult(Response<JsonElement> response) {
 				multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.MET_NORWAY,
 						RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST, response);
 			}
@@ -53,4 +53,6 @@ public class MetNorwayProcessing {
 
 		});
 	}
+
+
 }

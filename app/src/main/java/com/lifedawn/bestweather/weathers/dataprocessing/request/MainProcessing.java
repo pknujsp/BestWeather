@@ -1,11 +1,17 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.request;
 
 import android.content.Context;
+import android.util.ArrayMap;
 import android.util.ArraySet;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.FiveDaysOfDailyForecastsParameter;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.GeoPositionSearchParameter;
@@ -26,7 +32,6 @@ import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -35,8 +40,38 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 public class MainProcessing {
-	public enum WeatherSourceType implements Serializable {
-		ACCU_WEATHER, KMA, MET_NORWAY, OPEN_WEATHER_MAP, AQICN
+
+	public static void requestWeatherData(Context context, Double latitude, Double longitude,
+	                                      ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	                                      MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+		int totalRequestCount = 0;
+		for (RequestWeatherSource requestWeatherSource : requestWeatherSources.values()) {
+			totalRequestCount += requestWeatherSource.getRequestServiceTypes().size();
+		}
+
+		if (requestWeatherSources.containsKey(WeatherSourceType.ACCU_WEATHER)) {
+			//요청 좌표의 locationKey가 저장되어 있는지 확인
+			if (AccuWeatherProcessing.getLocationKey(context, latitude, longitude).isEmpty()) {
+				++totalRequestCount;
+				requestWeatherSources.get(WeatherSourceType.ACCU_WEATHER).addRequestServiceType(RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH);
+			}
+		}
+
+		multipleJsonDownloader.setRequestCount(totalRequestCount);
+
+		if (requestWeatherSources.containsKey(WeatherSourceType.ACCU_WEATHER)) {
+			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherSourceType.ACCU_WEATHER), multipleJsonDownloader);
+		}
+		if (requestWeatherSources.containsKey(WeatherSourceType.KMA)) {
+			KmaProcessing.requestWeatherData(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherSourceType.KMA), multipleJsonDownloader);
+		}
+		if (requestWeatherSources.containsKey(WeatherSourceType.OPEN_WEATHER_MAP)) {
+			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,
+					(RequestOwm) requestWeatherSources.get(WeatherSourceType.OPEN_WEATHER_MAP), multipleJsonDownloader);
+		}
+		if (requestWeatherSources.containsKey(WeatherSourceType.AQICN)) {
+			AqicnProcessing.getAirQuality(latitude, longitude, multipleJsonDownloader);
+		}
 	}
 
 	public static void downloadAllWeatherData(Context context, final String latitude, final String longitude,
@@ -128,7 +163,7 @@ public class MainProcessing {
 			totalRequestCount += 2;
 		}
 		if (requestWeatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
-			if (AccuWeatherProcessing.getLocationKey(context, latitude.toString(), longitude.toString()).isEmpty()) {
+			if (AccuWeatherProcessing.getLocationKey(context, latitude, longitude).isEmpty()) {
 				totalRequestCount += 2;
 			} else {
 				totalRequestCount += 1;
@@ -176,7 +211,7 @@ public class MainProcessing {
 
 					Call<JsonElement> ultraSrtFcstCall = KmaProcessing.getUltraSrtFcstData(ultraSrtFcstParameter,
 							LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-									koreaLocalDateTime.toLocalTime()), new JsonDownloader<JsonElement>() {
+									koreaLocalDateTime.toLocalTime()), new JsonDownloader() {
 								@Override
 								public void onResponseResult(Response<? extends JsonElement> response) {
 									Log.e(RetrofitClient.LOG_TAG, "kma ultra srt fcst 성공");
@@ -195,7 +230,7 @@ public class MainProcessing {
 					Call<JsonElement> vilageFcstCall = KmaProcessing.getVilageFcstData(vilageFcstParameter,
 							LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
 									koreaLocalDateTime.toLocalTime()),
-							new JsonDownloader<JsonElement>() {
+							new JsonDownloader() {
 								@Override
 								public void onResponseResult(Response<? extends JsonElement> response) {
 									Log.e(RetrofitClient.LOG_TAG, "kma vilage fcst 성공");
@@ -227,7 +262,7 @@ public class MainProcessing {
 
 			if (locationKey.isEmpty()) {
 				Call<JsonElement> geoPositionSearchCall = AccuWeatherProcessing.getGeoPositionSearch(context,
-						geoPositionSearchParameter, new JsonDownloader<JsonElement>() {
+						geoPositionSearchParameter, new JsonDownloader() {
 
 							@Override
 							public void onResponseResult(Response<? extends JsonElement> response) {
@@ -241,7 +276,7 @@ public class MainProcessing {
 								twelveHoursOfHourlyForecastsParameter.setLocationKey(newLocationKey);
 
 								Call<JsonElement> twelveHoursOfHourlyForecastsCall = AccuWeatherProcessing.get12HoursOfHourlyForecasts(
-										twelveHoursOfHourlyForecastsParameter, new JsonDownloader<JsonElement>() {
+										twelveHoursOfHourlyForecastsParameter, new JsonDownloader() {
 											@Override
 											public void onResponseResult(Response<? extends JsonElement> response) {
 												multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
@@ -273,7 +308,7 @@ public class MainProcessing {
 				twelveHoursOfHourlyForecastsParameter.setLocationKey(locationKey);
 
 				Call<JsonElement> twelveHoursOfHourlyForecastsCall = AccuWeatherProcessing.get12HoursOfHourlyForecasts(
-						twelveHoursOfHourlyForecastsParameter, new JsonDownloader<JsonElement>() {
+						twelveHoursOfHourlyForecastsParameter, new JsonDownloader() {
 							@Override
 							public void onResponseResult(Response<? extends JsonElement> response) {
 								multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
@@ -300,7 +335,7 @@ public class MainProcessing {
 			excludeOneCallApis.add(OneCallParameter.OneCallApis.daily);
 			oneCallParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString()).setOneCallApis(excludeOneCallApis);
 
-			Call<JsonElement> oneCallCall = OpenWeatherMapProcessing.getOneCall(oneCallParameter, new JsonDownloader<JsonElement>() {
+			Call<JsonElement> oneCallCall = OpenWeatherMapProcessing.getOneCall(oneCallParameter, new JsonDownloader() {
 				@Override
 				public void onResponseResult(Response<? extends JsonElement> response) {
 					Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
@@ -381,7 +416,7 @@ public class MainProcessing {
 					midLandParameter.setTmFc(tmFc);
 					midTaParameter.setTmFc(tmFc);
 
-					Call<JsonElement> midTaFcstCall = KmaProcessing.getMidTaData(midTaParameter, new JsonDownloader<JsonElement>() {
+					Call<JsonElement> midTaFcstCall = KmaProcessing.getMidTaData(midTaParameter, new JsonDownloader() {
 						@Override
 						public void onResponseResult(Response<? extends JsonElement> response) {
 							Log.e(RetrofitClient.LOG_TAG, "kma mid ta 성공");
@@ -399,7 +434,7 @@ public class MainProcessing {
 					});
 
 					Call<JsonElement> midLandFcstCall = KmaProcessing.getMidLandFcstData(midLandParameter,
-							new JsonDownloader<JsonElement>() {
+							new JsonDownloader() {
 								@Override
 								public void onResponseResult(Response<? extends JsonElement> response) {
 									Log.e(RetrofitClient.LOG_TAG, "kma mid land 성공");
@@ -431,7 +466,7 @@ public class MainProcessing {
 
 			if (locationKey.isEmpty()) {
 				Call<JsonElement> geoPositionSearchCall = AccuWeatherProcessing.getGeoPositionSearch(context,
-						geoPositionSearchParameter, new JsonDownloader<JsonElement>() {
+						geoPositionSearchParameter, new JsonDownloader() {
 
 							@Override
 							public void onResponseResult(Response<? extends JsonElement> response) {
@@ -446,7 +481,7 @@ public class MainProcessing {
 								dailyForecastsParameter.setLocationKey(newLocationKey);
 
 								Call<JsonElement> dailyForecastCall = AccuWeatherProcessing.get5DaysOfDailyForecasts(dailyForecastsParameter,
-										new JsonDownloader<JsonElement>() {
+										new JsonDownloader() {
 											@Override
 											public void onResponseResult(Response<? extends JsonElement> response) {
 												multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
@@ -476,7 +511,7 @@ public class MainProcessing {
 				dailyForecastsParameter.setLocationKey(locationKey);
 
 				Call<JsonElement> dailyForecastCall = AccuWeatherProcessing.get5DaysOfDailyForecasts(dailyForecastsParameter,
-						new JsonDownloader<JsonElement>() {
+						new JsonDownloader() {
 							@Override
 							public void onResponseResult(Response<? extends JsonElement> response) {
 								multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER,
@@ -501,7 +536,7 @@ public class MainProcessing {
 			excludeOneCallApis.add(OneCallParameter.OneCallApis.hourly);
 			oneCallParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString()).setOneCallApis(excludeOneCallApis);
 
-			Call<JsonElement> oneCallCall = OpenWeatherMapProcessing.getOneCall(oneCallParameter, new JsonDownloader<JsonElement>() {
+			Call<JsonElement> oneCallCall = OpenWeatherMapProcessing.getOneCall(oneCallParameter, new JsonDownloader() {
 				@Override
 				public void onResponseResult(Response<? extends JsonElement> response) {
 					multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP,

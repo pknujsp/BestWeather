@@ -1,8 +1,11 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.request;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.JsonElement;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
@@ -12,15 +15,17 @@ import com.lifedawn.bestweather.retrofit.parameters.kma.MidTaParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.UltraSrtFcstParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.UltraSrtNcstParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.VilageFcstParameter;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.KmaAreaCodeDto;
+import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Locale;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TimeZone;
 
 import retrofit2.Call;
@@ -35,7 +40,7 @@ public final class KmaProcessing {
 	 * 초단기 실황
 	 */
 	public static Call<JsonElement> getUltraSrtNcstData(UltraSrtNcstParameter parameter, LocalDateTime localDateTime,
-	                                                    JsonDownloader<JsonElement> callback) {
+	                                                    JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
 		//basetime설정
 		if (localDateTime.getMinute() < 40) {
@@ -53,11 +58,14 @@ public final class KmaProcessing {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
 				callback.onResponseResult(response);
+				Log.e(RetrofitClient.LOG_TAG, "kma ultra srt ncst 성공");
+
 			}
 
 			@Override
 			public void onFailure(Call<JsonElement> call, Throwable t) {
 				callback.onResponseResult(t);
+				Log.e(RetrofitClient.LOG_TAG, "kma ultra srt ncst 실패");
 			}
 		});
 
@@ -68,7 +76,7 @@ public final class KmaProcessing {
 	 * 초단기예보
 	 */
 	public static Call<JsonElement> getUltraSrtFcstData(UltraSrtFcstParameter parameter, LocalDateTime localDateTime,
-	                                                    JsonDownloader<JsonElement> callback) {
+	                                                    JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
 		//basetime설정
 		if (localDateTime.getMinute() < 45) {
@@ -85,11 +93,13 @@ public final class KmaProcessing {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
 				callback.onResponseResult(response);
+				Log.e(RetrofitClient.LOG_TAG, "kma ultra srt fcst 성공");
 			}
 
 			@Override
 			public void onFailure(Call<JsonElement> call, Throwable t) {
 				callback.onResponseResult(t);
+				Log.e(RetrofitClient.LOG_TAG, "kma ultra srt fcst 실패");
 			}
 		});
 		return call;
@@ -102,7 +112,7 @@ public final class KmaProcessing {
 	 * - API 제공 시간(~이후) : 02:10, 05:10, 08:10, 11:10, 14:10, 17:10, 20:10, 23:10
 	 */
 	public static Call<JsonElement> getVilageFcstData(VilageFcstParameter parameter, LocalDateTime localDateTime,
-	                                                  JsonDownloader<JsonElement> callback) {
+	                                                  JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.VILAGE_FCST);
 		//basetime설정
 		final int currentHour = localDateTime.getHour();
@@ -135,11 +145,13 @@ public final class KmaProcessing {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
 				callback.onResponseResult(response);
+				Log.e(RetrofitClient.LOG_TAG, "kma vilage fcst 성공");
 			}
 
 			@Override
 			public void onFailure(Call<JsonElement> call, Throwable t) {
 				callback.onResponseResult(t);
+				Log.e(RetrofitClient.LOG_TAG, "kma vilage fcst 실패");
 			}
 		});
 		return call;
@@ -151,7 +163,7 @@ public final class KmaProcessing {
 	 *
 	 * @param parameter
 	 */
-	public static Call<JsonElement> getMidLandFcstData(MidLandParameter parameter, JsonDownloader<JsonElement> callback) {
+	public static Call<JsonElement> getMidLandFcstData(MidLandParameter parameter, JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.MID_LAND_FCST);
 
 		Call<JsonElement> call = Objects.requireNonNull(querys).getMidLandFcst(parameter.getMap());
@@ -159,11 +171,13 @@ public final class KmaProcessing {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
 				callback.onResponseResult(response);
+				Log.e(RetrofitClient.LOG_TAG, "kma mid land 성공");
 			}
 
 			@Override
 			public void onFailure(Call<JsonElement> call, Throwable t) {
 				callback.onResponseResult(t);
+				Log.e(RetrofitClient.LOG_TAG, "kma mid land 실패");
 			}
 		});
 		return call;
@@ -174,7 +188,7 @@ public final class KmaProcessing {
 	 *
 	 * @param parameter
 	 */
-	public static Call<JsonElement> getMidTaData(MidTaParameter parameter, JsonDownloader<JsonElement> callback) {
+	public static Call<JsonElement> getMidTaData(MidTaParameter parameter, JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.MID_TA_FCST);
 
 		Call<JsonElement> call = Objects.requireNonNull(querys).getMidTa(parameter.getMap());
@@ -182,11 +196,13 @@ public final class KmaProcessing {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
 				callback.onResponseResult(response);
+				Log.e(RetrofitClient.LOG_TAG, "kma mid ta 성공");
 			}
 
 			@Override
 			public void onFailure(Call<JsonElement> call, Throwable t) {
 				callback.onResponseResult(t);
+				Log.e(RetrofitClient.LOG_TAG, "kma mid ta 실패");
 			}
 		});
 
@@ -212,115 +228,168 @@ public final class KmaProcessing {
 		return tmFc;
 	}
 
-	public static void getKmaForecasts(KmaAreaCodeDto nearbyKmaAreaCodeDto,
-	                                   MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
-		UltraSrtNcstParameter ultraSrtNcstParameter = new UltraSrtNcstParameter();
-		UltraSrtFcstParameter ultraSrtFcstParameter = new UltraSrtFcstParameter();
-		VilageFcstParameter vilageFcstParameter = new VilageFcstParameter();
-		MidLandParameter midLandParameter = new MidLandParameter();
-		MidTaParameter midTaParameter = new MidTaParameter();
-
-		ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
-		ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
-		vilageFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
-		midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode());
-		midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode());
-
-		LocalDateTime koreaLocalDateTime = LocalDateTime.parse(multipleJsonDownloader.get("koreaLocalDateTime"));
-
-		String tmFc = getTmFc(LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-				koreaLocalDateTime.toLocalTime()));
-		multipleJsonDownloader.put("tmFc", tmFc);
-
-		midLandParameter.setTmFc(tmFc);
-		midTaParameter.setTmFc(tmFc);
-
-		Call<JsonElement> ultraSrtNcstCall = getUltraSrtNcstData(ultraSrtNcstParameter, LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-				koreaLocalDateTime.toLocalTime()),
-				new JsonDownloader<JsonElement>() {
+	public static void requestWeatherData(Context context, Double latitude, Double longitude,
+	                                      RequestKma requestKma,
+	                                      MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+		KmaAreaCodesRepository kmaAreaCodesRepository = new KmaAreaCodesRepository(context);
+		kmaAreaCodesRepository.getAreaCodes(latitude, longitude,
+				new DbQueryCallback<List<KmaAreaCodeDto>>() {
 					@Override
-					public void onResponseResult(Response<? extends JsonElement> response) {
-						Log.e(RetrofitClient.LOG_TAG, "kma ultra srt ncst 성공");
-						multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA,
-								RetrofitClient.ServiceType.ULTRA_SRT_NCST, response);
+					public void onResultSuccessful(List<KmaAreaCodeDto> result) {
+						final double[] criteriaLatLng = {latitude, longitude};
+						double minDistance = Double.MAX_VALUE;
+						double distance = 0;
+						double[] compLatLng = new double[2];
+						KmaAreaCodeDto nearbyKmaAreaCodeDto = null;
+
+						for (KmaAreaCodeDto weatherAreaCodeDTO : result) {
+							compLatLng[0] = Double.parseDouble(weatherAreaCodeDTO.getLatitudeSecondsDivide100());
+							compLatLng[1] = Double.parseDouble(weatherAreaCodeDTO.getLongitudeSecondsDivide100());
+
+							distance = LocationDistance.distance(criteriaLatLng[0], criteriaLatLng[1], compLatLng[0], compLatLng[1],
+									LocationDistance.Unit.METER);
+							if (distance < minDistance) {
+								minDistance = distance;
+								nearbyKmaAreaCodeDto = weatherAreaCodeDTO;
+							}
+						}
+						LocalDateTime koreaLocalDateTime = LocalDateTime.now(ZoneId.of(TimeZone.getTimeZone("Asia/Seoul").getID()));
+						multipleJsonDownloader.put("koreaLocalDateTime", koreaLocalDateTime.toString());
+
+						final String tmFc = getTmFc(LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
+								koreaLocalDateTime.toLocalTime()));
+						multipleJsonDownloader.put("tmFc", tmFc);
+						Set<RetrofitClient.ServiceType> requestTypeSet = requestKma.getRequestServiceTypes();
+
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_NCST)) {
+							UltraSrtNcstParameter ultraSrtNcstParameter = new UltraSrtNcstParameter();
+							ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
+
+							getUltraSrtNcstData(ultraSrtNcstParameter, LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
+									koreaLocalDateTime.toLocalTime()),
+									new JsonDownloader() {
+										@Override
+										public void onResponseResult(Response<JsonElement> response) {
+											multipleJsonDownloader.processResult(WeatherSourceType.KMA,
+													RetrofitClient.ServiceType.ULTRA_SRT_NCST, response);
+										}
+
+										@Override
+										public void onResponseResult(Throwable t) {
+											multipleJsonDownloader.processResult(WeatherSourceType.KMA,
+													RetrofitClient.ServiceType.ULTRA_SRT_NCST, t);
+										}
+									});
+						}
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_FCST)) {
+							UltraSrtFcstParameter ultraSrtFcstParameter = new UltraSrtFcstParameter();
+							ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
+
+							getUltraSrtFcstData(ultraSrtFcstParameter, LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
+									koreaLocalDateTime.toLocalTime()),
+									new JsonDownloader() {
+										@Override
+										public void onResponseResult(Response<JsonElement> response) {
+											multipleJsonDownloader.processResult(WeatherSourceType.KMA,
+													RetrofitClient.ServiceType.ULTRA_SRT_FCST, response);
+										}
+
+										@Override
+										public void onResponseResult(Throwable t) {
+											multipleJsonDownloader.processResult(WeatherSourceType.KMA,
+													RetrofitClient.ServiceType.ULTRA_SRT_FCST, t);
+										}
+									});
+						}
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.VILAGE_FCST)) {
+							VilageFcstParameter vilageFcstParameter = new VilageFcstParameter();
+							vilageFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
+
+							getVilageFcstData(vilageFcstParameter, LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
+									koreaLocalDateTime.toLocalTime()),
+									new JsonDownloader() {
+										@Override
+										public void onResponseResult(Response<JsonElement> response) {
+											multipleJsonDownloader.processResult(WeatherSourceType.KMA, RetrofitClient.ServiceType.VILAGE_FCST,
+													response);
+										}
+
+										@Override
+										public void onResponseResult(Throwable t) {
+											multipleJsonDownloader.processResult(WeatherSourceType.KMA, RetrofitClient.ServiceType.VILAGE_FCST,
+													t);
+										}
+									});
+
+						}
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_LAND_FCST)) {
+							MidLandParameter midLandParameter = new MidLandParameter();
+							midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode()).setTmFc(tmFc);
+
+							getMidLandFcstData(midLandParameter, new JsonDownloader() {
+								@Override
+								public void onResponseResult(Response<JsonElement> response) {
+									multipleJsonDownloader.processResult(WeatherSourceType.KMA, RetrofitClient.ServiceType.MID_LAND_FCST,
+											response);
+								}
+
+								@Override
+								public void onResponseResult(Throwable t) {
+									multipleJsonDownloader.processResult(WeatherSourceType.KMA, RetrofitClient.ServiceType.MID_LAND_FCST, t);
+								}
+
+							});
+						}
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_TA_FCST)) {
+							MidTaParameter midTaParameter = new MidTaParameter();
+							midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode()).setTmFc(tmFc);
+
+							getMidTaData(midTaParameter, new JsonDownloader() {
+								@Override
+								public void onResponseResult(Response<JsonElement> response) {
+									multipleJsonDownloader.processResult(WeatherSourceType.KMA, RetrofitClient.ServiceType.MID_TA_FCST,
+											response);
+								}
+
+								@Override
+								public void onResponseResult(Throwable t) {
+									multipleJsonDownloader.processResult(WeatherSourceType.KMA, RetrofitClient.ServiceType.MID_TA_FCST, t);
+								}
+
+							});
+						}
 					}
 
 					@Override
-					public void onResponseResult(Throwable t) {
-						Log.e(RetrofitClient.LOG_TAG, "kma ultra srt ncst 실패");
-						multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA,
-								RetrofitClient.ServiceType.ULTRA_SRT_NCST, t);
+					public void onResultNoData() {
+						Exception exception = new Exception("not found lat,lon");
+						Set<RetrofitClient.ServiceType> requestTypeSet = requestKma.getRequestServiceTypes();
+
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_NCST)) {
+							multipleJsonDownloader.processResult(WeatherSourceType.KMA,
+									RetrofitClient.ServiceType.ULTRA_SRT_NCST, exception);
+						}
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_FCST)) {
+							multipleJsonDownloader.processResult(WeatherSourceType.KMA,
+									RetrofitClient.ServiceType.ULTRA_SRT_FCST, exception);
+						}
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.VILAGE_FCST)) {
+							multipleJsonDownloader.processResult(WeatherSourceType.KMA,
+									RetrofitClient.ServiceType.VILAGE_FCST, exception);
+						}
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_LAND_FCST)) {
+							multipleJsonDownloader.processResult(WeatherSourceType.KMA,
+									RetrofitClient.ServiceType.MID_LAND_FCST, exception);
+						}
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_TA_FCST)) {
+							multipleJsonDownloader.processResult(WeatherSourceType.KMA,
+									RetrofitClient.ServiceType.MID_TA_FCST, exception);
+
+						}
 					}
+
+
 				});
-
-		Call<JsonElement> ultraSrtFcstCall = getUltraSrtFcstData(ultraSrtFcstParameter, LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-				koreaLocalDateTime.toLocalTime()),
-				new JsonDownloader<JsonElement>() {
-					@Override
-					public void onResponseResult(Response<? extends JsonElement> response) {
-						Log.e(RetrofitClient.LOG_TAG, "kma ultra srt fcst 성공");
-						multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA,
-								RetrofitClient.ServiceType.ULTRA_SRT_FCST, response);
-					}
-
-					@Override
-					public void onResponseResult(Throwable t) {
-						Log.e(RetrofitClient.LOG_TAG, "kma ultra srt fcst 실패");
-						multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA,
-								RetrofitClient.ServiceType.ULTRA_SRT_FCST, t);
-					}
-				});
-
-		Call<JsonElement> vilageFcstCall = getVilageFcstData(vilageFcstParameter, LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-				koreaLocalDateTime.toLocalTime()),
-				new JsonDownloader<JsonElement>() {
-					@Override
-					public void onResponseResult(Response<? extends JsonElement> response) {
-						Log.e(RetrofitClient.LOG_TAG, "kma vilage fcst 성공");
-						multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA, RetrofitClient.ServiceType.VILAGE_FCST,
-								response);
-					}
-
-					@Override
-					public void onResponseResult(Throwable t) {
-						Log.e(RetrofitClient.LOG_TAG, "kma vilage fcst 실패");
-						multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA, RetrofitClient.ServiceType.VILAGE_FCST,
-								t);
-					}
-				});
-
-		Call<JsonElement> midTaFcstCall = getMidTaData(midTaParameter, new JsonDownloader<JsonElement>() {
-			@Override
-			public void onResponseResult(Response<? extends JsonElement> response) {
-				Log.e(RetrofitClient.LOG_TAG, "kma mid ta 성공");
-				multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA, RetrofitClient.ServiceType.MID_TA_FCST,
-						response);
-			}
-
-			@Override
-			public void onResponseResult(Throwable t) {
-				Log.e(RetrofitClient.LOG_TAG, "kma mid ta 실패");
-				multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA, RetrofitClient.ServiceType.MID_TA_FCST, t);
-			}
-
-		});
-
-		Call<JsonElement> midLandFcstCall = getMidLandFcstData(midLandParameter, new JsonDownloader<JsonElement>() {
-			@Override
-			public void onResponseResult(Response<? extends JsonElement> response) {
-				Log.e(RetrofitClient.LOG_TAG, "kma mid land 성공");
-				multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA, RetrofitClient.ServiceType.MID_LAND_FCST,
-						response);
-			}
-
-			@Override
-			public void onResponseResult(Throwable t) {
-				Log.e(RetrofitClient.LOG_TAG, "kma mid land 실패");
-				multipleJsonDownloader.processResult(MainProcessing.WeatherSourceType.KMA, RetrofitClient.ServiceType.MID_LAND_FCST, t);
-			}
-
-		});
-
 	}
 
 
