@@ -1,11 +1,21 @@
 package com.lifedawn.bestweather.main;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.core.view.OnApplyWindowInsetsListener;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
@@ -27,6 +37,27 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
 	private SharedPreferences sharedPreferences;
+
+	public static void setWindowFlag(Activity activity, final int bits, boolean on) {
+		Window win = activity.getWindow();
+		WindowManager.LayoutParams winParams = win.getAttributes();
+		if (on) {
+			winParams.flags |= bits;
+		} else {
+			winParams.flags &= ~bits;
+		}
+		win.setAttributes(winParams);
+	}
+
+	public static int getHeightOfStatusBar(Context context) {
+		int height = 0;
+		int id = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+		if (id > 0) {
+			height = context.getResources().getDimensionPixelSize(id);
+		}
+		return height;
+	}
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

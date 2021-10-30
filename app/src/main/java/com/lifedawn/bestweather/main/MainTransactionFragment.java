@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentResultListener;
@@ -20,6 +21,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -337,6 +339,9 @@ public class MainTransactionFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		binding.sideNavMenu.favorites.setOnClickListener(sideNavOnClickListener);
 		binding.sideNavMenu.settings.setOnClickListener(sideNavOnClickListener);
+
+		int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
+		binding.sideNavMenu.currentLocationLayout.setPadding(padding, MainActivity.getHeightOfStatusBar(getContext()) + padding, padding, padding);
 
 		weatherMainFragment = new WeatherMainFragment(new View.OnClickListener() {
 			@Override
