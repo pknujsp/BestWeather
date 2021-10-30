@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
@@ -43,7 +44,7 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 	protected Double longitude;
 	protected String addressName;
 	protected String countryCode;
-	protected MainProcessing.WeatherSourceType mainWeatherSourceType;
+	protected WeatherSourceType mainWeatherSourceType;
 	protected TimeZone timeZone;
 
 	@Override
@@ -62,7 +63,7 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
 		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
 		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
-		mainWeatherSourceType = (MainProcessing.WeatherSourceType) bundle.getSerializable(
+		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(
 				getString(R.string.bundle_key_main_weather_data_source));
 	}
 

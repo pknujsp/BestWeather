@@ -101,14 +101,14 @@ public class OpenWeatherMapProcessing {
 				@Override
 				public void onResponseResult(Response<JsonElement> response) {
 					Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
-					multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP,
+					multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
 							RetrofitClient.ServiceType.OWM_ONE_CALL, response);
 				}
 
 				@Override
 				public void onResponseResult(Throwable t) {
 					Log.e(RetrofitClient.LOG_TAG, "own one call 실패");
-					multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP,
+					multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
 							RetrofitClient.ServiceType.OWM_ONE_CALL, t);
 				}
 
@@ -127,13 +127,13 @@ public class OpenWeatherMapProcessing {
 		Call<JsonElement> oneCallCall = getOneCall(oneCallParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<JsonElement> response) {
-				multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP,
+				multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
 						RetrofitClient.ServiceType.OWM_ONE_CALL, response);
 			}
 
 			@Override
 			public void onResponseResult(Throwable t) {
-				multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP,
+				multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
 						RetrofitClient.ServiceType.OWM_ONE_CALL, t);
 			}
 

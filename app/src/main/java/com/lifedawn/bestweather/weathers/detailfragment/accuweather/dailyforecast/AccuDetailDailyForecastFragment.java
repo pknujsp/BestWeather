@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -162,7 +163,7 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 		TextValueView cloudCoverRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
 
 		dateRow.setValueList(dateList);
-		weatherIconRow.setIcons(MainProcessing.WeatherSourceType.ACCU_WEATHER, weatherIconObjList);
+		weatherIconRow.setIcons(WeatherSourceType.ACCU_WEATHER, weatherIconObjList);
 		popRow.setValueList(popList);
 		rainVolumeRow.setValueList(rainVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);

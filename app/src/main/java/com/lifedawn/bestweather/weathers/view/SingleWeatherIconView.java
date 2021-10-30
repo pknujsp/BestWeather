@@ -59,7 +59,7 @@ public class SingleWeatherIconView extends View {
 
 
 	/*
-	public void setWeatherImgs(MainProcessing.WeatherSourceType weatherSourceType, List<WeatherIconObj> weatherIconObjList,
+	public void setWeatherImgs(WeatherSourceType weatherSourceType, List<WeatherIconObj> weatherIconObjList,
 	                           long firstFcstDateTime, long lastFcstDateTime, double latitude, double longitude) {
 		this.weatherIconObjList = weatherIconObjList;
 		List<SunsetriseUtil.SunSetRiseData> setRiseDataList = SunsetriseUtil.getSunsetRiseList(firstFcstDateTime, lastFcstDateTime,

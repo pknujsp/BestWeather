@@ -390,6 +390,9 @@
     <string name="key_current_location">key_current_location</string>
     <string name="key_selected_location">key_selected_location</string>
     <string name="bundle_key_igps">bundle_key_igps</string>
+    <string name="msg_failed_update">날씨 자료 다운로드에 실패했습니다.</string>
+    <string name="again">다시 시도</string>
+    <string name="rerequest_another_weather_datasource">로 다시 시도</string>
 
 
 </resources>

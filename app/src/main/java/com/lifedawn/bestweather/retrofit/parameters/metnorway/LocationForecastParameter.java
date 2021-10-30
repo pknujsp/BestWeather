@@ -2,10 +2,12 @@ package com.lifedawn.bestweather.retrofit.parameters.metnorway;
 
 import android.util.ArrayMap;
 
+import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class LocationForecastParameter {
+public class LocationForecastParameter extends RequestParameter {
 	private String latitude;
 	private String longitude;
 

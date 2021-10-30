@@ -1,11 +1,12 @@
 package com.lifedawn.bestweather.retrofit.parameters.accuweather;
 
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class GeoPositionSearchParameter {
+public class GeoPositionSearchParameter extends RequestParameter {
 	private String latitude;
 	private String longitude;
 

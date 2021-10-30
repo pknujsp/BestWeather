@@ -3,16 +3,14 @@ package com.lifedawn.bestweather.retrofit.util;
 import android.util.ArrayMap;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
+import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +43,17 @@ public abstract class MultipleJsonDownloader<T> {
 		this.requestCount = requestCount;
 	}
 
+	public int getRequestCount() {
+		return requestCount;
+	}
+
+	public void setResponseCount(int responseCount) {
+		this.responseCount = responseCount;
+	}
+
+	public int getResponseCount() {
+		return responseCount;
+	}
 
 	public String get(@NonNull @NotNull String key) {
 		return valueMap.get(key);
@@ -65,45 +74,47 @@ public abstract class MultipleJsonDownloader<T> {
 
 	public abstract void onResult();
 
-	public void processResult(WeatherSourceType weatherSourceType, RetrofitClient.ServiceType serviceType,
+	public void processResult(WeatherSourceType weatherSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
 	                          Response<? extends T> response) {
 		if (!responseMap.containsKey(weatherSourceType)) {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
 		}
-		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult<T>(response));
+		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult<T>(requestParameter, response));
 
 		if (requestCount == ++responseCount) {
 			onResult();
 		}
 	}
 
-	public void processResult(WeatherSourceType weatherSourceType, RetrofitClient.ServiceType serviceType, Throwable t) {
+	public void processResult(WeatherSourceType weatherSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType, Throwable t) {
 		if (!responseMap.containsKey(weatherSourceType)) {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
 		}
 
-		if (!responseMap.get(weatherSourceType).containsKey(serviceType)) {
-			responseMap.get(weatherSourceType).put(serviceType, new ResponseResult<T>(t));
+		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult<T>(requestParameter, t));
 
-			if (requestCount == ++responseCount) {
-				onResult();
-			}
+		if (requestCount == ++responseCount) {
+			onResult();
 		}
+	}
 
+	public RequestParameter getRequestParameter(WeatherSourceType weatherSourceType, RetrofitClient.ServiceType serviceType) {
+		return responseMap.get(weatherSourceType).get(serviceType).getRequestParameter();
 	}
 
 	public static class ResponseResult<T> {
+		private RequestParameter requestParameter;
 		private Response<? extends T> response;
 		private Throwable t;
 
 		public ResponseResult() {
 		}
 
-		public ResponseResult(Throwable t) {
+		public ResponseResult(RequestParameter requestParameter, Throwable t) {
 			this.t = t;
 		}
 
-		public ResponseResult(Response<? extends T> response) {
+		public ResponseResult(RequestParameter requestParameter, Response<? extends T> response) {
 			this.response = response;
 		}
 
@@ -121,6 +132,10 @@ public abstract class MultipleJsonDownloader<T> {
 
 		public void setT(Throwable t) {
 			this.t = t;
+		}
+
+		public RequestParameter getRequestParameter() {
+			return requestParameter;
 		}
 	}
 }

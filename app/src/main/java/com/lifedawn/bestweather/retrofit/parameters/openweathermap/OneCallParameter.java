@@ -3,11 +3,12 @@ package com.lifedawn.bestweather.retrofit.parameters.openweathermap;
 import android.util.ArrayMap;
 
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 
 import java.util.Map;
 import java.util.Set;
 
-public class OneCallParameter {
+public class OneCallParameter extends RequestParameter {
 	private String latitude;
 	private String longitude;
 	private Set<OneCallApis> oneCallApis;

@@ -1,11 +1,12 @@
 package com.lifedawn.bestweather.retrofit.parameters.kma;
 
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class UltraSrtNcstParameter {
+public class UltraSrtNcstParameter extends RequestParameter {
 	private String serviceKey = RetrofitClient.VILAGE_FCST_INFO_SERVICE_SERVICE_KEY;
 	private final String numOfRows = "300";
 	private final String pageNo = "1";

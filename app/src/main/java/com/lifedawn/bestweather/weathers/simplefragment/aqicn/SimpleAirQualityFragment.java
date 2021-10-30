@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
@@ -43,7 +44,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	private Double longitude;
 	private String addressName;
 	private String countryCode;
-	private MainProcessing.WeatherSourceType mainWeatherSourceType;
+	private WeatherSourceType mainWeatherSourceType;
 	private TimeZone timeZone;
 	private ValueUnits clockUnit;
 
@@ -55,7 +56,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
 		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
 		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
-		mainWeatherSourceType = (MainProcessing.WeatherSourceType) bundle.getSerializable(
+		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(
 				getString(R.string.bundle_key_main_weather_data_source));
 		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 

@@ -3,10 +3,11 @@ package com.lifedawn.bestweather.retrofit.parameters.openweathermap;
 import android.util.ArrayMap;
 
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 
 import java.util.Map;
 
-public class HourlyForecastParameter {
+public class HourlyForecastParameter extends RequestParameter {
 	private String latitude;
 	private String longitude;
 

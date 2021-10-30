@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.lifedawn.bestweather.commons.classes.Gps;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.queryinterfaces.FavoriteAddressQuery;
@@ -93,7 +94,7 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	}
 
 	public interface ILoadImgOfCurrentConditions {
-		void loadImgOfCurrentConditions(MainProcessing.WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude, TimeZone timeZone);
+		void loadImgOfCurrentConditions(WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude, TimeZone timeZone);
 	}
 
 }

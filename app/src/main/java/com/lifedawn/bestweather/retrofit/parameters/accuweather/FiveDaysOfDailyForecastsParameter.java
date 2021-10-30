@@ -1,11 +1,12 @@
 package com.lifedawn.bestweather.retrofit.parameters.accuweather;
 
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class FiveDaysOfDailyForecastsParameter {
+public class FiveDaysOfDailyForecastsParameter extends RequestParameter {
 	private String locationKey;
 	private final String details = "True";
 	private final String metric = "True";

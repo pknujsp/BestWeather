@@ -43,13 +43,13 @@ public class AqicnProcessing {
 		getLocalizedFeed(aqicnParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<JsonElement> response) {
-				multipleJsonDownloader.processResult(WeatherSourceType.AQICN,
+				multipleJsonDownloader.processResult(WeatherSourceType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, response);
 			}
 
 			@Override
 			public void onResponseResult(Throwable t) {
-				multipleJsonDownloader.processResult(WeatherSourceType.AQICN,
+				multipleJsonDownloader.processResult(WeatherSourceType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, t);
 			}
 

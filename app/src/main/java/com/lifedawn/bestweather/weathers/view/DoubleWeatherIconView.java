@@ -11,6 +11,7 @@ import android.view.View;
 import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 
@@ -88,7 +89,7 @@ public class DoubleWeatherIconView extends View {
 	}
 
 
-	public void setIcons(MainProcessing.WeatherSourceType weatherSourceType, List<WeatherIconObj> weatherIconObjList) {
+	public void setIcons(WeatherSourceType weatherSourceType, List<WeatherIconObj> weatherIconObjList) {
 		this.weatherIconObjList = weatherIconObjList;
 		for (WeatherIconObj weatherIconObj : weatherIconObjList) {
 			weatherIconObj.leftImg = ContextCompat.getDrawable(getContext(), R.drawable.temp_icon);

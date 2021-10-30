@@ -37,6 +37,7 @@ import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.enums.LocationType;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.databinding.FragmentWeatherMainBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
@@ -183,7 +184,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	}
 
 	@Override
-	public void loadImgOfCurrentConditions(MainProcessing.WeatherSourceType weatherSourceType, String val, Double latitude,
+	public void loadImgOfCurrentConditions(WeatherSourceType weatherSourceType, String val, Double latitude,
 	                                       Double longitude, TimeZone timeZone) {
 		Calendar calendar = Calendar.getInstance(timeZone);
 		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(

@@ -3,10 +3,11 @@ package com.lifedawn.bestweather.retrofit.parameters.flickr;
 import android.util.ArrayMap;
 
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 
 import java.util.Map;
 
-public class FlickrGetPhotosFromGalleryParameter {
+public class FlickrGetPhotosFromGalleryParameter extends RequestParameter {
 	private String galleryId;
 
 	public Map<String, String> getMap() {

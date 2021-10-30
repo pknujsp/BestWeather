@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.location.Address;
@@ -15,8 +16,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import android.util.ArrayMap;
-import android.util.ArraySet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,12 +24,19 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqicn;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
@@ -66,6 +72,7 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -82,7 +89,7 @@ public class WeatherFragment extends Fragment {
 	private WeatherViewModel.ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions;
 	private WeatherViewModel weatherViewModel;
 
-	private MainProcessing.WeatherSourceType mainWeatherSourceType;
+	private WeatherSourceType mainWeatherSourceType;
 	private Double latitude;
 	private Double longitude;
 	private String countryCode;
@@ -213,20 +220,20 @@ public class WeatherFragment extends Fragment {
 		}
 	}
 
-	private MainProcessing.WeatherSourceType getMainWeatherSourceType(@NonNull String countryCode) {
+	private WeatherSourceType getMainWeatherSourceType(@NonNull String countryCode) {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		MainProcessing.WeatherSourceType mainWeatherSourceType = null;
+		WeatherSourceType mainWeatherSourceType = null;
 
 		if (sharedPreferences.getBoolean(getString(R.string.pref_key_accu_weather), true)) {
-			mainWeatherSourceType = MainProcessing.WeatherSourceType.ACCU_WEATHER;
+			mainWeatherSourceType = WeatherSourceType.ACCU_WEATHER;
 		} else {
-			mainWeatherSourceType = MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP;
+			mainWeatherSourceType = WeatherSourceType.OPEN_WEATHER_MAP;
 		}
 
 		if (countryCode.equals("KR")) {
 			boolean kmaIsTopPriority = sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), true);
 			if (kmaIsTopPriority) {
-				mainWeatherSourceType = MainProcessing.WeatherSourceType.KMA;
+				mainWeatherSourceType = WeatherSourceType.KMA;
 			}
 		}
 
@@ -256,68 +263,222 @@ public class WeatherFragment extends Fragment {
 		if (containWeatherData(latitude, longitude)) {
 			setWeatherFragments(finalResponseMap.get(latLon), latitude, longitude, null);
 		} else {
-			AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data));
+			final AlertDialog[] loadingDialogs = new AlertDialog[]{ProgressDialog.show(getActivity(),
+					getString(R.string.msg_refreshing_weather_data))};
 
-			Set<MainProcessing.WeatherSourceType> weatherSourceTypeSet = new ArraySet<>();
-			weatherSourceTypeSet.add(MainProcessing.WeatherSourceType.AQICN);
-			weatherSourceTypeSet.add(mainWeatherSourceType);
+			ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
+			RequestAqicn requestAqicn = new RequestAqicn();
+			requestAqicn.addRequestServiceType(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
+			requestWeatherSources.put(WeatherSourceType.AQICN, requestAqicn);
 
 			//메인 날씨 제공사만 요청
-			MainProcessing.WeatherSourceType secondWeatherSourceType = null;
+			WeatherSourceType secondWeatherSourceType = null;
 			switch (mainWeatherSourceType) {
 				case KMA:
-					MainProcessing.WeatherSourceType defaultWeatherSourceType = getMainWeatherSourceType("");
+					WeatherSourceType defaultWeatherSourceType = getMainWeatherSourceType("");
 					secondWeatherSourceType = defaultWeatherSourceType;
+
+					RequestKma requestKma = new RequestKma();
+					requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_NCST)
+							.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST)
+							.addRequestServiceType(RetrofitClient.ServiceType.VILAGE_FCST)
+							.addRequestServiceType(RetrofitClient.ServiceType.MID_LAND_FCST)
+							.addRequestServiceType(RetrofitClient.ServiceType.MID_TA_FCST);
+					requestWeatherSources.put(WeatherSourceType.KMA, requestKma);
 					break;
 				case OPEN_WEATHER_MAP:
-					secondWeatherSourceType = MainProcessing.WeatherSourceType.ACCU_WEATHER;
+					secondWeatherSourceType = WeatherSourceType.ACCU_WEATHER;
+
+					RequestOwm requestOwm = new RequestOwm();
+					requestOwm.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
+					Set<OneCallParameter.OneCallApis> excludes = new HashSet<>();
+					excludes.add(OneCallParameter.OneCallApis.minutely);
+					excludes.add(OneCallParameter.OneCallApis.alerts);
+					requestOwm.setExcludeApis(excludes);
+
+					requestWeatherSources.put(WeatherSourceType.OPEN_WEATHER_MAP, requestOwm);
 					break;
 				case ACCU_WEATHER:
-					secondWeatherSourceType = MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP;
+					secondWeatherSourceType = WeatherSourceType.OPEN_WEATHER_MAP;
+
+					RequestAccu requestAccu = new RequestAccu();
+					requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS)
+							.addRequestServiceType(RetrofitClient.ServiceType.ACCU_12_HOURLY)
+							.addRequestServiceType(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY);
+
+					requestWeatherSources.put(WeatherSourceType.ACCU_WEATHER, requestAccu);
 					break;
 			}
-			final MainProcessing.WeatherSourceType finalSecondWeatherSourceType = secondWeatherSourceType;
+			final WeatherSourceType finalSecondWeatherSourceType = secondWeatherSourceType;
 
-			Log.e(RetrofitClient.LOG_TAG, "날씨 정보 요청, " + weatherSourceTypeSet.toString());
-
-			MainProcessing.downloadAllWeatherData(getContext(), latitude.toString(), longitude.toString(), weatherSourceTypeSet,
+			MainProcessing.requestWeatherData(getContext(), latitude, longitude, requestWeatherSources,
 					new MultipleJsonDownloader<JsonElement>() {
 						@Override
 						public void onResult() {
-							Set<Map.Entry<MainProcessing.WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<JsonElement>>>> entrySet = responseMap.entrySet();
+							MultipleJsonDownloader<JsonElement> multipleJsonDownloader = this;
+							Set<Map.Entry<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<JsonElement>>>> entrySet = responseMap.entrySet();
 							//메인 날씨 제공사의 데이터가 정상이면 메인 날씨 제공사의 프래그먼트들을 설정하고 값을 표시한다.
 							//메인 날씨 제공사의 응답이 불량이면 정상인 다른 날씨 제공사에 데이터를 재 요청 한다.
-
-							for (Map.Entry<MainProcessing.WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<JsonElement>>> entry : entrySet) {
-								MainProcessing.WeatherSourceType weatherSourceType = entry.getKey();
+							for (Map.Entry<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<JsonElement>>> entry : entrySet) {
+								WeatherSourceType weatherSourceType = entry.getKey();
 
 								if (weatherSourceType == mainWeatherSourceType) {
 									for (ResponseResult<JsonElement> responseResult : entry.getValue().values()) {
-										if (responseResult.getResponse() == null) {
-											mainWeatherSourceType = finalSecondWeatherSourceType;
-											dialog.dismiss();
-											refresh(latitude, longitude);
+										if (responseResult.getT() != null) {
+											loadingDialogs[0].dismiss();
+											if (getActivity() != null) {
+												getActivity().runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
+														//다른 제공사로 재 시도, 다시시도, 취소 중 택1
+														String main = null;
+														switch (mainWeatherSourceType) {
+															case KMA:
+																main = getString(R.string.kma);
+																break;
+															case ACCU_WEATHER:
+																main = getString(R.string.accu_weather);
+																break;
+															case OPEN_WEATHER_MAP:
+																main = getString(R.string.owm);
+																break;
+														}
+
+														String second = null;
+														switch (finalSecondWeatherSourceType) {
+															case KMA:
+																second = getString(R.string.kma);
+																break;
+															case ACCU_WEATHER:
+																second = getString(R.string.accu_weather);
+																break;
+															case OPEN_WEATHER_MAP:
+																second = getString(R.string.owm);
+																break;
+														}
+
+														String[] choiceItems = new String[]
+																{
+																		getString(R.string.again),
+																		second + getString(R.string.rerequest_another_weather_datasource),
+																		getString(R.string.cancel)
+																};
+
+														String msg = main + ", " + getString(R.string.msg_failed_update);
+
+														AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+																.setCancelable(false)
+																.setTitle(R.string.update_failed)
+																.setItems(choiceItems, new DialogInterface.OnClickListener() {
+																	@Override
+																	public void onClick(DialogInterface dialog, int which) {
+																		if (which == 0) {
+																			//다시 시도
+																			loadingDialogs[0] = reRefreshBySameWeatherSource(requestWeatherSources,
+																					mainWeatherSourceType, multipleJsonDownloader);
+																		} else if (which == 1) {
+																			//다른 날씨 제공사로 다시 시도
+																			loadingDialogs[0] = reRefreshByAnotherWeatherSource(
+																					mainWeatherSourceType, finalSecondWeatherSourceType, multipleJsonDownloader);
+																		} else {
+																			//취소
+																			getActivity().finish();
+																		}
+																		dialog.dismiss();
+																	}
+																}).create();
+														alertDialog.show();
+
+													}
+												});
+											}
+
 											return;
 										}
 									}
 								}
 							}
+
 							finalResponseMap.put(latLon, this);
-							setWeatherFragments(this, latitude, longitude, dialog);
+							setWeatherFragments(this, latitude, longitude, loadingDialogs[0]);
 						}
 					});
 
 		}
 
+	}
 
+	private AlertDialog reRefreshBySameWeatherSource(ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	                                                 WeatherSourceType requestWeatherSourceType,
+	                                                 MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+		AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data));
+		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> result =
+				multipleJsonDownloader.getResponseMap().get(requestWeatherSourceType);
+
+		ArrayMap<WeatherSourceType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
+		//요청한 날씨 제공사만 가져옴
+		RequestWeatherSource failedRequestWeatherSource = requestWeatherSources.get(requestWeatherSourceType);
+		newRequestWeatherSources.put(requestWeatherSourceType, failedRequestWeatherSource);
+		failedRequestWeatherSource.getRequestServiceTypes().clear();
+
+		//실패한 자료만 재 요청
+		for (int i = 0; i < result.size(); i++) {
+			if (result.valueAt(i).getT() != null) {
+				failedRequestWeatherSource.addRequestServiceType(result.keyAt(i));
+			}
+		}
+
+		MainProcessing.reRequestWeatherDataBySameWeatherSource(getContext(), latitude, longitude, newRequestWeatherSources, multipleJsonDownloader);
+		return dialog;
+	}
+
+	private AlertDialog reRefreshByAnotherWeatherSource(WeatherSourceType lastRequestWeatherSourceType, WeatherSourceType anotherWeatherSourceType,
+	                                                    MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+		AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data));
+		ArrayMap<WeatherSourceType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
+		mainWeatherSourceType = anotherWeatherSourceType;
+
+		switch (anotherWeatherSourceType) {
+			case KMA:
+				RequestKma requestKma = new RequestKma();
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_NCST)
+						.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST)
+						.addRequestServiceType(RetrofitClient.ServiceType.VILAGE_FCST)
+						.addRequestServiceType(RetrofitClient.ServiceType.MID_LAND_FCST)
+						.addRequestServiceType(RetrofitClient.ServiceType.MID_TA_FCST);
+				newRequestWeatherSources.put(WeatherSourceType.KMA, requestKma);
+				break;
+			case OPEN_WEATHER_MAP:
+				RequestOwm requestOwm = new RequestOwm();
+				requestOwm.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
+				Set<OneCallParameter.OneCallApis> excludes = new HashSet<>();
+				excludes.add(OneCallParameter.OneCallApis.minutely);
+				excludes.add(OneCallParameter.OneCallApis.alerts);
+				requestOwm.setExcludeApis(excludes);
+
+				newRequestWeatherSources.put(WeatherSourceType.OPEN_WEATHER_MAP, requestOwm);
+				break;
+			case ACCU_WEATHER:
+				RequestAccu requestAccu = new RequestAccu();
+				requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS)
+						.addRequestServiceType(RetrofitClient.ServiceType.ACCU_12_HOURLY)
+						.addRequestServiceType(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY);
+
+				newRequestWeatherSources.put(WeatherSourceType.ACCU_WEATHER, requestAccu);
+				break;
+		}
+
+		MainProcessing.reRequestWeatherDataByAnotherWeatherSource(getContext(), latitude, longitude, lastRequestWeatherSourceType, newRequestWeatherSources,
+				multipleJsonDownloader);
+		return dialog;
 	}
 
 	private void setWeatherFragments(MultipleJsonDownloader<JsonElement> multipleJsonDownloader, Double latitude, Double longitude,
 	                                 @Nullable AlertDialog dialog) {
-		Map<MainProcessing.WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>>> responseMap = multipleJsonDownloader.getResponseMap();
+		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>>> responseMap = multipleJsonDownloader.getResponseMap();
 
 		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> aqiArrayMap = responseMap.get(
-				MainProcessing.WeatherSourceType.AQICN);
+				WeatherSourceType.AQICN);
 		MultipleJsonDownloader.ResponseResult<JsonElement> aqicnResponse = aqiArrayMap.get(
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 		GeolocalizedFeedResponse airQualityResponse = AqicnResponseProcessor.getAirQualityObjFromJson((Response<JsonElement>) aqicnResponse.getResponse());
@@ -513,11 +674,11 @@ public class WeatherFragment extends Fragment {
 					items[1] = getString(R.string.accu_weather);
 					items[2] = getString(R.string.owm);
 
-					checkedItemIdx = (mainWeatherSourceType == MainProcessing.WeatherSourceType.KMA) ? 0 : (mainWeatherSourceType == MainProcessing.WeatherSourceType.ACCU_WEATHER) ? 1 : 2;
+					checkedItemIdx = (mainWeatherSourceType == WeatherSourceType.KMA) ? 0 : (mainWeatherSourceType == WeatherSourceType.ACCU_WEATHER) ? 1 : 2;
 				} else {
 					items[0] = getString(R.string.accu_weather);
 					items[1] = getString(R.string.owm);
-					checkedItemIdx = mainWeatherSourceType == MainProcessing.WeatherSourceType.ACCU_WEATHER ? 0 : 1;
+					checkedItemIdx = mainWeatherSourceType == WeatherSourceType.ACCU_WEATHER ? 0 : 1;
 				}
 				final int finalCheckedItemIdx = checkedItemIdx;
 
@@ -535,9 +696,9 @@ public class WeatherFragment extends Fragment {
 										editor.putBoolean(getString(R.string.pref_key_open_weather_map), !accu);
 										editor.apply();
 
-										mainWeatherSourceType = accu ? MainProcessing.WeatherSourceType.ACCU_WEATHER : MainProcessing.WeatherSourceType.OPEN_WEATHER_MAP;
+										mainWeatherSourceType = accu ? WeatherSourceType.ACCU_WEATHER : WeatherSourceType.OPEN_WEATHER_MAP;
 									} else {
-										mainWeatherSourceType = MainProcessing.WeatherSourceType.KMA;
+										mainWeatherSourceType = WeatherSourceType.KMA;
 									}
 									forceRefresh();
 								}
