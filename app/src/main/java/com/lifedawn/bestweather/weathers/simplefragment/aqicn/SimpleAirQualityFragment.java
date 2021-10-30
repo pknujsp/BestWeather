@@ -129,6 +129,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		} else {
 			binding.measuringStationName.setText(notData);
 		}
+		/*
 		if (geolocalizedFeedResponse.getData().getTime().getIso() != null) {
 			// time : 2021-10-22T11:16:41+09:00
 			ZonedDateTime syncDateTime = null;
@@ -144,6 +145,8 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		} else {
 			binding.updatedTime.setText(notData);
 		}
+
+		 */
 
 		GeolocalizedFeedResponse.Data.IAqi iAqi = geolocalizedFeedResponse.getData().getIaqi();
 		if (iAqi.getPm10() == null) {

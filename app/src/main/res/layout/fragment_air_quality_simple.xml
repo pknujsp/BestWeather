@@ -46,28 +46,13 @@
                 android:id="@+id/distance_to_measuring_station"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
+                android:layout_marginBottom="8dp"
                 android:text="distance_to_measuring_station"
                 android:textColor="?attr/textColor"
                 android:textSize="14sp" />
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
-                android:text="@string/updated_time"
-                android:textColor="?attr/textColor"
-                android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/updated_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="updated_time"
-                android:textColor="?attr/textColor"
-                android:textSize="14sp" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
