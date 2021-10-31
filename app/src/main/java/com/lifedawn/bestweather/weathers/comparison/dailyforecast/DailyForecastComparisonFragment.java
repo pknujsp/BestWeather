@@ -2,8 +2,6 @@ package com.lifedawn.bestweather.weathers.comparison.dailyforecast;
 
 import android.os.Bundle;
 import android.util.ArrayMap;
-import android.util.ArraySet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +35,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProc
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
+import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
@@ -62,6 +61,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		binding.rootScrollView.setVisibility(View.GONE);
+
 		binding.toolbar.fragmentTitle.setText(R.string.comparison_daily_forecast);
 
 		binding.addressName.setText(addressName);
@@ -169,7 +170,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		final int defaultValueRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
 		//날짜, 날씨, 기온, 강수량, 강수확률
-		TextValueView dateRow = new TextValueView(getContext(), valueRowWidth, dateValueRowHeight, columnWidth);
+		TextValueView dateRow = new TextValueView(getContext(), FragmentType.Comparison, valueRowWidth, dateValueRowHeight, columnWidth);
 		List<SingleWeatherIconView> weatherIconRows = new ArrayList<>();
 		List<TextValueView> tempRows = new ArrayList<>();
 		List<TextValueView> precipitationVolumeRows = new ArrayList<>();
@@ -207,16 +208,16 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 					}
 				}
 			}
-			weatherIconRows.add(new SingleWeatherIconView(getContext(), specificRowWidth, weatherValueRowHeight, columnWidth));
+			weatherIconRows.add(new SingleWeatherIconView(getContext(), FragmentType.Comparison, specificRowWidth, weatherValueRowHeight, columnWidth));
 			weatherIconRows.get(i).setTag(R.id.begin_column_index, beginColumnIndex);
 
-			tempRows.add(new TextValueView(getContext(), specificRowWidth, defaultValueRowHeight, columnWidth));
+			tempRows.add(new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth, defaultValueRowHeight, columnWidth));
 			tempRows.get(i).setTag(R.id.begin_column_index, beginColumnIndex);
 
-			precipitationVolumeRows.add(new TextValueView(getContext(), specificRowWidth, defaultValueRowHeight, columnWidth));
+			precipitationVolumeRows.add(new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth, defaultValueRowHeight, columnWidth));
 			precipitationVolumeRows.get(i).setTag(R.id.begin_column_index, beginColumnIndex);
 
-			probabilityOfPrecipitationRows.add(new TextValueView(getContext(), specificRowWidth, defaultValueRowHeight, columnWidth));
+			probabilityOfPrecipitationRows.add(new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth, defaultValueRowHeight, columnWidth));
 			probabilityOfPrecipitationRows.get(i).setTag(R.id.begin_column_index, beginColumnIndex);
 		}
 
@@ -337,7 +338,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			request.put(WeatherSourceType.KMA, requestKma);
 		}
 
-		MainProcessing.requestWeatherData(getContext(), latitude, longitude,
+		MainProcessing.requestNewWeatherData(getContext(), latitude, longitude,
 				request, new MultipleJsonDownloader<JsonElement>() {
 					@Override
 					public void onResult() {
@@ -410,6 +411,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 				@Override
 				public void run() {
 					setValuesToViews(dailyForecastResponse);
+					binding.rootScrollView.setVisibility(View.VISIBLE);
 					dialog.dismiss();
 				}
 			});

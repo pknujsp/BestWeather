@@ -15,23 +15,20 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.accuweather.dailyforecast.AccuDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
+import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	private FiveDaysOfDailyForecastsResponse fiveDaysOfDailyForecastsResponse;
@@ -109,10 +106,10 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), DEFAULT_TEXT_ROW_HEIGHT);
 		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_volume), DEFAULT_TEXT_ROW_HEIGHT);
 
-		TextValueView dateRow = new TextValueView(context, viewWidth, DATE_ROW_HEIGHT, columnWidth);
-		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, viewWidth, WEATHER_ROW_HEIGHT, columnWidth);
-		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, viewWidth, DEFAULT_TEXT_ROW_HEIGHT, columnWidth);
-		TextValueView precipitationVolumeRow = new TextValueView(context, viewWidth, DEFAULT_TEXT_ROW_HEIGHT, columnWidth);
+		TextValueView dateRow = new TextValueView(context, FragmentType.Simple, viewWidth, DATE_ROW_HEIGHT, columnWidth);
+		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Simple, viewWidth, WEATHER_ROW_HEIGHT, columnWidth);
+		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, FragmentType.Simple, viewWidth, DEFAULT_TEXT_ROW_HEIGHT, columnWidth);
+		TextValueView precipitationVolumeRow = new TextValueView(context, FragmentType.Simple, viewWidth, DEFAULT_TEXT_ROW_HEIGHT, columnWidth);
 
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 
@@ -139,8 +136,8 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		dateRow.setValueList(dateList);
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 		precipitationVolumeRow.setValueList(precipitationVolumeList);
-		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(getContext(), viewWidth, TEMP_ROW_HEIGHT, columnWidth,
-				minTempList, maxTempList);
+		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(getContext(), FragmentType.Simple, viewWidth, TEMP_ROW_HEIGHT,
+				columnWidth, minTempList, maxTempList);
 
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);

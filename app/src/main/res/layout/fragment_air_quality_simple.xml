@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="3dp"
                 android:text="@string/measuring_station_name"
-                android:textColor="?attr/textColor"
+                android:textColor="?attr/textColorInWeatherCard"
                 android:textSize="16sp" />
 
             <TextView
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
                 android:text="measuring_station_name"
-                android:textColor="?attr/textColor"
+                android:textColor="?attr/textColorInWeatherCard"
                 android:textSize="14sp" />
 
             <TextView
@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="3dp"
                 android:text="@string/distance_to_measuring_station"
-                android:textColor="?attr/textColor"
+                android:textColor="?attr/textColorInWeatherCard"
                 android:textSize="16sp" />
 
             <TextView
@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:text="distance_to_measuring_station"
-                android:textColor="?attr/textColor"
+                android:textColor="?attr/textColorInWeatherCard"
                 android:textSize="14sp" />
 
 
@@ -77,7 +77,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/current"
-                android:textColor="?attr/textColor" />
+                android:textColor="?attr/textColorInWeatherCard" />
 
 
             <androidx.gridlayout.widget.GridLayout
@@ -95,7 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/daily_forecast"
-                android:textColor="?attr/textColor" />
+                android:textColor="?attr/textColorInWeatherCard" />
 
             <LinearLayout
                 android:id="@+id/forecast"

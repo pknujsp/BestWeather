@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DoubleWindDirectionView extends View {
+	private final FragmentType fragmentType;
+
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
@@ -31,8 +33,10 @@ public class DoubleWindDirectionView extends View {
 
 	private List<WindDirectionObj> windDirectionObjList = new ArrayList<>();
 
-	public DoubleWindDirectionView(Context context, int viewWidth, int viewHeight, int columnWidth) {
+	public DoubleWindDirectionView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
+		this.fragmentType = fragmentType;
+
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;

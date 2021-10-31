@@ -22,6 +22,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.hourlyfor
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
+import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
@@ -29,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
@@ -110,13 +110,13 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		addLabelView(R.drawable.temp_icon, getString(R.string.rain_volume), DEFAULT_TEXT_ROW_HEIGHT);
 		ImageView snowVolumeLabel = addLabelView(R.drawable.temp_icon, getString(R.string.snow_volume), DEFAULT_TEXT_ROW_HEIGHT);
 
-		dateRow = new DateView(context, VIEW_WIDTH, DATE_ROW_HEIGHT, COLUMN_WIDTH);
-		ClockView clockRow = new ClockView(context, VIEW_WIDTH, CLOCK_ROW_HEIGHT, COLUMN_WIDTH);
-		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, VIEW_WIDTH, WEATHER_ROW_HEIGHT, COLUMN_WIDTH);
-		TextValueView tempRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
-		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
-		TextValueView rainVolumeRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
-		TextValueView snowVolumeRow = new TextValueView(context, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
+		dateRow = new DateView(context, FragmentType.Simple, VIEW_WIDTH, DATE_ROW_HEIGHT, COLUMN_WIDTH);
+		ClockView clockRow = new ClockView(context, FragmentType.Simple, VIEW_WIDTH, CLOCK_ROW_HEIGHT, COLUMN_WIDTH);
+		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Simple, VIEW_WIDTH, WEATHER_ROW_HEIGHT, COLUMN_WIDTH);
+		TextValueView tempRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
+		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
+		TextValueView rainVolumeRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
+		TextValueView snowVolumeRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
 
 		//시각, 기온, 강수확률, 강수량
 		List<LocalDateTime> dateTimeList = new ArrayList<>();

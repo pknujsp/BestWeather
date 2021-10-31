@@ -15,12 +15,12 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
+import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,9 +69,9 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), defaultTextRowHeight);
 		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), tempRowHeight);
 
-		TextValueView dateRow = new TextValueView(context, viewWidth, dateRowHeight, columnWidth);
-		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
-		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView dateRow = new TextValueView(context, FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
+		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Detail, viewWidth, weatherRowHeight, columnWidth);
+		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
 
 		//날짜, 시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
@@ -100,8 +100,8 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 			probabilityOfPrecipitationList.add(pop);
 		}
 
-		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(context, viewWidth, tempRowHeight, columnWidth, minTempList,
-				maxTempList);
+		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(context, FragmentType.Detail, viewWidth, tempRowHeight, columnWidth,
+				minTempList, maxTempList);
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,

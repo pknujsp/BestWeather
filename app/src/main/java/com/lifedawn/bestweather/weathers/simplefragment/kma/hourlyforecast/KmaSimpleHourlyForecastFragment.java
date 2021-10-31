@@ -19,6 +19,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.kma.hourlyforecast.KmaDe
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
+import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
@@ -26,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -106,12 +106,12 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), defaultTextRowHeight);
 		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_volume), defaultTextRowHeight);
 
-		dateRow = new DateView(context, viewWidth, dateRowHeight, columnWidth);
-		ClockView clockRow = new ClockView(context, viewWidth, clockRowHeight, columnWidth);
-		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
-		TextValueView tempRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView precipitationVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		dateRow = new DateView(context, FragmentType.Simple, viewWidth, dateRowHeight, columnWidth);
+		ClockView clockRow = new ClockView(context, FragmentType.Simple, viewWidth, clockRowHeight, columnWidth);
+		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Simple, viewWidth, weatherRowHeight, columnWidth);
+		TextValueView tempRow = new TextValueView(context, FragmentType.Simple, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView probabilityOfPrecipitationRow = new TextValueView(context, FragmentType.Simple, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView precipitationVolumeRow = new TextValueView(context, FragmentType.Simple, viewWidth, defaultTextRowHeight, columnWidth);
 
 		//시각 --------------------------------------------------------------------------
 		List<LocalDateTime> dateTimeList = new ArrayList<>();

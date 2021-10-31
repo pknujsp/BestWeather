@@ -14,7 +14,7 @@
         android:layout_weight="1"
         android:text="date"
         android:textAlignment="center"
-        android:textColor="?attr/textColor"
+        android:textColor="?attr/textColorInWeatherCard"
         android:textSize="14sp" />
 
     <TextView

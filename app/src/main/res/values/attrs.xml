@@ -26,6 +26,7 @@
     </declare-styleable>
 
     <attr name="textColor" format="color" />
+    <attr name="textColorInDetailAndComparison" format="color" />
     <attr name="weatherCardBackgroundColor" format="color" />
     <attr name="textColorInWeatherCard" format="color" />
     <attr name="toolbarTextColor" format="color" />

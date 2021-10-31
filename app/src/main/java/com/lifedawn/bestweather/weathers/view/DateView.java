@@ -9,20 +9,15 @@ import android.view.View;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.theme.AppTheme;
-import com.lifedawn.bestweather.commons.classes.ClockUtil;
 
-import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class DateView extends View {
+	private final FragmentType fragmentType;
+
 	private final TextPaint dateTextPaint;
 	private final int viewWidth;
 	private final int viewHeight;
@@ -33,8 +28,9 @@ public class DateView extends View {
 	private int currentX;
 	private int firstColX;
 
-	public DateView(Context context, int viewWidth, int viewHeight, int columnWidth) {
+	public DateView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
+		this.fragmentType = fragmentType;
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;
@@ -42,7 +38,7 @@ public class DateView extends View {
 		dateTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		dateTextPaint.setTextAlign(Paint.Align.CENTER);
 		dateTextPaint.setTextSize(context.getResources().getDimension(R.dimen.dateValueTextSizeInSCD));
-		dateTextPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
+		dateTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
 		Rect rect = new Rect();
 		dateTextPaint.getTextBounds("0", 0, 1, rect);

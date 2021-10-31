@@ -12,11 +12,13 @@ import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 
+import java.util.Set;
+
 public class MainProcessing {
 
-	public static void requestWeatherData(Context context, Double latitude, Double longitude,
-	                                      ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
-	                                      MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	public static void requestNewWeatherData(Context context, Double latitude, Double longitude,
+	                                         ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	                                         MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
 		int totalRequestCount = 0;
 		for (RequestWeatherSource requestWeatherSource : requestWeatherSources.values()) {
 			totalRequestCount += requestWeatherSource.getRequestServiceTypes().size();
@@ -47,9 +49,20 @@ public class MainProcessing {
 		}
 	}
 
-	public static void reRequestWeatherDataBySameWeatherSource(Context context, Double latitude, Double longitude,
-	                                                           ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
-	                                                           MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	public static void reRequestWeatherDataBySameWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
+	                                                                   ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	                                                                   MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+		//실패한 데이터는 모두 삭제(aqicn 제외)
+		Set<RetrofitClient.ServiceType> failedRequestServiceTypes = requestWeatherSources.valueAt(0).getRequestServiceTypes();
+		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> resultArrayMap =
+				multipleJsonDownloader.getResponseMap().get(requestWeatherSources.keyAt(0));
+
+		for (RetrofitClient.ServiceType fail : failedRequestServiceTypes) {
+			if (resultArrayMap.containsKey(fail)) {
+				resultArrayMap.remove(fail);
+			}
+		}
+
 		int totalResponseCount = multipleJsonDownloader.getResponseCount();
 		for (RequestWeatherSource requestWeatherSource : requestWeatherSources.values()) {
 			totalResponseCount -= requestWeatherSource.getRequestServiceTypes().size();
@@ -69,20 +82,23 @@ public class MainProcessing {
 		}
 	}
 
-	public static void reRequestWeatherDataByAnotherWeatherSource(Context context, Double latitude, Double longitude,
-	                                                              WeatherSourceType lastWeatherSourceType,
-	                                                              ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
-	                                                              MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
-		//이전 날씨 제공사 응답 삭제
-		int totalResponseCount = multipleJsonDownloader.getResponseCount() - multipleJsonDownloader.getResponseMap().get(lastWeatherSourceType).size();
-		int totalRequestCount =
-				multipleJsonDownloader.getRequestCount() - multipleJsonDownloader.getResponseMap().get(lastWeatherSourceType).size();
+	public static void reRequestWeatherDataByAnotherWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
+	                                                                      WeatherSourceType lastWeatherSourceType,
+	                                                                      ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	                                                                      MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+		//aqicn빼고 모두 삭제
+		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> aqicnResult
+				= multipleJsonDownloader.getResponseMap().get(WeatherSourceType.AQICN);
+		multipleJsonDownloader.getResponseMap().clear();
+		multipleJsonDownloader.getResponseMap().put(WeatherSourceType.AQICN, aqicnResult);
+
+		int totalRequestCount = 1;
 
 		for (RequestWeatherSource requestWeatherSource : requestWeatherSources.values()) {
 			totalRequestCount += requestWeatherSource.getRequestServiceTypes().size();
 		}
 
-		multipleJsonDownloader.setResponseCount(totalResponseCount);
+		multipleJsonDownloader.setResponseCount(1);
 		multipleJsonDownloader.setRequestCount(totalRequestCount);
 
 		if (requestWeatherSources.containsKey(WeatherSourceType.ACCU_WEATHER)) {

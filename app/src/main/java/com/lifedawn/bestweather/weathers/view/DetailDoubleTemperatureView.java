@@ -9,16 +9,15 @@ import android.text.TextPaint;
 import android.util.TypedValue;
 import android.view.View;
 
-import androidx.preference.PreferenceManager;
-
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.theme.AppTheme;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DetailDoubleTemperatureView extends View {
+	private final FragmentType fragmentType;
+
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
@@ -34,9 +33,11 @@ public class DetailDoubleTemperatureView extends View {
 	private List<Integer> maxTempList = new ArrayList<>();
 	private List<Integer> minTempList = new ArrayList<>();
 
-	public DetailDoubleTemperatureView(Context context, int viewWidth, int viewHeight, int columnWidth, List<Integer> minTempList,
+	public DetailDoubleTemperatureView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth, List<Integer> minTempList,
 	                                   List<Integer> maxTempList) {
 		super(context);
+		this.fragmentType = fragmentType;
+
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;
@@ -46,13 +47,13 @@ public class DetailDoubleTemperatureView extends View {
 		tempPaint = new TextPaint();
 		tempPaint.setTextAlign(Paint.Align.CENTER);
 		tempPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, getResources().getDisplayMetrics()));
-		tempPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
+		tempPaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
 		linePaint = new Paint();
 		linePaint.setAntiAlias(true);
 		linePaint.setStyle(Paint.Style.FILL);
 		linePaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.3f, getResources().getDisplayMetrics()));
-		linePaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
+		linePaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
 		minMaxTempLinePaint = new Paint();
 		minMaxTempLinePaint.setAntiAlias(true);

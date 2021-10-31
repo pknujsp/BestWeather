@@ -79,7 +79,7 @@ public class SunSetRiseViewGroup extends ViewGroup {
 		linePaint.setColor(Color.GREEN);
 
 		timeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-		timeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
+		timeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
 		timeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, getResources().getDisplayMetrics()));
 		timeTextPaint.setTextAlign(Paint.Align.RIGHT);
 

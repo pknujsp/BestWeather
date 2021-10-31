@@ -165,7 +165,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 			@Override
 			public void onClick(View v) {
 				WeatherFragment weatherFragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(getString(R.string.tag_weather_fragment));
-				weatherFragment.refresh();
+				weatherFragment.requestNewData();
 			}
 		});
 

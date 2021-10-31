@@ -28,19 +28,14 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponsePr
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.AirQualityBarView;
+import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -121,10 +116,10 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		}
 
 		final int dateRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
-		TextValueView dateRow = new TextValueView(getContext(), viewWidth, dateRowHeight, columnWidth);
-		AirQualityBarView pm10BarView = new AirQualityBarView(getContext(), viewWidth, viewHeight, columnWidth, pm10AirQualityObjList);
-		AirQualityBarView pm25BarView = new AirQualityBarView(getContext(), viewWidth, viewHeight, columnWidth, pm25AirQualityObjList);
-		AirQualityBarView o3BarView = new AirQualityBarView(getContext(), viewWidth, viewHeight, columnWidth, o3AirQualityObjList);
+		TextValueView dateRow = new TextValueView(getContext(),FragmentType.Detail , viewWidth, dateRowHeight, columnWidth );
+		AirQualityBarView pm10BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, pm10AirQualityObjList);
+		AirQualityBarView pm25BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, pm25AirQualityObjList);
+		AirQualityBarView o3BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, o3AirQualityObjList);
 
 		dateRow.setValueList(dateList);
 

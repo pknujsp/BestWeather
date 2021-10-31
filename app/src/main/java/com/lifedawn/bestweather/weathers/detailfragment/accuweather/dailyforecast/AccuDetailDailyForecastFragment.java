@@ -14,17 +14,16 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.DoubleWindDirectionView;
+import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -144,23 +143,23 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 		//풍향, 풍속, 바람세기, 돌풍, 강수지속시간, 강우지속시간, 운량
 		Context context = getContext();
 
-		TextValueView dateRow = new TextValueView(context, viewWidth, dateRowHeight, columnWidth);
-		DoubleWeatherIconView weatherIconRow = new DoubleWeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
-		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(context, viewWidth, tempRowHeight, columnWidth, minTempList,
-				maxTempList);
-		TextValueView popRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView precipitationVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView precipitationOfRainRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView rainVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView precipitationOfSnowRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView snowVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		DoubleWindDirectionView windDirectionRow = new DoubleWindDirectionView(context, viewWidth, windDirectionRowHeight, columnWidth);
-		TextValueView windSpeedRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView windStrengthRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView windGustRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView hoursOfPrecipitationRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView hoursOfRainRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView cloudCoverRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView dateRow = new TextValueView(context, FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
+		DoubleWeatherIconView weatherIconRow = new DoubleWeatherIconView(context, FragmentType.Detail, viewWidth, weatherRowHeight, columnWidth);
+		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(context, FragmentType.Detail, viewWidth, tempRowHeight, columnWidth,
+				minTempList, maxTempList);
+		TextValueView popRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView precipitationVolumeRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView precipitationOfRainRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView rainVolumeRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView precipitationOfSnowRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView snowVolumeRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		DoubleWindDirectionView windDirectionRow = new DoubleWindDirectionView(context, FragmentType.Detail, viewWidth, windDirectionRowHeight, columnWidth);
+		TextValueView windSpeedRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView windStrengthRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView windGustRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView hoursOfPrecipitationRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView hoursOfRainRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView cloudCoverRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
 
 		dateRow.setValueList(dateList);
 		weatherIconRow.setIcons(WeatherSourceType.ACCU_WEATHER, weatherIconObjList);

@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
-    android:padding="8dp"
     android:layout_gravity="center"
+    android:padding="8dp"
     app:layout_columnWeight="1">
 
     <ImageView
@@ -23,7 +23,7 @@
         android:layout_marginBottom="4dp"
         android:layout_toRightOf="@id/label_icon"
         android:text="label"
-        android:textColor="?attr/textColor"
+        android:textColor="?attr/textColorInWeatherCard"
         android:textSize="16sp" />
 
 
@@ -35,7 +35,7 @@
         android:layout_below="@id/label"
         android:layout_alignLeft="@id/label"
         android:text="valueInt"
-        android:textColor="?attr/textColor"
+        android:textColor="?attr/textColorInWeatherCard"
         android:textSize="15sp" />
 
     <TextView
@@ -46,7 +46,7 @@
         android:layout_below="@id/value_int"
         android:layout_alignLeft="@id/label"
         android:text="valueStr"
-        android:textColor="?attr/textColor"
+        android:textColor="?attr/textColorInWeatherCard"
         android:textSize="16sp" />
 
 

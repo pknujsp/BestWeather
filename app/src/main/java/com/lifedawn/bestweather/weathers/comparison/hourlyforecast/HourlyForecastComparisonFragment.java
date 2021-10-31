@@ -2,8 +2,6 @@ package com.lifedawn.bestweather.weathers.comparison.hourlyforecast;
 
 import android.os.Bundle;
 import android.util.ArrayMap;
-import android.util.ArraySet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +26,6 @@ import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParame
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtfcstresponse.UltraSrtFcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse.VilageFcstRoot;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast.HourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.comparison.base.BaseForecastComparisonFragment;
@@ -40,6 +37,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponse
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
+import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
@@ -64,6 +62,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		binding.rootScrollView.setVisibility(View.GONE);
+
 		binding.toolbar.fragmentTitle.setText(R.string.comparison_hourly_forecast);
 
 		binding.addressName.setText(addressName);
@@ -171,8 +171,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		final int defaultValueRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
 		//날짜, 시각, 날씨, 기온, 강수량, 강수확률
-		dateRow = new DateView(getContext(), valueRowWidth, dateValueRowHeight, columnWidth);
-		ClockView clockRow = new ClockView(getContext(), valueRowWidth, clockValueRowHeight, columnWidth);
+		dateRow = new DateView(getContext(), FragmentType.Comparison, valueRowWidth, dateValueRowHeight, columnWidth);
+		ClockView clockRow = new ClockView(getContext(), FragmentType.Comparison, valueRowWidth, clockValueRowHeight, columnWidth);
 		SingleWeatherIconView[] weatherIconRows = new SingleWeatherIconView[columnsCount];
 		TextValueView[] tempRows = new TextValueView[columnsCount];
 		TextValueView[] precipitationVolumeRows = new TextValueView[columnsCount];
@@ -211,16 +211,16 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				}
 			}
 
-			weatherIconRows[i] = new SingleWeatherIconView(getContext(), specificRowWidth, weatherValueRowHeight, columnWidth);
+			weatherIconRows[i] = new SingleWeatherIconView(getContext(), FragmentType.Comparison, specificRowWidth, weatherValueRowHeight, columnWidth);
 			weatherIconRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 
-			tempRows[i] = new TextValueView(getContext(), specificRowWidth, defaultValueRowHeight, columnWidth);
+			tempRows[i] = new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth, defaultValueRowHeight, columnWidth);
 			tempRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 
-			precipitationVolumeRows[i] = new TextValueView(getContext(), specificRowWidth, defaultValueRowHeight, columnWidth);
+			precipitationVolumeRows[i] = new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth, defaultValueRowHeight, columnWidth);
 			precipitationVolumeRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 
-			probabilityOfPrecipitationRows[i] = new TextValueView(getContext(), specificRowWidth, defaultValueRowHeight, columnWidth);
+			probabilityOfPrecipitationRows[i] = new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth, defaultValueRowHeight, columnWidth);
 			probabilityOfPrecipitationRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 		}
 
@@ -315,7 +315,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			request.put(WeatherSourceType.KMA, requestKma);
 		}
 
-		MainProcessing.requestWeatherData(getContext(), latitude, longitude,
+		MainProcessing.requestNewWeatherData(getContext(), latitude, longitude,
 				request, new MultipleJsonDownloader<JsonElement>() {
 					@Override
 					public void onResult() {
@@ -391,6 +391,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				@Override
 				public void run() {
 					setValuesToViews(hourlyForecastResponse);
+					binding.rootScrollView.setVisibility(View.VISIBLE);
 					dialog.dismiss();
 				}
 			});

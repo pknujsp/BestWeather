@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AirQualityBarView extends View {
+	private final FragmentType fragmentType;
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
@@ -40,10 +41,11 @@ public class AirQualityBarView extends View {
 	private final int minGradeValue;
 	private final int maxGradeValue;
 
-	private List<AirQualityObj> airQualityObjList = new ArrayList<>();
+	private List<AirQualityObj> airQualityObjList;
 
-	public AirQualityBarView(Context context, int viewWidth, int viewHeight, int columnWidth, List<AirQualityObj> airQualityObjList) {
+	public AirQualityBarView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth, List<AirQualityObj> airQualityObjList) {
 		super(context);
+		this.fragmentType = fragmentType;
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;

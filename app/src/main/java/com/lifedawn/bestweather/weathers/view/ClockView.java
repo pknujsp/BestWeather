@@ -10,14 +10,13 @@ import android.view.View;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.theme.AppTheme;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class ClockView extends View {
+	private final FragmentType fragmentType;
+
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
@@ -28,15 +27,16 @@ public class ClockView extends View {
 
 	private List<LocalDateTime> clockList;
 
-	public ClockView(Context context, int viewWidth, int viewHeight, int columnWidth) {
+	public ClockView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
+		this.fragmentType = fragmentType;
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;
 		clockPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		clockPaint.setTextAlign(Paint.Align.CENTER);
 		clockPaint.setTextSize(context.getResources().getDimension(R.dimen.clockValueTextSizeInSCD));
-		clockPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
+		clockPaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
 		Rect rect = new Rect();
 		clockPaint.getTextBounds("0", 0, 1, rect);

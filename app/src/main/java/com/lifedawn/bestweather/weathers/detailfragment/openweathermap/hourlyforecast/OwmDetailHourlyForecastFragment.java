@@ -18,6 +18,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastF
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
+import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
@@ -26,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment {
@@ -88,23 +88,23 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		addLabelView(R.drawable.temp_icon, getString(R.string.visibility), defaultTextRowHeight);
 		addLabelView(R.drawable.temp_icon, getString(R.string.uv_index), defaultTextRowHeight);
 
-		dateRow = new DateView(context, viewWidth, dateRowHeight, columnWidth);
-		ClockView clockRow = new ClockView(context, viewWidth, clockRowHeight, columnWidth);
-		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, viewWidth, weatherRowHeight, columnWidth);
-		TextValueView realFeelTempRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView popRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView rainVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView snowVolumeRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		SingleWindDirectionView windDirectionRow = new SingleWindDirectionView(context, viewWidth, windDirectionRowHeight, columnWidth);
-		TextValueView windSpeedRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView windStrengthRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView windGustRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView pressureRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView humidityRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView dewPointRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView cloudCoverRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView visibilityRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
-		TextValueView uvIndexRow = new TextValueView(context, viewWidth, defaultTextRowHeight, columnWidth);
+		dateRow = new DateView(context, FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
+		ClockView clockRow = new ClockView(context, FragmentType.Detail, viewWidth, clockRowHeight, columnWidth);
+		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Detail, viewWidth, weatherRowHeight, columnWidth);
+		TextValueView realFeelTempRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView popRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView rainVolumeRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView snowVolumeRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		SingleWindDirectionView windDirectionRow = new SingleWindDirectionView(context, FragmentType.Detail, viewWidth, windDirectionRowHeight, columnWidth);
+		TextValueView windSpeedRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView windStrengthRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView windGustRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView pressureRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView humidityRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView dewPointRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView cloudCoverRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView visibilityRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
+		TextValueView uvIndexRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
 
 		List<LocalDateTime> dateTimeList = new ArrayList<>();
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
@@ -167,7 +167,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		visibilityRow.setValueList(visibilityList);
 		uvIndexRow.setValueList(uvIndexList);
 
-		DetailSingleTemperatureView tempRow = new DetailSingleTemperatureView(context, tempList, viewWidth, tempRowHeight, columnWidth);
+		DetailSingleTemperatureView tempRow = new DetailSingleTemperatureView(context, FragmentType.Detail, tempList, viewWidth, tempRowHeight, columnWidth);
 
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);

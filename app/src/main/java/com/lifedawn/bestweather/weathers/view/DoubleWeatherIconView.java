@@ -13,12 +13,13 @@ import androidx.core.content.ContextCompat;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.theme.AppTheme;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DoubleWeatherIconView extends View {
+	private final FragmentType fragmentType;
+
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
@@ -33,8 +34,9 @@ public class DoubleWeatherIconView extends View {
 
 	private List<WeatherIconObj> weatherIconObjList = new ArrayList<>();
 
-	public DoubleWeatherIconView(Context context, int viewWidth, int viewHeight, int columnWidth) {
+	public DoubleWeatherIconView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
+		this.fragmentType = fragmentType;
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;

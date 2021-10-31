@@ -3,6 +3,7 @@ package com.lifedawn.bestweather.retrofit.util;
 import android.util.ArrayMap;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
@@ -17,8 +18,9 @@ import java.util.Map;
 import retrofit2.Response;
 
 public abstract class MultipleJsonDownloader<T> {
-	private int requestCount;
-	private int responseCount;
+	private volatile int requestCount;
+	private volatile int responseCount;
+	private AlertDialog loadingDialog;
 	private Map<String, String> valueMap = new HashMap<>();
 	private LocalDateTime localDateTime = LocalDateTime.now();
 
@@ -59,6 +61,14 @@ public abstract class MultipleJsonDownloader<T> {
 		return valueMap.get(key);
 	}
 
+
+	public void setLoadingDialog(AlertDialog loadingDialog) {
+		this.loadingDialog = loadingDialog;
+	}
+
+	public AlertDialog getLoadingDialog() {
+		return loadingDialog;
+	}
 
 	public void put(@NonNull @NotNull String key, @NonNull @NotNull String value) {
 		valueMap.put(key, value);

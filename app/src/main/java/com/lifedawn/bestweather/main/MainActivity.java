@@ -75,9 +75,9 @@ public class MainActivity extends AppCompatActivity {
 
 		AppThemes appTheme = AppThemes.enumOf(sharedPreferences.getString(getString(R.string.pref_key_app_theme), AppThemes.BLACK.name()));
 		if (appTheme == AppThemes.BLACK) {
-			setTheme(R.style.AppTheme_White);
+			setTheme(R.style.AppTheme_Black);
 		} else {
-			//	setTheme(R.style.AppTheme_White);
+			setTheme(R.style.AppTheme_White);
 		}
 
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);

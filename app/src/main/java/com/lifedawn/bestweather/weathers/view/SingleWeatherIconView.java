@@ -4,19 +4,15 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.util.TypedValue;
 import android.view.View;
-
-import com.lifedawn.bestweather.commons.classes.ClockUtil;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.SunsetriseUtil;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class SingleWeatherIconView extends View {
+	private final FragmentType fragmentType;
+
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
@@ -25,8 +21,10 @@ public class SingleWeatherIconView extends View {
 	private List<WeatherIconObj> weatherIconObjList = new ArrayList<>();
 	private Rect imgRect = new Rect();
 
-	public SingleWeatherIconView(Context context, int viewWidth, int viewHeight, int columnWidth) {
+	public SingleWeatherIconView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
+		this.fragmentType = fragmentType;
+
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;

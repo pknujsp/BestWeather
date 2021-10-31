@@ -9,25 +9,24 @@ import android.view.View;
 import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.ClockUtil;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.SunsetriseUtil;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class SingleWindDirectionView extends View {
+	private final FragmentType fragmentType;
+
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
 	private final int imgSize;
-	
+
 	private List<WindDirectionObj> windDirectionObjList = new ArrayList<>();
 	private Rect imgRect = new Rect();
 
-	public SingleWindDirectionView(Context context, int viewWidth, int viewHeight, int columnWidth) {
+	public SingleWindDirectionView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
+		this.fragmentType = fragmentType;
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;

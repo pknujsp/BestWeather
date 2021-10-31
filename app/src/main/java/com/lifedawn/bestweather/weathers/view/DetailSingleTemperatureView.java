@@ -15,6 +15,8 @@ import com.lifedawn.bestweather.theme.AppTheme;
 import java.util.List;
 
 public class DetailSingleTemperatureView extends View {
+	private final FragmentType fragmentType;
+
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
@@ -27,8 +29,9 @@ public class DetailSingleTemperatureView extends View {
 	private final float RADIUS;
 	private List<Integer> tempList;
 
-	public DetailSingleTemperatureView(Context context, List<Integer> tempList, int viewWidth, int viewHeight, int columnWidth) {
+	public DetailSingleTemperatureView(Context context, FragmentType fragmentType, List<Integer> tempList, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
+		this.fragmentType = fragmentType;
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;
@@ -36,13 +39,13 @@ public class DetailSingleTemperatureView extends View {
 		TEMP_PAINT = new TextPaint();
 		TEMP_PAINT.setTextAlign(Paint.Align.CENTER);
 		TEMP_PAINT.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics()));
-		TEMP_PAINT.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
+		TEMP_PAINT.setColor(AppTheme.getTextColor(context, fragmentType));
 
 		LINE_PAINT = new Paint();
 		LINE_PAINT.setAntiAlias(true);
 		LINE_PAINT.setStyle(Paint.Style.FILL);
 		LINE_PAINT.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.3f, getResources().getDisplayMetrics()));
-		LINE_PAINT.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
+		LINE_PAINT.setColor(AppTheme.getTextColor(context, fragmentType));
 
 		MIN_MAX_TEMP_LINE_PAINT = new Paint();
 		MIN_MAX_TEMP_LINE_PAINT.setAntiAlias(true);
