@@ -16,6 +16,7 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCal
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -92,7 +93,9 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		return FLICKR_MAP.get(code);
 	}
 
-	public static TimeZone getTimeZone(String dateTime) throws ParseException {
-		return ClockUtil.convertISO8061Format(dateTime).getTimeZone();
+
+	public static String getTimeZone(String dateTime) throws ParseException {
+		// 2021-10-22T13:31:00+09:00
+		return ClockUtil.convertISO8061Format(dateTime).getZone().toString();
 	}
 }

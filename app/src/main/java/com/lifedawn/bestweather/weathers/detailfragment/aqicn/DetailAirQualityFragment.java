@@ -116,7 +116,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		}
 
 		final int dateRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
-		TextValueView dateRow = new TextValueView(getContext(),FragmentType.Detail , viewWidth, dateRowHeight, columnWidth );
+		TextValueView dateRow = new TextValueView(getContext(), FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
 		AirQualityBarView pm10BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, pm10AirQualityObjList);
 		AirQualityBarView pm25BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, pm25AirQualityObjList);
 		AirQualityBarView o3BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, o3AirQualityObjList);
@@ -208,7 +208,9 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		View gridItem = getLayoutInflater().inflate(R.layout.air_quality_item, null);
 		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
 		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
+		((TextView) gridItem.findViewById(R.id.label)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Detail));
 		((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
+		((TextView) gridItem.findViewById(R.id.value_int)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Detail));
 		((TextView) gridItem.findViewById(R.id.value_str)).setText(value == null ? getString(R.string.not_data) : AqicnResponseProcessor.getGradeDescription(value));
 		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(value == null ? ContextCompat.getColor(getContext(), R.color.not_data_color)
 				: AqicnResponseProcessor.getGradeColorId(value));

@@ -22,11 +22,13 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.detailfragment.aqicn.DetailAirQualityFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
+import com.lifedawn.bestweather.weathers.view.FragmentType;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -73,6 +75,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		binding.progressResultView.setContentView(binding.contentContainer);
 
 		binding.weatherCardViewHeader.forecastName.setText(R.string.air_quality);
 		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
@@ -104,6 +107,14 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 	@Override
 	public void setValuesToViews() {
+		//응답 실패한 경우
+		if (geolocalizedFeedResponse == null) {
+			binding.progressResultView.onFailedProcessingData(getString(R.string.error));
+			return;
+		} else {
+			binding.progressResultView.onSuccessfulProcessingData();
+		}
+
 		Context context = getContext();
 
 		//측정소와의 거리 계산 후 50km이상의 거리에 있으면 표시보류
@@ -233,7 +244,9 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		View gridItem = getLayoutInflater().inflate(R.layout.air_quality_item, null);
 		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
 		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
+		((TextView) gridItem.findViewById(R.id.label)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
 		((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
+		((TextView) gridItem.findViewById(R.id.value_int)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
 		((TextView) gridItem.findViewById(R.id.value_str)).setText(value == null ? getString(R.string.not_data) :
 				AqicnResponseProcessor.getGradeDescription(value));
 		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(value == null ? ContextCompat.getColor(getContext(), R.color.not_data_color)

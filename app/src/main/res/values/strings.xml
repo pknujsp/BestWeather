@@ -393,6 +393,8 @@
     <string name="msg_failed_update">날씨 자료 다운로드에 실패했습니다.</string>
     <string name="again">다시 시도</string>
     <string name="rerequest_another_weather_datasource">다시 시도</string>
+    <string name="unknown_address">알수 없는 주소</string>
+    <string name="error">오류발생</string>
 
 
 </resources>

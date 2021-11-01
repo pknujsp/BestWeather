@@ -2,6 +2,8 @@ package com.lifedawn.bestweather.commons.classes;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -9,8 +11,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class ClockUtil {
-	public static final SimpleDateFormat iso8061Format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US);
-
 
 	private ClockUtil() {
 	}
@@ -38,10 +38,9 @@ public class ClockUtil {
 		}
 	}
 
-	public static Calendar convertISO8061Format(String dateTime) throws ParseException {
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(iso8061Format.parse(dateTime));
-		return calendar;
+	public static ZonedDateTime convertISO8061Format(String dateTime) {
+		//2021-10-22T13:31:00+09:00
+		return ZonedDateTime.parse(dateTime);
 	}
 
 }

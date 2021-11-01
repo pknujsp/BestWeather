@@ -58,43 +58,48 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 				getString(R.string.bundle_key_main_weather_data_source));
 		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = BaseLayoutSimpleCurrentConditionsBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 	}
-	
+
 	public BaseSimpleCurrentConditionsFragment setAirQualityResponse(GeolocalizedFeedResponse airQualityResponse) {
 		this.airQualityResponse = airQualityResponse;
 		return this;
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
 		setAqiValuesToViews();
 	}
-	
+
 	public void setAqiValuesToViews() {
-		if (airQualityResponse.getStatus().equals("ok")) {
-			if (airQualityResponse.getData().getIaqi().getPm10() == null) {
+		if (airQualityResponse != null) {
+			if (airQualityResponse.getStatus().equals("ok")) {
+				if (airQualityResponse.getData().getIaqi().getPm10() == null) {
+					binding.pm10Grade.setText(R.string.not_data);
+				} else {
+					binding.pm10Grade.setText(AqicnResponseProcessor.getGradeDescription(
+							Integer.parseInt(airQualityResponse.getData().getIaqi().getPm10().getValue())));
+				}
+				if (airQualityResponse.getData().getIaqi().getPm25() == null) {
+					binding.pm25Grade.setText(R.string.not_data);
+				} else {
+					binding.pm25Grade.setText(AqicnResponseProcessor.getGradeDescription(
+							Integer.parseInt(airQualityResponse.getData().getIaqi().getPm25().getValue())));
+				}
+
+			} else {
 				binding.pm10Grade.setText(R.string.not_data);
-			} else {
-				binding.pm10Grade.setText(AqicnResponseProcessor.getGradeDescription(
-						Integer.parseInt(airQualityResponse.getData().getIaqi().getPm10().getValue())));
-			}
-			if (airQualityResponse.getData().getIaqi().getPm25() == null) {
 				binding.pm25Grade.setText(R.string.not_data);
-			} else {
-				binding.pm25Grade.setText(AqicnResponseProcessor.getGradeDescription(
-						Integer.parseInt(airQualityResponse.getData().getIaqi().getPm25().getValue())));
 			}
-			
 		} else {
 			binding.pm10Grade.setText(R.string.not_data);
 			binding.pm25Grade.setText(R.string.not_data);

@@ -96,7 +96,17 @@ public class WeatherFragment extends Fragment {
 	private SharedPreferences sharedPreferences;
 	private IGps iGps;
 
-	public static final Map<String, MultipleJsonDownloader<JsonElement>> finalResponseMap = new HashMap<>();
+	public static final Map<String, WeatherResponseObj> finalResponseMap = new HashMap<>();
+
+	static class WeatherResponseObj {
+		final MultipleJsonDownloader<JsonElement> multipleJsonDownloader;
+		final WeatherSourceType requestWeatherSourceType;
+
+		public WeatherResponseObj(MultipleJsonDownloader<JsonElement> multipleJsonDownloader, WeatherSourceType requestWeatherSourceType) {
+			this.multipleJsonDownloader = multipleJsonDownloader;
+			this.requestWeatherSourceType = requestWeatherSourceType;
+		}
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -166,6 +176,8 @@ public class WeatherFragment extends Fragment {
 
 				if (containWeatherData(latitude, longitude)) {
 					//기존 데이터 표시
+					mainWeatherSourceType =
+							finalResponseMap.get(latitude.toString() + longitude.toString()).requestWeatherSourceType;
 					reDraw();
 				} else {
 					requestNewData();
@@ -183,14 +195,37 @@ public class WeatherFragment extends Fragment {
 		Geocoding.geocoding(getContext(), latitude, longitude, new Geocoding.GeocodingCallback() {
 			@Override
 			public void onGeocodingResult(List<Address> addressList) {
-				setAddressNameOfLocation(addressList);
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
+							if (addressList.isEmpty()) {
+								//검색 결과가 없으면 주소 정보 미 표시하고 데이터 로드
+								mainWeatherSourceType = getMainWeatherSourceType("");
+								countryCode = "";
+								addressName = getString(R.string.unknown_address);
+
+								String addressStr = getString(R.string.current_location) + " : " + addressName;
+								binding.addressName.setText(addressStr);
+								weatherViewModel.setCurrentLocationAddressName(addressName);
+							} else {
+								Address address = addressList.get(0);
+								addressName = address.getAddressLine(0);
+								mainWeatherSourceType = getMainWeatherSourceType(address.getCountryCode());
+								countryCode = address.getCountryCode();
+
+								String addressStr = getString(R.string.current_location) + " : " + addressName;
+								binding.addressName.setText(addressStr);
+								weatherViewModel.setCurrentLocationAddressName(addressName);
+							}
+
+
 							if (refresh) {
 								requestNewData();
 							} else {
+								//이미 데이터가 있으면 다시 그림
+								mainWeatherSourceType =
+										finalResponseMap.get(latitude.toString() + longitude.toString()).requestWeatherSourceType;
 								reDraw();
 							}
 						}
@@ -200,29 +235,6 @@ public class WeatherFragment extends Fragment {
 
 			}
 		});
-	}
-
-	private void setAddressNameOfLocation(List<Address> addressList) {
-		if (addressList.isEmpty()) {
-			//검색 결과가 없으면 미 표시
-		} else {
-			Address address = addressList.get(0);
-			addressName = address.getAddressLine(0);
-			mainWeatherSourceType = getMainWeatherSourceType(address.getCountryCode());
-			countryCode = address.getCountryCode();
-
-			if (getActivity() != null) {
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						String addressStr = getString(R.string.current_location) + " : " + addressName;
-						binding.addressName.setText(addressStr);
-						weatherViewModel.setCurrentLocationAddressName(addressName);
-					}
-				});
-
-			}
-		}
 	}
 
 	private WeatherSourceType getMainWeatherSourceType(@NonNull String countryCode) {
@@ -247,7 +259,8 @@ public class WeatherFragment extends Fragment {
 
 
 	public void reDraw() {
-		setWeatherFragments(mainWeatherSourceType, finalResponseMap.get(latitude.toString() + longitude.toString()), latitude, longitude, null);
+		setWeatherFragments(mainWeatherSourceType, finalResponseMap.get(latitude.toString() + longitude.toString()).multipleJsonDownloader, latitude, longitude
+				, null);
 	}
 
 	public void onChangedCurrentLocation(Location currentLocation) {
@@ -391,7 +404,9 @@ public class WeatherFragment extends Fragment {
 			}
 		}
 		//응답 성공 하면
-		finalResponseMap.put(latitude.toString() + longitude.toString(), jsonResultObj.multipleJsonDownloader);
+		WeatherResponseObj weatherResponseObj = new WeatherResponseObj(jsonResultObj.multipleJsonDownloader, jsonResultObj.requestWeatherSource);
+
+		finalResponseMap.put(latitude.toString() + longitude.toString(), weatherResponseObj);
 		setWeatherFragments(jsonResultObj.requestWeatherSource, jsonResultObj.multipleJsonDownloader, latitude, longitude,
 				jsonResultObj.multipleJsonDownloader.getLoadingDialog());
 	}
@@ -494,6 +509,7 @@ public class WeatherFragment extends Fragment {
 
 		ArrayMap<WeatherSourceType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
 		setRequestWeatherSourceWithSourceType(jsonResultObj.requestWeatherSource, newRequestWeatherSources);
+		jsonResultObj.requestWeatherSources = newRequestWeatherSources;
 
 		MainProcessing.reRequestWeatherDataByAnotherWeatherSourceIfFailed(getContext(), latitude, longitude, lastWeatherSourceType, newRequestWeatherSources,
 				jsonResultObj.multipleJsonDownloader);
@@ -538,12 +554,14 @@ public class WeatherFragment extends Fragment {
 	private void setWeatherFragments(WeatherSourceType requestWeatherSourceType, MultipleJsonDownloader<JsonElement> multipleJsonDownloader, Double latitude, Double longitude,
 	                                 @Nullable AlertDialog loadingDialog) {
 		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>>> responseMap = multipleJsonDownloader.getResponseMap();
-
-		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> aqiArrayMap = responseMap.get(
-				WeatherSourceType.AQICN);
-		MultipleJsonDownloader.ResponseResult<JsonElement> aqicnResponse = aqiArrayMap.get(
+		MultipleJsonDownloader.ResponseResult<JsonElement> aqicnResponse = responseMap.get(
+				WeatherSourceType.AQICN).get(
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
-		GeolocalizedFeedResponse airQualityResponse = AqicnResponseProcessor.getAirQualityObjFromJson((Response<JsonElement>) aqicnResponse.getResponse());
+
+		GeolocalizedFeedResponse airQualityResponse = null;
+		if (aqicnResponse.getResponse() != null) {
+			airQualityResponse = AqicnResponseProcessor.getAirQualityObjFromJson((Response<JsonElement>) aqicnResponse.getResponse());
+		}
 
 		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> arrayMap = responseMap.get(
 				requestWeatherSourceType);
@@ -622,8 +640,8 @@ public class WeatherFragment extends Fragment {
 				currentConditionsWeatherVal = currentConditionsResponse.getItems().get(0).getWeatherIcon();
 
 				try {
-					timeZone = AccuWeatherResponseProcessor.getTimeZone(
-							currentConditionsResponse.getItems().get(0).getLocalObservationDateTime());
+					timeZone = TimeZone.getTimeZone(AccuWeatherResponseProcessor.getTimeZone(
+							currentConditionsResponse.getItems().get(0).getLocalObservationDateTime()));
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
@@ -652,26 +670,26 @@ public class WeatherFragment extends Fragment {
 				timeZone = OpenWeatherMapResponseProcessor.getTimeZone(oneCallResponse);
 				break;
 		}
+		mainWeatherSourceType = requestWeatherSourceType;
 		iLoadImgOfCurrentConditions.loadImgOfCurrentConditions(mainWeatherSourceType, currentConditionsWeatherVal, latitude, longitude,
 				timeZone);
 
-
-		final Bundle defaultBundle = new Bundle();
-		defaultBundle.putDouble(getString(R.string.bundle_key_latitude), this.latitude);
-		defaultBundle.putDouble(getString(R.string.bundle_key_longitude), this.longitude);
-		defaultBundle.putString(getString(R.string.bundle_key_address_name), addressName);
-		defaultBundle.putString(getString(R.string.bundle_key_country_code), countryCode);
-		defaultBundle.putSerializable(getString(R.string.bundle_key_main_weather_data_source), mainWeatherSourceType);
-		defaultBundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
-
-		SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
-		simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);
-		simpleAirQualityFragment.setArguments(defaultBundle);
-
-		Fragment sunSetRiseFragment = new SunsetriseFragment();
-		sunSetRiseFragment.setArguments(defaultBundle);
-
 		if (getActivity() != null) {
+			final Bundle defaultBundle = new Bundle();
+			defaultBundle.putDouble(getString(R.string.bundle_key_latitude), this.latitude);
+			defaultBundle.putDouble(getString(R.string.bundle_key_longitude), this.longitude);
+			defaultBundle.putString(getString(R.string.bundle_key_address_name), addressName);
+			defaultBundle.putString(getString(R.string.bundle_key_country_code), countryCode);
+			defaultBundle.putSerializable(getString(R.string.bundle_key_main_weather_data_source), mainWeatherSourceType);
+			defaultBundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+
+			SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
+			simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);
+			simpleAirQualityFragment.setArguments(defaultBundle);
+
+			Fragment sunSetRiseFragment = new SunsetriseFragment();
+			sunSetRiseFragment.setArguments(defaultBundle);
+
 			Fragment finalSimpleDailyForecastFragment = simpleDailyForecastFragment;
 			Fragment finalSimpleHourlyForecastFragment = simpleHourlyForecastFragment;
 			Fragment finalSimpleCurrentConditionsFragment = simpleCurrentConditionsFragment;
@@ -687,7 +705,6 @@ public class WeatherFragment extends Fragment {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					mainWeatherSourceType = requestWeatherSourceType;
 					createWeatherDataSourcePicker(countryCode);
 					LocalDateTime localDateTime = multipleJsonDownloader.getLocalDateTime();
 					DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
@@ -777,10 +794,6 @@ public class WeatherFragment extends Fragment {
 
 	public LocationType getLocationType() {
 		return locationType;
-	}
-
-	public FavoriteAddressDto getSelectedFavoriteAddressDto() {
-		return selectedFavoriteAddressDto;
 	}
 
 	static class JsonResultObj {

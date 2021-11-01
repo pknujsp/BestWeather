@@ -13,6 +13,7 @@
             layout="@layout/weather_card_header_view" />
 
         <LinearLayout
+            android:id="@+id/content_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -50,8 +51,6 @@
                 android:text="distance_to_measuring_station"
                 android:textColor="?attr/textColorInWeatherCard"
                 android:textSize="14sp" />
-
-
 
 
             <RelativeLayout
@@ -104,6 +103,11 @@
                 android:orientation="vertical" />
 
         </LinearLayout>
+
+        <com.lifedawn.bestweather.commons.views.ProgressResultView
+            android:id="@+id/progress_result_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
 
     </LinearLayout>

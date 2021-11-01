@@ -357,7 +357,7 @@ public class MainTransactionFragment extends Fragment {
 			@Override
 			public void onClick(View view) {
 				weatherMainFragment.setWeatherFragment(LocationType.CurrentLocation, null);
-				binding.drawerLayout.closeDrawer(binding.sideNavigation);
+				binding.drawerLayout.closeDrawer(binding.sideNavigation, false);
 			}
 		});
 
@@ -461,7 +461,7 @@ public class MainTransactionFragment extends Fragment {
 							getString(R.string.tag_settings_main_fragment)).commit();
 					break;
 			}
-			binding.drawerLayout.closeDrawer(binding.sideNavigation);
+			binding.drawerLayout.closeDrawer(binding.sideNavigation, false);
 		}
 	};
 }

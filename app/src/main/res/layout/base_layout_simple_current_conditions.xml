@@ -55,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="기온"
-                    android:textSize="58sp" />
+                    android:textSize="62sp" />
 
                 <GridLayout
                     android:id="@+id/air_quality_in_current_conditions"
