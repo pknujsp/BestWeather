@@ -288,7 +288,7 @@
         <item>@string/owm_icon_804_overcast_clouds</item>
     </string-array>
 
-    <integer-array name="OpenWeatherMapWeatherIconForCode">
+    <array name="OpenWeatherMapWeatherIconForCode">
         <item>@drawable/thunderstorms</item>
         <item>@drawable/thunderstorms</item>
         <item>@drawable/thunderstorms</item>
@@ -344,7 +344,7 @@
         <item>@drawable/partlysunny</item>
         <item>@drawable/mostlycloudy</item>
         <item>@drawable/overcast</item>
-    </integer-array>
+    </array>
 
     <string-array name="OpenWeatherMapFlickrGalleryNames">
         <item>@string/flickr_rain</item>

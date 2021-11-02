@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,6 +62,9 @@ public class OwmSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 			binding.precipitation.setVisibility(View.GONE);
 		}
 		
+		
+		binding.weatherIcon.setImageDrawable(ContextCompat.getDrawable(getContext(),
+				OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId(), false)));
 		binding.sky.setText(OpenWeatherMapResponseProcessor.getWeatherIconDescription(current.getWeather().get(0).getId()));
 		binding.temperature.setText(
 				ValueUnits.convertTemperature(current.getTemp(), tempUnit).toString() + ValueUnits.convertToStr(getContext(), tempUnit));
