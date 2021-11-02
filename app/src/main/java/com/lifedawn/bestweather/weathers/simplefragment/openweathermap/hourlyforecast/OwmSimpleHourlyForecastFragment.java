@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -119,6 +120,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		TextValueView snowVolumeRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
 
 		//시각, 기온, 강수확률, 강수량
+		List<SingleWeatherIconView.WeatherIconObj> iconObjList = new ArrayList<>();
 		List<LocalDateTime> dateTimeList = new ArrayList<>();
 		List<String> tempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
@@ -127,8 +129,10 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 		boolean haveSnowVolumes = false;
 
+		int index = 0;
 		for (OneCallResponse.Hourly item : items) {
 			dateTimeList.add(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getDt()) * 1000L, timeZone));
+			iconObjList.add(new SingleWeatherIconView.WeatherIconObj(WeatherSourceType.OPEN_WEATHER_MAP, item.getWeather().get(0).getId(), dateTimeList.get(index), context));
 			tempList.add(ValueUnits.convertTemperature(item.getTemp(), tempUnit).toString());
 			probabilityOfPrecipitationList.add(String.valueOf((int) (Double.parseDouble(item.getPop()) * 100.0)));
 			rainVolumeList.add(item.getRain() == null ? "-" : item.getRain().getPrecipitation1Hour());
@@ -139,7 +143,9 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				}
 			}
 			snowVolumeList.add(item.getSnow() == null ? "-" : item.getSnow().getPrecipitation1Hour());
+			index++;
 		}
+		weatherIconRow.setWeatherImgs(iconObjList);
 		dateRow.init(dateTimeList);
 		clockRow.setClockList(dateTimeList);
 		tempRow.setValueList(tempList);

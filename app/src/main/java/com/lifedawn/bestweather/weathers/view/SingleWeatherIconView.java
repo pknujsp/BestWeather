@@ -6,6 +6,11 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
+import androidx.core.content.ContextCompat;
+
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,27 +61,10 @@ public class SingleWeatherIconView extends View {
 	}
 
 
-	/*
-	public void setWeatherImgs(WeatherSourceType weatherSourceType, List<WeatherIconObj> weatherIconObjList,
-	                           long firstFcstDateTime, long lastFcstDateTime, double latitude, double longitude) {
+	public void setWeatherImgs(List<WeatherIconObj> weatherIconObjList) {
 		this.weatherIconObjList = weatherIconObjList;
-		List<SunsetriseUtil.SunSetRiseData> setRiseDataList = SunsetriseUtil.getSunsetRiseList(firstFcstDateTime, lastFcstDateTime,
-				latitude, longitude);
 
-		boolean day = false;
-		for (WeatherIconObj weatherIconObj : weatherIconObjList) {
-			for (SunsetriseUtil.SunSetRiseData sunSetRiseData : setRiseDataList) {
-				if (ClockUtil.areSameDate(sunSetRiseData.getDate().getTime(), weatherIconObj.dateTime.getTime())) {
-					day = weatherIconObj.dateTime.getTime() > sunSetRiseData.getSunrise().getTime() && weatherIconObj.dateTime.getTime() < sunSetRiseData.getSunset().getTime();
-					// add drawable to list
-
-					break;
-				}
-			}
-		}
 	}
-
-	 */
 
 
 	public static class WeatherIconObj {
@@ -84,9 +72,13 @@ public class SingleWeatherIconView extends View {
 		final LocalDateTime dateTime;
 		Drawable img;
 
-		public WeatherIconObj(String code, LocalDateTime dateTime) {
+		public WeatherIconObj(WeatherSourceType weatherSourceType, String code, LocalDateTime dateTime, Context context) {
 			this.code = code;
 			this.dateTime = dateTime;
+
+			if (weatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
+				img = ContextCompat.getDrawable(context, OpenWeatherMapResponseProcessor.getWeatherIconImg(code, false));
+			}
 		}
 	}
 }

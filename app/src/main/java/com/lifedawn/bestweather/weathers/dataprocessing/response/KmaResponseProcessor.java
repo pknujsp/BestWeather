@@ -111,7 +111,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 			if (code.equals("1")) {
 				return R.drawable.night_clear;
 			} else if (code.equals("3")) {
-				return R.drawable.night_mostlycloudy;
+				return R.drawable.night_mostly_cloudy;
 			} else {
 				return WEATHER_SKY_ICON_ID_MAP.get(code);
 			}

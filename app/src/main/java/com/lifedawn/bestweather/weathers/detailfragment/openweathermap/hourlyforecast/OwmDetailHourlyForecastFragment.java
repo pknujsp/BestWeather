@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
@@ -131,7 +132,8 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		for (OneCallResponse.Hourly hourly : hourlyList) {
 			dateTimeList.add(
 					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getDt()) * 1000L, timeZone));
-			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(hourly.getWeather().get(0).getIcon(), dateTimeList.get(index)));
+			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(WeatherSourceType.OPEN_WEATHER_MAP, hourly.getWeather().get(0).getIcon(),
+					dateTimeList.get(index),context ));
 			tempList.add(ValueUnits.convertTemperature(hourly.getTemp(), tempUnit));
 			realFeelTempList.add(ValueUnits.convertTemperature(hourly.getFeelsLike(), tempUnit).toString());
 			popList.add(String.valueOf((int) (Double.parseDouble(hourly.getPop()) * 100.0)));

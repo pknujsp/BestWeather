@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
@@ -133,7 +134,8 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 		for (TwelveHoursOfHourlyForecastsResponse.Item hourly : hourlyItemList) {
 			dateTimeList.add(
 					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L, timeZone));
-			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(hourly.getWeatherIcon(), dateTimeList.get(index)));
+			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(WeatherSourceType.ACCU_WEATHER, hourly.getWeatherIcon(),
+					dateTimeList.get(index), context));
 
 			tempList.add(ValueUnits.convertTemperature(hourly.getTemperature().getValue(), tempUnit));
 			realFeelTempList.add(ValueUnits.convertTemperature(hourly.getRealFeelTemperature().getValue(), tempUnit).toString());

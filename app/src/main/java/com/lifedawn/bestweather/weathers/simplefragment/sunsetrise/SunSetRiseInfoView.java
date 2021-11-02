@@ -47,7 +47,7 @@ public class SunSetRiseInfoView extends View {
 	private void init(ZonedDateTime dateTime, SunsetriseFragment.SunSetRiseType sunSetRiseType) {
 		this.dateTime = dateTime;
 		this.typeIcon = ContextCompat.getDrawable(getContext(), sunSetRiseType == SunsetriseFragment.SunSetRiseType.RISE ?
-				R.drawable.temp_icon : R.drawable.temp_icon);
+				R.drawable.sunrise : R.drawable.sunset);
 		this.type = getContext().getString(sunSetRiseType == SunsetriseFragment.SunSetRiseType.RISE ? R.string.sunrise : R.string.sunset);
 
 		typeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
@@ -79,7 +79,7 @@ public class SunSetRiseInfoView extends View {
 
 		final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
 
-		final int iconSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32f, getResources().getDisplayMetrics());
+		final int iconSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 42f, getResources().getDisplayMetrics());
 		iconRect = new Rect(padding, padding, padding + iconSize, padding + iconSize);
 		typeTextRect.offsetTo(iconRect.right + typeTextLeftMargin, iconRect.centerY() + typeTextRect.height() / 2);
 		timeTextRect.offsetTo(iconRect.left, iconRect.bottom + timeTextTopMargin + timeTextRect.height() / 2);
