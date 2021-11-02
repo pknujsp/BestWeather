@@ -19,7 +19,7 @@ import retrofit2.Response;
 
 public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	private static final Map<String, String> WEATHER_ICON_DESCRIPTION_MAP = new HashMap<>();
-	private static final Map<String, Drawable> WEATHER_ICON_IMG_MAP = new HashMap<>();
+	private static final Map<String, Integer> WEATHER_ICON_ID_MAP = new HashMap<>();
 	private static final Map<String, String> FLICKR_MAP = new HashMap<>();
 	
 	private OpenWeatherMapResponseProcessor() {
@@ -28,10 +28,12 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	public static void init(Context context) {
 		String[] codes = context.getResources().getStringArray(R.array.OpenWeatherMapWeatherIconCodes);
 		String[] descriptions = context.getResources().getStringArray(R.array.OpenWeatherMapWeatherIconDescriptionsForCode);
+		int[] iconIds = context.getResources().getIntArray(R.array.OpenWeatherMapWeatherIconForCode);
 		
 		WEATHER_ICON_DESCRIPTION_MAP.clear();
 		for (int i = 0; i < codes.length; i++) {
 			WEATHER_ICON_DESCRIPTION_MAP.put(codes[i], descriptions[i]);
+			WEATHER_ICON_ID_MAP.put(codes[i], iconIds[i]);
 		}
 		
 		String[] flickrGalleryNames = context.getResources().getStringArray(R.array.OpenWeatherMapFlickrGalleryNames);
@@ -42,8 +44,24 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		}
 	}
 	
-	public static Drawable getWeatherIconImg(String code) {
-		return null;
+	public static int getWeatherIconImg(String code, boolean night) {
+		if (night) {
+			switch (code) {
+				case "800":
+					return R.drawable.night_clear;
+				case "801":
+					return R.drawable.night_mostlyclear;
+				case "802":
+					return R.drawable.night_partlycloudy;
+				case "803":
+					return R.drawable.night_mostlycloudy;
+				case "804":
+					return R.drawable.overcast;
+				default:
+					return WEATHER_ICON_ID_MAP.get(code);
+			}
+		}
+		return WEATHER_ICON_ID_MAP.get(code);
 	}
 	
 	public static String getWeatherIconDescription(String code) {
@@ -69,7 +87,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	public static String getFlickrGalleryName(String code) {
 		return FLICKR_MAP.get(code);
 	}
-
+	
 	public static TimeZone getTimeZone(OneCallResponse oneCallResponse) {
 		return TimeZone.getTimeZone(oneCallResponse.getTimezone());
 	}

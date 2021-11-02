@@ -86,6 +86,49 @@
         <item>@string/accu_weather_icon_44_mostly_cloudy_and_snow</item>
     </string-array>
 
+    <integer-array name="AccuWeatherWeatherIconForCode">
+        <item>@drawable/sunny</item>
+        <item>@drawable/mostlysunny</item>
+        <item>@drawable/partlysunny</item>
+        <item>@drawable/partlysunny</item>
+        <item>@drawable/hazysunshine</item>
+        <item>@drawable/mostlycloudy</item>
+        <item>@drawable/overcast</item>
+        <item>@drawable/overcast</item>
+        <item>@drawable/fog</item>
+        <item>@drawable/showers</item>
+        <item>@drawable/mostlycloudyandshowers</item>
+        <item>@drawable/partlysunnyandshowers</item>
+        <item>@drawable/thunderstorms</item>
+        <item>@drawable/mostlycloudyandshowers</item>
+        <item>@drawable/partlysunnyandthunderstorms</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/flurries</item>
+        <item>@drawable/mostlycloudyandflurries</item>
+        <item>@drawable/partlysunnyandflurries</item>
+        <item>@drawable/snow</item>
+        <item>@drawable/mostlycloudyandsnow</item>
+        <item>@drawable/ice</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/sunny</item>
+        <item>@drawable/snow</item>
+        <item>@drawable/temp_icon</item>
+        <item>@drawable/night_clear</item>
+        <item>@drawable/night_mostlyclear</item>
+        <item>@drawable/night_partlycloudy</item>
+        <item>@drawable/night_mostlycloudy</item>
+        <item>@drawable/hazymoonlight</item>
+        <item>@drawable/night_mostlycloudy</item>
+        <item>@drawable/night_partlycloudyandshowers</item>
+        <item>@drawable/night_mostlycloudyandshowers</item>
+        <item>@drawable/night_partlycloudyandthunderstorms</item>
+        <item>@drawable/night_mostlycloudyandthunderstorms</item>
+        <item>@drawable/flurries</item>
+        <item>@drawable/snow</item>
+    </integer-array>
+
     <string-array name="AccuWeatherFlickrGalleryNames">
         <item>@string/flickr_clear</item>
         <item>@string/flickr_clear</item>
@@ -245,6 +288,64 @@
         <item>@string/owm_icon_804_overcast_clouds</item>
     </string-array>
 
+    <integer-array name="OpenWeatherMapWeatherIconForCode">
+        <item>@drawable/thunderstorms</item>
+        <item>@drawable/thunderstorms</item>
+        <item>@drawable/thunderstorms</item>
+        <item>@drawable/thunderstorms</item>
+        <item>@drawable/thunderstorms</item>
+        <item>@drawable/thunderstorms</item>
+        <item>@drawable/thunderstorms</item>
+        <item>@drawable/thunderstorms</item>
+        <item>@drawable/thunderstorms</item>
+        <item>@drawable/thunderstorms</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/showers</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/showers</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/showers</item>
+        <item>@drawable/showers</item>
+        <item>@drawable/showers</item>
+        <item>@drawable/showers</item>
+        <item>@drawable/flurries</item>
+        <item>@drawable/snow</item>
+        <item>@drawable/snow</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/temp_icon</item>
+        <item>@drawable/temp_icon</item>
+        <item>@drawable/temp_icon</item>
+        <item>@drawable/temp_icon</item>
+        <item>@drawable/fog</item>
+        <item>@drawable/temp_icon</item>
+        <item>@drawable/fog</item>
+        <item>@drawable/temp_icon</item>
+        <item>@drawable/temp_icon</item>
+        <item>@drawable/temp_icon</item>
+        <item>@drawable/sunny</item>
+        <item>@drawable/mostlysunny</item>
+        <item>@drawable/partlysunny</item>
+        <item>@drawable/mostlycloudy</item>
+        <item>@drawable/overcast</item>
+    </integer-array>
+
     <string-array name="OpenWeatherMapFlickrGalleryNames">
         <item>@string/flickr_rain</item>
         <item>@string/flickr_rain</item>
@@ -315,6 +416,12 @@
         <item>@string/kma_sky_4_overcast</item>
     </string-array>
 
+    <integer-array name="KmaSkyWeatherIconForCode">
+        <item>@drawable/sunny</item>
+        <item>@drawable/mostlycloudy</item>
+        <item>@drawable/overcast</item>
+    </integer-array>
+
     <string-array name="KmaSkyFlickrGalleryNames">
         <item>@string/flickr_clear</item>
         <item>@string/flickr_mostly_cloudy</item>
@@ -342,6 +449,18 @@
         <item>@string/kma_pty_6_raindrop_and_snow_blizzard</item>
         <item>@string/kma_pty_7_snow_blizzard</item>
     </string-array>
+
+    <integer-array name="KmaPtyWeatherIconForCode">
+        <item>@drawable/sunny</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/snow</item>
+        <item>@drawable/showers</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/snow</item>
+    </integer-array>
+
 
     <string-array name="KmaPtyFlickrGalleryNames">
         <item>@string/flickr_clear</item>

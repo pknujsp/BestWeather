@@ -22,7 +22,6 @@ import java.util.TimeZone;
 public class WeatherResponseProcessor {
 	private static Map<String, String> windStrengthDescriptionMap = new HashMap<>();
 	private static Map<String, String> windStrengthDescriptionSimpleMap = new HashMap<>();
-	private static final TimeZone deviceTimeZone = TimeZone.getDefault();
 
 	public static void init(Context context) {
 		windStrengthDescriptionMap.clear();
