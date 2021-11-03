@@ -53,7 +53,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 				case "801":
 					return R.drawable.night_partly_cloudy;
 				case "802":
-					return R.drawable.temp_icon;
+					return R.drawable.night_scattered_clouds;
 				case "803":
 					return R.drawable.night_mostly_cloudy;
 				default:

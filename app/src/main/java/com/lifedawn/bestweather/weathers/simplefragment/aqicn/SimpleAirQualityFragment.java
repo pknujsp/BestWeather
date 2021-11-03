@@ -49,7 +49,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	private WeatherSourceType mainWeatherSourceType;
 	private TimeZone timeZone;
 	private ValueUnits clockUnit;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -60,22 +60,22 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
 		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(getString(R.string.bundle_key_main_weather_data_source));
 		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
-		
+
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentAirQualitySimpleBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.progressResultView.setContentView(binding.contentContainer);
-		
+
 		binding.weatherCardViewHeader.forecastName.setText(R.string.air_quality);
 		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
 		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
@@ -83,11 +83,11 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			public void onClick(View view) {
 				DetailAirQualityFragment detailAirQualityFragment = new DetailAirQualityFragment();
 				detailAirQualityFragment.setResponse(geolocalizedFeedResponse);
-				
+
 				Bundle bundle = new Bundle();
 				bundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
 				detailAirQualityFragment.setArguments(bundle);
-				
+
 				String tag = getString(R.string.tag_detail_air_quality_fragment);
 				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
 				fragmentManager.beginTransaction().hide(
@@ -95,15 +95,15 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 						detailAirQualityFragment, tag).addToBackStack(tag).commit();
 			}
 		});
-		
+
 		setValuesToViews();
 	}
-	
+
 	public SimpleAirQualityFragment setGeolocalizedFeedResponse(GeolocalizedFeedResponse geolocalizedFeedResponse) {
 		this.geolocalizedFeedResponse = geolocalizedFeedResponse;
 		return this;
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
 		//응답 실패한 경우
@@ -113,16 +113,16 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		} else {
 			binding.progressResultView.onSuccessfulProcessingData();
 		}
-		
+
 		Context context = getContext();
-		
+
 		//측정소와의 거리 계산 후 50km이상의 거리에 있으면 표시보류
 		final Double distance = LocationDistance.distance(latitude, longitude,
 				Double.parseDouble(geolocalizedFeedResponse.getData().getCity().getGeo().get(0)),
 				Double.parseDouble(geolocalizedFeedResponse.getData().getCity().getGeo().get(1)), LocationDistance.Unit.KM);
-		
+
 		String notData = getString(R.string.not_data);
-		
+
 		if (distance > 50.0) {
 			String msg = getString(R.string.the_measuring_station_is_very_far_away) + "\n" + String.format("%.2f", distance) + getString(
 					R.string.km);
@@ -132,7 +132,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			binding.message.setVisibility(View.GONE);
 		}
 		binding.distanceToMeasuringStation.setText(String.format("%.2f", distance) + getString(R.string.km));
-		
+
 		if (geolocalizedFeedResponse.getData().getCity().getName() != null) {
 			binding.measuringStationName.setText(geolocalizedFeedResponse.getData().getCity().getName());
 		} else {
@@ -156,7 +156,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		}
 
 		 */
-		
+
 		GeolocalizedFeedResponse.Data.IAqi iAqi = geolocalizedFeedResponse.getData().getIaqi();
 		if (iAqi.getPm10() == null) {
 			addGridItem(null, R.string.pm10_str, R.drawable.pm10);
@@ -164,78 +164,80 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			Integer pm10 = (int) Double.parseDouble(iAqi.getPm10().getValue());
 			addGridItem(pm10, R.string.pm10_str, R.drawable.pm10);
 		}
-		
+
 		if (iAqi.getPm25() == null) {
 			addGridItem(null, R.string.pm25_str, R.drawable.pm25);
 		} else {
 			Integer pm25 = (int) Double.parseDouble(iAqi.getPm25().getValue());
 			addGridItem(pm25, R.string.pm25_str, R.drawable.pm25);
 		}
-		
-		
+
+
 		if (iAqi.getO3() == null) {
 			addGridItem(null, R.string.o3_str, R.drawable.o3);
 		} else {
 			Integer o3 = (int) Double.parseDouble(iAqi.getO3().getValue());
 			addGridItem(o3, R.string.o3_str, R.drawable.o3);
 		}
-		
-		
+
+
 		if (iAqi.getCo() == null) {
 			addGridItem(null, R.string.co_str, R.drawable.co);
 		} else {
 			Integer co = (int) Double.parseDouble(iAqi.getCo().getValue());
 			addGridItem(co, R.string.co_str, R.drawable.co);
 		}
-		
+
 		if (iAqi.getSo2() == null) {
 			addGridItem(null, R.string.so2_str, R.drawable.so2);
 		} else {
 			Integer so2 = (int) Double.parseDouble(iAqi.getSo2().getValue());
 			addGridItem(so2, R.string.so2_str, R.drawable.so2);
 		}
-		
+
 		if (iAqi.getNo2() == null) {
 			addGridItem(null, R.string.no2_str, R.drawable.no2);
 		} else {
 			Integer no2 = (int) Double.parseDouble(iAqi.getNo2().getValue());
 			addGridItem(no2, R.string.no2_str, R.drawable.no2);
 		}
-		
+
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 		LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-		
+
 		View labelView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 		((TextView) labelView.findViewById(R.id.date)).setText(null);
 		((TextView) labelView.findViewById(R.id.pm10)).setText(getString(R.string.pm10_str));
 		((TextView) labelView.findViewById(R.id.pm25)).setText(getString(R.string.pm25_str));
 		((TextView) labelView.findViewById(R.id.o3)).setText(getString(R.string.o3_str));
-		
+		binding.forecast.addView(labelView);
+
+
 		List<AirQualityForecastObj> forecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(geolocalizedFeedResponse,
 				timeZone);
 		for (AirQualityForecastObj forecastObj : forecastObjList) {
 			View forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 			((TextView) forecastItemView.findViewById(R.id.date)).setText(forecastObj.date.format(dateTimeFormatter));
-			
+
 			((TextView) forecastItemView.findViewById(R.id.pm10)).setText(
 					forecastObj.pm10 == null ? notData : AqicnResponseProcessor.getGradeDescription(forecastObj.pm10));
 			((TextView) forecastItemView.findViewById(R.id.pm10)).setTextColor(forecastObj.pm10 == null ? ContextCompat.getColor(context,
 					R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.pm10));
-			
+
 			((TextView) forecastItemView.findViewById(R.id.pm25)).setText(
 					forecastObj.pm25 == null ? notData : AqicnResponseProcessor.getGradeDescription(forecastObj.pm25));
 			((TextView) forecastItemView.findViewById(R.id.pm25)).setTextColor(forecastObj.pm25 == null ? ContextCompat.getColor(context,
 					R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.pm25));
-			
+
 			((TextView) forecastItemView.findViewById(R.id.o3)).setText(
 					forecastObj.o3 == null ? notData : AqicnResponseProcessor.getGradeDescription(forecastObj.o3));
 			((TextView) forecastItemView.findViewById(R.id.o3)).setTextColor(forecastObj.o3 == null ? ContextCompat.getColor(context,
 					R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.o3));
-			
+
 			binding.forecast.addView(forecastItemView);
 		}
 	}
-	
+
 	protected final View addGridItem(@Nullable Integer value, int labelDescriptionId, @NonNull Integer labelIconId) {
 		View gridItem = getLayoutInflater().inflate(R.layout.air_quality_item, null);
 		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
@@ -248,7 +250,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(
 				value == null ? ContextCompat.getColor(getContext(), R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(
 						value));
-		
+
 		binding.grid.addView(gridItem);
 		return gridItem;
 	}

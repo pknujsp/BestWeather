@@ -341,7 +341,7 @@
         <item>@drawable/temp_icon</item>
         <item>@drawable/day_clear</item>
         <item>@drawable/day_partly_cloudy</item>
-        <item>@drawable/temp_icon</item>
+        <item>@drawable/day_scattered_clouds</item>
         <item>@drawable/day_mostly_cloudy</item>
         <item>@drawable/overcast</item>
     </array>

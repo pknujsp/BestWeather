@@ -19,10 +19,10 @@
         </group>
     </group>
     <group
-        android:scaleX="0.8230787"
-        android:scaleY="0.8230775"
-        android:translateX="3.525774"
-        android:translateY="28.53958">
+        android:scaleX="0.629604"
+        android:scaleY="0.4309978"
+        android:translateX="24.68476"
+        android:translateY="9.995888">
         <group
             android:translateX="-67.6687"
             android:translateY="-133.8595">
@@ -35,8 +35,8 @@
     <group
         android:scaleX="0.629604"
         android:scaleY="0.4309978"
-        android:translateX="24.68476"
-        android:translateY="9.995888">
+        android:translateX="11.93234"
+        android:translateY="36.62803">
         <group
             android:translateX="-67.6687"
             android:translateY="-133.8595">
