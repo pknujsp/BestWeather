@@ -92,8 +92,7 @@ public class BaseDetailForecastFragment extends Fragment implements IWeatherValu
 		ImageView labelView = new ImageView(getContext());
 		labelView.setImageDrawable(ContextCompat.getDrawable(getContext(), labelImgId));
 		labelView.setClickable(true);
-		labelView.setScaleType(ImageView.ScaleType.CENTER);
-		labelView.setImageTintList(ColorStateList.valueOf(AppTheme.getColor(getContext(), R.attr.iconColor)));
+		labelView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
 
 		labelView.setOnClickListener(new View.OnClickListener() {

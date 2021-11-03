@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,6 +61,8 @@ public class AccuSimpleCurrentConditionsFragment extends BaseSimpleCurrentCondit
 		}
 		binding.precipitation.setText(precipitation);
 		
+		binding.weatherIcon.setImageDrawable(
+				ContextCompat.getDrawable(getContext(), AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon())));
 		binding.sky.setText(AccuWeatherResponseProcessor.getWeatherIconDescription(item.getWeatherIcon()));
 		String temp = ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(), tempUnit) + ValueUnits.convertToStr(
 				getContext(), tempUnit);

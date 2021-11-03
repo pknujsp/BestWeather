@@ -128,9 +128,9 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		layoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
 
 		addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
-		addLabelView(R.drawable.temp_icon, getString(R.string.pm10_str), viewHeight);
-		addLabelView(R.drawable.temp_icon, getString(R.string.pm25_str), viewHeight);
-		addLabelView(R.drawable.temp_icon, getString(R.string.o3_str), viewHeight);
+		addLabelView(R.drawable.pm10, getString(R.string.pm10_str), viewHeight);
+		addLabelView(R.drawable.pm25, getString(R.string.pm25_str), viewHeight);
+		addLabelView(R.drawable.o3, getString(R.string.o3_str), viewHeight);
 
 		binding.forecastView.addView(dateRow, layoutParams);
 		binding.forecastView.addView(pm10BarView, layoutParams);
@@ -139,24 +139,24 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 		String notData = getString(R.string.not_data);
 		if (iAqi.getCo() == null) {
-			addGridItem(null, R.string.co_str, R.drawable.temp_icon);
+			addGridItem(null, R.string.co_str, R.drawable.co);
 		} else {
 			Integer co = (int) Double.parseDouble(iAqi.getCo().getValue());
-			addGridItem(co, R.string.co_str, R.drawable.temp_icon);
+			addGridItem(co, R.string.co_str, R.drawable.co);
 		}
 
 		if (iAqi.getSo2() == null) {
-			addGridItem(null, R.string.so2_str, R.drawable.temp_icon);
+			addGridItem(null, R.string.so2_str, R.drawable.so2);
 		} else {
 			Integer so2 = (int) Double.parseDouble(iAqi.getSo2().getValue());
-			addGridItem(so2, R.string.so2_str, R.drawable.temp_icon);
+			addGridItem(so2, R.string.so2_str, R.drawable.so2);
 		}
 
 		if (iAqi.getNo2() == null) {
-			addGridItem(null, R.string.no2_str, R.drawable.temp_icon);
+			addGridItem(null, R.string.no2_str, R.drawable.no2);
 		} else {
-			Integer no2 = (int) Double.parseDouble(iAqi.getCo().getValue());
-			addGridItem(no2, R.string.no2_str, R.drawable.temp_icon);
+			Integer no2 = (int) Double.parseDouble(iAqi.getNo2().getValue());
+			addGridItem(no2, R.string.no2_str, R.drawable.no2);
 		}
 
 		if (response.getData().getCity().getName() != null) {
@@ -185,8 +185,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		ImageView labelView = new ImageView(getContext());
 		labelView.setImageDrawable(ContextCompat.getDrawable(getContext(), labelImgId));
 		labelView.setClickable(true);
-		labelView.setScaleType(ImageView.ScaleType.CENTER);
-		labelView.setImageTintList(ColorStateList.valueOf(AppTheme.getColor(getContext(), R.attr.iconColor)));
+		labelView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 		labelView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

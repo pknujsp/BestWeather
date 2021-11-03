@@ -305,43 +305,43 @@
         <item>@drawable/rain</item>
         <item>@drawable/rain</item>
         <item>@drawable/rain</item>
-        <item>@drawable/showers</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/rain</item>
         <item>@drawable/rain</item>
         <item>@drawable/showers</item>
-        <item>@drawable/rain</item>
-        <item>@drawable/rain</item>
-        <item>@drawable/rain</item>
-        <item>@drawable/rain</item>
-        <item>@drawable/rain</item>
-        <item>@drawable/rain</item>
         <item>@drawable/showers</item>
         <item>@drawable/showers</item>
         <item>@drawable/showers</item>
-        <item>@drawable/showers</item>
-        <item>@drawable/rain</item>
         <item>@drawable/snow</item>
         <item>@drawable/snow</item>
+        <item>@drawable/snow</item>
         <item>@drawable/sleet</item>
         <item>@drawable/sleet</item>
         <item>@drawable/sleet</item>
         <item>@drawable/sleet</item>
         <item>@drawable/sleet</item>
-        <item>@drawable/sleet</item>
-        <item>@drawable/sleet</item>
-        <item>@drawable/sleet</item>
-        <item>@drawable/temp_icon</item>
-        <item>@drawable/temp_icon</item>
-        <item>@drawable/temp_icon</item>
-        <item>@drawable/temp_icon</item>
+        <item>@drawable/snow</item>
+        <item>@drawable/snow</item>
+        <item>@drawable/snow</item>
         <item>@drawable/fog</item>
-        <item>@drawable/temp_icon</item>
+        <item>@drawable/smoke</item>
         <item>@drawable/fog</item>
+        <item>@drawable/smoke</item>
+        <item>@drawable/fog</item>
+        <item>@drawable/smoke</item>
+        <item>@drawable/smoke</item>
         <item>@drawable/temp_icon</item>
         <item>@drawable/temp_icon</item>
         <item>@drawable/temp_icon</item>
         <item>@drawable/day_clear</item>
         <item>@drawable/day_partly_cloudy</item>
-        <item>@drawable/day_mostly_cloudy</item>
+        <item>@drawable/temp_icon</item>
         <item>@drawable/day_mostly_cloudy</item>
         <item>@drawable/overcast</item>
     </array>

@@ -38,14 +38,14 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 	public void setValuesToViews() {
 		// 기온,1시간강수량,습도,강수형태,풍향,풍속
 		addGridItem(R.string.temperature, ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(), tempUnit).toString(),
-				R.drawable.temp_icon, null);
-		addGridItem(R.string.humidity, finalCurrentConditions.getHumidity(), R.drawable.temp_icon, null);
-		addGridItem(R.string.wind_direction, finalCurrentConditions.getWindDirection(), R.drawable.temp_icon, null);
+				R.drawable.temperature, null);
+		addGridItem(R.string.humidity, finalCurrentConditions.getHumidity(), R.drawable.humidity, null);
+		addGridItem(R.string.wind_direction, finalCurrentConditions.getWindDirection(), R.drawable.winddirection, null);
 		addGridItem(R.string.wind_speed, ValueUnits.convertWindSpeed(finalCurrentConditions.getWindSpeed(), windUnit).toString(),
-				R.drawable.temp_icon, null);
+				R.drawable.windspeed, null);
 		addGridItem(R.string.wind_strength, WeatherResponseProcessor.getSimpleWindSpeedDescription(finalCurrentConditions.getWindSpeed()),
-				R.drawable.temp_icon, null);
-		addGridItem(R.string.precipitation_volume, finalCurrentConditions.getPrecipitation1Hour(), R.drawable.temp_icon, null);
+				R.drawable.windstrength, null);
+		addGridItem(R.string.precipitation_volume, finalCurrentConditions.getPrecipitation1Hour(), R.drawable.precipitationvolume, null);
 		addGridItem(R.string.precipitation_type,
 				KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()), R.drawable.temp_icon,
 				null);

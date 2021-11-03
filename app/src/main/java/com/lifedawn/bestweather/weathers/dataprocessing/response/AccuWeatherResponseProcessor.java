@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.response;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 
 import com.google.gson.Gson;
@@ -35,12 +36,12 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 	public static void init(Context context) {
 		String[] codes = context.getResources().getStringArray(R.array.AccuWeatherWeatherIconCodes);
 		String[] descriptions = context.getResources().getStringArray(R.array.AccuWeatherWeatherIconDescriptionsForCode);
-		int[] iconIds = context.getResources().getIntArray(R.array.AccuWeatherWeatherIconForCode);
+		TypedArray iconIds = context.getResources().obtainTypedArray(R.array.AccuWeatherWeatherIconForCode);
 		
 		WEATHER_ICON_DESCRIPTION_MAP.clear();
 		for (int i = 0; i < codes.length; i++) {
 			WEATHER_ICON_DESCRIPTION_MAP.put(codes[i], descriptions[i]);
-			WEATHER_ICON_ID_MAP.put(codes[i], iconIds[i]);
+			WEATHER_ICON_ID_MAP.put(codes[i], iconIds.getResourceId(i, 0));
 		}
 		
 		String[] flickrGalleryNames = context.getResources().getStringArray(R.array.AccuWeatherFlickrGalleryNames);
