@@ -473,6 +473,51 @@
         <item>@string/flickr_snow</item>
     </string-array>
 
+    <string-array name="KmaMidIconDescriptionsForCode">
+        <item>@string/kma_mid_clear</item>
+        <item>@string/kma_mid_mostly_cloudy</item>
+        <item>@string/kma_mid_mostly_cloudy_rain</item>
+        <item>@string/kma_mid_mostly_cloudy_snow</item>
+        <item>@string/kma_mid_mostly_cloudy_rain_and_snow</item>
+        <item>@string/kma_mid_mostly_cloudy_shower</item>
+        <item>@string/kma_mid_overcast</item>
+        <item>@string/kma_mid_overcast_rain</item>
+        <item>@string/kma_mid_overcast_snow</item>
+        <item>@string/kma_mid_overcast_rain_and_snow</item>
+        <item>@string/kma_mid_overcast_shower</item>
+        <item>@string/kma_mid_shower</item>
+    </string-array>
+
+    <string-array name="KmaMidIconCodes">
+        <item>맑음</item>
+        <item>구름많음</item>
+        <item>구름많고 비</item>
+        <item>구름많고 눈</item>
+        <item>구름많고 비/눈</item>
+        <item>구름많고 소나기</item>
+        <item>흐림</item>
+        <item>흐리고 비</item>
+        <item>흐리고 눈</item>
+        <item>흐리고 비/눈</item>
+        <item>흐리고 소나기</item>
+        <item>소나기</item>
+    </string-array>
+
+    <integer-array name="KmaMidWeatherIconForCode">
+        <item>@drawable/day_clear</item>
+        <item>@drawable/day_mostly_cloudy</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/snow</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/showers</item>
+        <item>@drawable/overcast</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/snow</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/showers</item>
+        <item>@drawable/showers</item>
+    </integer-array>
+
     <integer-array name="AqiGrades">
         <item>50</item>
         <item>100</item>

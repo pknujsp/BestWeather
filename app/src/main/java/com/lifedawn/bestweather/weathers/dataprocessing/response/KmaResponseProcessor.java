@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.response;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 
 import com.google.gson.Gson;
@@ -44,9 +45,12 @@ import retrofit2.Response;
 public class KmaResponseProcessor extends WeatherResponseProcessor {
 	private static final Map<String, String> WEATHER_SKY_ICON_DESCRIPTION_MAP = new HashMap<>();
 	private static final Map<String, String> WEATHER_PTY_ICON_DESCRIPTION_MAP = new HashMap<>();
+	private static final Map<String, String> WEATHER_MID_ICON_DESCRIPTION_MAP = new HashMap<>();
 	
 	private static final Map<String, Integer> WEATHER_SKY_ICON_ID_MAP = new HashMap<>();
 	private static final Map<String, Integer> WEATHER_PTY_ICON_ID_MAP = new HashMap<>();
+	private static final Map<String, Integer> WEATHER_MID_ICON_ID_MAP = new HashMap<>();
+	
 	private static final Map<String, String> PTY_FLICKR_MAP = new HashMap<>();
 	private static final Map<String, String> SKY_FLICKR_MAP = new HashMap<>();
 	
@@ -74,21 +78,30 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	public static void init(Context context) {
 		String[] skyCodes = context.getResources().getStringArray(R.array.KmaSkyIconCodes);
 		String[] ptyCodes = context.getResources().getStringArray(R.array.KmaPtyIconCodes);
+		String[] midCodes = context.getResources().getStringArray(R.array.KmaMidIconCodes);
 		String[] skyDescriptions = context.getResources().getStringArray(R.array.KmaSkyIconDescriptionsForCode);
 		String[] ptyDescriptions = context.getResources().getStringArray(R.array.KmaPtyIconDescriptionsForCode);
-		int[] ptyIconIds = context.getResources().getIntArray(R.array.KmaPtyWeatherIconForCode);
-		int[] skyIconIds = context.getResources().getIntArray(R.array.KmaSkyWeatherIconForCode);
+		String[] midDescriptions = context.getResources().getStringArray(R.array.KmaMidIconDescriptionsForCode);
+		TypedArray ptyIconIds = context.getResources().obtainTypedArray(R.array.KmaPtyWeatherIconForCode);
+		TypedArray skyIconIds = context.getResources().obtainTypedArray(R.array.KmaSkyWeatherIconForCode);
+		TypedArray midIconIds = context.getResources().obtainTypedArray(R.array.KmaMidWeatherIconForCode);
 		
 		WEATHER_SKY_ICON_DESCRIPTION_MAP.clear();
 		for (int i = 0; i < skyCodes.length; i++) {
 			WEATHER_SKY_ICON_DESCRIPTION_MAP.put(skyCodes[i], skyDescriptions[i]);
-			WEATHER_SKY_ICON_ID_MAP.put(skyCodes[i], skyIconIds[i]);
+			WEATHER_SKY_ICON_ID_MAP.put(skyCodes[i], skyIconIds.getResourceId(i, R.drawable.temp_icon));
 		}
 		
 		WEATHER_PTY_ICON_DESCRIPTION_MAP.clear();
 		for (int i = 0; i < ptyCodes.length; i++) {
 			WEATHER_PTY_ICON_DESCRIPTION_MAP.put(ptyCodes[i], ptyDescriptions[i]);
-			WEATHER_PTY_ICON_ID_MAP.put(ptyCodes[i], ptyIconIds[i]);
+			WEATHER_PTY_ICON_ID_MAP.put(ptyCodes[i], ptyIconIds.getResourceId(i, R.drawable.temp_icon));
+		}
+		
+		WEATHER_MID_ICON_DESCRIPTION_MAP.clear();
+		for (int i = 0; i < midCodes.length; i++) {
+			WEATHER_MID_ICON_DESCRIPTION_MAP.put(midCodes[i], midDescriptions[i]);
+			WEATHER_MID_ICON_ID_MAP.put(midCodes[i], midIconIds.getResourceId(i, R.drawable.temp_icon));
 		}
 		
 		String[] ptyFlickrGalleryNames = context.getResources().getStringArray(R.array.KmaPtyFlickrGalleryNames);
@@ -134,6 +147,23 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		}
 		return WEATHER_PTY_ICON_ID_MAP.get(code);
 		
+	}
+	
+	public static String getWeatherMidIconDescription(String code) {
+		return WEATHER_MID_ICON_DESCRIPTION_MAP.get(code);
+	}
+	
+	public static int getWeatherMidIconImg(String code, boolean night) {
+		if (night) {
+			if (code.equals("맑음")) {
+				return R.drawable.night_clear;
+			} else if (code.equals("구름많음")) {
+				return R.drawable.night_mostly_cloudy;
+			} else {
+				return WEATHER_MID_ICON_ID_MAP.get(code);
+			}
+		}
+		return WEATHER_MID_ICON_ID_MAP.get(code);
 	}
 	
 	public static String getWeatherPtyIconDescription(String code) {

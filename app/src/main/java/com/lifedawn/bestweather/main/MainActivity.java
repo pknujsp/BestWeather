@@ -37,7 +37,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
 	private SharedPreferences sharedPreferences;
-
+	
 	public static void setWindowFlag(Activity activity, final int bits, boolean on) {
 		Window win = activity.getWindow();
 		WindowManager.LayoutParams winParams = win.getAttributes();
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 		win.setAttributes(winParams);
 	}
-
+	
 	public static int getHeightOfStatusBar(Context context) {
 		int height = 0;
 		int id = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -57,13 +57,13 @@ public class MainActivity extends AppCompatActivity {
 		}
 		return height;
 	}
-
-
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
+		
 		initPreferences();
 		WeatherResponseProcessor.init(getApplicationContext());
 		AccuWeatherResponseProcessor.init(getApplicationContext());
@@ -72,21 +72,21 @@ public class MainActivity extends AppCompatActivity {
 		OpenWeatherMapResponseProcessor.init(getApplicationContext());
 		FlickrUtil.init(getApplicationContext());
 		UvIndexProcessor.init(getApplicationContext());
-
+		
 		AppThemes appTheme = AppThemes.enumOf(sharedPreferences.getString(getString(R.string.pref_key_app_theme), AppThemes.BLACK.name()));
 		if (appTheme == AppThemes.BLACK) {
 			setTheme(R.style.AppTheme_Black);
 		} else {
 			setTheme(R.style.AppTheme_White);
 		}
-
+		
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
+		
 		MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 		fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, mainTransactionFragment.getTag()).commit();
 	}
-
+	
 	private void initPreferences() {
 		try {
 			if (sharedPreferences.getAll().isEmpty()) {
@@ -99,7 +99,8 @@ public class MainActivity extends AppCompatActivity {
 				editor.putString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name());
 				editor.putString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name());
 				editor.putBoolean(getString(R.string.pref_key_use_current_location), true);
-
+				editor.putBoolean(getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false);
+				
 				Locale locale;
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 					locale = getResources().getConfiguration().getLocales().get(0);
@@ -107,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
 					locale = getResources().getConfiguration().locale;
 				}
 				String country = locale.getCountry();
-
+				
 				if (country.equals("KR")) {
 					editor.putBoolean(getString(R.string.pref_key_kma_top_priority), true);
 				} else {
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
 				editor.putBoolean(getString(R.string.pref_key_open_weather_map), false).apply();
 			}
 		} catch (NullPointerException e) {
-
+		
 		}
 	}
 }

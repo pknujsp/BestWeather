@@ -138,9 +138,9 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 					finalDailyForecastList.get(index).getAmProbabilityOfPrecipitation() + " / " + finalDailyForecastList.get(
 							index).getPmProbabilityOfPrecipitation());
 			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-					KmaResponseProcessor.getWeatherSkyIconImg(finalDailyForecastList.get(index).getAmSky(), false)),
+					KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getAmSky(), false)),
 					ContextCompat.getDrawable(context,
-							KmaResponseProcessor.getWeatherSkyIconImg(finalDailyForecastList.get(index).getPmSky(), true))));
+							KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getPmSky(), true))));
 		}
 		for (; index < finalDailyForecastList.size(); index++) {
 			minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
@@ -148,7 +148,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			
 			probabilityOfPrecipitationList.add(finalDailyForecastList.get(index).getProbabilityOfPrecipitation());
 			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-					KmaResponseProcessor.getWeatherSkyIconImg(finalDailyForecastList.get(index).getSky(), false))));
+					KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getSky(), false))));
 		}
 		
 		weatherIconRow.setIcons(weatherIconObjList);

@@ -101,13 +101,13 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 			if (index++ > 4) {
 				pop = finalDailyForecast.getProbabilityOfPrecipitation();
 				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
-						ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyIconImg(finalDailyForecast.getSky(), false))));
+						ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false))));
 			} else {
 				pop = finalDailyForecast.getAmProbabilityOfPrecipitation() + " / " + finalDailyForecast.getPmProbabilityOfPrecipitation();
 				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
-						ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyIconImg(finalDailyForecast.getAmSky(), false)),
+						ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getAmSky(), false)),
 						ContextCompat.getDrawable(context,
-								KmaResponseProcessor.getWeatherSkyIconImg(finalDailyForecast.getPmSky(), true))));
+								KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), true))));
 			}
 			probabilityOfPrecipitationList.add(pop);
 		}

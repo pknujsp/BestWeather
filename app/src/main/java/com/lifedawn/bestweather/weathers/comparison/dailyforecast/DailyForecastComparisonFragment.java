@@ -257,17 +257,13 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 					
 					if (index++ > 4) {
 						pop = item.e.getProbabilityOfPrecipitation();
-						/*
 						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
-								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyIconImg(item.e.getSky(), false))));
-						*/
+								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(item.e.getSky(), false))));
 					} else {
 						pop = item.e.getAmProbabilityOfPrecipitation() + " / " + item.e.getPmProbabilityOfPrecipitation();
-						/*
 						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
-								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyIconImg(item.e.getAmSky(), false)),
-								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyIconImg(item.e.getPmSky(), true))));
-					*/
+								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(item.e.getAmSky(), false)),
+								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(item.e.getPmSky(), true))));
 					}
 					
 				}

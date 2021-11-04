@@ -72,6 +72,9 @@
     <string name="pref_key_last_selected_favorite_address_id">pref_key_last_selected_favorite_address_id</string>
     <string name="pref_key_last_selected_location_type">pref_key_last_selected_location_type</string>
 
+    <string name="pref_key_never_ask_again_permission_for_access_fine_location">pref_key_never_ask_again_permission_for_access_fine_location</string>
+
+
     <!-- appthemes -->
     <string name="black">검정</string>
     <string name="white">하양</string>
