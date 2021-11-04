@@ -144,10 +144,10 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 			tempList.add(ValueUnits.convertTemperature(hourly.getTemperature().getValue(), tempUnit));
 			realFeelTempList.add(ValueUnits.convertTemperature(hourly.getRealFeelTemperature().getValue(), tempUnit).toString());
 			
-			popList.add(String.valueOf((int) (Double.parseDouble(hourly.getPrecipitationProbability()) * 100.0)));
-			probabilityOfRainList.add(String.valueOf((int) (Double.parseDouble(hourly.getRainProbability()) * 100.0)));
+			popList.add(String.valueOf((int) (Double.parseDouble(hourly.getPrecipitationProbability()))));
+			probabilityOfRainList.add(String.valueOf((int) (Double.parseDouble(hourly.getRainProbability()))));
 			rainVolumeList.add(hourly.getRain() == null ? "-" : hourly.getRain().getValue());
-			probabilityOfSnowList.add(String.valueOf((int) (Double.parseDouble(hourly.getSnowProbability()) * 100.0)));
+			probabilityOfSnowList.add(String.valueOf((int) (Double.parseDouble(hourly.getSnowProbability()))));
 			snowVolumeList.add(hourly.getSnow() == null ? "-" : ValueUnits.convertCMToMM(hourly.getSnow().getValue()).toString());
 			
 			precipitationTypeList.add(hourly.getPrecipitationType());

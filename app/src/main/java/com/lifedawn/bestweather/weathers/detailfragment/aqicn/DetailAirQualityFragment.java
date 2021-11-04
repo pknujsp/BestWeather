@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.weathers.detailfragment.aqicn;
 
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -25,6 +26,7 @@ import com.lifedawn.bestweather.databinding.FragmentAirQualityDetailBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.AirQualityBarView;
@@ -46,6 +48,9 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	private ValueUnits clockUnit;
 	private TimeZone timeZone;
 
+	private Double latitude;
+	private Double longitude;
+
 	public void setResponse(GeolocalizedFeedResponse response) {
 		this.response = response;
 	}
@@ -56,6 +61,9 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 		Bundle bundle = getArguments();
 		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
+		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
+
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
 	}
@@ -80,6 +88,8 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		});
 
 		binding.toolbar.fragmentTitle.setText(R.string.detail_air_quality);
+		setAirPollutionMaterialsInfo();
+		setAqiGradeInfo();
 		setValuesToViews();
 	}
 
@@ -179,6 +189,11 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		} else {
 			binding.updatedTime.setText(notData);
 		}
+
+		final Double distance = LocationDistance.distance(latitude, longitude,
+				Double.parseDouble(response.getData().getCity().getGeo().get(0)),
+				Double.parseDouble(response.getData().getCity().getGeo().get(1)), LocationDistance.Unit.KM);
+		binding.distanceToMeasuringStation.setText(String.format("%.2f km", distance));
 	}
 
 	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewHeight) {
@@ -203,7 +218,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		return labelView;
 	}
 
-	protected final View addGridItem(@Nullable Integer value, int labelDescriptionId, @NonNull Integer labelIconId) {
+	private View addGridItem(@Nullable Integer value, int labelDescriptionId, @NonNull Integer labelIconId) {
 		View gridItem = getLayoutInflater().inflate(R.layout.air_quality_item, null);
 		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
 		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
@@ -216,6 +231,47 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 		binding.grid.addView(gridItem);
 		return gridItem;
+	}
+
+	private void setAirPollutionMaterialsInfo() {
+		int[] icons = new int[]{R.drawable.pm10, R.drawable.pm25, R.drawable.co, R.drawable.no2, R.drawable.so2,
+				R.drawable.o3};
+		String[] names = new String[]{getString(R.string.pm10_str), getString(R.string.pm25_str), getString(R.string.co_str)
+				, getString(R.string.no2_str), getString(R.string.so2_str), getString(R.string.o3_str)};
+		String[] descriptions = new String[]{getString(R.string.pm10_description), getString(R.string.pm25_description), getString(R.string.co_description)
+				, getString(R.string.no2_description), getString(R.string.so2_description), getString(R.string.o3_description)};
+
+		View infoItem = null;
+		binding.airPollutionMaterialsInfo.removeAllViews();
+		LayoutInflater layoutInflater = getLayoutInflater();
+
+		for (int i = 0; i < icons.length; i++) {
+			infoItem = layoutInflater.inflate(R.layout.air_pollution_material_info_item_view, null);
+			((ImageView) infoItem.findViewById(R.id.material_icon)).setImageDrawable(ContextCompat.getDrawable(getContext(), icons[i]));
+			((TextView) infoItem.findViewById(R.id.material_name)).setText(names[i]);
+			((TextView) infoItem.findViewById(R.id.material_description)).setText(descriptions[i]);
+
+			binding.airPollutionMaterialsInfo.addView(infoItem);
+		}
+	}
+
+	private void setAqiGradeInfo() {
+		int[] gradeColors = getResources().getIntArray(R.array.AqiGradeColors);
+		String[] gradeRanges = getResources().getStringArray(R.array.AqiGradeRange);
+		String[] description = getResources().getStringArray(R.array.AqiGradeState);
+
+		View infoItem = null;
+		binding.aqiGradeInfo.removeAllViews();
+		LayoutInflater layoutInflater = getLayoutInflater();
+
+		for (int i = 0; i < gradeColors.length; i++) {
+			infoItem = layoutInflater.inflate(R.layout.aqi_grade_info_view, null);
+			((View) infoItem.findViewById(R.id.grade_color)).setBackgroundTintList(ColorStateList.valueOf(gradeColors[i]));
+			((TextView) infoItem.findViewById(R.id.grade_range)).setText(gradeRanges[i]);
+			((TextView) infoItem.findViewById(R.id.grade_state)).setText(description[i]);
+
+			binding.aqiGradeInfo.addView(infoItem);
+		}
 	}
 
 }

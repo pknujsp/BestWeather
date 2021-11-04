@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+    <View
+        android:id="@+id/grade_color"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginRight="4dp"
+        android:backgroundTint="@color/blue"
+        android:background="@drawable/icon_circle_background" />
+
+    <TextView
+        android:id="@+id/grade_range"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:text="range"
+        android:textColor="?attr/textColor" />
+
+    <TextView
+        android:id="@+id/grade_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="grade_state"
+        android:textColor="?attr/textColor" />
+</LinearLayout>

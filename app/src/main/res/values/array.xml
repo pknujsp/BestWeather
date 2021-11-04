@@ -526,6 +526,15 @@
         <item>300</item>
     </integer-array>
 
+    <string-array name="AqiGradeRange">
+        <item>0 ~ 50</item>
+        <item>51 ~ 100</item>
+        <item>101 ~ 150</item>
+        <item>151 ~ 200</item>
+        <item>201 ~ 300</item>
+        <item>301 ~</item>
+    </string-array>
+
     <string-array name="AqiGradeColors">
         <item>@color/aqi_1_good</item>
         <item>@color/aqi_2_Moderate</item>
@@ -535,7 +544,7 @@
         <item>@color/aqi_6_hazardous</item>
     </string-array>
 
-    <string-array name="AqiGradeDescriptions">
+    <string-array name="AqiGradeState">
         <item>@string/aqi_1_good</item>
         <item>@string/aqi_2_Moderate</item>
         <item>@string/aqi_3_unhealthy_for_sensitive_groups</item>
@@ -566,4 +575,5 @@
         <item>@string/uv_index_4_very_high</item>
         <item>@string/uv_index_5_extreme</item>
     </string-array>
+
 </resources>

@@ -93,6 +93,9 @@ public class AirQualityBarView extends View {
 			airQualityObj.gradeColor = AqicnResponseProcessor.getGradeColorId(airQualityObj.val);
 		}
 
+		if (max - min == 0) {
+			max++;
+		}
 		this.minGradeValue = min;
 		this.maxGradeValue = max;
 	}

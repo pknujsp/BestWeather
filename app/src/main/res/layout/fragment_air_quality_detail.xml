@@ -84,6 +84,23 @@
                     android:textColor="?attr/textColor"
                     android:textSize="15sp" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/distance_to_measuring_station"
+                    android:textColor="?attr/textColor"
+                    android:textSize="17sp" />
+
+                <TextView
+                    android:id="@+id/distance_to_measuring_station"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="distance_to_measuring_station"
+                    android:textColor="?attr/textColor"
+                    android:textSize="14sp" />
+
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -97,10 +114,40 @@
                     android:id="@+id/updated_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="16dp"
                     android:text="updated_time"
                     android:textColor="?attr/textColor"
                     android:textSize="15sp" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/air_pollution_material_info"
+                    android:textColor="?attr/textColor"
+                    android:textSize="17sp" />
+
+                <LinearLayout
+                    android:id="@+id/air_pollution_materials_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/aqi_grade"
+                    android:textColor="?attr/textColor"
+                    android:textSize="17sp" />
+
+                <LinearLayout
+                    android:id="@+id/aqi_grade_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
 
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

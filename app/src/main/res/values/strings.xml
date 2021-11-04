@@ -11,6 +11,17 @@
     <string name="pm25_str">초미세먼지</string>
     <string name="pm10">pm10</string>
     <string name="pm25">pm25</string>
+    <string name="o3_str">오존</string>
+    <string name="no2_str">이산화질소</string>
+    <string name="so2_str">이산화황</string>
+    <string name="co_str">일산화탄소</string>
+
+    <string name="pm10_description">지름이 10μm 이하인 미세한 먼지, 폐 깊숙히까지 침투하여 호흡기 질환의 원인이 됨</string>
+    <string name="pm25_description">지름이 2.5μm 이하인 매우 미세한 먼지</string>
+    <string name="o3_description">대기 중 농도가 짙으면 호흡기, 눈에 영향을 미치며 폐 기능 저하를 가져올수 있다</string>
+    <string name="no2_description">호흡기에 영향</string>
+    <string name="so2_description">호흡기에 영향</string>
+    <string name="co_description">두통과 현기증 유발 가능</string>
 
     <!-- 날씨 예보 종류 -->
     <string name="current_conditions">현재 날씨</string>
@@ -269,10 +280,6 @@
     <string name="snow_volume">강설량</string>
     <string name="precipitation_volume">강수량</string>
     <string name="current">현재</string>
-    <string name="o3_str">오존</string>
-    <string name="no2_str">이산화질소</string>
-    <string name="so2_str">이산화황</string>
-    <string name="co_str">일산화탄소</string>
     <string name="rain">비</string>
     <string name="snow">눈</string>
     <string name="real_feel_temperature">체감기온</string>
@@ -398,6 +405,8 @@
     <string name="rerequest_another_weather_datasource">다시 시도</string>
     <string name="unknown_address">알수 없는 주소</string>
     <string name="error">오류발생</string>
+    <string name="air_pollution_material_info">오염 물질 정보</string>
+    <string name="aqi_grade">AQI(대기질) 등급</string>
 
 
 </resources>

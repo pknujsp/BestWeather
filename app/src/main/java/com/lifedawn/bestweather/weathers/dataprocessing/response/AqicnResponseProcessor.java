@@ -9,18 +9,13 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import retrofit2.Response;
@@ -36,7 +31,7 @@ public class AqicnResponseProcessor {
 	public static void init(Context context) {
 		int[] aqiGrades = context.getResources().getIntArray(R.array.AqiGrades);
 		int[] aqiGradeColors = context.getResources().getIntArray(R.array.AqiGradeColors);
-		String[] aqiGradeDescriptions = context.getResources().getStringArray(R.array.AqiGradeDescriptions);
+		String[] aqiGradeDescriptions = context.getResources().getStringArray(R.array.AqiGradeState);
 
 		for (int i = 0; i < aqiGrades.length; i++) {
 			AQI_GRADES[i] = aqiGrades[i];

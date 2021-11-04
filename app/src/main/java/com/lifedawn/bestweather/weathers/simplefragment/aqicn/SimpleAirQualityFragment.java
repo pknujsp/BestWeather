@@ -86,6 +86,8 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 				Bundle bundle = new Bundle();
 				bundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+				bundle.putDouble(getString(R.string.bundle_key_latitude), latitude);
+				bundle.putDouble(getString(R.string.bundle_key_longitude), longitude);
 				detailAirQualityFragment.setArguments(bundle);
 
 				String tag = getString(R.string.tag_detail_air_quality_fragment);
@@ -123,14 +125,6 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 		String notData = getString(R.string.not_data);
 
-		if (distance > 50.0) {
-			String msg = getString(R.string.the_measuring_station_is_very_far_away) + "\n" + String.format("%.2f", distance) + getString(
-					R.string.km);
-			binding.message.setText(msg);
-			binding.message.setVisibility(View.VISIBLE);
-		} else {
-			binding.message.setVisibility(View.GONE);
-		}
 		binding.distanceToMeasuringStation.setText(String.format("%.2f", distance) + getString(R.string.km));
 
 		if (geolocalizedFeedResponse.getData().getCity().getName() != null) {
