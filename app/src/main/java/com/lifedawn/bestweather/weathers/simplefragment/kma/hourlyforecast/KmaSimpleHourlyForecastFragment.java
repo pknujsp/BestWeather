@@ -126,7 +126,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		}
 		dateRow.init(dateTimeList);
 		clockRow.setClockList(dateTimeList);
-		//날씨 아이콘
+		String tempUnitStr = tempUnit == ValueUnits.celsius ? getString(R.string.celsius) : getString(R.string.fahrenheit);
 		
 		//기온, 강수확률, 강수량
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
@@ -137,7 +137,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 					ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(), false))));
-			tempList.add(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit).toString());
+			tempList.add(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit).toString()+tempUnitStr);
 			
 			probabilityOfPrecipitationList.add(finalHourlyForecast.getProbabilityOfPrecipitation());
 			precipitationVolumeList.add(finalHourlyForecast.getRainPrecipitation1Hour());

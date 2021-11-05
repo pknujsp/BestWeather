@@ -223,7 +223,7 @@ public class MainTransactionFragment extends Fragment {
 				Double longitude = Double.parseDouble(
 						sharedPreferences.getString(getString(R.string.pref_key_last_current_location_longitude), "0.0"));
 
-				if (latitude == 0.0 && longitude == 0.0) {
+				if (latitude == 0.0 || longitude == 0.0) {
 					binding.sideNavMenu.favorites.callOnClick();
 				}
 			}
@@ -321,7 +321,9 @@ public class MainTransactionFragment extends Fragment {
 		} else {
 			//현재 위치
 			boolean enabledUseCurrentLocation = bundle.getBoolean(getString(R.string.bundle_key_changed_use_current_location));
-			if (enabledUseCurrentLocation) {
+			boolean refresh = bundle.getBoolean(getString(R.string.bundle_key_refresh));
+
+			if (enabledUseCurrentLocation || refresh) {
 				setCurrentLocationState(true);
 				binding.sideNavMenu.currentLocationLayout.callOnClick();
 			}

@@ -39,6 +39,7 @@ public class FavoritesFragment extends Fragment {
 	private WeatherViewModel weatherViewModel;
 
 	private boolean enableCurrentLocation;
+	private boolean refresh;
 
 	private FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
 		@Override
@@ -160,6 +161,7 @@ public class FavoritesFragment extends Fragment {
 		Bundle bundle = new Bundle();
 		bundle.putSerializable(getString(R.string.bundle_key_new_favorite_address_list), (Serializable) adapter.getFavoriteAddressDtoList());
 		bundle.putBoolean(getString(R.string.bundle_key_changed_use_current_location), enableCurrentLocation);
+		bundle.putBoolean(getString(R.string.bundle_key_refresh), refresh);
 
 		getParentFragmentManager().setFragmentResult(getString(R.string.key_back_from_favorite_to_main), bundle);
 		getParentFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
@@ -227,6 +229,10 @@ public class FavoritesFragment extends Fragment {
 			}).create().show();
 
 		} else {
+			if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString(getString(R.string.pref_key_last_current_location_latitude), "").isEmpty()) {
+				refresh = true;
+			}
+
 			getParentFragmentManager().popBackStack();
 		}
 	}

@@ -65,12 +65,12 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.rootScrollView.setVisibility(View.GONE);
+		binding.clockLabelIcon.setVisibility(View.GONE);
+		binding.kmaLabelLayout.precipitationVolumeLabel.setVisibility(View.GONE);
 
 		binding.toolbar.fragmentTitle.setText(R.string.comparison_daily_forecast);
-
 		binding.addressName.setText(addressName);
 
-		binding.dateLabelIcon.setVisibility(View.GONE);
 		loadForecasts();
 	}
 
@@ -89,8 +89,10 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			weatherSourceTypeList.add(WeatherSourceType.KMA);
 			binding.kmaLabelLayout.getRoot().setVisibility(View.VISIBLE);
+			binding.kma.setVisibility(View.VISIBLE);
 		} else {
 			binding.kmaLabelLayout.getRoot().setVisibility(View.GONE);
+			binding.kma.setVisibility(View.GONE);
 		}
 
 		if (dailyForecastResponse.accuDailyForecastsResponse != null) {
@@ -102,8 +104,10 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			}
 			weatherSourceTypeList.add(WeatherSourceType.ACCU_WEATHER);
 			binding.accuLabelLayout.getRoot().setVisibility(View.VISIBLE);
+			binding.accu.setVisibility(View.VISIBLE);
 		} else {
 			binding.accuLabelLayout.getRoot().setVisibility(View.GONE);
+			binding.accu.setVisibility(View.GONE);
 		}
 
 		if (dailyForecastResponse.owmOneCallResponse != null) {
@@ -114,8 +118,10 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			}
 			weatherSourceTypeList.add(WeatherSourceType.OPEN_WEATHER_MAP);
 			binding.owmLabelLayout.getRoot().setVisibility(View.VISIBLE);
+			binding.owm.setVisibility(View.VISIBLE);
 		} else {
 			binding.owmLabelLayout.getRoot().setVisibility(View.GONE);
+			binding.owm.setVisibility(View.GONE);
 		}
 
 		LocalDateTime now = LocalDateTime.now(ZoneId.of(timeZone.getID())).plusDays(10).withHour(0).withMinute(0).withSecond(0).withNano(0);
@@ -277,9 +283,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 							item.e.getTemperature().getMaximum().getValue(), tempUnit).toString();
 					tempList.add(temp);
 
-					pop = item.e.getDay().getPrecipitationProbability() == null ? "0" : ((int) (Double.parseDouble(
-							item.e.getDay().getPrecipitationProbability()) * 100.0)) + " / " + item.e.getNight().getPrecipitationProbability() == null ? "0" : (String.valueOf(
-							(int) (Double.parseDouble(item.e.getNight().getPrecipitationProbability()) * 100.0)));
+					pop = (int) Double.parseDouble(item.e.getDay().getPrecipitationProbability()) + " / " +
+							(int) Double.parseDouble(item.e.getNight().getPrecipitationProbability());
 					probabilityOfPrecipitationList.add(pop);
 					precipitationVolumeList.add(
 							item.e.getDay().getTotalLiquid().getValue() + " / " + item.e.getNight().getTotalLiquid().getValue());
@@ -298,7 +303,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 					pop = item.e.getPop();
 					probabilityOfPrecipitationList.add((String.valueOf((int) (Double.parseDouble(pop) * 100.0))));
-					precipitationVolumeList.add(item.e.getRain() == null ? "-" : item.e.getRain());
+					precipitationVolumeList.add(item.e.getRain() == null ? "0.0" : item.e.getRain());
 					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
 							OpenWeatherMapResponseProcessor.getWeatherIconImg(item.e.getWeather().get(0).getId(), false))));
 				}
@@ -315,21 +320,32 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		rowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 
-		binding.forecastView.addView(dateRow, rowLayoutParams);
+		binding.datetime.addView(dateRow, rowLayoutParams);
+		LinearLayout view = null;
+
 		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
 			LinearLayout.LayoutParams specificRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 					ViewGroup.LayoutParams.WRAP_CONTENT);
 			specificRowLayoutParams.leftMargin = columnWidth * (Integer) weatherIconRows.get(i).getTag(R.id.begin_column_index);
 
-			binding.forecastView.addView(weatherIconRows.get(i), specificRowLayoutParams);
-			binding.forecastView.addView(tempRows.get(i), specificRowLayoutParams);
-			binding.forecastView.addView(precipitationVolumeRows.get(i), specificRowLayoutParams);
+			switch (weatherSourceTypeList.get(i)) {
+				case KMA:
+					view = binding.kma;
+					break;
+				case ACCU_WEATHER:
+					view = binding.accu;
+					break;
+				default:
+					view = binding.owm;
+					break;
+			}
 
-			LinearLayout.LayoutParams lastRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-					ViewGroup.LayoutParams.WRAP_CONTENT);
-			lastRowLayoutParams.leftMargin = columnWidth * (Integer) weatherIconRows.get(i).getTag(R.id.begin_column_index);
-			lastRowLayoutParams.bottomMargin = lastRowMargin;
-			binding.forecastView.addView(probabilityOfPrecipitationRows.get(i), lastRowLayoutParams);
+			view.addView(weatherIconRows.get(i), specificRowLayoutParams);
+			view.addView(tempRows.get(i), specificRowLayoutParams);
+			if (weatherSourceTypeList.get(i) != WeatherSourceType.KMA) {
+				view.addView(precipitationVolumeRows.get(i), specificRowLayoutParams);
+			}
+			view.addView(probabilityOfPrecipitationRows.get(i), specificRowLayoutParams);
 		}
 	}
 

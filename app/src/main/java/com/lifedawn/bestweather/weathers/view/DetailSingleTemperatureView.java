@@ -9,7 +9,11 @@ import android.text.TextPaint;
 import android.util.TypedValue;
 import android.view.View;
 
+import androidx.preference.PreferenceManager;
+
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.ValueUnit;
 import com.lifedawn.bestweather.theme.AppTheme;
 
 import java.util.List;
@@ -27,6 +31,7 @@ public class DetailSingleTemperatureView extends View {
 	private final Paint CIRCLE_PAINT;
 	private final Paint MIN_MAX_TEMP_LINE_PAINT;
 	private final float RADIUS;
+	private final String tempUnit;
 	private List<Integer> tempList;
 
 	public DetailSingleTemperatureView(Context context, FragmentType fragmentType, List<Integer> tempList, int viewWidth, int viewHeight, int columnWidth) {
@@ -57,6 +62,11 @@ public class DetailSingleTemperatureView extends View {
 		CIRCLE_PAINT.setAntiAlias(true);
 		CIRCLE_PAINT.setStyle(Paint.Style.FILL);
 		CIRCLE_PAINT.setColor(Color.DKGRAY);
+
+		ValueUnits unit =
+				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_temp),
+						ValueUnits.celsius.name()));
+		tempUnit = unit == ValueUnits.celsius ? context.getString(R.string.celsius) : context.getString(R.string.fahrenheit);
 
 		RADIUS = getResources().getDimension(R.dimen.circleRadiusInSingleTemperature);
 		this.tempList = tempList;
@@ -116,7 +126,7 @@ public class DetailSingleTemperatureView extends View {
 		for (Integer temp : tempList) {
 			x = COLUMN_WIDTH / 2f + COLUMN_WIDTH * index;
 			y = (MIN_TEMP == MAX_TEMP) ? getHeight() / 2f : (10f * (MAX_TEMP - temp)) * SPACING + TEXT_HEIGHT + RADIUS;
-			canvas.drawText(temp.toString(), x, y + RADIUS + TEXT_HEIGHT, TEMP_PAINT);
+			canvas.drawText(temp.toString() + tempUnit, x, y + RADIUS + TEXT_HEIGHT, TEMP_PAINT);
 
 			if (index != 0) {
 				canvas.drawLine(lastColumnPoint.x, lastColumnPoint.y, x, y, LINE_PAINT);

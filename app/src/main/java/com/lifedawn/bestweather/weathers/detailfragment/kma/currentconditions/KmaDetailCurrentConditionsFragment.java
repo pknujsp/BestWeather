@@ -17,27 +17,29 @@ import org.jetbrains.annotations.NotNull;
 
 public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
 	private FinalCurrentConditions finalCurrentConditions;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		setValuesToViews();
 	}
-	
+
 	public KmaDetailCurrentConditionsFragment setFinalCurrentConditions(FinalCurrentConditions finalCurrentConditions) {
 		this.finalCurrentConditions = finalCurrentConditions;
 		return this;
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
 		// 기온,1시간강수량,습도,강수형태,풍향,풍속
-		addGridItem(R.string.temperature, ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(), tempUnit).toString(),
+		String tempUnitStr = tempUnit == ValueUnits.celsius ? getString(R.string.celsius) : getString(R.string.fahrenheit);
+
+		addGridItem(R.string.temperature, ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(), tempUnit).toString() + tempUnitStr,
 				R.drawable.temperature, null);
 		addGridItem(R.string.humidity, finalCurrentConditions.getHumidity(), R.drawable.humidity, null);
 		addGridItem(R.string.wind_direction, finalCurrentConditions.getWindDirection(), R.drawable.winddirection, null);
@@ -49,6 +51,6 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 		addGridItem(R.string.precipitation_type,
 				KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()), R.drawable.temp_icon,
 				null);
-		
+
 	}
 }

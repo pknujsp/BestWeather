@@ -95,11 +95,39 @@
                         android:scrollbars="none">
 
                         <LinearLayout
-                            android:id="@+id/forecast_view"
+                            android:id="@+id/values_viewgroup"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical" />
+                            android:orientation="vertical">
 
+                            <LinearLayout
+                                android:id="@+id/datetime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical" />
+
+                            <LinearLayout
+                                android:id="@+id/kma"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/lastRowInForecastTableMargin"
+                                android:orientation="vertical" />
+
+                            <LinearLayout
+                                android:id="@+id/accu"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/lastRowInForecastTableMargin"
+                                android:orientation="vertical" />
+
+                            <LinearLayout
+                                android:id="@+id/owm"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/lastRowInForecastTableMargin"
+                                android:orientation="vertical" />
+
+                        </LinearLayout>
                     </HorizontalScrollView>
 
                 </LinearLayout>

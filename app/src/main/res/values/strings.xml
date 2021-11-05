@@ -383,6 +383,10 @@
     <string name="bundle_key_timezone">bundle_key_timezone</string>
     <string name="bundle_key_selected_address_dto">bundle_key_selected_address_dto</string>
     <string name="bundle_key_location_type">bundle_key_location_type</string>
+    <string name="bundle_key_new_favorite_address_dto_id">bundle_key_new_favorite_address_dto_id</string>
+    <string name="bundle_key_new_favorite_address_list">bundle_key_new_favorite_address_list</string>
+    <string name="bundle_key_changed_use_current_location">bundle_key_changed_use_current_location</string>
+    <string name="bundle_key_refresh">bundle_key_refresh</string>
 
     <!-- fragment result key -->
     <string name="key_from_favorite_to_find_address">key_from_favorite_to_find_address</string>
@@ -391,9 +395,7 @@
     <string name="key_back_from_find_address_to_main">key_back_from_find_address_to_main</string>
     <string name="key_back_from_favorite_to_main">key_back_from_favorite_to_main</string>
     <string name="key_back_from_find_address_to_favorite">key_back_from_find_address_to_favorite</string>
-    <string name="bundle_key_new_favorite_address_dto_id">bundle_key_new_favorite_address_dto_id</string>
-    <string name="bundle_key_new_favorite_address_list">bundle_key_new_favorite_address_list</string>
-    <string name="bundle_key_changed_use_current_location">bundle_key_changed_use_current_location</string>
+
     <string name="disabled_use_current_location">현재 위치 미사용</string>
     <string name="enabled_use_current_location">현재 위치 사용</string>
     <string name="unavailable_update">업데이트 불가</string>

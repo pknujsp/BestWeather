@@ -9,7 +9,10 @@ import android.text.TextPaint;
 import android.util.TypedValue;
 import android.view.View;
 
+import androidx.preference.PreferenceManager;
+
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.theme.AppTheme;
 
 import java.util.ArrayList;
@@ -29,6 +32,7 @@ public class DetailDoubleTemperatureView extends View {
 	private final Paint maxCirclePaint;
 	private final Paint minCirclePaint;
 	private final int circleRadius;
+	private final String tempUnit;
 
 	private List<Integer> maxTempList = new ArrayList<>();
 	private List<Integer> minTempList = new ArrayList<>();
@@ -93,6 +97,11 @@ public class DetailDoubleTemperatureView extends View {
 		this.maxTemp = max;
 		this.minTemp = min;
 
+		ValueUnits unit =
+				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_temp),
+						ValueUnits.celsius.name()));
+		tempUnit = unit == ValueUnits.celsius ? context.getString(R.string.celsius) : context.getString(R.string.fahrenheit);
+
 		setWillNotDraw(false);
 	}
 
@@ -149,10 +158,10 @@ public class DetailDoubleTemperatureView extends View {
 			}
 
 			canvas.drawCircle(x, minY, circleRadius, minCirclePaint);
-			canvas.drawText(minTempList.get(index).toString(), x, minY + circleRadius + TEXT_HEIGHT, tempPaint);
+			canvas.drawText(minTempList.get(index).toString() + tempUnit, x, minY + circleRadius + TEXT_HEIGHT, tempPaint);
 
 			canvas.drawCircle(x, maxY, circleRadius, maxCirclePaint);
-			canvas.drawText(maxTempList.get(index).toString(), x, maxY - circleRadius - TEXT_HEIGHT + TEXT_ASCENT, tempPaint);
+			canvas.drawText(maxTempList.get(index).toString() + tempUnit, x, maxY - circleRadius - TEXT_HEIGHT + TEXT_ASCENT, tempPaint);
 
 			lastMinColumnPoint.set(x, minY);
 			lastMaxColumnPoint.set(x, maxY);
