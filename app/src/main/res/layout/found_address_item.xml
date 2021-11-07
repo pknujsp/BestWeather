@@ -22,5 +22,5 @@
         android:layout_marginTop="2dp"
         android:text="addressName"
         android:textColor="?attr/textColor"
-        android:textSize="19sp" />
+        android:textSize="18sp" />
 </LinearLayout>

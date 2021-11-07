@@ -117,7 +117,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		List<String> popList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
-		List<SingleWindDirectionView.WindDirectionObj> windDirectionList = new ArrayList<>();
+		List<Integer> windDirectionList = new ArrayList<>();
 		List<String> windSpeedList = new ArrayList<>();
 		List<String> windStrengthList = new ArrayList<>();
 		List<String> windGustList = new ArrayList<>();
@@ -142,7 +142,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 			popList.add(String.valueOf((int) (Double.parseDouble(hourly.getPop()) * 100.0)));
 			rainVolumeList.add(hourly.getRain() == null ? "-" : hourly.getRain().getPrecipitation1Hour());
 			snowVolumeList.add(hourly.getSnow() == null ? "-" : hourly.getSnow().getPrecipitation1Hour());
-			windDirectionList.add(new SingleWindDirectionView.WindDirectionObj(Integer.parseInt(hourly.getWind_deg())));
+			windDirectionList.add(Integer.parseInt(hourly.getWind_deg()));
 			windSpeedList.add(ValueUnits.convertWindSpeed(hourly.getWind_speed(), windUnit).toString());
 			windStrengthList.add(WeatherResponseProcessor.getSimpleWindSpeedDescription(hourly.getWind_speed()));
 			windGustList.add(hourly.getWindGust() == null ? "-" : ValueUnits.convertWindSpeed(hourly.getWindGust(), windUnit).toString());
@@ -163,7 +163,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		popRow.setValueList(popList);
 		rainVolumeRow.setValueList(rainVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);
-		windDirectionRow.setIcons(windDirectionList);
+		windDirectionRow.setWindDirectionObjList(windDirectionList);
 		windSpeedRow.setValueList(windSpeedList);
 		windStrengthRow.setValueList(windStrengthList);
 		windGustRow.setValueList(windGustList);

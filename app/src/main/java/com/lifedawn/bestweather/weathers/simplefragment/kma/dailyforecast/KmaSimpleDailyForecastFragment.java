@@ -38,6 +38,8 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		needCompare = true;
+		
 	}
 	
 	@Override
@@ -45,7 +47,6 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);
 		setValuesToViews();
-		
 		
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
 			@Override

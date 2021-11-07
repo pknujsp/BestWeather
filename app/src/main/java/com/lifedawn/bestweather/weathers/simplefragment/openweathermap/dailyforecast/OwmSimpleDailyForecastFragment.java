@@ -40,6 +40,8 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		needCompare = true;
+		
 	}
 	
 	@Override

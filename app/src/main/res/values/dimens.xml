@@ -38,7 +38,7 @@
     <!-- detail : D로 축약 -->
     <dimen name="valueColumnWidthInDHourly">63dp</dimen>
     <dimen name="valueColumnWidthInDDaily">87dp</dimen>
-    <dimen name="defaultValueRowHeightInD">38dp</dimen>
+    <dimen name="defaultValueRowHeightInD">42dp</dimen>
 
     <dimen name="doubleTemperatureRowHeightInD">95dp</dimen>
     <dimen name="singleWindDirectionIconValueRowHeightInD">37dp</dimen>

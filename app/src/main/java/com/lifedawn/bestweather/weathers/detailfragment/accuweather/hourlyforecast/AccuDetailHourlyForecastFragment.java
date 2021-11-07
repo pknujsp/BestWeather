@@ -124,7 +124,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 		List<String> snowVolumeList = new ArrayList<>();
 		List<String> precipitationTypeList = new ArrayList<>();
 		List<String> precipitationIntensityList = new ArrayList<>();
-		List<SingleWindDirectionView.WindDirectionObj> windDirectionList = new ArrayList<>();
+		List<Integer> windDirectionList = new ArrayList<>();
 		List<String> windSpeedList = new ArrayList<>();
 		List<String> windStrengthList = new ArrayList<>();
 		List<String> windGustList = new ArrayList<>();
@@ -152,8 +152,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 			
 			precipitationTypeList.add(hourly.getPrecipitationType());
 			precipitationIntensityList.add(hourly.getPrecipitationIntensity());
-			windDirectionList.add(
-					new SingleWindDirectionView.WindDirectionObj(Integer.parseInt(hourly.getWind().getDirection().getDegrees())));
+			windDirectionList.add(Integer.parseInt(hourly.getWind().getDirection().getDegrees()));
 			windSpeedList.add(ValueUnits.convertWindSpeedForAccu(hourly.getWind().getSpeed().getValue(), windUnit).toString());
 			windStrengthList.add(WeatherResponseProcessor.getSimpleWindSpeedDescription(hourly.getWind().getSpeed().getValue()));
 			windGustList.add(
@@ -181,7 +180,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 		precipitationTypeRow.setValueList(precipitationTypeList);
 		precipitationIntensityRow.setValueList(precipitationIntensityList);
 		
-		windDirectionRow.setIcons(windDirectionList);
+		windDirectionRow.setWindDirectionObjList(windDirectionList);
 		windSpeedRow.setValueList(windSpeedList);
 		windStrengthRow.setValueList(windStrengthList);
 		windGustRow.setValueList(windGustList);

@@ -116,7 +116,7 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		List<String> precipitationVolumeList = new ArrayList<>();
 		List<String> freshSnowCoverList = new ArrayList<>();
 		List<String> thunderStormList = new ArrayList<>();
-		List<SingleWindDirectionView.WindDirectionObj> windDirectionList = new ArrayList<>();
+		List<Integer> windDirectionList = new ArrayList<>();
 		List<String> windSpeedList = new ArrayList<>();
 		List<String> windStrengthList = new ArrayList<>();
 		List<String> humidityList = new ArrayList<>();
@@ -136,7 +136,7 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 			//낙뢰
 			thunderStormList.add(finalHourlyForecast.getLightning() == null ? "" : "O");
 			//풍향
-			windDirectionList.add(new SingleWindDirectionView.WindDirectionObj(Integer.parseInt(finalHourlyForecast.getWindDirection())));
+			windDirectionList.add(Integer.parseInt(finalHourlyForecast.getWindDirection()));
 			//풍속
 			windSpeedList.add(ValueUnits.convertWindSpeed(finalHourlyForecast.getWindSpeed(), windUnit).toString());
 			//바람세기
@@ -153,7 +153,7 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		freshSnowCoverRow.setValueList(freshSnowCoverList);
 		thunderstormRow.setValueList(thunderStormList);
 		humidityRow.setValueList(humidityList);
-		windDirectionRow.setIcons(windDirectionList);
+		windDirectionRow.setWindDirectionObjList(windDirectionList);
 		windSpeedRow.setValueList(windSpeedList);
 		windStrengthRow.setValueList(windStrengthList);
 		weatherIconRow.setWeatherImgs(weatherIconObjList);

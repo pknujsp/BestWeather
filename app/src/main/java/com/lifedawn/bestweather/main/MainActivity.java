@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,9 +23,11 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
+import com.lifedawn.bestweather.intro.IntroTransactionFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
@@ -37,6 +41,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
 	private SharedPreferences sharedPreferences;
+	private NetworkStatus networkStatus;
 	
 	public static void setWindowFlag(Activity activity, final int bits, boolean on) {
 		Window win = activity.getWindow();
@@ -64,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		
+		networkStatus = new NetworkStatus(getApplicationContext(), new ConnectivityManager.NetworkCallback() {});
+		if (!networkStatus.networkAvailable()) {
+			Toast.makeText(this, getString(R.string.need_to_connect_network), Toast.LENGTH_SHORT).show();
+			finish();
+		}
+		
 		initPreferences();
 		WeatherResponseProcessor.init(getApplicationContext());
 		AccuWeatherResponseProcessor.init(getApplicationContext());
@@ -82,9 +93,17 @@ public class MainActivity extends AppCompatActivity {
 		
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 		
-		MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-		fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, mainTransactionFragment.getTag()).commit();
+		
+		if (sharedPreferences.getBoolean(getString(R.string.pref_key_show_intro), true)) {
+			IntroTransactionFragment introTransactionFragment = new IntroTransactionFragment();
+			fragmentTransaction.add(binding.fragmentContainer.getId(), introTransactionFragment,
+					introTransactionFragment.getTag()).commit();
+		} else {
+			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
+			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, mainTransactionFragment.getTag()).commit();
+		}
+		
 	}
 	
 	private void initPreferences() {
@@ -100,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
 				editor.putString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name());
 				editor.putBoolean(getString(R.string.pref_key_use_current_location), true);
 				editor.putBoolean(getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false);
+				editor.putBoolean(getString(R.string.pref_key_show_intro), true);
 				
 				Locale locale;
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -107,15 +127,10 @@ public class MainActivity extends AppCompatActivity {
 				} else {
 					locale = getResources().getConfiguration().locale;
 				}
-				String country = locale.getCountry();
 				
-				if (country.equals("KR")) {
-					editor.putBoolean(getString(R.string.pref_key_kma_top_priority), true);
-				} else {
-					editor.putBoolean(getString(R.string.pref_key_kma_top_priority), false);
-				}
-				editor.putBoolean(getString(R.string.pref_key_accu_weather), true);
-				editor.putBoolean(getString(R.string.pref_key_open_weather_map), false).apply();
+				editor.putBoolean(getString(R.string.pref_key_kma_top_priority), false).putBoolean(
+						getString(R.string.pref_key_accu_weather), false).putBoolean(getString(R.string.pref_key_open_weather_map),
+						true).apply();
 			}
 		} catch (NullPointerException e) {
 		

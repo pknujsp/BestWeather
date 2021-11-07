@@ -83,6 +83,8 @@
     <string name="pref_key_last_selected_favorite_address_id">pref_key_last_selected_favorite_address_id</string>
     <string name="pref_key_last_selected_location_type">pref_key_last_selected_location_type</string>
 
+    <string name="pref_key_show_intro">pref_key_show_intro</string>
+
     <string name="pref_key_never_ask_again_permission_for_access_fine_location">pref_key_never_ask_again_permission_for_access_fine_location</string>
 
 
@@ -119,6 +121,7 @@
     <string name="tag_comparison_fragment">tag_comparison_fragment</string>
     <string name="tag_detail_air_quality_fragment">tag_detail_air_quality_fragment</string>
     <string name="tag_detail_daily_forecast_fragment">tag_detail_daily_forecast_fragment</string>
+    <string name="tag_intro_fragment">tag_intro_fragment</string>
 
 
     <!-- accu weather precipitation type -->
@@ -387,6 +390,7 @@
     <string name="bundle_key_new_favorite_address_list">bundle_key_new_favorite_address_list</string>
     <string name="bundle_key_changed_use_current_location">bundle_key_changed_use_current_location</string>
     <string name="bundle_key_refresh">bundle_key_refresh</string>
+    <string name="bundle_key_igps">bundle_key_igps</string>
 
     <!-- fragment result key -->
     <string name="key_from_favorite_to_find_address">key_from_favorite_to_find_address</string>
@@ -395,13 +399,14 @@
     <string name="key_back_from_find_address_to_main">key_back_from_find_address_to_main</string>
     <string name="key_back_from_favorite_to_main">key_back_from_favorite_to_main</string>
     <string name="key_back_from_find_address_to_favorite">key_back_from_find_address_to_favorite</string>
+    <string name="key_from_intro_to_find_address">key_from_intro_to_find_address</string>
+    <string name="key_current_location">key_current_location</string>
+    <string name="key_selected_location">key_selected_location</string>
 
     <string name="disabled_use_current_location">현재 위치 미사용</string>
     <string name="enabled_use_current_location">현재 위치 사용</string>
     <string name="unavailable_update">업데이트 불가</string>
-    <string name="key_current_location">key_current_location</string>
-    <string name="key_selected_location">key_selected_location</string>
-    <string name="bundle_key_igps">bundle_key_igps</string>
+
     <string name="msg_failed_update">날씨 자료 다운로드에 실패했습니다.</string>
     <string name="again">다시 시도</string>
     <string name="rerequest_another_weather_datasource">다시 시도</string>
@@ -409,6 +414,11 @@
     <string name="error">오류발생</string>
     <string name="air_pollution_material_info">오염 물질 정보</string>
     <string name="aqi_grade">AQI(대기질) 등급</string>
+    <string name="start_app">사용 시작</string>
+    <string name="key_back_from_find_address_to_intro">key_back_from_find_address_to_intro</string>
+    <string name="disconnected_network">네트워크가 연결되어 있지 않습니다</string>
+    <string name="connected_network">네트워크가 연결되었습니다</string>
+    <string name="need_to_connect_network">네트워크 연결을 해주세요</string>
 
 
 </resources>

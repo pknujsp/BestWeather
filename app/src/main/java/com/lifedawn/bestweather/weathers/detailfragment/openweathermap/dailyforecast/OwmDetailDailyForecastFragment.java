@@ -71,7 +71,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		List<String> popList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
-		List<SingleWindDirectionView.WindDirectionObj> windDirectionList = new ArrayList<>();
+		List<Integer> windDirectionList = new ArrayList<>();
 		List<String> windSpeedList = new ArrayList<>();
 		List<String> windStrengthList = new ArrayList<>();
 		List<String> windGustList = new ArrayList<>();
@@ -90,7 +90,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 			popList.add(String.valueOf((int) (Double.parseDouble(daily.getPop()) * 100.0)));
 			rainVolumeList.add(daily.getRain() == null ? "-" : daily.getRain());
 			snowVolumeList.add(daily.getSnow() == null ? "-" : daily.getSnow());
-			windDirectionList.add(new SingleWindDirectionView.WindDirectionObj(Integer.parseInt(daily.getWindDeg())));
+			windDirectionList.add(Integer.parseInt(daily.getWindDeg()));
 			windSpeedList.add(ValueUnits.convertWindSpeed(daily.getWindSpeed(), windUnit).toString());
 			windStrengthList.add(WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getWindSpeed()));
 			windGustList.add(daily.getWindGust() == null ? "-" : daily.getWindGust());
@@ -147,7 +147,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		popRow.setValueList(popList);
 		rainVolumeRow.setValueList(rainVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);
-		windDirectionRow.setIcons(windDirectionList);
+		windDirectionRow.setWindDirectionObjList(windDirectionList);
 		windSpeedRow.setValueList(windSpeedList);
 		windStrengthRow.setValueList(windStrengthList);
 		windGustRow.setValueList(windGustList);

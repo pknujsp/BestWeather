@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
@@ -40,6 +39,8 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		needCompare = true;
+		
 	}
 	
 	@Override
@@ -137,7 +138,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 					ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(), false))));
-			tempList.add(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit).toString()+tempUnitStr);
+			tempList.add(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit).toString() + tempUnitStr);
 			
 			probabilityOfPrecipitationList.add(finalHourlyForecast.getProbabilityOfPrecipitation());
 			precipitationVolumeList.add(finalHourlyForecast.getRainPrecipitation1Hour());
