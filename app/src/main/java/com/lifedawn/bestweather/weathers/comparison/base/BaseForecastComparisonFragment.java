@@ -26,6 +26,7 @@ import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
+import com.lifedawn.bestweather.weathers.view.NonScrolledView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -46,6 +47,8 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 	protected String countryCode;
 	protected WeatherSourceType mainWeatherSourceType;
 	protected TimeZone timeZone;
+
+	protected NonScrolledView[] nonScrolledViews;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -83,45 +86,16 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 			}
 		});
 
-		binding.kmaLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setText("K");
-		binding.kmaLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setBackgroundTintList(
-				getContext().getColorStateList(R.color.kma_icon_color));
-
-		binding.accuLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setText("A");
-		binding.accuLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setBackgroundTintList(
-				getContext().getColorStateList(R.color.accu_icon_color));
-
-		binding.owmLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setText("O");
-		binding.owmLabelLayout.weatherDataSourceIconView.weatherDataSourceIcon.setBackgroundTintList(
-				getContext().getColorStateList(R.color.owm_icon_color));
-
-		final View.OnClickListener labelIconOnClickListener = new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				Toast.makeText(getContext(), view.getContentDescription(), Toast.LENGTH_SHORT).show();
-			}
-		};
-
-		binding.kmaLabelLayout.weatherLabel.setOnClickListener(labelIconOnClickListener);
-		binding.kmaLabelLayout.temperatureLabel.setOnClickListener(labelIconOnClickListener);
-		binding.kmaLabelLayout.precipitationVolumeLabel.setOnClickListener(labelIconOnClickListener);
-		binding.kmaLabelLayout.popLabel.setOnClickListener(labelIconOnClickListener);
-
-		binding.accuLabelLayout.weatherLabel.setOnClickListener(labelIconOnClickListener);
-		binding.accuLabelLayout.temperatureLabel.setOnClickListener(labelIconOnClickListener);
-		binding.accuLabelLayout.precipitationVolumeLabel.setOnClickListener(labelIconOnClickListener);
-		binding.accuLabelLayout.popLabel.setOnClickListener(labelIconOnClickListener);
-
-		binding.owmLabelLayout.weatherLabel.setOnClickListener(labelIconOnClickListener);
-		binding.owmLabelLayout.temperatureLabel.setOnClickListener(labelIconOnClickListener);
-		binding.owmLabelLayout.precipitationVolumeLabel.setOnClickListener(labelIconOnClickListener);
-		binding.owmLabelLayout.popLabel.setOnClickListener(labelIconOnClickListener);
-
-		binding.scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+		binding.scrollview.setOnScrollChangeListener(new View.OnScrollChangeListener() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
 				if (dateRow != null) {
 					dateRow.reDraw(scrollX);
+				}
+				if (nonScrolledViews != null) {
+					for (NonScrolledView nonScrolledView : nonScrolledViews) {
+						nonScrolledView.reDraw(scrollX);
+					}
 				}
 			}
 		});

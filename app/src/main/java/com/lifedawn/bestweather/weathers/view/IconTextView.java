@@ -40,7 +40,7 @@ public class IconTextView extends View {
 		this.columnWidth = columnWidth;
 
 		valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-		valueTextPaint.setTextAlign(Paint.Align.CENTER);
+		valueTextPaint.setTextAlign(Paint.Align.LEFT);
 		valueTextPaint.setTextSize(context.getResources().getDimension(R.dimen.iconValueTextSizeInSCD));
 		valueTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
@@ -48,12 +48,14 @@ public class IconTextView extends View {
 		valueTextPaint.getTextBounds("0", 0, 1, rect);
 		valueTextHeight = rect.height();
 
-		iconSize = valueTextHeight;
 		iconRect = new Rect();
 
 		icon = ContextCompat.getDrawable(context, iconId);
 
 		margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, getResources().getDisplayMetrics());
+		int extraSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, getResources().getDisplayMetrics());
+
+		iconSize = valueTextHeight + extraSize * 2;
 		setWillNotDraw(false);
 	}
 
@@ -78,8 +80,8 @@ public class IconTextView extends View {
 
 		int column = 0;
 		int itemWidth = 0;
-		iconRect.top = getHeight() / 2 - iconSize / 2;
-		iconRect.bottom = getHeight() / 2 + iconSize / 2;
+		iconRect.top = 0;
+		iconRect.bottom = getHeight();
 
 		for (String value : valueList) {
 			valueTextPaint.getTextBounds(value, 0, value.length(), textRect);

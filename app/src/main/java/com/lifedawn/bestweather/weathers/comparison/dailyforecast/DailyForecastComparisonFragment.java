@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers.comparison.dailyforecast;
 
 import android.content.Context;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.view.Gravity;
@@ -39,6 +40,8 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponse
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.view.IconTextView;
+import com.lifedawn.bestweather.weathers.view.NonScrolledView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
@@ -65,9 +68,6 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.rootScrollView.setVisibility(View.GONE);
-		binding.clockLabelIcon.setVisibility(View.GONE);
-		binding.kmaLabelLayout.precipitationVolumeLabel.setVisibility(View.GONE);
-
 		binding.toolbar.fragmentTitle.setText(R.string.comparison_daily_forecast);
 		binding.addressName.setText(addressName);
 
@@ -75,6 +75,10 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 	}
 
 	private void setValuesToViews(DailyForecastResponse dailyForecastResponse) {
+		final int dateValueRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
+		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
+		final int defaultValueRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
+
 		List<WeatherSourceType> weatherSourceTypeList = new ArrayList<>();
 
 		List<ForecastObj<FinalDailyForecast>> kmaFinalDailyForecasts = null;
@@ -86,12 +90,9 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			for (FinalDailyForecast finalDailyForecast : dailyForecastResponse.kmaDailyForecastList) {
 				kmaFinalDailyForecasts.add(new ForecastObj<>(finalDailyForecast.getDate(), finalDailyForecast));
 			}
-
 			weatherSourceTypeList.add(WeatherSourceType.KMA);
-			binding.kmaLabelLayout.getRoot().setVisibility(View.VISIBLE);
 			binding.kma.setVisibility(View.VISIBLE);
 		} else {
-			binding.kmaLabelLayout.getRoot().setVisibility(View.GONE);
 			binding.kma.setVisibility(View.GONE);
 		}
 
@@ -102,11 +103,10 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 						WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getEpochDate()) * 1000L, timeZone),
 						item));
 			}
+
 			weatherSourceTypeList.add(WeatherSourceType.ACCU_WEATHER);
-			binding.accuLabelLayout.getRoot().setVisibility(View.VISIBLE);
 			binding.accu.setVisibility(View.VISIBLE);
 		} else {
-			binding.accuLabelLayout.getRoot().setVisibility(View.GONE);
 			binding.accu.setVisibility(View.GONE);
 		}
 
@@ -117,15 +117,12 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 						WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, timeZone), daily));
 			}
 			weatherSourceTypeList.add(WeatherSourceType.OPEN_WEATHER_MAP);
-			binding.owmLabelLayout.getRoot().setVisibility(View.VISIBLE);
 			binding.owm.setVisibility(View.VISIBLE);
 		} else {
-			binding.owmLabelLayout.getRoot().setVisibility(View.GONE);
 			binding.owm.setVisibility(View.GONE);
 		}
 
 		LocalDateTime now = LocalDateTime.now(ZoneId.of(timeZone.getID())).plusDays(10).withHour(0).withMinute(0).withSecond(0).withNano(0);
-
 		LocalDateTime firstDateTime = LocalDateTime.of(now.toLocalDate(), now.toLocalTime());
 		now = now.minusDays(20);
 		LocalDateTime lastDateTime = LocalDateTime.of(now.toLocalDate(), now.toLocalTime());
@@ -172,18 +169,13 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		final int columnsCount = dateTimeList.size();
 		final int columnWidth = (int) getResources().getDimension(R.dimen.valueColumnWidthInSCDaily);
 		final int valueRowWidth = columnWidth * columnsCount;
-		final int lastRowMargin = (int) getResources().getDimension(R.dimen.lastRowInForecastTableMargin);
-
-		final int dateValueRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
-		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
-		final int defaultValueRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
 		//날짜, 날씨, 기온, 강수량, 강수확률
 		TextValueView dateRow = new TextValueView(getContext(), FragmentType.Comparison, valueRowWidth, dateValueRowHeight, columnWidth);
 		List<DoubleWeatherIconView> weatherIconRows = new ArrayList<>();
+		List<IconTextView> precipitationVolumeRows = new ArrayList<>();
+		List<IconTextView> probabilityOfPrecipitationRows = new ArrayList<>();
 		List<TextValueView> tempRows = new ArrayList<>();
-		List<TextValueView> precipitationVolumeRows = new ArrayList<>();
-		List<TextValueView> probabilityOfPrecipitationRows = new ArrayList<>();
 
 		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
 			int specificRowWidth = 0;
@@ -225,11 +217,11 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			tempRows.get(i).setTag(R.id.begin_column_index, beginColumnIndex);
 
 			precipitationVolumeRows.add(
-					new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth, defaultValueRowHeight, columnWidth));
+					new IconTextView(getContext(), FragmentType.Comparison, specificRowWidth, columnWidth, R.drawable.precipitationvolume));
 			precipitationVolumeRows.get(i).setTag(R.id.begin_column_index, beginColumnIndex);
 
 			probabilityOfPrecipitationRows.add(
-					new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth, defaultValueRowHeight, columnWidth));
+					new IconTextView(getContext(), FragmentType.Comparison, specificRowWidth, columnWidth, R.drawable.pop));
 			probabilityOfPrecipitationRows.get(i).setTag(R.id.begin_column_index, beginColumnIndex);
 		}
 
@@ -248,6 +240,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		String pop = null;
 		Context context = getContext();
 
+		String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+
 		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
 			List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 			List<String> tempList = new ArrayList<>();
@@ -257,8 +251,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			if (weatherSourceTypeList.get(i) == WeatherSourceType.KMA) {
 				int index = 0;
 				for (ForecastObj<FinalDailyForecast> item : kmaFinalDailyForecasts) {
-					temp = ValueUnits.convertTemperature(item.e.getMinTemp(), tempUnit).toString() + " / " + ValueUnits.convertTemperature(
-							item.e.getMaxTemp(), tempUnit).toString();
+					temp = ValueUnits.convertTemperature(item.e.getMinTemp(), tempUnit).toString() + tempUnitStr + " / " + ValueUnits.convertTemperature(
+							item.e.getMaxTemp(), tempUnit).toString() + tempUnitStr;
 					tempList.add(temp);
 
 					if (index++ > 4) {
@@ -279,8 +273,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			} else if (weatherSourceTypeList.get(i) == WeatherSourceType.ACCU_WEATHER) {
 				for (ForecastObj<FiveDaysOfDailyForecastsResponse.DailyForecasts> item : accuFinalDailyForecasts) {
 					temp = ValueUnits.convertTemperature(item.e.getTemperature().getMinimum().getValue(),
-							tempUnit).toString() + " " + "/ " + ValueUnits.convertTemperature(
-							item.e.getTemperature().getMaximum().getValue(), tempUnit).toString();
+							tempUnit).toString() + tempUnitStr + " " + "/ " + ValueUnits.convertTemperature(
+							item.e.getTemperature().getMaximum().getValue(), tempUnit).toString() + tempUnitStr;
 					tempList.add(temp);
 
 					pop = (int) Double.parseDouble(item.e.getDay().getPrecipitationProbability()) + " / " +
@@ -298,7 +292,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			} else if (weatherSourceTypeList.get(i) == WeatherSourceType.OPEN_WEATHER_MAP) {
 				for (ForecastObj<OneCallResponse.Daily> item : owmFinalDailyForecasts) {
 					temp = ValueUnits.convertTemperature(item.e.getTemp().getMin(),
-							tempUnit).toString() + " / " + ValueUnits.convertTemperature(item.e.getTemp().getMax(), tempUnit).toString();
+							tempUnit).toString() + tempUnitStr + " / " + ValueUnits.convertTemperature(item.e.getTemp().getMax(), tempUnit).toString() + tempUnitStr;
 					tempList.add(temp);
 
 					pop = item.e.getPop();
@@ -322,30 +316,48 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 		binding.datetime.addView(dateRow, rowLayoutParams);
 		LinearLayout view = null;
+		nonScrolledViews = new NonScrolledView[weatherSourceTypeList.size()];
+
+		LinearLayout.LayoutParams nonScrollRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		nonScrollRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
+		int nonScrollViewMargin = (int) getResources().getDimension(R.dimen.nonScrollViewTopBottomMargin);
+		nonScrollRowLayoutParams.setMargins(0, nonScrollViewMargin, 0, nonScrollViewMargin);
 
 		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
 			LinearLayout.LayoutParams specificRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 					ViewGroup.LayoutParams.WRAP_CONTENT);
 			specificRowLayoutParams.leftMargin = columnWidth * (Integer) weatherIconRows.get(i).getTag(R.id.begin_column_index);
 
+			LinearLayout.LayoutParams iconTextRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT);
+			iconTextRowLayoutParams.leftMargin = columnWidth * (Integer) weatherIconRows.get(i).getTag(R.id.begin_column_index);
+			iconTextRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
+
+			String sourceName;
 			switch (weatherSourceTypeList.get(i)) {
 				case KMA:
 					view = binding.kma;
+					sourceName = getString(R.string.kma);
 					break;
 				case ACCU_WEATHER:
 					view = binding.accu;
+					sourceName = getString(R.string.accu_weather);
 					break;
 				default:
 					view = binding.owm;
+					sourceName = getString(R.string.owm);
 					break;
 			}
+			nonScrolledViews[i] = new NonScrolledView(getContext(), FragmentType.Comparison, valueRowWidth, columnWidth, sourceName);
 
+			view.addView(nonScrolledViews[i], nonScrollRowLayoutParams);
 			view.addView(weatherIconRows.get(i), specificRowLayoutParams);
-			view.addView(tempRows.get(i), specificRowLayoutParams);
+			view.addView(probabilityOfPrecipitationRows.get(i), iconTextRowLayoutParams);
 			if (weatherSourceTypeList.get(i) != WeatherSourceType.KMA) {
-				view.addView(precipitationVolumeRows.get(i), specificRowLayoutParams);
+				view.addView(precipitationVolumeRows.get(i), iconTextRowLayoutParams);
 			}
-			view.addView(probabilityOfPrecipitationRows.get(i), specificRowLayoutParams);
+			view.addView(tempRows.get(i), specificRowLayoutParams);
 		}
 	}
 

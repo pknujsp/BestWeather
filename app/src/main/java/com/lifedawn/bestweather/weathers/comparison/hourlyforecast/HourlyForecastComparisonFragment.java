@@ -41,6 +41,8 @@ import com.lifedawn.bestweather.weathers.dataprocessing.util.SunsetriseUtil;
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.view.IconTextView;
+import com.lifedawn.bestweather.weathers.view.NonScrolledView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
@@ -83,6 +85,11 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 	}
 
 	private void setValuesToViews(HourlyForecastResponse hourlyForecastResponse) {
+		final int dateValueRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
+		final int clockValueRowHeight = (int) getResources().getDimension(R.dimen.clockValueRowHeightInCOMMON);
+		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
+		final int defaultValueRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
+
 		List<WeatherSourceType> weatherSourceTypeList = new ArrayList<>();
 
 		List<ForecastObj<FinalHourlyForecast>> kmaFinalHourlyForecasts = null;
@@ -96,10 +103,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			}
 
 			weatherSourceTypeList.add(WeatherSourceType.KMA);
-			binding.kmaLabelLayout.getRoot().setVisibility(View.VISIBLE);
 			binding.kma.setVisibility(View.VISIBLE);
 		} else {
-			binding.kmaLabelLayout.getRoot().setVisibility(View.GONE);
 			binding.kma.setVisibility(View.GONE);
 		}
 
@@ -110,11 +115,10 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 						WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getEpochDateTime()) * 1000L, timeZone),
 						item));
 			}
+
 			weatherSourceTypeList.add(WeatherSourceType.ACCU_WEATHER);
-			binding.accuLabelLayout.getRoot().setVisibility(View.VISIBLE);
 			binding.accu.setVisibility(View.VISIBLE);
 		} else {
-			binding.accuLabelLayout.getRoot().setVisibility(View.GONE);
 			binding.accu.setVisibility(View.GONE);
 		}
 
@@ -125,11 +129,10 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 						WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getDt()) * 1000L, timeZone),
 						hourly));
 			}
+
 			weatherSourceTypeList.add(WeatherSourceType.OPEN_WEATHER_MAP);
-			binding.owmLabelLayout.getRoot().setVisibility(View.VISIBLE);
 			binding.owm.setVisibility(View.VISIBLE);
 		} else {
-			binding.owmLabelLayout.getRoot().setVisibility(View.GONE);
 			binding.owm.setVisibility(View.GONE);
 		}
 
@@ -181,20 +184,14 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		final int columnsCount = dateTimeList.size();
 		final int columnWidth = (int) getResources().getDimension(R.dimen.valueColumnWidthInSCHourly);
 		final int valueRowWidth = columnWidth * columnsCount;
-		final int lastRowMargin = (int) getResources().getDimension(R.dimen.lastRowInForecastTableMargin);
-
-		final int dateValueRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
-		final int clockValueRowHeight = (int) getResources().getDimension(R.dimen.clockValueRowHeightInCOMMON);
-		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
-		final int defaultValueRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
 		//날짜, 시각, 날씨, 기온, 강수량, 강수확률
 		dateRow = new DateView(getContext(), FragmentType.Comparison, valueRowWidth, dateValueRowHeight, columnWidth);
 		ClockView clockRow = new ClockView(getContext(), FragmentType.Comparison, valueRowWidth, clockValueRowHeight, columnWidth);
 		SingleWeatherIconView[] weatherIconRows = new SingleWeatherIconView[columnsCount];
 		TextValueView[] tempRows = new TextValueView[columnsCount];
-		TextValueView[] precipitationVolumeRows = new TextValueView[columnsCount];
-		TextValueView[] probabilityOfPrecipitationRows = new TextValueView[columnsCount];
+		IconTextView[] precipitationVolumeRows = new IconTextView[columnsCount];
+		IconTextView[] probabilityOfPrecipitationRows = new IconTextView[columnsCount];
 
 		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
 			int specificRowWidth = 0;
@@ -236,12 +233,12 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			tempRows[i] = new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth, defaultValueRowHeight, columnWidth);
 			tempRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 
-			precipitationVolumeRows[i] = new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth, defaultValueRowHeight,
-					columnWidth);
+			precipitationVolumeRows[i] = new IconTextView(getContext(), FragmentType.Comparison, specificRowWidth,
+					columnWidth, R.drawable.precipitationvolume);
 			precipitationVolumeRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 
-			probabilityOfPrecipitationRows[i] = new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth,
-					defaultValueRowHeight, columnWidth);
+			probabilityOfPrecipitationRows[i] = new IconTextView(getContext(), FragmentType.Comparison,
+					specificRowWidth, columnWidth, R.drawable.pop);
 			probabilityOfPrecipitationRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 		}
 
@@ -249,6 +246,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		dateRow.init(dateTimeList);
 		clockRow.setClockList(dateTimeList);
 		Context context = getContext();
+
+		String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
 
 		//날씨,기온,강수량,강수확률
 		//kma, accu weather, owm 순서
@@ -268,7 +267,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				boolean isNight = false;
 
 				for (ForecastObj<FinalHourlyForecast> finalHourlyForecastObj : kmaFinalHourlyForecasts) {
-					tempList.add(ValueUnits.convertTemperature(finalHourlyForecastObj.e.getTemp1Hour(), tempUnit).toString());
+					tempList.add(ValueUnits.convertTemperature(finalHourlyForecastObj.e.getTemp1Hour(), tempUnit).toString() + tempUnitStr);
 					probabilityOfPrecipitationList.add(finalHourlyForecastObj.e.getProbabilityOfPrecipitation());
 					precipitationVolumeList.add(finalHourlyForecastObj.e.getRainPrecipitation1Hour());
 
@@ -284,7 +283,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			} else if (weatherSourceTypeList.get(i) == WeatherSourceType.ACCU_WEATHER) {
 				for (ForecastObj<TwelveHoursOfHourlyForecastsResponse.Item> item : accuFinalHourlyForecasts) {
-					tempList.add(ValueUnits.convertTemperature(item.e.getTemperature().getValue(), tempUnit).toString());
+					tempList.add(ValueUnits.convertTemperature(item.e.getTemperature().getValue(), tempUnit).toString() + tempUnitStr);
 					probabilityOfPrecipitationList.add(item.e.getPrecipitationProbability());
 					precipitationVolumeList.add(item.e.getTotalLiquid().getValue());
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
@@ -293,7 +292,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			} else if (weatherSourceTypeList.get(i) == WeatherSourceType.OPEN_WEATHER_MAP) {
 				for (ForecastObj<OneCallResponse.Hourly> item : owmFinalHourlyForecasts) {
-					tempList.add(ValueUnits.convertTemperature(item.e.getTemp(), tempUnit).toString());
+					tempList.add(ValueUnits.convertTemperature(item.e.getTemp(), tempUnit).toString() + tempUnitStr);
 					probabilityOfPrecipitationList.add((String.valueOf((int) (Double.parseDouble(item.e.getPop()) * 100.0))));
 					precipitationVolumeList.add(item.e.getRain() == null ? "0.0" : item.e.getRain().getPrecipitation1Hour());
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
@@ -316,28 +315,46 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		binding.datetime.addView(dateRow, rowLayoutParams);
 		binding.datetime.addView(clockRow, rowLayoutParams);
 		LinearLayout view = null;
+		nonScrolledViews = new NonScrolledView[weatherSourceTypeList.size()];
+
+		LinearLayout.LayoutParams nonScrollRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		nonScrollRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
+		int nonScrollViewMargin = (int) getResources().getDimension(R.dimen.nonScrollViewTopBottomMargin);
+		nonScrollRowLayoutParams.setMargins(0, nonScrollViewMargin, 0, nonScrollViewMargin);
 
 		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
 			LinearLayout.LayoutParams specificRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 					ViewGroup.LayoutParams.WRAP_CONTENT);
 			specificRowLayoutParams.leftMargin = columnWidth * (Integer) weatherIconRows[i].getTag(R.id.begin_column_index);
 
+			LinearLayout.LayoutParams iconTextRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT);
+			iconTextRowLayoutParams.leftMargin = columnWidth * (Integer) weatherIconRows[i].getTag(R.id.begin_column_index);
+			iconTextRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
+
+			String sourceName;
 			switch (weatherSourceTypeList.get(i)) {
 				case KMA:
 					view = binding.kma;
+					sourceName = getString(R.string.kma);
 					break;
 				case ACCU_WEATHER:
 					view = binding.accu;
+					sourceName = getString(R.string.accu_weather);
 					break;
 				default:
 					view = binding.owm;
+					sourceName = getString(R.string.owm);
 					break;
 			}
+			nonScrolledViews[i] = new NonScrolledView(getContext(), FragmentType.Comparison, valueRowWidth, columnWidth, sourceName);
 
+			view.addView(nonScrolledViews[i], nonScrollRowLayoutParams);
 			view.addView(weatherIconRows[i], specificRowLayoutParams);
+			view.addView(probabilityOfPrecipitationRows[i], iconTextRowLayoutParams);
+			view.addView(precipitationVolumeRows[i], iconTextRowLayoutParams);
 			view.addView(tempRows[i], specificRowLayoutParams);
-			view.addView(precipitationVolumeRows[i], specificRowLayoutParams);
-			view.addView(probabilityOfPrecipitationRows[i], specificRowLayoutParams);
 		}
 	}
 

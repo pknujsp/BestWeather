@@ -62,5 +62,7 @@
     <dimen name="barWidthInAirQualityBarView">26dp</dimen>
     <dimen name="columnWidthInAirQualityBarView">60dp</dimen>
     <dimen name="viewHeightOfAirQualityBarView">100dp</dimen>
+    <dimen name="iconValueViewMargin">6dp</dimen>
+    <dimen name="nonScrollViewTopBottomMargin">4dp</dimen>
 
 </resources>
