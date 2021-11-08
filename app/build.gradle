@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
     buildToolsVersion '30.0.3'
 
     defaultConfig {
@@ -63,4 +63,8 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
     implementation 'com.luckycatlabs:SunriseSunsetCalculator:1.2'
+
+    implementation 'com.google.android.gms:play-services-ads:20.4.0'
+
+
 }
