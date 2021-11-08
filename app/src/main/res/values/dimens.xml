@@ -53,6 +53,7 @@
     <dimen name="clockValueTextSizeInSCD">13sp</dimen>
     <dimen name="dateValueTextSizeInSCD">13sp</dimen>
     <dimen name="valueTextSizeInSCD">14sp</dimen>
+    <dimen name="iconValueTextSizeInSCD">13sp</dimen>
     <dimen name="lastRowInForecastTableMargin">10dp</dimen>
 
     <!-- detail air quality -->
