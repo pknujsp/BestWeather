@@ -27,14 +27,10 @@ import retrofit2.Response;
 
 public class AccuWeatherProcessing {
 	
-	public static boolean checkResponse(Response<JsonElement> response) {
+	public static boolean successfulResponse(Response<JsonElement> response) {
 		if (response.body() == null) {
 			return false;
-		} else if (response.isSuccessful()) {
-			return true;
-		} else {
-			return true;
-		}
+		} else {return response.errorBody() == null;}
 	}
 	
 	
@@ -49,7 +45,7 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				if (checkResponse(response)) {
+				if (successfulResponse(response)) {
 					callback.onResponseResult(response);
 					Log.e(RetrofitClient.LOG_TAG, "accu weather current conditions 성공");
 					
@@ -80,7 +76,7 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				if (checkResponse(response)) {
+				if (successfulResponse(response)) {
 					callback.onResponseResult(response);
 					Log.e(RetrofitClient.LOG_TAG, "accu weather daily forecast 성공");
 					
@@ -113,7 +109,7 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				if (checkResponse(response)) {
+				if (successfulResponse(response)) {
 					callback.onResponseResult(response);
 					Log.e(RetrofitClient.LOG_TAG, "accu weather hourly forecast 성공");
 					
@@ -149,7 +145,7 @@ public class AccuWeatherProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				if (checkResponse(response)) {
+				if (successfulResponse(response)) {
 					GeoPositionResponse geoPositionResponse = AccuWeatherResponseProcessor.getGeoPositionObjFromJson(
 							response.body().toString());
 					
@@ -198,6 +194,7 @@ public class AccuWeatherProcessing {
 					
 					multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER, geoPositionSearchParameter,
 							RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH, t);
+					
 					if (requestTypeSet.contains(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS)) {
 						multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER, null,
 								RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, t);
