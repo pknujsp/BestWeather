@@ -152,7 +152,7 @@ public class FindAddressFragment extends Fragment {
 		binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.finding_address));
+				AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.finding_address),null);
 				
 				Geocoding.reverseGeocoding(getContext(), query, new Geocoding.ReverseGeocodingCallback() {
 					@Override

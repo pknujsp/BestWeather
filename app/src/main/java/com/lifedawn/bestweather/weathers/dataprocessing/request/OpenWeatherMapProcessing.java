@@ -137,7 +137,8 @@ public class OpenWeatherMapProcessing {
 						RetrofitClient.ServiceType.OWM_ONE_CALL, t);
 			}
 
-
 		});
+		multipleJsonDownloader.getCallMap().put(RetrofitClient.ServiceType.OWM_ONE_CALL, oneCallCall);
+
 	}
 }

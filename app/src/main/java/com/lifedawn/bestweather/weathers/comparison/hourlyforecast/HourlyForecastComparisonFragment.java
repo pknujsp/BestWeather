@@ -62,6 +62,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class HourlyForecastComparisonFragment extends BaseForecastComparisonFragment {
+	private MultipleJsonDownloader<JsonElement> multipleJsonDownloader;
 
 
 	@Override
@@ -359,8 +360,6 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 	}
 
 	private void loadForecasts() {
-		AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data));
-
 		ArrayMap<WeatherSourceType, RequestWeatherSource> request = new ArrayMap<>();
 
 		RequestAccu requestAccu = new RequestAccu();
@@ -386,12 +385,24 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			request.put(WeatherSourceType.KMA, requestKma);
 		}
 
-		MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, new MultipleJsonDownloader<JsonElement>() {
+		AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (multipleJsonDownloader != null) {
+					multipleJsonDownloader.clearAllCalls();
+				}
+				getParentFragmentManager().popBackStack();
+			}
+		});
+
+		multipleJsonDownloader = new MultipleJsonDownloader<JsonElement>() {
 			@Override
 			public void onResult() {
 				setTable(this, latitude, longitude, dialog);
 			}
-		});
+		};
+
+		MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, multipleJsonDownloader);
 
 
 	}

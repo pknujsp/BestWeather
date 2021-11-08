@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import retrofit2.Call;
 import retrofit2.Response;
 
 public abstract class MultipleJsonDownloader<T> {
@@ -23,10 +24,15 @@ public abstract class MultipleJsonDownloader<T> {
 	private AlertDialog loadingDialog;
 	private Map<String, String> valueMap = new HashMap<>();
 	private LocalDateTime localDateTime = LocalDateTime.now();
+	private Map<RetrofitClient.ServiceType, Call<T>> callMap = new HashMap<>();
 
 	protected Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<T>>> responseMap = new ArrayMap<>();
 
 	public MultipleJsonDownloader() {
+	}
+
+	public Map<RetrofitClient.ServiceType, Call<T>> getCallMap() {
+		return callMap;
 	}
 
 	public Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<T>>> getResponseMap() {
@@ -83,6 +89,14 @@ public abstract class MultipleJsonDownloader<T> {
 	}
 
 	public abstract void onResult();
+
+	public void clearAllCalls() {
+		if (!callMap.isEmpty()) {
+			for (Call<T> call : callMap.values()) {
+				call.cancel();
+			}
+		}
+	}
 
 	public void processResult(WeatherSourceType weatherSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
 	                          Response<? extends T> response) {

@@ -35,7 +35,7 @@ public class Gps {
 			ActivityResultLauncher<Intent> moveToAppDetailSettingsLauncher) {
 		//권한 확인
 		Context context = activity.getApplicationContext();
-		dialog = ProgressDialog.show(activity, context.getString(R.string.msg_finding_current_location));
+		dialog = ProgressDialog.show(activity, context.getString(R.string.msg_finding_current_location),null);
 		
 		if (locationManager == null) {
 			locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);

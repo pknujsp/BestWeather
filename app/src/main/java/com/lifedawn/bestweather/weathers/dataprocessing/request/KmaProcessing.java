@@ -265,8 +265,9 @@ public final class KmaProcessing {
 							UltraSrtNcstParameter ultraSrtNcstParameter = new UltraSrtNcstParameter();
 							ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
 
-							getUltraSrtNcstData(ultraSrtNcstParameter, LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-									koreaLocalDateTime.toLocalTime()),
+							Call<JsonElement> ultraSrtNcstCall = getUltraSrtNcstData(ultraSrtNcstParameter,
+									LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
+											koreaLocalDateTime.toLocalTime()),
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<JsonElement> response) {
@@ -280,13 +281,16 @@ public final class KmaProcessing {
 													RetrofitClient.ServiceType.ULTRA_SRT_NCST, t);
 										}
 									});
+							multipleJsonDownloader.getCallMap().put(RetrofitClient.ServiceType.ULTRA_SRT_NCST, ultraSrtNcstCall);
+
 						}
 						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_FCST)) {
 							UltraSrtFcstParameter ultraSrtFcstParameter = new UltraSrtFcstParameter();
 							ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
 
-							getUltraSrtFcstData(ultraSrtFcstParameter, LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-									koreaLocalDateTime.toLocalTime()),
+							Call<JsonElement> ultraSrtFcstCall = getUltraSrtFcstData(ultraSrtFcstParameter,
+									LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
+											koreaLocalDateTime.toLocalTime()),
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<JsonElement> response) {
@@ -300,13 +304,16 @@ public final class KmaProcessing {
 													RetrofitClient.ServiceType.ULTRA_SRT_FCST, t);
 										}
 									});
+							multipleJsonDownloader.getCallMap().put(RetrofitClient.ServiceType.ULTRA_SRT_FCST, ultraSrtFcstCall);
+
 						}
 						if (requestTypeSet.contains(RetrofitClient.ServiceType.VILAGE_FCST)) {
 							VilageFcstParameter vilageFcstParameter = new VilageFcstParameter();
 							vilageFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
 
-							getVilageFcstData(vilageFcstParameter, LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-									koreaLocalDateTime.toLocalTime()),
+							Call<JsonElement> vilageFcstCall = getVilageFcstData(vilageFcstParameter,
+									LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
+											koreaLocalDateTime.toLocalTime()),
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<JsonElement> response) {
@@ -320,13 +327,13 @@ public final class KmaProcessing {
 													RetrofitClient.ServiceType.VILAGE_FCST, t);
 										}
 									});
-
+							multipleJsonDownloader.getCallMap().put(RetrofitClient.ServiceType.VILAGE_FCST, vilageFcstCall);
 						}
 						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_LAND_FCST)) {
 							MidLandParameter midLandParameter = new MidLandParameter();
 							midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode()).setTmFc(tmFc);
 
-							getMidLandFcstData(midLandParameter, new JsonDownloader() {
+							Call<JsonElement> midLandFcstCall = getMidLandFcstData(midLandParameter, new JsonDownloader() {
 								@Override
 								public void onResponseResult(Response<JsonElement> response) {
 									multipleJsonDownloader.processResult(WeatherSourceType.KMA, midLandParameter,
@@ -339,12 +346,14 @@ public final class KmaProcessing {
 								}
 
 							});
+							multipleJsonDownloader.getCallMap().put(RetrofitClient.ServiceType.MID_LAND_FCST, midLandFcstCall);
+
 						}
 						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_TA_FCST)) {
 							MidTaParameter midTaParameter = new MidTaParameter();
 							midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode()).setTmFc(tmFc);
 
-							getMidTaData(midTaParameter, new JsonDownloader() {
+							Call<JsonElement> midTaFcstCall = getMidTaData(midTaParameter, new JsonDownloader() {
 								@Override
 								public void onResponseResult(Response<JsonElement> response) {
 									multipleJsonDownloader.processResult(WeatherSourceType.KMA, midTaParameter,
@@ -357,6 +366,8 @@ public final class KmaProcessing {
 								}
 
 							});
+							multipleJsonDownloader.getCallMap().put(RetrofitClient.ServiceType.MID_TA_FCST, midTaFcstCall);
+
 						}
 					}
 

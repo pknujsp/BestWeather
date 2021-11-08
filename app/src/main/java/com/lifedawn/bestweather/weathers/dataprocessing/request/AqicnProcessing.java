@@ -40,7 +40,7 @@ public class AqicnProcessing {
 		AqicnParameter aqicnParameter = new AqicnParameter();
 		aqicnParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString());
 
-		getLocalizedFeed(aqicnParameter, new JsonDownloader() {
+		Call<JsonElement> localizedFeedCall = getLocalizedFeed(aqicnParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<JsonElement> response) {
 				multipleJsonDownloader.processResult(WeatherSourceType.AQICN, aqicnParameter,
@@ -54,6 +54,7 @@ public class AqicnProcessing {
 			}
 
 		});
+		multipleJsonDownloader.getCallMap().put(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, localizedFeedCall);
 
 	}
 }
