@@ -31,4 +31,9 @@
         <item name="lineColor">@color/black</item>
     </style>
 
+    <style name="ThemeOverlay.BestWeather.AppWidgetContainer" parent="">
+        <item name="appWidgetBackgroundColor">@color/light_blue_600</item>
+        <item name="appWidgetTextColor">@color/light_blue_50</item>
+    </style>
+
 </resources>

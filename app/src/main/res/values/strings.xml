@@ -419,6 +419,8 @@
     <string name="disconnected_network">네트워크가 연결되어 있지 않습니다</string>
     <string name="connected_network">네트워크가 연결되었습니다</string>
     <string name="need_to_connect_network">네트워크 연결을 해주세요</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 
 
 </resources>
