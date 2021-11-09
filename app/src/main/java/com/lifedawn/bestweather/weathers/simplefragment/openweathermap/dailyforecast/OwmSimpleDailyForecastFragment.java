@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,9 +99,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		// 날짜 ,낮과 밤의 날씨상태, 강수확률, 강우량, 강설량, 최저/최고 기온
 		Context context = getContext();
 
-		final int DATE_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
-		final int DEFAULT_TEXT_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
 
 		List<OneCallResponse.Daily> items = oneCallResponse.getDaily();
@@ -119,7 +118,8 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 		 */
 
-		TextValueView dateRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, DATE_ROW_HEIGHT, COLUMN_WIDTH);
+		TextValueView dateRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, (int) getResources().getDimension(R.dimen.multipleDateTextRowHeightInCOMMON),
+				COLUMN_WIDTH);
 		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Simple, VIEW_WIDTH, WEATHER_ROW_HEIGHT,
 				COLUMN_WIDTH);
 		IconTextView probabilityOfPrecipitationRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
@@ -131,7 +131,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 		//시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE", Locale.getDefault());
 		//날씨 아이콘
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		//기온, 강수확률, 강수량
@@ -187,7 +187,12 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		int margin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
 		iconTextRowLayoutParams.topMargin = margin;
 
-		binding.forecastView.addView(dateRow, rowLayoutParams);
+		LinearLayout.LayoutParams dateRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		dateRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
+		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
+
+		binding.forecastView.addView(dateRow, dateRowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
 		binding.forecastView.addView(probabilityOfPrecipitationRow, iconTextRowLayoutParams);
 		binding.forecastView.addView(rainVolumeRow, iconTextRowLayoutParams);

@@ -44,6 +44,8 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="4dp"
+                    android:drawableLeft="@drawable/location"
+                    android:drawableTint="@color/white"
                     android:text="주소명"
                     android:textAlignment="center"
                     android:textSize="19sp" />
@@ -98,21 +100,30 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/detail_current_conditions"
-                    android:layout_marginBottom="32dp" />
+                    android:layout_marginBottom="24dp" />
+
+                <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/adViewBelowAirQuality"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/simple_air_quality"
+                    android:layout_marginBottom="24dp"
+                    ads:adSize="BANNER"
+                    ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/sun_set_rise"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/simple_air_quality"
-                    android:layout_marginBottom="32dp" />
+                    android:layout_below="@id/adViewBelowAirQuality"
+                    android:layout_marginBottom="24dp" />
 
                 <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/adView"
+                    android:id="@+id/adViewBottom"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/sun_set_rise"
-                    android:layout_marginBottom="32dp"
+                    android:layout_marginBottom="24dp"
                     ads:adSize="BANNER"
                     ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
             </RelativeLayout>

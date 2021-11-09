@@ -19,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
@@ -79,6 +81,10 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		MobileAds.initialize(getContext());
+		AdRequest adRequest = new AdRequest.Builder().build();
+		binding.adViewBelowScrollView.loadAd(adRequest);
+
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {

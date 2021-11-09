@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -115,7 +116,7 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 
 		 */
 
-		TextValueView dateRow = new TextValueView(context, FragmentType.Simple, viewWidth, DATE_ROW_HEIGHT, columnWidth);
+		TextValueView dateRow = new TextValueView(context, FragmentType.Simple, viewWidth, (int) getResources().getDimension(R.dimen.multipleDateTextRowHeightInCOMMON), columnWidth);
 		DoubleWeatherIconView weatherIconRow = new DoubleWeatherIconView(context, FragmentType.Simple, viewWidth, WEATHER_ROW_HEIGHT,
 				columnWidth);
 		IconTextView probabilityOfPrecipitationRow = new IconTextView(context, FragmentType.Simple, viewWidth,
@@ -123,7 +124,7 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		IconTextView precipitationVolumeRow = new IconTextView(context, FragmentType.Simple, viewWidth,
 				columnWidth, R.drawable.precipitationvolume);
 
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE", Locale.getDefault());
 
 		//시각, 기온, 강수확률, 강수량--------------------------------
 		List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
@@ -165,7 +166,12 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		iconTextRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 		iconTextRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
 
-		binding.forecastView.addView(dateRow, rowLayoutParams);
+		LinearLayout.LayoutParams dateRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		dateRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
+		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,4f, getResources().getDisplayMetrics());
+
+		binding.forecastView.addView(dateRow, dateRowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
 		binding.forecastView.addView(probabilityOfPrecipitationRow, iconTextRowLayoutParams);
 		binding.forecastView.addView(precipitationVolumeRow, iconTextRowLayoutParams);

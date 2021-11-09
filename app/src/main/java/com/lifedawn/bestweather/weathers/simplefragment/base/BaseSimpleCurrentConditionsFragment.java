@@ -71,9 +71,12 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
+		/*
 		MobileAds.initialize(getContext());
 		AdRequest adRequest = new AdRequest.Builder().build();
 		binding.adView.loadAd(adRequest);
+
+		 */
 	}
 
 	public BaseSimpleCurrentConditionsFragment setAirQualityResponse(GeolocalizedFeedResponse airQualityResponse) {

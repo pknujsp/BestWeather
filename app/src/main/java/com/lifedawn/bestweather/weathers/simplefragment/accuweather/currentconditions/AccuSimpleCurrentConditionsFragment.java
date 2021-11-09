@@ -23,44 +23,46 @@ import java.util.List;
 
 public class AccuSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
 	protected CurrentConditionsResponse currentConditionsResponse;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		return super.onCreateView(inflater, container, savedInstanceState);
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		setValuesToViews();
 	}
-	
+
 	public AccuSimpleCurrentConditionsFragment setCurrentConditionsResponse(CurrentConditionsResponse currentConditionsResponse) {
 		this.currentConditionsResponse = currentConditionsResponse;
 		return this;
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
 		super.setValuesToViews();
-		
+
 		List<CurrentConditionsResponse.Item> items = currentConditionsResponse.getItems();
 		CurrentConditionsResponse.Item item = items.get(0);
 		String precipitation = null;
 		if (item.getHasPrecipitation().equals("true")) {
 			// precipitation type 값 종류 : Rain, Snow, Ice, Null(Not), or Mixed
+			String precipitationUnit = "mm";
+
 			precipitation = AccuWeatherResponseProcessor.getPty(
-					item.getPrecipitationType()) + ", " + item.getPrecip1hr().getMetric().getValue();
+					item.getPrecipitationType()) + ", " + item.getPrecip1hr().getMetric().getValue() + precipitationUnit;
 		} else {
 			precipitation = getString(R.string.not_precipitation);
 		}
 		binding.precipitation.setText(precipitation);
-		
+
 		binding.weatherIcon.setImageDrawable(
 				ContextCompat.getDrawable(getContext(), AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon())));
 		binding.sky.setText(AccuWeatherResponseProcessor.getWeatherIconDescription(item.getWeatherIcon()));

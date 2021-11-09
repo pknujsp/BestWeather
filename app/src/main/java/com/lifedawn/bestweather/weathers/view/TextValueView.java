@@ -4,7 +4,10 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.text.Layout;
+import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.util.TypedValue;
 import android.view.View;
 
 import com.lifedawn.bestweather.R;
@@ -18,8 +21,8 @@ public class TextValueView extends View {
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
-	private final int valueTextHeight;
 	private final TextPaint valueTextPaint;
+	private final Rect valueTextRect;
 	private List<String> valueList;
 
 
@@ -27,16 +30,15 @@ public class TextValueView extends View {
 		super(context);
 		this.fragmentType = fragmentType;
 		this.viewWidth = viewWidth;
-		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;
+		this.viewHeight = viewHeight;
+
 		valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		valueTextPaint.setTextAlign(Paint.Align.CENTER);
 		valueTextPaint.setTextSize(context.getResources().getDimension(R.dimen.valueTextSizeInSCD));
 		valueTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
-		Rect rect = new Rect();
-		valueTextPaint.getTextBounds("0", 0, 1, rect);
-		valueTextHeight = rect.height();
+		valueTextRect = new Rect();
 
 		setWillNotDraw(false);
 	}
@@ -60,14 +62,50 @@ public class TextValueView extends View {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 
-		float x = 0f;
-		final float columnCenterX = columnWidth / 2f;
-		final float y = getHeight() / 2f + valueTextHeight / 2f;
-
 		int column = 0;
 		for (String value : valueList) {
-			x = columnCenterX + (columnWidth * column++);
-			canvas.drawText(value == null ? "-" : value, x, y, valueTextPaint);
+			//x = columnCenterX + (columnWidth * column++);
+			//canvas.drawText(value == null ? "" : value, x, y, valueTextPaint);
+			drawText(canvas, value, column);
+			column++;
 		}
+
 	}
+
+	private void drawText(Canvas canvas, String textOnCanvas, int column) {
+		//Static layout which will be drawn on canvas
+		//textOnCanvas - text which will be drawn
+		//text paint - paint object
+		//bounds.width - width of the layout
+		//Layout.Alignment.ALIGN_CENTER - layout alignment
+		//1 - text spacing multiply
+		//1 - text spacing add
+		//true - include padding
+		valueTextPaint.getTextBounds(textOnCanvas, 0, textOnCanvas.length(), valueTextRect);
+		StaticLayout.Builder builder = StaticLayout.Builder.obtain(textOnCanvas, 0, textOnCanvas.length(), valueTextPaint, columnWidth);
+		StaticLayout sl = builder.build();
+
+		canvas.save();
+
+		//calculate X and Y coordinates - In this case we want to draw the text in the
+		//center of canvas so we calculate
+		//text height and number of lines to move Y coordinate to center.
+		float textHeight = valueTextRect.height();
+		int numberOfTextLines = sl.getLineCount();
+		float textYCoordinate = viewHeight / 2f + valueTextRect.exactCenterY() -
+				((numberOfTextLines * textHeight) / 2);
+
+		//text will be drawn from left
+		final float columnCenterX = columnWidth / 2f;
+		float textXCoordinate = columnCenterX
+				+ columnWidth * column + valueTextRect.left;
+
+		canvas.translate(textXCoordinate, textYCoordinate);
+
+		//draws static layout on canvas
+		sl.draw(canvas);
+		canvas.restore();
+	}
+
+
 }

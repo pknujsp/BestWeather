@@ -17,6 +17,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailForecastBinding;
@@ -66,6 +68,10 @@ public class BaseDetailForecastFragment extends Fragment implements IWeatherValu
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		MobileAds.initialize(getContext());
+		AdRequest adRequest = new AdRequest.Builder().build();
+		binding.adViewBottom.loadAd(adRequest);
+
 		binding.addressName.setText(addressName);
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override

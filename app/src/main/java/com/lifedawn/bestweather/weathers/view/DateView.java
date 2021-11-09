@@ -41,7 +41,9 @@ public class DateView extends View {
 		dateTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
 		Rect rect = new Rect();
-		dateTextPaint.getTextBounds("0", 0, 1, rect);
+		LocalDateTime now = LocalDateTime.now();
+		String val = now.format(dateTimeFormatter);
+		dateTextPaint.getTextBounds(val, 0, val.length(), rect);
 		textHeight = rect.height();
 
 		setWillNotDraw(false);

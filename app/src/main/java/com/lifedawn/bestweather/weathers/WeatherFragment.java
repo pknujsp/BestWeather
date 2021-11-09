@@ -131,7 +131,8 @@ public class WeatherFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		MobileAds.initialize(getContext());
 		AdRequest adRequest = new AdRequest.Builder().build();
-		binding.adView.loadAd(adRequest);
+		binding.adViewBelowAirQuality.loadAd(adRequest);
+		binding.adViewBottom.loadAd(adRequest);
 
 		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_current_location), this, new FragmentResultListener() {
 			@Override

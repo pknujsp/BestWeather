@@ -17,7 +17,8 @@
     -->
     <!-- common -->
     <dimen name="dateValueRowHeightInCOMMON">30dp</dimen>
-    <dimen name="clockValueRowHeightInCOMMON">30dp</dimen>
+    <dimen name="multipleDateTextRowHeightInCOMMON">32dp</dimen>
+    <dimen name="clockValueRowHeightInCOMMON">28dp</dimen>
     <dimen name="labelIconSizeInCOMMON">30dp</dimen>
     <dimen name="labelIconColumnWidthInCOMMON">38dp</dimen>
     <dimen name="singleTemperatureRowHeightInCOMMON">80dp</dimen>
@@ -59,8 +60,8 @@
     <!-- detail air quality -->
     <dimen name="gradeValueTextSizeInAirQualityBarView">13sp</dimen>
     <dimen name="gradeTextSizeInAirQualityBarView">13sp</dimen>
-    <dimen name="barWidthInAirQualityBarView">26dp</dimen>
-    <dimen name="columnWidthInAirQualityBarView">60dp</dimen>
+    <dimen name="barWidthInAirQualityBarView">27dp</dimen>
+    <dimen name="columnWidthInAirQualityBarView">57dp</dimen>
     <dimen name="viewHeightOfAirQualityBarView">100dp</dimen>
     <dimen name="iconValueViewMargin">6dp</dimen>
     <dimen name="nonScrollViewTopBottomMargin">4dp</dimen>

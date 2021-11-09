@@ -20,6 +20,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.FragmentAirQualityDetailBinding;
@@ -80,6 +82,11 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
+		MobileAds.initialize(getContext());
+		AdRequest adRequest = new AdRequest.Builder().build();
+		binding.adViewBelowGrid.loadAd(adRequest);
+
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -116,7 +123,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 				(int) Double.parseDouble(iAqi.getO3().getValue())));
 		dateList.add(getString(R.string.current));
 
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE", Locale.getDefault());
 
 		for (AirQualityForecastObj airQualityForecastObj : airQualityForecastObjList) {
 			dateList.add(airQualityForecastObj.date.format(dateTimeFormatter));
