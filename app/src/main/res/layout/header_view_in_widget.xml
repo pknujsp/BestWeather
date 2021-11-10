@@ -8,16 +8,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-
+        android:layout_centerVertical="true"
+        android:maxLines="1"
+        android:minLines="1"
         android:text="address"
         android:textSize="13sp" />
 
     <TextView
-        android:id="@+id/updated_time"
+        android:id="@+id/refresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:clickable="true"
         android:drawableLeft="@drawable/refresh"
         android:gravity="center_vertical"
         android:text="updated_time"

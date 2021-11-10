@@ -15,64 +15,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.White"
         android:usesCleartextTraffic="true">
-        <receiver android:name=".widget.CurrentThird">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
+        <activity
+            android:name=".widget.ConfigureWidgetActivity"
+            android:theme="@style/AppTheme.White">
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/current_third_info" />
-        </receiver>
-        <receiver android:name=".widget.CurrentFirst">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
+        </activity>
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/current_first_info" />
-        </receiver>
-        <receiver android:name=".widget.CurrentSecond">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/current_second_info" />
-        </receiver>
-        <receiver android:name=".widget.CurrentDaily">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/current_daily_info" />
-        </receiver>
-        <receiver android:name=".widget.CurrentHourly">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/current_hourly_info" />
-        </receiver>
-        <receiver android:name=".widget.CurrentHourlyDaily">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/current_hourly_daily_info" />
-        </receiver>
+        <activity
+            android:name=".widget.DialogActivity"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <activity
             android:name=".main.MainActivity"
             android:label="@string/app_name"
+            android:launchMode="singleInstance"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.White">
             <intent-filter>
@@ -81,6 +42,75 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+        <receiver android:name=".widget.CurrentThird">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="@string/ACTION_REFRESH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/current_third_info" />
+        </receiver>
+
+        <receiver android:name=".widget.CurrentFirst">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="@string/ACTION_REFRESH" />
+                <action android:name="@string/ACTION_SHOW_DIALOG" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/current_first_info" />
+        </receiver>
+
+        <receiver android:name=".widget.CurrentSecond">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="@string/ACTION_REFRESH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/current_second_info" />
+        </receiver>
+
+        <receiver android:name=".widget.CurrentDaily">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="@string/ACTION_REFRESH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/current_daily_info" />
+        </receiver>
+
+        <receiver android:name=".widget.CurrentHourly">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="@string/ACTION_REFRESH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/current_hourly_info" />
+        </receiver>
+
+        <receiver android:name=".widget.CurrentHourlyDaily">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="@string/ACTION_REFRESH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/current_hourly_daily_info" />
+        </receiver>
+
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

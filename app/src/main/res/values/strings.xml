@@ -368,6 +368,22 @@
     <string name="cancel">취소</string>
     <string name="close_app">앱 종료</string>
     <string name="add_favorite">위치 추가</string>
+    <string name="disabled_use_current_location">현재 위치 미사용</string>
+    <string name="enabled_use_current_location">현재 위치 사용</string>
+    <string name="unavailable_update">업데이트 불가</string>
+    <string name="msg_failed_update">날씨 자료 다운로드에 실패했습니다.</string>
+    <string name="again">다시 시도</string>
+    <string name="rerequest_another_weather_datasource">다시 시도</string>
+    <string name="unknown_address">알수없는 주소</string>
+    <string name="error">오류발생</string>
+    <string name="air_pollution_material_info">오염 물질 정보</string>
+    <string name="aqi_grade">AQI(대기질) 등급</string>
+    <string name="start_app">사용 시작</string>
+    <string name="disconnected_network">네트워크가 연결되어 있지 않습니다</string>
+    <string name="connected_network">네트워크가 연결되었습니다</string>
+    <string name="need_to_connect_network">네트워크 연결을 해주세요</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 
     <!-- flickr weather -->
     <string name="flickr_clear">clear</string>
@@ -402,25 +418,10 @@
     <string name="key_from_intro_to_find_address">key_from_intro_to_find_address</string>
     <string name="key_current_location">key_current_location</string>
     <string name="key_selected_location">key_selected_location</string>
-
-    <string name="disabled_use_current_location">현재 위치 미사용</string>
-    <string name="enabled_use_current_location">현재 위치 사용</string>
-    <string name="unavailable_update">업데이트 불가</string>
-
-    <string name="msg_failed_update">날씨 자료 다운로드에 실패했습니다.</string>
-    <string name="again">다시 시도</string>
-    <string name="rerequest_another_weather_datasource">다시 시도</string>
-    <string name="unknown_address">알수 없는 주소</string>
-    <string name="error">오류발생</string>
-    <string name="air_pollution_material_info">오염 물질 정보</string>
-    <string name="aqi_grade">AQI(대기질) 등급</string>
-    <string name="start_app">사용 시작</string>
     <string name="key_back_from_find_address_to_intro">key_back_from_find_address_to_intro</string>
-    <string name="disconnected_network">네트워크가 연결되어 있지 않습니다</string>
-    <string name="connected_network">네트워크가 연결되었습니다</string>
-    <string name="need_to_connect_network">네트워크 연결을 해주세요</string>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
 
-
+    <!-- intent action -->
+    <string name="ACTION_REFRESH" translatable="false">ACTION_REFRESH</string>
+    <string name="ACTION_SHOW_DIALOG">ACTION_SHOW_DIALOG</string>
+    <string name="open_app">앱 열기</string>
 </resources>
