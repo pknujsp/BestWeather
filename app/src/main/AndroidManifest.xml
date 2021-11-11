@@ -44,38 +44,17 @@
         </activity>
 
 
-        <receiver android:name=".widget.CurrentThird">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="@string/ACTION_REFRESH" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/current_third_info" />
-        </receiver>
-
         <receiver android:name=".widget.CurrentFirst">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="@string/ACTION_REFRESH" />
                 <action android:name="@string/ACTION_SHOW_DIALOG" />
+                <action android:name="@string/ACTION_INIT" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/current_first_info" />
-        </receiver>
-
-        <receiver android:name=".widget.CurrentSecond">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="@string/ACTION_REFRESH" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/current_second_info" />
         </receiver>
 
         <receiver android:name=".widget.CurrentDaily">

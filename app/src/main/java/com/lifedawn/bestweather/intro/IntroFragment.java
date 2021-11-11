@@ -44,28 +44,28 @@ public class IntroFragment extends Fragment {
 	private FragmentIntroBinding binding;
 	private Gps gps;
 	private SharedPreferences sharedPreferences;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		gps = new Gps();
+		gps = new Gps(requestOnGpsLauncher, requestLocationPermissionLauncher,
+				moveToAppDetailSettingsLauncher);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentIntroBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.startApp.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				gps.runGps(requireActivity(), locationCallback, requestOnGpsLauncher, requestLocationPermissionLauncher,
-						moveToAppDetailSettingsLauncher);
+				gps.runGps(requireActivity(), locationCallback);
 			}
 		});
 		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_back_from_find_address_to_intro), this,
@@ -73,23 +73,23 @@ public class IntroFragment extends Fragment {
 					@Override
 					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
 						final boolean isSelectedNewAddress = result.getBoolean(getString(R.string.bundle_key_selected_address_dto));
-						
+
 						if (isSelectedNewAddress) {
 							final int newFavoriteAddressDtoId = result.getInt(getString(R.string.bundle_key_new_favorite_address_dto_id));
 							sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
 									newFavoriteAddressDtoId).putString(getString(R.string.pref_key_last_selected_location_type),
 									LocationType.SelectedAddress.name()).putBoolean(getString(R.string.pref_key_show_intro), false).apply();
-							
+
 							MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 							getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, mainTransactionFragment,
 									mainTransactionFragment.getTag()).commit();
 						} else {
-						
+
 						}
 					}
 				});
 	}
-	
+
 	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(
 			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
 				@Override
@@ -97,7 +97,7 @@ public class IntroFragment extends Fragment {
 					//gps 사용확인 화면에서 나온뒤 현재 위치 다시 파악
 					LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
 					boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-					
+
 					if (isGpsEnabled) {
 						binding.startApp.callOnClick();
 					} else {
@@ -105,7 +105,7 @@ public class IntroFragment extends Fragment {
 					}
 				}
 			});
-	
+
 	private final ActivityResultLauncher<Intent> moveToAppDetailSettingsLauncher = registerForActivityResult(
 			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
 				@Override
@@ -118,10 +118,10 @@ public class IntroFragment extends Fragment {
 					} else {
 						locationCallback.onFailed(Gps.LocationCallback.Fail.REJECT_PERMISSION);
 					}
-					
+
 				}
 			});
-	
+
 	private final ActivityResultLauncher<String> requestLocationPermissionLauncher = registerForActivityResult(
 			new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
 				@Override
@@ -143,30 +143,30 @@ public class IntroFragment extends Fragment {
 					}
 				}
 			});
-	
+
 	private final Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
 		@Override
 		public void onSuccessful(Location location) {
 			//현재 위치 파악 성공
 			Double latitude = location.getLatitude();
 			Double longitude = location.getLongitude();
-			
+
 			sharedPreferences.edit().putString(getString(R.string.pref_key_last_current_location_latitude), latitude.toString()).putString(
 					getString(R.string.pref_key_last_current_location_longitude), longitude.toString()).putString(
 					getString(R.string.pref_key_last_selected_location_type), LocationType.CurrentLocation.name()).putBoolean(
 					getString(R.string.pref_key_show_intro), false).apply();
-			
+
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 			getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, mainTransactionFragment,
 					mainTransactionFragment.getTag()).commit();
 		}
-		
+
 		@Override
 		public void onFailed(Fail fail) {
 			FindAddressFragment findAddressFragment = new FindAddressFragment();
 			getParentFragmentManager().clearFragmentResult(getString(R.string.key_from_intro_to_find_address));
 			getParentFragmentManager().setFragmentResult(getString(R.string.key_from_intro_to_find_address), new Bundle());
-			
+
 			getParentFragmentManager().beginTransaction().hide(IntroFragment.this).add(R.id.fragment_container, findAddressFragment,
 					getString(R.string.tag_find_address_fragment)).addToBackStack(getString(R.string.tag_find_address_fragment)).commit();
 		}

@@ -12,6 +12,8 @@
         android:maxLines="1"
         android:minLines="1"
         android:text="address"
+
+        android:textColor="@color/white"
         android:textSize="13sp" />
 
     <TextView
@@ -20,8 +22,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:drawableLeft="@drawable/refresh"
+        android:drawableTint="@color/white"
         android:gravity="center_vertical"
         android:text="updated_time"
+        android:textColor="@color/white"
         android:textSize="13sp" />
 
 </RelativeLayout>

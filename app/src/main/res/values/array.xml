@@ -576,4 +576,22 @@
         <item>@string/uv_index_5_extreme</item>
     </string-array>
 
+    <string-array name="AutoRefreshIntervals">
+        <item>@string/disable_auto_refresh</item>
+        <item>@string/minutes_30</item>
+        <item>@string/hours_1</item>
+        <item>@string/hours_2</item>
+        <item>@string/hours_3</item>
+        <item>@string/hours_6</item>
+    </string-array>
+
+    <string-array name="AutoRefreshIntervalsLong">
+        <item>0</item>
+        <item>1800000</item>
+        <item>3600000</item>
+        <item>7200000</item>
+        <item>10800000</item>
+        <item>21600000</item>
+    </string-array>
+
 </resources>

@@ -10,20 +10,17 @@
         android:id="@+id/current_conditions"
         layout="@layout/simple_current_conditions_view_in_widget"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="wrap_content" />
 
     <include
         android:id="@+id/hourly_forecast"
         layout="@layout/simple_hourly_forecast_view_in_widget"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="wrap_content" />
 
     <include
         android:id="@+id/daily_forecast"
         layout="@layout/simple_daily_forecast_view_in_widget"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="wrap_content" />
 </LinearLayout>

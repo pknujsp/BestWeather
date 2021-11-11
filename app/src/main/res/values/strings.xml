@@ -407,6 +407,7 @@
     <string name="bundle_key_changed_use_current_location">bundle_key_changed_use_current_location</string>
     <string name="bundle_key_refresh">bundle_key_refresh</string>
     <string name="bundle_key_igps">bundle_key_igps</string>
+    <string name="bundle_key_textsizelist">bundle_key_textsizelist</string>
 
     <!-- fragment result key -->
     <string name="key_from_favorite_to_find_address">key_from_favorite_to_find_address</string>
@@ -424,4 +425,31 @@
     <string name="ACTION_REFRESH" translatable="false">ACTION_REFRESH</string>
     <string name="ACTION_SHOW_DIALOG">ACTION_SHOW_DIALOG</string>
     <string name="open_app">앱 열기</string>
+    <string name="text_size">글자 크기</string>
+    <string name="location">위치</string>
+    <string name="selected_location">선택한 주소</string>
+    <string name="background_transparency">배경 투명도</string>
+    <string name="auto_refresh_interval">자동 업데이트 간격</string>
+    <string name="display_datetime">날짜와 시각 표시</string>
+    <string name="display_local_datetime">현지 시각으로 표시</string>
+    <string name="create_widget">위젯 생성</string>
+    <string name="key_back_from_find_address_to_widget_config_main">key_back_from_find_address_to_widget_config_main</string>
+    <string name="key_from_widget_config_main_to_find_address">key_from_widget_config_main_to_find_address</string>
+    <string name="change_address">주소 변경</string>
+
+    <!-- auto refresh interval -->
+    <string name="minutes_30">30분</string>
+    <string name="disable_auto_refresh">수동업데이트</string>
+    <string name="hours_1">1시간</string>
+    <string name="hours_2">2시간</string>
+    <string name="hours_3">3시간</string>
+    <string name="hours_6">6시간</string>
+    <string name="bundle_key_background_alpha">bundle_key_background_alpha</string>
+    <string name="ACTION_INIT">ACTION_INIT</string>
+    <string name="bundle_key_widgetname">bundle_key_widgetname</string>
+    <string name="refresh">업데이트</string>
+    <string name="bundle_key_using_current_location">bundle_key_using_current_location</string>
+    <string name="bundle_key_widget_custom_attributes">bundle_key_widget_custom_attributes</string>
+    <string name="refresh_current_location">현재 위치 업데이트</string>
+    <string name="bundle_key_widget_layout_id">bundle_key_widget_layout_id</string>
 </resources>

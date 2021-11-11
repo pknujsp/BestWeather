@@ -6,7 +6,7 @@
     android:orientation="horizontal">
 
     <ImageView
-        android:id="@+id/weather_icon"
+        android:id="@+id/current_weather_icon"
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:layout_marginRight="8dp"
@@ -21,17 +21,21 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/temperature"
+            android:id="@+id/current_temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="temp"
+            android:text="20°C"
+
+            android:textColor="@color/white"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/realfeel_temperature"
+            android:id="@+id/current_realfeel_temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="realfeel_temperature"
+
+            android:text="20°C"
+            android:textColor="@color/white"
             android:textSize="14sp" />
 
     </LinearLayout>
@@ -57,10 +61,12 @@
                 android:src="@drawable/pm10" />
 
             <TextView
-                android:id="@+id/airquality"
+                android:id="@+id/current_airquality"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="good"
+                android:text="@string/good"
+                android:textColor="@color/white"
+
                 android:textSize="14sp" />
 
         </LinearLayout>
@@ -81,10 +87,12 @@
                 android:src="@drawable/precipitationvolume" />
 
             <TextView
-                android:id="@+id/precipitation"
+                android:id="@+id/current_precipitation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="precipitation"
+                android:text="@string/not_precipitation"
+                android:textColor="@color/white"
+
                 android:textSize="14sp" />
 
         </LinearLayout>

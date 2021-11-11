@@ -1,16 +1,16 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/content_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/appWidgetBackgroundColor"
+    android:clickable="true"
     android:padding="@dimen/widget_padding"
     android:theme="@style/ThemeOverlay.BestWeather.AppWidgetContainer">
 
     <LinearLayout
-        android:id="@+id/content_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:clickable="true"
         android:orientation="vertical">
 
         <include

@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
 
-import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.room.AppDb;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dao.FavoriteAddressDao;
@@ -34,6 +33,16 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 			@Override
 			public void run() {
 				callback.processResult(favoriteAddressDao.getAll());
+			}
+		}).start();
+	}
+
+	@Override
+	public void get(int id, DbQueryCallback<FavoriteAddressDto> callback) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				callback.processResult(favoriteAddressDao.get(id));
 			}
 		}).start();
 	}

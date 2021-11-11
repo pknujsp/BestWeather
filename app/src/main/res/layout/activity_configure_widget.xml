@@ -3,22 +3,172 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".widget.ConfigureWidgetActivity">
+        android:background="@color/white">
 
-        <EditText
-            android:id="@+id/edittext"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
-        <Button
-            android:id="@+id/check"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/check" />
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                tools:context=".widget.ConfigureWidgetActivity">
+
+                <FrameLayout
+                    android:id="@+id/preview_widget_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="24dp"
+                    android:paddingLeft="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingRight="16dp"
+                    android:paddingBottom="12dp" />
+
+                <TextView
+                    style="@style/WidgetConfigureLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_size" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/text_size_slider"
+                    style="@style/WidgetConfigureConfig"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:stepSize="1"
+                    android:value="0"
+                    android:valueFrom="-4"
+                    android:valueTo="4" />
+
+                <TextView
+                    style="@style/WidgetConfigureLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/background_transparency" />
+
+                <SeekBar
+                    android:id="@+id/background_transparency_slider"
+                    style="@style/WidgetConfigureConfig"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="255" />
+
+                <TextView
+                    style="@style/WidgetConfigureLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/location" />
+
+                <RadioGroup
+                    android:id="@+id/location_radio_group"
+                    style="@style/WidgetConfigureConfig"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:id="@+id/current_location_radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/current_location" />
+
+                    <RadioButton
+                        android:id="@+id/selected_location_radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/selected_location" />
+
+                </RadioGroup>
+
+                <Button
+                    android:id="@+id/change_address_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/change_address"
+                    android:visibility="gone" />
+
+                <TextView
+                    style="@style/WidgetConfigureLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/pref_title_weather_data_sources" />
+
+                <RadioGroup
+                    android:id="@+id/weather_data_source_radio_group"
+                    style="@style/WidgetConfigureConfig"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioButton
+                        android:id="@+id/accu_weather_radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/accu_weather" />
+
+                    <RadioButton
+                        android:id="@+id/owm_radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/owm" />
+
+                </RadioGroup>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/kma_top_priority_switch"
+                    style="@style/WidgetConfigureLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:text="@string/pref_title_kma_top_priority" />
+
+                <TextView
+                    style="@style/WidgetConfigureLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/auto_refresh_interval" />
+
+                <Spinner
+                    android:id="@+id/auto_refresh_interval_spinner"
+                    style="@style/WidgetConfigureConfig"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/display_datetime_switch"
+                    style="@style/WidgetConfigureLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/display_datetime" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/display_local_datetime_switch"
+                    style="@style/WidgetConfigureLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/display_local_datetime" />
+
+
+                <Button
+                    android:id="@+id/check"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/create_widget" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </FrameLayout>
 </layout>

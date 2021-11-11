@@ -66,6 +66,11 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	}
 
 	@Override
+	public void get(int id, DbQueryCallback<FavoriteAddressDto> callback) {
+		favoriteAddressRepository.get(id, callback);
+	}
+
+	@Override
 	public void size(DbQueryCallback<Integer> callback) {
 		favoriteAddressRepository.size(callback);
 	}

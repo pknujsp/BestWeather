@@ -38,7 +38,7 @@ public class FindAddressFragment extends Fragment {
 	private boolean selectedAddress = false;
 	private FavoriteAddressDto newFavoriteAddressDto;
 	private String fragmentRequestKey;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -64,19 +64,26 @@ public class FindAddressFragment extends Fragment {
 						fragmentRequestKey = getString(R.string.key_back_from_find_address_to_intro);
 					}
 				});
+		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_from_widget_config_main_to_find_address), this,
+				new FragmentResultListener() {
+					@Override
+					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
+						fragmentRequestKey = getString(R.string.key_back_from_find_address_to_widget_config_main);
+					}
+				});
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentFindAddressBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.progressResultView.setContentView(binding.addressList);
-		
+
 		binding.toolbar.fragmentTitle.setText(R.string.find_address);
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -84,7 +91,7 @@ public class FindAddressFragment extends Fragment {
 				getParentFragmentManager().popBackStackImmediate();
 			}
 		});
-		
+
 		addressesAdapter = new FoundAddressesAdapter();
 		addressesAdapter.setOnClickedAddressListener(new FoundAddressesAdapter.OnClickedAddressListener() {
 			@Override
@@ -95,7 +102,7 @@ public class FindAddressFragment extends Fragment {
 				favoriteAddressDto.setAddress(address.getAddressLine(0));
 				favoriteAddressDto.setLatitude(String.valueOf(address.getLatitude()));
 				favoriteAddressDto.setLongitude(String.valueOf(address.getLongitude()));
-				
+
 				weatherViewModel.contains(favoriteAddressDto.getLatitude(), favoriteAddressDto.getLongitude(),
 						new DbQueryCallback<Boolean>() {
 							@Override
@@ -117,7 +124,7 @@ public class FindAddressFragment extends Fragment {
 											selectedAddress = true;
 											favoriteAddressDto.setId(result.intValue());
 											newFavoriteAddressDto = favoriteAddressDto;
-											
+
 											if (getActivity() != null) {
 												getActivity().runOnUiThread(new Runnable() {
 													@Override
@@ -127,45 +134,45 @@ public class FindAddressFragment extends Fragment {
 												});
 											}
 										}
-										
+
 										@Override
 										public void onResultNoData() {
-										
+
 										}
 									});
 								}
 							}
-							
+
 							@Override
 							public void onResultNoData() {
-							
+
 							}
 						});
-				
-				
+
+
 			}
 		});
-		
+
 		binding.addressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		binding.addressList.setAdapter(addressesAdapter);
-		
+
 		binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.finding_address),null);
-				
+				AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.finding_address), null);
+
 				Geocoding.reverseGeocoding(getContext(), query, new Geocoding.ReverseGeocodingCallback() {
 					@Override
 					public void onReverseGeocodingResult(List<Address> addressList) {
 						addressesAdapter.setAddressList(addressList);
-						
+
 						if (getActivity() != null) {
 							getActivity().runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
 									addressesAdapter.notifyDataSetChanged();
 									dialog.dismiss();
-									
+
 									if (addressList.isEmpty()) {
 										binding.progressResultView.onFailedProcessingData(getString(R.string.not_search_result));
 									} else {
@@ -176,17 +183,17 @@ public class FindAddressFragment extends Fragment {
 						}
 					}
 				});
-				
+
 				return true;
 			}
-			
+
 			@Override
 			public boolean onQueryTextChange(String newText) {
 				return false;
 			}
 		});
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		Bundle bundle = new Bundle();
@@ -197,11 +204,11 @@ public class FindAddressFragment extends Fragment {
 		getParentFragmentManager().setFragmentResult(fragmentRequestKey, bundle);
 		super.onDestroy();
 	}
-	
+
 	public boolean isSelectedAddress() {
 		return selectedAddress;
 	}
-	
+
 	public FavoriteAddressDto getNewFavoriteAddressDto() {
 		return newFavoriteAddressDto;
 	}
