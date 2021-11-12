@@ -25,6 +25,7 @@ public class DialogActivity extends Activity {
 	private ActivityDialogBinding binding;
 	private Class<?> widgetClassName;
 	private int appWidgetId;
+	private int widgetLayoutId;
 	private LocationType locationType;
 	private String addressName;
 
@@ -38,6 +39,7 @@ public class DialogActivity extends Activity {
 		Bundle bundle = getIntent().getExtras();
 		widgetClassName = (Class<?>) bundle.getSerializable(getString(R.string.bundle_key_widgetname));
 		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+		widgetLayoutId = bundle.getInt(getString(R.string.bundle_key_widget_layout_id));
 		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
 		locationType = (LocationType) bundle.getSerializable(getString(R.string.bundle_key_location_type));
 
@@ -50,7 +52,7 @@ public class DialogActivity extends Activity {
 		}
 
 		AlertDialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light_Dialog))
-				.setTitle("address")
+				.setTitle(getString(R.string.widget_control))
 				.setCancelable(false)
 				.setItems(listItems, new DialogInterface.OnClickListener() {
 					@Override
@@ -66,6 +68,11 @@ public class DialogActivity extends Activity {
 						} else if (which == 2) {
 							Intent refreshIntent = new Intent(getApplicationContext(), widgetClassName);
 							refreshIntent.setAction(getString(R.string.ACTION_REFRESH));
+							Bundle refreshBundle = new Bundle();
+							refreshBundle.putSerializable(getString(R.string.bundle_key_widgetname), widgetClassName);
+							refreshBundle.putInt(getString(R.string.bundle_key_widget_layout_id), widgetLayoutId);
+
+							refreshIntent.putExtras(refreshBundle);
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, refreshIntent, 0);
 							try {
 								pendingIntent.send();

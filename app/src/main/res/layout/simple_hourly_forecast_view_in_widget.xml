@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="clock"
+                android:text="@string/clock"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
 
@@ -41,7 +41,7 @@
                 android:id="@+id/hourly_temperature1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="temperature"
+                android:text="@string/temperature"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -58,7 +58,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="clock"
+                android:text="@string/clock"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
 
@@ -75,7 +75,7 @@
                 android:id="@+id/hourly_temperature2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="temperature"
+                android:text="@string/temperature"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -92,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="clock"
+                android:text="@string/clock"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
 
@@ -109,7 +109,7 @@
                 android:id="@+id/hourly_temperature3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="temperature"
+                android:text="@string/temperature"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -126,7 +126,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="clock"
+                android:text="@string/clock"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
 
@@ -143,7 +143,7 @@
                 android:id="@+id/hourly_temperature4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="temperature"
+                android:text="@string/temperature"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -160,7 +160,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="clock"
+                android:text="@string/clock"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
 
@@ -177,7 +177,7 @@
                 android:id="@+id/hourly_temperature5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="temperature"
+                android:text="@string/temperature"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -194,7 +194,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="clock"
+                android:text="@string/clock"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
 
@@ -211,7 +211,7 @@
                 android:id="@+id/hourly_temperature6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="temperature"
+                android:text="@string/temperature"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -228,7 +228,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="clock"
+                android:text="@string/clock"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
 
@@ -245,7 +245,7 @@
                 android:id="@+id/hourly_temperature7"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="temperature"
+                android:text="@string/temperature"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -262,7 +262,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="clock"
+                android:text="@string/clock"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
 
@@ -279,7 +279,7 @@
                 android:id="@+id/hourly_temperature8"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="temperature"
+                android:text="@string/temperature"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -296,7 +296,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="clock"
+                android:text="@string/clock"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
 
@@ -313,7 +313,7 @@
                 android:id="@+id/hourly_temperature9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="temperature"
+                android:text="@string/temperature"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -330,7 +330,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="clock"
+                android:text="@string/clock"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
 
@@ -347,7 +347,7 @@
                 android:id="@+id/hourly_temperature10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="temperature"
+                android:text="@string/temperature"
                 android:textColor="@color/white"
                 android:textSize="13sp" />
         </LinearLayout>

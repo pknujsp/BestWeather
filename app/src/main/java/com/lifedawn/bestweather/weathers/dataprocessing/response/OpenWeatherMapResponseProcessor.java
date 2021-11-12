@@ -11,6 +11,7 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.currentweather
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.dailyforecast.DailyForecast;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast.HourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,6 +69,20 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 	public static String getWeatherIconDescription(String code) {
 		return WEATHER_ICON_DESCRIPTION_MAP.get(code);
+	}
+
+	public static boolean successfulResponse(MultipleJsonDownloader.ResponseResult<JsonElement> result) {
+		if (result.getResponse() != null) {
+			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();
+
+			if (response.isSuccessful()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	public static CurrentWeatherResponse getCurrentWeatherObjFromJson(String response) {

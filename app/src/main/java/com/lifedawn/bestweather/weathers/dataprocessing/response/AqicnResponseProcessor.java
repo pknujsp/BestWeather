@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
 
 import java.time.LocalDate;
@@ -42,6 +43,7 @@ public class AqicnResponseProcessor {
 		for (int i = 0; i < aqiGradeDescriptions.length; i++) {
 			AQI_GRADE_DESCRIPTIONS[i] = aqiGradeDescriptions[i];
 		}
+
 	}
 
 	public static int getGradeColorId(int grade) {
@@ -147,5 +149,19 @@ public class AqicnResponseProcessor {
 			e.printStackTrace();
 		}
 		return date;
+	}
+
+	public static boolean successfulResponse(MultipleJsonDownloader.ResponseResult<JsonElement> result) {
+		if (result.getResponse() != null) {
+			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();
+
+			if (response.isSuccessful()) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 }

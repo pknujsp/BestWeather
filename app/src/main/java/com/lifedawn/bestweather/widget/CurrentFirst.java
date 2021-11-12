@@ -21,18 +21,28 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.LocationType;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
+import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+
+import retrofit2.Response;
 
 public class CurrentFirst extends RootAppWidget {
 
@@ -52,30 +62,6 @@ public class CurrentFirst extends RootAppWidget {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
-		final String action = intent.getAction();
-
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		ComponentName componentName = new ComponentName(context.getPackageName(), CurrentFirst.class.getName());
-		int[] widgetIds = appWidgetManager.getAppWidgetIds(componentName);
-
-		if (action.equals(context.getString(R.string.ACTION_REFRESH))) {
-			for (int appWidgetId : widgetIds) {
-				RemoteViews remoteViews = createViews(context, R.layout.current_first);
-				remoteViews.setOnClickPendingIntent(R.id.content_container, getOnClickedPendingIntent(context, appWidgetId,
-						CurrentFirst.class));
-
-				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-				loadWeatherData(context, appWidgetId, remoteViews);
-			}
-		} else if (action.equals(context.getString(R.string.ACTION_SHOW_DIALOG))) {
-			Log.e(tag, "show dialog");
-			Intent i = new Intent(context, DialogActivity.class);
-			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			i.putExtras(intent.getExtras());
-			context.startActivity(i);
-		} else if (action.equals(context.getString(R.string.ACTION_INIT))) {
-
-		}
 	}
 
 	@Override
@@ -119,10 +105,22 @@ public class CurrentFirst extends RootAppWidget {
 			longitude = Double.parseDouble(favoriteAddressDto.getLongitude());
 		}
 
-		Log.e(tag, "데이터 요청");
 		MainProcessing.requestNewWeatherData(context, latitude, longitude, requestWeatherSources, new MultipleJsonDownloader<JsonElement>() {
 			@Override
 			public void onResult() {
+				final WeatherSourceType requestWeatherSourceType = Objects.requireNonNull(widgetDataObjArrayMap.get(appWidgetId)).weatherSourceType;
+				switch (requestWeatherSourceType) {
+					case KMA:
+						KmaResponseProcessor.init(context);
+						break;
+					case ACCU_WEATHER:
+						AccuWeatherResponseProcessor.init(context);
+						break;
+					case OPEN_WEATHER_MAP:
+						OpenWeatherMapResponseProcessor.init(context);
+						break;
+				}
+				AqicnResponseProcessor.init(context);
 				setResultViews(context, AppWidgetManager.getInstance(context), appWidgetId, remoteViews, this);
 			}
 		});
@@ -131,22 +129,26 @@ public class CurrentFirst extends RootAppWidget {
 	@Override
 	public void setResultViews(Context context, AppWidgetManager appWidgetManager, int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
 		super.setResultViews(context, appWidgetManager, appWidgetId, remoteViews, multipleJsonDownloader);
-		OpenWeatherMapResponseProcessor.init(context);
+		WeatherSourceType requestWeatherSourceType = Objects.requireNonNull(widgetDataObjArrayMap.get(appWidgetId)).weatherSourceType;
 
-		OneCallResponse oneCallResponse =
-				OpenWeatherMapResponseProcessor.getOneCallObjFromJson(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.OPEN_WEATHER_MAP)
-						.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponse().body().toString());
+		CurrentConditionsObj currentConditionsObj = getCurrentConditions(context, requestWeatherSourceType, multipleJsonDownloader,
+				appWidgetId);
+		HeaderObj headerObj = getHeader(context, multipleJsonDownloader, appWidgetId, currentConditionsObj.timeZone);
 
-		LocalDateTime updatedTime = multipleJsonDownloader.getLocalDateTime();
+		remoteViews.setTextViewText(R.id.address, headerObj.address);
+		remoteViews.setTextViewText(R.id.refresh, headerObj.refreshDateTime);
+		remoteViews.setTextViewText(R.id.current_temperature, currentConditionsObj.temp);
+		if (currentConditionsObj.realFeelTemp == null) {
+			remoteViews.setViewVisibility(R.id.current_realfeel_temperature, View.GONE);
+		} else {
+			remoteViews.setViewVisibility(R.id.current_realfeel_temperature, View.VISIBLE);
+			remoteViews.setTextViewText(R.id.current_realfeel_temperature,
+					context.getString(R.string.real_feel_temperature) + ": " + currentConditionsObj.realFeelTemp);
+		}
+		remoteViews.setTextViewText(R.id.current_airquality, currentConditionsObj.airQuality);
+		remoteViews.setTextViewText(R.id.current_precipitation, currentConditionsObj.precipitation);
+		remoteViews.setImageViewResource(R.id.current_weather_icon, currentConditionsObj.weatherIcon);
 
-		remoteViews.setTextViewText(R.id.address, widgetDataObjArrayMap.get(appWidgetId).addressName);
-		remoteViews.setTextViewText(R.id.refresh, updatedTime.format(DATE_TIME_FORMATTER));
-		remoteViews.setTextViewText(R.id.current_temperature, oneCallResponse.getCurrent().getTemp());
-		remoteViews.setTextViewText(R.id.current_realfeel_temperature, oneCallResponse.getCurrent().getFeelsLike());
-		remoteViews.setTextViewText(R.id.current_precipitation, oneCallResponse.getCurrent().getRain() != null
-				? oneCallResponse.getCurrent().getRain().getPrecipitation1Hour() : context.getString(R.string.not_precipitation));
-		remoteViews.setImageViewResource(R.id.current_weather_icon, OpenWeatherMapResponseProcessor.getWeatherIconImg(
-				oneCallResponse.getCurrent().getWeather().get(0).getId(), false));
 		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
 		remoteViews.setViewVisibility(R.id.content_container, View.VISIBLE);
 

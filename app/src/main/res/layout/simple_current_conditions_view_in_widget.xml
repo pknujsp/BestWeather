@@ -24,7 +24,7 @@
             android:id="@+id/current_temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="20°C"
+            android:text="@string/temperature"
 
             android:textColor="@color/white"
             android:textSize="18sp" />
@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
-            android:text="20°C"
+            android:text="@string/real_feel_temperature"
             android:textColor="@color/white"
             android:textSize="14sp" />
 
@@ -64,9 +64,8 @@
                 android:id="@+id/current_airquality"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/good"
+                android:text="@string/air_quality"
                 android:textColor="@color/white"
-
                 android:textSize="14sp" />
 
         </LinearLayout>
@@ -90,7 +89,7 @@
                 android:id="@+id/current_precipitation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/not_precipitation"
+                android:text="@string/precipitation_volume"
                 android:textColor="@color/white"
 
                 android:textSize="14sp" />
