@@ -9,13 +9,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
@@ -97,10 +98,9 @@ public class RootAppWidget extends AppWidgetProvider {
 			widgetDataObjArrayMap.put(appWidgetId, widgetDataObj);
 
 			RemoteViews remoteViews = createViews(context, appWidgetId, layoutId);
-			remoteViews.setOnClickPendingIntent(R.id.content_container, getOnClickedPendingIntent(context, appWidgetId, layoutId,
-					widgetClass));
+			widgetDataObj.remoteViews = remoteViews;
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-			init(context, appWidgetId, remoteViews);
+			init(context, appWidgetId, remoteViews, widgetClass);
 		} else if (action.equals(context.getString(R.string.ACTION_REFRESH))) {
 			Bundle bundle = intent.getExtras();
 			final Class<?> widgetClass = (Class<?>) bundle.getSerializable(context.getString(R.string.bundle_key_widgetname));
@@ -111,18 +111,30 @@ public class RootAppWidget extends AppWidgetProvider {
 			int[] widgetIds = appWidgetManager.getAppWidgetIds(componentName);
 
 			for (int appWidgetId : widgetIds) {
-				RemoteViews remoteViews = createViews(context, appWidgetId, layoutId);
-				remoteViews.setOnClickPendingIntent(R.id.content_container, getOnClickedPendingIntent(context, appWidgetId, layoutId,
-						widgetClass));
-
-				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-				loadWeatherData(context, appWidgetId, remoteViews);
+				loadWeatherData(context, appWidgetId, widgetDataObjArrayMap.get(appWidgetId).remoteViews);
 			}
 		} else if (action.equals(context.getString(R.string.ACTION_SHOW_DIALOG))) {
 			Intent i = new Intent(context, DialogActivity.class);
 			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			i.putExtras(intent.getExtras());
 			context.startActivity(i);
+		} else if (action.equals(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)) {
+			context.startActivity(intent);
+		} else if (action.equals(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) {
+			context.startActivity(intent);
+		} else if (action.equals(context.getString(R.string.ACTION_REFRESH_CURRENT_LOCATION))) {
+			Bundle bundle = intent.getExtras();
+			final Class<?> widgetClass = (Class<?>) bundle.getSerializable(context.getString(R.string.bundle_key_widgetname));
+
+			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+			ComponentName componentName = new ComponentName(context.getPackageName(), widgetClass.getName());
+			int[] widgetIds = appWidgetManager.getAppWidgetIds(componentName);
+
+			for (int appWidgetId : widgetIds) {
+				if (widgetDataObjArrayMap.get(appWidgetId).locationType == LocationType.CurrentLocation) {
+					loadCurrentLocation(context, appWidgetId, widgetDataObjArrayMap.get(appWidgetId).remoteViews, widgetClass);
+				}
+			}
 		}
 
 		if (tempUnit == null) {
@@ -158,17 +170,20 @@ public class RootAppWidget extends AppWidgetProvider {
 		bundle.putSerializable(context.getString(R.string.bundle_key_widgetname), className);
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 		bundle.putInt(context.getString(R.string.bundle_key_widget_layout_id), widgetLayoutId);
-		bundle.putString(context.getString(R.string.bundle_key_address_name), "ss");
-		bundle.putSerializable(context.getString(R.string.bundle_key_location_type), LocationType.CurrentLocation);
+		bundle.putSerializable(context.getString(R.string.bundle_key_location_type), Objects.requireNonNull(widgetDataObjArrayMap.get(appWidgetId)).locationType);
 
 		intent.putExtras(bundle);
 		return PendingIntent.getBroadcast(
 				context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
-	public void loadCurrentLocation(Context context, int appWidgetId, RemoteViews remoteViews) {
+	public void loadCurrentLocation(Context context, int appWidgetId, RemoteViews remoteViews, Class<?> className) {
 		remoteViews.setViewVisibility(R.id.progressbar, View.VISIBLE);
 		remoteViews.setViewVisibility(R.id.content_container, View.GONE);
+		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
+
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 		Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
 			@Override
@@ -191,6 +206,11 @@ public class RootAppWidget extends AppWidgetProvider {
 							}
 						}
 
+						remoteViews.setOnClickPendingIntent(R.id.content_container, getOnClickedPendingIntent(context, appWidgetId,
+								attributeArrayMap.get(appWidgetId).layoutId, className));
+						AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
 						Log.e(tag, countryCode);
 						Log.e(tag, addressList.get(0).getAddressLine(0));
 						loadWeatherData(context, appWidgetId, remoteViews);
@@ -200,13 +220,26 @@ public class RootAppWidget extends AppWidgetProvider {
 
 			@Override
 			public void onFailed(Fail fail) {
+				Intent intent = new Intent(context, className);
+
 				if (fail == Fail.REJECT_PERMISSION) {
-					Toast.makeText(context, R.string.message_needs_location_permission, Toast.LENGTH_SHORT).show();
+					remoteViews.setTextViewText(R.id.warning, context.getString(R.string.message_needs_location_permission));
+					remoteViews.setTextViewText(R.id.warning_process_btn, context.getString(R.string.check_permission));
+					intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+					intent.setData(Uri.fromParts("package", context.getPackageName(), null));
 				} else {
-					Toast.makeText(context, R.string.request_to_make_gps_on, Toast.LENGTH_SHORT).show();
+					remoteViews.setTextViewText(R.id.warning, context.getString(R.string.request_to_make_gps_on));
+					remoteViews.setTextViewText(R.id.warning_process_btn, context.getString(R.string.enable_gps));
+					intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 				}
+
+				PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, pendingIntent);
+
 				remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
-				remoteViews.setViewVisibility(R.id.content_container, View.VISIBLE);
+				remoteViews.setViewVisibility(R.id.content_container, View.GONE);
+				remoteViews.setViewVisibility(R.id.warning_layout, View.VISIBLE);
+				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 			}
 		};
 
@@ -215,17 +248,25 @@ public class RootAppWidget extends AppWidgetProvider {
 		}
 	}
 
-	public void init(Context context, int appWidgetId, RemoteViews remoteViews) {
+	public void init(Context context, int appWidgetId, RemoteViews remoteViews, Class<?> className) {
 		if (widgetDataObjArrayMap.get(appWidgetId).locationType == LocationType.CurrentLocation) {
-			loadCurrentLocation(context, appWidgetId, remoteViews);
+			loadCurrentLocation(context, appWidgetId, remoteViews, className);
 		} else {
 			widgetDataObjArrayMap.get(appWidgetId).addressName = widgetDataObjArrayMap.get(appWidgetId).selectedAddressDto.getAddress();
 			widgetDataObjArrayMap.get(appWidgetId).weatherSourceType = attributeArrayMap.get(appWidgetId).weatherSourceType;
+			widgetDataObjArrayMap.get(appWidgetId).latitude =
+					Double.parseDouble(attributeArrayMap.get(appWidgetId).selectedAddressDto.getLatitude());
+			widgetDataObjArrayMap.get(appWidgetId).longitude =
+					Double.parseDouble(attributeArrayMap.get(appWidgetId).selectedAddressDto.getLongitude());
 			if (attributeArrayMap.get(appWidgetId).selectedAddressDto.getCountryCode().equals("KR")) {
 				if (attributeArrayMap.get(appWidgetId).topPriorityKma) {
 					widgetDataObjArrayMap.get(appWidgetId).weatherSourceType = WeatherSourceType.KMA;
 				}
 			}
+			remoteViews.setOnClickPendingIntent(R.id.content_container, getOnClickedPendingIntent(context, appWidgetId,
+					attributeArrayMap.get(appWidgetId).layoutId, className));
+			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 			loadWeatherData(context,
 					appWidgetId, remoteViews);
 		}
@@ -234,6 +275,7 @@ public class RootAppWidget extends AppWidgetProvider {
 	public void loadWeatherData(Context context, int appWidgetId, RemoteViews remoteViews) {
 		remoteViews.setViewVisibility(R.id.progressbar, View.VISIBLE);
 		remoteViews.setViewVisibility(R.id.content_container, View.GONE);
+		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
 		AppWidgetManager.getInstance(context).updateAppWidget(appWidgetId, remoteViews);
 	}
 
@@ -266,15 +308,11 @@ public class RootAppWidget extends AppWidgetProvider {
 		} else {
 			ZonedDateTime updatedTime = ZonedDateTime.now(ZoneId.of(timeZone.getID()));
 
-			String addressName = Objects.requireNonNull(widgetDataObjArrayMap.get(appWidgetId)).addressName;
-			String refreshDateTime = updatedTime.format(DATE_TIME_FORMATTER);
-
 			HeaderObj headerObj = new HeaderObj(true);
-			headerObj.address = addressName;
-			headerObj.refreshDateTime = refreshDateTime;
+			headerObj.address = Objects.requireNonNull(widgetDataObjArrayMap.get(appWidgetId)).addressName;
+			headerObj.refreshDateTime = updatedTime.format(DATE_TIME_FORMATTER);
 			return headerObj;
 		}
-
 	}
 
 	public final CurrentConditionsObj getCurrentConditions(Context context, WeatherSourceType weatherSourceType,
@@ -373,7 +411,7 @@ public class RootAppWidget extends AppWidgetProvider {
 				}
 				break;
 		}
-		String notData = context.getString(R.string.not_data);
+		final String notData = context.getString(R.string.not_data);
 
 		if (AqicnResponseProcessor.successfulResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.AQICN).get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED))) {
 			GeolocalizedFeedResponse geolocalizedFeedResponse =
@@ -382,7 +420,7 @@ public class RootAppWidget extends AppWidgetProvider {
 					geolocalizedFeedResponse.getData().getIaqi().getPm10() == null ? notData :
 							AqicnResponseProcessor.getGradeDescription(Integer.parseInt(geolocalizedFeedResponse.getData().getIaqi().getPm10().getValue()));
 		} else {
-			airQuality = context.getString(R.string.not_data);
+			airQuality = notData;
 		}
 
 		CurrentConditionsObj currentConditionsObj = new CurrentConditionsObj(successfulResponse);
@@ -704,5 +742,6 @@ public class RootAppWidget extends AppWidgetProvider {
 		WeatherSourceType weatherSourceType;
 		FavoriteAddressDto selectedAddressDto;
 		LocalDateTime updatedDateTime;
+		RemoteViews remoteViews;
 	}
 }

@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.favorites;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -40,6 +39,8 @@ public class FavoritesFragment extends Fragment {
 
 	private boolean enableCurrentLocation;
 	private boolean refresh;
+	private boolean clickedItem;
+	private String fragmentRequestKey = "";
 
 	private FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
 		@Override
@@ -64,7 +65,16 @@ public class FavoritesFragment extends Fragment {
 	private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
 		@Override
 		public void handleOnBackPressed() {
-			checkHaveLocations();
+			if (fragmentRequestKey == null) {
+				checkHaveLocations();
+			} else if (fragmentRequestKey.equals(getString(R.string.key_from_widget_config_main_to_favorites))) {
+				if (!clickedItem) {
+					Bundle bundle = new Bundle();
+					bundle.putSerializable(getString(R.string.bundle_key_selected_address_dto), null);
+					getParentFragmentManager().setFragmentResult(getString(R.string.key_back_from_favorites_to_widget_config_main), bundle);
+				}
+				getParentFragmentManager().popBackStack();
+			}
 		}
 	};
 
@@ -72,15 +82,24 @@ public class FavoritesFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
+		getActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
+
 		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_back_from_find_address_to_favorite), this,
 				new FragmentResultListener() {
 					@Override
 					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
-						int size = result.size();
+
 					}
 				});
-		getActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
-		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
+		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_from_widget_config_main_to_favorites), this,
+				new FragmentResultListener() {
+					@Override
+					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
+						fragmentRequestKey = requestKey;
+					}
+				});
+
 	}
 
 	@Override
@@ -98,7 +117,7 @@ public class FavoritesFragment extends Fragment {
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				checkHaveLocations();
+				onBackPressedCallback.handleOnBackPressed();
 			}
 		});
 
@@ -115,10 +134,16 @@ public class FavoritesFragment extends Fragment {
 
 		binding.favoriteAddressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		adapter = new FavoriteAddressesAdapter();
-		adapter.setOnDeleteListener(new FavoriteAddressesAdapter.OnDeleteListener() {
+		adapter.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
 			@Override
 			public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {
 				weatherViewModel.delete(favoriteAddressDto);
+			}
+
+			@Override
+			public void onClicked(FavoriteAddressDto favoriteAddressDto) {
+				clickedItem = true;
+				onClickedItem(favoriteAddressDto);
 			}
 		});
 
@@ -158,12 +183,6 @@ public class FavoritesFragment extends Fragment {
 
 	@Override
 	public void onDestroy() {
-		Bundle bundle = new Bundle();
-		bundle.putSerializable(getString(R.string.bundle_key_new_favorite_address_list), (Serializable) adapter.getFavoriteAddressDtoList());
-		bundle.putBoolean(getString(R.string.bundle_key_changed_use_current_location), enableCurrentLocation);
-		bundle.putBoolean(getString(R.string.bundle_key_refresh), refresh);
-
-		getParentFragmentManager().setFragmentResult(getString(R.string.key_back_from_favorite_to_main), bundle);
 		getParentFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		super.onDestroy();
 	}
@@ -199,6 +218,9 @@ public class FavoritesFragment extends Fragment {
 		final boolean usingCurrentLocation = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(
 				getString(R.string.pref_key_use_current_location), true);
 
+		Bundle bundle = new Bundle();
+		bundle.putSerializable(getString(R.string.bundle_key_new_favorite_address_list), (Serializable) adapter.getFavoriteAddressDtoList());
+
 		if (!haveFavorites && !usingCurrentLocation) {
 			//즐겨찾기가 비었고, 현재 위치 사용이 꺼져있음
 			//현재 위치 사용 여부 다이얼로그 표시
@@ -212,7 +234,11 @@ public class FavoritesFragment extends Fragment {
 							PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(
 									getString(R.string.pref_key_use_current_location), true).apply();
 							enableCurrentLocation = true;
+							bundle.putBoolean(getString(R.string.bundle_key_changed_use_current_location), enableCurrentLocation);
+							bundle.putBoolean(getString(R.string.bundle_key_refresh), refresh);
 							getParentFragmentManager().popBackStack();
+
+							getParentFragmentManager().setFragmentResult(getString(R.string.key_back_from_favorite_to_main), bundle);
 						}
 					}).setNegativeButton(R.string.add_favorite, new DialogInterface.OnClickListener() {
 				@Override
@@ -231,10 +257,21 @@ public class FavoritesFragment extends Fragment {
 		} else {
 			if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString(getString(R.string.pref_key_last_current_location_latitude), "").isEmpty()) {
 				refresh = true;
+				bundle.putBoolean(getString(R.string.bundle_key_changed_use_current_location), enableCurrentLocation);
+				bundle.putBoolean(getString(R.string.bundle_key_refresh), refresh);
 			}
 
 			getParentFragmentManager().popBackStack();
+			getParentFragmentManager().setFragmentResult(getString(R.string.key_back_from_favorite_to_main), bundle);
 		}
 	}
 
+	private void onClickedItem(FavoriteAddressDto favoriteAddressDto) {
+		if (fragmentRequestKey.equals(getString(R.string.key_from_widget_config_main_to_favorites))) {
+			Bundle bundle = new Bundle();
+			bundle.putSerializable(getString(R.string.bundle_key_selected_address_dto), favoriteAddressDto);
+			getParentFragmentManager().setFragmentResult(getString(R.string.key_back_from_favorites_to_widget_config_main), bundle);
+			onBackPressedCallback.handleOnBackPressed();
+		}
+	}
 }

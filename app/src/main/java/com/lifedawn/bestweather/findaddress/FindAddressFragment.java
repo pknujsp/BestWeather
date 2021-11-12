@@ -64,13 +64,6 @@ public class FindAddressFragment extends Fragment {
 						fragmentRequestKey = getString(R.string.key_back_from_find_address_to_intro);
 					}
 				});
-		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_from_widget_config_main_to_find_address), this,
-				new FragmentResultListener() {
-					@Override
-					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
-						fragmentRequestKey = getString(R.string.key_back_from_find_address_to_widget_config_main);
-					}
-				});
 	}
 
 	@Override

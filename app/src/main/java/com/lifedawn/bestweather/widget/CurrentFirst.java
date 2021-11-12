@@ -130,7 +130,6 @@ public class CurrentFirst extends RootAppWidget {
 	public void setResultViews(Context context, AppWidgetManager appWidgetManager, int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
 		super.setResultViews(context, appWidgetManager, appWidgetId, remoteViews, multipleJsonDownloader);
 		WeatherSourceType requestWeatherSourceType = Objects.requireNonNull(widgetDataObjArrayMap.get(appWidgetId)).weatherSourceType;
-
 		CurrentConditionsObj currentConditionsObj = getCurrentConditions(context, requestWeatherSourceType, multipleJsonDownloader,
 				appWidgetId);
 		HeaderObj headerObj = getHeader(context, multipleJsonDownloader, appWidgetId, currentConditionsObj.timeZone);
@@ -151,6 +150,7 @@ public class CurrentFirst extends RootAppWidget {
 
 		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
 		remoteViews.setViewVisibility(R.id.content_container, View.VISIBLE);
+		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
 
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}

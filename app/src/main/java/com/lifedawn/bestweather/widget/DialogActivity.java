@@ -27,7 +27,6 @@ public class DialogActivity extends Activity {
 	private int appWidgetId;
 	private int widgetLayoutId;
 	private LocationType locationType;
-	private String addressName;
 
 
 	@Override
@@ -40,7 +39,6 @@ public class DialogActivity extends Activity {
 		widgetClassName = (Class<?>) bundle.getSerializable(getString(R.string.bundle_key_widgetname));
 		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
 		widgetLayoutId = bundle.getInt(getString(R.string.bundle_key_widget_layout_id));
-		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
 		locationType = (LocationType) bundle.getSerializable(getString(R.string.bundle_key_location_type));
 
 		String[] listItems = null;
@@ -81,6 +79,19 @@ public class DialogActivity extends Activity {
 							}
 						} else if (which == 3) {
 							//현재 위치 업데이트
+							Intent refreshCurrentLocationIntent = new Intent(getApplicationContext(), widgetClassName);
+							refreshCurrentLocationIntent.setAction(getString(R.string.ACTION_REFRESH_CURRENT_LOCATION));
+							Bundle refreshBundle = new Bundle();
+							refreshBundle.putSerializable(getString(R.string.bundle_key_widgetname), widgetClassName);
+							refreshBundle.putInt(getString(R.string.bundle_key_widget_layout_id), widgetLayoutId);
+
+							refreshCurrentLocationIntent.putExtras(refreshBundle);
+							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, refreshCurrentLocationIntent, 0);
+							try {
+								pendingIntent.send();
+							} catch (PendingIntent.CanceledException e) {
+								e.printStackTrace();
+							}
 						}
 						dialog.dismiss();
 						finish();

@@ -36,7 +36,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
-import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -46,8 +45,10 @@ import com.google.android.material.slider.Slider;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.enums.LocationType;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.ActivityConfigureWidgetBinding;
+import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -56,6 +57,8 @@ import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -87,7 +90,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 		@Override
 		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 			super.onFragmentCreated(fm, f, savedInstanceState);
-			if (f instanceof FindAddressFragment) {
+			if (f instanceof FavoritesFragment) {
 				binding.scrollView.setVisibility(View.GONE);
 				binding.fragmentContainer.setVisibility(View.VISIBLE);
 			}
@@ -96,7 +99,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 		@Override
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
-			if (f instanceof FindAddressFragment) {
+			if (f instanceof FavoritesFragment) {
 				binding.scrollView.setVisibility(View.VISIBLE);
 				binding.fragmentContainer.setVisibility(View.GONE);
 			}
@@ -161,14 +164,13 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 						break;
 				}
 
-
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 				setResult(RESULT_OK, resultIntent);
 
 				ArrayList<TextSizeObj> textSizeObjList = new ArrayList<>();
-				for (int i = 0; i < textSizeMap.size(); i++) {
-					textSizeObjList.add(new TextSizeObj(textSizeMap.keyAt(i), textSizeMap.valueAt(i)));
+				for (int i = 0; i < textViewMap.size(); i++) {
+					textSizeObjList.add(new TextSizeObj(textViewMap.keyAt(i), textViewMap.valueAt(i).getTextSize()));
 				}
 
 				LocationType locationType = binding.currentLocationRadio.isChecked() ? LocationType.CurrentLocation :
@@ -183,7 +185,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 				CustomAttributeObj customAttributeObj = new CustomAttributeObj(appWidgetId, textSizeObjList,
 						previewWidgetView.getBackground().getAlpha(), locationType, weatherSourceType,
 						binding.kmaTopPrioritySwitch.isChecked(), autoRefreshInterval, binding.displayDatetimeSwitch.isChecked(),
-						binding.displayLocalDatetimeSwitch.isChecked(), newSelectedAddressDto);
+						binding.displayLocalDatetimeSwitch.isChecked(),
+						locationType == LocationType.SelectedAddress ? newSelectedAddressDto : null, layoutId);
 
 				Intent initIntent = new Intent(getApplicationContext(), className);
 				initIntent.setAction(getString(R.string.ACTION_INIT));
@@ -313,10 +316,19 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 	}
 
 	private void initDisplayDateTime() {
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
+		DateTimeFormatter timeFormatter =
+				DateTimeFormatter.ofPattern(ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock),
+						ValueUnits.clock12.name())) == ValueUnits.clock12 ? "a h:mm" : "HH:mm");
+		LocalDateTime now = LocalDateTime.now();
+		((TextView) previewWidgetView.findViewById(R.id.date)).setText(now.format(dateFormatter));
+		((TextView) previewWidgetView.findViewById(R.id.time)).setText(now.format(timeFormatter));
+
 		binding.displayDatetimeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				binding.displayLocalDatetimeSwitch.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+				previewWidgetView.findViewById(R.id.watch).setVisibility(isChecked ? View.VISIBLE : View.GONE);
 			}
 		});
 	}
@@ -379,8 +391,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 	}
 
 	private void initLocation() {
-
-
 		binding.currentLocationRadio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -397,7 +407,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (isChecked) {
 					if (newSelectedAddressDto == null) {
-						openFindAddressFragment();
+						openFavoritesFragment();
 					}
 				}
 			}
@@ -406,54 +416,38 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 		binding.changeAddressBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				openFindAddressFragment();
+				openFavoritesFragment();
 			}
 		});
 	}
 
-	private void openFindAddressFragment() {
+	private void openFavoritesFragment() {
 		FragmentManager fragmentManager = getSupportFragmentManager();
-		fragmentManager.setFragmentResult(getString(R.string.key_from_widget_config_main_to_find_address), new Bundle());
+		fragmentManager.setFragmentResult(getString(R.string.key_from_widget_config_main_to_favorites), new Bundle());
 
-		FindAddressFragment findAddressFragment = new FindAddressFragment();
-		getSupportFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), findAddressFragment, getString(R.string.tag_find_address_fragment))
-				.addToBackStack(getString(R.string.tag_find_address_fragment)).commit();
+		FavoritesFragment favoritesFragment = new FavoritesFragment();
+		getSupportFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), favoritesFragment, getString(R.string.tag_favorites_fragment))
+				.addToBackStack(getString(R.string.tag_favorites_fragment)).commit();
 
-		fragmentManager.setFragmentResultListener(getString(R.string.key_back_from_find_address_to_widget_config_main), ConfigureWidgetActivity.this,
+		fragmentManager.setFragmentResultListener(getString(R.string.key_back_from_favorites_to_widget_config_main),
+				ConfigureWidgetActivity.this,
 				new FragmentResultListener() {
 					@Override
 					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
-						fragmentManager.clearFragmentResult(getString(R.string.key_from_widget_config_main_to_find_address));
+						fragmentManager.clearFragmentResult(getString(R.string.key_from_widget_config_main_to_favorites));
 						fragmentManager.clearFragmentResultListener(requestKey);
 
-						final boolean selectedAddress = result.getBoolean(getString(R.string.bundle_key_selected_address_dto));
-						if (selectedAddress) {
-							int id = result.getInt(getString(R.string.bundle_key_new_favorite_address_dto_id));
-							FavoriteAddressRepository favoriteAddressRepository =
-									new FavoriteAddressRepository(getApplicationContext());
-
-							favoriteAddressRepository.get(id, new DbQueryCallback<FavoriteAddressDto>() {
-								@Override
-								public void onResultSuccessful(FavoriteAddressDto result) {
-									runOnUiThread(new Runnable() {
-										@Override
-										public void run() {
-											newSelectedAddressDto = result;
-											String text =
-													getString(R.string.current_location) + ", " + newSelectedAddressDto.getAddress();
-											binding.selectedLocationRadio.setText(text);
-											binding.changeAddressBtn.setVisibility(View.VISIBLE);
-										}
-									});
-								}
-
-								@Override
-								public void onResultNoData() {
-
-								}
-							});
+						if (result.getSerializable(getString(R.string.bundle_key_selected_address_dto)) == null) {
+							Toast.makeText(getApplicationContext(), R.string.not_selected_address, Toast.LENGTH_SHORT).show();
+							binding.selectedLocationRadio.setText(R.string.click_again_to_select_address);
+						} else {
+							newSelectedAddressDto = (FavoriteAddressDto) result.getSerializable(getString(R.string.bundle_key_selected_address_dto));
+							String text = getString(R.string.location) + ", " + newSelectedAddressDto.getAddress();
+							binding.selectedLocationRadio.setText(text);
+							binding.changeAddressBtn.setVisibility(View.VISIBLE);
 						}
 					}
+
 				});
 	}
 
@@ -567,10 +561,11 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 		final boolean displayDateTime;
 		final boolean displayLocalDateTime;
 		final FavoriteAddressDto selectedAddressDto;
+		final int layoutId;
 
 		public CustomAttributeObj(int appWidgetId, List<TextSizeObj> textSizeObjList, int backgroundAlpha, LocationType locationType,
 		                          WeatherSourceType weatherSourceType, boolean topPriorityKma, Long updateInterval,
-		                          boolean displayDateTime, boolean displayLocalDateTime, FavoriteAddressDto selectedAddressDto) {
+		                          boolean displayDateTime, boolean displayLocalDateTime, FavoriteAddressDto selectedAddressDto, int layoutId) {
 			this.appWidgetId = appWidgetId;
 			this.textSizeObjList = textSizeObjList;
 			this.backgroundAlpha = backgroundAlpha;
@@ -581,6 +576,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 			this.displayDateTime = displayDateTime;
 			this.displayLocalDateTime = displayLocalDateTime;
 			this.selectedAddressDto = selectedAddressDto;
+			this.layoutId = layoutId;
 		}
 	}
 }

@@ -19,10 +19,10 @@ import java.util.List;
 
 public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddressesAdapter.ViewHolder> {
 	private List<FavoriteAddressDto> favoriteAddressDtoList = new ArrayList<>();
-	private OnDeleteListener onDeleteListener;
+	private OnClickedAddressListener onClickedAddressListener;
 
-	public void setOnDeleteListener(OnDeleteListener onDeleteListener) {
-		this.onDeleteListener = onDeleteListener;
+	public void setOnClickedAddressListener(OnClickedAddressListener onClickedAddressListener) {
+		this.onClickedAddressListener = onClickedAddressListener;
 	}
 
 	public void setFavoriteAddressDtoList(List<FavoriteAddressDto> favoriteAddressDtoList) {
@@ -46,11 +46,11 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 	public int getItemCount() {
 		return favoriteAddressDtoList.size();
 	}
-	
+
 	public List<FavoriteAddressDto> getFavoriteAddressDtoList() {
 		return favoriteAddressDtoList;
 	}
-	
+
 	class ViewHolder extends RecyclerView.ViewHolder {
 		private TextView addressTextView;
 		private ImageButton deleteBtn;
@@ -60,11 +60,18 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 
 			addressTextView = (TextView) itemView.findViewById(R.id.address_name);
 			deleteBtn = (ImageButton) itemView.findViewById(R.id.delete);
+
+			addressTextView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onClickedAddressListener.onClicked(favoriteAddressDtoList.get(getAdapterPosition()));
+				}
+			});
 			deleteBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					int position = getAdapterPosition();
-					onDeleteListener.onClickedDelete(favoriteAddressDtoList.get(position), position);
+					onClickedAddressListener.onClickedDelete(favoriteAddressDtoList.get(position), position);
 					favoriteAddressDtoList.remove(position);
 					notifyDataSetChanged();
 				}
@@ -76,7 +83,9 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 		}
 	}
 
-	public interface OnDeleteListener {
+	public interface OnClickedAddressListener {
 		void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position);
+
+		void onClicked(FavoriteAddressDto favoriteAddressDto);
 	}
 }
