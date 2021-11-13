@@ -36,10 +36,7 @@ public class DialogActivity extends Activity {
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_dialog);
 
 		Bundle bundle = getIntent().getExtras();
-		widgetClassName = (Class<?>) bundle.getSerializable(getString(R.string.bundle_key_widgetname));
-		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		widgetLayoutId = bundle.getInt(getString(R.string.bundle_key_widget_layout_id));
-		locationType = (LocationType) bundle.getSerializable(getString(R.string.bundle_key_location_type));
+
 
 		String[] listItems = null;
 		if (locationType == LocationType.CurrentLocation) {
@@ -67,7 +64,6 @@ public class DialogActivity extends Activity {
 							Intent refreshIntent = new Intent(getApplicationContext(), widgetClassName);
 							refreshIntent.setAction(getString(R.string.ACTION_REFRESH));
 							Bundle refreshBundle = new Bundle();
-							refreshBundle.putSerializable(getString(R.string.bundle_key_widgetname), widgetClassName);
 							refreshBundle.putInt(getString(R.string.bundle_key_widget_layout_id), widgetLayoutId);
 
 							refreshIntent.putExtras(refreshBundle);
@@ -82,7 +78,6 @@ public class DialogActivity extends Activity {
 							Intent refreshCurrentLocationIntent = new Intent(getApplicationContext(), widgetClassName);
 							refreshCurrentLocationIntent.setAction(getString(R.string.ACTION_REFRESH_CURRENT_LOCATION));
 							Bundle refreshBundle = new Bundle();
-							refreshBundle.putSerializable(getString(R.string.bundle_key_widgetname), widgetClassName);
 							refreshBundle.putInt(getString(R.string.bundle_key_widget_layout_id), widgetLayoutId);
 
 							refreshCurrentLocationIntent.putExtras(refreshBundle);

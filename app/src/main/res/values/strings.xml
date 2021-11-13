@@ -392,6 +392,18 @@
     <string name="widget_control">위젯 관리</string>
     <string name="check_permission">권한 확인</string>
     <string name="enable_gps">위치 사용</string>
+    <string name="open_app">앱 열기</string>
+    <string name="text_size">글자 크기</string>
+    <string name="location">위치</string>
+    <string name="selected_location">선택한 주소</string>
+    <string name="background_transparency">배경 투명도</string>
+    <string name="auto_refresh_interval">자동 업데이트 간격</string>
+    <string name="display_datetime">날짜와 시각 표시</string>
+    <string name="display_local_datetime">현지 시각으로 표시</string>
+    <string name="create_widget">위젯 생성</string>
+    <string name="not_selected_address">주소가 선택되지 않았습니다</string>
+    <string name="click_again_to_select_address">현재 위치 선택되지 않음, 선택하기</string>
+    <string name="change_address">주소 변경</string>
 
     <!-- flickr weather -->
     <string name="flickr_clear">clear</string>
@@ -415,12 +427,7 @@
     <string name="bundle_key_changed_use_current_location">bundle_key_changed_use_current_location</string>
     <string name="bundle_key_refresh">bundle_key_refresh</string>
     <string name="bundle_key_igps">bundle_key_igps</string>
-    <string name="bundle_key_textsizelist">bundle_key_textsizelist</string>
-    <string name="bundle_key_widgetname">bundle_key_widgetname</string>
-    <string name="bundle_key_background_alpha">bundle_key_background_alpha</string>
     <string name="bundle_key_using_current_location">bundle_key_using_current_location</string>
-    <string name="bundle_key_widget_custom_attributes">bundle_key_widget_custom_attributes</string>
-    <string name="bundle_key_widget_layout_id">bundle_key_widget_layout_id</string>
 
     <!-- fragment result key -->
     <string name="key_from_favorite_to_find_address">key_from_favorite_to_find_address</string>
@@ -433,22 +440,16 @@
     <string name="key_current_location">key_current_location</string>
     <string name="key_selected_location">key_selected_location</string>
     <string name="key_back_from_find_address_to_intro">key_back_from_find_address_to_intro</string>
+    <string name="key_from_widget_config_main_to_favorites">key_from_widget_config_main_to_favorites</string>
+    <string name="key_back_from_favorites_to_widget_config_main">key_back_from_favorites_to_widget_config_main</string>
+    <string name="key_back_from_find_address_to_widget_config_main">key_back_from_find_address_to_widget_config_main</string>
+    <string name="key_from_widget_config_main_to_find_address">key_from_widget_config_main_to_find_address</string>
 
     <!-- intent action -->
     <string name="ACTION_REFRESH" translatable="false">ACTION_REFRESH</string>
     <string name="ACTION_SHOW_DIALOG">ACTION_SHOW_DIALOG</string>
-    <string name="open_app">앱 열기</string>
-    <string name="text_size">글자 크기</string>
-    <string name="location">위치</string>
-    <string name="selected_location">선택한 주소</string>
-    <string name="background_transparency">배경 투명도</string>
-    <string name="auto_refresh_interval">자동 업데이트 간격</string>
-    <string name="display_datetime">날짜와 시각 표시</string>
-    <string name="display_local_datetime">현지 시각으로 표시</string>
-    <string name="create_widget">위젯 생성</string>
-    <string name="key_back_from_find_address_to_widget_config_main">key_back_from_find_address_to_widget_config_main</string>
-    <string name="key_from_widget_config_main_to_find_address">key_from_widget_config_main_to_find_address</string>
-    <string name="change_address">주소 변경</string>
+    <string name="ACTION_REFRESH_CURRENT_LOCATION">ACTION_REFRESH_CURRENT_LOCATION</string>
+
 
     <!-- auto refresh interval -->
     <string name="minutes_30">30분</string>
@@ -457,10 +458,14 @@
     <string name="hours_2">2시간</string>
     <string name="hours_3">3시간</string>
     <string name="hours_6">6시간</string>
-    <string name="ACTION_REFRESH_CURRENT_LOCATION">ACTION_REFRESH_CURRENT_LOCATION</string>
-    <string name="key_from_widget_config_main_to_favorites">key_from_widget_config_main_to_favorites</string>
-    <string name="key_back_from_favorites_to_widget_config_main">key_back_from_favorites_to_widget_config_main</string>
-    <string name="not_selected_address">주소가 선택되지 않았습니다</string>
-    <string name="click_again_to_select_address">현재 위치 선택되지 않음, 선택하기</string>
 
+
+    <string name="shared_preferences_widget_attributes">shared_preferences_widget_attributes</string>
+    <string name="shared_preferences_widget_attributes_appwidgetid">shared_preferences_widget_attributes_appwidgetid</string>
+
+    <string name="clock_12_pattern">a h:mm</string>
+    <string name="clock_24_pattern">HH:mm</string>
+    <string name="date_pattern">M.d E</string>
+    <string name="bundle_key_widget_class_name">bundle_key_widget_class_name</string>
+    <string name="bundle_key_widget_layout_id">bundle_key_widget_layout_id</string>
 </resources>

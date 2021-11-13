@@ -22,7 +22,6 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -37,6 +36,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
+import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -50,18 +50,12 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.ActivityConfigureWidgetBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
-import com.lifedawn.bestweather.findaddress.FindAddressFragment;
-import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public class ConfigureWidgetActivity extends AppCompatActivity {
@@ -148,8 +142,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 					Toast.makeText(ConfigureWidgetActivity.this, R.string.msg_empty_locations, Toast.LENGTH_SHORT).show();
 					return;
 				}
-				Class<?> className = null;
+				Context context = getApplicationContext();
 
+				Class<?> className = null;
 				switch (layoutId) {
 					case R.layout.current_first:
 						className = CurrentFirst.class;
@@ -165,45 +160,62 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 						break;
 				}
 
+				final LocationType locationType = binding.currentLocationRadio.isChecked() ? LocationType.CurrentLocation :
+						LocationType.SelectedAddress;
+				final WeatherSourceType weatherSourceType = binding.accuWeatherRadio.isChecked() ? WeatherSourceType.ACCU_WEATHER : WeatherSourceType.OPEN_WEATHER_MAP;
+
+				/*
+				if (binding.displayDatetimeSwitch.isChecked()) {
+					registerReceiver(new CurrentFirst(), new IntentFilter(Intent.ACTION_TIME_TICK));
+				}
+				 */
+
+				SharedPreferences widgetAttributes =
+						getApplicationContext().getSharedPreferences(WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId,
+								MODE_PRIVATE);
+				SharedPreferences.Editor editor = widgetAttributes.edit();
+				//appwidget id
+				editor.putInt(WidgetAttributes.APP_WIDGET_ID.name(), appWidgetId);
+				//view text size
+				for (int i = 0; i < textViewMap.size(); i++) {
+					editor.putFloat(textViewMap.keyAt(i).toString(), textViewMap.valueAt(i).getTextSize());
+				}
+				//background alpha
+				editor.putInt(WidgetAttributes.BACKGROUND_ALPHA.name(), previewWidgetView.getBackground().getAlpha());
+				//location type
+				editor.putString(WidgetAttributes.LOCATION_TYPE.name(), locationType.name());
+				//weatherSourceType
+				editor.putString(WidgetAttributes.WEATHER_SOURCE_TYPE.name(), weatherSourceType.name());
+				//top priority kma
+				editor.putBoolean(WidgetAttributes.TOP_PRIORITY_KMA.name(), binding.kmaTopPrioritySwitch.isChecked());
+				//refresh interval
+				editor.putLong(WidgetAttributes.UPDATE_INTERVAL.name(), autoRefreshInterval);
+				//display datetime
+				editor.putBoolean(WidgetAttributes.DISPLAY_DATETIME.name(), binding.displayDatetimeSwitch.isChecked());
+				//display local datetime
+				editor.putBoolean(WidgetAttributes.DISPLAY_LOCAL_DATETIME.name(), binding.displayLocalDatetimeSwitch.isChecked());
+				//selected address dto id
+				editor.putInt(WidgetAttributes.SELECTED_ADDRESS_DTO_ID.name(), locationType == LocationType.SelectedAddress ?
+						newSelectedAddressDto.getId() : 0);
+				//layout id
+				editor.putInt(WidgetAttributes.LAYOUT_ID.name(), layoutId);
+				editor.apply();
+
+				RemoteViews remoteViews = RootAppWidget.createNewViews(getApplicationContext(), appWidgetId, layoutId);
+				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 				setResult(RESULT_OK, resultIntent);
 
-				ArrayList<TextSizeObj> textSizeObjList = new ArrayList<>();
-				for (int i = 0; i < textViewMap.size(); i++) {
-					textSizeObjList.add(new TextSizeObj(textViewMap.keyAt(i), textViewMap.valueAt(i).getTextSize()));
-				}
+				Intent initIntent = new Intent(context, className);
+				Bundle initBundle = new Bundle();
+				initBundle.putSerializable(context.getString(R.string.bundle_key_widget_class_name), className);
+				initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+				initBundle.putInt(context.getString(R.string.bundle_key_widget_layout_id), layoutId);
+				initIntent.putExtras(initBundle);
 
-				LocationType locationType = binding.currentLocationRadio.isChecked() ? LocationType.CurrentLocation :
-						LocationType.SelectedAddress;
-				WeatherSourceType weatherSourceType = null;
-				if (binding.accuWeatherRadio.isChecked()) {
-					weatherSourceType = WeatherSourceType.ACCU_WEATHER;
-				} else if (binding.owmRadio.isChecked()) {
-					weatherSourceType = WeatherSourceType.OPEN_WEATHER_MAP;
-				}
-
-				if (binding.displayDatetimeSwitch.isChecked()) {
-					registerReceiver(new CurrentFirst(), new IntentFilter(Intent.ACTION_TIME_TICK));
-				}
-
-				CustomAttributeObj customAttributeObj = new CustomAttributeObj(appWidgetId, textSizeObjList,
-						previewWidgetView.getBackground().getAlpha(), locationType, weatherSourceType,
-						binding.kmaTopPrioritySwitch.isChecked(), autoRefreshInterval, binding.displayDatetimeSwitch.isChecked(),
-						binding.displayLocalDatetimeSwitch.isChecked(),
-						locationType == LocationType.SelectedAddress ? newSelectedAddressDto : null, layoutId);
-
-				Intent initIntent = new Intent(getApplicationContext(), className);
-				initIntent.setAction(getString(R.string.ACTION_INIT));
-
-				Bundle newBundle = new Bundle();
-				newBundle.putSerializable(getString(R.string.bundle_key_widgetname), className);
-				newBundle.putInt(getString(R.string.bundle_key_widget_layout_id), layoutId);
-				newBundle.putSerializable(getString(R.string.bundle_key_widget_custom_attributes), customAttributeObj);
-				newBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-				initIntent.putExtras(newBundle);
-				PendingIntent initPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, initIntent, 0);
-
+				PendingIntent initPendingIntent = PendingIntent.getBroadcast(context, 0, initIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 				try {
 					initPendingIntent.send();
 				} catch (PendingIntent.CanceledException e) {
@@ -545,43 +557,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 		previewWidgetView.getBackground().setAlpha(255 - alpha);
 	}
 
-	public static class TextSizeObj implements Serializable {
-		final int viewId;
-		float textSize;
-
-		public TextSizeObj(int viewId, float textSize) {
-			this.viewId = viewId;
-			this.textSize = textSize;
-		}
-	}
-
-	public static class CustomAttributeObj implements Serializable {
-		final int appWidgetId;
-		final List<TextSizeObj> textSizeObjList;
-		final int backgroundAlpha;
-		final LocationType locationType;
-		final WeatherSourceType weatherSourceType;
-		final boolean topPriorityKma;
-		final Long updateInterval;
-		final boolean displayDateTime;
-		final boolean displayLocalDateTime;
-		final FavoriteAddressDto selectedAddressDto;
-		final int layoutId;
-
-		public CustomAttributeObj(int appWidgetId, List<TextSizeObj> textSizeObjList, int backgroundAlpha, LocationType locationType,
-		                          WeatherSourceType weatherSourceType, boolean topPriorityKma, Long updateInterval,
-		                          boolean displayDateTime, boolean displayLocalDateTime, FavoriteAddressDto selectedAddressDto, int layoutId) {
-			this.appWidgetId = appWidgetId;
-			this.textSizeObjList = textSizeObjList;
-			this.backgroundAlpha = backgroundAlpha;
-			this.locationType = locationType;
-			this.weatherSourceType = weatherSourceType;
-			this.topPriorityKma = topPriorityKma;
-			this.updateInterval = updateInterval;
-			this.displayDateTime = displayDateTime;
-			this.displayLocalDateTime = displayLocalDateTime;
-			this.selectedAddressDto = selectedAddressDto;
-			this.layoutId = layoutId;
-		}
+	public enum WidgetAttributes {
+		WIDGET_ATTRIBUTES_ID_, APP_WIDGET_ID, BACKGROUND_ALPHA, LOCATION_TYPE, WEATHER_SOURCE_TYPE, TOP_PRIORITY_KMA,
+		UPDATE_INTERVAL, DISPLAY_DATETIME, DISPLAY_LOCAL_DATETIME, SELECTED_ADDRESS_DTO_ID, LAYOUT_ID
 	}
 }
