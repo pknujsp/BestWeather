@@ -4,14 +4,12 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.os.Bundle;
 import android.util.ArrayMap;
-import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
+import androidx.preference.PreferenceManager;
 
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
@@ -25,9 +23,6 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
-import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
@@ -35,14 +30,14 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResp
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
-import retrofit2.Response;
+import java.util.TimeZone;
 
 public class CurrentFirst extends RootAppWidget {
 
@@ -62,6 +57,33 @@ public class CurrentFirst extends RootAppWidget {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
+	}
+
+	@Override
+	public void onTimeTick(Context context) {
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		ZonedDateTime now = ZonedDateTime.now();
+
+		ComponentName componentName = new ComponentName(context.getPackageName(), CurrentFirst.class.getName());
+		int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
+
+		for (int appWidgetId : appWidgetIds) {
+			if (attributeArrayMap.get(appWidgetId).displayDateTime) {
+				boolean displayLocalDateTime = attributeArrayMap.get(appWidgetId).displayLocalDateTime;
+				TimeZone timeZone = null;
+				if (displayLocalDateTime) {
+					timeZone = widgetDataObjArrayMap.get(appWidgetId).timeZone;
+				}
+				ZonedDateTime zonedDateTime = ZonedDateTime.of(now.toLocalDateTime(), displayLocalDateTime ?
+						timeZone == null ? ZoneId.systemDefault() : ZoneId.of(timeZone.getID()) : ZoneId.systemDefault());
+
+				RemoteViews remoteViews = widgetDataObjArrayMap.get(appWidgetId).remoteViews;
+				remoteViews.setTextViewText(R.id.date, zonedDateTime.format(WATCH_DATE_FORMATTER));
+				remoteViews.setTextViewText(R.id.time, zonedDateTime.format(WATCH_TIME_FORMATTER));
+
+				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+			}
+		}
 	}
 
 	@Override
@@ -147,6 +169,8 @@ public class CurrentFirst extends RootAppWidget {
 		remoteViews.setTextViewText(R.id.current_airquality, currentConditionsObj.airQuality);
 		remoteViews.setTextViewText(R.id.current_precipitation, currentConditionsObj.precipitation);
 		remoteViews.setImageViewResource(R.id.current_weather_icon, currentConditionsObj.weatherIcon);
+
+		setWatch(remoteViews, currentConditionsObj.timeZone);
 
 		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
 		remoteViews.setViewVisibility(R.id.content_container, View.VISIBLE);

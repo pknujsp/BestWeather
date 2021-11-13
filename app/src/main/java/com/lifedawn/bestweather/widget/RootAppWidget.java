@@ -68,12 +68,18 @@ import retrofit2.Response;
 public class RootAppWidget extends AppWidgetProvider {
 	public static final String tag = "appWidget";
 	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("M.d E HH:mm");
+	public static final DateTimeFormatter WATCH_DATE_FORMATTER = DateTimeFormatter.ofPattern("M.d E");
+	public static DateTimeFormatter WATCH_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
 	protected Gps gps = new Gps(null, null, null);
 	protected ValueUnits tempUnit;
 	protected String tempUnitStr;
 	protected static ArrayMap<Integer, ConfigureWidgetActivity.CustomAttributeObj> attributeArrayMap = new ArrayMap<>();
 	protected static ArrayMap<Integer, WidgetDataObj> widgetDataObjArrayMap = new ArrayMap<>();
+
+	public void onTimeTick(Context context) {
+
+	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -97,7 +103,13 @@ public class RootAppWidget extends AppWidgetProvider {
 			widgetDataObj.selectedAddressDto = customAttributeObj.selectedAddressDto;
 			widgetDataObjArrayMap.put(appWidgetId, widgetDataObj);
 
+
 			RemoteViews remoteViews = createViews(context, appWidgetId, layoutId);
+			if (customAttributeObj.displayDateTime) {
+				setWatch(remoteViews, TimeZone.getDefault());
+			}
+			remoteViews.setViewVisibility(R.id.watch, customAttributeObj.displayDateTime ? View.VISIBLE : View.GONE);
+
 			widgetDataObj.remoteViews = remoteViews;
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 			init(context, appWidgetId, remoteViews, widgetClass);
@@ -135,6 +147,8 @@ public class RootAppWidget extends AppWidgetProvider {
 					loadCurrentLocation(context, appWidgetId, widgetDataObjArrayMap.get(appWidgetId).remoteViews, widgetClass);
 				}
 			}
+		} else if (action.equals(Intent.ACTION_TIME_TICK)) {
+			onTimeTick(context);
 		}
 
 		if (tempUnit == null) {
@@ -150,6 +164,14 @@ public class RootAppWidget extends AppWidgetProvider {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
 	}
 
+	@Override
+	public void onEnabled(Context context) {
+		super.onEnabled(context);
+		ValueUnits clockUnit =
+				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
+		WATCH_TIME_FORMATTER = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "a h:mm" : "HH:mm");
+	}
+
 	public static RemoteViews createViews(Context context, int appWidgetId, int layoutId) {
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
 		ConfigureWidgetActivity.CustomAttributeObj customAttributeObj = attributeArrayMap.get(appWidgetId);
@@ -160,6 +182,12 @@ public class RootAppWidget extends AppWidgetProvider {
 		}
 
 		return remoteViews;
+	}
+
+	public void setWatch(RemoteViews remoteViews, TimeZone timeZone) {
+		ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timeZone.getID()));
+		remoteViews.setTextViewText(R.id.date, now.format(WATCH_DATE_FORMATTER));
+		remoteViews.setTextViewText(R.id.time, now.format(WATCH_TIME_FORMATTER));
 	}
 
 	public static PendingIntent getOnClickedPendingIntent(Context context, int appWidgetId, int widgetLayoutId, Class<?> className) {
@@ -324,7 +352,7 @@ public class RootAppWidget extends AppWidgetProvider {
 		String precipitation = null;
 		String airQuality = null;
 		int weatherIcon = 0;
-		TimeZone timeZone = null;
+		TimeZone timeZone = TimeZone.getDefault();
 
 		String precipitationUnitStr = "mm";
 		boolean successfulResponse = true;
@@ -429,6 +457,7 @@ public class RootAppWidget extends AppWidgetProvider {
 			currentConditionsObj.realFeelTemp = realFeelTemp;
 			currentConditionsObj.precipitation = precipitation;
 			currentConditionsObj.weatherIcon = weatherIcon;
+			widgetDataObjArrayMap.get(appWidgetId).timeZone = timeZone;
 		} else {
 			currentConditionsObj.temp = notData;
 			currentConditionsObj.realFeelTemp = notData;
@@ -444,7 +473,7 @@ public class RootAppWidget extends AppWidgetProvider {
 	                                                        MultipleJsonDownloader<JsonElement> multipleJsonDownloader, int appWidgetId) {
 		boolean successfulResponse = true;
 		List<HourlyForecastObj> hourlyForecastObjList = new ArrayList<>();
-		TimeZone timeZone = null;
+		TimeZone timeZone = TimeZone.getDefault();
 
 		DateTimeFormatter clockFormatter = DateTimeFormatter.ofPattern("H");
 
@@ -559,6 +588,7 @@ public class RootAppWidget extends AppWidgetProvider {
 
 		}
 		if (successfulResponse) {
+			widgetDataObjArrayMap.get(appWidgetId).timeZone = timeZone;
 			hourlyForecastObjList.get(0).timeZone = timeZone;
 		}
 		return hourlyForecastObjList;
@@ -568,7 +598,7 @@ public class RootAppWidget extends AppWidgetProvider {
 	                                                      MultipleJsonDownloader<JsonElement> multipleJsonDownloader, int appWidgetId) {
 		boolean successfulResponse = true;
 		List<DailyForecastObj> dailyForecastObjList = new ArrayList<>();
-		TimeZone timeZone = null;
+		TimeZone timeZone = TimeZone.getDefault();
 
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
 
@@ -672,6 +702,7 @@ public class RootAppWidget extends AppWidgetProvider {
 
 		if (successfulResponse) {
 			dailyForecastObjList.get(0).timeZone = timeZone;
+			widgetDataObjArrayMap.get(appWidgetId).timeZone = timeZone;
 		}
 		return dailyForecastObjList;
 	}

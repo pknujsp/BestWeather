@@ -22,6 +22,7 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -180,6 +181,10 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 					weatherSourceType = WeatherSourceType.ACCU_WEATHER;
 				} else if (binding.owmRadio.isChecked()) {
 					weatherSourceType = WeatherSourceType.OPEN_WEATHER_MAP;
+				}
+
+				if (binding.displayDatetimeSwitch.isChecked()) {
+					registerReceiver(new CurrentFirst(), new IntentFilter(Intent.ACTION_TIME_TICK));
 				}
 
 				CustomAttributeObj customAttributeObj = new CustomAttributeObj(appWidgetId, textSizeObjList,

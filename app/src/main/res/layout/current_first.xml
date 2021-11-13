@@ -14,13 +14,13 @@
         android:orientation="vertical">
 
         <include
+            android:id="@+id/header"
+            layout="@layout/header_view_in_widget" />
+
+        <include
             android:id="@+id/watch"
             layout="@layout/watch_view_in_widget"
             android:visibility="gone" />
-
-        <include
-            android:id="@+id/header"
-            layout="@layout/header_view_in_widget" />
 
         <include
             android:id="@+id/current_conditions"
