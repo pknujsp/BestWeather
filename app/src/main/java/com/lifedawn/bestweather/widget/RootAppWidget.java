@@ -3,6 +3,7 @@ package com.lifedawn.bestweather.widget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -48,12 +49,17 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.F
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunsetriseUtil;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -75,6 +81,26 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
 					.edit().clear().apply();
 		}
+	}
+
+	protected final void onBeginProcess(RemoteViews remoteViews) {
+		remoteViews.setViewVisibility(R.id.content_container, View.GONE);
+		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
+		remoteViews.setViewVisibility(R.id.progressbar, View.VISIBLE);
+	}
+
+	protected final void onSuccessfulProcess(RemoteViews remoteViews) {
+		remoteViews.setViewVisibility(R.id.content_container, View.VISIBLE);
+		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
+		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
+	}
+
+	protected final void onErrorProcess(RemoteViews remoteViews, String errorMsg, String btnMsg) {
+		remoteViews.setViewVisibility(R.id.content_container, View.GONE);
+		remoteViews.setViewVisibility(R.id.warning_layout, View.VISIBLE);
+		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
+		remoteViews.setTextViewText(R.id.warning, errorMsg);
+		remoteViews.setTextViewText(R.id.warning_process_btn, btnMsg);
 	}
 
 	public void init(Context context, Bundle bundle) {
@@ -101,7 +127,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 				}
 			}
 
-			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent(context,
+			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent(context, remoteViews,
 					className, appWidgetId));
 			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
@@ -137,7 +163,46 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 			RemoteViews remoteViews = bundle.getParcelable(ConfigureWidgetActivity.WidgetAttributes.REMOTE_VIEWS.name());
 			loadCurrentLocation(context, remoteViews, appWidgetId);
 		} else if (action.equals(Intent.ACTION_TIME_TICK)) {
-			onTimeTick(context);
+			ZonedDateTime now = ZonedDateTime.now();
+
+			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern));
+			ValueUnits clockUnit =
+					ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
+			DateTimeFormatter timeFormatter =
+					DateTimeFormatter.ofPattern(context.getString(clockUnit == ValueUnits.clock12 ? R.string.clock_12_pattern :
+							R.string.clock_24_pattern));
+
+			ComponentName componentName = new ComponentName(context.getPackageName(), getThisClass().getName());
+			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+			final int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
+
+			for (int appWidgetId : appWidgetIds) {
+				SharedPreferences sharedPreferences = context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE);
+
+				if (sharedPreferences.getBoolean(ConfigureWidgetActivity.WidgetAttributes.DISPLAY_DATETIME.name(), false)) {
+					boolean displayLocalDateTime =
+							sharedPreferences.getBoolean(ConfigureWidgetActivity.WidgetAttributes.DISPLAY_LOCAL_DATETIME.name(), false);
+
+					ZoneId zoneId = null;
+					if (displayLocalDateTime) {
+						zoneId = ZoneId.of(sharedPreferences.getString(WidgetDataKeys.TIMEZONE_ID.name(), ""));
+					} else {
+						zoneId = ZoneId.systemDefault();
+					}
+					ZonedDateTime tempNow = ZonedDateTime.of(now.toLocalDateTime(), now.getZone());
+					ZonedDateTime zonedDateTime = tempNow.withZoneSameInstant(zoneId);
+
+					RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+							appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout);
+					remoteViews.setTextViewText(R.id.date, zonedDateTime.format(dateFormatter));
+					remoteViews.setTextViewText(R.id.time, zonedDateTime.format(timeFormatter));
+
+					appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+					Log.e("widget timetick", "zoneid : " + zoneId.getId());
+					Log.e("widget timetick", "appwidget id :" + appWidgetId + " - " + zonedDateTime.toString());
+				}
+			}
+
 		}
 
 	}
@@ -173,7 +238,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 		return remoteViews;
 	}
 
-	public void setWatch(Context context, RemoteViews remoteViews, TimeZone timeZone) {
+	public void setWatch(Context context, RemoteViews remoteViews, ZoneId zoneId) {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern));
 		ValueUnits clockUnit =
 				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
@@ -181,17 +246,18 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 				DateTimeFormatter.ofPattern(context.getString(clockUnit == ValueUnits.clock12 ? R.string.clock_12_pattern :
 						R.string.clock_24_pattern));
 
-		ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timeZone.getID()));
+		ZonedDateTime now = ZonedDateTime.now(zoneId);
 		remoteViews.setTextViewText(R.id.date, now.format(dateFormatter));
 		remoteViews.setTextViewText(R.id.time, now.format(timeFormatter));
 	}
 
-	public static PendingIntent getOnClickedPendingIntent(Context context, Class<?> className, int appWidgetId) {
+	public static PendingIntent getOnClickedPendingIntent(Context context, RemoteViews remoteViews, Class<?> className, int appWidgetId) {
 		Intent intent = new Intent(context, className);
 		intent.setAction(context.getString(R.string.ACTION_SHOW_DIALOG));
 		Bundle bundle = new Bundle();
 		bundle.putSerializable(ConfigureWidgetActivity.WidgetAttributes.WIDGET_CLASS.name(), className);
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+		bundle.putParcelable(ConfigureWidgetActivity.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
 		intent.putExtras(bundle);
 
 		return PendingIntent.getBroadcast(
@@ -204,9 +270,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
 						Context.MODE_PRIVATE);
 
-		remoteViews.setViewVisibility(R.id.content_container, View.GONE);
-		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
-		remoteViews.setViewVisibility(R.id.progressbar, View.VISIBLE);
+		onBeginProcess(remoteViews);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 		Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
@@ -224,7 +288,12 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 								editor.putString(ConfigureWidgetActivity.WidgetAttributes.WEATHER_SOURCE_TYPE.name(), WeatherSourceType.KMA.name());
 							}
 						}
+						editor.putString(WidgetDataKeys.LATITUDE.name(), String.valueOf(addressList.get(0).getLatitude()))
+								.putString(WidgetDataKeys.LONGITUDE.name(), String.valueOf(addressList.get(0).getLongitude()));
 						editor.putString(WidgetDataKeys.COUNTRY_CODE.name(), countryCode).commit();
+
+						remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent(context, remoteViews,
+								getThisClass(), appWidgetId));
 
 						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 						loadWeatherData(context, appWidgetManager, remoteViews, appWidgetId);
@@ -235,24 +304,24 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 			@Override
 			public void onFailed(Fail fail) {
 				Intent intent = null;
+				String errorMsg = null;
+				String btnMsg = null;
 
 				if (fail == Fail.REJECT_PERMISSION) {
-					remoteViews.setTextViewText(R.id.warning, context.getString(R.string.message_needs_location_permission));
-					remoteViews.setTextViewText(R.id.warning_process_btn, context.getString(R.string.check_permission));
+					errorMsg = context.getString(R.string.message_needs_location_permission);
+					btnMsg = context.getString(R.string.check_permission);
 					intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
 					intent.setData(Uri.fromParts("package", context.getPackageName(), null));
 				} else {
-					remoteViews.setTextViewText(R.id.warning, context.getString(R.string.request_to_make_gps_on));
-					remoteViews.setTextViewText(R.id.warning_process_btn, context.getString(R.string.enable_gps));
+					errorMsg = context.getString(R.string.request_to_make_gps_on);
+					btnMsg = context.getString(R.string.enable_gps);
 					intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 				}
 
 				PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, pendingIntent);
 
-				remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
-				remoteViews.setViewVisibility(R.id.content_container, View.GONE);
-				remoteViews.setViewVisibility(R.id.warning_layout, View.VISIBLE);
+				onErrorProcess(remoteViews, errorMsg, btnMsg);
 				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 			}
 		};
@@ -265,9 +334,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 
 
 	public void loadWeatherData(Context context, AppWidgetManager appWidgetManager, RemoteViews remoteViews, int appWidgetId) {
-		remoteViews.setViewVisibility(R.id.content_container, View.GONE);
-		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
-		remoteViews.setViewVisibility(R.id.progressbar, View.VISIBLE);
+		onBeginProcess(remoteViews);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 
@@ -303,27 +370,28 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 
 	abstract void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, AppWidgetManager appWidgetManager, @Nullable MultipleJsonDownloader<JsonElement> multipleJsonDownloader);
 
-	public final HeaderObj getHeader(Context context, MultipleJsonDownloader<JsonElement> multipleJsonDownloader, int appWidgetId, TimeZone timeZone) {
-		if (timeZone == null) {
-			HeaderObj headerObj = new HeaderObj(false);
-			headerObj.address = context.getString(R.string.error);
+	public final HeaderObj getHeader(Context context, MultipleJsonDownloader<JsonElement> multipleJsonDownloader, int appWidgetId,
+	                                 ZoneId zoneId) {
+		HeaderObj headerObj = new HeaderObj(zoneId != null);
+		headerObj.address = context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
+				.getString(WidgetDataKeys.ADDRESS_NAME.name(), "");
+
+		if (zoneId == null) {
 			headerObj.refreshDateTime = context.getString(R.string.error);
-			return headerObj;
 		} else {
 			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 			ValueUnits clockUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_clock),
 					ValueUnits.clock12.name()));
 
-			ZonedDateTime updatedTime = ZonedDateTime.now(ZoneId.of(timeZone.getID()));
-
-			HeaderObj headerObj = new HeaderObj(true);
-			headerObj.address = context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
-					.getString(WidgetDataKeys.ADDRESS_NAME.name(), "");
+			LocalDateTime updatedTime = LocalDateTime.now();
 			headerObj.refreshDateTime =
 					updatedTime.format(DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ?
 							context.getString(R.string.datetime_pattern_clock12) : context.getString(R.string.datetime_pattern_clock24)));
-			return headerObj;
+
+			Log.e("timezone", zoneId.getId());
 		}
+
+		return headerObj;
 	}
 
 	public final CurrentConditionsObj getCurrentConditions(Context context, WeatherSourceType weatherSourceType,
@@ -335,7 +403,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 		String precipitation = null;
 		String airQuality = null;
 		int weatherIcon = 0;
-		TimeZone timeZone = TimeZone.getDefault();
+		ZoneId zoneId = ZoneId.systemDefault();
 
 		String precipitationUnitStr = "mm";
 		boolean successfulResponse = true;
@@ -359,9 +427,8 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 							context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
 									Context.MODE_PRIVATE);
 
-					timeZone = TimeZone.getTimeZone("Asia/Seoul");
-					ZonedDateTime begin = ZonedDateTime.of(updatedTime, ZoneId.of(timeZone.getID()));
-					ZonedDateTime end = ZonedDateTime.of(updatedTime, ZoneId.of(timeZone.getID()));
+					ZonedDateTime begin = ZonedDateTime.of(updatedTime, KmaResponseProcessor.getZoneId());
+					ZonedDateTime end = ZonedDateTime.of(updatedTime, KmaResponseProcessor.getZoneId());
 					Double latitude = Double.parseDouble(sharedPreferences.getString(WidgetDataKeys.LATITUDE.name(), "0.0"));
 					Double longitude = Double.parseDouble(sharedPreferences.getString(WidgetDataKeys.LONGITUDE.name(), "0.0"));
 
@@ -381,25 +448,19 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 				if (AccuWeatherResponseProcessor.successfulResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS))) {
 					CurrentConditionsResponse currentConditionsResponse = AccuWeatherResponseProcessor.getCurrentConditionsObjFromJson(
 							multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponse().body());
-					temp = ValueUnits.convertTemperature(currentConditionsResponse.getItems().get(0).getTemperature().getMetric().getValue(),
+					CurrentConditionsResponse.Item item = currentConditionsResponse.getItems().get(0);
+					temp = ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(),
 							tempUnit).toString() + tempUnitStr;
-					realFeelTemp = ValueUnits.convertTemperature(currentConditionsResponse.getItems().get(0).getRealFeelTemperature().getMetric().getValue(),
+					realFeelTemp = ValueUnits.convertTemperature(item.getRealFeelTemperature().getMetric().getValue(),
 							tempUnit).toString() + tempUnitStr;
-					precipitation = currentConditionsResponse.getItems().get(0).getPrecip1hr() == null ?
+					precipitation = item.getPrecip1hr() == null ?
 							context.getString(R.string.not_precipitation) :
-							AccuWeatherResponseProcessor.getPty(currentConditionsResponse.getItems().get(0).getPrecipitationType()) + ", " + currentConditionsResponse.getItems().get(0).getPrecip1hr().getMetric().getValue() +
+							AccuWeatherResponseProcessor.getPty(item.getPrecipitationType()) + ", " + item.getPrecip1hr().getMetric().getValue() +
 									precipitationUnitStr;
 					weatherIcon =
-							AccuWeatherResponseProcessor.getWeatherIconImg(currentConditionsResponse.getItems().get(0).getWeatherIcon());
+							AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon());
 
-					try {
-						ZoneId zoneId = AccuWeatherResponseProcessor.getTimeZone(
-								currentConditionsResponse.getItems().get(0).getLocalObservationDateTime());
-						timeZone = TimeZone.getDefault();
-						timeZone.setID(zoneId.toString());
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
+					zoneId = ZonedDateTime.parse(item.getLocalObservationDateTime()).getZone();
 				} else {
 					successfulResponse = false;
 				}
@@ -424,7 +485,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 						precipitation = context.getString(R.string.not_precipitation);
 					}
 					weatherIcon = OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId(), false);
-					timeZone = OpenWeatherMapResponseProcessor.getTimeZone(oneCallResponse);
+					zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
 				} else {
 					successfulResponse = false;
 				}
@@ -449,7 +510,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 			currentConditionsObj.precipitation = precipitation;
 			currentConditionsObj.weatherIcon = weatherIcon;
 			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
-					.edit().putString(WidgetDataKeys.TIMEZONE.name(), timeZone.getID()).apply();
+					.edit().putString(WidgetDataKeys.TIMEZONE_ID.name(), zoneId.getId()).apply();
 		} else {
 			currentConditionsObj.temp = notData;
 			currentConditionsObj.realFeelTemp = notData;
@@ -457,7 +518,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 			currentConditionsObj.weatherIcon = R.drawable.error;
 		}
 		currentConditionsObj.airQuality = airQuality;
-		currentConditionsObj.timeZone = timeZone;
+		currentConditionsObj.zoneId = zoneId;
 		return currentConditionsObj;
 	}
 
@@ -465,7 +526,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 	                                                        MultipleJsonDownloader<JsonElement> multipleJsonDownloader, int appWidgetId) {
 		boolean successfulResponse = true;
 		List<HourlyForecastObj> hourlyForecastObjList = new ArrayList<>();
-		TimeZone timeZone = TimeZone.getDefault();
+		ZoneId zoneId = null;
 
 		ValueUnits tempUnit =
 				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
@@ -476,16 +537,16 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 			case KMA:
 				if (KmaResponseProcessor.successfulVilageResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_FCST)) &&
 						KmaResponseProcessor.successfulVilageResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.VILAGE_FCST))) {
-					timeZone = TimeZone.getTimeZone("Asia/Seoul");
+					zoneId = KmaResponseProcessor.getZoneId();
 					List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
 							KmaResponseProcessor.getUltraSrtFcstObjFromJson(
 									multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponse().body().toString()),
 							KmaResponseProcessor.getVilageFcstObjFromJson(
 									multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.VILAGE_FCST).getResponse().body().toString()));
 
-					ZonedDateTime begin = ZonedDateTime.of(finalHourlyForecastList.get(0).getFcstDateTime(), ZoneId.of(timeZone.getID()));
+					ZonedDateTime begin = ZonedDateTime.of(finalHourlyForecastList.get(0).getFcstDateTime(), zoneId);
 					ZonedDateTime end = ZonedDateTime.of(finalHourlyForecastList.get(finalHourlyForecastList.size() - 1).getFcstDateTime(),
-							ZoneId.of(timeZone.getID()));
+							zoneId);
 					SharedPreferences sharedPreferences =
 							context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
 									Context.MODE_PRIVATE);
@@ -523,15 +584,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 					TwelveHoursOfHourlyForecastsResponse hourlyForecastResponse = AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
 							multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponse().body());
 
-					try {
-						ZoneId zoneId = AccuWeatherResponseProcessor.getTimeZone(
-								hourlyForecastResponse.getItems().get(0).getDateTime());
-						timeZone = TimeZone.getDefault();
-						timeZone.setID(zoneId.toString());
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
-
+					zoneId = ZonedDateTime.parse(hourlyForecastResponse.getItems().get(0).getDateTime()).getZone();
 					List<TwelveHoursOfHourlyForecastsResponse.Item> hourlyForecastList = hourlyForecastResponse.getItems();
 					int index = 0;
 
@@ -539,7 +592,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 						HourlyForecastObj hourlyForecastObj = new HourlyForecastObj(true);
 
 						LocalDateTime dateTime =
-								WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourlyForecast.getEpochDateTime()) * 1000L, timeZone);
+								WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourlyForecast.getEpochDateTime()) * 1000L, TimeZone.getTimeZone(zoneId.getId()));
 						hourlyForecastObj.clock = dateTime.format(clockFormatter);
 						hourlyForecastObj.temp =
 								ValueUnits.convertTemperature(hourlyForecast.getTemperature().getValue(), tempUnit).toString();
@@ -560,7 +613,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 				if (OpenWeatherMapResponseProcessor.successfulResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.OPEN_WEATHER_MAP).get(RetrofitClient.ServiceType.OWM_ONE_CALL))) {
 					OneCallResponse oneCallResponse =
 							OpenWeatherMapResponseProcessor.getOneCallObjFromJson(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.OPEN_WEATHER_MAP).get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponse().toString());
-					timeZone = OpenWeatherMapResponseProcessor.getTimeZone(oneCallResponse);
+					zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
 
 					List<OneCallResponse.Hourly> hourly = oneCallResponse.getHourly();
 					int index = 0;
@@ -569,7 +622,8 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 						HourlyForecastObj hourlyForecastObj = new HourlyForecastObj(true);
 
 						LocalDateTime dateTime =
-								WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getDt()) * 1000L, timeZone);
+								WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getDt()) * 1000L,
+										TimeZone.getTimeZone(zoneId.getId()));
 						hourlyForecastObj.clock = dateTime.format(clockFormatter);
 						hourlyForecastObj.weatherIcon = OpenWeatherMapResponseProcessor.getWeatherIconImg(item.getWeather().get(0).getId(),
 								item.getWeather().get(0).getIcon().contains("n"));
@@ -588,8 +642,8 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 		}
 		if (successfulResponse) {
 			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
-					.edit().putString(WidgetDataKeys.TIMEZONE.name(), timeZone.getID()).apply();
-			hourlyForecastObjList.get(0).timeZone = timeZone;
+					.edit().putString(WidgetDataKeys.TIMEZONE_ID.name(), zoneId.getId()).apply();
+			hourlyForecastObjList.get(0).zoneId = zoneId;
 		}
 		return hourlyForecastObjList;
 	}
@@ -598,7 +652,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 	                                                      MultipleJsonDownloader<JsonElement> multipleJsonDownloader, int appWidgetId) {
 		boolean successfulResponse = true;
 		List<DailyForecastObj> dailyForecastObjList = new ArrayList<>();
-		TimeZone timeZone = TimeZone.getDefault();
+		ZoneId zoneId = null;
 
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
 		ValueUnits tempUnit =
@@ -633,7 +687,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 							break;
 						}
 					}
-					timeZone = TimeZone.getTimeZone("Asia/Seoul");
+					zoneId = KmaResponseProcessor.getZoneId();
 				} else {
 					successfulResponse = false;
 				}
@@ -645,21 +699,14 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 
 					int index = 0;
 					List<FiveDaysOfDailyForecastsResponse.DailyForecasts> dailyForecasts = dailyForecastsResponse.getDailyForecasts();
-					try {
-						ZoneId zoneId = AccuWeatherResponseProcessor.getTimeZone(
-								dailyForecasts.get(0).getDateTime());
-						timeZone = TimeZone.getDefault();
-						timeZone.setID(zoneId.toString());
-					} catch (ParseException e) {
-						e.printStackTrace();
-					}
+					zoneId = ZonedDateTime.parse(dailyForecasts.get(0).getDateTime()).getZone();
 
 					for (FiveDaysOfDailyForecastsResponse.DailyForecasts item : dailyForecasts) {
 						DailyForecastObj dailyForecastObj = new DailyForecastObj(true, false);
 
 						dailyForecastObj.date =
 								WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getEpochDate()) * 1000L,
-										timeZone).format(dateFormatter);
+										TimeZone.getTimeZone(zoneId.getId())).format(dateFormatter);
 						dailyForecastObj.temp =
 								ValueUnits.convertTemperature(item.getTemperature().getMinimum().getValue(), tempUnit).toString() + " / " + ValueUnits.convertTemperature(item.getTemperature().getMaximum().getValue(), tempUnit).toString();
 						dailyForecastObj.dayWeatherIcon = AccuWeatherResponseProcessor.getWeatherIconImg(item.getDay().getIcon());
@@ -677,15 +724,17 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 				if (OpenWeatherMapResponseProcessor.successfulResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.OPEN_WEATHER_MAP).get(RetrofitClient.ServiceType.OWM_ONE_CALL))) {
 					OneCallResponse oneCallResponse =
 							OpenWeatherMapResponseProcessor.getOneCallObjFromJson(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.OPEN_WEATHER_MAP).get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponse().toString());
-					timeZone = OpenWeatherMapResponseProcessor.getTimeZone(oneCallResponse);
+					zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
 
 					List<OneCallResponse.Daily> daily = oneCallResponse.getDaily();
 					int index = 0;
 
 					for (OneCallResponse.Daily item : daily) {
 						DailyForecastObj dailyForecastObj = new DailyForecastObj(true, true);
-						dailyForecastObj.date = (WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getDt()) * 1000L, timeZone).format(
-								dateFormatter));
+						dailyForecastObj.date =
+								(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getDt()) * 1000L,
+										TimeZone.getTimeZone(zoneId.getId())).format(
+										dateFormatter));
 						dailyForecastObj.temp =
 								ValueUnits.convertTemperature(item.getTemp().getMin(), tempUnit) + " / " + ValueUnits.convertTemperature(item.getTemp().getMax(), tempUnit);
 						dailyForecastObj.weatherIcon = OpenWeatherMapResponseProcessor.getWeatherIconImg(item.getWeather().get(0).getId()
@@ -703,9 +752,9 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 		}
 
 		if (successfulResponse) {
-			dailyForecastObjList.get(0).timeZone = timeZone;
+			dailyForecastObjList.get(0).zoneId = zoneId;
 			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
-					.edit().putString(WidgetDataKeys.TIMEZONE.name(), timeZone.getID()).apply();
+					.edit().putString(WidgetDataKeys.TIMEZONE_ID.name(), zoneId.getId()).apply();
 		}
 		return dailyForecastObjList;
 	}
@@ -728,7 +777,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 		String precipitation;
 		String airQuality;
 		int weatherIcon;
-		TimeZone timeZone;
+		ZoneId zoneId;
 
 		public CurrentConditionsObj(boolean successful) {
 			this.successful = successful;
@@ -741,7 +790,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 		String clock;
 		String temp;
 		int weatherIcon;
-		TimeZone timeZone;
+		ZoneId zoneId;
 
 		public HourlyForecastObj(boolean successful) {
 			this.successful = successful;
@@ -757,7 +806,7 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 		int dayWeatherIcon;
 		int nightWeatherIcon;
 		int weatherIcon;
-		TimeZone timeZone;
+		ZoneId zoneId;
 
 		public DailyForecastObj(boolean successful, boolean isSingle) {
 			this.successful = successful;
@@ -767,6 +816,6 @@ public abstract class RootAppWidget extends AppWidgetProvider {
 	}
 
 	public enum WidgetDataKeys {
-		ADDRESS_NAME, LATITUDE, LONGITUDE, COUNTRY_CODE, TIMEZONE
+		ADDRESS_NAME, LATITUDE, LONGITUDE, COUNTRY_CODE, TIMEZONE_ID
 	}
 }

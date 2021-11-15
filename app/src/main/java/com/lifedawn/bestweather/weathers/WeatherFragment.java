@@ -72,6 +72,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -639,15 +640,8 @@ public class WeatherFragment extends Fragment {
 				detailCurrentConditionsFragment = accuDetailCurrentConditionsFragment;
 
 				currentConditionsWeatherVal = currentConditionsResponse.getItems().get(0).getWeatherIcon();
-
-				try {
-					ZoneId zoneId = AccuWeatherResponseProcessor.getTimeZone(
-							currentConditionsResponse.getItems().get(0).getLocalObservationDateTime());
-					timeZone = TimeZone.getDefault();
-					timeZone.setID(zoneId.toString());
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
+				timeZone = TimeZone.getDefault();
+				timeZone.setID(ZonedDateTime.parse(currentConditionsResponse.getItems().get(0).getLocalObservationDateTime()).getZone().toString());
 				break;
 			case OPEN_WEATHER_MAP:
 				OwmSimpleCurrentConditionsFragment owmSimpleCurrentConditionsFragment = new OwmSimpleCurrentConditionsFragment();
@@ -670,7 +664,7 @@ public class WeatherFragment extends Fragment {
 
 				currentConditionsWeatherVal = oneCallResponse.getCurrent().getWeather().get(0).getId();
 
-				timeZone = OpenWeatherMapResponseProcessor.getTimeZone(oneCallResponse);
+				timeZone = TimeZone.getTimeZone(OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse).getId());
 				break;
 		}
 		mainWeatherSourceType = requestWeatherSourceType;

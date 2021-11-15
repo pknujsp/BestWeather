@@ -419,4 +419,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		return new Gson().fromJson(response, MidTaRoot.class);
 	}
 
+	public static ZoneId getZoneId() {
+		return ZoneId.of("Asia/Seoul");
+	}
 }

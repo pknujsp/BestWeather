@@ -51,7 +51,7 @@ public class DialogActivity extends Activity {
 			listItems = new String[]{getString(R.string.open_app), getString(R.string.cancel), getString(R.string.refresh)};
 		}
 
-		AlertDialog dialog = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light_Dialog))
+		new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light_Dialog))
 				.setTitle(getString(R.string.widget_control))
 				.setCancelable(false)
 				.setItems(listItems, new DialogInterface.OnClickListener() {
@@ -61,8 +61,6 @@ public class DialogActivity extends Activity {
 							Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 							startActivity(intent);
-
-
 						} else if (which == 1) {
 
 						} else if (which == 2) {
@@ -101,8 +99,6 @@ public class DialogActivity extends Activity {
 						dialog.dismiss();
 						finish();
 					}
-				}).create();
-
-		dialog.show();
+				}).create().show();
 	}
 }

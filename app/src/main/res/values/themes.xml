@@ -32,7 +32,7 @@
     </style>
 
     <style name="ThemeOverlay.BestWeather.AppWidgetContainer" parent="">
-        <item name="appWidgetBackgroundColor">@color/app_main_color</item>
+        <item name="appWidgetBackgroundColor">@color/widget_background_color</item>
         <item name="appWidgetTextColor">@color/white</item>
     </style>
 

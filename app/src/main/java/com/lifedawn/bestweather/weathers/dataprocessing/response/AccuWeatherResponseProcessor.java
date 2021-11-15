@@ -103,11 +103,6 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 	}
 
 
-	public static ZoneId getTimeZone(String dateTime) throws ParseException {
-		// 2021-10-22T13:31:00+09:00
-		return ZonedDateTime.parse(dateTime).getZone();
-	}
-
 	public static boolean successfulResponse(MultipleJsonDownloader.ResponseResult<JsonElement> result) {
 		if (result.getResponse() != null) {
 			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();

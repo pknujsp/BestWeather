@@ -13,6 +13,8 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -105,7 +107,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		return FLICKR_MAP.get(code);
 	}
 
-	public static TimeZone getTimeZone(OneCallResponse oneCallResponse) {
-		return TimeZone.getTimeZone(oneCallResponse.getTimezone());
+	public static ZoneId getZoneId(OneCallResponse oneCallResponse) {
+		return ZoneId.of(oneCallResponse.getTimezone());
 	}
 }

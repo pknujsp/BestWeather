@@ -466,8 +466,12 @@
     <string name="clock_12_pattern">a h:mm</string>
     <string name="clock_24_pattern">HH:mm</string>
     <string name="date_pattern">M.d E</string>
-    <string name="bundle_key_widget_class_name">bundle_key_widget_class_name</string>
-    <string name="bundle_key_widget_layout_id">bundle_key_widget_layout_id</string>
     <string name="datetime_pattern_clock12">M.d E a h:mm</string>
     <string name="datetime_pattern_clock24">M.d E a HH:mm</string>
+
+    <string name="bundle_key_widget_class_name">bundle_key_widget_class_name</string>
+    <string name="bundle_key_widget_layout_id">bundle_key_widget_layout_id</string>
+
+    <string name="widget_current_label">현재날씨</string>
+    <string name="real_feel_temperature_simple">체감</string>
 </resources>

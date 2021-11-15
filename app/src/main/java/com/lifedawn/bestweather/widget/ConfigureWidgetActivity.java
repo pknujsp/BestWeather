@@ -22,6 +22,7 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -122,6 +123,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 					AppWidgetManager.EXTRA_APPWIDGET_ID,
 					AppWidgetManager.INVALID_APPWIDGET_ID);
 		}
+
 		layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
 		previewWidgetView = (ViewGroup) getLayoutInflater().inflate(layoutId, null);
 		loadTextViewsAndTextSize();
@@ -147,8 +149,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 
 				Class<?> className = null;
 				switch (layoutId) {
-					case R.layout.current_first:
-						className = CurrentFirst.class;
+					case R.layout.widget_current:
+						className = WidgetCurrent.class;
 						break;
 					case R.layout.current_daily:
 						className = CurrentDaily.class;
@@ -164,12 +166,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 				final LocationType locationType = binding.currentLocationRadio.isChecked() ? LocationType.CurrentLocation :
 						LocationType.SelectedAddress;
 				final WeatherSourceType weatherSourceType = binding.accuWeatherRadio.isChecked() ? WeatherSourceType.ACCU_WEATHER : WeatherSourceType.OPEN_WEATHER_MAP;
-
-				/*
-				if (binding.displayDatetimeSwitch.isChecked()) {
-					registerReceiver(new CurrentFirst(), new IntentFilter(Intent.ACTION_TIME_TICK));
-				}
-				 */
 
 				SharedPreferences widgetAttributes =
 						getSharedPreferences(WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
@@ -198,10 +194,21 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 				//selected address dto id
 				editor.putInt(WidgetAttributes.SELECTED_ADDRESS_DTO_ID.name(), locationType == LocationType.SelectedAddress ?
 						newSelectedAddressDto.getId() : 0);
+
+				//address name if select
+				if (binding.selectedLocationRadio.isChecked()) {
+					editor.putString(RootAppWidget.WidgetDataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
+							.putString(RootAppWidget.WidgetDataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
+							.putString(RootAppWidget.WidgetDataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude());
+				}
 				editor.commit();
 
 				RemoteViews remoteViews = RootAppWidget.createRemoteViews(getApplicationContext(), appWidgetId, layoutId);
 				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
+				if (binding.displayDatetimeSwitch.isChecked()) {
+					registerReceiver(new WidgetCurrent(), new IntentFilter(Intent.ACTION_TIME_TICK));
+				}
 
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
@@ -233,7 +240,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 	@SuppressLint("NonConstantResourceId")
 	private void loadTextViewsAndTextSize() {
 		switch (layoutId) {
-			case R.layout.current_first:
+			case R.layout.widget_current:
 				createTextViewMap(R.id.address, R.id.refresh, R.id.current_temperature, R.id.current_realfeel_temperature, R.id.current_airquality, R.id.current_precipitation);
 				createTextViewSizeMap(R.id.address, R.id.refresh, R.id.current_temperature, R.id.current_realfeel_temperature, R.id.current_airquality, R.id.current_precipitation);
 				break;
@@ -335,10 +342,11 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 	}
 
 	private void initDisplayDateTime() {
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
 		DateTimeFormatter timeFormatter =
 				DateTimeFormatter.ofPattern(ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock),
-						ValueUnits.clock12.name())) == ValueUnits.clock12 ? "a h:mm" : "HH:mm");
+						ValueUnits.clock12.name())) == ValueUnits.clock12 ? getString(R.string.clock_12_pattern) :
+						getString(R.string.clock_24_pattern));
 		LocalDateTime now = LocalDateTime.now();
 		((TextView) previewWidgetView.findViewById(R.id.date)).setText(now.format(dateFormatter));
 		((TextView) previewWidgetView.findViewById(R.id.time)).setText(now.format(timeFormatter));
@@ -350,6 +358,11 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 				previewWidgetView.findViewById(R.id.watch).setVisibility(isChecked ? View.VISIBLE : View.GONE);
 			}
 		});
+
+		if (previewWidgetView.findViewById(R.id.watch).getVisibility() == View.VISIBLE) {
+			binding.displayDatetimeSwitch.setChecked(true);
+		}
+
 	}
 
 	private void initAutoRefreshInterval() {

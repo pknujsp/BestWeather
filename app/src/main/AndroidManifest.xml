@@ -45,7 +45,8 @@
 
 
         <receiver
-            android:name=".widget.CurrentFirst"
+            android:name=".widget.WidgetCurrent"
+            android:label="@string/widget_current_label"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -57,7 +58,7 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/current_first_info" />
+                android:resource="@xml/widget_current_info" />
         </receiver>
 
         <receiver android:name=".widget.CurrentDaily">

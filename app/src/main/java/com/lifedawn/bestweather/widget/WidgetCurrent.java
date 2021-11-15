@@ -26,7 +26,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import java.util.HashSet;
 import java.util.Set;
 
-public class CurrentFirst extends RootAppWidget {
+public class WidgetCurrent extends RootAppWidget {
 
 	@Override
 	Class<?> getThisClass() {
@@ -60,42 +60,7 @@ public class CurrentFirst extends RootAppWidget {
 
 	@Override
 	public void onTimeTick(Context context) {
-		/*
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		ZonedDateTime now = ZonedDateTime.now();
-		ComponentName componentName = new ComponentName(context.getPackageName(), CurrentFirst.class.getName());
-		int[] appWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
 
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern));
-		ValueUnits clockUnit =
-				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
-		DateTimeFormatter timeFormatter =
-				DateTimeFormatter.ofPattern(context.getString(clockUnit == ValueUnits.clock12 ? R.string.clock_12_pattern :
-						R.string.clock_24_pattern));
-
-		for (int appWidgetId : appWidgetIds) {
-			if (context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
-					.getBoolean(ConfigureWidgetActivity.WidgetAttributes.DISPLAY_DATETIME.name(), false)) {
-				SharedPreferences sharedPreferences = context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE);
-				boolean displayLocalDateTime =
-						sharedPreferences.getBoolean(ConfigureWidgetActivity.WidgetAttributes.DISPLAY_LOCAL_DATETIME.name(), false);
-
-				String timeZoneId = ZoneId.systemDefault().getId();
-				if (displayLocalDateTime) {
-					timeZoneId = sharedPreferences.getString(WidgetDataKeys.TIMEZONE.name(), "");
-				}
-				ZonedDateTime zonedDateTime = ZonedDateTime.of(now.toLocalDateTime(), ZoneId.of(timeZoneId));
-
-				RemoteViews remoteViews = createViews(context,
-						sharedPreferences.getInt(ConfigureWidgetActivity.WidgetAttributes.LAYOUT_ID.name(), 0));
-				remoteViews.setTextViewText(R.id.date, zonedDateTime.format(dateFormatter));
-				remoteViews.setTextViewText(R.id.time, zonedDateTime.format(timeFormatter));
-
-				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-			}
-		}
-
-		 */
 	}
 
 	@Override
@@ -155,7 +120,7 @@ public class CurrentFirst extends RootAppWidget {
 
 		CurrentConditionsObj currentConditionsObj = getCurrentConditions(context, requestWeatherSourceType, multipleJsonDownloader,
 				appWidgetId);
-		HeaderObj headerObj = getHeader(context, multipleJsonDownloader, appWidgetId, currentConditionsObj.timeZone);
+		HeaderObj headerObj = getHeader(context, multipleJsonDownloader, appWidgetId, currentConditionsObj.zoneId);
 
 		remoteViews.setTextViewText(R.id.address, headerObj.address);
 		remoteViews.setTextViewText(R.id.refresh, headerObj.refreshDateTime);
@@ -166,18 +131,15 @@ public class CurrentFirst extends RootAppWidget {
 		} else {
 			remoteViews.setViewVisibility(R.id.current_realfeel_temperature, View.VISIBLE);
 			remoteViews.setTextViewText(R.id.current_realfeel_temperature,
-					context.getString(R.string.real_feel_temperature) + ": " + currentConditionsObj.realFeelTemp);
+					context.getString(R.string.real_feel_temperature_simple) + " : " + currentConditionsObj.realFeelTemp);
 		}
 		remoteViews.setTextViewText(R.id.current_airquality, currentConditionsObj.airQuality);
 		remoteViews.setTextViewText(R.id.current_precipitation, currentConditionsObj.precipitation);
 		remoteViews.setImageViewResource(R.id.current_weather_icon, currentConditionsObj.weatherIcon);
 
-		setWatch(context, remoteViews, currentConditionsObj.timeZone);
+		setWatch(context, remoteViews, currentConditionsObj.zoneId);
 
-		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
-		remoteViews.setViewVisibility(R.id.content_container, View.VISIBLE);
-		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
-
+		onSuccessfulProcess(remoteViews);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 }
