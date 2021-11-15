@@ -1,7 +1,6 @@
 package com.lifedawn.bestweather.widget;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import android.app.Activity;
@@ -9,23 +8,22 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
-import android.view.Window;
-import android.view.WindowManager;
+import android.widget.RemoteViews;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.databinding.ActivityDialogBinding;
 import com.lifedawn.bestweather.main.MainActivity;
 
 public class DialogActivity extends Activity {
 	private ActivityDialogBinding binding;
-	private Class<?> widgetClassName;
+	private Class<?> widgetClass;
 	private int appWidgetId;
-	private int widgetLayoutId;
+	private RemoteViews remoteViews;
 	private LocationType locationType;
 
 
@@ -36,7 +34,14 @@ public class DialogActivity extends Activity {
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_dialog);
 
 		Bundle bundle = getIntent().getExtras();
+		widgetClass = (Class<?>) bundle.getSerializable(ConfigureWidgetActivity.WidgetAttributes.WIDGET_CLASS.name());
+		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+		remoteViews = bundle.getParcelable(ConfigureWidgetActivity.WidgetAttributes.REMOTE_VIEWS.name());
 
+		SharedPreferences sharedPreferences =
+				getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, MODE_PRIVATE);
+		locationType = LocationType.valueOf(sharedPreferences.getString(ConfigureWidgetActivity.WidgetAttributes.LOCATION_TYPE.name(),
+				LocationType.CurrentLocation.name()));
 
 		String[] listItems = null;
 		if (locationType == LocationType.CurrentLocation) {
@@ -61,13 +66,16 @@ public class DialogActivity extends Activity {
 						} else if (which == 1) {
 
 						} else if (which == 2) {
-							Intent refreshIntent = new Intent(getApplicationContext(), widgetClassName);
+							Intent refreshIntent = new Intent(getApplicationContext(), widgetClass);
 							refreshIntent.setAction(getString(R.string.ACTION_REFRESH));
-							Bundle refreshBundle = new Bundle();
-							refreshBundle.putInt(getString(R.string.bundle_key_widget_layout_id), widgetLayoutId);
 
-							refreshIntent.putExtras(refreshBundle);
-							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, refreshIntent, 0);
+							Bundle bundle = new Bundle();
+							bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+							bundle.putParcelable(ConfigureWidgetActivity.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
+							refreshIntent.putExtras(bundle);
+
+							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, refreshIntent,
+									PendingIntent.FLAG_CANCEL_CURRENT);
 							try {
 								pendingIntent.send();
 							} catch (PendingIntent.CanceledException e) {
@@ -75,13 +83,15 @@ public class DialogActivity extends Activity {
 							}
 						} else if (which == 3) {
 							//현재 위치 업데이트
-							Intent refreshCurrentLocationIntent = new Intent(getApplicationContext(), widgetClassName);
+							Intent refreshCurrentLocationIntent = new Intent(getApplicationContext(), widgetClass);
 							refreshCurrentLocationIntent.setAction(getString(R.string.ACTION_REFRESH_CURRENT_LOCATION));
-							Bundle refreshBundle = new Bundle();
-							refreshBundle.putInt(getString(R.string.bundle_key_widget_layout_id), widgetLayoutId);
+							Bundle bundle = new Bundle();
+							bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+							bundle.putParcelable(ConfigureWidgetActivity.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
+							refreshCurrentLocationIntent.putExtras(bundle);
 
-							refreshCurrentLocationIntent.putExtras(refreshBundle);
-							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, refreshCurrentLocationIntent, 0);
+							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId,
+									refreshCurrentLocationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 							try {
 								pendingIntent.send();
 							} catch (PendingIntent.CanceledException e) {

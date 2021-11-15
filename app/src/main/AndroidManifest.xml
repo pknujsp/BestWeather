@@ -44,9 +44,15 @@
         </activity>
 
 
-        <receiver android:name=".widget.CurrentFirst" android:enabled="true">
+        <receiver
+            android:name=".widget.CurrentFirst"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="@string/ACTION_REFRESH" />
+                <action android:name="@string/ACTION_REFRESH_CURRENT_LOCATION" />
+                <action android:name="@string/ACTION_SHOW_DIALOG" />
+                <action android:name="@string/ACTION_INIT" />
             </intent-filter>
 
             <meta-data

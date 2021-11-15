@@ -76,6 +76,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 		@Override
 		public void handleOnBackPressed() {
 			if (!getSupportFragmentManager().popBackStackImmediate()) {
+				setResult(RESULT_CANCELED);
 				finish();
 			}
 		}
@@ -171,7 +172,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 				 */
 
 				SharedPreferences widgetAttributes =
-						getApplicationContext().getSharedPreferences(WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId,
+						getSharedPreferences(WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
 								MODE_PRIVATE);
 				SharedPreferences.Editor editor = widgetAttributes.edit();
 				//appwidget id
@@ -197,11 +198,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 				//selected address dto id
 				editor.putInt(WidgetAttributes.SELECTED_ADDRESS_DTO_ID.name(), locationType == LocationType.SelectedAddress ?
 						newSelectedAddressDto.getId() : 0);
-				//layout id
-				editor.putInt(WidgetAttributes.LAYOUT_ID.name(), layoutId);
-				editor.apply();
+				editor.commit();
 
-				RemoteViews remoteViews = RootAppWidget.createNewViews(getApplicationContext(), appWidgetId, layoutId);
+				RemoteViews remoteViews = RootAppWidget.createRemoteViews(getApplicationContext(), appWidgetId, layoutId);
 				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 				Intent resultIntent = new Intent();
@@ -209,13 +208,16 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 				setResult(RESULT_OK, resultIntent);
 
 				Intent initIntent = new Intent(context, className);
+				initIntent.setAction(getString(R.string.ACTION_INIT));
+
 				Bundle initBundle = new Bundle();
 				initBundle.putSerializable(context.getString(R.string.bundle_key_widget_class_name), className);
 				initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 				initBundle.putInt(context.getString(R.string.bundle_key_widget_layout_id), layoutId);
+				initBundle.putParcelable(WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
 				initIntent.putExtras(initBundle);
 
-				PendingIntent initPendingIntent = PendingIntent.getBroadcast(context, 0, initIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent initPendingIntent = PendingIntent.getBroadcast(context, appWidgetId, initIntent, 0);
 				try {
 					initPendingIntent.send();
 				} catch (PendingIntent.CanceledException e) {
@@ -558,7 +560,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 	}
 
 	public enum WidgetAttributes {
-		WIDGET_ATTRIBUTES_ID_, APP_WIDGET_ID, BACKGROUND_ALPHA, LOCATION_TYPE, WEATHER_SOURCE_TYPE, TOP_PRIORITY_KMA,
-		UPDATE_INTERVAL, DISPLAY_DATETIME, DISPLAY_LOCAL_DATETIME, SELECTED_ADDRESS_DTO_ID, LAYOUT_ID
+		WIDGET_ATTRIBUTES_ID, APP_WIDGET_ID, BACKGROUND_ALPHA, LOCATION_TYPE, WEATHER_SOURCE_TYPE, TOP_PRIORITY_KMA,
+		UPDATE_INTERVAL, DISPLAY_DATETIME, DISPLAY_LOCAL_DATETIME, SELECTED_ADDRESS_DTO_ID, WIDGET_CLASS, REMOTE_VIEWS;
 	}
 }

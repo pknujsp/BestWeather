@@ -1,17 +1,14 @@
 package com.lifedawn.bestweather.widget;
 
 import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Parcel;
 import android.util.ArrayMap;
 import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
-import androidx.preference.PreferenceManager;
 
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
@@ -20,41 +17,35 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqic
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
-import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.ValueUnit;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
-import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
-import java.util.TimeZone;
 
 public class CurrentFirst extends RootAppWidget {
 
 	@Override
-	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+	Class<?> getThisClass() {
+		return getClass();
+	}
 
+	@Override
+	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+		super.onUpdate(context, appWidgetManager, appWidgetIds);
 	}
 
 	@Override
 	public void onEnabled(Context context) {
+		super.onEnabled(context);
 	}
 
 	@Override
 	public void onDisabled(Context context) {
+		super.onEnabled(context);
 	}
 
 	@Override
@@ -69,6 +60,7 @@ public class CurrentFirst extends RootAppWidget {
 
 	@Override
 	public void onTimeTick(Context context) {
+		/*
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		ZonedDateTime now = ZonedDateTime.now();
 		ComponentName componentName = new ComponentName(context.getPackageName(), CurrentFirst.class.getName());
@@ -82,9 +74,9 @@ public class CurrentFirst extends RootAppWidget {
 						R.string.clock_24_pattern));
 
 		for (int appWidgetId : appWidgetIds) {
-			if (context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId, Context.MODE_PRIVATE)
+			if (context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
 					.getBoolean(ConfigureWidgetActivity.WidgetAttributes.DISPLAY_DATETIME.name(), false)) {
-				SharedPreferences sharedPreferences = context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId, Context.MODE_PRIVATE);
+				SharedPreferences sharedPreferences = context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE);
 				boolean displayLocalDateTime =
 						sharedPreferences.getBoolean(ConfigureWidgetActivity.WidgetAttributes.DISPLAY_LOCAL_DATETIME.name(), false);
 
@@ -94,7 +86,7 @@ public class CurrentFirst extends RootAppWidget {
 				}
 				ZonedDateTime zonedDateTime = ZonedDateTime.of(now.toLocalDateTime(), ZoneId.of(timeZoneId));
 
-				RemoteViews remoteViews = createViews(context, appWidgetId,
+				RemoteViews remoteViews = createViews(context,
 						sharedPreferences.getInt(ConfigureWidgetActivity.WidgetAttributes.LAYOUT_ID.name(), 0));
 				remoteViews.setTextViewText(R.id.date, zonedDateTime.format(dateFormatter));
 				remoteViews.setTextViewText(R.id.time, zonedDateTime.format(timeFormatter));
@@ -102,13 +94,15 @@ public class CurrentFirst extends RootAppWidget {
 				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 			}
 		}
+
+		 */
 	}
 
 	@Override
-	public void loadWeatherData(Context context, int appWidgetId) {
-		super.loadWeatherData(context, appWidgetId);
+	public void loadWeatherData(Context context, AppWidgetManager appWidgetManager, RemoteViews remoteViews, int appWidgetId) {
+		super.loadWeatherData(context, appWidgetManager, remoteViews, appWidgetId);
 		SharedPreferences widgetAttributes =
-				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId,
+				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
 						Context.MODE_PRIVATE);
 		final WeatherSourceType weatherSourceType =
 				WeatherSourceType.valueOf(widgetAttributes.getString(ConfigureWidgetActivity.WidgetAttributes.WEATHER_SOURCE_TYPE.name(),
@@ -145,17 +139,15 @@ public class CurrentFirst extends RootAppWidget {
 			@Override
 			public void onResult() {
 				initWeatherSourceUniqueValues(context, weatherSourceType);
-				setResultViews(context, appWidgetId, this);
+				setResultViews(context, appWidgetId, remoteViews, appWidgetManager, this);
 			}
 		});
 	}
 
 	@Override
-	public void setResultViews(Context context, int appWidgetId, @Nullable MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
-		super.setResultViews(context, appWidgetId, multipleJsonDownloader);
-
+	void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, AppWidgetManager appWidgetManager, @Nullable @org.jetbrains.annotations.Nullable MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
 		SharedPreferences widgetAttributes =
-				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId,
+				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
 						Context.MODE_PRIVATE);
 		final WeatherSourceType requestWeatherSourceType =
 				WeatherSourceType.valueOf(widgetAttributes.getString(ConfigureWidgetActivity.WidgetAttributes.WEATHER_SOURCE_TYPE.name(),
@@ -165,8 +157,6 @@ public class CurrentFirst extends RootAppWidget {
 				appWidgetId);
 		HeaderObj headerObj = getHeader(context, multipleJsonDownloader, appWidgetId, currentConditionsObj.timeZone);
 
-		RemoteViews remoteViews = createViews(context, appWidgetId,
-				widgetAttributes.getInt(ConfigureWidgetActivity.WidgetAttributes.LAYOUT_ID.name(), 0));
 		remoteViews.setTextViewText(R.id.address, headerObj.address);
 		remoteViews.setTextViewText(R.id.refresh, headerObj.refreshDateTime);
 		remoteViews.setTextViewText(R.id.current_temperature, currentConditionsObj.temp);
@@ -188,7 +178,6 @@ public class CurrentFirst extends RootAppWidget {
 		remoteViews.setViewVisibility(R.id.content_container, View.VISIBLE);
 		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
 
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 }

@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.widget;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -59,22 +58,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 
 import retrofit2.Response;
 
-public class RootAppWidget extends AppWidgetProvider {
-	public void onTimeTick(Context context) {
+public abstract class RootAppWidget extends AppWidgetProvider {
+	abstract Class<?> getThisClass();
 
-	}
+	abstract void onTimeTick(Context context);
 
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
 		super.onDeleted(context, appWidgetIds);
 		for (int appWidgetId : appWidgetIds) {
-			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.APP_WIDGET_ID.name() + appWidgetId, Context.MODE_PRIVATE)
+			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
 					.edit().clear().apply();
 		}
 	}
@@ -82,19 +80,20 @@ public class RootAppWidget extends AppWidgetProvider {
 	public void init(Context context, Bundle bundle) {
 		//초기화
 		Class<?> className = (Class<?>) bundle.getSerializable(context.getString(R.string.bundle_key_widget_class_name));
+		RemoteViews remoteViews = bundle.getParcelable(ConfigureWidgetActivity.WidgetAttributes.REMOTE_VIEWS.name());
 		int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		int layoutId = bundle.getInt(context.getString(R.string.bundle_key_widget_layout_id));
-		SharedPreferences sharedPreferences =
-				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId,
+		int layoutId = remoteViews.getLayoutId();
+
+		final SharedPreferences sharedPreferences =
+				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
 						Context.MODE_PRIVATE);
 		LocationType locationType =
 				LocationType.valueOf(sharedPreferences.getString(ConfigureWidgetActivity.WidgetAttributes.LOCATION_TYPE.name(),
 						LocationType.CurrentLocation.name()));
 
 		if (locationType == LocationType.CurrentLocation) {
-			loadCurrentLocation(context, className, appWidgetId);
+			loadCurrentLocation(context, remoteViews, appWidgetId);
 		} else {
-
 			if (sharedPreferences.getString(WidgetDataKeys.COUNTRY_CODE.name(), "").equals("KR")) {
 				if (sharedPreferences.getBoolean(ConfigureWidgetActivity.WidgetAttributes.TOP_PRIORITY_KMA.name(), false)) {
 					sharedPreferences.edit().putString(ConfigureWidgetActivity.WidgetAttributes.WEATHER_SOURCE_TYPE.name(),
@@ -102,12 +101,11 @@ public class RootAppWidget extends AppWidgetProvider {
 				}
 			}
 
-			RemoteViews remoteViews = createViews(context, appWidgetId, layoutId);
-			remoteViews.setOnClickPendingIntent(R.id.content_container, getOnClickedPendingIntent(context,
+			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent(context,
 					className, appWidgetId));
 			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-			loadWeatherData(context, appWidgetId);
+			loadWeatherData(context, appWidgetManager, remoteViews, appWidgetId);
 		}
 	}
 
@@ -115,26 +113,15 @@ public class RootAppWidget extends AppWidgetProvider {
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
 		String action = intent.getAction();
+		Log.e("APP WIDGET TAG : ", action);
 
 		if (action.equals(context.getString(R.string.ACTION_INIT))) {
-			Bundle bundle = intent.getExtras();
-			final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-			init(context, bundle);
+			init(context, intent.getExtras());
 		} else if (action.equals(context.getString(R.string.ACTION_REFRESH))) {
-			/*
 			Bundle bundle = intent.getExtras();
-			final Class<?> widgetClass = (Class<?>) bundle.getSerializable(context.getString(R.string.bundle_key_widgetname));
-			final int layoutId = bundle.getInt(context.getString(R.string.bundle_key_widget_layout_id));
-
-			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-			ComponentName componentName = new ComponentName(context.getPackageName(), widgetClass.getName());
-			int[] widgetIds = appWidgetManager.getAppWidgetIds(componentName);
-
-			for (int appWidgetId : widgetIds) {
-				loadWeatherData(context, appWidgetId);
-			}
-
-			 */
+			int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+			RemoteViews remoteViews = bundle.getParcelable(ConfigureWidgetActivity.WidgetAttributes.REMOTE_VIEWS.name());
+			loadWeatherData(context, AppWidgetManager.getInstance(context), remoteViews, appWidgetId);
 		} else if (action.equals(context.getString(R.string.ACTION_SHOW_DIALOG))) {
 			Intent i = new Intent(context, DialogActivity.class);
 			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -145,21 +132,10 @@ public class RootAppWidget extends AppWidgetProvider {
 		} else if (action.equals(Settings.ACTION_LOCATION_SOURCE_SETTINGS)) {
 			context.startActivity(intent);
 		} else if (action.equals(context.getString(R.string.ACTION_REFRESH_CURRENT_LOCATION))) {
-			/*
 			Bundle bundle = intent.getExtras();
-			final Class<?> widgetClass = (Class<?>) bundle.getSerializable(context.getString(R.string.bundle_key_widgetname));
-
-			AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-			ComponentName componentName = new ComponentName(context.getPackageName(), widgetClass.getName());
-			int[] widgetIds = appWidgetManager.getAppWidgetIds(componentName);
-
-			for (int appWidgetId : widgetIds) {
-				if (widgetDataObjArrayMap.get(appWidgetId).locationType == LocationType.CurrentLocation) {
-					loadCurrentLocation(context, appWidgetId, widgetDataObjArrayMap.get(appWidgetId).remoteViews, widgetClass);
-				}
-			}
-
-			 */
+			int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+			RemoteViews remoteViews = bundle.getParcelable(ConfigureWidgetActivity.WidgetAttributes.REMOTE_VIEWS.name());
+			loadCurrentLocation(context, remoteViews, appWidgetId);
 		} else if (action.equals(Intent.ACTION_TIME_TICK)) {
 			onTimeTick(context);
 		}
@@ -172,18 +148,17 @@ public class RootAppWidget extends AppWidgetProvider {
 		super.onEnabled(context);
 	}
 
-	public static RemoteViews createNewViews(Context context, int appWidgetId, int layoutId) {
+
+	public static RemoteViews createRemoteViews(Context context, int appWidgetId, int layoutId) {
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
 		SharedPreferences widgetAttributes =
-				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.APP_WIDGET_ID.name() + appWidgetId, Context.MODE_PRIVATE);
+				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE);
 		Map<String, ?> map = widgetAttributes.getAll();
 		Set<? extends Map.Entry<String, ?>> entrySet = map.entrySet();
 
-		int viewId = 0;
 		for (Map.Entry<String, ?> entry : entrySet) {
 			try {
-				viewId = Integer.parseInt(entry.getKey());
-				remoteViews.setTextViewTextSize(viewId, TypedValue.COMPLEX_UNIT_PX, Float.parseFloat((String) entry.getValue()));
+				remoteViews.setTextViewTextSize(Integer.parseInt(entry.getKey()), TypedValue.COMPLEX_UNIT_PX, (Float) entry.getValue());
 			} catch (NumberFormatException e) {
 
 			}
@@ -198,15 +173,10 @@ public class RootAppWidget extends AppWidgetProvider {
 		return remoteViews;
 	}
 
-	public static RemoteViews createViews(Context context, int appWidgetId, int layoutId) {
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
-		return remoteViews;
-	}
-
 	public void setWatch(Context context, RemoteViews remoteViews, TimeZone timeZone) {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern));
 		ValueUnits clockUnit =
-				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
+				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
 		DateTimeFormatter timeFormatter =
 				DateTimeFormatter.ofPattern(context.getString(clockUnit == ValueUnits.clock12 ? R.string.clock_12_pattern :
 						R.string.clock_24_pattern));
@@ -220,26 +190,23 @@ public class RootAppWidget extends AppWidgetProvider {
 		Intent intent = new Intent(context, className);
 		intent.setAction(context.getString(R.string.ACTION_SHOW_DIALOG));
 		Bundle bundle = new Bundle();
-		bundle.putSerializable(context.getString(R.string.bundle_key_widget_class_name), className);
+		bundle.putSerializable(ConfigureWidgetActivity.WidgetAttributes.WIDGET_CLASS.name(), className);
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 		intent.putExtras(bundle);
 
 		return PendingIntent.getBroadcast(
-				context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				context, appWidgetId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	}
 
-	public void loadCurrentLocation(Context context, Class<?> className, int appWidgetId) {
+	public void loadCurrentLocation(Context context, RemoteViews remoteViews, int appWidgetId) {
 		final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		SharedPreferences widgetAttributes =
-				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId,
+		final SharedPreferences widgetAttributes =
+				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
 						Context.MODE_PRIVATE);
 
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-				widgetAttributes.getInt(ConfigureWidgetActivity.WidgetAttributes.LAYOUT_ID.name(), 0));
 		remoteViews.setViewVisibility(R.id.content_container, View.GONE);
 		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
 		remoteViews.setViewVisibility(R.id.progressbar, View.VISIBLE);
-
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 		Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
@@ -257,13 +224,10 @@ public class RootAppWidget extends AppWidgetProvider {
 								editor.putString(ConfigureWidgetActivity.WidgetAttributes.WEATHER_SOURCE_TYPE.name(), WeatherSourceType.KMA.name());
 							}
 						}
-						editor.putString(WidgetDataKeys.COUNTRY_CODE.name(), countryCode).apply();
+						editor.putString(WidgetDataKeys.COUNTRY_CODE.name(), countryCode).commit();
 
-						remoteViews.setOnClickPendingIntent(R.id.content_container, getOnClickedPendingIntent(context,
-								className, appWidgetId));
 						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-
-						loadWeatherData(context, appWidgetId);
+						loadWeatherData(context, appWidgetManager, remoteViews, appWidgetId);
 					}
 				});
 			}
@@ -283,7 +247,7 @@ public class RootAppWidget extends AppWidgetProvider {
 					intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 				}
 
-				PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, pendingIntent);
 
 				remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
@@ -300,18 +264,11 @@ public class RootAppWidget extends AppWidgetProvider {
 	}
 
 
-	public void loadWeatherData(Context context, int appWidgetId) {
-		SharedPreferences widgetAttributes =
-				context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId,
-						Context.MODE_PRIVATE);
-
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-				widgetAttributes.getInt(ConfigureWidgetActivity.WidgetAttributes.LAYOUT_ID.name(), 0));
+	public void loadWeatherData(Context context, AppWidgetManager appWidgetManager, RemoteViews remoteViews, int appWidgetId) {
 		remoteViews.setViewVisibility(R.id.content_container, View.GONE);
 		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
 		remoteViews.setViewVisibility(R.id.progressbar, View.VISIBLE);
-
-		AppWidgetManager.getInstance(context).updateAppWidget(appWidgetId, remoteViews);
+		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 
 	public static void initWeatherSourceUniqueValues(Context context, WeatherSourceType weatherSourceType) {
@@ -344,8 +301,7 @@ public class RootAppWidget extends AppWidgetProvider {
 		return requestWeatherSources;
 	}
 
-	public void setResultViews(Context context, int appWidgetId, @Nullable MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
-	}
+	abstract void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, AppWidgetManager appWidgetManager, @Nullable MultipleJsonDownloader<JsonElement> multipleJsonDownloader);
 
 	public final HeaderObj getHeader(Context context, MultipleJsonDownloader<JsonElement> multipleJsonDownloader, int appWidgetId, TimeZone timeZone) {
 		if (timeZone == null) {
@@ -354,12 +310,18 @@ public class RootAppWidget extends AppWidgetProvider {
 			headerObj.refreshDateTime = context.getString(R.string.error);
 			return headerObj;
 		} else {
+			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+			ValueUnits clockUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_clock),
+					ValueUnits.clock12.name()));
+
 			ZonedDateTime updatedTime = ZonedDateTime.now(ZoneId.of(timeZone.getID()));
 
 			HeaderObj headerObj = new HeaderObj(true);
-			headerObj.address = context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId, Context.MODE_PRIVATE)
+			headerObj.address = context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
 					.getString(WidgetDataKeys.ADDRESS_NAME.name(), "");
-			headerObj.refreshDateTime = updatedTime.format(DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern)));
+			headerObj.refreshDateTime =
+					updatedTime.format(DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ?
+							context.getString(R.string.datetime_pattern_clock12) : context.getString(R.string.datetime_pattern_clock24)));
 			return headerObj;
 		}
 	}
@@ -394,7 +356,7 @@ public class RootAppWidget extends AppWidgetProvider {
 							KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()) + ", " + finalCurrentConditions.getPrecipitation1Hour() + precipitationUnitStr;
 
 					SharedPreferences sharedPreferences =
-							context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId,
+							context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
 									Context.MODE_PRIVATE);
 
 					timeZone = TimeZone.getTimeZone("Asia/Seoul");
@@ -486,7 +448,7 @@ public class RootAppWidget extends AppWidgetProvider {
 			currentConditionsObj.realFeelTemp = realFeelTemp;
 			currentConditionsObj.precipitation = precipitation;
 			currentConditionsObj.weatherIcon = weatherIcon;
-			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId, Context.MODE_PRIVATE)
+			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
 					.edit().putString(WidgetDataKeys.TIMEZONE.name(), timeZone.getID()).apply();
 		} else {
 			currentConditionsObj.temp = notData;
@@ -525,7 +487,7 @@ public class RootAppWidget extends AppWidgetProvider {
 					ZonedDateTime end = ZonedDateTime.of(finalHourlyForecastList.get(finalHourlyForecastList.size() - 1).getFcstDateTime(),
 							ZoneId.of(timeZone.getID()));
 					SharedPreferences sharedPreferences =
-							context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId,
+							context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
 									Context.MODE_PRIVATE);
 
 					Double latitude = Double.parseDouble(sharedPreferences.getString(WidgetDataKeys.LATITUDE.name(), "0.0"));
@@ -625,7 +587,7 @@ public class RootAppWidget extends AppWidgetProvider {
 
 		}
 		if (successfulResponse) {
-			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId, Context.MODE_PRIVATE)
+			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
 					.edit().putString(WidgetDataKeys.TIMEZONE.name(), timeZone.getID()).apply();
 			hourlyForecastObjList.get(0).timeZone = timeZone;
 		}
@@ -742,7 +704,7 @@ public class RootAppWidget extends AppWidgetProvider {
 
 		if (successfulResponse) {
 			dailyForecastObjList.get(0).timeZone = timeZone;
-			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID_.name() + appWidgetId, Context.MODE_PRIVATE)
+			context.getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, Context.MODE_PRIVATE)
 					.edit().putString(WidgetDataKeys.TIMEZONE.name(), timeZone.getID()).apply();
 		}
 		return dailyForecastObjList;
