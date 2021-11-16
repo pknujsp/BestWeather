@@ -22,15 +22,16 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -70,8 +71,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 	private SharedPreferences sharedPreferences;
 	private boolean isKr;
 	private long autoRefreshInterval;
-	private ArrayMap<Integer, TextView> textViewMap = new ArrayMap<>();
-	private ArrayMap<Integer, Float> textSizeMap = new ArrayMap<>();
+	private ArrayMap<TextView, Float> textOriginalSizeMap = new ArrayMap<>();
 
 	private OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
 		@Override
@@ -126,17 +126,29 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 
 		layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
 		previewWidgetView = (ViewGroup) getLayoutInflater().inflate(layoutId, null);
-		loadTextViewsAndTextSize();
-		binding.previewWidgetContainer.addView(previewWidgetView);
+		initPreviewWidget();
 
-		//위치, 날씨제공사, 대한민국 최우선, 자동 업데이트 간격, 날짜와 시각표시,
-		//현지 시각으로 표시, 글자크기, 배경 투명도
-		initLocation();
-		initWeatherDataSource();
-		initAutoRefreshInterval();
-		initDisplayDateTime();
-		initTextSize();
-		initBackground();
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				loadTextViewsAndTextSize();
+
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						binding.previewWidgetContainer.addView(previewWidgetView);
+						//위치, 날씨제공사, 대한민국 최우선, 자동 업데이트 간격, 날짜와 시각표시,
+						//현지 시각으로 표시, 글자크기, 배경 투명도
+						initLocation();
+						initWeatherDataSource();
+						initAutoRefreshInterval();
+						initDisplayDateTime();
+						initTextSize();
+						initBackground();
+					}
+				});
+			}
+		}).start();
 
 		binding.check.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -146,20 +158,19 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 					return;
 				}
 				Context context = getApplicationContext();
-
 				Class<?> className = null;
 				switch (layoutId) {
 					case R.layout.widget_current:
 						className = WidgetCurrent.class;
 						break;
-					case R.layout.current_daily:
-						className = CurrentDaily.class;
+					case R.layout.widget_current_hourly:
+						className = WidgetCurrentHourly.class;
 						break;
-					case R.layout.current_hourly:
-						className = CurrentHourly.class;
+					case R.layout.widget_current_daily:
+						className = WidgetCurrentDaily.class;
 						break;
-					case R.layout.current_hourly_daily:
-						className = CurrentHourlyDaily.class;
+					case R.layout.widget_current_hourly_daily:
+						className = WidgetCurrentHourlyDaily.class;
 						break;
 				}
 
@@ -174,9 +185,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 				//appwidget id
 				editor.putInt(WidgetAttributes.APP_WIDGET_ID.name(), appWidgetId);
 				//view text size
-				for (int i = 0; i < textViewMap.size(); i++) {
-					editor.putFloat(textViewMap.keyAt(i).toString(), textViewMap.valueAt(i).getTextSize());
-				}
+
 				//background alpha
 				editor.putInt(WidgetAttributes.BACKGROUND_ALPHA.name(), previewWidgetView.getBackground().getAlpha());
 				//location type
@@ -206,10 +215,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 				RemoteViews remoteViews = RootAppWidget.createRemoteViews(getApplicationContext(), appWidgetId, layoutId);
 				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
-				if (binding.displayDatetimeSwitch.isChecked()) {
-					registerReceiver(new WidgetCurrent(), new IntentFilter(Intent.ACTION_TIME_TICK));
-				}
-
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 				setResult(RESULT_OK, resultIntent);
@@ -237,74 +242,103 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 
 	}
 
-	@SuppressLint("NonConstantResourceId")
+	private void initPreviewWidget() {
+		if (previewWidgetView.findViewById(R.id.hourly_forecast_rows) != null) {
+			final int size = 10;
+			LocalDateTime now = LocalDateTime.now();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M.d H");
+			String hours = null;
+			LayoutInflater layoutInflater = getLayoutInflater();
+
+			ViewGroup row1 = ((ViewGroup) previewWidgetView.findViewById(R.id.hourly_forecast_row));
+
+			for (int i = 0; i < size; i++) {
+				View view = layoutInflater.inflate(R.layout.view_hourly_forecast_item_in_widget, null);
+				if (now.getHour() == 0) {
+					hours = now.format(formatter);
+				} else {
+					hours = String.valueOf(now.getHour());
+				}
+				now = now.plusHours(1);
+
+				((TextView) view.findViewById(R.id.hourly_clock)).setText(hours);
+				
+				row1.addView(view);
+			}
+		}
+		if (previewWidgetView.findViewById(R.id.daily_forecast_row) != null) {
+			final int size = 4;
+			LocalDateTime now = LocalDateTime.now();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M.d E");
+			String date = null;
+			LayoutInflater layoutInflater = getLayoutInflater();
+
+			ViewGroup row = ((ViewGroup) previewWidgetView.findViewById(R.id.daily_forecast_row));
+
+			for (int i = 0; i < size; i++) {
+				View view = layoutInflater.inflate(R.layout.view_daily_forecast_item_in_widget, null);
+				date = now.format(formatter);
+				now = now.plusDays(1);
+
+				((TextView) view.findViewById(R.id.daily_date)).setText(date);
+				row.addView(view);
+			}
+		}
+	}
+
 	private void loadTextViewsAndTextSize() {
-		switch (layoutId) {
-			case R.layout.widget_current:
-				createTextViewMap(R.id.address, R.id.refresh, R.id.current_temperature, R.id.current_realfeel_temperature, R.id.current_airquality, R.id.current_precipitation);
-				createTextViewSizeMap(R.id.address, R.id.refresh, R.id.current_temperature, R.id.current_realfeel_temperature, R.id.current_airquality, R.id.current_precipitation);
-				break;
+		TextView textView = ((TextView) previewWidgetView.findViewById(R.id.address));
+		textOriginalSizeMap.put(textView, textView.getTextSize());
+		textView = ((TextView) previewWidgetView.findViewById(R.id.refresh));
+		textOriginalSizeMap.put(textView, textView.getTextSize());
 
-			case R.layout.current_daily:
-				createTextViewMap(R.id.address, R.id.refresh, R.id.current_temperature, R.id.current_realfeel_temperature, R.id.current_airquality, R.id.current_precipitation,
-						R.id.daily_date1, R.id.daily_date2, R.id.daily_date3, R.id.daily_date4, R.id.daily_left_weather_icon1, R.id.daily_left_weather_icon2,
-						R.id.daily_left_weather_icon3, R.id.daily_left_weather_icon4, R.id.daily_right_weather_icon1, R.id.daily_right_weather_icon2,
-						R.id.daily_right_weather_icon3, R.id.daily_right_weather_icon4, R.id.daily_temperature1, R.id.daily_temperature2, R.id.daily_temperature3,
-						R.id.daily_temperature4);
-				createTextViewSizeMap(R.id.address, R.id.refresh, R.id.current_temperature, R.id.current_realfeel_temperature, R.id.current_airquality, R.id.current_precipitation,
-						R.id.daily_date1, R.id.daily_date2, R.id.daily_date3, R.id.daily_date4, R.id.daily_left_weather_icon1, R.id.daily_left_weather_icon2,
-						R.id.daily_left_weather_icon3, R.id.daily_left_weather_icon4, R.id.daily_right_weather_icon1, R.id.daily_right_weather_icon2,
-						R.id.daily_right_weather_icon3, R.id.daily_right_weather_icon4, R.id.daily_temperature1, R.id.daily_temperature2, R.id.daily_temperature3,
-						R.id.daily_temperature4);
-				break;
+		textView = ((TextView) previewWidgetView.findViewById(R.id.date));
+		textOriginalSizeMap.put(textView, textView.getTextSize());
+		textView = ((TextView) previewWidgetView.findViewById(R.id.time));
+		textOriginalSizeMap.put(textView, textView.getTextSize());
 
-			case R.layout.current_hourly:
-				createTextViewMap(R.id.address, R.id.refresh, R.id.current_temperature, R.id.current_realfeel_temperature, R.id.current_airquality, R.id.current_precipitation,
-						R.id.hourly_clock1, R.id.hourly_clock2, R.id.hourly_clock3, R.id.hourly_clock4, R.id.hourly_clock5, R.id.hourly_clock6, R.id.hourly_clock7, R.id.hourly_clock8,
-						R.id.hourly_clock9,
-						R.id.hourly_clock10, R.id.hourly_temperature1, R.id.hourly_temperature2, R.id.hourly_temperature3, R.id.hourly_temperature4, R.id.hourly_temperature5,
-						R.id.hourly_temperature6, R.id.hourly_temperature7, R.id.hourly_temperature8, R.id.hourly_temperature9, R.id.hourly_temperature10);
-				createTextViewSizeMap(R.id.address, R.id.refresh, R.id.current_temperature, R.id.current_realfeel_temperature, R.id.current_airquality, R.id.current_precipitation,
-						R.id.hourly_clock1, R.id.hourly_clock2, R.id.hourly_clock3, R.id.hourly_clock4, R.id.hourly_clock5, R.id.hourly_clock6, R.id.hourly_clock7, R.id.hourly_clock8,
-						R.id.hourly_clock9,
-						R.id.hourly_clock10, R.id.hourly_temperature1, R.id.hourly_temperature2, R.id.hourly_temperature3, R.id.hourly_temperature4, R.id.hourly_temperature5,
-						R.id.hourly_temperature6, R.id.hourly_temperature7, R.id.hourly_temperature8, R.id.hourly_temperature9, R.id.hourly_temperature10);
-				break;
+		textView = ((TextView) previewWidgetView.findViewById(R.id.current_temperature));
+		textOriginalSizeMap.put(textView, textView.getTextSize());
+		textView = ((TextView) previewWidgetView.findViewById(R.id.current_realfeel_temperature));
+		textOriginalSizeMap.put(textView, textView.getTextSize());
+		textView = ((TextView) previewWidgetView.findViewById(R.id.current_airquality));
+		textOriginalSizeMap.put(textView, textView.getTextSize());
+		textView = ((TextView) previewWidgetView.findViewById(R.id.current_precipitation));
+		textOriginalSizeMap.put(textView, textView.getTextSize());
 
-			case R.layout.current_hourly_daily:
-				createTextViewMap(R.id.address, R.id.refresh, R.id.current_temperature, R.id.current_realfeel_temperature, R.id.current_airquality, R.id.current_precipitation,
-						R.id.hourly_clock1, R.id.hourly_clock2, R.id.hourly_clock3, R.id.hourly_clock4, R.id.hourly_clock5, R.id.hourly_clock6, R.id.hourly_clock7, R.id.hourly_clock8,
-						R.id.hourly_clock9,
-						R.id.hourly_clock10, R.id.hourly_temperature1, R.id.hourly_temperature2, R.id.hourly_temperature3, R.id.hourly_temperature4, R.id.hourly_temperature5,
-						R.id.hourly_temperature6, R.id.hourly_temperature7, R.id.hourly_temperature8, R.id.hourly_temperature9,
-						R.id.hourly_temperature10, R.id.daily_date1, R.id.daily_date2, R.id.daily_date3, R.id.daily_date4, R.id.daily_left_weather_icon1, R.id.daily_left_weather_icon2,
-						R.id.daily_left_weather_icon3, R.id.daily_left_weather_icon4, R.id.daily_right_weather_icon1, R.id.daily_right_weather_icon2,
-						R.id.daily_right_weather_icon3, R.id.daily_right_weather_icon4, R.id.daily_temperature1, R.id.daily_temperature2, R.id.daily_temperature3,
-						R.id.daily_temperature4);
-				createTextViewSizeMap(R.id.address, R.id.refresh, R.id.current_temperature, R.id.current_realfeel_temperature, R.id.current_airquality, R.id.current_precipitation,
-						R.id.hourly_clock1, R.id.hourly_clock2, R.id.hourly_clock3, R.id.hourly_clock4, R.id.hourly_clock5, R.id.hourly_clock6, R.id.hourly_clock7, R.id.hourly_clock8,
-						R.id.hourly_clock9,
-						R.id.hourly_clock10, R.id.hourly_temperature1, R.id.hourly_temperature2, R.id.hourly_temperature3, R.id.hourly_temperature4, R.id.hourly_temperature5,
-						R.id.hourly_temperature6, R.id.hourly_temperature7, R.id.hourly_temperature8, R.id.hourly_temperature9,
-						R.id.hourly_temperature10, R.id.daily_date1, R.id.daily_date2, R.id.daily_date3, R.id.daily_date4, R.id.daily_left_weather_icon1, R.id.daily_left_weather_icon2,
-						R.id.daily_left_weather_icon3, R.id.daily_left_weather_icon4, R.id.daily_right_weather_icon1, R.id.daily_right_weather_icon2,
-						R.id.daily_right_weather_icon3, R.id.daily_right_weather_icon4, R.id.daily_temperature1, R.id.daily_temperature2, R.id.daily_temperature3,
-						R.id.daily_temperature4);
-				break;
+		int rowCount = 0;
+		if (previewWidgetView.findViewById(R.id.hourly_forecast_rows) != null) {
+			ViewGroup layout = ((ViewGroup) previewWidgetView.findViewById(R.id.hourly_forecast_rows));
+			rowCount = layout.getChildCount();
 
+			for (int rowIdx = 0; rowIdx < rowCount; rowIdx++) {
+				ViewGroup row = (ViewGroup) layout.getChildAt(rowIdx);
+				int cellCount = row.getChildCount();
+
+				for (int cellIdx = 0; cellIdx < cellCount; cellIdx++) {
+					View cell = row.getChildAt(cellIdx);
+
+					textView = ((TextView) cell.findViewById(R.id.hourly_clock));
+					textOriginalSizeMap.put(textView, textView.getTextSize());
+					textView = ((TextView) cell.findViewById(R.id.hourly_temperature));
+					textOriginalSizeMap.put(textView, textView.getTextSize());
+				}
+			}
 		}
-	}
+		if (previewWidgetView.findViewById(R.id.daily_forecast_row) != null) {
+			ViewGroup row = ((ViewGroup) previewWidgetView.findViewById(R.id.daily_forecast_row));
+			int cellCount = row.getChildCount();
 
-	private void createTextViewMap(int... layoutId) {
-		for (int id : layoutId) {
-			textViewMap.put(id, (TextView) previewWidgetView.findViewById(id));
-		}
-	}
+			for (int cellIdx = 0; cellIdx < cellCount; cellIdx++) {
+				View cell = row.getChildAt(cellIdx);
 
-	private void createTextViewSizeMap(int... layoutId) {
-		for (int id : layoutId) {
-			textSizeMap.put(id, textViewMap.get(id).getTextSize());
+				textView = ((TextView) cell.findViewById(R.id.daily_date));
+				textOriginalSizeMap.put(textView, textView.getTextSize());
+				textView = ((TextView) cell.findViewById(R.id.daily_temperature));
+				textOriginalSizeMap.put(textView, textView.getTextSize());
+			}
 		}
+
 	}
 
 
@@ -558,12 +592,11 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 	private void setTextSizeInWidget(float value) {
 		float originalSize = 0;
 		final float extraSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, Math.abs(value), getResources().getDisplayMetrics());
-		int viewId = 0;
 
-		for (int i = 0; i < textViewMap.size(); i++) {
-			viewId = textViewMap.keyAt(i);
-			originalSize = textSizeMap.get(viewId);
-			textViewMap.valueAt(i).setTextSize(TypedValue.COMPLEX_UNIT_PX, value < 0f ? originalSize - extraSize : originalSize + extraSize);
+		for (int i = 0; i < textOriginalSizeMap.size(); i++) {
+			originalSize = textOriginalSizeMap.valueAt(i);
+			textOriginalSizeMap.keyAt(i).setTextSize(TypedValue.COMPLEX_UNIT_PX, value < 0f ? originalSize - extraSize :
+					originalSize + extraSize);
 		}
 
 	}
@@ -575,5 +608,27 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 	public enum WidgetAttributes {
 		WIDGET_ATTRIBUTES_ID, APP_WIDGET_ID, BACKGROUND_ALPHA, LOCATION_TYPE, WEATHER_SOURCE_TYPE, TOP_PRIORITY_KMA,
 		UPDATE_INTERVAL, DISPLAY_DATETIME, DISPLAY_LOCAL_DATETIME, SELECTED_ADDRESS_DTO_ID, WIDGET_CLASS, REMOTE_VIEWS;
+	}
+
+	public static class WidgetTextViews {
+		public enum Header {
+			ADDRESS_TEXT, REFRESH_TEXT;
+		}
+
+		public enum Watch {
+			DATE_TEXT, TIME_TEXT;
+		}
+
+		public enum Current {
+			TEMP_TEXT, REAL_FEEL_TEMP_TEXT, AIR_QUALITY_TEXT, PRECIPITATION_TEXT;
+		}
+
+		public enum Hourly {
+			CLOCK_TEXT, TEMP_TEXT;
+		}
+
+		public enum Daily {
+			DATE_TEXT, TEMP_TEXT;
+		}
 	}
 }

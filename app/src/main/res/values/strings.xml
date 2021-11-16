@@ -449,6 +449,7 @@
     <string name="ACTION_REFRESH" translatable="false">ACTION_REFRESH</string>
     <string name="ACTION_SHOW_DIALOG">ACTION_SHOW_DIALOG</string>
     <string name="ACTION_REFRESH_CURRENT_LOCATION">ACTION_REFRESH_CURRENT_LOCATION</string>
+    <string name="ACTION_REFRESH_CLOCK">ACTION_REFRESH_CLOCK</string>
 
 
     <!-- auto refresh interval -->
@@ -474,4 +475,7 @@
 
     <string name="widget_current_label">현재날씨</string>
     <string name="real_feel_temperature_simple">체감</string>
+    <string name="current_hourly">현재/시간별</string>
+    <string name="current_hourly_daily">현재/시간별/일별</string>
+    <string name="current_daily">현재/일별</string>
 </resources>

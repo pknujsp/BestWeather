@@ -8,7 +8,7 @@ import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import java.util.HashSet;
 import java.util.Set;
 
-public class WidgetCurrent extends RootAppWidget {
+public class WidgetCurrentDaily extends RootAppWidget {
 	@Override
 	public void onEnabled(Context context) {
 		super.onEnabled(context);
@@ -33,11 +33,12 @@ public class WidgetCurrent extends RootAppWidget {
 	Set<RequestWeatherDataType> getRequestWeatherDataTypeSet() {
 		Set<RequestWeatherDataType> set = new HashSet<>();
 		set.add(RequestWeatherDataType.currentConditions);
+		set.add(RequestWeatherDataType.dailyForecast);
 		return set;
 	}
 
 	@Override
 	Class<?> getThis() {
-		return WidgetCurrent.class;
+		return WidgetCurrentDaily.class;
 	}
 }

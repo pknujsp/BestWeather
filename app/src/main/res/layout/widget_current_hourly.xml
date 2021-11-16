@@ -20,15 +20,11 @@
             layout="@layout/header_view_in_widget" />
 
         <include
-            android:id="@+id/watch"
-            layout="@layout/watch_view_in_widget" />
+            android:id="@+id/watch_current"
+            layout="@layout/layout_watch_and_current_in_widget" />
 
-        <include
-            android:id="@+id/current_conditions"
-            layout="@layout/simple_current_conditions_view_in_widget"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+        <include layout="@layout/simple_hourly_forecast_view_in_widget" />
+
     </LinearLayout>
 
     <ProgressBar
