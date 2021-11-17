@@ -2,25 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center"
     android:orientation="vertical">
 
-    <TextView
+    <android.widget.TextClock
         android:id="@+id/date"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="10.1 Mon"
-        android:textAlignment="center"
+        android:gravity="center"
+        android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="13sp" />
+        android:textSize="@dimen/dateTextSizeInClock" />
 
-    <TextView
+
+    <android.widget.TextClock
         android:id="@+id/time"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="10:00"
-        android:textAlignment="center"
+        android:gravity="center"
+        android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="32sp" />
+        android:textSize="@dimen/timeTextSizeInClock" />
 
 </LinearLayout>

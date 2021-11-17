@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <FrameLayout
+        android:id="@+id/root_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white">
@@ -14,162 +15,183 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/scroll_view"
+        <LinearLayout
+            android:id="@+id/widget_settings_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                tools:context=".widget.ConfigureWidgetActivity">
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/wallpaper"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop" />
 
                 <FrameLayout
-                    android:id="@+id/preview_widget_container"
+                    android:id="@+id/preview_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="24dp"
-                    android:paddingLeft="16dp"
-                    android:paddingTop="12dp"
-                    android:paddingRight="16dp"
-                    android:paddingBottom="12dp" />
+                    android:layout_height="match_parent"
+                    android:minHeight="40dp"
+                    android:paddingHorizontal="18dp"
+                    android:paddingVertical="12dp" />
 
-                <TextView
-                    style="@style/WidgetConfigureLabel"
+            </FrameLayout>
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/scroll_view"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:overScrollMode="never"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:scrollbars="none">
+
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/text_size" />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    tools:context=".widget.ConfigureWidgetActivity">
 
-                <com.google.android.material.slider.Slider
-                    android:id="@+id/text_size_slider"
-                    style="@style/WidgetConfigureConfig"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:stepSize="1"
-                    android:value="0"
-                    android:valueFrom="-4"
-                    android:valueTo="4" />
+                    <TextView
+                        style="@style/WidgetConfigureLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_size" />
 
-                <TextView
-                    style="@style/WidgetConfigureLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/background_transparency" />
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/text_size_slider"
+                        style="@style/WidgetConfigureConfig"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:stepSize="1"
+                        android:value="0"
+                        android:valueFrom="-4"
+                        android:valueTo="4" />
 
-                <SeekBar
-                    android:id="@+id/background_transparency_slider"
-                    style="@style/WidgetConfigureConfig"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="255" />
+                    <TextView
+                        style="@style/WidgetConfigureLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/background_transparency" />
 
-                <TextView
-                    style="@style/WidgetConfigureLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/location" />
+                    <SeekBar
+                        android:id="@+id/background_transparency_slider"
+                        style="@style/WidgetConfigureConfig"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100" />
 
-                <RadioGroup
-                    android:id="@+id/location_radio_group"
-                    style="@style/WidgetConfigureConfig"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    <TextView
+                        style="@style/WidgetConfigureLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/location" />
 
-                    <RadioButton
-                        android:id="@+id/current_location_radio"
+                    <RadioGroup
+                        android:id="@+id/location_radio_group"
+                        style="@style/WidgetConfigureConfig"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <RadioButton
+                            android:id="@+id/current_location_radio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/current_location" />
+
+                        <RadioButton
+                            android:id="@+id/selected_location_radio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/selected_location" />
+
+                    </RadioGroup>
+
+                    <Button
+                        android:id="@+id/change_address_btn"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/current_location" />
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/change_address"
+                        android:visibility="gone" />
 
-                    <RadioButton
-                        android:id="@+id/selected_location_radio"
-                        android:layout_width="wrap_content"
+                    <TextView
+                        style="@style/WidgetConfigureLabel"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/selected_location" />
+                        android:text="@string/pref_title_weather_data_sources" />
 
-                </RadioGroup>
+                    <RadioGroup
+                        android:id="@+id/weather_data_source_radio_group"
+                        style="@style/WidgetConfigureConfig"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
 
-                <Button
-                    android:id="@+id/change_address_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/change_address"
-                    android:visibility="gone" />
+                        <RadioButton
+                            android:id="@+id/accu_weather_radio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/accu_weather" />
 
-                <TextView
-                    style="@style/WidgetConfigureLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/pref_title_weather_data_sources" />
+                        <RadioButton
+                            android:id="@+id/owm_radio"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/owm" />
 
-                <RadioGroup
-                    android:id="@+id/weather_data_source_radio_group"
-                    style="@style/WidgetConfigureConfig"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    </RadioGroup>
 
-                    <RadioButton
-                        android:id="@+id/accu_weather_radio"
-                        android:layout_width="wrap_content"
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/kma_top_priority_switch"
+                        style="@style/WidgetConfigureLabel"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/accu_weather" />
+                        android:checked="false"
+                        android:text="@string/pref_title_kma_top_priority" />
 
-                    <RadioButton
-                        android:id="@+id/owm_radio"
-                        android:layout_width="wrap_content"
+                    <TextView
+                        style="@style/WidgetConfigureLabel"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/owm" />
+                        android:text="@string/auto_refresh_interval" />
 
-                </RadioGroup>
+                    <Spinner
+                        android:id="@+id/auto_refresh_interval_spinner"
+                        style="@style/WidgetConfigureConfig"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
 
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/kma_top_priority_switch"
-                    style="@style/WidgetConfigureLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:checked="false"
-                    android:text="@string/pref_title_kma_top_priority" />
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/display_datetime_switch"
+                        style="@style/WidgetConfigureLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="@string/display_datetime" />
 
-                <TextView
-                    style="@style/WidgetConfigureLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/auto_refresh_interval" />
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/display_local_datetime_switch"
+                        style="@style/WidgetConfigureLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/display_local_datetime" />
 
-                <Spinner
-                    android:id="@+id/auto_refresh_interval_spinner"
-                    style="@style/WidgetConfigureConfig"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    <Button
+                        android:id="@+id/check"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/create_widget" />
 
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/display_datetime_switch"
-                    style="@style/WidgetConfigureLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/display_datetime" />
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
 
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/display_local_datetime_switch"
-                    style="@style/WidgetConfigureLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/display_local_datetime"
-                    android:visibility="gone" />
+        </LinearLayout>
 
 
-                <Button
-                    android:id="@+id/check"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/create_widget" />
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
     </FrameLayout>
 </layout>

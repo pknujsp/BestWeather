@@ -61,6 +61,7 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -207,14 +208,19 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 
 	@Override
 	public void loadImgOfCurrentConditions(WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude,
-	                                       TimeZone timeZone) {
-		Calendar calendar = Calendar.getInstance(timeZone);
-		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(
-				new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), calendar.getTimeZone());
-		Calendar sunRiseCalendar = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(calendar);
-		Calendar sunSetCalendar = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(calendar);
+	                                       ZoneId zoneId) {
+		Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
 
-		final long currentTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(calendar.getTimeInMillis());
+		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(
+				new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), currentCalendar.getTimeZone());
+		Calendar sunRiseCalendar = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(currentCalendar);
+		Calendar sunSetCalendar = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(currentCalendar);
+
+		if (sunRiseCalendar == null || sunSetCalendar == null) {
+			return;
+		}
+
+		final long currentTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(currentCalendar.getTimeInMillis());
 		final long sunRiseTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunRiseCalendar.getTimeInMillis());
 		final long sunSetTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunSetCalendar.getTimeInMillis());
 

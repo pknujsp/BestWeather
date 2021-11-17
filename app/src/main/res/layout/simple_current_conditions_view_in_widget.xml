@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/temperature"
                 android:textColor="@color/white"
-                android:textSize="20sp" />
+                android:textSize="@dimen/tempTextSizeInCurrent" />
 
             <TextView
                 android:id="@+id/current_realfeel_temperature"
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/real_feel_temperature"
                 android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textSize="@dimen/realFeelTempTextSizeInCurrent" />
 
         </LinearLayout>
     </LinearLayout>
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/air_quality"
                 android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textSize="@dimen/airQualityTextSizeInCurrent" />
 
         </LinearLayout>
 
@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/precipitation_volume"
                 android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textSize="@dimen/precipitationTextSizeInCurrent" />
 
         </LinearLayout>
     </LinearLayout>

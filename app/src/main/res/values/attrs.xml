@@ -38,6 +38,7 @@
     <attr name="iconColor" format="color" />
     <attr name="lineColor" format="color" />
     <attr name="alertDialogStyle" format="reference" />
+
     <declare-styleable name="AppWidgetAttrs">
         <attr name="appWidgetBackgroundColor" format="color" />
         <attr name="appWidgetTextColor" format="color" />

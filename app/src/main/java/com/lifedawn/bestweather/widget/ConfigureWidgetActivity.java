@@ -14,41 +14,41 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentResultListener;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
+import android.app.WallpaperManager;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.ArrayMap;
+import android.util.Log;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.SpinnerAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.slider.Slider;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.ActivityConfigureWidgetBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
@@ -56,39 +56,37 @@ import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class ConfigureWidgetActivity extends AppCompatActivity {
+public class ConfigureWidgetActivity extends AppCompatActivity implements WidgetCreator.WidgetUpdateCallback {
+	private static String tag = "ConfigureWidgetActivity";
 	private ActivityConfigureWidgetBinding binding;
 	private Integer appWidgetId;
 	private Integer layoutId;
-	private ViewGroup previewWidgetView;
+	private boolean isKr;
 
 	private FavoriteAddressDto newSelectedAddressDto;
 	private Gps gps;
-	private SharedPreferences sharedPreferences;
-	private boolean isKr;
-	private long autoRefreshInterval;
-	private ArrayMap<TextView, Float> textOriginalSizeMap = new ArrayMap<>();
 
-	private OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+	private WidgetCreator widgetCreator;
+
+	private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
 		@Override
 		public void handleOnBackPressed() {
 			if (!getSupportFragmentManager().popBackStackImmediate()) {
+				getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE).edit().clear().apply();
 				setResult(RESULT_CANCELED);
 				finish();
 			}
 		}
 	};
 
-	private FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
 		@Override
 		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 			super.onFragmentCreated(fm, f, savedInstanceState);
 			if (f instanceof FavoritesFragment) {
-				binding.scrollView.setVisibility(View.GONE);
+				binding.widgetSettingsContainer.setVisibility(View.GONE);
 				binding.fragmentContainer.setVisibility(View.VISIBLE);
 			}
 		}
@@ -97,25 +95,51 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
 			if (f instanceof FavoritesFragment) {
-				binding.scrollView.setVisibility(View.VISIBLE);
+				binding.widgetSettingsContainer.setVisibility(View.VISIBLE);
 				binding.fragmentContainer.setVisibility(View.GONE);
 			}
 		}
 	};
 
-	@SuppressLint("NonConstantResourceId")
+
+	private boolean isReadStoragePermissionGranted() {
+		if (Build.VERSION.SDK_INT >= 23) {
+			if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+					== PackageManager.PERMISSION_GRANTED) {
+				return true;
+			} else {
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		setBackgroundImg();
+	}
+
+	private void setBackgroundImg() {
+		if (isReadStoragePermissionGranted()) {
+			WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+			Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+			Glide.with(this).load(wallpaperDrawable).into(binding.wallpaper);
+		}
+
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_configure_widget);
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
-
 		getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+		setBackgroundImg();
 
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		gps = new Gps(requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
-
 		Bundle bundle = getIntent().getExtras();
 
 		if (bundle != null) {
@@ -123,32 +147,26 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 					AppWidgetManager.EXTRA_APPWIDGET_ID,
 					AppWidgetManager.INVALID_APPWIDGET_ID);
 		}
-
+		Log.e("configure", "appwidgetId : " + appWidgetId);
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
-		previewWidgetView = (ViewGroup) getLayoutInflater().inflate(layoutId, null);
-		initPreviewWidget();
 
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				loadTextViewsAndTextSize();
+		widgetCreator = new WidgetCreator(this, this);
 
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						binding.previewWidgetContainer.addView(previewWidgetView);
-						//위치, 날씨제공사, 대한민국 최우선, 자동 업데이트 간격, 날짜와 시각표시,
-						//현지 시각으로 표시, 글자크기, 배경 투명도
-						initLocation();
-						initWeatherDataSource();
-						initAutoRefreshInterval();
-						initDisplayDateTime();
-						initTextSize();
-						initBackground();
-					}
-				});
-			}
-		}).start();
+		SharedPreferences widgetPreferences =
+				getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE);
+		widgetCreator.setIntialValues(appWidgetId, widgetPreferences);
+		widgetPreferences =
+				getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE);
+
+		//위치, 날씨제공사, 대한민국 최우선, 자동 업데이트 간격, 날짜와 시각표시,
+		//현지 시각으로 표시, 글자크기, 배경 투명도
+		initLocation();
+		initWeatherDataSource();
+		initAutoRefreshInterval();
+		initDisplayDateTime();
+		initTextSize();
+		initBackground();
 
 		binding.check.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -157,189 +175,73 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 					Toast.makeText(ConfigureWidgetActivity.this, R.string.msg_empty_locations, Toast.LENGTH_SHORT).show();
 					return;
 				}
-				Context context = getApplicationContext();
-				Class<?> className = null;
-				switch (layoutId) {
-					case R.layout.widget_current:
-						className = WidgetCurrent.class;
-						break;
-					case R.layout.widget_current_hourly:
-						className = WidgetCurrentHourly.class;
-						break;
-					case R.layout.widget_current_daily:
-						className = WidgetCurrentDaily.class;
-						break;
-					case R.layout.widget_current_hourly_daily:
-						className = WidgetCurrentHourlyDaily.class;
-						break;
+
+				Class<?> widgetProviderClass = null;
+				if (layoutId == R.layout.widget_current) {
+					widgetProviderClass = WidgetCurrent.class;
+				} else if (layoutId == R.layout.widget_current_hourly) {
+					widgetProviderClass = WidgetCurrentHourly.class;
+				} else if (layoutId == R.layout.widget_current_daily) {
+					widgetProviderClass = WidgetCurrentDaily.class;
+				} else if (layoutId == R.layout.widget_current_hourly_daily) {
+					widgetProviderClass = WidgetCurrentHourlyDaily.class;
 				}
 
-				final LocationType locationType = binding.currentLocationRadio.isChecked() ? LocationType.CurrentLocation :
-						LocationType.SelectedAddress;
-				final WeatherSourceType weatherSourceType = binding.accuWeatherRadio.isChecked() ? WeatherSourceType.ACCU_WEATHER : WeatherSourceType.OPEN_WEATHER_MAP;
-
-				SharedPreferences widgetAttributes =
-						getSharedPreferences(WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId,
-								MODE_PRIVATE);
-				SharedPreferences.Editor editor = widgetAttributes.edit();
-				//appwidget id
-				editor.putInt(WidgetAttributes.APP_WIDGET_ID.name(), appWidgetId);
-				//view text size
-
-				//background alpha
-				editor.putInt(WidgetAttributes.BACKGROUND_ALPHA.name(), previewWidgetView.getBackground().getAlpha());
-				//location type
-				editor.putString(WidgetAttributes.LOCATION_TYPE.name(), locationType.name());
-				//weatherSourceType
-				editor.putString(WidgetAttributes.WEATHER_SOURCE_TYPE.name(), weatherSourceType.name());
-				//top priority kma
-				editor.putBoolean(WidgetAttributes.TOP_PRIORITY_KMA.name(), binding.kmaTopPrioritySwitch.isChecked());
-				//refresh interval
-				editor.putLong(WidgetAttributes.UPDATE_INTERVAL.name(), autoRefreshInterval);
-				//display datetime
-				editor.putBoolean(WidgetAttributes.DISPLAY_DATETIME.name(), binding.displayDatetimeSwitch.isChecked());
-				//display local datetime
-				editor.putBoolean(WidgetAttributes.DISPLAY_LOCAL_DATETIME.name(), binding.displayLocalDatetimeSwitch.isChecked());
-				//selected address dto id
-				editor.putInt(WidgetAttributes.SELECTED_ADDRESS_DTO_ID.name(), locationType == LocationType.SelectedAddress ?
-						newSelectedAddressDto.getId() : 0);
-
-				//address name if select
-				if (binding.selectedLocationRadio.isChecked()) {
-					editor.putString(RootAppWidget.WidgetDataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
-							.putString(RootAppWidget.WidgetDataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
-							.putString(RootAppWidget.WidgetDataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude());
-				}
-				editor.commit();
-
-				RemoteViews remoteViews = RootAppWidget.createRemoteViews(getApplicationContext(), appWidgetId, layoutId);
-				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-
-				Intent resultIntent = new Intent();
-				resultIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-				setResult(RESULT_OK, resultIntent);
-
-				Intent initIntent = new Intent(context, className);
-				initIntent.setAction(getString(R.string.ACTION_INIT));
-
+				Intent intent = new Intent(getApplicationContext(), widgetProviderClass);
+				intent.setAction(getString(R.string.com_lifedawn_bestweather_action_INIT));
 				Bundle initBundle = new Bundle();
-				initBundle.putSerializable(context.getString(R.string.bundle_key_widget_class_name), className);
-				initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-				initBundle.putInt(context.getString(R.string.bundle_key_widget_layout_id), layoutId);
-				initBundle.putParcelable(WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
-				initIntent.putExtras(initBundle);
 
-				PendingIntent initPendingIntent = PendingIntent.getBroadcast(context, appWidgetId, initIntent, 0);
+				initBundle.putParcelable(WidgetCreator.WidgetAttributes.REMOTE_VIEWS.name(), widgetCreator.createRemoteViews(false));
+				initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+				intent.putExtras(initBundle);
+
+				PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent, 0);
 				try {
-					initPendingIntent.send();
+					pendingIntent.send();
 				} catch (PendingIntent.CanceledException e) {
 					e.printStackTrace();
 				}
-
 				finish();
 			}
 		});
 
+		widgetPreferences.registerOnSharedPreferenceChangeListener(widgetCreator);
+		widgetCreator.onSharedPreferenceChanged(widgetPreferences, null);
 	}
 
-	private void initPreviewWidget() {
-		if (previewWidgetView.findViewById(R.id.hourly_forecast_rows) != null) {
-			final int size = 10;
-			LocalDateTime now = LocalDateTime.now();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M.d H");
-			String hours = null;
-			LayoutInflater layoutInflater = getLayoutInflater();
-
-			ViewGroup row1 = ((ViewGroup) previewWidgetView.findViewById(R.id.hourly_forecast_row));
-
-			for (int i = 0; i < size; i++) {
-				View view = layoutInflater.inflate(R.layout.view_hourly_forecast_item_in_widget, null);
-				if (now.getHour() == 0) {
-					hours = now.format(formatter);
-				} else {
-					hours = String.valueOf(now.getHour());
-				}
-				now = now.plusHours(1);
-
-				((TextView) view.findViewById(R.id.hourly_clock)).setText(hours);
-				
-				row1.addView(view);
-			}
-		}
-		if (previewWidgetView.findViewById(R.id.daily_forecast_row) != null) {
-			final int size = 4;
-			LocalDateTime now = LocalDateTime.now();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M.d E");
-			String date = null;
-			LayoutInflater layoutInflater = getLayoutInflater();
-
-			ViewGroup row = ((ViewGroup) previewWidgetView.findViewById(R.id.daily_forecast_row));
-
-			for (int i = 0; i < size; i++) {
-				View view = layoutInflater.inflate(R.layout.view_daily_forecast_item_in_widget, null);
-				date = now.format(formatter);
-				now = now.plusDays(1);
-
-				((TextView) view.findViewById(R.id.daily_date)).setText(date);
-				row.addView(view);
-			}
-		}
+	@Override
+	protected void onDestroy() {
+		getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(widgetCreator);
+		super.onDestroy();
 	}
 
-	private void loadTextViewsAndTextSize() {
-		TextView textView = ((TextView) previewWidgetView.findViewById(R.id.address));
-		textOriginalSizeMap.put(textView, textView.getTextSize());
-		textView = ((TextView) previewWidgetView.findViewById(R.id.refresh));
-		textOriginalSizeMap.put(textView, textView.getTextSize());
+	Preference.OnPreferenceChangeListener onPreferenceChangeListener = new Preference.OnPreferenceChangeListener() {
+		@Override
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			SharedPreferences.Editor editor = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE).edit();
+			String key = preference.getKey();
 
-		textView = ((TextView) previewWidgetView.findViewById(R.id.date));
-		textOriginalSizeMap.put(textView, textView.getTextSize());
-		textView = ((TextView) previewWidgetView.findViewById(R.id.time));
-		textOriginalSizeMap.put(textView, textView.getTextSize());
+			if (key.equals(WidgetCreator.WidgetAttributes.BACKGROUND_ALPHA.name()))
+				editor.putInt(key, (int) newValue);
+			else if (key.equals(WidgetCreator.WidgetAttributes.UPDATE_INTERVAL.name()))
+				editor.putLong(key, (long) newValue);
+			else if (key.equals(WidgetCreator.WidgetAttributes.LOCATION_TYPE.name()))
+				editor.putString(key, (String) newValue);
+			else if (key.equals(WidgetCreator.WidgetAttributes.DISPLAY_CLOCK.name()))
+				editor.putBoolean(key, (boolean) newValue);
+			else if (key.equals(WidgetCreator.WidgetAttributes.DISPLAY_LOCAL_CLOCK.name()))
+				editor.putBoolean(key, (boolean) newValue);
+			else if (key.equals(WidgetCreator.WidgetAttributes.TOP_PRIORITY_KMA.name()))
+				editor.putBoolean(key, (boolean) newValue);
+			else if (key.equals(WidgetCreator.WidgetAttributes.SELECTED_ADDRESS_DTO_ID.name()))
+				editor.putInt(key, (int) newValue);
+			else if (key.equals(WidgetCreator.WidgetAttributes.WEATHER_SOURCE_TYPE.name()))
+				editor.putString(key, (String) newValue);
 
-		textView = ((TextView) previewWidgetView.findViewById(R.id.current_temperature));
-		textOriginalSizeMap.put(textView, textView.getTextSize());
-		textView = ((TextView) previewWidgetView.findViewById(R.id.current_realfeel_temperature));
-		textOriginalSizeMap.put(textView, textView.getTextSize());
-		textView = ((TextView) previewWidgetView.findViewById(R.id.current_airquality));
-		textOriginalSizeMap.put(textView, textView.getTextSize());
-		textView = ((TextView) previewWidgetView.findViewById(R.id.current_precipitation));
-		textOriginalSizeMap.put(textView, textView.getTextSize());
-
-		int rowCount = 0;
-		if (previewWidgetView.findViewById(R.id.hourly_forecast_rows) != null) {
-			ViewGroup layout = ((ViewGroup) previewWidgetView.findViewById(R.id.hourly_forecast_rows));
-			rowCount = layout.getChildCount();
-
-			for (int rowIdx = 0; rowIdx < rowCount; rowIdx++) {
-				ViewGroup row = (ViewGroup) layout.getChildAt(rowIdx);
-				int cellCount = row.getChildCount();
-
-				for (int cellIdx = 0; cellIdx < cellCount; cellIdx++) {
-					View cell = row.getChildAt(cellIdx);
-
-					textView = ((TextView) cell.findViewById(R.id.hourly_clock));
-					textOriginalSizeMap.put(textView, textView.getTextSize());
-					textView = ((TextView) cell.findViewById(R.id.hourly_temperature));
-					textOriginalSizeMap.put(textView, textView.getTextSize());
-				}
-			}
+			editor.apply();
+			return true;
 		}
-		if (previewWidgetView.findViewById(R.id.daily_forecast_row) != null) {
-			ViewGroup row = ((ViewGroup) previewWidgetView.findViewById(R.id.daily_forecast_row));
-			int cellCount = row.getChildCount();
-
-			for (int cellIdx = 0; cellIdx < cellCount; cellIdx++) {
-				View cell = row.getChildAt(cellIdx);
-
-				textView = ((TextView) cell.findViewById(R.id.daily_date));
-				textOriginalSizeMap.put(textView, textView.getTextSize());
-				textView = ((TextView) cell.findViewById(R.id.daily_temperature));
-				textOriginalSizeMap.put(textView, textView.getTextSize());
-			}
-		}
-
-	}
+	};
 
 
 	private void initBackground() {
@@ -376,27 +278,23 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 	}
 
 	private void initDisplayDateTime() {
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
-		DateTimeFormatter timeFormatter =
-				DateTimeFormatter.ofPattern(ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock),
-						ValueUnits.clock12.name())) == ValueUnits.clock12 ? getString(R.string.clock_12_pattern) :
-						getString(R.string.clock_24_pattern));
-		LocalDateTime now = LocalDateTime.now();
-		((TextView) previewWidgetView.findViewById(R.id.date)).setText(now.format(dateFormatter));
-		((TextView) previewWidgetView.findViewById(R.id.time)).setText(now.format(timeFormatter));
-
 		binding.displayDatetimeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				binding.displayLocalDatetimeSwitch.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-				previewWidgetView.findViewById(R.id.watch).setVisibility(isChecked ? View.VISIBLE : View.GONE);
+				Preference preference = new Preference(getApplicationContext());
+				preference.setKey(WidgetCreator.WidgetAttributes.DISPLAY_CLOCK.name());
+				onPreferenceChangeListener.onPreferenceChange(preference, isChecked);
 			}
 		});
-
-		if (previewWidgetView.findViewById(R.id.watch).getVisibility() == View.VISIBLE) {
-			binding.displayDatetimeSwitch.setChecked(true);
-		}
-
+		binding.displayLocalDatetimeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				Preference preference = new Preference(getApplicationContext());
+				preference.setKey(WidgetCreator.WidgetAttributes.DISPLAY_LOCAL_CLOCK.name());
+				onPreferenceChangeListener.onPreferenceChange(preference, isChecked);
+			}
+		});
 	}
 
 	private void initAutoRefreshInterval() {
@@ -414,7 +312,10 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 		binding.autoRefreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				autoRefreshInterval = intervalsLong[position];
+				long autoRefreshInterval = intervalsLong[position];
+				Preference preference = new Preference(getApplicationContext());
+				preference.setKey(WidgetCreator.WidgetAttributes.UPDATE_INTERVAL.name());
+				onPreferenceChangeListener.onPreferenceChange(preference, autoRefreshInterval);
 			}
 
 			@Override
@@ -442,7 +343,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 		}
 
 		//기본 날씨 제공사 확인
-		if (sharedPreferences.getBoolean(getString(R.string.pref_key_accu_weather), true)) {
+
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_accu_weather), true)) {
 			binding.accuWeatherRadio.setChecked(true);
 		} else {
 			binding.owmRadio.setChecked(true);
@@ -451,9 +353,21 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 		binding.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-
+				Preference preference = new Preference(getApplicationContext());
+				preference.setKey(WidgetCreator.WidgetAttributes.WEATHER_SOURCE_TYPE.name());
+				onPreferenceChangeListener.onPreferenceChange(preference, checkedId == 0 ? WeatherSourceType.ACCU_WEATHER.name()
+						: WeatherSourceType.OPEN_WEATHER_MAP.name());
 			}
 		});
+		binding.kmaTopPrioritySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				Preference preference = new Preference(getApplicationContext());
+				preference.setKey(WidgetCreator.WidgetAttributes.TOP_PRIORITY_KMA.name());
+				onPreferenceChangeListener.onPreferenceChange(preference, isChecked);
+			}
+		});
+
 	}
 
 	private void initLocation() {
@@ -463,7 +377,11 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 				if (isChecked) {
 					//현재 위치
 					//위치 권한, gps on 확인
-					gps.checkPermissionAndGpsEnabled(ConfigureWidgetActivity.this, locationCallback);
+					if (gps.checkPermissionAndGpsEnabled(ConfigureWidgetActivity.this, locationCallback)) {
+						Preference preference = new Preference(getApplicationContext());
+						preference.setKey(WidgetCreator.WidgetAttributes.LOCATION_TYPE.name());
+						onPreferenceChangeListener.onPreferenceChange(preference, LocationType.CurrentLocation.name());
+					}
 				}
 			}
 		});
@@ -506,11 +424,25 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 						if (result.getSerializable(getString(R.string.bundle_key_selected_address_dto)) == null) {
 							Toast.makeText(getApplicationContext(), R.string.not_selected_address, Toast.LENGTH_SHORT).show();
 							binding.selectedLocationRadio.setText(R.string.click_again_to_select_address);
+							binding.selectedLocationRadio.setChecked(false);
+							binding.currentLocationRadio.setChecked(false);
 						} else {
 							newSelectedAddressDto = (FavoriteAddressDto) result.getSerializable(getString(R.string.bundle_key_selected_address_dto));
 							String text = getString(R.string.location) + ", " + newSelectedAddressDto.getAddress();
 							binding.selectedLocationRadio.setText(text);
 							binding.changeAddressBtn.setVisibility(View.VISIBLE);
+
+							Preference preference = new Preference(getApplicationContext());
+							preference.setKey(WidgetCreator.WidgetAttributes.LOCATION_TYPE.name());
+							onPreferenceChangeListener.onPreferenceChange(preference, LocationType.SelectedAddress.name());
+
+							SharedPreferences.Editor editor = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId),
+									MODE_PRIVATE).edit();
+
+							editor.putString(RootAppWidget.WidgetDataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
+									.putString(RootAppWidget.WidgetDataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
+									.putString(RootAppWidget.WidgetDataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude())
+									.putString(RootAppWidget.WidgetDataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).apply();
 						}
 					}
 
@@ -590,45 +522,48 @@ public class ConfigureWidgetActivity extends AppCompatActivity {
 
 
 	private void setTextSizeInWidget(float value) {
-		float originalSize = 0;
-		final float extraSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, Math.abs(value), getResources().getDisplayMetrics());
+		int absSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, Math.abs(value), getResources().getDisplayMetrics());
+		final int extraSize = value > 0 ? absSize : absSize * -1;
+		SharedPreferences.Editor editor = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE).edit();
 
-		for (int i = 0; i < textOriginalSizeMap.size(); i++) {
-			originalSize = textOriginalSizeMap.valueAt(i);
-			textOriginalSizeMap.keyAt(i).setTextSize(TypedValue.COMPLEX_UNIT_PX, value < 0f ? originalSize - extraSize :
-					originalSize + extraSize);
-		}
+		editor.putInt(WidgetCreator.WidgetTextViews.Header.ADDRESS_TEXT_IN_HEADER.name(), getResources().getDimensionPixelSize(R.dimen.addressTextSizeInHeader) + extraSize);
+		editor.putInt(WidgetCreator.WidgetTextViews.Header.REFRESH_TEXT_IN_HEADER.name(), getResources().getDimensionPixelSize(R.dimen.refreshTextSizeInHeader) + extraSize);
 
+		editor.putInt(WidgetCreator.WidgetTextViews.Current.TEMP_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.tempTextSizeInCurrent) + extraSize);
+		editor.putInt(WidgetCreator.WidgetTextViews.Current.REAL_FEEL_TEMP_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.realFeelTempTextSizeInCurrent) + extraSize);
+		editor.putInt(WidgetCreator.WidgetTextViews.Current.AIR_QUALITY_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrent) + extraSize);
+		editor.putInt(WidgetCreator.WidgetTextViews.Current.PRECIPITATION_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrent) + extraSize);
+
+		editor.putInt(WidgetCreator.WidgetTextViews.Hourly.CLOCK_TEXT_IN_HOURLY.name(), getResources().getDimensionPixelSize(R.dimen.clockTextSizeInHourly) + extraSize);
+		editor.putInt(WidgetCreator.WidgetTextViews.Hourly.TEMP_TEXT_IN_HOURLY.name(), getResources().getDimensionPixelSize(R.dimen.tempTextSizeInHourly) + extraSize);
+
+		editor.putInt(WidgetCreator.WidgetTextViews.Daily.DATE_TEXT_IN_DAILY.name(), getResources().getDimensionPixelSize(R.dimen.dateTextSizeInDaily) + extraSize);
+		editor.putInt(WidgetCreator.WidgetTextViews.Daily.TEMP_TEXT_IN_DAILY.name(), getResources().getDimensionPixelSize(R.dimen.tempTextSizeInDaily) + extraSize);
+
+		editor.apply();
 	}
 
 	private void setBackgroundAlpha(int alpha) {
-		previewWidgetView.getBackground().setAlpha(255 - alpha);
+		Preference preference = new Preference(getApplicationContext());
+		preference.setKey(WidgetCreator.WidgetAttributes.BACKGROUND_ALPHA.name());
+		onPreferenceChangeListener.onPreferenceChange(preference, 100 - alpha);
+		Log.e(tag, "background alpha : " + (100 - alpha));
 	}
 
-	public enum WidgetAttributes {
-		WIDGET_ATTRIBUTES_ID, APP_WIDGET_ID, BACKGROUND_ALPHA, LOCATION_TYPE, WEATHER_SOURCE_TYPE, TOP_PRIORITY_KMA,
-		UPDATE_INTERVAL, DISPLAY_DATETIME, DISPLAY_LOCAL_DATETIME, SELECTED_ADDRESS_DTO_ID, WIDGET_CLASS, REMOTE_VIEWS;
-	}
+	@Override
+	public void updateWidget() {
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+		binding.previewLayout.removeAllViews();
 
-	public static class WidgetTextViews {
-		public enum Header {
-			ADDRESS_TEXT, REFRESH_TEXT;
-		}
+		RemoteViews removeViews = widgetCreator.createRemoteViews(true);
+		View previewWidgetView = removeViews.apply(getApplicationContext(), binding.previewLayout);
+		binding.previewLayout.setMinimumHeight(appWidgetManager.getAppWidgetInfo(appWidgetId).minHeight);
+		binding.previewLayout.addView(previewWidgetView);
 
-		public enum Watch {
-			DATE_TEXT, TIME_TEXT;
-		}
+		appWidgetManager.updateAppWidget(appWidgetId, removeViews);
 
-		public enum Current {
-			TEMP_TEXT, REAL_FEEL_TEMP_TEXT, AIR_QUALITY_TEXT, PRECIPITATION_TEXT;
-		}
-
-		public enum Hourly {
-			CLOCK_TEXT, TEMP_TEXT;
-		}
-
-		public enum Daily {
-			DATE_TEXT, TEMP_TEXT;
-		}
+		Intent resultValue = new Intent();
+		resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+		setResult(RESULT_OK, resultValue);
 	}
 }

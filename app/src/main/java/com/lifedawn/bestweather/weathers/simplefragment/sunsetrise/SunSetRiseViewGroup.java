@@ -8,7 +8,11 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.text.TextPaint;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.preference.PreferenceManager;
 
@@ -32,7 +36,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-public class SunSetRiseViewGroup extends ViewGroup {
+public class SunSetRiseViewGroup extends FrameLayout {
 	private DateTimeFormatter dateTimeFormatter;
 	private Location location;
 	private TimeZone timeZone;
@@ -40,6 +44,7 @@ public class SunSetRiseViewGroup extends ViewGroup {
 	private SunSetRiseInfoView type1View;
 	private SunSetRiseInfoView type2View;
 	private SunSetRiseInfoView type3View;
+	private TextView errorView;
 
 	private int type1BottomMargin;
 	private int type2BottomMargin;
@@ -112,90 +117,100 @@ public class SunSetRiseViewGroup extends ViewGroup {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		int widthSize = MeasureSpec.getSize(widthMeasureSpec);
-		setMeasuredDimension(widthSize, type1View.getPixelHeight() + type1BottomMargin + type2View.getPixelHeight() + type2BottomMargin
-				+ type3View.getPixelHeight());
+		if (type1View != null && type2View != null && type3View != null) {
+			int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+			setMeasuredDimension(widthSize, type1View.getPixelHeight() + type1BottomMargin + type2View.getPixelHeight() + type2BottomMargin
+					+ type3View.getPixelHeight());
+		} else {
+			setMeasuredDimension(widthMeasureSpec, (int) errorView.getTextSize() * 2);
+		}
 	}
 
 	@Override
 	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-		type1View.measure(type1View.getPixelWidth(), type1View.getPixelHeight());
-		type2View.measure(type2View.getPixelWidth(), type2View.getPixelHeight());
-		type3View.measure(type3View.getPixelWidth(), type3View.getPixelHeight());
+		if (type1View != null && type2View != null && type3View != null) {
+			type1View.measure(type1View.getPixelWidth(), type1View.getPixelHeight());
+			type2View.measure(type2View.getPixelWidth(), type2View.getPixelHeight());
+			type3View.measure(type3View.getPixelWidth(), type3View.getPixelHeight());
 
-		int centerX = right / 2;
-		int childLeft = centerX;
-		int childRight = childLeft + type1View.getPixelWidth();
-		int childTop = 0;
-		int childBottom = type1View.getPixelHeight();
+			int centerX = right / 2;
+			int childLeft = centerX;
+			int childRight = childLeft + type1View.getPixelWidth();
+			int childTop = 0;
+			int childBottom = type1View.getPixelHeight();
 
-		int lineTop = childTop + type1View.getPixelHeight() / 2;
-		type1PointOnLine.y = lineTop;
+			int lineTop = childTop + type1View.getPixelHeight() / 2;
+			type1PointOnLine.y = lineTop;
 
-		type1View.layout(childLeft, childTop, childRight, childBottom);
+			type1View.layout(childLeft, childTop, childRight, childBottom);
 
-		childRight = childLeft + type2View.getPixelWidth();
-		childTop = childBottom + type1BottomMargin;
-		childBottom = childTop + type2View.getPixelHeight();
+			childRight = childLeft + type2View.getPixelWidth();
+			childTop = childBottom + type1BottomMargin;
+			childBottom = childTop + type2View.getPixelHeight();
 
-		type2PointOnLine.y = childTop + type2View.getPixelHeight() / 2;
-		type2View.layout(childLeft, childTop, childRight, childBottom);
+			type2PointOnLine.y = childTop + type2View.getPixelHeight() / 2;
+			type2View.layout(childLeft, childTop, childRight, childBottom);
 
-		childRight = childLeft + type3View.getPixelWidth();
-		childTop = childBottom + type2BottomMargin;
-		childBottom = childTop + type3View.getPixelHeight();
+			childRight = childLeft + type3View.getPixelWidth();
+			childTop = childBottom + type2BottomMargin;
+			childBottom = childTop + type3View.getPixelHeight();
 
-		int lineBottom = childTop + type3View.getPixelHeight() / 2;
+			int lineBottom = childTop + type3View.getPixelHeight() / 2;
 
-		type3View.layout(childLeft, childTop, childRight, childBottom);
+			type3View.layout(childLeft, childTop, childRight, childBottom);
 
-		type1PointOnLine.x = childLeft - lineMargin - lineWidth / 2;
-		type2PointOnLine.x = type1PointOnLine.x;
-		lineRect.set(childLeft - lineMargin - lineWidth, lineTop, childLeft - lineMargin, lineBottom);
+			type1PointOnLine.x = childLeft - lineMargin - lineWidth / 2;
+			type2PointOnLine.x = type1PointOnLine.x;
+			lineRect.set(childLeft - lineMargin - lineWidth, lineTop, childLeft - lineMargin, lineBottom);
+		} else {
+			errorView.layout(0, 0, getWidth(), (int) errorView.getTextSize() * 2);
+		}
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		canvas.drawRect(lineRect.left, lineRect.top, lineRect.right, lineRect.bottom, linePaint);
+		if (type1View != null && type2View != null && type3View != null) {
+			canvas.drawRect(lineRect.left, lineRect.top, lineRect.right, lineRect.bottom, linePaint);
+			LocalDateTime now = LocalDateTime.now(ZoneId.of(timeZone.getID()));
 
-		LocalDateTime now = LocalDateTime.now(ZoneId.of(timeZone.getID()));
+			long millis = now.atZone(ZoneId.of(timeZone.getID())).toInstant().toEpochMilli();
 
-		long millis = now.atZone(ZoneId.of(timeZone.getID())).toInstant().toEpochMilli();
+			long nowTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+			millis = type1View.getDateTime().toInstant().toEpochMilli();
 
-		long nowTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-		millis = type1View.getDateTime().toInstant().toEpochMilli();
+			long type1Minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+			millis = type2View.getDateTime().toInstant().toEpochMilli();
 
-		long type1Minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-		millis = type2View.getDateTime().toInstant().toEpochMilli();
+			long type2Minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
 
-		long type2Minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+			long diff = type2Minutes - type1Minutes;
 
-		long diff = type2Minutes - type1Minutes;
+			float heightPerMinute = (float) (type2PointOnLine.y - type1PointOnLine.y) / (float) diff;
+			float currentTimeY = type1PointOnLine.y + (heightPerMinute * (nowTimeMinutes - type1Minutes));
+			timeCirclePoint.x = type1PointOnLine.x;
+			timeCirclePoint.y = (int) currentTimeY;
+			canvas.drawCircle(timeCirclePoint.x, timeCirclePoint.y, circleRadius, timeCirclePaint);
 
-		float heightPerMinute = (float) (type2PointOnLine.y - type1PointOnLine.y) / (float) diff;
-		float currentTimeY = type1PointOnLine.y + (heightPerMinute * (nowTimeMinutes - type1Minutes));
-		timeCirclePoint.x = type1PointOnLine.x;
-		timeCirclePoint.y = (int) currentTimeY;
-		canvas.drawCircle(timeCirclePoint.x, timeCirclePoint.y, circleRadius, timeCirclePaint);
+			timeTextRect.offsetTo(timeCirclePoint.x - lineMargin - lineWidth / 2, timeCirclePoint.y);
+			timeTextPaint.setTextAlign(Paint.Align.RIGHT);
 
-		timeTextRect.offsetTo(timeCirclePoint.x - lineMargin - lineWidth / 2, timeCirclePoint.y);
-		timeTextPaint.setTextAlign(Paint.Align.RIGHT);
+			String currentDateTime = now.format(dateTimeFormatter);
 
-		String currentDateTime = now.format(dateTimeFormatter);
+			canvas.drawText(currentDateTime, timeTextRect.left, timeTextRect.top + timeTextPaint.descent() - timeTextPaint.ascent(),
+					timeTextPaint);
 
-		canvas.drawText(currentDateTime, timeTextRect.left, timeTextRect.top + timeTextPaint.descent() - timeTextPaint.ascent(),
-				timeTextPaint);
+			timeTextPaint.getTextBounds(currentDateTime, 0, currentDateTime.length(), currentTextRect);
 
-		timeTextPaint.getTextBounds(currentDateTime, 0, currentDateTime.length(), currentTextRect);
+			timeTextPaint.setTextAlign(Paint.Align.CENTER);
 
-		timeTextPaint.setTextAlign(Paint.Align.CENTER);
-
-		canvas.drawText(current, timeTextRect.left - currentTextRect.width() / 2f, timeTextRect.top,
-				timeTextPaint);
+			canvas.drawText(current, timeTextRect.left - currentTextRect.width() / 2f, timeTextRect.top,
+					timeTextPaint);
+		}
 	}
 
 	public void refresh() {
 		ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timeZone.getID()));
+
 		if (type2View.getDateTime().isBefore(now)) {
 			setViews();
 			invalidate();
@@ -218,6 +233,23 @@ public class SunSetRiseViewGroup extends ViewGroup {
 
 		Calendar todaySunRiseCalendar = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(todayCalendar);
 		Calendar todaySunSetCalendar = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(todayCalendar);
+
+		removeAllViews();
+		type1View = null;
+		type2View = null;
+		type3View = null;
+		errorView = null;
+
+		if (todaySunRiseCalendar == null || todaySunSetCalendar == null) {
+			errorView = new TextView(getContext());
+			errorView.setText(R.string.failed_calculating_sun_rise_set);
+			errorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+			errorView.setTextColor(AppTheme.getColor(getContext(), R.attr.textColorInWeatherCard));
+			errorView.setGravity(Gravity.CENTER);
+			errorView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+			addView(errorView);
+			return;
+		}
 
 		Calendar type1Calendar;
 		Calendar type2Calendar;
@@ -273,7 +305,6 @@ public class SunSetRiseViewGroup extends ViewGroup {
 		type2View = new SunSetRiseInfoView(getContext(), type2ZonedDateTime, type2);
 		type3View = new SunSetRiseInfoView(getContext(), type3ZonedDateTime, type3);
 
-		removeAllViews();
 
 		addView(type1View);
 		addView(type2View);

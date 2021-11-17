@@ -574,7 +574,7 @@ public class WeatherFragment extends Fragment {
 		Fragment detailCurrentConditionsFragment = null;
 
 		String currentConditionsWeatherVal = null;
-		TimeZone timeZone = TimeZone.getDefault();
+		ZoneId zoneId = null;
 
 		switch (requestWeatherSourceType) {
 			case KMA:
@@ -613,7 +613,7 @@ public class WeatherFragment extends Fragment {
 				String pty = finalCurrentConditions.getPrecipitationType();
 
 				currentConditionsWeatherVal = pty.equals("0") ? sky + "_sky" : pty + "_pty";
-				timeZone = TimeZone.getTimeZone("Asia/Seoul");
+				zoneId = KmaResponseProcessor.getZoneId();
 				break;
 			case ACCU_WEATHER:
 				AccuSimpleCurrentConditionsFragment accuSimpleCurrentConditionsFragment = new AccuSimpleCurrentConditionsFragment();
@@ -640,8 +640,7 @@ public class WeatherFragment extends Fragment {
 				detailCurrentConditionsFragment = accuDetailCurrentConditionsFragment;
 
 				currentConditionsWeatherVal = currentConditionsResponse.getItems().get(0).getWeatherIcon();
-				timeZone = TimeZone.getDefault();
-				timeZone.setID(ZonedDateTime.parse(currentConditionsResponse.getItems().get(0).getLocalObservationDateTime()).getZone().toString());
+				zoneId = ZonedDateTime.parse(currentConditionsResponse.getItems().get(0).getLocalObservationDateTime()).getZone();
 				break;
 			case OPEN_WEATHER_MAP:
 				OwmSimpleCurrentConditionsFragment owmSimpleCurrentConditionsFragment = new OwmSimpleCurrentConditionsFragment();
@@ -664,12 +663,12 @@ public class WeatherFragment extends Fragment {
 
 				currentConditionsWeatherVal = oneCallResponse.getCurrent().getWeather().get(0).getId();
 
-				timeZone = TimeZone.getTimeZone(OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse).getId());
+				zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
 				break;
 		}
 		mainWeatherSourceType = requestWeatherSourceType;
 		iLoadImgOfCurrentConditions.loadImgOfCurrentConditions(mainWeatherSourceType, currentConditionsWeatherVal, latitude, longitude,
-				timeZone);
+				zoneId);
 
 		if (getActivity() != null) {
 			final Bundle defaultBundle = new Bundle();
@@ -678,7 +677,7 @@ public class WeatherFragment extends Fragment {
 			defaultBundle.putString(getString(R.string.bundle_key_address_name), addressName);
 			defaultBundle.putString(getString(R.string.bundle_key_country_code), countryCode);
 			defaultBundle.putSerializable(getString(R.string.bundle_key_main_weather_data_source), mainWeatherSourceType);
-			defaultBundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+			defaultBundle.putSerializable(getString(R.string.bundle_key_timezone), TimeZone.getTimeZone(zoneId.getId()));
 
 			SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
 			simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);

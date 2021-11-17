@@ -34,13 +34,13 @@ public class DialogActivity extends Activity {
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_dialog);
 
 		Bundle bundle = getIntent().getExtras();
-		widgetClass = (Class<?>) bundle.getSerializable(ConfigureWidgetActivity.WidgetAttributes.WIDGET_CLASS.name());
+		widgetClass = (Class<?>) bundle.getSerializable(WidgetCreator.WidgetAttributes.WIDGET_CLASS.name());
 		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		remoteViews = bundle.getParcelable(ConfigureWidgetActivity.WidgetAttributes.REMOTE_VIEWS.name());
+		remoteViews = bundle.getParcelable(WidgetCreator.WidgetAttributes.REMOTE_VIEWS.name());
 
 		SharedPreferences sharedPreferences =
-				getSharedPreferences(ConfigureWidgetActivity.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId, MODE_PRIVATE);
-		locationType = LocationType.valueOf(sharedPreferences.getString(ConfigureWidgetActivity.WidgetAttributes.LOCATION_TYPE.name(),
+				getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE);
+		locationType = LocationType.valueOf(sharedPreferences.getString(WidgetCreator.WidgetAttributes.LOCATION_TYPE.name(),
 				LocationType.CurrentLocation.name()));
 
 		String[] listItems = null;
@@ -65,11 +65,11 @@ public class DialogActivity extends Activity {
 
 						} else if (which == 2) {
 							Intent refreshIntent = new Intent(getApplicationContext(), widgetClass);
-							refreshIntent.setAction(getString(R.string.ACTION_REFRESH));
+							refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
 							Bundle bundle = new Bundle();
 							bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-							bundle.putParcelable(ConfigureWidgetActivity.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
+							bundle.putParcelable(WidgetCreator.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
 							refreshIntent.putExtras(bundle);
 
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, refreshIntent,
@@ -82,10 +82,10 @@ public class DialogActivity extends Activity {
 						} else if (which == 3) {
 							//현재 위치 업데이트
 							Intent refreshCurrentLocationIntent = new Intent(getApplicationContext(), widgetClass);
-							refreshCurrentLocationIntent.setAction(getString(R.string.ACTION_REFRESH_CURRENT_LOCATION));
+							refreshCurrentLocationIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH_CURRENT_LOCATION));
 							Bundle bundle = new Bundle();
 							bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-							bundle.putParcelable(ConfigureWidgetActivity.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
+							bundle.putParcelable(WidgetCreator.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
 							refreshCurrentLocationIntent.putExtras(bundle);
 
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId,

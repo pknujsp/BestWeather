@@ -14,7 +14,7 @@
         android:minLines="1"
         android:text="@string/address_name"
         android:textColor="@color/white"
-        android:textSize="13sp" />
+        android:textSize="@dimen/addressTextSizeInHeader" />
 
     <TextView
         android:id="@+id/refresh"
@@ -25,6 +25,6 @@
         android:gravity="center_vertical"
         android:text="@string/updated_time"
         android:textColor="@color/white"
-        android:textSize="13sp" />
+        android:textSize="@dimen/refreshTextSizeInHeader" />
 
 </LinearLayout>

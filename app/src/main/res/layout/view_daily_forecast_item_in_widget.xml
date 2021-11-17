@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_horizontal"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:layout_weight="1"
+    android:gravity="center"
     android:orientation="vertical"
-    android:padding="3dp">
+    android:padding="4dp">
 
     <TextView
         android:id="@+id/daily_date"
@@ -14,27 +16,31 @@
         android:gravity="center"
         android:text="@string/clock"
         android:textColor="@color/white"
-        android:textSize="13sp" />
+        android:textSize="@dimen/dateTextSizeInDaily" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginBottom="2dp"
+        android:layout_weight="1"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:weightSum="2">
 
         <ImageView
             android:id="@+id/daily_left_weather_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:adjustViewBounds="true"
             android:scaleType="fitCenter"
             android:src="@drawable/day_clear" />
 
         <ImageView
             android:id="@+id/daily_right_weather_icon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
             android:layout_marginLeft="3dp"
+            android:adjustViewBounds="true"
             android:scaleType="fitCenter"
             android:src="@drawable/day_clear" />
 
@@ -46,8 +52,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="20º"
-
         android:textColor="@color/white"
-        android:textSize="13sp" />
+        android:textSize="@dimen/tempTextSizeInDaily" />
 
 </LinearLayout>

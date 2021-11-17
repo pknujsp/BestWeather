@@ -37,10 +37,12 @@ public class FavoritesFragment extends Fragment {
 	private FavoriteAddressesAdapter adapter;
 	private WeatherViewModel weatherViewModel;
 
+	private FavoriteAddressesAdapter.OnClickedAddressListener onClickedAddressListener;
+
 	private boolean enableCurrentLocation;
 	private boolean refresh;
 	private boolean clickedItem;
-	private String fragmentRequestKey = "";
+	private String fragmentRequestKey;
 
 	private FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
 		@Override
@@ -65,7 +67,7 @@ public class FavoritesFragment extends Fragment {
 	private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
 		@Override
 		public void handleOnBackPressed() {
-			if (fragmentRequestKey == null) {
+			if (fragmentRequestKey.equals(getString(R.string.key_from_main_to_favorite))) {
 				checkHaveLocations();
 			} else if (fragmentRequestKey.equals(getString(R.string.key_from_widget_config_main_to_favorites))) {
 				if (!clickedItem) {
@@ -78,12 +80,19 @@ public class FavoritesFragment extends Fragment {
 		}
 	};
 
+	public FavoritesFragment setOnClickedAddressListener(FavoriteAddressesAdapter.OnClickedAddressListener onClickedAddressListener) {
+		this.onClickedAddressListener = onClickedAddressListener;
+		return this;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		getActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
+
+		fragmentRequestKey = getString(R.string.key_from_main_to_favorite);
 
 		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_back_from_find_address_to_favorite), this,
 				new FragmentResultListener() {

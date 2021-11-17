@@ -67,8 +67,21 @@
     <dimen name="iconValueViewMargin">6dp</dimen>
     <dimen name="nonScrollViewTopBottomMargin">4dp</dimen>
 
+    <!-- widget -->
+    <dimen name="widget_margin">6dp</dimen>
+    <dimen name="widget_padding">6dp</dimen>
 
-    <dimen name="widget_margin">8dp</dimen>
-    <dimen name="widget_padding">8dp</dimen>
+    <dimen name="addressTextSizeInHeader">11sp</dimen>
+    <dimen name="refreshTextSizeInHeader">11sp</dimen>
+    <dimen name="tempTextSizeInCurrent">18sp</dimen>
+    <dimen name="realFeelTempTextSizeInCurrent">12sp</dimen>
+    <dimen name="airQualityTextSizeInCurrent">12sp</dimen>
+    <dimen name="precipitationTextSizeInCurrent">12sp</dimen>
+    <dimen name="dateTextSizeInDaily">11sp</dimen>
+    <dimen name="tempTextSizeInDaily">11sp</dimen>
+    <dimen name="clockTextSizeInHourly">11sp</dimen>
+    <dimen name="tempTextSizeInHourly">11sp</dimen>
+    <dimen name="dateTextSizeInClock">14sp</dimen>
+    <dimen name="timeTextSizeInClock">20sp</dimen>
 
 </resources>

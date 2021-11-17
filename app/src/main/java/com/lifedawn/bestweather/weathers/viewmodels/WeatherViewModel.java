@@ -13,12 +13,11 @@ import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.queryinterfaces.FavoriteAddressQuery;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZoneId;
 import java.util.List;
-import java.util.TimeZone;
 
 public class WeatherViewModel extends AndroidViewModel implements FavoriteAddressQuery {
 	private ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions;
@@ -99,7 +98,7 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	}
 
 	public interface ILoadImgOfCurrentConditions {
-		void loadImgOfCurrentConditions(WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude, TimeZone timeZone);
+		void loadImgOfCurrentConditions(WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude, ZoneId zoneId);
 	}
 
 }

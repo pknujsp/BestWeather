@@ -70,7 +70,6 @@ public class SunSetRiseInfoView extends View {
 		dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12
 				? "M.d E a h:mm" : "M.d E HH:mm", Locale.getDefault());
 
-
 		String dateTimeStr = this.dateTime.format(dateTimeFormatter);
 		timeTextPaint.getTextBounds(dateTimeStr, 0, dateTimeStr.length(), timeTextRect);
 

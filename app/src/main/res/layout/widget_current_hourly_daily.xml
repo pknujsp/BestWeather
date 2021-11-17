@@ -41,5 +41,4 @@
         layout="@layout/layout_warning_in_widget"
         android:visibility="gone" />
 
-
 </FrameLayout>

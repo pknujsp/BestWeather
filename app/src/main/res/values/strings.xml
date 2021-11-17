@@ -384,7 +384,6 @@
     <string name="need_to_connect_network">네트워크 연결을 해주세요</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
-    <string name="ACTION_INIT">ACTION_INIT</string>
     <string name="ACTION_CHECK_GPS">ACTION_CHECK_GPS</string>
     <string name="ACTION_CHECK_PERMISSION">ACTION_CHECK_PERMISSION</string>
     <string name="refresh">업데이트</string>
@@ -428,6 +427,8 @@
     <string name="bundle_key_refresh">bundle_key_refresh</string>
     <string name="bundle_key_igps">bundle_key_igps</string>
     <string name="bundle_key_using_current_location">bundle_key_using_current_location</string>
+    <string name="bundle_key_widget_class_name">bundle_key_widget_class_name</string>
+    <string name="bundle_key_widget_layout_id">bundle_key_widget_layout_id</string>
 
     <!-- fragment result key -->
     <string name="key_from_favorite_to_find_address">key_from_favorite_to_find_address</string>
@@ -446,11 +447,10 @@
     <string name="key_from_widget_config_main_to_find_address">key_from_widget_config_main_to_find_address</string>
 
     <!-- intent action -->
-    <string name="ACTION_REFRESH" translatable="false">ACTION_REFRESH</string>
-    <string name="ACTION_SHOW_DIALOG">ACTION_SHOW_DIALOG</string>
-    <string name="ACTION_REFRESH_CURRENT_LOCATION">ACTION_REFRESH_CURRENT_LOCATION</string>
-    <string name="ACTION_REFRESH_CLOCK">ACTION_REFRESH_CLOCK</string>
-
+    <string name="com.lifedawn.bestweather.action.REFRESH" translatable="false">com.lifedawn.bestweather.action.REFRESH</string>
+    <string name="com.lifedawn.bestweather.action.SHOW_DIALOG" translatable="false">com.lifedawn.bestweather.action.SHOW_DIALOG</string>
+    <string name="com.lifedawn.bestweather.action.REFRESH_CURRENT_LOCATION" translatable="false">com.lifedawn.bestweather.action.REFRESH_CURRENT_LOCATION</string>
+    <string name="com.lifedawn.bestweather.action.INIT" translatable="false">com.lifedawn.bestweather.action.INIT</string>
 
     <!-- auto refresh interval -->
     <string name="minutes_30">30분</string>
@@ -460,22 +460,22 @@
     <string name="hours_3">3시간</string>
     <string name="hours_6">6시간</string>
 
-
-    <string name="shared_preferences_widget_attributes">shared_preferences_widget_attributes</string>
-    <string name="shared_preferences_widget_attributes_appwidgetid">shared_preferences_widget_attributes_appwidgetid</string>
-
     <string name="clock_12_pattern">a h:mm</string>
     <string name="clock_24_pattern">HH:mm</string>
     <string name="date_pattern">M.d E</string>
     <string name="datetime_pattern_clock12">M.d E a h:mm</string>
-    <string name="datetime_pattern_clock24">M.d E a HH:mm</string>
+    <string name="datetime_pattern_clock24">M.d E HH:mm</string>
 
-    <string name="bundle_key_widget_class_name">bundle_key_widget_class_name</string>
-    <string name="bundle_key_widget_layout_id">bundle_key_widget_layout_id</string>
+    <string name="widget_current_label">현재</string>
+    <string name="widget_current_hourly">현재/시간별</string>
+    <string name="widget_current_hourly_daily">현재/시간별/일별</string>
+    <string name="widget_current_daily">현재/일별</string>
 
-    <string name="widget_current_label">현재날씨</string>
     <string name="real_feel_temperature_simple">체감</string>
-    <string name="current_hourly">현재/시간별</string>
-    <string name="current_hourly_daily">현재/시간별/일별</string>
-    <string name="current_daily">현재/일별</string>
+    <string name="time_pattern_if_hours_0_of_hourly_forecast_in_widget">E 0</string>
+    <string name="time_pattern_of_hourly_forecast_in_widget">H</string>
+    <string name="date_pattern_of_daily_forecast_in_widget">E</string>
+    <string name="degree_symbol">°</string>
+    <string name="failed_calculating_sun_rise_set">일출/일몰 계산 오류</string>
+
 </resources>

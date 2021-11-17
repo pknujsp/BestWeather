@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -15,10 +16,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.White"
         android:usesCleartextTraffic="true">
-        <service
-            android:name=".widget.service.WidgetWatchService"
-            android:enabled="true"
-            android:exported="true" />
 
         <activity
             android:name=".widget.ConfigureWidgetActivity"
@@ -51,11 +48,8 @@
             android:label="@string/current_conditions">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="@string/ACTION_REFRESH" />
-                <action android:name="@string/ACTION_REFRESH_CURRENT_LOCATION" />
-                <action android:name="@string/ACTION_SHOW_DIALOG" />
-                <action android:name="@string/ACTION_INIT" />
-                <action android:name="ACTION_REFRESH_CLOCK" />
+            </intent-filter>
+            <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 
@@ -68,14 +62,11 @@
         <receiver
             android:name=".widget.WidgetCurrentHourly"
             android:enabled="true"
-            android:label="@string/current_hourly">
+            android:label="@string/widget_current_hourly">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="@string/ACTION_REFRESH" />
-                <action android:name="@string/ACTION_REFRESH_CURRENT_LOCATION" />
-                <action android:name="@string/ACTION_SHOW_DIALOG" />
-                <action android:name="@string/ACTION_INIT" />
-                <action android:name="ACTION_REFRESH_CLOCK" />
+            </intent-filter>
+            <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 
@@ -87,14 +78,11 @@
         <receiver
             android:name=".widget.WidgetCurrentDaily"
             android:enabled="true"
-            android:label="@string/current_daily">
+            android:label="@string/widget_current_daily">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="@string/ACTION_REFRESH" />
-                <action android:name="@string/ACTION_REFRESH_CURRENT_LOCATION" />
-                <action android:name="@string/ACTION_SHOW_DIALOG" />
-                <action android:name="@string/ACTION_INIT" />
-                <action android:name="ACTION_REFRESH_CLOCK" />
+            </intent-filter>
+            <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 
@@ -107,14 +95,12 @@
         <receiver
             android:name=".widget.WidgetCurrentHourlyDaily"
             android:enabled="true"
-            android:label="@string/current_hourly_daily">
+            android:label="@string/widget_current_hourly_daily">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="@string/ACTION_REFRESH" />
-                <action android:name="@string/ACTION_REFRESH_CURRENT_LOCATION" />
-                <action android:name="@string/ACTION_SHOW_DIALOG" />
-                <action android:name="@string/ACTION_INIT" />
-                <action android:name="ACTION_REFRESH_CLOCK" />
+            </intent-filter>
+
+            <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 
