@@ -37,7 +37,7 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 	@Override
 	public void setValuesToViews() {
 		// 기온,1시간강수량,습도,강수형태,풍향,풍속
-		String tempUnitStr = tempUnit == ValueUnits.celsius ? getString(R.string.celsius) : getString(R.string.fahrenheit);
+		String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
 
 		addGridItem(R.string.temperature, ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(), tempUnit).toString() + tempUnitStr,
 				R.drawable.temperature, null);

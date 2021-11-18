@@ -18,10 +18,12 @@ import com.lifedawn.bestweather.retrofit.parameters.kma.VilageFcstParameter;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.KmaAreaCodeDto;
 import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -39,19 +41,19 @@ public final class KmaProcessing {
 	/**
 	 * 초단기 실황
 	 */
-	public static Call<JsonElement> getUltraSrtNcstData(UltraSrtNcstParameter parameter, LocalDateTime localDateTime,
+	public static Call<JsonElement> getUltraSrtNcstData(UltraSrtNcstParameter parameter, ZonedDateTime dateTime,
 	                                                    JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
 		//basetime설정
-		if (localDateTime.getMinute() < 40) {
-			localDateTime = localDateTime.minusHours(1);
+		if (dateTime.getMinute() < 40) {
+			dateTime = dateTime.minusHours(1);
 		}
 
 		DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
 		DateTimeFormatter HH = DateTimeFormatter.ofPattern("HH");
 
-		parameter.setBaseDate(localDateTime.toLocalDate().format(yyyyMMdd));
-		parameter.setBaseTime(localDateTime.toLocalTime().format(HH) + "00");
+		parameter.setBaseDate(dateTime.toLocalDate().format(yyyyMMdd));
+		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "00");
 
 		Call<JsonElement> call = querys.getUltraSrtNcst(parameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
@@ -75,18 +77,18 @@ public final class KmaProcessing {
 	/**
 	 * 초단기예보
 	 */
-	public static Call<JsonElement> getUltraSrtFcstData(UltraSrtFcstParameter parameter, LocalDateTime localDateTime,
+	public static Call<JsonElement> getUltraSrtFcstData(UltraSrtFcstParameter parameter, ZonedDateTime dateTime,
 	                                                    JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
 		//basetime설정
-		if (localDateTime.getMinute() < 45) {
-			localDateTime = localDateTime.minusHours(1);
+		if (dateTime.getMinute() < 45) {
+			dateTime = dateTime.minusHours(1);
 		}
 		DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
 		DateTimeFormatter HH = DateTimeFormatter.ofPattern("HH");
 
-		parameter.setBaseDate(localDateTime.toLocalDate().format(yyyyMMdd));
-		parameter.setBaseTime(localDateTime.toLocalTime().format(HH) + "30");
+		parameter.setBaseDate(dateTime.toLocalDate().format(yyyyMMdd));
+		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "30");
 
 		Call<JsonElement> call = Objects.requireNonNull(querys).getUltraSrtFcst(parameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
@@ -111,12 +113,12 @@ public final class KmaProcessing {
 	 * - Base_time : 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회)
 	 * - API 제공 시간(~이후) : 02:10, 05:10, 08:10, 11:10, 14:10, 17:10, 20:10, 23:10
 	 */
-	public static Call<JsonElement> getVilageFcstData(VilageFcstParameter parameter, LocalDateTime localDateTime,
+	public static Call<JsonElement> getVilageFcstData(VilageFcstParameter parameter, ZonedDateTime dateTime,
 	                                                  JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.VILAGE_FCST);
 		//basetime설정
-		final int currentHour = localDateTime.getHour();
-		final int currentMinute = localDateTime.getMinute();
+		final int currentHour = dateTime.getHour();
+		final int currentMinute = dateTime.getMinute();
 		int i = currentHour >= 0 && currentHour <= 2 ? 7 : currentHour / 3 - 1;
 		int baseHour = 0;
 
@@ -129,15 +131,15 @@ public final class KmaProcessing {
 		}
 
 		if (i == 7) {
-			localDateTime = localDateTime.minusDays(1).withHour(23);
+			dateTime = dateTime.minusDays(1).withHour(23);
 		} else {
-			localDateTime = localDateTime.withHour(baseHour);
+			dateTime = dateTime.withHour(baseHour);
 		}
 		DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
 		DateTimeFormatter HH = DateTimeFormatter.ofPattern("HH");
 
-		parameter.setBaseDate(localDateTime.toLocalDate().format(yyyyMMdd));
-		parameter.setBaseTime(localDateTime.toLocalTime().format(HH) + "00");
+		parameter.setBaseDate(dateTime.toLocalDate().format(yyyyMMdd));
+		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "00");
 
 		Call<JsonElement> call = Objects.requireNonNull(querys).getVilageFcst(parameter.getMap());
 
@@ -205,27 +207,24 @@ public final class KmaProcessing {
 				Log.e(RetrofitClient.LOG_TAG, "kma mid ta 실패");
 			}
 		});
-
 		return call;
 	}
 
-	public static String getTmFc(LocalDateTime localDateTime) {
-		final int hour = localDateTime.getHour();
-		final int minute = localDateTime.getMinute();
-		String tmFc = null;
+	public static String getTmFc(ZonedDateTime dateTime) {
+		final int hour = dateTime.getHour();
+		final int minute = dateTime.getMinute();
 		DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 		if (hour >= 18 && minute >= 1) {
-			localDateTime = localDateTime.withHour(18);
-			tmFc = localDateTime.format(yyyyMMdd) + "1800";
+			dateTime = dateTime.withHour(18);
+		return dateTime.format(yyyyMMdd) + "1800";
 		} else if (hour >= 6 && minute >= 1) {
-			localDateTime = localDateTime.withHour(6);
-			tmFc = localDateTime.format(yyyyMMdd) + "0600";
+			dateTime = dateTime.withHour(6);
+			return dateTime.format(yyyyMMdd) + "0600";
 		} else {
-			localDateTime = localDateTime.minusDays(1).withHour(18);
-			tmFc = localDateTime.format(yyyyMMdd) + "1800";
+			dateTime = dateTime.minusDays(1).withHour(18);
+			return dateTime.format(yyyyMMdd) + "1800";
 		}
-		return tmFc;
 	}
 
 	public static void requestWeatherData(Context context, Double latitude, Double longitude,
@@ -253,11 +252,10 @@ public final class KmaProcessing {
 								nearbyKmaAreaCodeDto = weatherAreaCodeDTO;
 							}
 						}
-						LocalDateTime koreaLocalDateTime = LocalDateTime.now(ZoneId.of(TimeZone.getTimeZone("Asia/Seoul").getID()));
+						ZonedDateTime koreaLocalDateTime = ZonedDateTime.now(KmaResponseProcessor.getZoneId());
 						multipleJsonDownloader.put("koreaLocalDateTime", koreaLocalDateTime.toString());
 
-						final String tmFc = getTmFc(LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-								koreaLocalDateTime.toLocalTime()));
+						final String tmFc = getTmFc(koreaLocalDateTime);
 						multipleJsonDownloader.put("tmFc", tmFc);
 						Set<RetrofitClient.ServiceType> requestTypeSet = requestKma.getRequestServiceTypes();
 
@@ -266,8 +264,7 @@ public final class KmaProcessing {
 							ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
 
 							Call<JsonElement> ultraSrtNcstCall = getUltraSrtNcstData(ultraSrtNcstParameter,
-									LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-											koreaLocalDateTime.toLocalTime()),
+									ZonedDateTime.of(koreaLocalDateTime.toLocalDateTime(), koreaLocalDateTime.getZone()),
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<JsonElement> response) {
@@ -289,8 +286,7 @@ public final class KmaProcessing {
 							ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
 
 							Call<JsonElement> ultraSrtFcstCall = getUltraSrtFcstData(ultraSrtFcstParameter,
-									LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-											koreaLocalDateTime.toLocalTime()),
+									ZonedDateTime.of(koreaLocalDateTime.toLocalDateTime(), koreaLocalDateTime.getZone()),
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<JsonElement> response) {
@@ -312,8 +308,7 @@ public final class KmaProcessing {
 							vilageFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
 
 							Call<JsonElement> vilageFcstCall = getVilageFcstData(vilageFcstParameter,
-									LocalDateTime.of(koreaLocalDateTime.toLocalDate(),
-											koreaLocalDateTime.toLocalTime()),
+									ZonedDateTime.of(koreaLocalDateTime.toLocalDateTime(), koreaLocalDateTime.getZone()),
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<JsonElement> response) {

@@ -28,6 +28,7 @@ import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,7 +103,7 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		TextValueView windStrengthRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
 		
 		//날짜, 시각 --------------------------------------------------------------------------
-		List<LocalDateTime> dateTimeList = new ArrayList<>();
+		List<ZonedDateTime> dateTimeList = new ArrayList<>();
 		for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
 			dateTimeList.add(finalHourlyForecast.getFcstDateTime());
 		}

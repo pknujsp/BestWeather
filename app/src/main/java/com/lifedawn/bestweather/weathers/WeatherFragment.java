@@ -69,8 +69,6 @@ import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.ParseException;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -80,7 +78,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import retrofit2.Response;
 
@@ -100,6 +99,9 @@ public class WeatherFragment extends Fragment {
 	private SharedPreferences sharedPreferences;
 	private IGps iGps;
 
+
+	private MultipleJsonDownloader<JsonElement> multipleJsonDownloader;
+	private static ExecutorService executors = Executors.newSingleThreadExecutor();
 	public static final Map<String, WeatherResponseObj> finalResponseMap = new HashMap<>();
 
 	static class WeatherResponseObj {
@@ -193,6 +195,14 @@ public class WeatherFragment extends Fragment {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void onDestroy() {
+		if (multipleJsonDownloader != null) {
+			multipleJsonDownloader.cancel();
+		}
+		super.onDestroy();
 	}
 
 	private boolean containWeatherData(Double latitude, Double longitude) {
@@ -294,16 +304,26 @@ public class WeatherFragment extends Fragment {
 
 		final JsonResultObj jsonResultObj = new JsonResultObj(requestWeatherSourceType, requestWeatherSources);
 
-		MultipleJsonDownloader<JsonElement> multipleJsonDownloader = new MultipleJsonDownloader<JsonElement>() {
+		multipleJsonDownloader = new MultipleJsonDownloader<JsonElement>() {
 			@Override
 			public void onResult() {
 				jsonResultObj.multipleJsonDownloader = this;
 				processOnResult(jsonResultObj);
 			}
+
+			@Override
+			public void onCanceled() {
+
+			}
 		};
 		multipleJsonDownloader.setLoadingDialog(loadingDialog);
 
-		MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleJsonDownloader);
+		executors.execute(new Runnable() {
+			@Override
+			public void run() {
+				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleJsonDownloader);
+			}
+		});
 	}
 
 	private void requestNewDataWithAnotherWeatherSource(WeatherSourceType newWeatherSourceType, WeatherSourceType lastWeatherSourceType) {
@@ -318,16 +338,25 @@ public class WeatherFragment extends Fragment {
 		setRequestWeatherSourceWithSourceType(newWeatherSourceType, requestWeatherSources);
 
 		final JsonResultObj jsonResultObj = new JsonResultObj(newWeatherSourceType, requestWeatherSources);
-		MultipleJsonDownloader<JsonElement> multipleJsonDownloader = new MultipleJsonDownloader<JsonElement>() {
+		multipleJsonDownloader = new MultipleJsonDownloader<JsonElement>() {
 			@Override
 			public void onResult() {
 				jsonResultObj.multipleJsonDownloader = this;
 				processOnResult(jsonResultObj);
 			}
+
+			@Override
+			public void onCanceled() {
+
+			}
 		};
 		multipleJsonDownloader.setLoadingDialog(loadingDialog);
-
-		MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleJsonDownloader);
+		executors.execute(new Runnable() {
+			@Override
+			public void run() {
+				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleJsonDownloader);
+			}
+		});
 	}
 
 	private void processOnResult(JsonResultObj jsonResultObj) {
@@ -347,7 +376,6 @@ public class WeatherFragment extends Fragment {
 								public void run() {
 									//다시시도, 취소 중 택1
 									jsonResultObj.multipleJsonDownloader.getLoadingDialog().dismiss();
-
 									Set<WeatherSourceType> otherTypes = getOtherWeatherSourceTypes(jsonResultObj.requestWeatherSource,
 											mainWeatherSourceType);
 
@@ -373,7 +401,6 @@ public class WeatherFragment extends Fragment {
 										failedDialogItems[arrIndex] = getString(R.string.owm) + ", " + getString(
 												R.string.rerequest_another_weather_datasource);
 									}
-
 
 									AlertDialog failedDialog = new AlertDialog.Builder(getActivity()).setCancelable(false).setTitle(
 											R.string.update_failed).setItems(failedDialogItems, new DialogInterface.OnClickListener() {
@@ -503,8 +530,14 @@ public class WeatherFragment extends Fragment {
 			}
 		}
 
-		MainProcessing.reRequestWeatherDataBySameWeatherSourceIfFailed(getContext(), latitude, longitude, newRequestWeatherSources,
-				jsonResultObj.multipleJsonDownloader);
+		executors.execute(new Runnable() {
+			@Override
+			public void run() {
+				MainProcessing.reRequestWeatherDataBySameWeatherSourceIfFailed(getContext(), latitude, longitude, newRequestWeatherSources,
+						jsonResultObj.multipleJsonDownloader);
+			}
+		});
+
 		return loadingDialog;
 	}
 
@@ -515,8 +548,14 @@ public class WeatherFragment extends Fragment {
 		setRequestWeatherSourceWithSourceType(jsonResultObj.requestWeatherSource, newRequestWeatherSources);
 		jsonResultObj.requestWeatherSources = newRequestWeatherSources;
 
-		MainProcessing.reRequestWeatherDataByAnotherWeatherSourceIfFailed(getContext(), latitude, longitude, lastWeatherSourceType,
-				newRequestWeatherSources, jsonResultObj.multipleJsonDownloader);
+		executors.execute(new Runnable() {
+			@Override
+			public void run() {
+				MainProcessing.reRequestWeatherDataByAnotherWeatherSourceIfFailed(getContext(), latitude, longitude, lastWeatherSourceType,
+						newRequestWeatherSources, jsonResultObj.multipleJsonDownloader);
+			}
+		});
+
 		return loadingDialog;
 	}
 
@@ -677,7 +716,7 @@ public class WeatherFragment extends Fragment {
 			defaultBundle.putString(getString(R.string.bundle_key_address_name), addressName);
 			defaultBundle.putString(getString(R.string.bundle_key_country_code), countryCode);
 			defaultBundle.putSerializable(getString(R.string.bundle_key_main_weather_data_source), mainWeatherSourceType);
-			defaultBundle.putSerializable(getString(R.string.bundle_key_timezone), TimeZone.getTimeZone(zoneId.getId()));
+			defaultBundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
 
 			SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
 			simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);
@@ -702,10 +741,11 @@ public class WeatherFragment extends Fragment {
 				@Override
 				public void run() {
 					createWeatherDataSourcePicker(countryCode);
-					LocalDateTime localDateTime = multipleJsonDownloader.getLocalDateTime();
+					ZonedDateTime dateTime = multipleJsonDownloader.getLocalDateTime();
 					DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
-							clockUnit == ValueUnits.clock12 ? "M.d E a h:mm" : "M.d E HH:mm", Locale.getDefault());
-					binding.updatedDatetime.setText(localDateTime.format(dateTimeFormatter));
+							clockUnit == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
+									getString(R.string.datetime_pattern_clock24), Locale.getDefault());
+					binding.updatedDatetime.setText(dateTime.format(dateTimeFormatter));
 
 					getChildFragmentManager().beginTransaction().replace(binding.simpleCurrentConditions.getId(),
 							finalSimpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment)).replace(
@@ -715,7 +755,7 @@ public class WeatherFragment extends Fragment {
 							binding.detailCurrentConditions.getId(), finalDetailCurrentConditionsFragment,
 							getString(R.string.tag_detail_current_conditions_fragment)).replace(binding.simpleAirQuality.getId(),
 							simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment)).replace(
-							binding.sunSetRise.getId(), sunSetRiseFragment, getString(R.string.tag_sun_set_rise_fragment)).commit();
+							binding.sunSetRise.getId(), sunSetRiseFragment, getString(R.string.tag_sun_set_rise_fragment)).commitAllowingStateLoss();
 
 					if (loadingDialog != null) {
 						loadingDialog.dismiss();

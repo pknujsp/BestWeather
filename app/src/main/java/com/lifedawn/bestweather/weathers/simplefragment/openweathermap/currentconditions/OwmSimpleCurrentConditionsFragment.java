@@ -68,7 +68,8 @@ public class OwmSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 		binding.weatherIcon.setImageDrawable(ContextCompat.getDrawable(getContext(),
 				OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId(), false)));
 		binding.sky.setText(OpenWeatherMapResponseProcessor.getWeatherIconDescription(current.getWeather().get(0).getId()));
-		binding.temperature.setText(
-				ValueUnits.convertTemperature(current.getTemp(), tempUnit).toString() + ValueUnits.convertToStr(getContext(), tempUnit));
+		String temp = ValueUnits.convertTemperature(current.getTemp(), tempUnit).toString() + ValueUnits.convertToStr(getContext(),
+				tempUnit);
+		binding.temperature.setText(temp);
 	}
 }

@@ -1,11 +1,12 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 public class FinalHourlyForecast {
 	
-	private LocalDateTime fcstDateTime;
+	private ZonedDateTime fcstDateTime;
 	//nx
 	private String nx;
 	//ny
@@ -35,12 +36,12 @@ public class FinalHourlyForecast {
 	//낙뢰 LGT
 	private String lightning;
 	
-	public FinalHourlyForecast setFcstDateTime(LocalDateTime fcstDateTime) {
+	public FinalHourlyForecast setFcstDateTime(ZonedDateTime fcstDateTime) {
 		this.fcstDateTime = fcstDateTime;
 		return this;
 	}
 	
-	public LocalDateTime getFcstDateTime() {
+	public ZonedDateTime getFcstDateTime() {
 		return fcstDateTime;
 	}
 	

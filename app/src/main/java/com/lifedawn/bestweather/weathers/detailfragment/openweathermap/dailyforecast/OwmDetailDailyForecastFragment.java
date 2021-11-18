@@ -63,7 +63,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		final int columnsCount = dailyList.size();
 		final int columnWidth = (int) getResources().getDimension(R.dimen.valueColumnWidthInDDaily);
 		final int viewWidth = columnsCount * columnWidth;
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
 		
 		List<String> dateList = new ArrayList<>();
 		List<Integer> minTempList = new ArrayList<>();
@@ -83,7 +83,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		
 		for (OneCallResponse.Daily daily : dailyList) {
-			dateList.add(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, timeZone).format(
+			dateList.add(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, zoneId).format(
 					dateTimeFormatter));
 			minTempList.add(ValueUnits.convertTemperature(daily.getTemp().getMin(), tempUnit));
 			maxTempList.add(ValueUnits.convertTemperature(daily.getTemp().getMax(), tempUnit));

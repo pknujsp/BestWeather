@@ -40,7 +40,7 @@ public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 		// 현재기온,체감기온,기압,습도,이슬점,운량,자외선지수,시정,풍속,돌풍,풍향,강우량,강설량,날씨상태(흐림 등)
 		OneCallResponse.Current current = oneCallResponse.getCurrent();
 		String notData = getString(R.string.not_data);
-		String tempUnitStr = tempUnit == ValueUnits.celsius ? getString(R.string.celsius) : getString(R.string.fahrenheit);
+		String tempUnitStr = ValueUnits.convertToStr(getContext(),tempUnit);
 
 
 		addGridItem(R.string.weather, OpenWeatherMapResponseProcessor.getWeatherIconDescription(current.getWeather().get(0).getId()),

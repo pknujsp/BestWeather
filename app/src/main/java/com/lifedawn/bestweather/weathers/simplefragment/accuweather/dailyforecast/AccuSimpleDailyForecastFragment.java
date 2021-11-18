@@ -71,7 +71,7 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 
 				Bundle bundle = new Bundle();
 				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
-				bundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+				bundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
 				detailDailyForecastFragment.setArguments(bundle);
 
 				String tag = getString(R.string.tag_detail_daily_forecast_fragment);
@@ -136,7 +136,7 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 
 		for (FiveDaysOfDailyForecastsResponse.DailyForecasts dailyForecasts : items) {
 			dateList.add(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(dailyForecasts.getEpochDate()) * 1000L,
-					timeZone).format(dateTimeFormatter));
+					zoneId).format(dateTimeFormatter));
 			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
 					ContextCompat.getDrawable(context, AccuWeatherResponseProcessor.getWeatherIconImg(dailyForecasts.getDay().getIcon())),
 					ContextCompat.getDrawable(context,

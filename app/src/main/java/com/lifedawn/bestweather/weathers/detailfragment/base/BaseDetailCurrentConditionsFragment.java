@@ -20,6 +20,7 @@ import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValue
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZoneId;
 import java.util.TimeZone;
 
 public class BaseDetailCurrentConditionsFragment extends Fragment implements IWeatherValues {
@@ -30,7 +31,7 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	protected ValueUnits windUnit;
 	protected ValueUnits visibilityUnit;
 	protected ValueUnits clockUnit;
-	protected TimeZone timeZone;
+	protected ZoneId zoneId;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,7 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
 		Bundle bundle = getArguments();
-		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
 		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));

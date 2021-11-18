@@ -5,19 +5,10 @@ import android.content.Context;
 import com.lifedawn.bestweather.R;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Year;
-import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalUnit;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 public class WeatherResponseProcessor {
 	private static Map<String, String> windStrengthDescriptionMap = new HashMap<>();
@@ -66,12 +57,12 @@ public class WeatherResponseProcessor {
 		}
 	}
 
-	public static LocalDateTime convertDateTimeOfDailyForecast(long millis, TimeZone timeZone) {
-		return LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.of(timeZone.getID())).withHour(0).withMinute(0).withSecond(0).withNano(0);
+	public static ZonedDateTime convertDateTimeOfDailyForecast(long millis, ZoneId zoneId) {
+		return ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), zoneId).withHour(0).withMinute(0).withSecond(0).withNano(0);
 	}
 
 
-	public static LocalDateTime convertDateTimeOfHourlyForecast(long millis, TimeZone timeZone) {
-		return LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.of(timeZone.getID())).withMinute(0).withSecond(0).withNano(0);
+	public static ZonedDateTime convertDateTimeOfHourlyForecast(long millis, ZoneId zoneId) {
+		return ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), zoneId).withMinute(0).withSecond(0).withNano(0);
 	}
 }

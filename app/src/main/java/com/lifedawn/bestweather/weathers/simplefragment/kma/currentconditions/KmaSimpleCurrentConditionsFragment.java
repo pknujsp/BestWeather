@@ -17,9 +17,15 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
+import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
+import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
 	private FinalCurrentConditions finalCurrentConditions;
@@ -61,17 +67,24 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 		String precipitation = KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType());
 
 		if (Double.parseDouble(finalCurrentConditions.getPrecipitation1Hour()) > 0.0) {
-			String precipitationUnit = "mm";
-
-			precipitation += ", " + finalCurrentConditions.getPrecipitation1Hour() + precipitationUnit;
+			precipitation += ", " + finalCurrentConditions.getPrecipitation1Hour() + "mm";
 		}
 
 		binding.precipitation.setText(precipitation);
+
+		SunriseSunsetCalculator calculator = new SunriseSunsetCalculator(new Location(latitude, longitude),
+				TimeZone.getTimeZone(zoneId.getId()));
+
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(KmaResponseProcessor.getZoneId().getId()));
+		Calendar sunRise = calculator.getOfficialSunriseCalendarForDate(calendar);
+		Calendar sunSet = calculator.getOfficialSunsetCalendarForDate(calendar);
+
 		binding.weatherIcon.setImageDrawable(
-				ContextCompat.getDrawable(getContext(), KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(), false)));
+				ContextCompat.getDrawable(getContext(), KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(),
+						SunRiseSetUtil.isNight(calendar.getTime(), sunRise.getTime(), sunSet.getTime()))));
 		binding.sky.setText(KmaResponseProcessor.getWeatherSkyIconDescription(finalHourlyForecast.getSky()));
 		String temp = ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(),
-				tempUnit).toString() + (tempUnit == ValueUnits.celsius ? getString(R.string.celsius) : getString(R.string.fahrenheit));
+				tempUnit) + ValueUnits.convertToStr(getContext(), tempUnit);
 		binding.temperature.setText(temp);
 	}
 }

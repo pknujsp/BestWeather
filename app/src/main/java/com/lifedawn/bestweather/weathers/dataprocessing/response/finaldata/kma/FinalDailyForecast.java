@@ -1,10 +1,11 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 public class FinalDailyForecast {
-	private LocalDateTime date;
+	private ZonedDateTime date;
 	private String amSky;
 	private String pmSky;
 	private String sky;
@@ -14,7 +15,7 @@ public class FinalDailyForecast {
 	private String minTemp;
 	private String maxTemp;
 
-	public FinalDailyForecast(LocalDateTime date, String amSky, String pmSky, String amProbabilityOfPrecipitation,
+	public FinalDailyForecast(ZonedDateTime date, String amSky, String pmSky, String amProbabilityOfPrecipitation,
 	                          String pmProbabilityOfPrecipitation, String minTemp, String maxTemp) {
 		this.date = date;
 		this.amSky = amSky;
@@ -25,7 +26,7 @@ public class FinalDailyForecast {
 		this.maxTemp = maxTemp;
 	}
 
-	public FinalDailyForecast(LocalDateTime date, String sky, String probabilityOfPrecipitation, String minTemp, String maxTemp) {
+	public FinalDailyForecast(ZonedDateTime date, String sky, String probabilityOfPrecipitation, String minTemp, String maxTemp) {
 		this.date = date;
 		this.sky = sky;
 		this.probabilityOfPrecipitation = probabilityOfPrecipitation;
@@ -33,11 +34,11 @@ public class FinalDailyForecast {
 		this.maxTemp = maxTemp;
 	}
 
-	public LocalDateTime getDate() {
+	public ZonedDateTime getDate() {
 		return date;
 	}
 
-	public FinalDailyForecast setDate(LocalDateTime date) {
+	public FinalDailyForecast setDate(ZonedDateTime date) {
 		this.date = date;
 		return this;
 	}

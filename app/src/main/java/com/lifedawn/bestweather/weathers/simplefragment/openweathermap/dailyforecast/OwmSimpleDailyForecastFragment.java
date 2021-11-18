@@ -12,7 +12,6 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
@@ -73,7 +72,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 				Bundle bundle = new Bundle();
 				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
-				bundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+				bundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
 
 				detailDailyForecastFragment.setArguments(bundle);
 
@@ -147,7 +146,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		boolean haveSnowVolumes = false;
 
 		for (OneCallResponse.Daily item : items) {
-			dateList.add((WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getDt()) * 1000L, timeZone).format(
+			dateList.add((WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getDt()) * 1000L, zoneId).format(
 					dateTimeFormatter)));
 			minTempList.add(ValueUnits.convertTemperature(item.getTemp().getMin(), tempUnit));
 			maxTempList.add(ValueUnits.convertTemperature(item.getTemp().getMax(), tempUnit));

@@ -11,6 +11,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.theme.AppTheme;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class ClockView extends View {
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("H");
 
 
-	private List<LocalDateTime> clockList;
+	private List<ZonedDateTime> clockList;
 
 	public ClockView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
@@ -45,7 +46,7 @@ public class ClockView extends View {
 
 	}
 
-	public ClockView setClockList(List<LocalDateTime> clockList) {
+	public ClockView setClockList(List<ZonedDateTime> clockList) {
 		this.clockList = clockList;
 		return this;
 	}
@@ -69,7 +70,7 @@ public class ClockView extends View {
 		final float y = getHeight() / 2f + clockTextHeight / 2f;
 
 		int column = 0;
-		for (LocalDateTime clock : clockList) {
+		for (ZonedDateTime clock : clockList) {
 			x = columnCenterX + (columnWidth * column++);
 			canvas.drawText(clock.format(dateTimeFormatter), x, y, clockPaint);
 		}

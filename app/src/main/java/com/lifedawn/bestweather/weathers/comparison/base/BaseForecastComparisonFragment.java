@@ -5,19 +5,12 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
@@ -25,14 +18,13 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.NonScrolledView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.TimeZone;
+import java.time.ZoneId;
 
 public class BaseForecastComparisonFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutForecastComparisonBinding binding;
@@ -48,7 +40,7 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 	protected String addressName;
 	protected String countryCode;
 	protected WeatherSourceType mainWeatherSourceType;
-	protected TimeZone timeZone;
+	protected ZoneId zoneId;
 
 	protected NonScrolledView[] nonScrolledViews;
 
@@ -67,7 +59,7 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
 		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
 		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
-		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(
 				getString(R.string.bundle_key_main_weather_data_source));
 	}

@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.weathers.detailfragment.aqicn;
 
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -37,6 +36,7 @@ import com.lifedawn.bestweather.weathers.view.TextValueView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	private GeolocalizedFeedResponse response;
 	private FragmentAirQualityDetailBinding binding;
 	private ValueUnits clockUnit;
-	private TimeZone timeZone;
+	private ZoneId zoneId;
 
 	private Double latitude;
 	private Double longitude;
@@ -62,7 +62,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		super.onCreate(savedInstanceState);
 
 		Bundle bundle = getArguments();
-		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
 		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
 
@@ -102,7 +102,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 	@Override
 	public void setValuesToViews() {
-		List<AirQualityForecastObj> airQualityForecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(response, timeZone);
+		List<AirQualityForecastObj> airQualityForecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(response, zoneId);
 
 		final int columnWidth = (int) getResources().getDimension(R.dimen.columnWidthInAirQualityBarView);
 		final int viewHeight = (int) getResources().getDimension(R.dimen.viewHeightOfAirQualityBarView);
@@ -189,8 +189,8 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 			} catch (Exception e) {
 
 			}
-			DateTimeFormatter syncDateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "M.d E a h:mm" : "M.d" +
-							" E HH:mm",
+			DateTimeFormatter syncDateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ?
+							getString(R.string.datetime_pattern_clock12) : getString(R.string.datetime_pattern_clock24),
 					Locale.getDefault());
 			binding.updatedTime.setText(syncDateTime.format(syncDateTimeFormatter));
 		} else {

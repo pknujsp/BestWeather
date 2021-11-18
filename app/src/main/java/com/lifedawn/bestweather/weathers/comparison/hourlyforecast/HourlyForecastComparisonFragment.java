@@ -37,7 +37,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProc
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.SunsetriseUtil;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.FragmentType;
@@ -48,10 +48,6 @@ import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -60,6 +56,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HourlyForecastComparisonFragment extends BaseForecastComparisonFragment {
 	private MultipleJsonDownloader<JsonElement> multipleJsonDownloader;
@@ -113,7 +111,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			accuFinalHourlyForecasts = new ArrayList<>();
 			for (TwelveHoursOfHourlyForecastsResponse.Item item : hourlyForecastResponse.accuHourlyForecastsResponse.getItems()) {
 				accuFinalHourlyForecasts.add(new ForecastObj<>(
-						WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getEpochDateTime()) * 1000L, timeZone),
+						WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getEpochDateTime()) * 1000L, zoneId),
 						item));
 			}
 
@@ -127,7 +125,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			owmFinalHourlyForecasts = new ArrayList<>();
 			for (OneCallResponse.Hourly hourly : hourlyForecastResponse.owmOneCallResponse.getHourly()) {
 				owmFinalHourlyForecasts.add(new ForecastObj<>(
-						WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getDt()) * 1000L, timeZone),
+						WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getDt()) * 1000L, zoneId),
 						hourly));
 			}
 
@@ -137,46 +135,43 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			binding.owm.setVisibility(View.GONE);
 		}
 
-		LocalDateTime now = LocalDateTime.now(ZoneId.of(timeZone.getID())).plusDays(2).withMinute(0).withSecond(0).withNano(0);
+		ZonedDateTime now = ZonedDateTime.now(zoneId).plusDays(2).withMinute(0).withSecond(0).withNano(0);
 
-		LocalDateTime firstDateTime = LocalDateTime.of(now.toLocalDate(), now.toLocalTime());
+		ZonedDateTime firstDateTime = ZonedDateTime.of(now.toLocalDateTime(), zoneId);
 		now = now.minusDays(5);
-		LocalDateTime lastDateTime = LocalDateTime.of(now.toLocalDate(), now.toLocalTime());
+		ZonedDateTime lastDateTime = ZonedDateTime.of(now.toLocalDateTime(), zoneId);
 
 		if (kmaFinalHourlyForecasts != null) {
 			if (kmaFinalHourlyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
-				firstDateTime = LocalDateTime.of(kmaFinalHourlyForecasts.get(0).dateTime.toLocalDate(),
-						kmaFinalHourlyForecasts.get(0).dateTime.toLocalTime());
+				firstDateTime = ZonedDateTime.of(kmaFinalHourlyForecasts.get(0).dateTime.toLocalDateTime(), zoneId);
 			}
 			if (kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
-				lastDateTime = LocalDateTime.of(kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.toLocalDate(),
-						kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.toLocalTime());
+				lastDateTime =
+						ZonedDateTime.of(kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.toLocalDateTime(), zoneId);
 			}
 		}
 		if (accuFinalHourlyForecasts != null) {
 			if (accuFinalHourlyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
-				firstDateTime = LocalDateTime.of(accuFinalHourlyForecasts.get(0).dateTime.toLocalDate(),
-						accuFinalHourlyForecasts.get(0).dateTime.toLocalTime());
+				firstDateTime = ZonedDateTime.of(accuFinalHourlyForecasts.get(0).dateTime.toLocalDateTime(), zoneId);
 			}
 			if (accuFinalHourlyForecasts.get(accuFinalHourlyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
-				lastDateTime = LocalDateTime.of(accuFinalHourlyForecasts.get(accuFinalHourlyForecasts.size() - 1).dateTime.toLocalDate(),
-						accuFinalHourlyForecasts.get(accuFinalHourlyForecasts.size() - 1).dateTime.toLocalTime());
+				lastDateTime =
+						ZonedDateTime.of(accuFinalHourlyForecasts.get(accuFinalHourlyForecasts.size() - 1).dateTime.toLocalDateTime(), zoneId);
 			}
 		}
 		if (owmFinalHourlyForecasts != null) {
 			if (owmFinalHourlyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
-				firstDateTime = LocalDateTime.of(owmFinalHourlyForecasts.get(0).dateTime.toLocalDate(),
-						owmFinalHourlyForecasts.get(0).dateTime.toLocalTime());
+				firstDateTime = ZonedDateTime.of(owmFinalHourlyForecasts.get(0).dateTime.toLocalDateTime(), zoneId);
 			}
 			if (owmFinalHourlyForecasts.get(owmFinalHourlyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
-				lastDateTime = LocalDateTime.of(owmFinalHourlyForecasts.get(owmFinalHourlyForecasts.size() - 1).dateTime.toLocalDate(),
-						owmFinalHourlyForecasts.get(owmFinalHourlyForecasts.size() - 1).dateTime.toLocalTime());
+				lastDateTime =
+						ZonedDateTime.of(owmFinalHourlyForecasts.get(owmFinalHourlyForecasts.size() - 1).dateTime.toLocalDateTime(), zoneId);
 			}
 		}
 
-		List<LocalDateTime> dateTimeList = new ArrayList<>();
+		List<ZonedDateTime> dateTimeList = new ArrayList<>();
 		//firstDateTime부터 lastDateTime까지 추가
-		now = LocalDateTime.of(firstDateTime.toLocalDate(), firstDateTime.toLocalTime());
+		now = ZonedDateTime.of(firstDateTime.toLocalDateTime(), zoneId);
 		while (!now.isAfter(lastDateTime)) {
 			dateTimeList.add(now);
 			now = now.plusHours(1);
@@ -248,7 +243,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		clockRow.setClockList(dateTimeList);
 		Context context = getContext();
 
-		String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+		String tempUnitStr = getString(R.string.degree_symbol);
 
 		//날씨,기온,강수량,강수확률
 		//kma, accu weather, owm 순서
@@ -260,23 +255,24 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			if (weatherSourceTypeList.get(i) == WeatherSourceType.KMA) {
 				//일출, 일몰 시각 계산
-				Map<String, SunsetriseUtil.SunSetRiseData> sunSetRiseDataMap = SunsetriseUtil.getSunSetRiseMap(
-						ZonedDateTime.of(kmaFinalHourlyForecasts.get(0).dateTime, ZoneId.of(timeZone.getID())),
-						ZonedDateTime.of(kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime,
-								ZoneId.of(timeZone.getID())), latitude, longitude);
+				Map<Integer, SunRiseSetUtil.SunRiseSetObj> sunSetRiseDataMap = SunRiseSetUtil.getDailySunRiseSetMap(
+						ZonedDateTime.of(kmaFinalHourlyForecasts.get(0).dateTime.toLocalDateTime(), zoneId),
+						ZonedDateTime.of(kmaFinalHourlyForecasts.get(kmaFinalHourlyForecasts.size() - 1).dateTime.toLocalDateTime(),
+								zoneId), latitude, longitude);
 
 				boolean isNight = false;
+				Calendar sunRise = null;
+				Calendar sunSet = null;
 
 				for (ForecastObj<FinalHourlyForecast> finalHourlyForecastObj : kmaFinalHourlyForecasts) {
 					tempList.add(ValueUnits.convertTemperature(finalHourlyForecastObj.e.getTemp1Hour(), tempUnit).toString() + tempUnitStr);
 					probabilityOfPrecipitationList.add(finalHourlyForecastObj.e.getProbabilityOfPrecipitation());
 					precipitationVolumeList.add(finalHourlyForecastObj.e.getRainPrecipitation1Hour());
 
-					Date sunRiseDate = sunSetRiseDataMap.get(finalHourlyForecastObj.dateTime.toString()).getSunrise();
-					Date sunSetDate = sunSetRiseDataMap.get(finalHourlyForecastObj.dateTime.toString()).getSunset();
-					Date itemDate = new Date(finalHourlyForecastObj.dateTime.toInstant(ZoneOffset.UTC).toEpochMilli());
-
-					isNight = SunsetriseUtil.isNight(itemDate, sunRiseDate, sunSetDate);
+					Date itemDate = new Date(finalHourlyForecastObj.dateTime.toInstant().toEpochMilli());
+					sunRise = sunSetRiseDataMap.get(finalHourlyForecastObj.dateTime.getDayOfYear()).getSunrise();
+					sunSet = sunSetRiseDataMap.get(finalHourlyForecastObj.dateTime.getDayOfYear()).getSunset();
+					isNight = SunRiseSetUtil.isNight(itemDate, sunRise.getTime(), sunSet.getTime());
 
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
 							KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecastObj.e.getSky(), isNight))));
@@ -389,7 +385,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			@Override
 			public void onClick(View v) {
 				if (multipleJsonDownloader != null) {
-					multipleJsonDownloader.clearAllCalls();
+					multipleJsonDownloader.cancel();
 				}
 				getParentFragmentManager().popBackStack();
 			}
@@ -400,11 +396,25 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			public void onResult() {
 				setTable(this, latitude, longitude, dialog);
 			}
+
+			@Override
+			public void onCanceled() {
+
+			}
 		};
+		ExecutorService executorService = Executors.newSingleThreadExecutor();
+		executorService.execute(new Runnable() {
+			@Override
+			public void run() {
+				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, multipleJsonDownloader);
+			}
+		});
+	}
 
-		MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, multipleJsonDownloader);
-
-
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		multipleJsonDownloader.cancel();
 	}
 
 	private void setTable(MultipleJsonDownloader<JsonElement> multipleJsonDownloader, Double latitude, Double longitude,

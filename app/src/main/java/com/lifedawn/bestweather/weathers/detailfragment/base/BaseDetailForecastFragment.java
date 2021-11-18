@@ -1,7 +1,6 @@
 package com.lifedawn.bestweather.weathers.detailfragment.base;
 
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,12 +21,12 @@ import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailForecastBinding;
-import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZoneId;
 import java.util.TimeZone;
 
 public class BaseDetailForecastFragment extends Fragment implements IWeatherValues {
@@ -39,7 +38,7 @@ public class BaseDetailForecastFragment extends Fragment implements IWeatherValu
 	protected ValueUnits clockUnit;
 	protected String addressName;
 	protected DateView dateRow;
-	protected TimeZone timeZone;
+	protected ZoneId zoneId;
 
 
 	@Override
@@ -54,7 +53,7 @@ public class BaseDetailForecastFragment extends Fragment implements IWeatherValu
 
 		Bundle bundle = getArguments();
 		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
-		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 	}
 
 	@Nullable

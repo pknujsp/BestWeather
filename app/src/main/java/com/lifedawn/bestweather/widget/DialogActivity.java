@@ -34,7 +34,6 @@ public class DialogActivity extends Activity {
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_dialog);
 
 		Bundle bundle = getIntent().getExtras();
-		widgetClass = (Class<?>) bundle.getSerializable(WidgetCreator.WidgetAttributes.WIDGET_CLASS.name());
 		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
 		remoteViews = bundle.getParcelable(WidgetCreator.WidgetAttributes.REMOTE_VIEWS.name());
 
@@ -49,6 +48,18 @@ public class DialogActivity extends Activity {
 					getString(R.string.cancel), getString(R.string.refresh), getString(R.string.refresh_current_location)};
 		} else {
 			listItems = new String[]{getString(R.string.open_app), getString(R.string.cancel), getString(R.string.refresh)};
+		}
+
+		int widgetLayoutId = AppWidgetManager.getInstance(getApplicationContext()).getAppWidgetInfo(appWidgetId).initialLayout;
+
+		if (widgetLayoutId == R.layout.widget_current) {
+			widgetClass = WidgetProviderCurrent.class;
+		} else if (widgetLayoutId == R.layout.widget_current_hourly) {
+			widgetClass = WidgetProviderCurrentHourly.class;
+		} else if (widgetLayoutId == R.layout.widget_current_daily) {
+			widgetClass = WidgetProviderCurrentDaily.class;
+		} else if (widgetLayoutId == R.layout.widget_current_hourly_daily) {
+			widgetClass = WidgetProviderCurrentHourlyDaily.class;
 		}
 
 		new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light_Dialog))

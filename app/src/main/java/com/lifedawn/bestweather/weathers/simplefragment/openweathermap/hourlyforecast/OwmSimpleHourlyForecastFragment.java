@@ -11,7 +11,6 @@ import androidx.fragment.app.FragmentManager;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
@@ -32,6 +31,7 @@ import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +72,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 				Bundle bundle = new Bundle();
 				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
-				bundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+				bundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
 
 				detailHourlyForecastFragment.setArguments(bundle);
 
@@ -133,7 +133,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 		//시각, 기온, 강수확률, 강수량
 		List<SingleWeatherIconView.WeatherIconObj> iconObjList = new ArrayList<>();
-		List<LocalDateTime> dateTimeList = new ArrayList<>();
+		List<ZonedDateTime> dateTimeList = new ArrayList<>();
 		List<String> tempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
@@ -145,7 +145,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		String tempUnitStr = tempUnit == ValueUnits.celsius ? getString(R.string.celsius) : getString(R.string.fahrenheit);
 
 		for (OneCallResponse.Hourly item : items) {
-			dateTimeList.add(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getDt()) * 1000L, timeZone));
+			dateTimeList.add(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getDt()) * 1000L, zoneId));
 			iconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
 					OpenWeatherMapResponseProcessor.getWeatherIconImg(item.getWeather().get(0).getId(),
 							item.getWeather().get(0).getIcon().contains("n")))));

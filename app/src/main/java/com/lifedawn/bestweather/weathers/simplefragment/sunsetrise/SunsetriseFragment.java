@@ -18,12 +18,12 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.FragmentSunsetriseBinding;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZoneId;
 import java.util.TimeZone;
 
 public class SunsetriseFragment extends Fragment implements IWeatherValues {
@@ -35,7 +35,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	private String addressName;
 	private String countryCode;
 	private WeatherSourceType mainWeatherSourceType;
-	private TimeZone timeZone;
+	private ZoneId zoneId;
 
 	public enum SunSetRiseType {
 		RISE, SET
@@ -52,7 +52,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
 		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(
 				getString(R.string.bundle_key_main_weather_data_source));
-		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 
 		location = new Location(latitude, longitude);
 	}
@@ -74,7 +74,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.sun_set_rise);
 
-		sunSetRiseViewGroup = new SunSetRiseViewGroup(getContext(), location, timeZone);
+		sunSetRiseViewGroup = new SunSetRiseViewGroup(getContext(), location, zoneId);
 		binding.rootLayout.addView(sunSetRiseViewGroup, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 		setValuesToViews();
 

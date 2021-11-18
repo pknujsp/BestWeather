@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.commons.enums;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.lifedawn.bestweather.R;
 

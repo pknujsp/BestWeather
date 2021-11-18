@@ -28,6 +28,7 @@ import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,7 +111,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		TextValueView visibilityRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView uvIndexRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
 		
-		List<LocalDateTime> dateTimeList = new ArrayList<>();
+		List<ZonedDateTime> dateTimeList = new ArrayList<>();
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		List<Integer> tempList = new ArrayList<>();
 		List<String> realFeelTempList = new ArrayList<>();
@@ -133,7 +134,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		
 		int index = 0;
 		for (OneCallResponse.Hourly hourly : hourlyList) {
-			dateTimeList.add(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getDt()) * 1000L, timeZone));
+			dateTimeList.add(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getDt()) * 1000L, zoneId));
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
 					OpenWeatherMapResponseProcessor.getWeatherIconImg(hourly.getWeather().get(0).getId(),
 							hourly.getWeather().get(0).getIcon().contains("n")))));

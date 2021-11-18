@@ -79,16 +79,15 @@ public class OpenWeatherMapProcessing {
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
 				callback.onResponseResult(response);
 				Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
-
 			}
 
 			@Override
 			public void onFailure(Call<JsonElement> call, Throwable t) {
 				callback.onResponseResult(t);
 				Log.e(RetrofitClient.LOG_TAG, "own one call 실패");
-
 			}
 		});
+
 		return call;
 	}
 

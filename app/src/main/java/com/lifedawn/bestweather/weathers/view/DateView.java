@@ -11,6 +11,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.theme.AppTheme;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class DateView extends View {
 	private final int viewHeight;
 	private final int columnWidth;
 	private final int textHeight;
-	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E");
+	private final DateTimeFormatter dateTimeFormatter;
 	private List<DateValue> dateValueList;
 	private int currentX;
 	private int firstColX;
@@ -34,6 +35,7 @@ public class DateView extends View {
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;
+		dateTimeFormatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern));
 
 		dateTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		dateTextPaint.setTextAlign(Paint.Align.CENTER);
@@ -41,7 +43,7 @@ public class DateView extends View {
 		dateTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
 		Rect rect = new Rect();
-		LocalDateTime now = LocalDateTime.now();
+		ZonedDateTime now = ZonedDateTime.now();
 		String val = now.format(dateTimeFormatter);
 		dateTextPaint.getTextBounds(val, 0, val.length(), rect);
 		textHeight = rect.height();
@@ -49,15 +51,15 @@ public class DateView extends View {
 		setWillNotDraw(false);
 	}
 
-	public void init(List<LocalDateTime> dateTimeList) {
-		LocalDateTime date = LocalDateTime.of(dateTimeList.get(0).toLocalDate(), dateTimeList.get(0).toLocalTime());
-		LocalDateTime lastDate = LocalDateTime.of(date.toLocalDate(), date.toLocalTime());
+	public void init(List<ZonedDateTime> dateTimeList) {
+		ZonedDateTime date = ZonedDateTime.of(dateTimeList.get(0).toLocalDateTime(), dateTimeList.get(0).getZone());
+		ZonedDateTime lastDate = ZonedDateTime.of(date.toLocalDateTime(), date.getZone());
 
 		List<DateView.DateValue> dateValueList = new ArrayList<>();
 		int beginX = 0;
 
 		for (int col = 0; col < dateTimeList.size(); col++) {
-			date = LocalDateTime.of(dateTimeList.get(col).toLocalDate(), dateTimeList.get(col).toLocalTime());
+			date = ZonedDateTime.of(dateTimeList.get(col).toLocalDateTime(), lastDate.getZone());
 
 			if (date.getHour() == 0 || col == 0) {
 				if (dateValueList.size() > 0) {
@@ -111,11 +113,11 @@ public class DateView extends View {
 
 	public static class DateValue {
 		public final int beginX;
-		public final LocalDateTime date;
+		public final ZonedDateTime date;
 		public int endX;
 		public int lastX;
 
-		public DateValue(int beginX, LocalDateTime date) {
+		public DateValue(int beginX, ZonedDateTime date) {
 			this.beginX = beginX;
 			this.date = date;
 			this.lastX = beginX;

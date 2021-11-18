@@ -28,6 +28,7 @@ import com.lifedawn.bestweather.weathers.view.TextValueView;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,7 +114,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 		TextValueView dewPointRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView cloudCoverRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
 		
-		List<LocalDateTime> dateTimeList = new ArrayList<>();
+		List<ZonedDateTime> dateTimeList = new ArrayList<>();
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		List<Integer> tempList = new ArrayList<>();
 		List<String> realFeelTempList = new ArrayList<>();
@@ -137,7 +138,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 		int index = 0;
 		for (TwelveHoursOfHourlyForecastsResponse.Item hourly : hourlyItemList) {
 			dateTimeList.add(
-					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L, timeZone));
+					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L, zoneId));
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 					ContextCompat.getDrawable(context, AccuWeatherResponseProcessor.getWeatherIconImg(hourly.getWeatherIcon()))));
 			

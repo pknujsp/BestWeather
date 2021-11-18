@@ -18,7 +18,6 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.appwidget.AppWidgetManager;
@@ -37,7 +36,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
@@ -151,7 +149,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
 
-		widgetCreator = new WidgetCreator(this, this);
+		widgetCreator = new WidgetCreator(getApplicationContext(), this);
 
 		SharedPreferences widgetPreferences =
 				getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE);
@@ -178,24 +176,24 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 
 				Class<?> widgetProviderClass = null;
 				if (layoutId == R.layout.widget_current) {
-					widgetProviderClass = WidgetCurrent.class;
+					widgetProviderClass = WidgetProviderCurrent.class;
 				} else if (layoutId == R.layout.widget_current_hourly) {
-					widgetProviderClass = WidgetCurrentHourly.class;
+					widgetProviderClass = WidgetProviderCurrentHourly.class;
 				} else if (layoutId == R.layout.widget_current_daily) {
-					widgetProviderClass = WidgetCurrentDaily.class;
+					widgetProviderClass = WidgetProviderCurrentDaily.class;
 				} else if (layoutId == R.layout.widget_current_hourly_daily) {
-					widgetProviderClass = WidgetCurrentHourlyDaily.class;
+					widgetProviderClass = WidgetProviderCurrentHourlyDaily.class;
 				}
 
 				Intent intent = new Intent(getApplicationContext(), widgetProviderClass);
 				intent.setAction(getString(R.string.com_lifedawn_bestweather_action_INIT));
 				Bundle initBundle = new Bundle();
 
-				initBundle.putParcelable(WidgetCreator.WidgetAttributes.REMOTE_VIEWS.name(), widgetCreator.createRemoteViews(false));
 				initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 				intent.putExtras(initBundle);
 
 				PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent, 0);
+				widgetCreator.removeWidgetUpdateCallback();
 				try {
 					pendingIntent.send();
 				} catch (PendingIntent.CanceledException e) {
@@ -211,7 +209,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 
 	@Override
 	protected void onDestroy() {
+		widgetCreator.removeWidgetUpdateCallback();
 		getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(widgetCreator);
+		widgetCreator = null;
 		super.onDestroy();
 	}
 
@@ -439,10 +439,10 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 							SharedPreferences.Editor editor = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId),
 									MODE_PRIVATE).edit();
 
-							editor.putString(RootAppWidget.WidgetDataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
-									.putString(RootAppWidget.WidgetDataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
-									.putString(RootAppWidget.WidgetDataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude())
-									.putString(RootAppWidget.WidgetDataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).apply();
+							editor.putString(AbstractAppWidgetProvider.WidgetDataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
+									.putString(AbstractAppWidgetProvider.WidgetDataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
+									.putString(AbstractAppWidgetProvider.WidgetDataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude())
+									.putString(AbstractAppWidgetProvider.WidgetDataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).apply();
 						}
 					}
 
@@ -539,6 +539,11 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 
 		editor.putInt(WidgetCreator.WidgetTextViews.Daily.DATE_TEXT_IN_DAILY.name(), getResources().getDimensionPixelSize(R.dimen.dateTextSizeInDaily) + extraSize);
 		editor.putInt(WidgetCreator.WidgetTextViews.Daily.TEMP_TEXT_IN_DAILY.name(), getResources().getDimensionPixelSize(R.dimen.tempTextSizeInDaily) + extraSize);
+
+		editor.putInt(WidgetCreator.WidgetTextViews.Clock.DATE_TEXT_IN_CLOCK.name(),
+				getResources().getDimensionPixelSize(R.dimen.dateTextSizeInClock) + extraSize);
+		editor.putInt(WidgetCreator.WidgetTextViews.Clock.TIME_TEXT_IN_CLOCK.name(),
+				getResources().getDimensionPixelSize(R.dimen.timeTextSizeInClock) + extraSize);
 
 		editor.apply();
 	}

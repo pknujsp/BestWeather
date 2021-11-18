@@ -84,9 +84,9 @@ public class AqicnResponseProcessor {
 		return new Gson().fromJson(response.body().toString(), GeolocalizedFeedResponse.class);
 	}
 
-	public static List<AirQualityForecastObj> getAirQualityForecastObjList(GeolocalizedFeedResponse geolocalizedFeedResponse, TimeZone timeZone) {
+	public static List<AirQualityForecastObj> getAirQualityForecastObjList(GeolocalizedFeedResponse geolocalizedFeedResponse, ZoneId timeZone) {
 		ArrayMap<String, AirQualityForecastObj> forecastObjMap = new ArrayMap<>();
-		final LocalDate todayDate = LocalDate.now(ZoneId.of(timeZone.getID()));
+		final LocalDate todayDate = LocalDate.now(timeZone);
 		LocalDate date = null;
 
 		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm10Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm10();

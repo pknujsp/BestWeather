@@ -12,6 +12,7 @@ import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +24,7 @@ public abstract class MultipleJsonDownloader<T> {
 	private volatile int responseCount;
 	private AlertDialog loadingDialog;
 	private Map<String, String> valueMap = new HashMap<>();
-	private LocalDateTime localDateTime = LocalDateTime.now();
+	private ZonedDateTime localDateTime = ZonedDateTime.now();
 	private Map<RetrofitClient.ServiceType, Call<T>> callMap = new HashMap<>();
 
 	protected Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<T>>> responseMap = new ArrayMap<>();
@@ -43,7 +44,7 @@ public abstract class MultipleJsonDownloader<T> {
 		this.requestCount = requestCount;
 	}
 
-	public LocalDateTime getLocalDateTime() {
+	public ZonedDateTime getLocalDateTime() {
 		return localDateTime;
 	}
 
@@ -80,9 +81,6 @@ public abstract class MultipleJsonDownloader<T> {
 		valueMap.put(key, value);
 	}
 
-	public void clear() {
-		valueMap.clear();
-	}
 
 	public Map<String, String> getValueMap() {
 		return valueMap;
@@ -90,12 +88,18 @@ public abstract class MultipleJsonDownloader<T> {
 
 	public abstract void onResult();
 
-	public void clearAllCalls() {
+	public abstract void onCanceled();
+
+	public void cancel() {
+		responseCount = requestCount + 1000;
+
 		if (!callMap.isEmpty()) {
 			for (Call<T> call : callMap.values()) {
 				call.cancel();
 			}
 		}
+
+
 	}
 
 	public void processResult(WeatherSourceType weatherSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,

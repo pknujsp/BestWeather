@@ -31,6 +31,7 @@ import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,7 +74,7 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 
 				Bundle bundle = new Bundle();
 				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
-				bundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+				bundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
 
 				detailHourlyForecastFragment.setArguments(bundle);
 
@@ -133,7 +134,7 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 
 		//시각, 기온, 강수확률, 강수량-----
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
-		List<LocalDateTime> dateTimeList = new ArrayList<>();
+		List<ZonedDateTime> dateTimeList = new ArrayList<>();
 		List<String> tempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> precipitationVolumeList = new ArrayList<>();
@@ -142,7 +143,7 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 
 		for (TwelveHoursOfHourlyForecastsResponse.Item item : items) {
 			dateTimeList.add(
-					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getEpochDateTime()) * 1000L, timeZone));
+					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getEpochDateTime()) * 1000L, zoneId));
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 					ContextCompat.getDrawable(context, AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon()))));
 			tempList.add(ValueUnits.convertTemperature(item.getTemperature().getValue(), tempUnit).toString() + tempUnitStr);

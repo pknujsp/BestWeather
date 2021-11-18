@@ -237,8 +237,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		}
 
 		List<FinalHourlyForecast> finalHourlyForecastList = new ArrayList<>();
-		ZonedDateTime now = ZonedDateTime.now(ZoneId.of(TimeZone.getTimeZone("Asia/Seoul").getID())).withMinute(0).withSecond(0).withNano(
-				0);
+		ZonedDateTime now = ZonedDateTime.now(KmaResponseProcessor.getZoneId()).withMinute(0).withSecond(0).withNano(0);
 		String fcstDate = null;
 
 		for (Map.Entry<Long, List<VilageFcstItem>> entry : hourDataListMap.entrySet()) {
@@ -250,7 +249,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 					Integer.parseInt(fcstDate.substring(4, 6))).withDayOfMonth(Integer.parseInt(fcstDate.substring(6, 8))).withHour(
 					Integer.parseInt(hourlyFcstItems.get(0).getFcstTime().substring(0, 2).substring(0, 2)));
 
-			finalHourlyForecast.setFcstDateTime(now.toLocalDateTime());
+			finalHourlyForecast.setFcstDateTime(ZonedDateTime.of(now.toLocalDateTime(), now.getZone()));
 
 			for (VilageFcstItem item : hourlyFcstItems) {
 				if (item.getCategory().equals(POP)) {
@@ -299,7 +298,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	public static List<FinalDailyForecast> getFinalDailyForecastList(MidLandFcstRoot midLandFcstRoot, MidTaRoot midTaRoot, Long tmFc) {
 		//중기예보 데이터 생성 3~10일후
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddhhmm");
-		ZonedDateTime now = ZonedDateTime.now(ZoneId.of(TimeZone.getTimeZone("Asia/Seoul").getID()));
+		ZonedDateTime now = ZonedDateTime.now(KmaResponseProcessor.getZoneId());
 
 		try {
 			now = ZonedDateTime.parse(tmFc.toString(), dateTimeFormatter);
@@ -313,42 +312,42 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		MidTaItem midTaFcstData = midTaRoot.getResponse().getBody().getItems().getItem().get(0);
 		List<FinalDailyForecast> finalDailyForecastList = new ArrayList<>();
 
-		finalDailyForecastList.add(new FinalDailyForecast(now.toLocalDateTime(), midLandFcstData.getWf3Am(), midLandFcstData.getWf3Pm(),
+		finalDailyForecastList.add(new FinalDailyForecast(now, midLandFcstData.getWf3Am(), midLandFcstData.getWf3Pm(),
 				midLandFcstData.getRnSt3Am(), midLandFcstData.getRnSt3Pm(), midTaFcstData.getTaMin3(), midTaFcstData.getTaMax3()));
 
 		now = now.plusDays(1);
 
-		finalDailyForecastList.add(new FinalDailyForecast(now.toLocalDateTime(), midLandFcstData.getWf4Am(), midLandFcstData.getWf4Pm(),
+		finalDailyForecastList.add(new FinalDailyForecast(now, midLandFcstData.getWf4Am(), midLandFcstData.getWf4Pm(),
 				midLandFcstData.getRnSt4Am(), midLandFcstData.getRnSt4Pm(), midTaFcstData.getTaMin4(), midTaFcstData.getTaMax4()));
 
 		now = now.plusDays(1);
 
-		finalDailyForecastList.add(new FinalDailyForecast(now.toLocalDateTime(), midLandFcstData.getWf5Am(), midLandFcstData.getWf5Pm(),
+		finalDailyForecastList.add(new FinalDailyForecast(now, midLandFcstData.getWf5Am(), midLandFcstData.getWf5Pm(),
 				midLandFcstData.getRnSt5Am(), midLandFcstData.getRnSt5Pm(), midTaFcstData.getTaMin5(), midTaFcstData.getTaMax5()));
 
 		now = now.plusDays(1);
 
-		finalDailyForecastList.add(new FinalDailyForecast(now.toLocalDateTime(), midLandFcstData.getWf6Am(), midLandFcstData.getWf6Pm(),
+		finalDailyForecastList.add(new FinalDailyForecast(now, midLandFcstData.getWf6Am(), midLandFcstData.getWf6Pm(),
 				midLandFcstData.getRnSt6Am(), midLandFcstData.getRnSt6Pm(), midTaFcstData.getTaMin6(), midTaFcstData.getTaMax6()));
 
 		now = now.plusDays(1);
 
-		finalDailyForecastList.add(new FinalDailyForecast(now.toLocalDateTime(), midLandFcstData.getWf7Am(), midLandFcstData.getWf7Pm(),
+		finalDailyForecastList.add(new FinalDailyForecast(now, midLandFcstData.getWf7Am(), midLandFcstData.getWf7Pm(),
 				midLandFcstData.getRnSt7Am(), midLandFcstData.getRnSt7Pm(), midTaFcstData.getTaMin7(), midTaFcstData.getTaMax7()));
 
 		now = now.plusDays(1);
 
-		finalDailyForecastList.add(new FinalDailyForecast(now.toLocalDateTime(), midLandFcstData.getWf8(), midLandFcstData.getRnSt8(),
+		finalDailyForecastList.add(new FinalDailyForecast(now, midLandFcstData.getWf8(), midLandFcstData.getRnSt8(),
 				midTaFcstData.getTaMin8(), midTaFcstData.getTaMax8()));
 
 		now = now.plusDays(1);
 
-		finalDailyForecastList.add(new FinalDailyForecast(now.toLocalDateTime(), midLandFcstData.getWf9(), midLandFcstData.getRnSt9(),
+		finalDailyForecastList.add(new FinalDailyForecast(now, midLandFcstData.getWf9(), midLandFcstData.getRnSt9(),
 				midTaFcstData.getTaMin9(), midTaFcstData.getTaMax9()));
 
 		now = now.plusDays(1);
 
-		finalDailyForecastList.add(new FinalDailyForecast(now.toLocalDateTime(), midLandFcstData.getWf10(), midLandFcstData.getRnSt10(),
+		finalDailyForecastList.add(new FinalDailyForecast(now, midLandFcstData.getWf10(), midLandFcstData.getRnSt10(),
 				midTaFcstData.getTaMin10(), midTaFcstData.getTaMax10()));
 
 		return finalDailyForecastList;

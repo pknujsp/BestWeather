@@ -2,13 +2,14 @@ package com.lifedawn.bestweather.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.content.Intent;
 
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class WidgetCurrentHourly extends RootAppWidget {
+public class WidgetProviderCurrentHourly extends AbstractAppWidgetProvider {
 	@Override
 	public void onEnabled(Context context) {
 		super.onEnabled(context);
@@ -30,6 +31,11 @@ public class WidgetCurrentHourly extends RootAppWidget {
 	}
 
 	@Override
+	public void onReceive(Context context, Intent intent) {
+		super.onReceive(context, intent);
+	}
+
+	@Override
 	Set<RequestWeatherDataType> getRequestWeatherDataTypeSet() {
 		Set<RequestWeatherDataType> set = new HashSet<>();
 		set.add(RequestWeatherDataType.currentConditions);
@@ -39,6 +45,6 @@ public class WidgetCurrentHourly extends RootAppWidget {
 
 	@Override
 	Class<?> getThis() {
-		return WidgetCurrentHourly.class;
+		return WidgetProviderCurrentHourly.class;
 	}
 }

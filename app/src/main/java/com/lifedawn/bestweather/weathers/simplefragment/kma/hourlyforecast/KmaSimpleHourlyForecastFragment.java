@@ -18,6 +18,7 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
 import com.lifedawn.bestweather.weathers.detailfragment.kma.hourlyforecast.KmaDetailHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.ClockView;
@@ -26,12 +27,17 @@ import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
+import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
+import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 
 public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
@@ -75,7 +81,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 				Bundle bundle = new Bundle();
 				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
-				bundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+				bundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
 
 				detailHourlyForecastFragment.setArguments(bundle);
 
@@ -127,13 +133,13 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				columnWidth, R.drawable.precipitationvolume);
 
 		//시각 --------------------------------------------------------------------------
-		List<LocalDateTime> dateTimeList = new ArrayList<>();
+		List<ZonedDateTime> dateTimeList = new ArrayList<>();
 		for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
 			dateTimeList.add(finalHourlyForecast.getFcstDateTime());
 		}
 		dateRow.init(dateTimeList);
 		clockRow.setClockList(dateTimeList);
-		String tempUnitStr = tempUnit == ValueUnits.celsius ? getString(R.string.celsius) : getString(R.string.fahrenheit);
+		String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
 
 		//기온, 강수확률, 강수량
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
@@ -141,10 +147,21 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> precipitationVolumeList = new ArrayList<>();
 
+		Map<Integer, SunRiseSetUtil.SunRiseSetObj> sunRiseSetObjMap =
+				SunRiseSetUtil.getDailySunRiseSetMap(finalHourlyForecastList.get(0).getFcstDateTime(),
+						finalHourlyForecastList.get(finalHourlyForecastList.size() - 1).getFcstDateTime(), latitude, longitude);
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
+
 		for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
+			calendar.setTimeInMillis(finalHourlyForecast.getFcstDateTime().toInstant().toEpochMilli());
+
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
-					ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(), false))));
-			tempList.add(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit).toString() + tempUnitStr);
+					ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(),
+							SunRiseSetUtil.isNight(calendar.getTime(),
+									sunRiseSetObjMap.get(finalHourlyForecast.getFcstDateTime().getDayOfYear()).getSunrise().getTime(),
+									sunRiseSetObjMap.get(finalHourlyForecast.getFcstDateTime().getDayOfYear()).getSunset().getTime()
+							)))));
+			tempList.add(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit) + tempUnitStr);
 
 			probabilityOfPrecipitationList.add(finalHourlyForecast.getProbabilityOfPrecipitation());
 			precipitationVolumeList.add(finalHourlyForecast.getRainPrecipitation1Hour());

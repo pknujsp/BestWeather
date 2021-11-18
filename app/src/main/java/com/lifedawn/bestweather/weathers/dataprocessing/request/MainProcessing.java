@@ -16,9 +16,9 @@ import java.util.Set;
 
 public class MainProcessing {
 
-	public static void requestNewWeatherData(Context context, Double latitude, Double longitude,
-	                                         ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
-	                                         MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	public static MultipleJsonDownloader<JsonElement> requestNewWeatherData(Context context, Double latitude, Double longitude,
+	                                                                        ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	                                                                        MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
 		int totalRequestCount = 0;
 		for (RequestWeatherSource requestWeatherSource : requestWeatherSources.values()) {
 			totalRequestCount += requestWeatherSource.getRequestServiceTypes().size();
@@ -47,11 +47,13 @@ public class MainProcessing {
 		if (requestWeatherSources.containsKey(WeatherSourceType.AQICN)) {
 			AqicnProcessing.getAirQuality(latitude, longitude, multipleJsonDownloader);
 		}
+
+		return multipleJsonDownloader;
 	}
 
-	public static void reRequestWeatherDataBySameWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
-	                                                                   ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
-	                                                                   MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	public static MultipleJsonDownloader<JsonElement> reRequestWeatherDataBySameWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
+	                                                                                                  ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	                                                                                                  MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
 		//실패한 데이터는 모두 삭제(aqicn 제외)
 		Set<RetrofitClient.ServiceType> failedRequestServiceTypes = requestWeatherSources.valueAt(0).getRequestServiceTypes();
 		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> resultArrayMap =
@@ -80,12 +82,13 @@ public class MainProcessing {
 			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,
 					(RequestOwm) requestWeatherSources.get(WeatherSourceType.OPEN_WEATHER_MAP), multipleJsonDownloader);
 		}
+		return multipleJsonDownloader;
 	}
 
-	public static void reRequestWeatherDataByAnotherWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
-	                                                                      WeatherSourceType lastWeatherSourceType,
-	                                                                      ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
-	                                                                      MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	public static MultipleJsonDownloader<JsonElement> reRequestWeatherDataByAnotherWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
+	                                                                                                     WeatherSourceType lastWeatherSourceType,
+	                                                                                                     ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	                                                                                                     MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
 		//aqicn빼고 모두 삭제
 		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> aqicnResult
 				= multipleJsonDownloader.getResponseMap().get(WeatherSourceType.AQICN);
@@ -111,6 +114,7 @@ public class MainProcessing {
 			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,
 					(RequestOwm) requestWeatherSources.get(WeatherSourceType.OPEN_WEATHER_MAP), multipleJsonDownloader);
 		}
+		return multipleJsonDownloader;
 	}
 
 

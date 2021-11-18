@@ -43,7 +43,7 @@
         </activity>
 
         <receiver
-            android:name=".widget.WidgetCurrent"
+            android:name=".widget.WidgetProviderCurrent"
             android:enabled="true"
             android:label="@string/current_conditions">
             <intent-filter>
@@ -60,7 +60,7 @@
 
 
         <receiver
-            android:name=".widget.WidgetCurrentHourly"
+            android:name=".widget.WidgetProviderCurrentHourly"
             android:enabled="true"
             android:label="@string/widget_current_hourly">
             <intent-filter>
@@ -76,7 +76,7 @@
         </receiver>
 
         <receiver
-            android:name=".widget.WidgetCurrentDaily"
+            android:name=".widget.WidgetProviderCurrentDaily"
             android:enabled="true"
             android:label="@string/widget_current_daily">
             <intent-filter>
@@ -93,7 +93,7 @@
 
 
         <receiver
-            android:name=".widget.WidgetCurrentHourlyDaily"
+            android:name=".widget.WidgetProviderCurrentHourlyDaily"
             android:enabled="true"
             android:label="@string/widget_current_hourly_daily">
             <intent-filter>

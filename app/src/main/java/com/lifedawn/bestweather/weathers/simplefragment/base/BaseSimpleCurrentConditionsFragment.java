@@ -11,19 +11,17 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZoneId;
 import java.util.TimeZone;
 
 public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues {
@@ -39,7 +37,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	protected String addressName;
 	protected String countryCode;
 	protected WeatherSourceType mainWeatherSourceType;
-	protected TimeZone timeZone;
+	protected ZoneId zoneId;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -58,7 +56,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
 		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(
 				getString(R.string.bundle_key_main_weather_data_source));
-		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 	}
 
 	@Override

@@ -1,7 +1,6 @@
 package com.lifedawn.bestweather.weathers.comparison.dailyforecast;
 
 import android.content.Context;
-import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.view.Gravity;
@@ -43,19 +42,18 @@ import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
 import com.lifedawn.bestweather.weathers.view.NonScrolledView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
-import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DailyForecastComparisonFragment extends BaseForecastComparisonFragment {
 	private MultipleJsonDownloader<JsonElement> multipleJsonDownloader;
@@ -101,7 +99,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			accuFinalDailyForecasts = new ArrayList<>();
 			for (FiveDaysOfDailyForecastsResponse.DailyForecasts item : dailyForecastResponse.accuDailyForecastsResponse.getDailyForecasts()) {
 				accuFinalDailyForecasts.add(new ForecastObj<>(
-						WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getEpochDate()) * 1000L, timeZone),
+						WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getEpochDate()) * 1000L, zoneId),
 						item));
 			}
 
@@ -115,7 +113,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			owmFinalDailyForecasts = new ArrayList<>();
 			for (OneCallResponse.Daily daily : dailyForecastResponse.owmOneCallResponse.getDaily()) {
 				owmFinalDailyForecasts.add(new ForecastObj<>(
-						WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, timeZone), daily));
+						WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, zoneId), daily));
 			}
 			weatherSourceTypeList.add(WeatherSourceType.OPEN_WEATHER_MAP);
 			binding.owm.setVisibility(View.VISIBLE);
@@ -123,45 +121,41 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			binding.owm.setVisibility(View.GONE);
 		}
 
-		LocalDateTime now = LocalDateTime.now(ZoneId.of(timeZone.getID())).plusDays(10).withHour(0).withMinute(0).withSecond(0).withNano(0);
-		LocalDateTime firstDateTime = LocalDateTime.of(now.toLocalDate(), now.toLocalTime());
+		ZonedDateTime now = ZonedDateTime.now(zoneId).plusDays(10).withHour(0).withMinute(0).withSecond(0).withNano(0);
+		ZonedDateTime firstDateTime = ZonedDateTime.of(now.toLocalDateTime(), zoneId);
 		now = now.minusDays(20);
-		LocalDateTime lastDateTime = LocalDateTime.of(now.toLocalDate(), now.toLocalTime());
+		ZonedDateTime lastDateTime = ZonedDateTime.of(now.toLocalDateTime(), zoneId);
 
 		if (kmaFinalDailyForecasts != null) {
 			if (kmaFinalDailyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
-				firstDateTime = LocalDateTime.of(kmaFinalDailyForecasts.get(0).dateTime.toLocalDate(),
-						kmaFinalDailyForecasts.get(0).dateTime.toLocalTime());
+				firstDateTime = ZonedDateTime.of(kmaFinalDailyForecasts.get(0).dateTime.toLocalDateTime(), zoneId);
 			}
 			if (kmaFinalDailyForecasts.get(kmaFinalDailyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
-				lastDateTime = LocalDateTime.of(kmaFinalDailyForecasts.get(kmaFinalDailyForecasts.size() - 1).dateTime.toLocalDate(),
-						kmaFinalDailyForecasts.get(kmaFinalDailyForecasts.size() - 1).dateTime.toLocalTime());
+				lastDateTime = ZonedDateTime.of(kmaFinalDailyForecasts.get(kmaFinalDailyForecasts.size() - 1).dateTime.toLocalDateTime(), zoneId);
 			}
 		}
 		if (accuFinalDailyForecasts != null) {
 			if (accuFinalDailyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
-				firstDateTime = LocalDateTime.of(accuFinalDailyForecasts.get(0).dateTime.toLocalDate(),
-						accuFinalDailyForecasts.get(0).dateTime.toLocalTime());
+				firstDateTime = ZonedDateTime.of(accuFinalDailyForecasts.get(0).dateTime.toLocalDateTime(), zoneId);
 			}
 			if (accuFinalDailyForecasts.get(accuFinalDailyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
-				lastDateTime = LocalDateTime.of(accuFinalDailyForecasts.get(accuFinalDailyForecasts.size() - 1).dateTime.toLocalDate(),
-						accuFinalDailyForecasts.get(accuFinalDailyForecasts.size() - 1).dateTime.toLocalTime());
+				lastDateTime =
+						ZonedDateTime.of(accuFinalDailyForecasts.get(accuFinalDailyForecasts.size() - 1).dateTime.toLocalDateTime(), zoneId);
 			}
 		}
 		if (owmFinalDailyForecasts != null) {
 			if (owmFinalDailyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
-				firstDateTime = LocalDateTime.of(owmFinalDailyForecasts.get(0).dateTime.toLocalDate(),
-						owmFinalDailyForecasts.get(0).dateTime.toLocalTime());
+				firstDateTime = ZonedDateTime.of(owmFinalDailyForecasts.get(0).dateTime.toLocalDateTime(), zoneId);
 			}
 			if (owmFinalDailyForecasts.get(owmFinalDailyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
-				lastDateTime = LocalDateTime.of(owmFinalDailyForecasts.get(owmFinalDailyForecasts.size() - 1).dateTime.toLocalDate(),
-						owmFinalDailyForecasts.get(owmFinalDailyForecasts.size() - 1).dateTime.toLocalTime());
+				lastDateTime = ZonedDateTime.of(owmFinalDailyForecasts.get(owmFinalDailyForecasts.size() - 1).dateTime.toLocalDateTime(),
+						zoneId);
 			}
 		}
 
-		List<LocalDateTime> dateTimeList = new ArrayList<>();
+		List<ZonedDateTime> dateTimeList = new ArrayList<>();
 		//firstDateTime부터 lastDateTime까지 추가
-		now = LocalDateTime.of(firstDateTime.toLocalDate(), firstDateTime.toLocalTime());
+		now = ZonedDateTime.of(firstDateTime.toLocalDateTime(), zoneId);
 		while (!now.isAfter(lastDateTime)) {
 			dateTimeList.add(now);
 			now = now.plusDays(1);
@@ -228,9 +222,9 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 		//날짜
 		List<String> dateList = new ArrayList<>();
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
 
-		for (LocalDateTime date : dateTimeList) {
+		for (ZonedDateTime date : dateTimeList) {
 			dateList.add(date.format(dateTimeFormatter));
 		}
 		dateRow.setValueList(dateList);
@@ -241,7 +235,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		String pop = null;
 		Context context = getContext();
 
-		String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+		String tempUnitStr = getString(R.string.degree_symbol);
 
 		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
 			List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
@@ -391,7 +385,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			@Override
 			public void onClick(View v) {
 				if (multipleJsonDownloader != null) {
-					multipleJsonDownloader.clearAllCalls();
+					multipleJsonDownloader.cancel();
 				}
 				getParentFragmentManager().popBackStack();
 			}
@@ -402,9 +396,26 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			public void onResult() {
 				setTable(this, latitude, longitude, dialog);
 			}
+
+			@Override
+			public void onCanceled() {
+
+			}
 		};
 
-		MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, multipleJsonDownloader);
+		ExecutorService executorService = Executors.newSingleThreadExecutor();
+		executorService.execute(new Runnable() {
+			@Override
+			public void run() {
+				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, multipleJsonDownloader);
+			}
+		});
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		multipleJsonDownloader.cancel();
 	}
 
 	private void setTable(MultipleJsonDownloader<JsonElement> multipleJsonDownloader, Double latitude, Double longitude,

@@ -30,6 +30,7 @@ import com.lifedawn.bestweather.weathers.view.DateView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZoneId;
 import java.util.TimeZone;
 
 public class BaseSimpleForecastFragment extends Fragment implements IWeatherValues {
@@ -45,7 +46,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	protected String addressName;
 	protected String countryCode;
 	protected WeatherSourceType mainWeatherSourceType;
-	protected TimeZone timeZone;
+	protected ZoneId zoneId;
 	protected NetworkStatus networkStatus;
 	protected boolean needCompare;
 	
@@ -66,7 +67,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
 		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
 		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(getString(R.string.bundle_key_main_weather_data_source));
-		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 	}
 	
 	@Override

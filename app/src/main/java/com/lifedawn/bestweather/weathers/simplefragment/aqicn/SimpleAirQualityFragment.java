@@ -23,7 +23,6 @@ import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.theme.AppTheme;
-import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.detailfragment.aqicn.DetailAirQualityFragment;
@@ -32,7 +31,7 @@ import com.lifedawn.bestweather.weathers.view.FragmentType;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -47,7 +46,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	private String addressName;
 	private String countryCode;
 	private WeatherSourceType mainWeatherSourceType;
-	private TimeZone timeZone;
+	private ZoneId zoneId;
 	private ValueUnits clockUnit;
 
 	@Override
@@ -59,7 +58,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
 		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
 		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(getString(R.string.bundle_key_main_weather_data_source));
-		timeZone = (TimeZone) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
@@ -85,7 +84,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 				detailAirQualityFragment.setResponse(geolocalizedFeedResponse);
 
 				Bundle bundle = new Bundle();
-				bundle.putSerializable(getString(R.string.bundle_key_timezone), timeZone);
+				bundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
 				bundle.putDouble(getString(R.string.bundle_key_latitude), latitude);
 				bundle.putDouble(getString(R.string.bundle_key_longitude), longitude);
 				detailAirQualityFragment.setArguments(bundle);
@@ -208,7 +207,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 
 		List<AirQualityForecastObj> forecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(geolocalizedFeedResponse,
-				timeZone);
+				zoneId);
 		for (AirQualityForecastObj forecastObj : forecastObjList) {
 			View forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 			((TextView) forecastItemView.findViewById(R.id.date)).setText(forecastObj.date.format(dateTimeFormatter));

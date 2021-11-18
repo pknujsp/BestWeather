@@ -80,7 +80,7 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		
 		//날짜, 시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
 		for (FinalDailyForecast finalDailyForecast : finalDailyForecastList) {
 			dateList.add(finalDailyForecast.getDate().format(dateTimeFormatter));
 		}
