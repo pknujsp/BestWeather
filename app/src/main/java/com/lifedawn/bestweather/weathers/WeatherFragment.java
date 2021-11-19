@@ -137,6 +137,9 @@ public class WeatherFragment extends Fragment {
 		binding.adViewBelowAirQuality.loadAd(adRequest);
 		binding.adViewBottom.loadAd(adRequest);
 
+		binding.adViewBelowAirQuality.setVisibility(View.GONE);
+		binding.adViewBottom.setVisibility(View.GONE);
+
 		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_current_location), this, new FragmentResultListener() {
 			@Override
 			public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
@@ -195,6 +198,11 @@ public class WeatherFragment extends Fragment {
 				}
 			}
 		});
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
 	}
 
 	@Override
@@ -760,6 +768,9 @@ public class WeatherFragment extends Fragment {
 					if (loadingDialog != null) {
 						loadingDialog.dismiss();
 					}
+
+					binding.adViewBelowAirQuality.setVisibility(View.VISIBLE);
+					binding.adViewBottom.setVisibility(View.VISIBLE);
 				}
 			});
 

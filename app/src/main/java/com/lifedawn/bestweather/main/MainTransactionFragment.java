@@ -124,8 +124,7 @@ public class MainTransactionFragment extends Fragment {
 						} else {
 							//날씨 프래그먼트 다시 그림
 							weatherMainFragment.reDraw();
-							
-							
+
 						}
 					}
 				} else {
@@ -424,8 +423,8 @@ public class MainTransactionFragment extends Fragment {
 		locationItemView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				weatherMainFragment.setWeatherFragment(locationType, favoriteAddressDto);
 				binding.drawerLayout.closeDrawer(binding.sideNavigation);
+				weatherMainFragment.setWeatherFragment(locationType, favoriteAddressDto);
 			}
 		});
 		

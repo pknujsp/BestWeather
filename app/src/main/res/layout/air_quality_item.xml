@@ -25,7 +25,7 @@
         android:layout_toRightOf="@id/label_icon"
         android:text="label"
         android:textColor="?attr/textColorInWeatherCard"
-        android:textSize="16sp" />
+        android:textSize="13sp" />
 
 
     <TextView
@@ -37,7 +37,7 @@
         android:layout_alignLeft="@id/label"
         android:text="valueInt"
         android:textColor="?attr/textColorInWeatherCard"
-        android:textSize="15sp" />
+        android:textSize="19sp" />
 
     <TextView
 

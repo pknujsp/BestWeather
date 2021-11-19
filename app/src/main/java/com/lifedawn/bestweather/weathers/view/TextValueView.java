@@ -64,8 +64,6 @@ public class TextValueView extends View {
 
 		int column = 0;
 		for (String value : valueList) {
-			//x = columnCenterX + (columnWidth * column++);
-			//canvas.drawText(value == null ? "" : value, x, y, valueTextPaint);
 			drawText(canvas, value, column);
 			column++;
 		}
@@ -73,36 +71,24 @@ public class TextValueView extends View {
 	}
 
 	private void drawText(Canvas canvas, String textOnCanvas, int column) {
-		//Static layout which will be drawn on canvas
-		//textOnCanvas - text which will be drawn
-		//text paint - paint object
-		//bounds.width - width of the layout
-		//Layout.Alignment.ALIGN_CENTER - layout alignment
-		//1 - text spacing multiply
-		//1 - text spacing add
-		//true - include padding
 		valueTextPaint.getTextBounds(textOnCanvas, 0, textOnCanvas.length(), valueTextRect);
 		StaticLayout.Builder builder = StaticLayout.Builder.obtain(textOnCanvas, 0, textOnCanvas.length(), valueTextPaint, columnWidth);
 		StaticLayout sl = builder.build();
 
 		canvas.save();
 
-		//calculate X and Y coordinates - In this case we want to draw the text in the
-		//center of canvas so we calculate
-		//text height and number of lines to move Y coordinate to center.
 		float textHeight = valueTextRect.height();
 		int numberOfTextLines = sl.getLineCount();
 		float textYCoordinate = viewHeight / 2f + valueTextRect.exactCenterY() -
 				((numberOfTextLines * textHeight) / 2);
 
-		//text will be drawn from left
+
 		final float columnCenterX = columnWidth / 2f;
 		float textXCoordinate = columnCenterX
 				+ columnWidth * column + valueTextRect.left;
 
 		canvas.translate(textXCoordinate, textYCoordinate);
 
-		//draws static layout on canvas
 		sl.draw(canvas);
 		canvas.restore();
 	}

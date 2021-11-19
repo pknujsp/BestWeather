@@ -30,7 +30,7 @@
                     android:clickable="true"
                     android:drawableRight="@drawable/expand_more"
                     android:drawableTint="@color/purple_500"
-                    android:text="weatherDataSource"
+                    android:text="@string/loading"
                     android:textAlignment="center"
                     android:textSize="16sp" />
 
@@ -44,7 +44,7 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
                     android:layout_marginBottom="4dp"
-                    android:text="주소명"
+                    android:text="@string/loading"
                     android:textAlignment="center"
                     android:textSize="20sp" />
 
@@ -59,8 +59,8 @@
                     android:drawableLeft="@drawable/refresh"
                     android:drawableTint="@color/white"
                     android:gravity="center_vertical"
-                    android:text="업데이트 시각"
-                    android:textAlignment="viewEnd"
+                    android:text="@string/loading"
+                    android:textAlignment="textEnd"
                     android:textSize="14sp" />
 
                 <androidx.fragment.app.FragmentContainerView

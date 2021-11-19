@@ -6,7 +6,7 @@
     <dimen name="toolbar_page_title_margin">28dp</dimen>
     <dimen name="toolbar_image_size">28dp</dimen>
     <dimen name="cornerRadius">16dp</dimen>
-    <dimen name="btnCornerRadius">8dp</dimen>
+    <dimen name="btnCornerRadius">10dp</dimen>
 
 
     <!-- forecast view 내의 길이, 크기 값

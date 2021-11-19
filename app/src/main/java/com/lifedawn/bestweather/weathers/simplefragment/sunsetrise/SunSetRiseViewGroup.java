@@ -6,6 +6,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextDirectionHeuristics;
 import android.text.TextPaint;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -69,9 +72,9 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		setWillNotDraw(false);
 		type1BottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 35f, getResources().getDisplayMetrics());
 		type2BottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15f, getResources().getDisplayMetrics());
-		lineMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
+		lineMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10f, getResources().getDisplayMetrics());
 		lineWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
-		circleRadius = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 7f, getResources().getDisplayMetrics());
+		circleRadius = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
 
 		linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		linePaint.setColor(Color.GREEN);
@@ -79,7 +82,7 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		timeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		timeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
 		timeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, getResources().getDisplayMetrics()));
-		timeTextPaint.setTextAlign(Paint.Align.RIGHT);
+		timeTextPaint.setTextAlign(Paint.Align.CENTER);
 
 		timeCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		timeCirclePaint.setColor(Color.WHITE);
@@ -163,6 +166,7 @@ public class SunSetRiseViewGroup extends FrameLayout {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if (type1View != null && type2View != null && type3View != null) {
+			/*
 			canvas.drawRect(lineRect.left, lineRect.top, lineRect.right, lineRect.bottom, linePaint);
 			ZonedDateTime now = ZonedDateTime.now(zoneId);
 
@@ -198,7 +202,52 @@ public class SunSetRiseViewGroup extends FrameLayout {
 
 			canvas.drawText(current, timeTextRect.left - currentTextRect.width() / 2f, timeTextRect.top,
 					timeTextPaint);
+
+			 */
+			canvas.drawRect(lineRect.left, lineRect.top, lineRect.right, lineRect.bottom, linePaint);
+			ZonedDateTime now = ZonedDateTime.now(zoneId);
+
+			long millis = now.toInstant().toEpochMilli();
+
+			long nowTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+			millis = type1View.getDateTime().toInstant().toEpochMilli();
+
+			long type1Minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+			millis = type2View.getDateTime().toInstant().toEpochMilli();
+
+			long type2Minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+			long diff = type2Minutes - type1Minutes;
+
+			float heightPerMinute = (float) (type2PointOnLine.y - type1PointOnLine.y) / (float) diff;
+			float currentTimeY = type1PointOnLine.y + (heightPerMinute * (nowTimeMinutes - type1Minutes));
+			timeCirclePoint.x = type1PointOnLine.x;
+			timeCirclePoint.y = (int) currentTimeY;
+			canvas.drawCircle(timeCirclePoint.x, timeCirclePoint.y, circleRadius, timeCirclePaint);
+
+			drawCurrent(now.format(dateTimeFormatter), canvas);
 		}
+	}
+
+	private void drawCurrent(String dateTime, Canvas canvas) {
+		String textOnCanvas = current + "\n" + dateTime;
+
+		timeTextPaint.getTextBounds(textOnCanvas, 0, textOnCanvas.length(), timeTextRect);
+		StaticLayout.Builder builder = StaticLayout.Builder.obtain(textOnCanvas, 0, textOnCanvas.length(), timeTextPaint,
+				timeTextRect.width());
+		StaticLayout sl = builder.build();
+		canvas.save();
+
+		int criteriaX = timeCirclePoint.x - lineMargin - timeTextRect.width() / 2 - lineWidth / 2;
+		int criteriaY = timeCirclePoint.y;
+
+		float textHeight = timeTextRect.height();
+		float textYCoordinate = criteriaY + timeTextRect.exactCenterY() -
+				((sl.getLineCount() * textHeight) / 2);
+
+		canvas.translate(criteriaX, textYCoordinate);
+
+		sl.draw(canvas);
+		canvas.restore();
 	}
 
 	public void refresh() {
@@ -298,7 +347,6 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		type1View = new SunSetRiseInfoView(getContext(), type1ZonedDateTime, type1);
 		type2View = new SunSetRiseInfoView(getContext(), type2ZonedDateTime, type2);
 		type3View = new SunSetRiseInfoView(getContext(), type3ZonedDateTime, type3);
-
 
 		addView(type1View);
 		addView(type2View);

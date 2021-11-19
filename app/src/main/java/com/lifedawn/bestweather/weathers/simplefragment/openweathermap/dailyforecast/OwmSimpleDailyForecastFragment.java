@@ -130,7 +130,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 		//시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE", Locale.getDefault());
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE");
 		//날씨 아이콘
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		//기온, 강수확률, 강수량

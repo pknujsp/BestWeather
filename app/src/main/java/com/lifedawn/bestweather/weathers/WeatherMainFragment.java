@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -44,6 +45,7 @@ import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
+import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherMainBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.main.MainActivity;
@@ -84,6 +86,8 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	private Gps.LocationCallback locationCallbackInMainFragment;
 	private NetworkStatus networkStatus;
 
+	private AlertDialog loadingDialog;
+
 	public WeatherMainFragment(View.OnClickListener menuOnClickListener) {
 		this.menuOnClickListener = menuOnClickListener;
 	}
@@ -93,6 +97,18 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
 		                              @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 			super.onFragmentCreated(fm, f, savedInstanceState);
+			if (f instanceof WeatherFragment) {
+				if (loadingDialog != null) {
+					loadingDialog.dismiss();
+					loadingDialog = null;
+				}
+			}
+		}
+
+		@Override
+		public void onFragmentResumed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
+			super.onFragmentResumed(fm, f);
+
 		}
 
 		@Override
@@ -104,7 +120,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
+		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		networkStatus = new NetworkStatus(getContext(), new ConnectivityManager.NetworkCallback() {
 		});
 
@@ -135,7 +151,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 
 	@Override
 	public void onDestroy() {
-		getParentFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
+		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		super.onDestroy();
 	}
 
@@ -185,6 +201,10 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	}
 
 	public void setWeatherFragment(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
+		if (loadingDialog != null) {
+			loadingDialog.dismiss();
+		}
+		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.loading), null);
 		Glide.with(this).clear(binding.currentConditionsImg);
 
 		binding.mainToolbar.gps.setVisibility(locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
@@ -202,8 +222,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		getChildFragmentManager().clearFragmentResultListener(requestKey);
 		getChildFragmentManager().setFragmentResult(requestKey, bundle);
 		getChildFragmentManager().beginTransaction().setPrimaryNavigationFragment(weatherFragment).replace(
-				binding.weatherFragmentsContainer.getId(), weatherFragment, getString(R.string.tag_weather_fragment)).commit();
-
+				binding.weatherFragmentsContainer.getId(), weatherFragment, getString(R.string.tag_weather_fragment)).commitAllowingStateLoss();
 	}
 
 	@Override
@@ -211,10 +230,10 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	                                       ZoneId zoneId) {
 		Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
 
-		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(
+		SunriseSunsetCalculator sunRiseSunsetCalculator = new SunriseSunsetCalculator(
 				new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), currentCalendar.getTimeZone());
-		Calendar sunRiseCalendar = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(currentCalendar);
-		Calendar sunSetCalendar = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(currentCalendar);
+		Calendar sunRiseCalendar = sunRiseSunsetCalculator.getOfficialSunriseCalendarForDate(currentCalendar);
+		Calendar sunSetCalendar = sunRiseSunsetCalculator.getOfficialSunsetCalendarForDate(currentCalendar);
 
 		if (sunRiseCalendar == null || sunSetCalendar == null) {
 			return;
@@ -267,7 +286,6 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 			Glide.with(WeatherMainFragment.this).load(backgroundImgMap.get(galleryName)).transition(
 					DrawableTransitionOptions.withCrossFade(500)).into(binding.currentConditionsImg);
 		} else {
-
 			FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
 			photosFromGalleryParameter.setGalleryId(FlickrUtil.getWeatherGalleryId(galleryName));
 

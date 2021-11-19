@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/label_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="6dp"
@@ -24,7 +24,7 @@
         android:layout_toRightOf="@id/label_icon"
         android:text="label"
         android:textColor="?attr/textColorInWeatherCard"
-        android:textSize="15sp" />
+        android:textSize="13sp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -48,7 +48,7 @@
             android:layout_gravity="center_vertical"
             android:text="value"
             android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="14sp" />
+            android:textSize="17sp" />
     </LinearLayout>
 
 
