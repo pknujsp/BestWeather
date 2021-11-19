@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.gridlayout.widget.GridLayout;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
@@ -32,7 +33,7 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	protected ValueUnits visibilityUnit;
 	protected ValueUnits clockUnit;
 	protected ZoneId zoneId;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -46,13 +47,13 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = BaseLayoutDetailCurrentConditionsBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -61,15 +62,15 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		binding.weatherCardViewHeader.detailForecast.setVisibility(View.GONE);
 		layoutInflater = getLayoutInflater();
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
-	
+
 	}
-	
+
 	protected final View addGridItem(int labelDescriptionId, String value, @NonNull Integer labelIconId, Integer valueIconId) {
-		View gridItem = layoutInflater.inflate(R.layout.current_conditions_detail_item, null);
-		
+		View gridItem = layoutInflater.inflate(R.layout.current_conditions_detail_item, null, false);
+
 		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
 		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
 		((TextView) gridItem.findViewById(R.id.value)).setText(value);
@@ -78,8 +79,20 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		} else {
 			((ImageView) gridItem.findViewById(R.id.value_img)).setImageResource(valueIconId);
 		}
-		binding.conditionsGrid.addView(gridItem);
+
+		int cellCount = binding.conditionsGrid.getChildCount();
+		int row = cellCount / 4;
+		int column = cellCount % 4;
+
+		GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+
+		layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
+		layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
+
+		binding.conditionsGrid.addView(gridItem, layoutParams);
+
+
 		return gridItem;
 	}
-	
+
 }

@@ -6,7 +6,7 @@ import android.util.Log;
 import com.lifedawn.bestweather.R;
 
 public enum ValueUnits {
-	celsius, fahrenheit, mPerSec, kmPerHour, km, mile, clock12, clock24;
+	celsius, fahrenheit, mPerSec, kmPerHour, km, mile, clock12, clock24, percent, mm, hpa;
 
 	/*
 	accu weather 기본 단위
@@ -46,6 +46,12 @@ public enum ValueUnits {
 				return context.getString(R.string.clock12);
 			case clock24:
 				return context.getString(R.string.clock24);
+			case percent:
+				return context.getString(R.string.percent);
+			case mm:
+				return context.getString(R.string.mm);
+			case hpa:
+				return context.getString(R.string.hpa);
 			default:
 				return null;
 		}
@@ -80,6 +86,15 @@ public enum ValueUnits {
 
 	public static String convertVisibility(String val, ValueUnits unit) {
 		Double convertedVal = Double.parseDouble(val) / 1000.0;
+		if (unit == mile) {
+			//km -> mile  n / 1.609 = c
+			convertedVal = convertedVal / 1.609;
+		}
+		return String.format("%.1f", convertedVal);
+	}
+
+	public static String convertVisibilityForAccu(String val, ValueUnits unit) {
+		Double convertedVal = Double.parseDouble(val);
 		if (unit == mile) {
 			//km -> mile  n / 1.609 = c
 			convertedVal = convertedVal / 1.609;

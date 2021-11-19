@@ -101,6 +101,27 @@
     <string name="mile">mile</string>
     <string name="clock12">12시간제</string>
     <string name="clock24">24시간제</string>
+    <string name="percent">%</string>
+    <string name="hpa">hpa</string>
+    <string name="mm">mm</string>
+
+    <!-- 풍향 -->
+    <string name="wind_direction_N">북</string>
+    <string name="wind_direction_NNE">북북동</string>
+    <string name="wind_direction_NE">북동</string>
+    <string name="wind_direction_ENE">동북동</string>
+    <string name="wind_direction_E">동</string>
+    <string name="wind_direction_ESE">동남동</string>
+    <string name="wind_direction_SE">남동</string>
+    <string name="wind_direction_SSE">남남동</string>
+    <string name="wind_direction_S">남</string>
+    <string name="wind_direction_SSW">남남서</string>
+    <string name="wind_direction_SW">남서</string>
+    <string name="wind_direction_WSW">서남서</string>
+    <string name="wind_direction_W">서</string>
+    <string name="wind_direction_WNW">서북서</string>
+    <string name="wind_direction_NW">북서</string>
+    <string name="wind_direction_NNW">북북서</string>
 
 
     <!-- fragment tag -->
@@ -478,5 +499,7 @@
     <string name="degree_symbol">°</string>
     <string name="failed_calculating_sun_rise_set">일출/일몰 계산 오류</string>
     <string name="loading">Loading</string>
+    <string name="not_available">없음</string>
+
 
 </resources>

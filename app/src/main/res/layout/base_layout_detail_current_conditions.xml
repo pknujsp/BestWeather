@@ -15,13 +15,13 @@
 
         <androidx.gridlayout.widget.GridLayout
             android:id="@+id/conditions_grid"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             app:alignmentMode="alignBounds"
-            app:columnCount="2"
+            app:columnCount="4"
             app:orientation="horizontal"
-            app:rowCount="8" />
+            app:rowOrderPreserved="false"
+            app:useDefaultMargins="false" />
 
     </LinearLayout>
 </layout>

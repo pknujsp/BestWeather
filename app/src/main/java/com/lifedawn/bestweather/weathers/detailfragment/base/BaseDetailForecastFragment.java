@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers.detailfragment.base;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -15,19 +16,22 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailForecastBinding;
+import com.lifedawn.bestweather.databinding.ViewDetailHourlyForecastListBinding;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
-import java.util.TimeZone;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BaseDetailForecastFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutDetailForecastBinding binding;
@@ -114,5 +118,121 @@ public class BaseDetailForecastFragment extends Fragment implements IWeatherValu
 
 		binding.labels.addView(labelView);
 		return labelView;
+	}
+
+	protected static class HourlyForecastListAdapter extends RecyclerView.Adapter<HourlyForecastListAdapter.ViewHolder> {
+		private List<HourlyForecastListItemObj> hourlyForecastListItemObjs = new ArrayList<>();
+		private Context context;
+		private OnClickedForecastItem onClickedForecastItem;
+
+		public HourlyForecastListAdapter(Context context, @Nullable OnClickedForecastItem onClickedForecastItem) {
+			this.context = context;
+			this.onClickedForecastItem = onClickedForecastItem;
+		}
+
+		public HourlyForecastListAdapter(List<HourlyForecastListItemObj> hourlyForecastListItemObjs) {
+			this.hourlyForecastListItemObjs = hourlyForecastListItemObjs;
+		}
+
+		@NonNull
+		@NotNull
+		@Override
+		public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+			return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.view_detail_hourly_forecast_list, null, false));
+		}
+
+		@Override
+		public void onBindViewHolder(@NonNull @NotNull BaseDetailForecastFragment.HourlyForecastListAdapter.ViewHolder holder, int position) {
+			holder.onBind(hourlyForecastListItemObjs.get(position));
+		}
+
+		@Override
+		public int getItemCount() {
+			return hourlyForecastListItemObjs.size();
+		}
+
+		public class ViewHolder extends RecyclerView.ViewHolder {
+			private ViewDetailHourlyForecastListBinding binding;
+
+			public ViewHolder(@NonNull @NotNull View itemView) {
+				super(itemView);
+				binding = ViewDetailHourlyForecastListBinding.bind(itemView);
+				onClickedForecastItem.onClickedForecastItem(getAdapterPosition());
+			}
+
+			public void onBind(HourlyForecastListItemObj hourlyForecastListItemObj) {
+				binding.datetime.setText(hourlyForecastListItemObj.weatherIconId);
+				binding.pop.setText(hourlyForecastListItemObj.pop);
+				binding.weatherIcon.setImageResource(hourlyForecastListItemObj.weatherIconId);
+				binding.temp.setText(hourlyForecastListItemObj.temp);
+			}
+		}
+	}
+
+	static interface OnClickedForecastItem {
+		void onClickedForecastItem(int position);
+	}
+
+	static class HourlyForecastListItemObj {
+		private String dateTime;
+		private String pop;
+		private String rainVolume;
+		private String snowVolume;
+		private int weatherIconId;
+		private String temp;
+
+		public String getDateTime() {
+			return dateTime;
+		}
+
+		public HourlyForecastListItemObj setDateTime(String dateTime) {
+			this.dateTime = dateTime;
+			return this;
+		}
+
+		public String getPop() {
+			return pop;
+		}
+
+		public HourlyForecastListItemObj setPop(String pop) {
+			this.pop = pop;
+			return this;
+		}
+
+		public String getRainVolume() {
+			return rainVolume;
+		}
+
+		public HourlyForecastListItemObj setRainVolume(String rainVolume) {
+			this.rainVolume = rainVolume;
+			return this;
+		}
+
+		public String getSnowVolume() {
+			return snowVolume;
+		}
+
+		public HourlyForecastListItemObj setSnowVolume(String snowVolume) {
+			this.snowVolume = snowVolume;
+			return this;
+		}
+
+		public int getWeatherIconId() {
+			return weatherIconId;
+		}
+
+		public HourlyForecastListItemObj setWeatherIconId(int weatherIconId) {
+			this.weatherIconId = weatherIconId;
+			return this;
+		}
+
+		public String getTemp() {
+			return temp;
+		}
+
+		public HourlyForecastListItemObj setTemp(String temp) {
+			this.temp = temp;
+			return this;
+		}
 	}
 }

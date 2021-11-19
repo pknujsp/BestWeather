@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.weathers.detailfragment.kma.currentconditions;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,6 +12,7 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
 
 import org.jetbrains.annotations.NotNull;
@@ -39,15 +41,23 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 		// 기온,1시간강수량,습도,강수형태,풍향,풍속
 		String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
 
-		addGridItem(R.string.temperature, ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(), tempUnit).toString() + tempUnitStr,
+		addGridItem(R.string.temperature, ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(), tempUnit) + tempUnitStr,
 				R.drawable.temperature, null);
-		addGridItem(R.string.humidity, finalCurrentConditions.getHumidity(), R.drawable.humidity, null);
-		addGridItem(R.string.wind_direction, finalCurrentConditions.getWindDirection(), R.drawable.winddirection, null);
-		addGridItem(R.string.wind_speed, ValueUnits.convertWindSpeed(finalCurrentConditions.getWindSpeed(), windUnit).toString(),
+		addGridItem(R.string.humidity, finalCurrentConditions.getHumidity() + ValueUnits.convertToStr(getContext(), ValueUnits.percent), R.drawable.humidity,
+				null);
+		View windDirectionView = addGridItem(R.string.wind_direction, WindDirectionConverter.windDirection(getContext(), finalCurrentConditions.getWindDirection()),
+				R.drawable.winddirection,
+				R.drawable.arrow);
+		((ImageView) windDirectionView.findViewById(R.id.value_img)).setRotation(Integer.parseInt(finalCurrentConditions.getWindDirection()) + 180);
+		addGridItem(R.string.wind_speed,
+				ValueUnits.convertWindSpeed(finalCurrentConditions.getWindSpeed(), windUnit) + ValueUnits.convertToStr(getContext(), windUnit),
 				R.drawable.windspeed, null);
 		addGridItem(R.string.wind_strength, WeatherResponseProcessor.getSimpleWindSpeedDescription(finalCurrentConditions.getWindSpeed()),
 				R.drawable.windstrength, null);
-		addGridItem(R.string.precipitation_volume, finalCurrentConditions.getPrecipitation1Hour(), R.drawable.precipitationvolume, null);
+		addGridItem(R.string.precipitation_volume, finalCurrentConditions.getPrecipitation1Hour().equals("0") ?
+						getString(R.string.not_available) :
+						finalCurrentConditions.getPrecipitation1Hour() + ValueUnits.convertToStr(getContext(), ValueUnits.mm),
+				R.drawable.precipitationvolume, null);
 		addGridItem(R.string.precipitation_type,
 				KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()), R.drawable.temp_icon,
 				null);
