@@ -45,8 +45,10 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 		String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
 		String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
 
+		binding.conditionsGrid.requestLayout();
+
 		addGridItem(R.string.weather, AccuWeatherResponseProcessor.getWeatherIconDescription(item.getWeatherIcon()),
-				R.drawable.day_clear, AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon()));
+				AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon()), null);
 		addGridItem(R.string.temperature,
 				ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(), tempUnit) + tempUnitStr,
 				R.drawable.temperature, null);
@@ -58,8 +60,8 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 				R.drawable.dewpoint,
 				null);
 		View windDirectionView = addGridItem(R.string.wind_direction, WindDirectionConverter.windDirection(getContext(), item.getWind().getDirection().getDegrees()),
-				R.drawable.winddirection, R.drawable.arrow);
-		((ImageView) windDirectionView.findViewById(R.id.value_img)).setRotation(Integer.parseInt(item.getWind().getDirection().getDegrees()) + 180);
+				R.drawable.arrow, null);
+		((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(Integer.parseInt(item.getWind().getDirection().getDegrees()) + 180);
 
 		addGridItem(R.string.wind_speed,
 				ValueUnits.convertWindSpeedForAccu(item.getWind().getSpeed().getMetric().getValue(), windUnit) + ValueUnits.convertToStr(getContext(), windUnit),
@@ -80,10 +82,8 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 		addGridItem(R.string.cloud_cover, item.getCloudCover() + percent, R.drawable.cloudiness, null);
 		addGridItem(R.string.precipitation_volume, item.getPrecip1hr().getMetric().getValue().equals("0.0") ?
 						getString(R.string.not_available) :
-						item.getPrecip1hr().getMetric().getValue().equals("0.0") + ValueUnits.convertToStr(getContext(), ValueUnits.mm)
-				,
-				R.drawable.pop,
-				null);
+						item.getPrecip1hr().getMetric().getValue().equals("0.0") + ValueUnits.convertToStr(getContext(), ValueUnits.mm),
+				R.drawable.pop, null);
 		addGridItem(R.string.precipitation_type, AccuWeatherResponseProcessor.getPty(item.getPrecipitationType()), R.drawable.temp_icon, null);
 	}
 }

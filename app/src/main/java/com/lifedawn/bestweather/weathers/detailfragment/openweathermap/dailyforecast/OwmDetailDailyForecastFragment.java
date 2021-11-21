@@ -32,39 +32,48 @@ import java.util.Locale;
 
 public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 	private List<OneCallResponse.Daily> dailyList;
-	
+
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.toolbar.fragmentTitle.setText(R.string.detail_daily_forecast);
 		setValuesToViews();
 	}
-	
+
 	public OwmDetailDailyForecastFragment setDailyList(List<OneCallResponse.Daily> dailyList) {
 		this.dailyList = dailyList;
 		return this;
 	}
-	
+
 	@Override
+	protected void setDataViewsByList() {
+
+	}
+
+	@Override
+	protected void setDataViewsByTable() {
+
+	}
+
 	public void setValuesToViews() {
 		Context context = getContext();
-		
+
 		final int dateRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
 		final int weatherRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInD);
 		final int tempRowHeight = (int) getResources().getDimension(R.dimen.doubleTemperatureRowHeightInD);
 		final int windDirectionRowHeight = (int) getResources().getDimension(R.dimen.singleWindDirectionIconValueRowHeightInD);
 		final int defaultTextRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInD);
-		
+
 		final int columnsCount = dailyList.size();
 		final int columnWidth = (int) getResources().getDimension(R.dimen.valueColumnWidthInDDaily);
 		final int viewWidth = columnsCount * columnWidth;
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
-		
+
 		List<String> dateList = new ArrayList<>();
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
@@ -81,7 +90,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		List<String> cloudinessList = new ArrayList<>();
 		List<String> uvMaxIndexList = new ArrayList<>();
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
-		
+
 		for (OneCallResponse.Daily daily : dailyList) {
 			dateList.add(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, zoneId).format(
 					dateTimeFormatter));
@@ -99,14 +108,14 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 			dewPointList.add(daily.getDew_point());
 			cloudinessList.add(daily.getClouds());
 			uvMaxIndexList.add(daily.getUvi());
-			
+
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
 					OpenWeatherMapResponseProcessor.getWeatherIconImg(daily.getWeather().get(0).getId(), false))));
 		}
-		
+
 		//순서 : 날짜, 날씨상태, 최저/최고 기온, 강수확률, 하루 강우량(nullable), 하루 강설량(nullable)
 		//풍향, 풍속, 바람세기, 돌풍(nullable), 기압, 습도, 이슬점, 운량, 자외선최고치
-		
+
 		//아침/낮/저녁/밤 기온(체감) 제외
 		addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
 		addLabelView(R.drawable.day_clear, getString(R.string.weather), weatherRowHeight);
@@ -123,7 +132,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		addLabelView(R.drawable.dewpoint, getString(R.string.dew_point), defaultTextRowHeight);
 		addLabelView(R.drawable.cloudiness, getString(R.string.cloud_cover), defaultTextRowHeight);
 		addLabelView(R.drawable.uv, getString(R.string.uv_index), defaultTextRowHeight);
-		
+
 		TextValueView dateRow = new TextValueView(context, FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
 		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Detail, viewWidth, weatherRowHeight,
 				columnWidth);
@@ -142,7 +151,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		TextValueView dewPointRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView cloudCoverRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
 		TextValueView uvIndexRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);
-		
+
 		dateRow.setValueList(dateList);
 		popRow.setValueList(popList);
 		rainVolumeRow.setValueList(rainVolumeList);
@@ -157,11 +166,11 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 		cloudCoverRow.setValueList(cloudinessList);
 		uvIndexRow.setValueList(uvMaxIndexList);
 		weatherIconRow.setWeatherImgs(weatherIconObjList);
-		
+
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		rowLayoutParams.gravity = Gravity.CENTER;
-		
+
 		binding.forecastView.addView(dateRow, rowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
 		binding.forecastView.addView(tempRow, rowLayoutParams);

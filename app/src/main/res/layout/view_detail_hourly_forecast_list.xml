@@ -1,37 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="42dp"
+        android:layout_height="wrap_content"
+        android:paddingVertical="8dp"
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
-        android:gravity="center"
         android:orientation="horizontal"
-        android:paddingHorizontal="8dp">
+        android:paddingHorizontal="6dp"
+        android:weightSum="1.0">
 
         <TextView
             android:id="@+id/datetime"
-            android:layout_width="wrap_content"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
-            android:layout_weight="25"
-            android:text="10.1 Fri PM7"
+            android:layout_centerVertical="true"
+            android:text="10.12 월 오후 12"
             android:textColor="?attr/textColor"
             android:textSize="14sp" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="60"
-            android:gravity="center|right"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/temp_layout"
+            android:layout_toRightOf="@id/datetime"
+            android:gravity="center|end"
             android:orientation="horizontal">
 
             <LinearLayout
                 android:id="@+id/pop_layout"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="6dp"
-                android:gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical|left"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -52,16 +56,17 @@
 
             <LinearLayout
                 android:id="@+id/rain_volume_layout"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="6dp"
-                android:gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical|left"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginRight="6dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginRight="5dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/rain" />
 
@@ -76,16 +81,17 @@
 
             <LinearLayout
                 android:id="@+id/snow_volume_layout"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="6dp"
-                android:gravity="center_vertical"
+                android:layout_weight="1"
+                android:gravity="center_vertical|left"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginRight="6dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_marginRight="5dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/snow" />
 
@@ -101,17 +107,19 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/temp_layout"
+            android:layout_width="72dp"
             android:layout_height="wrap_content"
-            android:layout_weight="10"
-            android:gravity="center"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center|left"
             android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/weather_icon"
                 android:layout_width="34dp"
                 android:layout_height="34dp"
-                android:layout_marginRight="4dp"
+                android:layout_marginRight="8dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/day_clear" />
 
@@ -120,12 +128,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:text="20º"
+                android:text="-55º"
                 android:textColor="?attr/textColor"
                 android:textSize="14sp" />
 
         </LinearLayout>
 
-
-    </LinearLayout>
+    </RelativeLayout>
 </layout>

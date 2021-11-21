@@ -48,10 +48,11 @@ public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 		String mm = ValueUnits.convertToStr(getContext(), ValueUnits.mm);
 		String hpa = ValueUnits.convertToStr(getContext(), ValueUnits.hpa);
 
+		binding.conditionsGrid.requestLayout();
 
 		addGridItem(R.string.weather, OpenWeatherMapResponseProcessor.getWeatherIconDescription(current.getWeather().get(0).getId()),
-				R.drawable.day_clear, OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId(),
-						current.getWeather().get(0).getIcon().contains("n")));
+				OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId(),
+						current.getWeather().get(0).getIcon().contains("n")),null);
 		addGridItem(R.string.temperature, ValueUnits.convertTemperature(current.getTemp(), tempUnit).toString() + tempUnitStr, R.drawable.temperature,
 				null);
 		addGridItem(R.string.real_feel_temperature, ValueUnits.convertTemperature(current.getFeelsLike(), tempUnit).toString() + tempUnitStr,
@@ -60,13 +61,10 @@ public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 		addGridItem(R.string.dew_point, ValueUnits.convertTemperature(current.getDewPoint(), tempUnit) + tempUnitStr, R.drawable.dewpoint,
 				null);
 		View windDirectionView = addGridItem(R.string.wind_direction, WindDirectionConverter.windDirection(getContext(), current.getWind_deg()),
-				R.drawable.winddirection,
-				R.drawable.arrow);
-		((ImageView) windDirectionView.findViewById(R.id.value_img)).setRotation(Integer.parseInt(current.getWind_deg()) + 180);
+				R.drawable.arrow,null);
+		((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(Integer.parseInt(current.getWind_deg()) + 180);
 		addGridItem(R.string.wind_speed,
-				ValueUnits.convertWindSpeed(current.getWind_speed(), windUnit) + windUnitStr,
-				R.drawable.windspeed,
-				null);
+				ValueUnits.convertWindSpeed(current.getWind_speed(), windUnit) + windUnitStr, R.drawable.windspeed, null);
 		addGridItem(R.string.wind_gust,
 				current.getWindGust() == null ? notData :
 						ValueUnits.convertWindSpeed(current.getWindGust(), windUnit) + windUnitStr,

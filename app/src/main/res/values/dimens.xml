@@ -83,5 +83,6 @@
     <dimen name="tempTextSizeInHourly">11sp</dimen>
     <dimen name="dateTextSizeInClock">14sp</dimen>
     <dimen name="timeTextSizeInClock">20sp</dimen>
+    <dimen name="btnSizeInToolbar">24dp</dimen>
 
 </resources>
