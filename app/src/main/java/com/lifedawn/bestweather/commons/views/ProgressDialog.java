@@ -37,7 +37,6 @@ public class ProgressDialog {
 			});
 		}
 
-
 		Window window = dialog.getWindow();
 		if (window != null) {
 			WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();

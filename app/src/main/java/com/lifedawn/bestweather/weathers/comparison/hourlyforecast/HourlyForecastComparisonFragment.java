@@ -399,7 +399,6 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			@Override
 			public void onCanceled() {
-
 			}
 		};
 		ExecutorService executorService = Executors.newSingleThreadExecutor();

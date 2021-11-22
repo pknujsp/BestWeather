@@ -69,6 +69,8 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 						getString(R.string.datetime_pattern_in_detail_forecast_clock12) :
 						getString(R.string.datetime_pattern_in_detail_forecast_clock24));
 
+				final String zero = "0";
+
 				for (TwelveHoursOfHourlyForecastsResponse.Item hourly : hourlyItemList) {
 					HourlyForecastListItemObj item = new HourlyForecastListItemObj();
 
@@ -78,8 +80,10 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 							.setTemp(ValueUnits.convertTemperature(hourly.getTemperature().getValue(), tempUnit) + tempDegree)
 							.setWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(hourly.getWeatherIcon()))
 							.setPop((int) (Double.parseDouble(hourly.getPrecipitationProbability())) + percent)
-							.setRainVolume(hourly.getRain() == null ? null : hourly.getRain().getValue() + mm)
-							.setSnowVolume(hourly.getSnow() == null ? null : ValueUnits.convertCMToMM(hourly.getSnow().getValue()) + mm);
+							.setRainVolume(hourly.getRain().getValue().equals(zero) ? null : hourly.getRain().getValue() + mm)
+							.setSnowVolume(hourly.getSnow().getValue().equals(zero) ? null :
+									ValueUnits.convertCMToMM(hourly.getSnow().getValue()) + mm);
+					
 					hourlyForecastListItemObjs.add(item);
 				}
 

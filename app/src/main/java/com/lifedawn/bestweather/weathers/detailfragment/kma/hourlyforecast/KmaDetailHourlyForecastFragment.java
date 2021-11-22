@@ -72,6 +72,7 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ?
 						getString(R.string.datetime_pattern_in_detail_forecast_clock12) :
 						getString(R.string.datetime_pattern_in_detail_forecast_clock24));
+				final String zero = "0";
 				List<HourlyForecastListItemObj> hourlyForecastListItemObjs = new ArrayList<>();
 
 				Map<Integer, SunRiseSetUtil.SunRiseSetObj> sunSetRiseDataMap = SunRiseSetUtil.getDailySunRiseSetMap(
@@ -93,9 +94,9 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 
 					item.setDateTime(finalHourlyForecast.getFcstDateTime().format(dateTimeFormatter))
 							.setTemp(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit) + tempDegree)
-							.setRainVolume(finalHourlyForecast.getRainPrecipitation1Hour().equals("0") ? null :
+							.setRainVolume(finalHourlyForecast.getRainPrecipitation1Hour().equals(zero) ? null :
 									finalHourlyForecast.getRainPrecipitation1Hour() + mm)
-							.setSnowVolume(finalHourlyForecast.getSnowPrecipitation1Hour().equals("0") ? null :
+							.setSnowVolume(finalHourlyForecast.getSnowPrecipitation1Hour().equals(zero) ? null :
 									finalHourlyForecast.getSnowPrecipitation1Hour() + mm)
 							.setPop(finalHourlyForecast.getProbabilityOfPrecipitation())
 							.setWeatherIconId(KmaResponseProcessor.getWeatherPtyIconImg(finalHourlyForecast.getPrecipitationType(), isNight));

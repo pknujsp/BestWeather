@@ -102,7 +102,7 @@ public enum ValueUnits {
 		return String.format("%.1f", convertedVal);
 	}
 
-	public static Integer convertCMToMM(String val) {
-		return (int) (Double.parseDouble(val) * 10.0);
+	public static Double convertCMToMM(String val) {
+		return (Double.parseDouble(val) * 100) / 10.0;
 	}
 }

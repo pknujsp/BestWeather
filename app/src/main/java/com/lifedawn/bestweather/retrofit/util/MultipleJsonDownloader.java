@@ -99,7 +99,6 @@ public abstract class MultipleJsonDownloader<T> {
 			}
 		}
 
-
 	}
 
 	public void processResult(WeatherSourceType weatherSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,

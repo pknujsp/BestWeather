@@ -82,7 +82,7 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 		addGridItem(R.string.cloud_cover, item.getCloudCover() + percent, R.drawable.cloudiness, null);
 		addGridItem(R.string.precipitation_volume, item.getPrecip1hr().getMetric().getValue().equals("0.0") ?
 						getString(R.string.not_available) :
-						item.getPrecip1hr().getMetric().getValue().equals("0.0") + ValueUnits.convertToStr(getContext(), ValueUnits.mm),
+						item.getPrecip1hr().getMetric().getValue() + ValueUnits.convertToStr(getContext(), ValueUnits.mm),
 				R.drawable.pop, null);
 		addGridItem(R.string.precipitation_type, AccuWeatherResponseProcessor.getPty(item.getPrecipitationType()), R.drawable.temp_icon, null);
 	}

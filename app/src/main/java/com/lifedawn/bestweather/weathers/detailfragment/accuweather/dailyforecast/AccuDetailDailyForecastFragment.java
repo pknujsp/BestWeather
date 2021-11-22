@@ -64,6 +64,7 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
 
 				List<DailyForecastListItemObj> dailyForecastListItemObjs = new ArrayList<>();
+				String zero = "0.0";
 
 				for (FiveDaysOfDailyForecastsResponse.DailyForecasts daily : dailyForecastsList) {
 					DailyForecastListItemObj item = new DailyForecastListItemObj();
@@ -71,13 +72,24 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 					item.setDateTime(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, zoneId).format(
 							dateTimeFormatter))
 							.setPop(daily.getDay().getPrecipitationProbability() + percent + "/" + daily.getNight().getPrecipitationProbability() + percent)
-							.setRainVolume(daily.getDay().getRain().getValue() + mm + "/" + daily.getNight().getRain().getValue() + mm)
-							.setSnowVolume(ValueUnits.convertCMToMM(daily.getDay().getSnow().getValue()) + mm + "/" +
-									ValueUnits.convertCMToMM(daily.getNight().getSnow().getValue()) + mm)
 							.setSingle(false).setLeftWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getDay().getIcon()))
 							.setRightWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getNight().getIcon()))
 							.setMinTemp(ValueUnits.convertTemperature(daily.getTemperature().getMinimum().getValue(), tempUnit) + tempDegree)
-							.setDateTime(ValueUnits.convertTemperature(daily.getTemperature().getMaximum().getValue(), tempUnit) + tempDegree);
+							.setMaxTemp(ValueUnits.convertTemperature(daily.getTemperature().getMaximum().getValue(), tempUnit) + tempDegree);
+
+					if (daily.getDay().getRain().getValue().equals(zero) && daily.getNight().getRain().getValue().equals(zero)) {
+						item.setRainVolume(null);
+					} else {
+						item.setRainVolume(daily.getDay().getRain().getValue() + mm + "/" + daily.getNight().getRain().getValue() + mm);
+					}
+
+
+					if (daily.getDay().getSnow().getValue().equals(zero) && daily.getNight().getSnow().getValue().equals(zero)) {
+						item.setSnowVolume(null);
+					} else {
+						item.setSnowVolume(ValueUnits.convertCMToMM(daily.getDay().getSnow().getValue()) + mm + "/" +
+								ValueUnits.convertCMToMM(daily.getNight().getSnow().getValue()) + mm);
+					}
 
 					dailyForecastListItemObjs.add(item);
 				}
