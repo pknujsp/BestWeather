@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.ForecastObj;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
@@ -33,7 +32,6 @@ import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -70,7 +68,6 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				//공통 : 날짜, 시각, 하늘상태, 기온, 강수확률, 강수량, 신적설, 낙뢰, 풍향, 풍속, 바람세기, 습도
 				Context context = getContext();
 				String tempDegree = getString(R.string.degree_symbol);
-				String percent = ValueUnits.convertToStr(context, ValueUnits.percent);
 				String mm = ValueUnits.convertToStr(context, ValueUnits.mm);
 				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ?
 						getString(R.string.datetime_pattern_in_detail_forecast_clock12) :
@@ -115,7 +112,7 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 								public void run() {
 									HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(getContext(), new OnClickedListViewItemListener<Integer>() {
 										@Override
-										public void onCLickedItem(Integer position) {
+										public void onClickedItem(Integer position) {
 
 										}
 									});

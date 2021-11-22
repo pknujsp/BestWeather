@@ -225,7 +225,7 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 			public ViewHolder(@NonNull @NotNull View itemView) {
 				super(itemView);
 				binding = ViewDetailHourlyForecastListBinding.bind(itemView);
-				onClickedForecastItem.onCLickedItem(getAdapterPosition());
+				onClickedForecastItem.onClickedItem(getAdapterPosition());
 			}
 
 			public void onBind(HourlyForecastListItemObj hourlyForecastListItemObj) {
@@ -289,11 +289,34 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 			public ViewHolder(@NonNull @NotNull View itemView) {
 				super(itemView);
 				binding = ViewDetailDailyForecastListBinding.bind(itemView);
-				onClickedForecastItem.onCLickedItem(getAdapterPosition());
+				onClickedForecastItem.onClickedItem(getAdapterPosition());
 			}
 
 			public void onBind(DailyForecastListItemObj dailyForecastListItemObj) {
+				binding.datetime.setText(dailyForecastListItemObj.dateTime);
+				binding.pop.setText(dailyForecastListItemObj.pop);
+				if (dailyForecastListItemObj.snowVolume == null) {
+					binding.snowVolumeLayout.setVisibility(View.GONE);
+				} else {
+					binding.snowVolume.setText(dailyForecastListItemObj.snowVolume);
+					binding.snowVolumeLayout.setVisibility(View.VISIBLE);
+				}
+				if (dailyForecastListItemObj.rainVolume == null) {
+					binding.rainVolumeLayout.setVisibility(View.GONE);
+				} else {
+					binding.rainVolume.setText(dailyForecastListItemObj.rainVolume);
+					binding.rainVolumeLayout.setVisibility(View.VISIBLE);
+				}
 
+				if (dailyForecastListItemObj.isSingle) {
+					binding.rightWeatherIcon.setVisibility(View.GONE);
+				} else {
+					binding.rightWeatherIcon.setImageResource(dailyForecastListItemObj.rightWeatherIconId);
+					binding.rightWeatherIcon.setVisibility(View.VISIBLE);
+				}
+				binding.leftWeatherIcon.setImageResource(dailyForecastListItemObj.leftWeatherIconId);
+				binding.minTemp.setText(dailyForecastListItemObj.minTemp);
+				binding.maxTemp.setText(dailyForecastListItemObj.maxTemp);
 			}
 		}
 	}
@@ -369,7 +392,8 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 		int leftWeatherIconId;
 		int rightWeatherIconId;
 		boolean isSingle;
-		String temp;
+		String minTemp;
+		String maxTemp;
 
 		public String getDateTime() {
 			return dateTime;
@@ -434,12 +458,21 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 			return this;
 		}
 
-		public String getTemp() {
-			return temp;
+		public String getMinTemp() {
+			return minTemp;
 		}
 
-		public DailyForecastListItemObj setTemp(String temp) {
-			this.temp = temp;
+		public DailyForecastListItemObj setMinTemp(String minTemp) {
+			this.minTemp = minTemp;
+			return this;
+		}
+
+		public String getMaxTemp() {
+			return maxTemp;
+		}
+
+		public DailyForecastListItemObj setMaxTemp(String maxTemp) {
+			this.maxTemp = maxTemp;
 			return this;
 		}
 	}

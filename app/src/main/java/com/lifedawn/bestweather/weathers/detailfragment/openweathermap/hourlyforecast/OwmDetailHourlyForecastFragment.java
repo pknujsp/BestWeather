@@ -256,7 +256,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 						public void run() {
 							HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(getContext(), new OnClickedListViewItemListener<Integer>() {
 								@Override
-								public void onCLickedItem(Integer position) {
+								public void onClickedItem(Integer position) {
 
 								}
 							});

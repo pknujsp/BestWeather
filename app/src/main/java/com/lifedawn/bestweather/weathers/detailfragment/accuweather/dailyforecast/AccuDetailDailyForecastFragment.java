@@ -10,9 +10,13 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -54,49 +58,47 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
+				String tempDegree = getString(R.string.degree_symbol);
+				String mm = ValueUnits.convertToStr(getContext(), ValueUnits.mm);
+				String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
 				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
-				Context context = getContext();
+
+				List<DailyForecastListItemObj> dailyForecastListItemObjs = new ArrayList<>();
 
 				for (FiveDaysOfDailyForecastsResponse.DailyForecasts daily : dailyForecastsList) {
-					// 	WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, zoneId).format(dateTimeFormatter)
+					DailyForecastListItemObj item = new DailyForecastListItemObj();
 
+					item.setDateTime(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, zoneId).format(
+							dateTimeFormatter))
+							.setPop(daily.getDay().getPrecipitationProbability() + percent + "/" + daily.getNight().getPrecipitationProbability() + percent)
+							.setRainVolume(daily.getDay().getRain().getValue() + mm + "/" + daily.getNight().getRain().getValue() + mm)
+							.setSnowVolume(ValueUnits.convertCMToMM(daily.getDay().getSnow().getValue()) + mm + "/" +
+									ValueUnits.convertCMToMM(daily.getNight().getSnow().getValue()) + mm)
+							.setSingle(false).setLeftWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getDay().getIcon()))
+							.setRightWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getNight().getIcon()))
+							.setMinTemp(ValueUnits.convertTemperature(daily.getTemperature().getMinimum().getValue(), tempUnit) + tempDegree)
+							.setDateTime(ValueUnits.convertTemperature(daily.getTemperature().getMaximum().getValue(), tempUnit) + tempDegree);
 
-					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
-							ContextCompat.getDrawable(context, AccuWeatherResponseProcessor.getWeatherIconImg(daily.getDay().getIcon())),
-							ContextCompat.getDrawable(context, AccuWeatherResponseProcessor.getWeatherIconImg(daily.getNight().getIcon()))));
-					minTempList.add(ValueUnits.convertTemperature(daily.getTemperature().getMinimum().getValue(), tempUnit));
-					maxTempList.add(ValueUnits.convertTemperature(daily.getTemperature().getMaximum().getValue(), tempUnit));
-
-					popList.add(getDayNightValueStr(daily.getDay().getPrecipitationProbability(), daily.getNight().getPrecipitationProbability()));
-					precipitationVolumeList.add(
-							getDayNightValueStr(daily.getDay().getTotalLiquid().getValue(), daily.getNight().getTotalLiquid().getValue()));
-
-					precipitationOfRainList.add(getDayNightValueStr(daily.getDay().getRainProbability(), daily.getNight().getRainProbability()));
-					rainVolumeList.add(getDayNightValueStr(daily.getDay().getRain().getValue(), daily.getNight().getRain().getValue()));
-
-					precipitationOfSnowList.add(getDayNightValueStr(daily.getDay().getSnowProbability(), daily.getNight().getSnowProbability()));
-					snowVolumeList.add(getDayNightValueStr(ValueUnits.convertCMToMM(daily.getDay().getSnow().getValue()).toString(),
-							ValueUnits.convertCMToMM(daily.getNight().getSnow().getValue()).toString()));
-
-					windDirectionList.add(
-							new DoubleWindDirectionView.WindDirectionObj(Integer.parseInt(daily.getDay().getWind().getDirection().getDegrees()),
-									Integer.parseInt(daily.getNight().getWind().getDirection().getDegrees())));
-					windSpeedList.add(getDayNightValueStr(
-							ValueUnits.convertWindSpeedForAccu(daily.getDay().getWind().getSpeed().getValue(), windUnit).toString(),
-							ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), windUnit).toString()));
-					windStrengthList.add(getDayNightValueStr(
-							WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getDay().getWind().getSpeed().getValue()),
-							WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getNight().getWind().getSpeed().getValue())));
-					windGustList.add(getDayNightValueStr(
-							ValueUnits.convertWindSpeedForAccu(daily.getDay().getWindGust().getSpeed().getValue(), windUnit).toString(),
-							ValueUnits.convertWindSpeedForAccu(daily.getNight().getWindGust().getSpeed().getValue(), windUnit).toString()));
-
-					hoursOfPrecipitationList.add(
-							getDayNightValueStr(daily.getDay().getHoursOfPrecipitation(), daily.getNight().getHoursOfPrecipitation()));
-					hoursOfRainList.add(getDayNightValueStr(daily.getDay().getHoursOfRain(), daily.getNight().getHoursOfRain()));
-					cloudinessList.add(getDayNightValueStr(daily.getDay().getCloudCover(), daily.getNight().getCloudCover()));
+					dailyForecastListItemObjs.add(item);
 				}
 
+				if (getActivity() != null) {
+					getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							DailyForecastListAdapter adapter = new DailyForecastListAdapter(getContext(), new OnClickedListViewItemListener<Integer>() {
+								@Override
+								public void onClickedItem(Integer position) {
+
+								}
+							});
+							adapter.setDailyForecastListItemObjs(dailyForecastListItemObjs);
+							binding.listview.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+							binding.listview.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+							binding.listview.setAdapter(adapter);
+						}
+					});
+				}
 			}
 		});
 	}
@@ -183,22 +185,6 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 					cloudinessList.add(getDayNightValueStr(daily.getDay().getCloudCover(), daily.getNight().getCloudCover()));
 				}
 
-				addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
-				addLabelView(R.drawable.day_clear, getString(R.string.weather), weatherRowHeight);
-				addLabelView(R.drawable.temperature, getString(R.string.temperature), tempRowHeight);
-				addLabelView(R.drawable.realfeeltemperature, getString(R.string.probability_of_precipitation), defaultTextRowHeight);
-				addLabelView(R.drawable.precipitationvolume, getString(R.string.precipitation_volume), defaultTextRowHeight);
-				addLabelView(R.drawable.por, getString(R.string.precipitation_of_rain), defaultTextRowHeight);
-				addLabelView(R.drawable.rainvolume, getString(R.string.rain_volume), defaultTextRowHeight);
-				addLabelView(R.drawable.pos, getString(R.string.precipitation_of_snow), defaultTextRowHeight);
-				addLabelView(R.drawable.snowvolume, getString(R.string.snow_volume), defaultTextRowHeight);
-				addLabelView(R.drawable.winddirection, getString(R.string.wind_direction), windDirectionRowHeight);
-				addLabelView(R.drawable.windspeed, getString(R.string.wind_speed), defaultTextRowHeight);
-				addLabelView(R.drawable.windstrength, getString(R.string.wind_strength), defaultTextRowHeight);
-				addLabelView(R.drawable.windgust, getString(R.string.wind_gust), defaultTextRowHeight);
-				addLabelView(R.drawable.temp_icon, getString(R.string.hours_of_precipitation), defaultTextRowHeight);
-				addLabelView(R.drawable.temp_icon, getString(R.string.hours_of_rain), defaultTextRowHeight);
-				addLabelView(R.drawable.cloudiness, getString(R.string.cloud_cover), defaultTextRowHeight);
 
 				//accu 순서 : 날짜, 낮/밤의 날씨, 최저/최고 기온, 낮/밤의 강수확률, 강수량, 강우확률, 강우량, 강설확률, 강설량
 				//풍향, 풍속, 바람세기, 돌풍, 강수지속시간, 강우지속시간, 운량
@@ -243,26 +229,51 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 				hoursOfPrecipitationRow.setValueList(hoursOfPrecipitationList);
 				hoursOfRainRow.setValueList(hoursOfRainList);
 
-				LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-						ViewGroup.LayoutParams.WRAP_CONTENT);
-				rowLayoutParams.gravity = Gravity.CENTER;
 
-				binding.forecastView.addView(dateRow, rowLayoutParams);
-				binding.forecastView.addView(weatherIconRow, rowLayoutParams);
-				binding.forecastView.addView(tempRow, rowLayoutParams);
-				binding.forecastView.addView(popRow, rowLayoutParams);
-				binding.forecastView.addView(precipitationVolumeRow, rowLayoutParams);
-				binding.forecastView.addView(precipitationOfRainRow, rowLayoutParams);
-				binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
-				binding.forecastView.addView(precipitationOfSnowRow, rowLayoutParams);
-				binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
-				binding.forecastView.addView(windDirectionRow, rowLayoutParams);
-				binding.forecastView.addView(windSpeedRow, rowLayoutParams);
-				binding.forecastView.addView(windStrengthRow, rowLayoutParams);
-				binding.forecastView.addView(windGustRow, rowLayoutParams);
-				binding.forecastView.addView(hoursOfPrecipitationRow, rowLayoutParams);
-				binding.forecastView.addView(hoursOfRainRow, rowLayoutParams);
-				binding.forecastView.addView(cloudCoverRow, rowLayoutParams);
+				if (getActivity() != null) {
+					getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
+							addLabelView(R.drawable.day_clear, getString(R.string.weather), weatherRowHeight);
+							addLabelView(R.drawable.temperature, getString(R.string.temperature), tempRowHeight);
+							addLabelView(R.drawable.realfeeltemperature, getString(R.string.probability_of_precipitation), defaultTextRowHeight);
+							addLabelView(R.drawable.precipitationvolume, getString(R.string.precipitation_volume), defaultTextRowHeight);
+							addLabelView(R.drawable.por, getString(R.string.precipitation_of_rain), defaultTextRowHeight);
+							addLabelView(R.drawable.rainvolume, getString(R.string.rain_volume), defaultTextRowHeight);
+							addLabelView(R.drawable.pos, getString(R.string.precipitation_of_snow), defaultTextRowHeight);
+							addLabelView(R.drawable.snowvolume, getString(R.string.snow_volume), defaultTextRowHeight);
+							addLabelView(R.drawable.winddirection, getString(R.string.wind_direction), windDirectionRowHeight);
+							addLabelView(R.drawable.windspeed, getString(R.string.wind_speed), defaultTextRowHeight);
+							addLabelView(R.drawable.windstrength, getString(R.string.wind_strength), defaultTextRowHeight);
+							addLabelView(R.drawable.windgust, getString(R.string.wind_gust), defaultTextRowHeight);
+							addLabelView(R.drawable.temp_icon, getString(R.string.hours_of_precipitation), defaultTextRowHeight);
+							addLabelView(R.drawable.temp_icon, getString(R.string.hours_of_rain), defaultTextRowHeight);
+							addLabelView(R.drawable.cloudiness, getString(R.string.cloud_cover), defaultTextRowHeight);
+
+							LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+									ViewGroup.LayoutParams.WRAP_CONTENT);
+							rowLayoutParams.gravity = Gravity.CENTER;
+
+							binding.forecastView.addView(dateRow, rowLayoutParams);
+							binding.forecastView.addView(weatherIconRow, rowLayoutParams);
+							binding.forecastView.addView(tempRow, rowLayoutParams);
+							binding.forecastView.addView(popRow, rowLayoutParams);
+							binding.forecastView.addView(precipitationVolumeRow, rowLayoutParams);
+							binding.forecastView.addView(precipitationOfRainRow, rowLayoutParams);
+							binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
+							binding.forecastView.addView(precipitationOfSnowRow, rowLayoutParams);
+							binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
+							binding.forecastView.addView(windDirectionRow, rowLayoutParams);
+							binding.forecastView.addView(windSpeedRow, rowLayoutParams);
+							binding.forecastView.addView(windStrengthRow, rowLayoutParams);
+							binding.forecastView.addView(windGustRow, rowLayoutParams);
+							binding.forecastView.addView(hoursOfPrecipitationRow, rowLayoutParams);
+							binding.forecastView.addView(hoursOfRainRow, rowLayoutParams);
+							binding.forecastView.addView(cloudCoverRow, rowLayoutParams);
+						}
+					});
+				}
 			}
 		});
 	}

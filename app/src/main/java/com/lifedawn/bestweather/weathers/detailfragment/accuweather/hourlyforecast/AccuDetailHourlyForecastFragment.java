@@ -31,7 +31,6 @@ import com.lifedawn.bestweather.weathers.view.TextValueView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -78,7 +77,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 									zoneId).format(dateTimeFormatter))
 							.setTemp(ValueUnits.convertTemperature(hourly.getTemperature().getValue(), tempUnit) + tempDegree)
 							.setWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(hourly.getWeatherIcon()))
-							.setPop(String.valueOf((int) (Double.parseDouble(hourly.getPrecipitationProbability()))))
+							.setPop((int) (Double.parseDouble(hourly.getPrecipitationProbability())) + percent)
 							.setRainVolume(hourly.getRain() == null ? null : hourly.getRain().getValue() + mm)
 							.setSnowVolume(hourly.getSnow() == null ? null : ValueUnits.convertCMToMM(hourly.getSnow().getValue()) + mm);
 					hourlyForecastListItemObjs.add(item);
@@ -90,7 +89,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 						public void run() {
 							HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(getContext(), new OnClickedListViewItemListener<Integer>() {
 								@Override
-								public void onCLickedItem(Integer position) {
+								public void onClickedItem(Integer position) {
 
 								}
 							});
