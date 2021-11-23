@@ -3,12 +3,14 @@ package com.lifedawn.bestweather.weathers.dataprocessing.util;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class SunRiseSetUtil {
 	private SunRiseSetUtil() {
@@ -34,19 +36,19 @@ public class SunRiseSetUtil {
 
 			criteria = criteria.plusDays(1);
 			beginDay = criteria.getDayOfYear();
-		} while (beginDay != endDay);
+		} while (beginDay <= endDay);
 
 		return map;
 	}
 
-	public static boolean isNight(Date compDate, Date sunRiseDate, Date sunSetDate) {
-		if (compDate.before(sunRiseDate)) {
+	public static boolean isNight(Calendar compDate, Calendar sunRiseDate, Calendar sunSetDate) {
+		long compH = TimeUnit.MILLISECONDS.toHours(compDate.getTimeInMillis());
+		long sunRiseH = TimeUnit.MILLISECONDS.toHours(sunRiseDate.getTimeInMillis());
+		long sunSetH = TimeUnit.MILLISECONDS.toHours(sunSetDate.getTimeInMillis());
+		if (compH > sunSetH || compH < sunRiseH) {
 			return true;
-		} else if (compDate.before(sunSetDate)) {
+		} else
 			return false;
-		} else {
-			return true;
-		}
 	}
 
 	public static class SunRiseSetObj {

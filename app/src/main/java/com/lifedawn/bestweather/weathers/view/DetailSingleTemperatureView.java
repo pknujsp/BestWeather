@@ -66,7 +66,7 @@ public class DetailSingleTemperatureView extends View {
 		ValueUnits unit =
 				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_temp),
 						ValueUnits.celsius.name()));
-		tempUnit = unit == ValueUnits.celsius ? context.getString(R.string.celsius) : context.getString(R.string.fahrenheit);
+		tempUnit = context.getString(R.string.degree_symbol);
 
 		RADIUS = getResources().getDimension(R.dimen.circleRadiusInSingleTemperature);
 		this.tempList = tempList;

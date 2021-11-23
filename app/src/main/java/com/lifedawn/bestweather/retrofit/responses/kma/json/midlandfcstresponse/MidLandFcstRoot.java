@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse;
+package com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

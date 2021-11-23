@@ -29,10 +29,10 @@ import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 	private List<OneCallResponse.Daily> dailyList;
@@ -61,15 +61,18 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 				String tempDegree = getString(R.string.degree_symbol);
 				String mm = ValueUnits.convertToStr(getContext(), ValueUnits.mm);
 				String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
+				DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
+				DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
 
 				List<DailyForecastListItemObj> dailyForecastListItemObjs = new ArrayList<>();
+				ZonedDateTime dateTime = null;
 
 				for (OneCallResponse.Daily daily : dailyList) {
 					DailyForecastListItemObj item = new DailyForecastListItemObj();
+					dateTime = WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, zoneId);
 
-					item.setDateTime(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, zoneId).format(
-							dateTimeFormatter))
+					item.setDate(dateTime.format(dateFormatter))
+							.setDay(dateTime.format(dayFormatter))
 							.setPop((int) (Double.parseDouble(daily.getPop()) * 100.0) + percent)
 							.setRainVolume(daily.getRain() == null ? null : daily.getRain() + mm)
 							.setSnowVolume(daily.getSnow() == null ? null : daily.getSnow() + mm)
@@ -118,7 +121,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 				final int columnsCount = dailyList.size();
 				final int columnWidth = (int) getResources().getDimension(R.dimen.valueColumnWidthInDDaily);
 				final int viewWidth = columnsCount * columnWidth;
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
+				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE");
 
 				List<String> dateList = new ArrayList<>();
 				List<Integer> minTempList = new ArrayList<>();
@@ -163,8 +166,6 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 				//풍향, 풍속, 바람세기, 돌풍(nullable), 기압, 습도, 이슬점, 운량, 자외선최고치
 
 				//아침/낮/저녁/밤 기온(체감) 제외
-
-
 				TextValueView dateRow = new TextValueView(context, FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
 				SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Detail, viewWidth, weatherRowHeight,
 						columnWidth);

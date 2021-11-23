@@ -40,6 +40,9 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -100,15 +103,15 @@ public class WeatherFragment extends Fragment {
 	private IGps iGps;
 
 
-	private MultipleJsonDownloader<JsonElement> multipleJsonDownloader;
+	private MultipleJsonDownloader multipleJsonDownloader;
 	private static ExecutorService executors = Executors.newSingleThreadExecutor();
 	public static final Map<String, WeatherResponseObj> finalResponseMap = new HashMap<>();
 
 	static class WeatherResponseObj {
-		final MultipleJsonDownloader<JsonElement> multipleJsonDownloader;
+		final MultipleJsonDownloader multipleJsonDownloader;
 		final WeatherSourceType requestWeatherSourceType;
 
-		public WeatherResponseObj(MultipleJsonDownloader<JsonElement> multipleJsonDownloader, WeatherSourceType requestWeatherSourceType) {
+		public WeatherResponseObj(MultipleJsonDownloader multipleJsonDownloader, WeatherSourceType requestWeatherSourceType) {
 			this.multipleJsonDownloader = multipleJsonDownloader;
 			this.requestWeatherSourceType = requestWeatherSourceType;
 		}
@@ -312,7 +315,7 @@ public class WeatherFragment extends Fragment {
 
 		final JsonResultObj jsonResultObj = new JsonResultObj(requestWeatherSourceType, requestWeatherSources);
 
-		multipleJsonDownloader = new MultipleJsonDownloader<JsonElement>() {
+		multipleJsonDownloader = new MultipleJsonDownloader() {
 			@Override
 			public void onResult() {
 				jsonResultObj.multipleJsonDownloader = this;
@@ -346,7 +349,7 @@ public class WeatherFragment extends Fragment {
 		setRequestWeatherSourceWithSourceType(newWeatherSourceType, requestWeatherSources);
 
 		final JsonResultObj jsonResultObj = new JsonResultObj(newWeatherSourceType, requestWeatherSources);
-		multipleJsonDownloader = new MultipleJsonDownloader<JsonElement>() {
+		multipleJsonDownloader = new MultipleJsonDownloader() {
 			@Override
 			public void onResult() {
 				jsonResultObj.multipleJsonDownloader = this;
@@ -368,14 +371,14 @@ public class WeatherFragment extends Fragment {
 	}
 
 	private void processOnResult(JsonResultObj jsonResultObj) {
-		Set<Map.Entry<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>>>> entrySet = jsonResultObj.multipleJsonDownloader.getResponseMap().entrySet();
+		Set<Map.Entry<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult>>> entrySet = jsonResultObj.multipleJsonDownloader.getResponseMap().entrySet();
 		//메인 날씨 제공사의 데이터가 정상이면 메인 날씨 제공사의 프래그먼트들을 설정하고 값을 표시한다.
 		//메인 날씨 제공사의 응답이 불량이면 재 시도, 취소 중 택1 다이얼로그 표시
-		for (Map.Entry<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>>> entry : entrySet) {
+		for (Map.Entry<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult>> entry : entrySet) {
 			WeatherSourceType weatherSourceType = entry.getKey();
 
 			if (weatherSourceType == jsonResultObj.requestWeatherSource) {
-				for (MultipleJsonDownloader.ResponseResult<JsonElement> responseResult : entry.getValue().values()) {
+				for (MultipleJsonDownloader.ResponseResult responseResult : entry.getValue().values()) {
 					if (responseResult.getT() != null) {
 
 						if (getActivity() != null) {
@@ -522,7 +525,7 @@ public class WeatherFragment extends Fragment {
 
 	private AlertDialog reRefreshBySameWeatherSource(JsonResultObj jsonResultObj) {
 		final AlertDialog loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
-		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> result = jsonResultObj.multipleJsonDownloader.getResponseMap().get(
+		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult> result = jsonResultObj.multipleJsonDownloader.getResponseMap().get(
 				jsonResultObj.requestWeatherSource);
 
 		ArrayMap<WeatherSourceType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
@@ -601,10 +604,10 @@ public class WeatherFragment extends Fragment {
 	}
 
 
-	private void setWeatherFragments(WeatherSourceType requestWeatherSourceType, MultipleJsonDownloader<JsonElement> multipleJsonDownloader,
+	private void setWeatherFragments(WeatherSourceType requestWeatherSourceType, MultipleJsonDownloader multipleJsonDownloader,
 	                                 Double latitude, Double longitude, @Nullable AlertDialog loadingDialog) {
-		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>>> responseMap = multipleJsonDownloader.getResponseMap();
-		MultipleJsonDownloader.ResponseResult<JsonElement> aqicnResponse = responseMap.get(WeatherSourceType.AQICN).get(
+		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult>> responseMap = multipleJsonDownloader.getResponseMap();
+		MultipleJsonDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherSourceType.AQICN).get(
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 
 		GeolocalizedFeedResponse airQualityResponse = null;
@@ -612,7 +615,7 @@ public class WeatherFragment extends Fragment {
 			airQualityResponse = AqicnResponseProcessor.getAirQualityObjFromJson((Response<JsonElement>) aqicnResponse.getResponse());
 		}
 
-		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> arrayMap = responseMap.get(
+		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult> arrayMap = responseMap.get(
 				requestWeatherSourceType);
 
 		Fragment simpleCurrentConditionsFragment = null;
@@ -626,18 +629,13 @@ public class WeatherFragment extends Fragment {
 		switch (requestWeatherSourceType) {
 			case KMA:
 				FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(
-						KmaResponseProcessor.getUltraSrtNcstObjFromJson(
-								arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponse().body().toString()));
+						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponse().body());
 				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
-						KmaResponseProcessor.getUltraSrtFcstObjFromJson(
-								arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponse().body().toString()),
-						KmaResponseProcessor.getVilageFcstObjFromJson(
-								arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST).getResponse().body().toString()));
+						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponse().body(),
+						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST).getResponse().body());
 				List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastList(
-						KmaResponseProcessor.getMidLandObjFromJson(
-								arrayMap.get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponse().body().toString()),
-						KmaResponseProcessor.getMidTaObjFromJson(
-								arrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST).getResponse().body().toString()),
+						(MidLandFcstResponse) arrayMap.get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponse().body(),
+						(MidTaResponse) arrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST).getResponse().body(),
 						Long.parseLong(multipleJsonDownloader.get("tmFc")));
 
 				KmaSimpleCurrentConditionsFragment kmaSimpleCurrentConditionsFragment = new KmaSimpleCurrentConditionsFragment();
@@ -669,13 +667,13 @@ public class WeatherFragment extends Fragment {
 				AccuDetailCurrentConditionsFragment accuDetailCurrentConditionsFragment = new AccuDetailCurrentConditionsFragment();
 
 				CurrentConditionsResponse currentConditionsResponse = AccuWeatherResponseProcessor.getCurrentConditionsObjFromJson(
-						arrayMap.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponse().body());
+						(JsonElement) arrayMap.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponse().body());
 
 				accuSimpleCurrentConditionsFragment.setCurrentConditionsResponse(currentConditionsResponse).setAirQualityResponse(
 						airQualityResponse);
 				accuSimpleHourlyForecastFragment.setTwelveHoursOfHourlyForecastsResponse(
 						AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
-								arrayMap.get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponse().body()));
+								(JsonElement) arrayMap.get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponse().body()));
 				accuSimpleDailyForecastFragment.setFiveDaysOfDailyForecastsResponse(
 						AccuWeatherResponseProcessor.getDailyForecastObjFromJson(
 								arrayMap.get(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY).getResponse().body().toString()));
@@ -844,7 +842,7 @@ public class WeatherFragment extends Fragment {
 	}
 
 	static class JsonResultObj {
-		MultipleJsonDownloader<JsonElement> multipleJsonDownloader;
+		MultipleJsonDownloader multipleJsonDownloader;
 		WeatherSourceType requestWeatherSource;
 		ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources;
 

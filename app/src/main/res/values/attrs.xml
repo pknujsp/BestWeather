@@ -43,4 +43,26 @@
         <attr name="appWidgetBackgroundColor" format="color" />
         <attr name="appWidgetTextColor" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="CustomSearchView">
+        <attr name="hint" format="string" />
+        <attr name="clickable" format="boolean" />
+        <attr name="focusable" format="boolean" />
+        <attr name="backBtnVisibility" format="enum">
+            <!-- Visible on screen; the default value. -->
+            <enum name="visible" value="0" />
+            <!-- Not displayed, but taken into account during layout (space is left for it). -->
+            <enum name="invisible" value="4" />
+            <!-- Completely hidden, as if the view had not been added. -->
+            <enum name="gone" value="8" />
+        </attr>
+        <attr name="searchBtnVisibility" format="enum">
+            <!-- Visible on screen; the default value. -->
+            <enum name="visible" value="0" />
+            <!-- Not displayed, but taken into account during layout (space is left for it). -->
+            <enum name="invisible" value="4" />
+            <!-- Completely hidden, as if the view had not been added. -->
+            <enum name="gone" value="8" />
+        </attr>
+    </declare-styleable>
 </resources>

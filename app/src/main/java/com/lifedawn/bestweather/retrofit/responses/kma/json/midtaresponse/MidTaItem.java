@@ -1,89 +1,126 @@
-package com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse;
+package com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.tickaroo.tikxml.annotation.PropertyElement;
+import com.tickaroo.tikxml.annotation.Xml;
 
+
+@Xml(name = "item", inheritance = true)
 public class MidTaItem {
 	@Expose
 	@SerializedName("regId")
+	@PropertyElement(name = "regId")
 	private String regId;
 
 
 	@Expose
 	@SerializedName("taMax3")
+	@PropertyElement(name = "taMax3")
+
 	private String taMax3;
 
 
 	@Expose
 	@SerializedName("taMax4")
+	@PropertyElement(name = "taMax4")
+
 	private String taMax4;
 
 
 	@Expose
 	@SerializedName("taMax5")
+	@PropertyElement(name = "taMax5")
+
 	private String taMax5;
 
 
 	@Expose
 	@SerializedName("taMax6")
+	@PropertyElement(name = "taMax6")
+
 	private String taMax6;
 
 
 	@Expose
 	@SerializedName("taMax7")
+	@PropertyElement(name = "taMax7")
+
 	private String taMax7;
 
 
 	@Expose
 	@SerializedName("taMax8")
+	@PropertyElement(name = "taMax8")
+
 	private String taMax8;
 
 
 	@Expose
 	@SerializedName("taMax9")
+	@PropertyElement(name = "taMax9")
+
 	private String taMax9;
 
 	@Expose
 	@SerializedName("taMax10")
+	@PropertyElement(name = "taMax10")
+
 	private String taMax10;
 
 
 	@Expose
 	@SerializedName("taMin3")
+	@PropertyElement(name = "taMin3")
+
 	private String taMin3;
 
 
 	@Expose
 	@SerializedName("taMin4")
+	@PropertyElement(name = "taMin4")
+
 	private String taMin4;
 
 
 	@Expose
 	@SerializedName("taMin5")
+	@PropertyElement(name = "taMin5")
+
 	private String taMin5;
 
 
 	@Expose
 	@SerializedName("taMin6")
+	@PropertyElement(name = "taMin6")
+
 	private String taMin6;
 
 
 	@Expose
 	@SerializedName("taMin7")
+	@PropertyElement(name = "taMin7")
+
 	private String taMin7;
 
 
 	@Expose
 	@SerializedName("taMin8")
+	@PropertyElement(name = "taMin8")
+
 	private String taMin8;
 
 
 	@Expose
 	@SerializedName("taMin9")
+	@PropertyElement(name = "taMin9")
+
 	private String taMin9;
 
 	@Expose
 	@SerializedName("taMin10")
+	@PropertyElement(name = "taMin10")
+
 	private String taMin10;
 
 

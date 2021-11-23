@@ -32,6 +32,8 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	protected ValueUnits windUnit;
 	protected ValueUnits visibilityUnit;
 	protected ValueUnits clockUnit;
+	protected Double latitude;
+	protected Double longitude;
 	protected ZoneId zoneId;
 
 	@Override
@@ -41,6 +43,8 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 
 		Bundle bundle = getArguments();
 		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
+		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
 
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
 		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));

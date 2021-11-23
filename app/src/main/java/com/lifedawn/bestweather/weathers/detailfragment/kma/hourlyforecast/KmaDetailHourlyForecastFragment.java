@@ -39,6 +39,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment {
 	private List<FinalHourlyForecast> finalHourlyForecastList;
@@ -68,11 +69,11 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				//공통 : 날짜, 시각, 하늘상태, 기온, 강수확률, 강수량, 신적설, 낙뢰, 풍향, 풍속, 바람세기, 습도
 				Context context = getContext();
 				String tempDegree = getString(R.string.degree_symbol);
+				String percent = ValueUnits.convertToStr(context, ValueUnits.percent);
 				String mm = ValueUnits.convertToStr(context, ValueUnits.mm);
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ?
-						getString(R.string.datetime_pattern_in_detail_forecast_clock12) :
-						getString(R.string.datetime_pattern_in_detail_forecast_clock24));
-				final String zero = "0";
+				DateTimeFormatter datePattern = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
+				final String lessThan1mm = getString(R.string.kma_less_than_1mm);
+				final String noSnow = getString(R.string.kma_no_snow);
 				List<HourlyForecastListItemObj> hourlyForecastListItemObjs = new ArrayList<>();
 
 				Map<Integer, SunRiseSetUtil.SunRiseSetObj> sunSetRiseDataMap = SunRiseSetUtil.getDailySunRiseSetMap(
@@ -81,26 +82,33 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 								zoneId), latitude, longitude);
 
 				boolean isNight = false;
+				Calendar itemCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
 				Calendar sunRise = null;
 				Calendar sunSet = null;
 
 				for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
 					HourlyForecastListItemObj item = new HourlyForecastListItemObj();
 
-					Date itemDate = new Date(finalHourlyForecast.getFcstDateTime().toInstant().toEpochMilli());
+					itemCalendar.setTimeInMillis(finalHourlyForecast.getFcstDateTime().toInstant().toEpochMilli());
 					sunRise = sunSetRiseDataMap.get(finalHourlyForecast.getFcstDateTime().getDayOfYear()).getSunrise();
 					sunSet = sunSetRiseDataMap.get(finalHourlyForecast.getFcstDateTime().getDayOfYear()).getSunset();
-					isNight = SunRiseSetUtil.isNight(itemDate, sunRise.getTime(), sunSet.getTime());
+					isNight = SunRiseSetUtil.isNight(itemCalendar, sunRise, sunSet);
 
-					item.setDateTime(finalHourlyForecast.getFcstDateTime().format(dateTimeFormatter))
+					item.setDate(finalHourlyForecast.getFcstDateTime().format(datePattern))
+							.setHour(String.valueOf(finalHourlyForecast.getFcstDateTime().getHour()))
 							.setTemp(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit) + tempDegree)
-							.setRainVolume(finalHourlyForecast.getRainPrecipitation1Hour().equals(zero) ? null :
-									finalHourlyForecast.getRainPrecipitation1Hour() + mm)
-							.setSnowVolume(finalHourlyForecast.getSnowPrecipitation1Hour().equals(zero) ? null :
-									finalHourlyForecast.getSnowPrecipitation1Hour() + mm)
-							.setPop(finalHourlyForecast.getProbabilityOfPrecipitation())
-							.setWeatherIconId(KmaResponseProcessor.getWeatherPtyIconImg(finalHourlyForecast.getPrecipitationType(), isNight));
+							.setRainVolume(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ? null :
+									finalHourlyForecast.getRainPrecipitation1Hour())
+							.setWeatherIconId(KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(), isNight));
 
+					if (finalHourlyForecast.getProbabilityOfPrecipitation() != null) {
+						item.setPop(finalHourlyForecast.getProbabilityOfPrecipitation() + percent);
+					}
+
+					if (finalHourlyForecast.getSnowPrecipitation1Hour() != null) {
+						item.setSnowVolume(finalHourlyForecast.getSnowPrecipitation1Hour().equals(noSnow) ? null :
+								finalHourlyForecast.getSnowPrecipitation1Hour());
+					}
 					hourlyForecastListItemObjs.add(item);
 				}
 
@@ -139,9 +147,6 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				//단기예보 : 강수확률, 강수형태(pty), 1시간강수량, 습도, 1시간신적설, 하늘상태(sky), 1시간기온, 최저/최고기온, 풍속, 풍향, 파고
 				//초단기예보 : 기온, 1시간강수량, 하늘상태(sky), 습도, 강수형태(pty), 낙뢰, 풍향, 풍속
 				//공통 : 날짜, 시각, 하늘상태, 기온, 강수확률, 강수량, 신적설, 낙뢰, 풍향, 풍속, 바람세기, 습도
-				binding.forecastView.removeAllViews();
-				binding.labels.removeAllViews();
-
 				Context context = getContext();
 
 				final int dateRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
@@ -192,19 +197,37 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				List<String> humidityList = new ArrayList<>();
 				List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 
+				boolean haveSnow = false;
+				final String lessThan1mm = getString(R.string.kma_less_than_1mm);
+				final String noSnow = getString(R.string.kma_no_snow);
+				final String zero = "0";
+
 				for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 							ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(), false))));
 					//기온
 					tempList.add(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit));
 					//강수확률
-					probabilityOfPrecipitationList.add(finalHourlyForecast.getProbabilityOfPrecipitation());
+					probabilityOfPrecipitationList.add(finalHourlyForecast.getProbabilityOfPrecipitation() == null ? "-" : finalHourlyForecast.getProbabilityOfPrecipitation());
 					//강수량
-					precipitationVolumeList.add(finalHourlyForecast.getRainPrecipitation1Hour());
+					precipitationVolumeList.add(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ?
+							"-" : finalHourlyForecast.getRainPrecipitation1Hour());
 					//신적설
-					freshSnowCoverList.add(finalHourlyForecast.getSnowPrecipitation1Hour());
+					if (finalHourlyForecast.getSnowPrecipitation1Hour() != null) {
+						freshSnowCoverList.add(finalHourlyForecast.getSnowPrecipitation1Hour().equals(noSnow) ? "-" :
+								finalHourlyForecast.getSnowPrecipitation1Hour());
+						if (!haveSnow) {
+							haveSnow = true;
+						}
+					} else {
+						freshSnowCoverList.add("-");
+					}
 					//낙뢰
-					thunderStormList.add(finalHourlyForecast.getLightning() == null ? "" : "O");
+					if (finalHourlyForecast.getLightning() != null) {
+						thunderStormList.add(finalHourlyForecast.getLightning().equals(zero) ? "-" : finalHourlyForecast.getLightning());
+					} else {
+						thunderStormList.add("-");
+					}
 					//풍향
 					windDirectionList.add(Integer.parseInt(finalHourlyForecast.getWindDirection()));
 					//풍속
@@ -229,16 +252,22 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				weatherIconRow.setWeatherImgs(weatherIconObjList);
 
 				if (getActivity() != null) {
+					boolean finalHaveSnow = haveSnow;
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
+							binding.forecastView.removeAllViews();
+							binding.labels.removeAllViews();
+
 							addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
 							addLabelView(R.drawable.time, getString(R.string.clock), clockRowHeight);
 							addLabelView(R.drawable.day_clear, getString(R.string.weather), weatherRowHeight);
 							addLabelView(R.drawable.temperature, getString(R.string.temperature), tempRowHeight);
 							addLabelView(R.drawable.pop, getString(R.string.probability_of_precipitation), defaultTextRowHeight);
 							addLabelView(R.drawable.precipitationvolume, getString(R.string.precipitation_volume), defaultTextRowHeight);
-							addLabelView(R.drawable.snowvolume, getString(R.string.fresh_snow_cover), defaultTextRowHeight);
+							if (finalHaveSnow) {
+								addLabelView(R.drawable.snowvolume, getString(R.string.fresh_snow_cover), defaultTextRowHeight);
+							}
 							addLabelView(R.drawable.thunderstorm, getString(R.string.thunderstorm), defaultTextRowHeight);
 							addLabelView(R.drawable.humidity, getString(R.string.humidity), defaultTextRowHeight);
 							addLabelView(R.drawable.winddirection, getString(R.string.wind_direction), windDirectionRowHeight);
@@ -255,7 +284,9 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 							binding.forecastView.addView(tempRow, rowLayoutParams);
 							binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
 							binding.forecastView.addView(precipitationVolumeRow, rowLayoutParams);
-							binding.forecastView.addView(freshSnowCoverRow, rowLayoutParams);
+							if (finalHaveSnow) {
+								binding.forecastView.addView(freshSnowCoverRow, rowLayoutParams);
+							}
 							binding.forecastView.addView(thunderstormRow, rowLayoutParams);
 							binding.forecastView.addView(humidityRow, rowLayoutParams);
 							binding.forecastView.addView(windDirectionRow, rowLayoutParams);

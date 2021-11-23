@@ -2,11 +2,14 @@ package com.lifedawn.bestweather.retrofit.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.tickaroo.tikxml.TikXml;
+import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -38,7 +41,7 @@ public class RetrofitClient {
 	public static final String FLICKR_KEY = "2c887b8d73b8334ddb3b0809c387de1b";
 	public static final String FLICKR_SECRET = "0112b42bf9b07200";
 
-	public static final String DATATYPE = "JSON";
+	public static final String DATATYPE = "XML";
 	public static final String LOG_TAG = "Retrofit Response";
 
 
@@ -50,21 +53,23 @@ public class RetrofitClient {
 
 
 	public static synchronized Querys getApiService(ServiceType serviceType) {
-		OkHttpClient client = new OkHttpClient.Builder().connectTimeout(5, TimeUnit.SECONDS).build();
+		OkHttpClient client = new OkHttpClient.Builder().connectTimeout(4, TimeUnit.SECONDS).build();
 
 		switch (serviceType) {
 			case MID_LAND_FCST:
 			case MID_TA_FCST:
-				Retrofit midFcstInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(MID_FCST_INFO_SERVICE_URL).build();
+				Retrofit midFcstInstance = new Retrofit.Builder().client(client)
+						.baseUrl(MID_FCST_INFO_SERVICE_URL)
+						.addConverterFactory(TikXmlConverterFactory.create(new TikXml.Builder().exceptionOnUnreadXml(false).build()))
+						.build();
 				return midFcstInstance.create(Querys.class);
 
 			case ULTRA_SRT_NCST:
 			case ULTRA_SRT_FCST:
 			case VILAGE_FCST:
-				Retrofit vilageFcstInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						VILAGE_FCST_INFO_SERVICE_URL).build();
+				Retrofit vilageFcstInstance = new Retrofit.Builder().client(client).baseUrl(VILAGE_FCST_INFO_SERVICE_URL)
+						.addConverterFactory(TikXmlConverterFactory.create(new TikXml.Builder().exceptionOnUnreadXml(false).build()))
+						.build();
 				return vilageFcstInstance.create(Querys.class);
 
 			case ACCU_GEOPOSITION_SEARCH:

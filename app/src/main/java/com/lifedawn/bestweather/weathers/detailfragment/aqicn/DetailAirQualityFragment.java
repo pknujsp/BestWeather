@@ -132,7 +132,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 			o3AirQualityObjList.add(new AirQualityBarView.AirQualityObj(airQualityForecastObj.o3));
 		}
 
-		final int dateRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
+		final int dateRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInD);
 		TextValueView dateRow = new TextValueView(getContext(), FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
 		AirQualityBarView pm10BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, pm10AirQualityObjList);
 		AirQualityBarView pm25BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, pm25AirQualityObjList);

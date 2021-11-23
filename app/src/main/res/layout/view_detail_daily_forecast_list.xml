@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -7,25 +8,46 @@
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
         android:orientation="horizontal"
-        android:paddingHorizontal="6dp"
-        android:paddingVertical="8dp">
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="6dp">
 
-        <TextView
-            android:id="@+id/datetime"
-            android:layout_width="110dp"
+
+        <LinearLayout
+            android:id="@+id/date_layout"
+            android:layout_width="70dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:text="10.12 월 오후 12"
-            android:textColor="?attr/textColor"
-            android:textSize="14sp" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="10.12"
+                android:textAlignment="center"
+                android:textColor="?attr/textColor"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/day"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Tue"
+                android:textAlignment="center"
+                android:textColor="@color/light_blue_900"
+                android:textSize="15sp" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/temp_layout"
-            android:layout_toRightOf="@id/datetime"
+            android:layout_toRightOf="@id/date_layout"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -43,13 +65,15 @@
                     android:layout_height="20dp"
                     android:layout_marginRight="6dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/pop" />
+                    android:src="@drawable/pop"
+                    app:tint="@color/blue" />
 
                 <TextView
                     android:id="@+id/pop"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="100%"
+                    android:textColor="@color/blue"
                     android:textSize="13sp" />
 
             </LinearLayout>
@@ -66,21 +90,25 @@
                     android:id="@+id/rain_volume_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginVertical="3dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_marginRight="6dp"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/rainvolume" />
+                        android:src="@drawable/raindrop"
+                        app:tint="@color/blue" />
 
                     <TextView
                         android:id="@+id/rain_volume"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="100%"
+                        android:textColor="@color/blue"
+
                         android:textSize="13sp" />
 
                 </LinearLayout>
@@ -89,22 +117,24 @@
                     android:id="@+id/snow_volume_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginVertical="3dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_marginRight="6dp"
                         android:scaleType="fitCenter"
-                        android:src="@drawable/snowvolume" />
+                        android:src="@drawable/snowparticle"
+                        app:tint="@color/blue" />
 
                     <TextView
                         android:id="@+id/snow_volume"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="100%"
+                        android:textColor="@color/blue"
                         android:textSize="13sp" />
 
                 </LinearLayout>
@@ -157,11 +187,11 @@
                     android:id="@+id/minTemp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="4dp"
                     android:singleLine="true"
                     android:text="-55º"
-                    android:layout_marginRight="4dp"
                     android:textAlignment="center"
-                    android:textSize="14sp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:id="@+id/maxTemp"
@@ -170,8 +200,8 @@
                     android:singleLine="true"
                     android:text="-55º"
                     android:textAlignment="center"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:textColor="@color/light_blue_900"
+                    android:textSize="17sp" />
             </LinearLayout>
 
         </LinearLayout>

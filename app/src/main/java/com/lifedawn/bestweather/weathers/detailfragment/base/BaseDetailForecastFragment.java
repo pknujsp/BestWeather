@@ -73,6 +73,8 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 		Bundle bundle = getArguments();
 		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
 		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
+		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
 	}
 
 	@Nullable
@@ -229,10 +231,17 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 			}
 
 			public void onBind(HourlyForecastListItemObj hourlyForecastListItemObj) {
-				binding.datetime.setText(hourlyForecastListItemObj.dateTime);
-				binding.pop.setText(hourlyForecastListItemObj.pop);
+				binding.date.setText(hourlyForecastListItemObj.date);
+				binding.hours.setText(hourlyForecastListItemObj.hour);
 				binding.weatherIcon.setImageResource(hourlyForecastListItemObj.weatherIconId);
 				binding.temp.setText(hourlyForecastListItemObj.temp);
+
+				if (hourlyForecastListItemObj.getPop() != null) {
+					binding.pop.setText(hourlyForecastListItemObj.pop);
+					binding.popLayout.setVisibility(View.VISIBLE);
+				} else {
+					binding.popLayout.setVisibility(View.GONE);
+				}
 
 				if (hourlyForecastListItemObj.snowVolume != null) {
 					binding.snowVolume.setText(hourlyForecastListItemObj.snowVolume);
@@ -293,7 +302,8 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 			}
 
 			public void onBind(DailyForecastListItemObj dailyForecastListItemObj) {
-				binding.datetime.setText(dailyForecastListItemObj.dateTime);
+				binding.date.setText(dailyForecastListItemObj.date);
+				binding.day.setText(dailyForecastListItemObj.day);
 				binding.pop.setText(dailyForecastListItemObj.pop);
 				if (dailyForecastListItemObj.snowVolume == null) {
 					binding.snowVolumeLayout.setVisibility(View.GONE);
@@ -322,19 +332,30 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 	}
 
 	public static class HourlyForecastListItemObj {
-		String dateTime;
+		String date;
+		String hour;
 		String pop;
 		String rainVolume;
 		String snowVolume;
 		int weatherIconId;
 		String temp;
 
-		public String getDateTime() {
-			return dateTime;
+
+		public String getHour() {
+			return hour;
 		}
 
-		public HourlyForecastListItemObj setDateTime(String dateTime) {
-			this.dateTime = dateTime;
+		public HourlyForecastListItemObj setHour(String hour) {
+			this.hour = hour;
+			return this;
+		}
+
+		public String getDate() {
+			return date;
+		}
+
+		public HourlyForecastListItemObj setDate(String date) {
+			this.date = date;
 			return this;
 		}
 
@@ -385,7 +406,8 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 	}
 
 	public static class DailyForecastListItemObj {
-		String dateTime;
+		String date;
+		String day;
 		String pop;
 		String rainVolume;
 		String snowVolume;
@@ -395,12 +417,21 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 		String minTemp;
 		String maxTemp;
 
-		public String getDateTime() {
-			return dateTime;
+		public String getDay() {
+			return day;
 		}
 
-		public DailyForecastListItemObj setDateTime(String dateTime) {
-			this.dateTime = dateTime;
+		public DailyForecastListItemObj setDay(String day) {
+			this.day = day;
+			return this;
+		}
+
+		public String getDate() {
+			return date;
+		}
+
+		public DailyForecastListItemObj setDate(String date) {
+			this.date = date;
 			return this;
 		}
 

@@ -92,7 +92,7 @@ public class OpenWeatherMapProcessing {
 	}
 
 	public static void getOwmForecasts(String latitude, String longitude, boolean useOneCall,
-	                                   MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	                                   MultipleJsonDownloader multipleJsonDownloader) {
 		if (useOneCall) {
 			OneCallParameter oneCallParameter = new OneCallParameter();
 			Set<OneCallParameter.OneCallApis> excludeOneCallApis = new ArraySet<>();
@@ -102,7 +102,7 @@ public class OpenWeatherMapProcessing {
 
 			Call<JsonElement> oneCallCall = getOneCall(oneCallParameter, new JsonDownloader() {
 				@Override
-				public void onResponseResult(Response<JsonElement> response) {
+				public void onResponseResult(Response<?> response) {
 					Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
 					multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
 							RetrofitClient.ServiceType.OWM_ONE_CALL, response);
@@ -122,14 +122,14 @@ public class OpenWeatherMapProcessing {
 
 	public static void requestWeatherData(Context context, Double latitude, Double longitude,
 	                                      RequestOwm requestOwm,
-	                                      MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	                                      MultipleJsonDownloader multipleJsonDownloader) {
 		OneCallParameter oneCallParameter = new OneCallParameter();
 		Set<OneCallParameter.OneCallApis> excludeOneCallApis = requestOwm.getExcludeApis();
 		oneCallParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString()).setOneCallApis(excludeOneCallApis);
 
 		Call<JsonElement> oneCallCall = getOneCall(oneCallParameter, new JsonDownloader() {
 			@Override
-			public void onResponseResult(Response<JsonElement> response) {
+			public void onResponseResult(Response<?> response) {
 				multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
 						RetrofitClient.ServiceType.OWM_ONE_CALL, response);
 			}

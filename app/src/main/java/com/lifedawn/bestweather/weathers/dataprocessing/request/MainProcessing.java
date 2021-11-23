@@ -16,9 +16,9 @@ import java.util.Set;
 
 public class MainProcessing {
 
-	public static MultipleJsonDownloader<JsonElement> requestNewWeatherData(Context context, Double latitude, Double longitude,
+	public static MultipleJsonDownloader requestNewWeatherData(Context context, Double latitude, Double longitude,
 	                                                                        ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
-	                                                                        MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	                                                                        MultipleJsonDownloader multipleJsonDownloader) {
 		int totalRequestCount = 0;
 		for (RequestWeatherSource requestWeatherSource : requestWeatherSources.values()) {
 			totalRequestCount += requestWeatherSource.getRequestServiceTypes().size();
@@ -51,12 +51,12 @@ public class MainProcessing {
 		return multipleJsonDownloader;
 	}
 
-	public static MultipleJsonDownloader<JsonElement> reRequestWeatherDataBySameWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
+	public static MultipleJsonDownloader reRequestWeatherDataBySameWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
 	                                                                                                  ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
-	                                                                                                  MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	                                                                                                  MultipleJsonDownloader multipleJsonDownloader) {
 		//실패한 데이터는 모두 삭제(aqicn 제외)
 		Set<RetrofitClient.ServiceType> failedRequestServiceTypes = requestWeatherSources.valueAt(0).getRequestServiceTypes();
-		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> resultArrayMap =
+		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult> resultArrayMap =
 				multipleJsonDownloader.getResponseMap().get(requestWeatherSources.keyAt(0));
 
 		for (RetrofitClient.ServiceType fail : failedRequestServiceTypes) {
@@ -85,12 +85,12 @@ public class MainProcessing {
 		return multipleJsonDownloader;
 	}
 
-	public static MultipleJsonDownloader<JsonElement> reRequestWeatherDataByAnotherWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
+	public static MultipleJsonDownloader reRequestWeatherDataByAnotherWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
 	                                                                                                     WeatherSourceType lastWeatherSourceType,
 	                                                                                                     ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
-	                                                                                                     MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	                                                                                                     MultipleJsonDownloader multipleJsonDownloader) {
 		//aqicn빼고 모두 삭제
-		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> aqicnResult
+		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult> aqicnResult
 				= multipleJsonDownloader.getResponseMap().get(WeatherSourceType.AQICN);
 		multipleJsonDownloader.getResponseMap().clear();
 		multipleJsonDownloader.getResponseMap().put(WeatherSourceType.AQICN, aqicnResult);

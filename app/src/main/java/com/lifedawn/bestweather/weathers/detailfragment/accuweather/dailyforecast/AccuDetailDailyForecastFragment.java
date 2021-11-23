@@ -29,10 +29,10 @@ import com.lifedawn.bestweather.weathers.view.TextValueView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment {
 	private List<FiveDaysOfDailyForecastsResponse.DailyForecasts> dailyForecastsList;
@@ -61,16 +61,19 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 				String tempDegree = getString(R.string.degree_symbol);
 				String mm = ValueUnits.convertToStr(getContext(), ValueUnits.mm);
 				String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
+				DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
+				DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
 
 				List<DailyForecastListItemObj> dailyForecastListItemObjs = new ArrayList<>();
 				String zero = "0.0";
+				ZonedDateTime dateTime = null;
 
 				for (FiveDaysOfDailyForecastsResponse.DailyForecasts daily : dailyForecastsList) {
 					DailyForecastListItemObj item = new DailyForecastListItemObj();
+					dateTime = WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, zoneId);
 
-					item.setDateTime(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, zoneId).format(
-							dateTimeFormatter))
+					item.setDate(dateTime.format(dateFormatter))
+							.setDay(dateTime.format(dayFormatter))
 							.setPop(daily.getDay().getPrecipitationProbability() + percent + "/" + daily.getNight().getPrecipitationProbability() + percent)
 							.setSingle(false).setLeftWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getDay().getIcon()))
 							.setRightWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getNight().getIcon()))
@@ -135,7 +138,7 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 				final int columnsCount = dailyForecastsList.size();
 				final int columnWidth = (int) getResources().getDimension(R.dimen.valueColumnWidthInDDaily);
 				final int viewWidth = columnsCount * columnWidth;
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
+				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE");
 
 				List<String> dateList = new ArrayList<>();
 				List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();

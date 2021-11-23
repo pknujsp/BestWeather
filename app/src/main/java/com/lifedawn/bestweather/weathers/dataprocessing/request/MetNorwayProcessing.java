@@ -35,12 +35,12 @@ public class MetNorwayProcessing {
 		return call;
 	}
 
-	public static void getMetNorwayForecasts(String latitude, String longitude, MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	public static void getMetNorwayForecasts(String latitude, String longitude, MultipleJsonDownloader multipleJsonDownloader) {
 		LocationForecastParameter locationForecastParameter = new LocationForecastParameter();
 		locationForecastParameter.setLatitude(latitude).setLongitude(longitude);
 		Call<JsonElement> locationForecastCall = getLocationForecast(locationForecastParameter, new JsonDownloader() {
 			@Override
-			public void onResponseResult(Response<JsonElement> response) {
+			public void onResponseResult(Response<?> response) {
 				multipleJsonDownloader.processResult(WeatherSourceType.MET_NORWAY, locationForecastParameter,
 						RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST, response);
 			}

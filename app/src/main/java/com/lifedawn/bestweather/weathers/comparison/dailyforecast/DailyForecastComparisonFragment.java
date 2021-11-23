@@ -26,8 +26,10 @@ import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
-import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstRoot;
-import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaRoot;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstRoot;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaRoot;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.comparison.base.BaseForecastComparisonFragment;
@@ -56,7 +58,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DailyForecastComparisonFragment extends BaseForecastComparisonFragment {
-	private MultipleJsonDownloader<JsonElement> multipleJsonDownloader;
+	private MultipleJsonDownloader multipleJsonDownloader;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -391,7 +393,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			}
 		});
 
-		multipleJsonDownloader = new MultipleJsonDownloader<JsonElement>() {
+		multipleJsonDownloader = new MultipleJsonDownloader() {
 			@Override
 			public void onResult() {
 				setTable(this, latitude, longitude, dialog);
@@ -418,26 +420,26 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		multipleJsonDownloader.cancel();
 	}
 
-	private void setTable(MultipleJsonDownloader<JsonElement> multipleJsonDownloader, Double latitude, Double longitude,
+	private void setTable(MultipleJsonDownloader multipleJsonDownloader, Double latitude, Double longitude,
 	                      AlertDialog dialog) {
-		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>>> responseMap = multipleJsonDownloader.getResponseMap();
-		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult<JsonElement>> arrayMap;
+		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult>> responseMap = multipleJsonDownloader.getResponseMap();
+		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult> arrayMap;
 		DailyForecastResponse dailyForecastResponse = new DailyForecastResponse();
 
 		//kma
 		if (responseMap.containsKey(WeatherSourceType.KMA)) {
 			arrayMap = responseMap.get(WeatherSourceType.KMA);
-			MultipleJsonDownloader.ResponseResult<JsonElement> midLandFcstResponse = arrayMap.get(RetrofitClient.ServiceType.MID_LAND_FCST);
-			MultipleJsonDownloader.ResponseResult<JsonElement> midTaFcstResponse = arrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST);
+			MultipleJsonDownloader.ResponseResult midLandFcstResponse = arrayMap.get(RetrofitClient.ServiceType.MID_LAND_FCST);
+			MultipleJsonDownloader.ResponseResult midTaFcstResponse = arrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST);
 
 			if (midLandFcstResponse.getT() == null && midTaFcstResponse.getT() == null) {
-				MidLandFcstRoot midLandFcstRoot = KmaResponseProcessor.getMidLandObjFromJson(
-						midLandFcstResponse.getResponse().body().toString());
-				MidTaRoot midTaRoot = KmaResponseProcessor.getMidTaObjFromJson(midTaFcstResponse.getResponse().body().toString());
+				MidLandFcstResponse midLandFcstRoot =
+						(MidLandFcstResponse) midLandFcstResponse.getResponse().body();
+				MidTaResponse midTaRoot = (MidTaResponse) midTaFcstResponse.getResponse().body();
 
 				String successfulCode = "00";
-				if (midLandFcstRoot.getResponse().getHeader().getResultCode().equals(
-						successfulCode) && midTaRoot.getResponse().getHeader().getResultCode().equals(successfulCode)) {
+				if (midLandFcstRoot.getKmaHeader().getResultCode().equals(
+						successfulCode) && midTaRoot.getKmaHeader().getResultCode().equals(successfulCode)) {
 					dailyForecastResponse.kmaDailyForecastList = KmaResponseProcessor.getFinalDailyForecastList(midLandFcstRoot, midTaRoot,
 							Long.parseLong(multipleJsonDownloader.get("tmFc")));
 				}
@@ -453,7 +455,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		//accu
 		if (responseMap.containsKey(WeatherSourceType.ACCU_WEATHER)) {
 			arrayMap = responseMap.get(WeatherSourceType.ACCU_WEATHER);
-			MultipleJsonDownloader.ResponseResult<JsonElement> accuDailyForecastResponse = arrayMap.get(
+			MultipleJsonDownloader.ResponseResult accuDailyForecastResponse = arrayMap.get(
 					RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY);
 
 			if (accuDailyForecastResponse.getT() == null) {
@@ -466,7 +468,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		//owm
 		if (responseMap.containsKey(WeatherSourceType.OPEN_WEATHER_MAP)) {
 			arrayMap = responseMap.get(WeatherSourceType.OPEN_WEATHER_MAP);
-			MultipleJsonDownloader.ResponseResult<JsonElement> responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
+			MultipleJsonDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
 			if (responseResult.getT() == null) {
 				dailyForecastResponse.owmOneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(

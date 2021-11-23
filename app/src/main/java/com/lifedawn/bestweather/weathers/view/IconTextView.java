@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers.view;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -45,12 +46,13 @@ public class IconTextView extends View {
 		valueTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
 		Rect rect = new Rect();
-		valueTextPaint.getTextBounds("0", 0, 1, rect);
+		valueTextPaint.getTextBounds("화", 0, 1, rect);
 		valueTextHeight = rect.height();
 
 		iconRect = new Rect();
 
 		icon = ContextCompat.getDrawable(context, iconId);
+		icon.setTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.blue)));
 
 		margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, getResources().getDisplayMetrics());
 		int extraSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, getResources().getDisplayMetrics());
@@ -62,6 +64,10 @@ public class IconTextView extends View {
 	public IconTextView setValueList(List<String> valueList) {
 		this.valueList = valueList;
 		return this;
+	}
+
+	public List<String> getValueList() {
+		return valueList;
 	}
 
 	@Override

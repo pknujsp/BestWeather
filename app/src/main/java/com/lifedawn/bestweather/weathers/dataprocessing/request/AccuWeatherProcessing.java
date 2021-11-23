@@ -174,7 +174,7 @@ public class AccuWeatherProcessing {
 	}
 
 	public static void requestWeatherData(Context context, Double latitude, Double longitude, RequestAccu requestAccu,
-	                                      MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	                                      MultipleJsonDownloader multipleJsonDownloader) {
 		final String locationKey = getLocationKey(context, latitude, longitude);
 
 		if (locationKey.isEmpty()) {
@@ -184,7 +184,7 @@ public class AccuWeatherProcessing {
 
 			Call<JsonElement> geoPositionCall = getGeoPositionSearch(context, geoPositionSearchParameter, new JsonDownloader() {
 				@Override
-				public void onResponseResult(Response<JsonElement> response) {
+				public void onResponseResult(Response<?> response) {
 					GeoPositionResponse geoPositionResponse = AccuWeatherResponseProcessor.getGeoPositionObjFromJson(
 							response.body().toString());
 					requestWeatherDataIfHasLocationKey(requestAccu, geoPositionResponse.getKey(), multipleJsonDownloader);
@@ -219,7 +219,7 @@ public class AccuWeatherProcessing {
 	}
 
 	private static void requestWeatherDataIfHasLocationKey(RequestAccu requestAccu, String locationKey,
-	                                                       MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	                                                       MultipleJsonDownloader multipleJsonDownloader) {
 		Set<RetrofitClient.ServiceType> requestTypeSet = requestAccu.getRequestServiceTypes();
 
 		if (requestTypeSet.contains(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS)) {
@@ -228,7 +228,7 @@ public class AccuWeatherProcessing {
 
 			Call<JsonElement> currentConditionsCall = getCurrentConditions(currentConditionsParameter, new JsonDownloader() {
 				@Override
-				public void onResponseResult(Response<JsonElement> response) {
+				public void onResponseResult(Response<?> response) {
 					multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER, currentConditionsParameter,
 							RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, response);
 				}
@@ -250,7 +250,7 @@ public class AccuWeatherProcessing {
 			Call<JsonElement> hourlyForecastCall = get12HoursOfHourlyForecasts(twelveHoursOfHourlyForecastsParameter,
 					new JsonDownloader() {
 						@Override
-						public void onResponseResult(Response<JsonElement> response) {
+						public void onResponseResult(Response<?> response) {
 							multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER, twelveHoursOfHourlyForecastsParameter,
 									RetrofitClient.ServiceType.ACCU_12_HOURLY, response);
 
@@ -273,7 +273,7 @@ public class AccuWeatherProcessing {
 
 			Call<JsonElement> dailyForecastCall = get5DaysOfDailyForecasts(fiveDaysOfDailyForecastsParameter, new JsonDownloader() {
 				@Override
-				public void onResponseResult(Response<JsonElement> response) {
+				public void onResponseResult(Response<?> response) {
 					multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER, fiveDaysOfDailyForecastsParameter,
 							RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY, response);
 				}

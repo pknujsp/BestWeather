@@ -81,7 +81,7 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 
 		binding.weatherIcon.setImageDrawable(
 				ContextCompat.getDrawable(getContext(), KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(),
-						SunRiseSetUtil.isNight(calendar.getTime(), sunRise.getTime(), sunSet.getTime()))));
+						SunRiseSetUtil.isNight(calendar, sunRise, sunSet))));
 		binding.sky.setText(KmaResponseProcessor.getWeatherSkyIconDescription(finalHourlyForecast.getSky()));
 		String temp = ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(),
 				tempUnit) + ValueUnits.convertToStr(getContext(), tempUnit);

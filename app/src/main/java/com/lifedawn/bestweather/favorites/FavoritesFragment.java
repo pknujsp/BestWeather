@@ -1,7 +1,10 @@
 package com.lifedawn.bestweather.favorites;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -15,13 +18,24 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.views.CustomEditText;
+import com.lifedawn.bestweather.commons.views.CustomSearchView;
 import com.lifedawn.bestweather.databinding.FragmentFavoritesBinding;
+import com.lifedawn.bestweather.databinding.ViewSearchBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -36,13 +50,14 @@ public class FavoritesFragment extends Fragment {
 	private FragmentFavoritesBinding binding;
 	private FavoriteAddressesAdapter adapter;
 	private WeatherViewModel weatherViewModel;
-
 	private FavoriteAddressesAdapter.OnClickedAddressListener onClickedAddressListener;
 
 	private boolean enableCurrentLocation;
 	private boolean refresh;
 	private boolean clickedItem;
 	private String fragmentRequestKey;
+
+	private Dialog dialog;
 
 	private FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
 		@Override
@@ -130,6 +145,7 @@ public class FavoritesFragment extends Fragment {
 			}
 		});
 
+		/*
 		binding.addFavorite.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -140,6 +156,29 @@ public class FavoritesFragment extends Fragment {
 						getString(R.string.tag_find_address_fragment)).commit();
 			}
 		});
+
+		 */
+
+
+		binding.searchview.setOnClickedListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dialog = new Dialog(getActivity());
+				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+				ViewSearchBinding binding = ViewSearchBinding.inflate(getLayoutInflater());
+
+				dialog.setContentView(binding.getRoot());
+				final Window window = dialog.getWindow();
+				window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+				window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+				window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+				//imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+				findDialogViews(dialog, binding);
+				dialog.show();
+			}
+		});
+
 
 		binding.favoriteAddressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		adapter = new FavoriteAddressesAdapter();
@@ -186,6 +225,15 @@ public class FavoritesFragment extends Fragment {
 			@Override
 			public void onResultNoData() {
 
+			}
+		});
+	}
+
+	private void findDialogViews(final Dialog dialog, ViewSearchBinding binding) {
+		binding.back.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
 			}
 		});
 	}
@@ -253,7 +301,7 @@ public class FavoritesFragment extends Fragment {
 				@Override
 				public void onClick(DialogInterface dialogInterface, int i) {
 					dialogInterface.dismiss();
-					binding.addFavorite.callOnClick();
+					//binding.addFavorite.callOnClick();
 				}
 			}).setNeutralButton(R.string.close_app, new DialogInterface.OnClickListener() {
 				@Override

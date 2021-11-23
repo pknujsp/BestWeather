@@ -12,10 +12,16 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
+import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
+import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
 	private FinalCurrentConditions finalCurrentConditions;
@@ -48,9 +54,9 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 		addGridItem(R.string.humidity, finalCurrentConditions.getHumidity() + ValueUnits.convertToStr(getContext(), ValueUnits.percent), R.drawable.humidity,
 				null);
 		View windDirectionView = addGridItem(R.string.wind_direction, WindDirectionConverter.windDirection(getContext(), finalCurrentConditions.getWindDirection()),
-				R.drawable.winddirection,
-				R.drawable.arrow);
-		((ImageView) windDirectionView.findViewById(R.id.value_img)).setRotation(Integer.parseInt(finalCurrentConditions.getWindDirection()) + 180);
+				R.drawable.arrow,
+				null);
+		((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(Integer.parseInt(finalCurrentConditions.getWindDirection()) + 180);
 		addGridItem(R.string.wind_speed,
 				ValueUnits.convertWindSpeed(finalCurrentConditions.getWindSpeed(), windUnit) + ValueUnits.convertToStr(getContext(), windUnit),
 				R.drawable.windspeed, null);
@@ -60,8 +66,17 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 						getString(R.string.not_available) :
 						finalCurrentConditions.getPrecipitation1Hour() + ValueUnits.convertToStr(getContext(), ValueUnits.mm),
 				R.drawable.precipitationvolume, null);
+
+		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(new Location(latitude, longitude),
+				TimeZone.getTimeZone(zoneId.getId()));
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
+		Calendar sunRise = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(calendar);
+		Calendar sunSet = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(calendar);
+
 		addGridItem(R.string.precipitation_type,
-				KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()), R.drawable.temp_icon,
+				KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()),
+				KmaResponseProcessor.getWeatherPtyIconImg(finalCurrentConditions.getPrecipitationType(), SunRiseSetUtil.isNight(calendar,
+						sunRise, sunSet)),
 				null);
 
 	}

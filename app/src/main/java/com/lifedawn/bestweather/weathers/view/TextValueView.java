@@ -82,7 +82,6 @@ public class TextValueView extends View {
 		float textYCoordinate = viewHeight / 2f + valueTextRect.exactCenterY() -
 				((numberOfTextLines * textHeight) / 2);
 
-
 		final float columnCenterX = columnWidth / 2f;
 		float textXCoordinate = columnCenterX
 				+ columnWidth * column + valueTextRect.left;

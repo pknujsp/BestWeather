@@ -65,25 +65,25 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 				String percent = ValueUnits.convertToStr(context, ValueUnits.percent);
 				String mm = ValueUnits.convertToStr(context, ValueUnits.mm);
 				List<HourlyForecastListItemObj> hourlyForecastListItemObjs = new ArrayList<>();
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ?
-						getString(R.string.datetime_pattern_in_detail_forecast_clock12) :
-						getString(R.string.datetime_pattern_in_detail_forecast_clock24));
+				DateTimeFormatter datePattern = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
 
-				final String zero = "0";
+				final String zero = "0.0";
+				ZonedDateTime dateTime = null;
 
 				for (TwelveHoursOfHourlyForecastsResponse.Item hourly : hourlyItemList) {
 					HourlyForecastListItemObj item = new HourlyForecastListItemObj();
+					dateTime = WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L,
+							zoneId);
 
-					item.setDateTime(
-							WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L,
-									zoneId).format(dateTimeFormatter))
+					item.setDate(dateTime.format(datePattern))
+							.setHour(String.valueOf(dateTime.getHour()))
 							.setTemp(ValueUnits.convertTemperature(hourly.getTemperature().getValue(), tempUnit) + tempDegree)
 							.setWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(hourly.getWeatherIcon()))
 							.setPop((int) (Double.parseDouble(hourly.getPrecipitationProbability())) + percent)
 							.setRainVolume(hourly.getRain().getValue().equals(zero) ? null : hourly.getRain().getValue() + mm)
 							.setSnowVolume(hourly.getSnow().getValue().equals(zero) ? null :
 									ValueUnits.convertCMToMM(hourly.getSnow().getValue()) + mm);
-					
+
 					hourlyForecastListItemObjs.add(item);
 				}
 

@@ -73,7 +73,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		return WEATHER_ICON_DESCRIPTION_MAP.get(code);
 	}
 
-	public static boolean successfulResponse(MultipleJsonDownloader.ResponseResult<JsonElement> result) {
+	public static boolean successfulResponse(MultipleJsonDownloader.ResponseResult result) {
 		if (result.getResponse() != null) {
 			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();
 

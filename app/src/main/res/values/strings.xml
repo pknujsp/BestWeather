@@ -507,6 +507,8 @@
     <string name="not_available">없음</string>
     <string name="list_type">리스트 형식</string>
     <string name="table_type">테이블 형식</string>
+    <string name="kma_less_than_1mm">1.0mm 미만</string>
+    <string name="kma_no_snow">적설없음</string>
 
 
 </resources>

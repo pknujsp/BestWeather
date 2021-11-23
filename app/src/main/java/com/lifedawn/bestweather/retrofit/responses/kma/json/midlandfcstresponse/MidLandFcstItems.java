@@ -1,14 +1,19 @@
-package com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse;
+package com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse;
 
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.tickaroo.tikxml.annotation.Element;
+import com.tickaroo.tikxml.annotation.PropertyElement;
+import com.tickaroo.tikxml.annotation.Xml;
 
 import java.util.List;
 
+@Xml(name = "items", inheritance = true)
 public class MidLandFcstItems {
     @Expose
     @SerializedName("item")
+    @Element(name = "item")
     private List<MidLandFcstItem> item;
     
     public void setItem(List<MidLandFcstItem> item) {

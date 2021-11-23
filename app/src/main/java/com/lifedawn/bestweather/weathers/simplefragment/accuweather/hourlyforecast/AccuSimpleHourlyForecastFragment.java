@@ -139,15 +139,16 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> precipitationVolumeList = new ArrayList<>();
 
-		String tempUnitStr = tempUnit == ValueUnits.celsius ? getString(R.string.celsius) : getString(R.string.fahrenheit);
+		String tempUnitStr = getString(R.string.degree_symbol);
+		String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
 
 		for (TwelveHoursOfHourlyForecastsResponse.Item item : items) {
 			dateTimeList.add(
 					WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getEpochDateTime()) * 1000L, zoneId));
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 					ContextCompat.getDrawable(context, AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon()))));
-			tempList.add(ValueUnits.convertTemperature(item.getTemperature().getValue(), tempUnit).toString() + tempUnitStr);
-			probabilityOfPrecipitationList.add(item.getPrecipitationProbability());
+			tempList.add(ValueUnits.convertTemperature(item.getTemperature().getValue(), tempUnit) + tempUnitStr);
+			probabilityOfPrecipitationList.add(item.getPrecipitationProbability() + percent);
 			precipitationVolumeList.add(item.getTotalLiquid().getValue());
 		}
 

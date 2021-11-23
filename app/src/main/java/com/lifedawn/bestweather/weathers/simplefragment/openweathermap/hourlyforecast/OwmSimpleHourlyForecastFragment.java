@@ -127,9 +127,9 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		IconTextView probabilityOfPrecipitationRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
 				COLUMN_WIDTH, R.drawable.pop);
 		IconTextView rainVolumeRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
-				COLUMN_WIDTH, R.drawable.rainvolume);
+				COLUMN_WIDTH, R.drawable.raindrop);
 		IconTextView snowVolumeRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
-				COLUMN_WIDTH, R.drawable.snowvolume);
+				COLUMN_WIDTH, R.drawable.snowparticle);
 
 		//시각, 기온, 강수확률, 강수량
 		List<SingleWeatherIconView.WeatherIconObj> iconObjList = new ArrayList<>();
@@ -139,18 +139,19 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
 
+		String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
+		String degree = getString(R.string.degree_symbol);
+
 		boolean haveSnowVolumes = false;
 
-		int index = 0;
-		String tempUnitStr = tempUnit == ValueUnits.celsius ? getString(R.string.celsius) : getString(R.string.fahrenheit);
 
 		for (OneCallResponse.Hourly item : items) {
 			dateTimeList.add(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getDt()) * 1000L, zoneId));
 			iconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
 					OpenWeatherMapResponseProcessor.getWeatherIconImg(item.getWeather().get(0).getId(),
 							item.getWeather().get(0).getIcon().contains("n")))));
-			tempList.add(ValueUnits.convertTemperature(item.getTemp(), tempUnit).toString() + tempUnitStr);
-			probabilityOfPrecipitationList.add(String.valueOf((int) (Double.parseDouble(item.getPop()) * 100.0)));
+			tempList.add(ValueUnits.convertTemperature(item.getTemp(), tempUnit) + degree);
+			probabilityOfPrecipitationList.add((int) (Double.parseDouble(item.getPop()) * 100.0) + percent);
 			rainVolumeList.add(item.getRain() != null ? item.getRain().getPrecipitation1Hour() : "0.0");
 
 			if (item.getSnow() != null) {
@@ -159,8 +160,6 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				}
 			}
 			snowVolumeList.add(item.getSnow() != null ? item.getSnow().getPrecipitation1Hour() : "0.0");
-
-			index++;
 		}
 		weatherIconRow.setWeatherImgs(iconObjList);
 		dateRow.init(dateTimeList);

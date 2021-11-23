@@ -136,6 +136,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
+		String percent = "%";
 
 		int index = 0;
 		for (; index < 5; index++) {
@@ -143,8 +144,8 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
 
 			probabilityOfPrecipitationList.add(
-					finalDailyForecastList.get(index).getAmProbabilityOfPrecipitation() + " / " + finalDailyForecastList.get(
-							index).getPmProbabilityOfPrecipitation());
+					finalDailyForecastList.get(index).getAmProbabilityOfPrecipitation() + percent + "/" + finalDailyForecastList.get(
+							index).getPmProbabilityOfPrecipitation() + percent);
 			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
 					KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getAmSky(), false)),
 					ContextCompat.getDrawable(context,
@@ -154,7 +155,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
 			maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
 
-			probabilityOfPrecipitationList.add(finalDailyForecastList.get(index).getProbabilityOfPrecipitation());
+			probabilityOfPrecipitationList.add(finalDailyForecastList.get(index).getProbabilityOfPrecipitation() + percent);
 			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
 					KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getSky(), false))));
 		}
@@ -176,7 +177,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		LinearLayout.LayoutParams dateRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		dateRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,4f, getResources().getDisplayMetrics());
+		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
 
 
 		binding.forecastView.addView(dateRow, dateRowLayoutParams);

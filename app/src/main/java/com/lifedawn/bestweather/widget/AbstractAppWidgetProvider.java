@@ -38,6 +38,9 @@ import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
@@ -61,7 +64,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +77,7 @@ import retrofit2.Response;
 public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implements WidgetCreator.WidgetUpdateCallback {
 	private static final String tag = "AppWidgetProvider";
 	private static ExecutorService executorService = Executors.newFixedThreadPool(2);
-	private MultipleJsonDownloader<JsonElement> multipleJsonDownloader;
+	private MultipleJsonDownloader multipleJsonDownloader;
 
 	abstract Class<?> getThis();
 
@@ -319,7 +321,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 			@Override
 			public void run() {
 				multipleJsonDownloader = MainProcessing.requestNewWeatherData(context, latitude, longitude, requestWeatherSources,
-						new MultipleJsonDownloader<JsonElement>() {
+						new MultipleJsonDownloader() {
 							@Override
 							public void onResult() {
 								Log.e(tag, "onResult");
@@ -373,7 +375,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 	}
 
 	protected final void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, AppWidgetManager appWidgetManager,
-	                                    @Nullable MultipleJsonDownloader<JsonElement> multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	                                    @Nullable MultipleJsonDownloader multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		SharedPreferences widgetAttributes =
 				context.getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE);
 
@@ -441,7 +443,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 		WidgetCreator.saveWeatherData(appWidgetId, context, headerObj, currentConditionsObj, hourlyForecastObjs, dailyForecasts);
 	}
 
-	public final HeaderObj getHeader(Context context, MultipleJsonDownloader<JsonElement> multipleJsonDownloader, int appWidgetId) {
+	public final HeaderObj getHeader(Context context, MultipleJsonDownloader multipleJsonDownloader, int appWidgetId) {
 		HeaderObj headerObj = new HeaderObj();
 		headerObj.setAddress(context.getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE)
 				.getString(WidgetDataKeys.ADDRESS_NAME.name(), ""));
@@ -451,7 +453,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 	}
 
 	public final CurrentConditionsObj getCurrentConditions(Context context, WeatherSourceType weatherSourceType,
-	                                                       MultipleJsonDownloader<JsonElement> multipleJsonDownloader, int appWidgetId) {
+	                                                       MultipleJsonDownloader multipleJsonDownloader, int appWidgetId) {
 		final ZonedDateTime updatedTime = ZonedDateTime.of(multipleJsonDownloader.getLocalDateTime().toLocalDate(),
 				multipleJsonDownloader.getLocalDateTime().toLocalTime(), ZoneId.systemDefault());
 
@@ -461,10 +463,9 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 
 		switch (weatherSourceType) {
 			case KMA:
-				if (KmaResponseProcessor.successfulVilageResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_NCST))) {
+				if (KmaResponseProcessor.successfulVilageResponse((Response<VilageFcstResponse>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponse())) {
 					FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(
-							KmaResponseProcessor.getUltraSrtNcstObjFromJson(
-									multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponse().body().toString()));
+							(VilageFcstResponse) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponse().body());
 					zoneId = KmaResponseProcessor.getZoneId();
 
 					currentConditionsObj.setTemp(finalCurrentConditions.getTemperature());
@@ -487,7 +488,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 
 					Calendar sunRise = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(calendar);
 					Calendar sunSet = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(calendar);
-					boolean isNight = SunRiseSetUtil.isNight(calendar.getTime(), sunRise.getTime(), sunSet.getTime());
+					boolean isNight = SunRiseSetUtil.isNight(calendar, sunRise, sunSet);
 
 					currentConditionsObj.setWeatherIcon(KmaResponseProcessor.getWeatherPtyIconImg(finalCurrentConditions.getPrecipitationType(), isNight));
 				} else {
@@ -497,7 +498,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 			case ACCU_WEATHER:
 				if (AccuWeatherResponseProcessor.successfulResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS))) {
 					CurrentConditionsResponse currentConditionsResponse = AccuWeatherResponseProcessor.getCurrentConditionsObjFromJson(
-							multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponse().body());
+							(JsonElement) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponse().body());
 					CurrentConditionsResponse.Item item = currentConditionsResponse.getItems().get(0);
 					zoneId = ZonedDateTime.parse(item.getLocalObservationDateTime()).getZone();
 
@@ -549,20 +550,18 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 	}
 
 	public final WeatherJsonObj.HourlyForecasts getHourlyForecasts(Context context, WeatherSourceType weatherSourceType,
-	                                                               MultipleJsonDownloader<JsonElement> multipleJsonDownloader, int appWidgetId) {
+	                                                               MultipleJsonDownloader multipleJsonDownloader, int appWidgetId) {
 		boolean successfulResponse = true;
 		List<HourlyForecastObj> hourlyForecastObjList = new ArrayList<>();
 		ZoneId zoneId = null;
 
 		switch (weatherSourceType) {
 			case KMA:
-				if (KmaResponseProcessor.successfulVilageResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_FCST)) &&
-						KmaResponseProcessor.successfulVilageResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.VILAGE_FCST))) {
+				if (KmaResponseProcessor.successfulVilageResponse((Response<VilageFcstResponse>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponse()) &&
+						KmaResponseProcessor.successfulVilageResponse((Response<VilageFcstResponse>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.VILAGE_FCST).getResponse())) {
 					List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
-							KmaResponseProcessor.getUltraSrtFcstObjFromJson(
-									multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponse().body().toString()),
-							KmaResponseProcessor.getVilageFcstObjFromJson(
-									multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.VILAGE_FCST).getResponse().body().toString()));
+							(VilageFcstResponse) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponse().body(),
+							(VilageFcstResponse) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.VILAGE_FCST).getResponse().body());
 					zoneId = KmaResponseProcessor.getZoneId();
 
 					ZonedDateTime begin = ZonedDateTime.of(finalHourlyForecastList.get(0).getFcstDateTime().toLocalDateTime(), zoneId);
@@ -580,6 +579,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 							, longitude);
 					ZonedDateTime fcstDateTime = null;
 					int index = 0;
+					Calendar itemCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
 
 					for (FinalHourlyForecast hourlyForecast : finalHourlyForecastList) {
 						HourlyForecastObj hourlyForecastObj = new HourlyForecastObj(true);
@@ -587,12 +587,12 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 						fcstDateTime = ZonedDateTime.of(hourlyForecast.getFcstDateTime().toLocalDateTime(), zoneId);
 						hourlyForecastObj.setClock(fcstDateTime.toString());
 
-						Date itemDate = new Date(fcstDateTime.toInstant().toEpochMilli());
-						Date sunRise = sunRiseSetObjMap.get(fcstDateTime.getDayOfMonth()).getSunrise().getTime();
-						Date sunSet = sunRiseSetObjMap.get(fcstDateTime.getDayOfMonth()).getSunset().getTime();
+						itemCalendar.setTimeInMillis(fcstDateTime.toInstant().toEpochMilli());
+						Calendar sunRise = sunRiseSetObjMap.get(fcstDateTime.getDayOfMonth()).getSunrise();
+						Calendar sunSet = sunRiseSetObjMap.get(fcstDateTime.getDayOfMonth()).getSunset();
 
 						hourlyForecastObj.setWeatherIcon(KmaResponseProcessor.getWeatherSkyIconImg(hourlyForecast.getSky(),
-								SunRiseSetUtil.isNight(itemDate, sunRise, sunSet)));
+								SunRiseSetUtil.isNight(itemCalendar, sunRise, sunSet)));
 						hourlyForecastObj.setTemp(hourlyForecast.getTemp1Hour());
 
 						hourlyForecastObjList.add(hourlyForecastObj);
@@ -608,7 +608,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 			case ACCU_WEATHER:
 				if (AccuWeatherResponseProcessor.successfulResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_12_HOURLY))) {
 					TwelveHoursOfHourlyForecastsResponse hourlyForecastResponse = AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
-							multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponse().body());
+							(JsonElement) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponse().body());
 					List<TwelveHoursOfHourlyForecastsResponse.Item> hourlyForecastList = hourlyForecastResponse.getItems();
 					zoneId = ZonedDateTime.parse(hourlyForecastList.get(0).getDateTime()).getZone();
 
@@ -668,20 +668,20 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 	}
 
 	public final WeatherJsonObj.DailyForecasts getDailyForecasts(Context context, WeatherSourceType weatherSourceType,
-	                                                             MultipleJsonDownloader<JsonElement> multipleJsonDownloader, int appWidgetId) {
+	                                                             MultipleJsonDownloader multipleJsonDownloader, int appWidgetId) {
 		boolean successfulResponse = true;
 		List<DailyForecastObj> dailyForecastObjList = new ArrayList<>();
 		ZoneId zoneId = null;
 
 		switch (weatherSourceType) {
 			case KMA:
-				if (KmaResponseProcessor.successfulMidResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_LAND_FCST))
-						&& KmaResponseProcessor.successfulMidResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_TA_FCST))) {
+				if (KmaResponseProcessor.successfulMidLandFcstResponse((Response<MidLandFcstResponse>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponse())
+						&& KmaResponseProcessor.successfulMidTaFcstResponse((Response<MidTaResponse>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_TA_FCST).getResponse())) {
 					List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastList(
-							KmaResponseProcessor.getMidLandObjFromJson(
-									multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponse().body().toString()),
-							KmaResponseProcessor.getMidTaObjFromJson(
-									multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_TA_FCST).getResponse().body().toString()),
+							(MidLandFcstResponse)
+									multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponse().body(),
+							(MidTaResponse)
+									multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_TA_FCST).getResponse().body(),
 							Long.parseLong(multipleJsonDownloader.get("tmFc")));
 					zoneId = KmaResponseProcessor.getZoneId();
 

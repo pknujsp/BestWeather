@@ -36,13 +36,13 @@ public class AqicnProcessing {
 		return call;
 	}
 
-	public static void getAirQuality(Double latitude, Double longitude, MultipleJsonDownloader<JsonElement> multipleJsonDownloader) {
+	public static void getAirQuality(Double latitude, Double longitude, MultipleJsonDownloader multipleJsonDownloader) {
 		AqicnParameter aqicnParameter = new AqicnParameter();
 		aqicnParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString());
 
 		Call<JsonElement> localizedFeedCall = getLocalizedFeed(aqicnParameter, new JsonDownloader() {
 			@Override
-			public void onResponseResult(Response<JsonElement> response) {
+			public void onResponseResult(Response<?> response) {
 				multipleJsonDownloader.processResult(WeatherSourceType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, response);
 			}

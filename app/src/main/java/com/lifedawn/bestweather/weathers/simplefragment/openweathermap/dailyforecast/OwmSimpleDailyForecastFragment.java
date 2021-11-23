@@ -124,9 +124,9 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		IconTextView probabilityOfPrecipitationRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
 				COLUMN_WIDTH, R.drawable.pop);
 		IconTextView rainVolumeRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
-				COLUMN_WIDTH, R.drawable.rainvolume);
+				COLUMN_WIDTH, R.drawable.raindrop);
 		IconTextView snowVolumeRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
-				COLUMN_WIDTH, R.drawable.snowvolume);
+				COLUMN_WIDTH, R.drawable.snowparticle);
 
 		//시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
@@ -142,6 +142,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 		String rainVolume = null;
 		String snowVolume = null;
+		String percent = "%";
 
 		boolean haveSnowVolumes = false;
 
@@ -160,7 +161,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			snowVolume = item.getSnow() == null ? "0.0" : item.getSnow();
 			snowVolumeList.add(snowVolume);
 
-			probabilityOfPrecipitationList.add(String.valueOf((int) (Double.parseDouble(item.getPop()) * 100.0)));
+			probabilityOfPrecipitationList.add((int) (Double.parseDouble(item.getPop()) * 100.0) + percent);
 			rainVolumeList.add(rainVolume);
 
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,

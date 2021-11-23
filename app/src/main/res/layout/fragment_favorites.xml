@@ -15,11 +15,22 @@
             android:layout_height="?attr/actionBarSize"
             android:layout_alignParentTop="true" />
 
+        <com.lifedawn.bestweather.commons.views.CustomSearchView
+            android:id="@+id/searchview"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:layout_below="@id/toolbar"
+            android:layout_margin="8dp"
+            app:backBtnVisibility="visible"
+            app:clickable="true"
+            app:hint="@string/hint_input_address"
+            app:searchBtnVisibility="visible" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/favorite_address_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/toolbar"
+            android:layout_below="@id/searchview"
             android:orientation="vertical"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
@@ -30,18 +41,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/toolbar"
-            android:layout_centerInParent="true" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/add_favorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="16dp"
-            android:src="@drawable/add"
-            app:backgroundTint="@color/blue" />
+            android:layout_centerInParent="true"
+            android:visibility="gone" />
 
     </RelativeLayout>
 </layout>

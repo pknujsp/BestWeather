@@ -134,6 +134,8 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> precipitationVolumeList = new ArrayList<>();
 
+		String percent = "%";
+
 		for (FiveDaysOfDailyForecastsResponse.DailyForecasts dailyForecasts : items) {
 			dateList.add(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(dailyForecasts.getEpochDate()) * 1000L,
 					zoneId).format(dateTimeFormatter));
@@ -145,9 +147,9 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 			maxTempList.add((int) Double.parseDouble(dailyForecasts.getTemperature().getMaximum().getValue()));
 
 			probabilityOfPrecipitationList.add(
-					dailyForecasts.getDay().getPrecipitationProbability() + " / " + dailyForecasts.getNight().getPrecipitationProbability());
+					dailyForecasts.getDay().getPrecipitationProbability() + percent + "/" + dailyForecasts.getNight().getPrecipitationProbability() + percent);
 			precipitationVolumeList.add(
-					dailyForecasts.getDay().getTotalLiquid().getValue() + " / " + dailyForecasts.getNight().getTotalLiquid().getValue());
+					dailyForecasts.getDay().getTotalLiquid().getValue() + "/" + dailyForecasts.getNight().getTotalLiquid().getValue());
 		}
 
 		weatherIconRow.setIcons(weatherIconObjList);
@@ -169,7 +171,7 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		LinearLayout.LayoutParams dateRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		dateRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,4f, getResources().getDisplayMetrics());
+		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
 
 		binding.forecastView.addView(dateRow, dateRowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);

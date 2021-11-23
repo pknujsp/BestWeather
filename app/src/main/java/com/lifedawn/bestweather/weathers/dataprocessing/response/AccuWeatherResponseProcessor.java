@@ -2,29 +2,18 @@ package com.lifedawn.bestweather.weathers.dataprocessing.response;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.ClockUtil;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.geopositionsearch.GeoPositionResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
-import com.lifedawn.bestweather.retrofit.responses.kma.kmacommons.KmaHeader;
-import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaRoot;
-import com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtncstresponse.UltraSrtNcstRoot;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 import retrofit2.Response;
 
@@ -103,7 +92,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 	}
 
 
-	public static boolean successfulResponse(MultipleJsonDownloader.ResponseResult<JsonElement> result) {
+	public static boolean successfulResponse(MultipleJsonDownloader.ResponseResult result) {
 		if (result.getResponse() != null) {
 			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();
 

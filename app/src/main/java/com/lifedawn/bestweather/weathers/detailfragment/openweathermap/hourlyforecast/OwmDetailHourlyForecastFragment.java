@@ -60,8 +60,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				binding.forecastView.removeAllViews();
-				binding.labels.removeAllViews();
+
 				Context context = getContext();
 
 				final int dateRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
@@ -77,7 +76,6 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 
 				//순서 : 날짜, 시각, 날씨상태, 기온, 체감기온, 강수확률, 강우량, 강설량, 풍향, 풍속, 바람세기, 돌풍
 				//기압, 습도, 이슬점, 운량, 시정, 자외선
-
 
 				dateRow = new DateView(context, FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
 				ClockView clockRow = new ClockView(context, FragmentType.Detail, viewWidth, clockRowHeight, columnWidth);
@@ -170,6 +168,9 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
+							binding.forecastView.removeAllViews();
+							binding.labels.removeAllViews();
+
 							addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
 							addLabelView(R.drawable.time, getString(R.string.clock), clockRowHeight);
 							addLabelView(R.drawable.day_clear, getString(R.string.weather), weatherRowHeight);
@@ -231,15 +232,18 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				String percent = ValueUnits.convertToStr(context, ValueUnits.percent);
 				String mm = ValueUnits.convertToStr(context, ValueUnits.mm);
 				List<HourlyForecastListItemObj> hourlyForecastListItemObjs = new ArrayList<>();
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ?
-						getString(R.string.datetime_pattern_in_detail_forecast_clock12) :
-						getString(R.string.datetime_pattern_in_detail_forecast_clock24));
+				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
+
+				ZonedDateTime dateTime = null;
 
 				//순서 : 날짜, 시각, 날씨상태, 기온, 강수확률, 강우량(nullable), 강설량(nullable)
 				for (OneCallResponse.Hourly hourly : hourlyList) {
 					HourlyForecastListItemObj hourlyForecastListItemObj = new HourlyForecastListItemObj();
-					hourlyForecastListItemObj.setDateTime(WeatherResponseProcessor.convertDateTimeOfHourlyForecast
-							(Long.parseLong(hourly.getDt()) * 1000L, zoneId).format(dateTimeFormatter))
+					dateTime = WeatherResponseProcessor.convertDateTimeOfHourlyForecast
+							(Long.parseLong(hourly.getDt()) * 1000L, zoneId);
+
+					hourlyForecastListItemObj.setDate(dateTime.format(dateTimeFormatter))
+							.setHour(String.valueOf(dateTime.getHour()))
 							.setWeatherIconId(OpenWeatherMapResponseProcessor.getWeatherIconImg(hourly.getWeather().get(0).getId(),
 									hourly.getWeather().get(0).getIcon().contains("n")))
 							.setTemp(ValueUnits.convertTemperature(hourly.getTemp(), tempUnit) + tempDegree)

@@ -2,44 +2,36 @@ package com.lifedawn.bestweather.weathers.dataprocessing.response;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.ClockUtil;
-import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.responses.kma.kmacommons.KmaHeader;
-import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstItem;
-import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstItems;
-import com.lifedawn.bestweather.retrofit.responses.kma.midlandfcstresponse.MidLandFcstRoot;
-import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaItem;
-import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaItems;
-import com.lifedawn.bestweather.retrofit.responses.kma.midtaresponse.MidTaRoot;
-import com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtfcstresponse.UltraSrtFcstRoot;
-import com.lifedawn.bestweather.retrofit.responses.kma.ultrasrtncstresponse.UltraSrtNcstRoot;
-import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstcommons.VilageFcstItem;
-import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstcommons.VilageFcstItems;
-import com.lifedawn.bestweather.retrofit.responses.kma.vilagefcstresponse.VilageFcstRoot;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.kmacommons.KmaHeader;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstItem;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstRoot;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaItem;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaRoot;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.ultrasrtfcstresponse.UltraSrtFcstRoot;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.ultrasrtncstresponse.UltraSrtNcstRoot;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstItem;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstresponse.VilageFcstRoot;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 
-import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import retrofit2.Response;
 
@@ -182,31 +174,31 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		return SKY_FLICKR_MAP.get(code);
 	}
 
-	public static FinalCurrentConditions getFinalCurrentConditions(UltraSrtNcstRoot ultraSrtNcstRoot) {
+	public static FinalCurrentConditions getFinalCurrentConditions(VilageFcstResponse ultraSrtNcstResponse) {
 		FinalCurrentConditions finalCurrentConditions = new FinalCurrentConditions();
-		List<VilageFcstItem> items = ultraSrtNcstRoot.getResponse().getBody().getItems().getItem();
+		List<VilageFcstItem> items = ultraSrtNcstResponse.getBody().getItems().getItem();
 
 		for (VilageFcstItem item : items) {
 			if (item.getCategory().equals(T1H)) {
-				finalCurrentConditions.setTemperature(item.getFcstValue());
+				finalCurrentConditions.setTemperature(item.getObsrValue());
 			} else if (item.getCategory().equals(RN1)) {
-				finalCurrentConditions.setPrecipitation1Hour(item.getFcstValue());
+				finalCurrentConditions.setPrecipitation1Hour(item.getObsrValue());
 			} else if (item.getCategory().equals(REH)) {
-				finalCurrentConditions.setHumidity(item.getFcstValue());
+				finalCurrentConditions.setHumidity(item.getObsrValue());
 			} else if (item.getCategory().equals(PTY)) {
-				finalCurrentConditions.setPrecipitationType(item.getFcstValue());
+				finalCurrentConditions.setPrecipitationType(item.getObsrValue());
 			} else if (item.getCategory().equals(VEC)) {
-				finalCurrentConditions.setWindDirection(item.getFcstValue());
+				finalCurrentConditions.setWindDirection(item.getObsrValue());
 			} else if (item.getCategory().equals(WSD)) {
-				finalCurrentConditions.setWindSpeed(item.getFcstValue());
+				finalCurrentConditions.setWindSpeed(item.getObsrValue());
 			}
 		}
 		return finalCurrentConditions;
 	}
 
-	public static List<FinalHourlyForecast> getFinalHourlyForecastList(UltraSrtFcstRoot ultraSrtFcstRoot, VilageFcstRoot vilageFcstRoot) {
-		List<VilageFcstItem> ultraSrtFcstItemList = ultraSrtFcstRoot.getResponse().getBody().getItems().getItem();
-		List<VilageFcstItem> vilageItemList = vilageFcstRoot.getResponse().getBody().getItems().getItem();
+	public static List<FinalHourlyForecast> getFinalHourlyForecastList(VilageFcstResponse ultraSrtFcstResponse, VilageFcstResponse vilageFcstResponse) {
+		List<VilageFcstItem> ultraSrtFcstItemList = ultraSrtFcstResponse.getBody().getItems().getItem();
+		List<VilageFcstItem> vilageItemList = vilageFcstResponse.getBody().getItems().getItem();
 		Map<Long, List<VilageFcstItem>> hourDataListMap = new HashMap<>();
 
 		long newDateTime = 0L;
@@ -295,7 +287,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		return finalHourlyForecastList;
 	}
 
-	public static List<FinalDailyForecast> getFinalDailyForecastList(MidLandFcstRoot midLandFcstRoot, MidTaRoot midTaRoot, Long tmFc) {
+	public static List<FinalDailyForecast> getFinalDailyForecastList(MidLandFcstResponse midLandFcstResponse, MidTaResponse midTaFcstResponse, Long tmFc) {
 		//중기예보 데이터 생성 3~10일후
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddhhmm");
 		ZonedDateTime now = ZonedDateTime.now(KmaResponseProcessor.getZoneId());
@@ -308,8 +300,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		//3일 후로 이동
 		now = now.plusDays(3).withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-		MidLandFcstItem midLandFcstData = midLandFcstRoot.getResponse().getBody().getItems().getItem().get(0);
-		MidTaItem midTaFcstData = midTaRoot.getResponse().getBody().getItems().getItem().get(0);
+		MidLandFcstItem midLandFcstData = midLandFcstResponse.getBody().getItems().getItem().get(0);
+		MidTaItem midTaFcstData = midTaFcstResponse.getBody().getItems().getItem().get(0);
 		List<FinalDailyForecast> finalDailyForecastList = new ArrayList<>();
 
 		finalDailyForecastList.add(new FinalDailyForecast(now, midLandFcstData.getWf3Am(), midLandFcstData.getWf3Pm(),
@@ -353,50 +345,59 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		return finalDailyForecastList;
 	}
 
-	public static boolean successfulVilageResponse(MultipleJsonDownloader.ResponseResult<JsonElement> result) {
-		if (result.getResponse() != null) {
+	public static boolean successfulVilageResponse(Response<VilageFcstResponse> response) {
+		if (response.isSuccessful()) {
 			final String successfulCode = "00";
-			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();
 
-			if (response.isSuccessful()) {
-				UltraSrtNcstRoot ultraSrtNcstRoot = getUltraSrtNcstObjFromJson(response.body().toString());
-				KmaHeader kmaHeader = ultraSrtNcstRoot.getResponse().getHeader();
-
-				if (kmaHeader.getResultCode().equals(successfulCode)) {
+			if (response.body() == null) {
+				return false;
+			} else {
+				if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
 					return true;
 				} else {
 					return false;
 				}
-			} else {
-				return false;
 			}
 		} else {
 			return false;
 		}
 	}
 
-	public static boolean successfulMidResponse(MultipleJsonDownloader.ResponseResult<JsonElement> result) {
-		if (result.getResponse() != null) {
+	public static boolean successfulMidLandFcstResponse(Response<MidLandFcstResponse> response) {
+		if (response.isSuccessful()) {
 			final String successfulCode = "00";
-			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();
 
-			if (response.isSuccessful()) {
-				MidLandFcstRoot midLandFcstRoot = getMidLandObjFromJson(response.body().toString());
-				KmaHeader kmaHeader = midLandFcstRoot.getResponse().getHeader();
-
-				if (kmaHeader.getResultCode().equals(successfulCode)) {
+			if (response.body() == null) {
+				return false;
+			} else {
+				if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
 					return true;
 				} else {
 					return false;
 				}
-			} else {
-				return false;
 			}
 		} else {
 			return false;
 		}
 	}
 
+	public static boolean successfulMidTaFcstResponse(Response<MidTaResponse> response) {
+		if (response.isSuccessful()) {
+			final String successfulCode = "00";
+
+			if (response.body() == null) {
+				return false;
+			} else {
+				if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		} else {
+			return false;
+		}
+	}
 
 	public static UltraSrtNcstRoot getUltraSrtNcstObjFromJson(String response) {
 		return new Gson().fromJson(response, UltraSrtNcstRoot.class);

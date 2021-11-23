@@ -19,24 +19,24 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public abstract class MultipleJsonDownloader<T> {
+public abstract class MultipleJsonDownloader {
 	private volatile int requestCount;
 	private volatile int responseCount;
 	private AlertDialog loadingDialog;
 	private Map<String, String> valueMap = new HashMap<>();
 	private ZonedDateTime localDateTime = ZonedDateTime.now();
-	private Map<RetrofitClient.ServiceType, Call<T>> callMap = new HashMap<>();
+	private Map<RetrofitClient.ServiceType, Call<?>> callMap = new HashMap<>();
 
-	protected Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<T>>> responseMap = new ArrayMap<>();
+	protected Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ArrayMap<>();
 
 	public MultipleJsonDownloader() {
 	}
 
-	public Map<RetrofitClient.ServiceType, Call<T>> getCallMap() {
+	public Map<RetrofitClient.ServiceType, Call<?>> getCallMap() {
 		return callMap;
 	}
 
-	public Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult<T>>> getResponseMap() {
+	public Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> getResponseMap() {
 		return responseMap;
 	}
 
@@ -94,7 +94,7 @@ public abstract class MultipleJsonDownloader<T> {
 		responseCount = requestCount + 1000;
 
 		if (!callMap.isEmpty()) {
-			for (Call<T> call : callMap.values()) {
+			for (Call<?> call : callMap.values()) {
 				call.cancel();
 			}
 		}
@@ -102,11 +102,11 @@ public abstract class MultipleJsonDownloader<T> {
 	}
 
 	public void processResult(WeatherSourceType weatherSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
-	                          Response<? extends T> response) {
+	                          Response<?> response) {
 		if (!responseMap.containsKey(weatherSourceType)) {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
 		}
-		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult<T>(requestParameter, response));
+		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, response));
 
 		if (requestCount == ++responseCount) {
 			onResult();
@@ -118,7 +118,7 @@ public abstract class MultipleJsonDownloader<T> {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
 		}
 
-		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult<T>(requestParameter, t));
+		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, t));
 
 		if (requestCount == ++responseCount) {
 			onResult();
@@ -129,9 +129,9 @@ public abstract class MultipleJsonDownloader<T> {
 		return responseMap.get(weatherSourceType).get(serviceType).getRequestParameter();
 	}
 
-	public static class ResponseResult<T> {
+	public static class ResponseResult {
 		private RequestParameter requestParameter;
-		private Response<? extends T> response;
+		private Response<?> response;
 		private Throwable t;
 
 		public ResponseResult() {
@@ -141,15 +141,15 @@ public abstract class MultipleJsonDownloader<T> {
 			this.t = t;
 		}
 
-		public ResponseResult(RequestParameter requestParameter, Response<? extends T> response) {
+		public ResponseResult(RequestParameter requestParameter, Response<?> response) {
 			this.response = response;
 		}
 
-		public Response<? extends T> getResponse() {
+		public Response<?> getResponse() {
 			return response;
 		}
 
-		public void setResponse(Response<? extends T> response) {
+		public void setResponse(Response<?> response) {
 			this.response = response;
 		}
 

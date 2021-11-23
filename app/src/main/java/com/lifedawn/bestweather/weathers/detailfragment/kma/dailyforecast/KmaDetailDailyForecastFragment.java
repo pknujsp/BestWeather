@@ -24,14 +24,12 @@ import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
-import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 	private List<FinalDailyForecast> finalDailyForecastList;
@@ -59,13 +57,15 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 			public void run() {
 				String tempDegree = getString(R.string.degree_symbol);
 				String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
+				DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
+				DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
 				List<DailyForecastListItemObj> dailyForecastListItemObjs = new ArrayList<>();
 
 				int index = 0;
 				for (FinalDailyForecast finalDailyForecast : finalDailyForecastList) {
 					DailyForecastListItemObj item = new DailyForecastListItemObj();
-					item.setDateTime(finalDailyForecast.getDate().format(dateTimeFormatter))
+					item.setDate(finalDailyForecast.getDate().format(dateFormatter))
+							.setDay(finalDailyForecast.getDate().format(dayFormatter))
 							.setMinTemp(ValueUnits.convertTemperature(finalDailyForecast.getMinTemp(), tempUnit) + tempDegree)
 							.setMaxTemp(ValueUnits.convertTemperature(finalDailyForecast.getMaxTemp(), tempUnit) + tempDegree);
 
@@ -110,9 +110,6 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 			public void run() {
 				//kma daily forecast detail :
 				//날짜, 오전/오후 날씨상태, 강수확률, 최저/최고기온
-				binding.forecastView.removeAllViews();
-				binding.labels.removeAllViews();
-
 				Context context = getContext();
 
 				final int dateRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
@@ -146,17 +143,19 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 
 				int index = 0;
 				String pop = null;
+				String percent = "%";
 
 				for (FinalDailyForecast finalDailyForecast : finalDailyForecastList) {
 					minTempList.add(ValueUnits.convertTemperature(finalDailyForecast.getMinTemp(), tempUnit));
 					maxTempList.add(ValueUnits.convertTemperature(finalDailyForecast.getMaxTemp(), tempUnit));
 
 					if (index++ > 4) {
-						pop = finalDailyForecast.getProbabilityOfPrecipitation();
+						pop = finalDailyForecast.getProbabilityOfPrecipitation() + percent;
 						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
 								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false))));
 					} else {
-						pop = finalDailyForecast.getAmProbabilityOfPrecipitation() + " / " + finalDailyForecast.getPmProbabilityOfPrecipitation();
+						pop =
+								finalDailyForecast.getAmProbabilityOfPrecipitation() + percent + "/" + finalDailyForecast.getPmProbabilityOfPrecipitation() + percent;
 						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
 								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getAmSky(), false)),
 								ContextCompat.getDrawable(context,
@@ -175,6 +174,9 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
+							binding.forecastView.removeAllViews();
+							binding.labels.removeAllViews();
+
 							addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
 							addLabelView(R.drawable.day_clear, getString(R.string.weather), weatherRowHeight);
 							addLabelView(R.drawable.pop, getString(R.string.probability_of_precipitation), defaultTextRowHeight);
