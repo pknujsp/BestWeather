@@ -4,9 +4,12 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.TypedValue;
 import android.view.View;
+
+import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.theme.AppTheme;
@@ -23,7 +26,6 @@ public class NonScrolledView extends View {
 	private final int textHeight;
 	private final int viewHeight;
 	private final String value;
-
 	private int currentX;
 	private int firstColX;
 

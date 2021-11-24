@@ -27,17 +27,13 @@ public class ProgressResultView extends LinearLayout implements OnProgressViewLi
 
 	private void init() {
 		setOrientation(VERTICAL);
-		int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, getResources().getDisplayMetrics());
-		setPadding(padding, padding, padding, padding);
-		setBackgroundResource(R.drawable.progressview_background);
 		setGravity(Gravity.CENTER);
 
 		statusTextView = new TextView(getContext());
 		statusTextView.setId(R.id.progress_status_textview);
 		statusTextView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
 		statusTextView.setText(null);
-		statusTextView.setTextColor(AppTheme.getColor(getContext(), R.attr.textColorInProgressView));
-		statusTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+		statusTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
 
 		LinearLayout.LayoutParams statusTextViewLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);

@@ -509,6 +509,7 @@
     <string name="table_type">테이블 형식</string>
     <string name="kma_less_than_1mm">1.0mm 미만</string>
     <string name="kma_no_snow">적설없음</string>
+    <string name="empty_search_query">검색어를 입력해주세요</string>
 
 
 </resources>

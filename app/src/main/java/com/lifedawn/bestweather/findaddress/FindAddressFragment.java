@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.findaddress;
 
 import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
+import com.lifedawn.bestweather.commons.views.CustomEditText;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentFindAddressBinding;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -29,6 +32,8 @@ import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class FindAddressFragment extends Fragment {
@@ -38,6 +43,7 @@ public class FindAddressFragment extends Fragment {
 	private boolean selectedAddress = false;
 	private FavoriteAddressDto newFavoriteAddressDto;
 	private String fragmentRequestKey;
+	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -76,6 +82,7 @@ public class FindAddressFragment extends Fragment {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.progressResultView.setContentView(binding.addressList);
+		binding.progressResultView.onFailedProcessingData(getString(R.string.title_empty_locations));
 
 		binding.toolbar.fragmentTitle.setText(R.string.find_address);
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
@@ -86,6 +93,16 @@ public class FindAddressFragment extends Fragment {
 		});
 
 		addressesAdapter = new FoundAddressesAdapter();
+		addressesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+			@Override
+			public void onChanged() {
+				if (addressesAdapter.getItemCount() == 0) {
+					binding.progressResultView.onFailedProcessingData(getString(R.string.title_empty_locations));
+				} else {
+					binding.progressResultView.onSuccessfulProcessingData();
+				}
+			}
+		});
 		addressesAdapter.setOnClickedAddressListener(new FoundAddressesAdapter.OnClickedAddressListener() {
 			@Override
 			public void onClickedAddress(Address address) {
@@ -149,42 +166,36 @@ public class FindAddressFragment extends Fragment {
 		binding.addressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		binding.addressList.setAdapter(addressesAdapter);
 
-		binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+		binding.searchView.setOnEditTextQueryListener(new CustomEditText.OnEditTextQueryListener() {
 			@Override
-			public boolean onQueryTextSubmit(String query) {
-				AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.finding_address), null);
+			public void onTextChange(String newText) {
 
-				Geocoding.reverseGeocoding(getContext(), query, new Geocoding.ReverseGeocodingCallback() {
+				Geocoding.reverseGeocoding(getContext(), executorService, newText, new Geocoding.ReverseGeocodingCallback() {
 					@Override
 					public void onReverseGeocodingResult(List<Address> addressList) {
-						addressesAdapter.setAddressList(addressList);
-
 						if (getActivity() != null) {
 							getActivity().runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									addressesAdapter.notifyDataSetChanged();
-									dialog.dismiss();
-
-									if (addressList.isEmpty()) {
-										binding.progressResultView.onFailedProcessingData(getString(R.string.not_search_result));
-									} else {
-										binding.progressResultView.onSuccessfulProcessingData();
-									}
+									Log.e("address", newText);
+									addressesAdapter.setAddressList(addressList);
+									addressesAdapter.getFilter().filter(newText);
 								}
 							});
 						}
 					}
 				});
 
-				return true;
 			}
 
 			@Override
-			public boolean onQueryTextChange(String newText) {
-				return false;
+			public void onTextSubmit(String text) {
+				if (text.isEmpty()) {
+					Toast.makeText(getContext(), R.string.empty_search_query, Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
+
 	}
 
 	@Override

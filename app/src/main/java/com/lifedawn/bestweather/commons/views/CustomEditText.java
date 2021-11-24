@@ -2,10 +2,13 @@ package com.lifedawn.bestweather.commons.views;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,10 +23,16 @@ import com.lifedawn.bestweather.R;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class CustomEditText extends AppCompatEditText implements TextWatcher, View.OnTouchListener {
 	private Drawable closeDrawable;
-	private OnTouchListener onTouchListener;
 	private OnEditTextQueryListener onEditTextQueryListener;
+	private ExecutorService executorService = Executors.newFixedThreadPool(3);
+	private Timer timer = new Timer();
 
 	public CustomEditText(@NonNull @NotNull Context context) {
 		super(context);
@@ -50,12 +59,7 @@ public class CustomEditText extends AppCompatEditText implements TextWatcher, Vi
 		setClearBtnVisibility(false);
 
 		addTextChangedListener(this);
-		super.setOnTouchListener(this);
-	}
-
-	@Override
-	public void setOnTouchListener(OnTouchListener l) {
-		this.onTouchListener = l;
+		setOnTouchListener(this);
 	}
 
 	@Override
@@ -70,7 +74,6 @@ public class CustomEditText extends AppCompatEditText implements TextWatcher, Vi
 
 	@Override
 	public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
 	}
 
 	@Override
@@ -78,22 +81,34 @@ public class CustomEditText extends AppCompatEditText implements TextWatcher, Vi
 		if (isFocused()) {
 			setClearBtnVisibility(charSequence.length() > 0);
 		}
-		if (onEditTextQueryListener != null) {
-			onEditTextQueryListener.onTextChange(charSequence.toString());
-		}
 	}
+
+	private long end;
 
 	@Override
 	public void afterTextChanged(Editable editable) {
+		end = System.currentTimeMillis();
 
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (System.currentTimeMillis() - end >= 495) {
+					if (onEditTextQueryListener != null) {
+						Log.e("afterTextChanged", getText().toString());
+						onEditTextQueryListener.onTextChange(getText().toString());
+					}
+				}
+			}
+		}, 500);
 	}
+
 
 	@Override
 	public boolean onTouch(View view, MotionEvent motionEvent) {
 		final int x = (int) motionEvent.getX();
 
 		if (closeDrawable.isVisible() && x >= getWidth() - getPaddingRight() - closeDrawable.getIntrinsicWidth()) {
-			setText(null);
+			setText("");
 			setError(null);
 		}
 		return false;

@@ -20,7 +20,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -145,10 +147,34 @@ public class FavoritesFragment extends Fragment {
 			}
 		});
 
-		/*
-		binding.addFavorite.setOnClickListener(new View.OnClickListener() {
+
+		binding.searchview.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				/*
+				dialog = new Dialog(getActivity());
+				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+				final Window window = dialog.getWindow();
+
+				WindowManager.LayoutParams windowLayoutParams = window.getAttributes();
+				windowLayoutParams.gravity = Gravity.TOP | Gravity.LEFT;
+				windowLayoutParams.x = binding.searchview.getLeft();
+				windowLayoutParams.y = binding.searchview.getTop();
+
+				//window.setLayout(binding.searchview.getWidth(), 300);
+				//window.setGravity(Gravity.CENTER_HORIZONTAL);
+				//window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+				//window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+				//imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+				ViewSearchBinding searchViewBinding = ViewSearchBinding.inflate(getLayoutInflater());
+				dialog.setContentView(searchViewBinding.getRoot());
+				findDialogViews(dialog, searchViewBinding);
+				dialog.show();
+
+				 */
+
 				FindAddressFragment findAddressFragment = new FindAddressFragment();
 				getParentFragmentManager().setFragmentResult(getString(R.string.key_from_favorite_to_find_address), new Bundle());
 				getParentFragmentManager().beginTransaction().hide(FavoritesFragment.this).add(R.id.fragment_container, findAddressFragment,
@@ -156,29 +182,6 @@ public class FavoritesFragment extends Fragment {
 						getString(R.string.tag_find_address_fragment)).commit();
 			}
 		});
-
-		 */
-
-
-		binding.searchview.setOnClickedListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				dialog = new Dialog(getActivity());
-				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-				ViewSearchBinding binding = ViewSearchBinding.inflate(getLayoutInflater());
-
-				dialog.setContentView(binding.getRoot());
-				final Window window = dialog.getWindow();
-				window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-				window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-				window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-				//imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-				findDialogViews(dialog, binding);
-				dialog.show();
-			}
-		});
-
 
 		binding.favoriteAddressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		adapter = new FavoriteAddressesAdapter();

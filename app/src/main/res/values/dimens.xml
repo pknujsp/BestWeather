@@ -84,5 +84,7 @@
     <dimen name="dateTextSizeInClock">14sp</dimen>
     <dimen name="timeTextSizeInClock">20sp</dimen>
     <dimen name="btnSizeInToolbar">24dp</dimen>
+    <dimen name="searchviewPaddingHorizontal">16dp</dimen>
+    <dimen name="searchviewPaddingVertical">8dp</dimen>
 
 </resources>

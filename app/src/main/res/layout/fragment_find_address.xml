@@ -15,29 +15,32 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize" />
 
-        <androidx.appcompat.widget.SearchView
+        <com.lifedawn.bestweather.commons.views.CustomSearchView
             android:id="@+id/search_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            app:defaultQueryHint="@string/hint_input_address"
-            app:iconifiedByDefault="false" />
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            app:backBtnVisibility="gone"
+            app:hint="@string/hint_input_address"
+            app:searchBtnVisibility="visible" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/address_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:overScrollMode="never"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
+            android:scrollbars="none"
             tools:listitem="@layout/found_address_item" />
 
         <com.lifedawn.bestweather.commons.views.ProgressResultView
             android:id="@+id/progress_result_view"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp" />
     </LinearLayout>
 </layout>

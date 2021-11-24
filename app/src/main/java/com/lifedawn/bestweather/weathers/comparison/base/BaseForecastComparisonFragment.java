@@ -21,6 +21,7 @@ import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.NonScrolledView;
+import com.lifedawn.bestweather.weathers.view.NotScrolledView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,6 +44,7 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 	protected ZoneId zoneId;
 
 	protected NonScrolledView[] nonScrolledViews;
+	protected NotScrolledView[] notScrolledViews;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -93,6 +95,11 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 				if (nonScrolledViews != null) {
 					for (NonScrolledView nonScrolledView : nonScrolledViews) {
 						nonScrolledView.reDraw(scrollX);
+					}
+				}
+				if (notScrolledViews != null) {
+					for (NotScrolledView notScrolledView : notScrolledViews) {
+						notScrolledView.reDraw(scrollX);
 					}
 				}
 			}

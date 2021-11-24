@@ -352,6 +352,10 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 			if (response.body() == null) {
 				return false;
 			} else {
+				if (response.body().getKmaHeader() == null) {
+					return false;
+				}
+
 				if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
 					return true;
 				} else {
@@ -370,6 +374,10 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 			if (response.body() == null) {
 				return false;
 			} else {
+				if (response.body().getKmaHeader() == null) {
+					return false;
+				}
+
 				if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
 					return true;
 				} else {
