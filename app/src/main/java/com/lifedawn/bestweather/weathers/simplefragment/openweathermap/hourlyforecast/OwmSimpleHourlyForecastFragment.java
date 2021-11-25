@@ -81,7 +81,8 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				String tag = getString(R.string.tag_detail_hourly_forecast_fragment);
 				FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
 
-				fragmentManager.beginTransaction().add(R.id.fragment_container,
+				fragmentManager.beginTransaction().hide(
+						fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
 						detailHourlyForecastFragment, tag).addToBackStack(tag).commit();
 			}
 		});

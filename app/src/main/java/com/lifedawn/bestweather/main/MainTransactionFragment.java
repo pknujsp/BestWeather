@@ -237,13 +237,21 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 					if (usingCurrentLocation) {
 						binding.sideNavMenu.currentLocationLayout.callOnClick();
 					} else {
-						binding.sideNavMenu.favorites.callOnClick();
+						if (favoriteAddressDtoList.size() > 0) {
+							binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+						} else {
+							binding.sideNavMenu.favorites.callOnClick();
+						}
 					}
 				} else {
 					final int lastSelectedFavoriteId = sharedPreferences.getInt(
 							getString(R.string.pref_key_last_selected_favorite_address_id), -1);
 					if (!clickLocationViewWithId(lastSelectedFavoriteId)) {
-						binding.sideNavMenu.favorites.callOnClick();
+						if (favoriteAddressDtoList.size() > 0) {
+							binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+						} else {
+							binding.sideNavMenu.favorites.callOnClick();
+						}
 					}
 				}
 			}

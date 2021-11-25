@@ -11,6 +11,7 @@ import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -27,13 +28,15 @@ import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
@@ -49,6 +52,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
+import com.lifedawn.bestweather.commons.classes.TextUtil;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqicn;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
@@ -63,6 +67,7 @@ import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
+import com.lifedawn.bestweather.flickr.FlickrImgObj;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.retrofit.client.Querys;
@@ -94,6 +99,7 @@ import com.lifedawn.bestweather.weathers.simplefragment.accuweather.currentcondi
 import com.lifedawn.bestweather.weathers.simplefragment.accuweather.dailyforecast.AccuSimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.accuweather.hourlyforecast.AccuSimpleHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.SimpleAirQualityFragment;
+import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.kma.currentconditions.KmaSimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.kma.dailyforecast.KmaSimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.kma.hourlyforecast.KmaSimpleHourlyForecastFragment;
@@ -131,7 +137,7 @@ import retrofit2.Response;
 public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadImgOfCurrentConditions, IGps {
 	private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 	private static final Map<String, WeatherResponseObj> FINAL_RESPONSE_MAP = new HashMap<>();
-	private static final Map<String, Drawable> backgroundImgMap = new HashMap<>();
+	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
 
 	private FragmentWeatherBinding binding;
 	private FavoriteAddressDto selectedFavoriteAddressDto;
@@ -283,6 +289,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				}
 			}
 		});
+
 	}
 
 	public void load(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
@@ -298,6 +305,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		bundle.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
 
 		locationType = LocationType.valueOf(bundle.getString(BundleKey.LocationType.name()));
+		this.locationType = locationType;
 
 		if (locationType == LocationType.CurrentLocation) {
 			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
@@ -355,122 +363,160 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void loadImgOfCurrentConditions(WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude,
 	                                       ZoneId zoneId) {
-		Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
+		EXECUTOR_SERVICE.execute(new Runnable() {
+			@Override
+			public void run() {
+				Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
 
-		SunriseSunsetCalculator sunRiseSunsetCalculator = new SunriseSunsetCalculator(
-				new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), currentCalendar.getTimeZone());
-		Calendar sunRiseCalendar = sunRiseSunsetCalculator.getOfficialSunriseCalendarForDate(currentCalendar);
-		Calendar sunSetCalendar = sunRiseSunsetCalculator.getOfficialSunsetCalendarForDate(currentCalendar);
+				SunriseSunsetCalculator sunRiseSunsetCalculator = new SunriseSunsetCalculator(
+						new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), currentCalendar.getTimeZone());
+				Calendar sunRiseCalendar = sunRiseSunsetCalculator.getOfficialSunriseCalendarForDate(currentCalendar);
+				Calendar sunSetCalendar = sunRiseSunsetCalculator.getOfficialSunsetCalendarForDate(currentCalendar);
 
-		if (sunRiseCalendar == null || sunSetCalendar == null) {
-			return;
-		}
+				if (sunRiseCalendar == null || sunSetCalendar == null) {
+					return;
+				}
 
-		final long currentTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(currentCalendar.getTimeInMillis());
-		final long sunRiseTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunRiseCalendar.getTimeInMillis());
-		final long sunSetTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunSetCalendar.getTimeInMillis());
+				final long currentTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(currentCalendar.getTimeInMillis());
+				final long sunRiseTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunRiseCalendar.getTimeInMillis());
+				final long sunSetTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunSetCalendar.getTimeInMillis());
 
-		String time = null;
-		//현재 시각 파악 : 낮, 밤, 일출, 일몰(+-20분)
-		if (currentTimeMinutes < sunRiseTimeMinutes - 2) {
-			//새벽
-			time = "night";
-		} else if (currentTimeMinutes <= sunRiseTimeMinutes + 20) {
-			//일출
-			time = "sunrise";
-		} else if (currentTimeMinutes > sunRiseTimeMinutes + 20 && currentTimeMinutes <= sunSetTimeMinutes - 20) {
-			//낮
-			time = "day";
-		} else if (currentTimeMinutes < sunSetTimeMinutes + 2) {
-			//일몰
-			time = "sunset";
-		} else {
-			//밤
-			time = "night";
-		}
+				String time = null;
+				//현재 시각 파악 : 낮, 밤, 일출, 일몰(+-20분)
+				if (currentTimeMinutes < sunRiseTimeMinutes - 2) {
+					//새벽
+					time = "night";
+				} else if (currentTimeMinutes <= sunRiseTimeMinutes + 20) {
+					//일출
+					time = "sunrise";
+				} else if (currentTimeMinutes > sunRiseTimeMinutes + 20 && currentTimeMinutes <= sunSetTimeMinutes - 20) {
+					//낮
+					time = "day";
+				} else if (currentTimeMinutes < sunSetTimeMinutes + 2) {
+					//일몰
+					time = "sunset";
+				} else {
+					//밤
+					time = "night";
+				}
 
-		String weather = null;
-		switch (weatherSourceType) {
-			case KMA:
-				String code = val.substring(0, 1);
-				weather = val.contains("_sky") ? KmaResponseProcessor.getSkyFlickrGalleryName(
-						code) : KmaResponseProcessor.getPtyFlickrGalleryName(code);
-				break;
-			case ACCU_WEATHER:
-				weather = AccuWeatherResponseProcessor.getFlickrGalleryName(val);
-				break;
-			case OPEN_WEATHER_MAP:
-				weather = OpenWeatherMapResponseProcessor.getFlickrGalleryName(val);
-				break;
-		}
+				String weather = null;
+				switch (weatherSourceType) {
+					case KMA:
+						String code = val.substring(0, 1);
+						weather = val.contains("_sky") ? KmaResponseProcessor.getSkyFlickrGalleryName(
+								code) : KmaResponseProcessor.getPtyFlickrGalleryName(code);
+						break;
+					case ACCU_WEATHER:
+						weather = AccuWeatherResponseProcessor.getFlickrGalleryName(val);
+						break;
+					case OPEN_WEATHER_MAP:
+						weather = OpenWeatherMapResponseProcessor.getFlickrGalleryName(val);
+						break;
+				}
 
-		final String galleryName = time + " " + weather;
-		// time : sunrise, sunset, day, night
-		// weather : clear, partly cloudy, mostly cloudy, overcast, rain, snow
+				final String galleryName = time + " " + weather;
+				// time : sunrise, sunset, day, night
+				// weather : clear, partly cloudy, mostly cloudy, overcast, rain, snow
 
-		//이미 다운로드 된 이미지가 있으면 다운로드 하지 않음
-		if (backgroundImgMap.containsKey(galleryName)) {
-			Glide.with(WeatherFragment.this).load(backgroundImgMap.get(galleryName)).transition(
-					DrawableTransitionOptions.withCrossFade(500)).into(binding.currentConditionsImg);
-		} else {
-			FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
-			photosFromGalleryParameter.setGalleryId(FlickrUtil.getWeatherGalleryId(galleryName));
-
-			Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
-			Call<JsonElement> call = querys.getPhotosFromGallery(photosFromGalleryParameter.getMap());
-			call.enqueue(new Callback<JsonElement>() {
-				@Override
-				public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-					if (getActivity() == null) {
-						return;
+				//이미 다운로드 된 이미지가 있으면 다운로드 하지 않음
+				if (BACKGROUND_IMG_MAP.containsKey(galleryName)) {
+					if (getActivity() != null) {
+						getActivity().runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								if (getChildFragmentManager().findFragmentByTag(getString(R.string.tag_simple_current_conditions_fragment)) != null) {
+									Glide.with(WeatherFragment.this).load(BACKGROUND_IMG_MAP.get(galleryName).getImg()).transition(
+											DrawableTransitionOptions.withCrossFade(500)).into(binding.currentConditionsImg);
+									BaseSimpleCurrentConditionsFragment currentConditionsFragment =
+											(BaseSimpleCurrentConditionsFragment) getChildFragmentManager().findFragmentByTag(getString(R.string.tag_simple_current_conditions_fragment));
+									currentConditionsFragment.setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
+								}
+							}
+						});
 					}
 
-					Gson gson = new Gson();
-					PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
-							PhotosFromGalleryResponse.class);
 
-					if (photosFromGalleryResponse.getStat().equals("ok")) {
-						if (!photosFromGalleryResponse.getPhotos().getTotal().equals("0")) {
-							// https://live.staticflickr.com/65535/50081787401_355bcec912_b.jpg
-							// https://live.staticflickr.com/server/id_secret_size.jpg
-							int randomIdx = new Random().nextInt(Integer.parseInt(photosFromGalleryResponse.getPhotos().getTotal()));
-							PhotosFromGalleryResponse.Photos.Photo photo = photosFromGalleryResponse.getPhotos().getPhoto().get(randomIdx);
-							final String imgUrl = "https://live.staticflickr.com/" + photo.getServer() + "/" + photo.getId() + "_" + photo.getSecret() + "_b.jpg";
+				} else {
+					FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
+					photosFromGalleryParameter.setGalleryId(FlickrUtil.getWeatherGalleryId(galleryName));
 
-							//Glide.with(WeatherMainFragment.this).load(url).into(binding.currentConditionsImg);
-							Target<Drawable> img = new CustomTarget<Drawable>() {
-								@Override
-								public void onResourceReady(@NonNull @NotNull Drawable resource,
-								                            @Nullable @org.jetbrains.annotations.Nullable Transition<? super Drawable> transition) {
-									if (getActivity() == null) {
-										return;
-									}
-									backgroundImgMap.put(galleryName, resource);
-									Glide.with(WeatherFragment.this).load(resource).transition(
-											DrawableTransitionOptions.withCrossFade(500)).into(binding.currentConditionsImg);
+					Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
+					Call<JsonElement> call = querys.getPhotosFromGallery(photosFromGalleryParameter.getMap());
+					call.enqueue(new Callback<JsonElement>() {
+						@Override
+						public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+							if (getActivity() == null) {
+								return;
+							}
+
+							Gson gson = new Gson();
+							PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
+									PhotosFromGalleryResponse.class);
+
+							if (photosFromGalleryResponse.getStat().equals("ok")) {
+								if (!photosFromGalleryResponse.getPhotos().getTotal().equals("0")) {
+									// https://live.staticflickr.com/65535/50081787401_355bcec912_b.jpg
+									// https://live.staticflickr.com/server/id_secret_size.jpg
+									int randomIdx = new Random().nextInt(Integer.parseInt(photosFromGalleryResponse.getPhotos().getTotal()));
+									PhotosFromGalleryResponse.Photos.Photo photo = photosFromGalleryResponse.getPhotos().getPhoto().get(randomIdx);
+									final String backgroundImgUrl = "https://live.staticflickr.com/" + photo.getServer() + "/" + photo.getId() + "_" + photo.getSecret() + "_b.jpg";
+
+									final FlickrImgObj flickrImgObj = new FlickrImgObj();
+									flickrImgObj.setPhoto(photo);
+									BACKGROUND_IMG_MAP.put(galleryName, flickrImgObj);
+
+									//Glide.with(WeatherMainFragment.this).load(url).into(binding.currentConditionsImg);
+									Target<Drawable> img = new CustomTarget<Drawable>() {
+										@Override
+										public void onResourceReady(@NonNull @NotNull Drawable resource,
+										                            @Nullable @org.jetbrains.annotations.Nullable Transition<? super Drawable> transition) {
+											if (getActivity() == null) {
+												return;
+											} else {
+												BACKGROUND_IMG_MAP.get(galleryName).setImg(resource);
+												Glide.with(WeatherFragment.this).load(resource).transition(
+														DrawableTransitionOptions.withCrossFade(500)).into(binding.currentConditionsImg);
+
+												getActivity().runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
+														if (getChildFragmentManager().findFragmentByTag(getString(R.string.tag_simple_current_conditions_fragment)) != null) {
+															BaseSimpleCurrentConditionsFragment currentConditionsFragment =
+																	(BaseSimpleCurrentConditionsFragment) getChildFragmentManager().findFragmentByTag(getString(R.string.tag_simple_current_conditions_fragment));
+															currentConditionsFragment.setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
+														}
+													}
+												});
+											}
+
+										}
+
+										@Override
+										public void onLoadCleared(@Nullable @org.jetbrains.annotations.Nullable Drawable placeholder) {
+
+										}
+									};
+									Glide.with(WeatherFragment.this).load(backgroundImgUrl).into(img);
+								} else {
+
 								}
+							} else {
 
-								@Override
-								public void onLoadCleared(@Nullable @org.jetbrains.annotations.Nullable Drawable placeholder) {
+							}
+						}
 
-								}
-							};
-							Glide.with(WeatherFragment.this).load(imgUrl).into(img);
-						} else {
+						@Override
+						public void onFailure(Call<JsonElement> call, Throwable t) {
 
 						}
-					} else {
-
-					}
+					});
 				}
+			}
+		});
 
-				@Override
-				public void onFailure(Call<JsonElement> call, Throwable t) {
-
-				}
-			});
-		}
 	}
+
 
 	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(
 			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
@@ -543,12 +589,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		@Override
 		public void onFailed(Fail fail) {
 			locationCallbackInMainFragment.onFailed(fail);
-
-			if (fail == Fail.DISABLED_GPS) {
-				Toast.makeText(getContext(), R.string.request_to_make_gps_on, Toast.LENGTH_SHORT).show();
-			} else if (fail == Fail.REJECT_PERMISSION) {
-				Toast.makeText(getContext(), R.string.message_needs_location_permission, Toast.LENGTH_SHORT).show();
-			}
 		}
 	};
 

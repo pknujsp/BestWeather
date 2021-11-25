@@ -1,6 +1,8 @@
 package com.lifedawn.bestweather.weathers.simplefragment.base;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,15 +10,19 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.TextUtil;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
+import com.lifedawn.bestweather.flickr.FlickrImgObj;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
@@ -76,6 +82,19 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		binding.adView.loadAd(adRequest);
 
 		 */
+		binding.flickrLayout.setVisibility(View.GONE);
+		binding.flickrImageUrl.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (binding.flickrImageUrl.getTag() != null) {
+					String url = (String) binding.flickrImageUrl.getTag();
+					Intent intent = new Intent(Intent.ACTION_VIEW);
+					intent.setData(Uri.parse(url));
+					startActivity(intent);
+				}
+
+			}
+		});
 	}
 
 	public BaseSimpleCurrentConditionsFragment setAirQualityResponse(GeolocalizedFeedResponse airQualityResponse) {
@@ -112,5 +131,14 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 			binding.pm10Grade.setText(R.string.not_data);
 			binding.pm25Grade.setText(R.string.not_data);
 		}
+	}
+
+	public void setFlickrImgInfo(FlickrImgObj flickrImgInfo) {
+		final String text = flickrImgInfo.getPhoto().getOwner();
+		binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
+				ContextCompat.getColor(getContext(), R.color.white)));
+		binding.flickrImageUrl.setTag(flickrImgInfo.getRealFlickrUrl());
+
+		binding.flickrLayout.setVisibility(View.VISIBLE);
 	}
 }

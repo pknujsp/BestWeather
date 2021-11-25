@@ -1,13 +1,20 @@
 package com.lifedawn.bestweather.favorites;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
@@ -15,13 +22,16 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentFavoritesBinding;
 import com.lifedawn.bestweather.databinding.ViewSearchBinding;
@@ -71,16 +81,21 @@ public class FavoritesFragment extends Fragment {
 	private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
 		@Override
 		public void handleOnBackPressed() {
-			if (requestFragment.equals(MainTransactionFragment.class.getName())) {
-				checkHaveLocations();
-			} else if (requestFragment.equals(ConfigureWidgetActivity.class.getName())) {
-				if (!clickedItem) {
-					Bundle bundle = new Bundle();
-					bundle.putSerializable(BundleKey.SelectedAddressDto.name(), null);
-					onResultFragmentListener.onResultFragment(bundle);
+			if (getParentFragmentManager().getBackStackEntryCount() >= 2) {
+				getParentFragmentManager().popBackStackImmediate();
+			} else {
+				if (requestFragment.equals(MainTransactionFragment.class.getName())) {
+					checkHaveLocations();
+				} else if (requestFragment.equals(ConfigureWidgetActivity.class.getName())) {
+					if (!clickedItem) {
+						Bundle bundle = new Bundle();
+						bundle.putSerializable(BundleKey.SelectedAddressDto.name(), null);
+						onResultFragmentListener.onResultFragment(bundle);
+					}
+					getParentFragmentManager().popBackStack();
 				}
-				getParentFragmentManager().popBackStack();
 			}
+
 		}
 	};
 
@@ -275,18 +290,24 @@ public class FavoritesFragment extends Fragment {
 						public void onClick(DialogInterface dialogInterface, int i) {
 							dialogInterface.dismiss();
 							PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(
-									getString(R.string.pref_key_use_current_location), true).apply();
+									getString(R.string.pref_key_use_current_location), true)
+									.putString(getString(R.string.pref_key_last_selected_location_type), LocationType.CurrentLocation.name()).apply();
 							enableCurrentLocation = true;
-							bundle.putBoolean(BundleKey.ChangedUseCurrentLocation.name(), enableCurrentLocation);
-							bundle.putBoolean(BundleKey.Refresh.name(), refresh);
 
-							onResultFragmentListener.onResultFragment(bundle);
-							getParentFragmentManager().popBackStack();
+							if (checkPermissionAndGpsOn()) {
+								bundle.putBoolean(BundleKey.ChangedUseCurrentLocation.name(), enableCurrentLocation);
+								bundle.putBoolean(BundleKey.Refresh.name(), refresh);
+
+								onResultFragmentListener.onResultFragment(bundle);
+								getParentFragmentManager().popBackStack();
+							}
 						}
 					}).setNegativeButton(R.string.add_favorite, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialogInterface, int i) {
 					dialogInterface.dismiss();
+					PreferenceManager.getDefaultSharedPreferences(getContext()).edit()
+							.putString(getString(R.string.pref_key_last_selected_location_type), LocationType.SelectedAddress.name()).apply();
 					binding.searchview.callOnClick();
 				}
 			}).setNeutralButton(R.string.close_app, new DialogInterface.OnClickListener() {
@@ -297,14 +318,51 @@ public class FavoritesFragment extends Fragment {
 				}
 			}).create().show();
 
-		} else {
-			if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString(getString(R.string.pref_key_last_current_location_latitude), "0.0").isEmpty()) {
-				refresh = true;
-				bundle.putBoolean(BundleKey.ChangedUseCurrentLocation.name(), enableCurrentLocation);
-				bundle.putBoolean(BundleKey.Refresh.name(), refresh);
-			}
+		} else if (haveFavorites) {
 			onResultFragmentListener.onResultFragment(bundle);
 			getParentFragmentManager().popBackStack();
+		} else {
+			if (checkPermissionAndGpsOn()) {
+				if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString(getString(R.string.pref_key_last_current_location_latitude), "0.0").equals("0.0")) {
+					refresh = true;
+					bundle.putBoolean(BundleKey.ChangedUseCurrentLocation.name(), enableCurrentLocation);
+					bundle.putBoolean(BundleKey.Refresh.name(), refresh);
+				}
+				onResultFragmentListener.onResultFragment(bundle);
+				getParentFragmentManager().popBackStack();
+			}
+		}
+	}
+
+	private boolean checkPermissionAndGpsOn() {
+		LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+		final boolean isPermissionGranted =
+				getContext().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+		final boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+		if (isPermissionGranted && isGpsEnabled) {
+			return true;
+		} else if (!isPermissionGranted) {
+			Toast.makeText(getContext(), R.string.message_needs_location_permission, Toast.LENGTH_SHORT).show();
+
+			// 다시 묻지 않음을 선택했는지 확인
+			final boolean neverAskAgain = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(
+					getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false);
+
+			if (neverAskAgain) {
+				Intent intent = new Intent();
+				intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+				intent.setData(Uri.fromParts("package", getActivity().getPackageName(), null));
+				startActivity(intent);
+			} else {
+				ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+			}
+			return false;
+		} else {
+			Toast.makeText(getContext(), R.string.request_to_make_gps_on, Toast.LENGTH_SHORT).show();
+			Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+			startActivity(intent);
+			return false;
 		}
 	}
 
