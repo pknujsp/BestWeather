@@ -1,9 +1,9 @@
 package com.lifedawn.bestweather.commons.views;
 
 public interface OnProgressViewListener {
-	void onSuccessfulProcessingData();
+	void onSuccessful();
 
-	void onFailedProcessingData(String text);
+	void onFailed(String text);
 
-	void onStartedProcessingData();
+	void onStarted();
 }

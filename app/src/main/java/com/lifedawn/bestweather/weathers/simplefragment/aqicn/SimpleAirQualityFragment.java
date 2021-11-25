@@ -37,7 +37,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import java.util.TimeZone;
 
 
 public class SimpleAirQualityFragment extends Fragment implements IWeatherValues {
@@ -112,10 +111,10 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	public void setValuesToViews() {
 		//응답 실패한 경우
 		if (geolocalizedFeedResponse == null) {
-			binding.progressResultView.onFailedProcessingData(getString(R.string.error));
+			binding.progressResultView.onFailed(getString(R.string.error));
 			return;
 		} else {
-			binding.progressResultView.onSuccessfulProcessingData();
+			binding.progressResultView.onSuccessful();
 		}
 
 		Context context = getContext();

@@ -14,7 +14,6 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
@@ -202,9 +201,9 @@ public class FavoritesFragment extends Fragment {
 				super.onChanged();
 
 				if (adapter.getItemCount() == 0) {
-					binding.progressResultView.onFailedProcessingData(getString(R.string.empty_favorite_addresses));
+					binding.progressResultView.onFailed(getString(R.string.empty_favorite_addresses));
 				} else {
-					binding.progressResultView.onSuccessfulProcessingData();
+					binding.progressResultView.onSuccessful();
 				}
 			}
 		});

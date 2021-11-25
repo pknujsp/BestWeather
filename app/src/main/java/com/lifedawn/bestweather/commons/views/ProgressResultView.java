@@ -2,20 +2,19 @@ package com.lifedawn.bestweather.commons.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.theme.AppTheme;
+import com.lifedawn.bestweather.databinding.ViewProgressResultBinding;
 
-public class ProgressResultView extends LinearLayout implements OnProgressViewListener, CheckSuccess {
-	private TextView statusTextView;
+import org.jetbrains.annotations.NotNull;
+
+public class ProgressResultView extends FrameLayout implements OnProgressViewListener, CheckSuccess {
+	private ViewProgressResultBinding binding;
 	private View contentView;
 	private boolean succeed;
 
@@ -24,51 +23,62 @@ public class ProgressResultView extends LinearLayout implements OnProgressViewLi
 		init();
 	}
 
+	public ProgressResultView(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+		init();
+
+	}
+
+	public ProgressResultView(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		super(context, attrs, defStyleAttr, defStyleRes);
+		init();
+
+	}
+
+	public ProgressResultView(@NonNull @NotNull Context context) {
+		super(context);
+		init();
+	}
+
+	@Override
+	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+		super.onLayout(changed, left, top, right, bottom);
+	}
+
 
 	private void init() {
-		setOrientation(VERTICAL);
-		setGravity(Gravity.CENTER);
-
-		statusTextView = new TextView(getContext());
-		statusTextView.setId(R.id.progress_status_textview);
-		statusTextView.setTextAlignment(TEXT_ALIGNMENT_CENTER);
-		statusTextView.setText(null);
-		statusTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
-
-		LinearLayout.LayoutParams statusTextViewLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-
-		statusTextView.setLayoutParams(statusTextViewLayoutParams);
-
-		addView(statusTextView);
+		binding = ViewProgressResultBinding.inflate(LayoutInflater.from(getContext()), this, true);
 	}
 
 	public void setContentView(View contentView) {
 		this.contentView = contentView;
-		onSuccessfulProcessingData();
+		onSuccessful();
 	}
 
 	@Override
-	public void onSuccessfulProcessingData() {
+	public void onSuccessful() {
 		succeed = true;
 		contentView.setVisibility(View.VISIBLE);
 		setVisibility(View.GONE);
 	}
 
 	@Override
-	public void onFailedProcessingData(@NonNull String text) {
+	public void onFailed(@NonNull String text) {
 		succeed = false;
 		contentView.setVisibility(View.GONE);
+		binding.status.setText(text);
 		setVisibility(View.VISIBLE);
-
-		statusTextView.setText(text);
+		binding.status.setVisibility(VISIBLE);
+		binding.progressbar.setVisibility(GONE);
 	}
 
 	@Override
-	public void onStartedProcessingData() {
+	public void onStarted() {
 		succeed = false;
 		contentView.setVisibility(View.GONE);
-		setVisibility(View.GONE);
+		setVisibility(View.VISIBLE);
+		binding.status.setVisibility(GONE);
+		binding.progressbar.setVisibility(VISIBLE);
 	}
 
 

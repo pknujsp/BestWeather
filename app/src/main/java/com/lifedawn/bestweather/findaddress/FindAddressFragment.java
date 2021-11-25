@@ -67,7 +67,7 @@ public class FindAddressFragment extends Fragment {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.progressResultView.setContentView(binding.addressList);
-		binding.progressResultView.onFailedProcessingData(getString(R.string.title_empty_locations));
+		binding.progressResultView.onFailed(getString(R.string.title_empty_locations));
 
 		binding.toolbar.fragmentTitle.setText(R.string.find_address);
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
@@ -82,9 +82,9 @@ public class FindAddressFragment extends Fragment {
 			@Override
 			public void onChanged() {
 				if (addressesAdapter.getItemCount() == 0) {
-					binding.progressResultView.onFailedProcessingData(getString(R.string.title_empty_locations));
+					binding.progressResultView.onFailed(getString(R.string.title_empty_locations));
 				} else {
-					binding.progressResultView.onSuccessfulProcessingData();
+					binding.progressResultView.onSuccessful();
 				}
 			}
 		});
@@ -154,6 +154,13 @@ public class FindAddressFragment extends Fragment {
 		binding.searchView.setOnEditTextQueryListener(new CustomEditText.OnEditTextQueryListener() {
 			@Override
 			public void onTextChange(String newText) {
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						binding.progressResultView.onStarted();
+
+					}
+				});
 
 				Geocoding.reverseGeocoding(getContext(), executorService, newText, new Geocoding.ReverseGeocodingCallback() {
 					@Override
