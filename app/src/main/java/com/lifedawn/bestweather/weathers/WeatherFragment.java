@@ -30,10 +30,12 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqic
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
+import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
@@ -93,6 +95,7 @@ public class WeatherFragment extends Fragment {
 	private LocationType locationType;
 	private WeatherViewModel.ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions;
 	private WeatherViewModel weatherViewModel;
+	private OnResultFragmentListener onResultFragmentListener;
 
 	private WeatherSourceType mainWeatherSourceType;
 	private Double latitude;
@@ -117,13 +120,21 @@ public class WeatherFragment extends Fragment {
 		}
 	}
 
+	public WeatherFragment setOnResultFragmentListener(OnResultFragmentListener onResultFragmentListener) {
+		this.onResultFragmentListener = onResultFragmentListener;
+		return this;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		Bundle bundle = getArguments();
+
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		iLoadImgOfCurrentConditions = weatherViewModel.getiLoadImgOfCurrentConditions();
+		locationType = LocationType.valueOf(bundle.getString(BundleKey.LocationType.name()));
 	}
 
 	@Override
@@ -143,64 +154,52 @@ public class WeatherFragment extends Fragment {
 		binding.adViewBelowAirQuality.setVisibility(View.GONE);
 		binding.adViewBottom.setVisibility(View.GONE);
 
-		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_current_location), this, new FragmentResultListener() {
-			@Override
-			public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
-				getParentFragmentManager().clearFragmentResultListener(requestKey);
-				getParentFragmentManager().clearFragmentResult(requestKey);
+		Bundle result = getArguments();
 
-				locationType = LocationType.CurrentLocation;
-				sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
-						getString(R.string.pref_key_last_selected_location_type), locationType.name()).apply();
-				iGps = (IGps) result.getSerializable(getString(R.string.bundle_key_igps));
+		if (locationType == LocationType.CurrentLocation) {
+			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
+					getString(R.string.pref_key_last_selected_location_type), locationType.name()).apply();
+			iGps = (IGps) result.getSerializable(BundleKey.IGps.name());
 
-				latitude = Double.parseDouble(
-						sharedPreferences.getString(getString(R.string.pref_key_last_current_location_latitude), "0.0"));
-				longitude = Double.parseDouble(
-						sharedPreferences.getString(getString(R.string.pref_key_last_current_location_longitude), "0.0"));
+			latitude = Double.parseDouble(
+					sharedPreferences.getString(getString(R.string.pref_key_last_current_location_latitude), "0.0"));
+			longitude = Double.parseDouble(
+					sharedPreferences.getString(getString(R.string.pref_key_last_current_location_longitude), "0.0"));
 
-				if (latitude == 0.0 && longitude == 0.0) {
-					//최근에 현재위치로 잡힌 위치가 없으므로 현재 위치 요청
-					iGps.requestCurrentLocation();
-				} else {
-					//위/경도에 해당하는 지역명을 불러오고, 날씨 데이터 다운로드
-					//이미 존재하는 날씨 데이터면 다운로드X
-					requestAddressOfLocation(latitude, longitude, !containWeatherData(latitude, longitude));
-				}
+			if (latitude == 0.0 && longitude == 0.0) {
+				//최근에 현재위치로 잡힌 위치가 없으므로 현재 위치 요청
+				iGps.requestCurrentLocation();
+			} else {
+				//위/경도에 해당하는 지역명을 불러오고, 날씨 데이터 다운로드
+				//이미 존재하는 날씨 데이터면 다운로드X
+				requestAddressOfLocation(latitude, longitude, !containWeatherData(latitude, longitude));
 			}
-		});
-		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_selected_location), this, new FragmentResultListener() {
-			@Override
-			public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
-				getParentFragmentManager().clearFragmentResultListener(requestKey);
-				getParentFragmentManager().clearFragmentResult(requestKey);
+		} else {
+			selectedFavoriteAddressDto = (FavoriteAddressDto) result.getSerializable(
+					BundleKey.SelectedAddressDto.name());
+			iGps = (IGps) result.getSerializable(BundleKey.IGps.name());
 
-				locationType = LocationType.SelectedAddress;
-				selectedFavoriteAddressDto = (FavoriteAddressDto) result.getSerializable(
-						getString(R.string.bundle_key_selected_address_dto));
-				iGps = (IGps) result.getSerializable(getString(R.string.bundle_key_igps));
+			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
+					selectedFavoriteAddressDto.getId()).putString(getString(R.string.pref_key_last_selected_location_type),
+					locationType.name()).apply();
 
-				sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
-						selectedFavoriteAddressDto.getId()).putString(getString(R.string.pref_key_last_selected_location_type),
-						locationType.name()).apply();
+			mainWeatherSourceType = getMainWeatherSourceType(selectedFavoriteAddressDto.getCountryCode());
+			countryCode = selectedFavoriteAddressDto.getCountryCode();
+			addressName = selectedFavoriteAddressDto.getAddress();
+			latitude = Double.parseDouble(selectedFavoriteAddressDto.getLatitude());
+			longitude = Double.parseDouble(selectedFavoriteAddressDto.getLongitude());
 
-				mainWeatherSourceType = getMainWeatherSourceType(selectedFavoriteAddressDto.getCountryCode());
-				countryCode = selectedFavoriteAddressDto.getCountryCode();
-				addressName = selectedFavoriteAddressDto.getAddress();
-				latitude = Double.parseDouble(selectedFavoriteAddressDto.getLatitude());
-				longitude = Double.parseDouble(selectedFavoriteAddressDto.getLongitude());
+			binding.addressName.setText(addressName);
 
-				binding.addressName.setText(addressName);
-
-				if (containWeatherData(latitude, longitude)) {
-					//기존 데이터 표시
-					mainWeatherSourceType = finalResponseMap.get(latitude.toString() + longitude.toString()).requestWeatherSourceType;
-					reDraw();
-				} else {
-					requestNewData();
-				}
+			if (containWeatherData(latitude, longitude)) {
+				//기존 데이터 표시
+				mainWeatherSourceType = finalResponseMap.get(latitude.toString() + longitude.toString()).requestWeatherSourceType;
+				reDraw();
+			} else {
+				requestNewData();
 			}
-		});
+		}
+
 	}
 
 	@Override
@@ -717,12 +716,12 @@ public class WeatherFragment extends Fragment {
 
 		if (getActivity() != null) {
 			final Bundle defaultBundle = new Bundle();
-			defaultBundle.putDouble(getString(R.string.bundle_key_latitude), this.latitude);
-			defaultBundle.putDouble(getString(R.string.bundle_key_longitude), this.longitude);
-			defaultBundle.putString(getString(R.string.bundle_key_address_name), addressName);
-			defaultBundle.putString(getString(R.string.bundle_key_country_code), countryCode);
-			defaultBundle.putSerializable(getString(R.string.bundle_key_main_weather_data_source), mainWeatherSourceType);
-			defaultBundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
+			defaultBundle.putDouble(BundleKey.Latitude.name(), this.latitude);
+			defaultBundle.putDouble(BundleKey.Longitude.name(), this.longitude);
+			defaultBundle.putString(BundleKey.AddressName.name(), addressName);
+			defaultBundle.putString(BundleKey.CountryCode.name(), countryCode);
+			defaultBundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherSourceType);
+			defaultBundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 
 			SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
 			simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);

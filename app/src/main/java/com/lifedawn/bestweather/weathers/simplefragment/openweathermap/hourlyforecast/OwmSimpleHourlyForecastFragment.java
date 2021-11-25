@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
@@ -71,8 +72,8 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				detailHourlyForecastFragment.setHourlyList(oneCallResponse.getHourly());
 
 				Bundle bundle = new Bundle();
-				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
-				bundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
+				bundle.putString(BundleKey.AddressName.name(), addressName);
+				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 
 				detailHourlyForecastFragment.setArguments(bundle);
 

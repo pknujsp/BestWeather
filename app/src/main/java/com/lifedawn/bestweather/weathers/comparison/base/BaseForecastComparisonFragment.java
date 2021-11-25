@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding;
@@ -43,7 +44,6 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 	protected WeatherSourceType mainWeatherSourceType;
 	protected ZoneId zoneId;
 
-	protected NonScrolledView[] nonScrolledViews;
 	protected NotScrolledView[] notScrolledViews;
 
 	@Override
@@ -57,13 +57,13 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
 
 		Bundle bundle = getArguments();
-		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
-		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
-		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
-		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
-		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		latitude = bundle.getDouble(BundleKey.Latitude.name());
+		longitude = bundle.getDouble(BundleKey.Longitude.name());
+		addressName = bundle.getString(BundleKey.AddressName.name());
+		countryCode = bundle.getString(BundleKey.CountryCode.name());
+		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(
-				getString(R.string.bundle_key_main_weather_data_source));
+				BundleKey.WeatherDataSource.name());
 	}
 
 	@Override
@@ -92,11 +92,7 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 				if (dateRow != null) {
 					dateRow.reDraw(scrollX);
 				}
-				if (nonScrolledViews != null) {
-					for (NonScrolledView nonScrolledView : nonScrolledViews) {
-						nonScrolledView.reDraw(scrollX);
-					}
-				}
+
 				if (notScrolledViews != null) {
 					for (NotScrolledView notScrolledView : notScrolledViews) {
 						notScrolledView.reDraw(scrollX);

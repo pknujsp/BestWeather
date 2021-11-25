@@ -42,12 +42,15 @@ import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
+import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherMainBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
+import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
@@ -63,6 +66,7 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -87,9 +91,21 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	private NetworkStatus networkStatus;
 
 	private AlertDialog loadingDialog;
+	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
+	private OnResultFragmentListener onResultFragmentListener;
 
 	public WeatherMainFragment(View.OnClickListener menuOnClickListener) {
 		this.menuOnClickListener = menuOnClickListener;
+	}
+
+	public WeatherMainFragment setiRefreshFavoriteLocationListOnSideNav(IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav) {
+		this.iRefreshFavoriteLocationListOnSideNav = iRefreshFavoriteLocationListOnSideNav;
+		return this;
+	}
+
+	public WeatherMainFragment setOnResultFragmentListener(OnResultFragmentListener onResultFragmentListener) {
+		this.onResultFragmentListener = onResultFragmentListener;
+		return this;
 	}
 
 	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
@@ -120,6 +136,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		networkStatus = new NetworkStatus(getContext(), new ConnectivityManager.NetworkCallback() {
 		});
@@ -130,6 +147,11 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 
 		gps = new Gps(requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
+		super.onSaveInstanceState(outState);
 	}
 
 	@Override
@@ -179,7 +201,25 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
 					FindAddressFragment findAddressFragment = new FindAddressFragment();
-					getParentFragmentManager().setFragmentResult(getString(R.string.key_from_main_to_find_address), new Bundle());
+					Bundle bundle = new Bundle();
+					bundle.putString(BundleKey.RequestFragment.name(), WeatherMainFragment.class.getName());
+					findAddressFragment.setArguments(bundle);
+
+					findAddressFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+						@Override
+						public void onResultFragment(Bundle result) {
+							final boolean isSelectedNewAddress = result.getBoolean(BundleKey.SelectedAddressDto.name());
+
+							if (isSelectedNewAddress) {
+								final int newFavoriteAddressDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name());
+								sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
+										newFavoriteAddressDtoId).apply();
+								iRefreshFavoriteLocationListOnSideNav.refreshFavoriteLocationsList(result.getString(BundleKey.LastFragment.name()),
+										result);
+							}
+						}
+					});
+
 					getParentFragmentManager().beginTransaction().hide(WeatherMainFragment.this).add(R.id.fragment_container,
 							findAddressFragment, getString(R.string.tag_find_address_fragment)).addToBackStack(
 							getString(R.string.tag_find_address_fragment)).commit();
@@ -211,16 +251,23 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		binding.mainToolbar.find.setVisibility(locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
 
 		Bundle bundle = new Bundle();
-		bundle.putSerializable(getString(R.string.bundle_key_selected_address_dto), favoriteAddressDto);
-		bundle.putSerializable(getString(R.string.bundle_key_igps), (IGps) this);
+		bundle.putSerializable(BundleKey.SelectedAddressDto.name(), favoriteAddressDto);
+		IGps iGps = (IGps) this;
+		bundle.putSerializable(BundleKey.IGps.name(), iGps);
 
-		String requestKey = locationType == LocationType.CurrentLocation ? getString(R.string.key_current_location) : getString(
-				R.string.key_selected_location);
+		bundle.putString(BundleKey.LocationType.name(), locationType.name());
+		bundle.putString(BundleKey.RequestFragment.name(), WeatherMainFragment.class.getName());
 
 		WeatherFragment weatherFragment = new WeatherFragment();
-		getChildFragmentManager().clearFragmentResult(requestKey);
-		getChildFragmentManager().clearFragmentResultListener(requestKey);
-		getChildFragmentManager().setFragmentResult(requestKey, bundle);
+		weatherFragment.setArguments(bundle);
+
+		weatherFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+			@Override
+			public void onResultFragment(Bundle result) {
+
+			}
+		});
+
 		getChildFragmentManager().beginTransaction().setPrimaryNavigationFragment(weatherFragment).replace(
 				binding.weatherFragmentsContainer.getId(), weatherFragment, getString(R.string.tag_weather_fragment)).commitAllowingStateLoss();
 	}

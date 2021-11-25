@@ -58,6 +58,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
@@ -93,13 +94,13 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int defaultValueRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
-		List<WeatherSourceType> weatherSourceTypeList = new ArrayList<>();
+		final List<WeatherSourceType> weatherSourceTypeList = new ArrayList<>();
 
 		List<ForecastObj<FinalHourlyForecast>> kmaFinalHourlyForecasts = null;
 		List<ForecastObj<TwelveHoursOfHourlyForecastsResponse.Item>> accuFinalHourlyForecasts = null;
 		List<ForecastObj<OneCallResponse.Hourly>> owmFinalHourlyForecasts = null;
 
-		if (hourlyForecastResponse.kmaHourlyForecastList != null) {
+		if (hourlyForecastResponse.kmaSuccessful) {
 			kmaFinalHourlyForecasts = new ArrayList<>();
 			for (FinalHourlyForecast finalHourlyForecast : hourlyForecastResponse.kmaHourlyForecastList) {
 				kmaFinalHourlyForecasts.add(new ForecastObj<>(finalHourlyForecast.getFcstDateTime(), finalHourlyForecast));
@@ -111,7 +112,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			binding.kma.setVisibility(View.GONE);
 		}
 
-		if (hourlyForecastResponse.accuHourlyForecastsResponse != null) {
+		if (hourlyForecastResponse.accuSuccessful) {
 			accuFinalHourlyForecasts = new ArrayList<>();
 			for (TwelveHoursOfHourlyForecastsResponse.Item item : hourlyForecastResponse.accuHourlyForecastsResponse.getItems()) {
 				accuFinalHourlyForecasts.add(new ForecastObj<>(
@@ -125,7 +126,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			binding.accu.setVisibility(View.GONE);
 		}
 
-		if (hourlyForecastResponse.owmOneCallResponse != null) {
+		if (hourlyForecastResponse.owmSuccessful) {
 			owmFinalHourlyForecasts = new ArrayList<>();
 			for (OneCallResponse.Hourly hourly : hourlyForecastResponse.owmOneCallResponse.getHourly()) {
 				owmFinalHourlyForecasts.add(new ForecastObj<>(
@@ -366,7 +367,6 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		binding.datetime.addView(dateRow, rowLayoutParams);
 		binding.datetime.addView(clockRow, rowLayoutParams);
 		LinearLayout view = null;
-		nonScrolledViews = new NonScrolledView[weatherSourceTypeList.size()];
 		notScrolledViews = new NotScrolledView[weatherSourceTypeList.size()];
 
 		LinearLayout.LayoutParams nonScrollRowLayoutParams = new LinearLayout.LayoutParams(valueRowWidth,
@@ -404,7 +404,6 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					logoId = R.drawable.owmicon;
 					break;
 			}
-			nonScrolledViews[i] = new NonScrolledView(getContext(), FragmentType.Comparison, valueRowWidth, columnWidth, sourceName);
 			notScrolledViews[i] = new NotScrolledView(getContext());
 			notScrolledViews[i].setImg(logoId);
 			notScrolledViews[i].setText(sourceName);
@@ -491,26 +490,24 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		//kma
 		if (responseMap.containsKey(WeatherSourceType.KMA)) {
 			arrayMap = responseMap.get(WeatherSourceType.KMA);
-			MultipleJsonDownloader.ResponseResult ultraSrtFcstResponse = arrayMap.get(
+			MultipleJsonDownloader.ResponseResult ultraSrtFcstResponse = Objects.requireNonNull(arrayMap).get(
 					RetrofitClient.ServiceType.ULTRA_SRT_FCST);
 			MultipleJsonDownloader.ResponseResult vilageFcstResponse = arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST);
 
-			if (ultraSrtFcstResponse.getResponse() != null && vilageFcstResponse.getResponse() != null) {
+			if (ultraSrtFcstResponse.isSuccessful() && vilageFcstResponse.isSuccessful()) {
+
 				VilageFcstResponse ultraSrtFcstRoot =
 						(VilageFcstResponse) ultraSrtFcstResponse.getResponse().body();
 				VilageFcstResponse vilageFcstRoot =
 						(VilageFcstResponse) vilageFcstResponse.getResponse().body();
 
-				String successfulCode = "00";
-				if (ultraSrtFcstRoot.getKmaHeader().getResultCode().equals(
-						successfulCode) && vilageFcstRoot.getKmaHeader().getResultCode().equals(successfulCode)) {
-					hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(ultraSrtFcstRoot,
-							vilageFcstRoot);
-				}
+				hourlyForecastResponse.kmaSuccessful = true;
+				hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(ultraSrtFcstRoot,
+						vilageFcstRoot);
 			} else {
-				if (ultraSrtFcstResponse.getT() != null) {
+				if (!ultraSrtFcstResponse.isSuccessful()) {
 					hourlyForecastResponse.kmaThrowable = ultraSrtFcstResponse.getT();
-				} else if (vilageFcstResponse.getT() != null) {
+				} else if (!vilageFcstResponse.isSuccessful()) {
 					hourlyForecastResponse.kmaThrowable = vilageFcstResponse.getT();
 				}
 			}
@@ -522,10 +519,10 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			MultipleJsonDownloader.ResponseResult accuHourlyForecastResponse = arrayMap.get(
 					RetrofitClient.ServiceType.ACCU_12_HOURLY);
 
-			if (accuHourlyForecastResponse.getT() == null) {
-
+			if (accuHourlyForecastResponse.isSuccessful()) {
+				hourlyForecastResponse.accuSuccessful = true;
 				hourlyForecastResponse.accuHourlyForecastsResponse = AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
-						(JsonElement) arrayMap.get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponse().body());
+						(JsonElement) accuHourlyForecastResponse.getResponse().body());
 			} else {
 				hourlyForecastResponse.accuThrowable = accuHourlyForecastResponse.getT();
 			}
@@ -535,7 +532,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			arrayMap = responseMap.get(WeatherSourceType.OPEN_WEATHER_MAP);
 			MultipleJsonDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
-			if (responseResult.getT() == null) {
+			if (responseResult.isSuccessful()) {
+				hourlyForecastResponse.owmSuccessful = true;
 				hourlyForecastResponse.owmOneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
 						responseResult.getResponse().body().toString());
 			} else {
@@ -560,6 +558,10 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		List<FinalHourlyForecast> kmaHourlyForecastList;
 		TwelveHoursOfHourlyForecastsResponse accuHourlyForecastsResponse;
 		OneCallResponse owmOneCallResponse;
+
+		boolean kmaSuccessful;
+		boolean accuSuccessful;
+		boolean owmSuccessful;
 
 		Throwable kmaThrowable;
 		Throwable accuThrowable;

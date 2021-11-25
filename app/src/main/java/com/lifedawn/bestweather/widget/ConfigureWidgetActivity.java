@@ -46,10 +46,13 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.slider.Slider;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Gps;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.ActivityConfigureWidgetBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
+import com.lifedawn.bestweather.main.MainTransactionFragment;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
@@ -406,47 +409,41 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 	}
 
 	private void openFavoritesFragment() {
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		fragmentManager.setFragmentResult(getString(R.string.key_from_widget_config_main_to_favorites), new Bundle());
-
 		FavoritesFragment favoritesFragment = new FavoritesFragment();
+		Bundle bundle = new Bundle();
+		bundle.putString(BundleKey.RequestFragment.name(), ConfigureWidgetActivity.class.getName());
+		favoritesFragment.setArguments(bundle);
+
+		favoritesFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+			@Override
+			public void onResultFragment(Bundle result) {
+				if (result.getSerializable(BundleKey.SelectedAddressDto.name()) == null) {
+					Toast.makeText(getApplicationContext(), R.string.not_selected_address, Toast.LENGTH_SHORT).show();
+					binding.selectedLocationRadio.setText(R.string.click_again_to_select_address);
+					binding.selectedLocationRadio.setChecked(false);
+					binding.currentLocationRadio.setChecked(false);
+				} else {
+					newSelectedAddressDto = (FavoriteAddressDto) result.getSerializable(BundleKey.SelectedAddressDto.name());
+					String text = getString(R.string.location) + ", " + newSelectedAddressDto.getAddress();
+					binding.selectedLocationRadio.setText(text);
+					binding.changeAddressBtn.setVisibility(View.VISIBLE);
+
+					Preference preference = new Preference(getApplicationContext());
+					preference.setKey(WidgetCreator.WidgetAttributes.LOCATION_TYPE.name());
+					onPreferenceChangeListener.onPreferenceChange(preference, LocationType.SelectedAddress.name());
+
+					SharedPreferences.Editor editor = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId),
+							MODE_PRIVATE).edit();
+
+					editor.putString(AbstractAppWidgetProvider.WidgetDataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
+							.putString(AbstractAppWidgetProvider.WidgetDataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
+							.putString(AbstractAppWidgetProvider.WidgetDataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude())
+							.putString(AbstractAppWidgetProvider.WidgetDataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).apply();
+				}
+			}
+		});
 		getSupportFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), favoritesFragment, getString(R.string.tag_favorites_fragment))
 				.addToBackStack(getString(R.string.tag_favorites_fragment)).commit();
-
-		fragmentManager.setFragmentResultListener(getString(R.string.key_back_from_favorites_to_widget_config_main),
-				ConfigureWidgetActivity.this,
-				new FragmentResultListener() {
-					@Override
-					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
-						fragmentManager.clearFragmentResult(getString(R.string.key_from_widget_config_main_to_favorites));
-						fragmentManager.clearFragmentResultListener(requestKey);
-
-						if (result.getSerializable(getString(R.string.bundle_key_selected_address_dto)) == null) {
-							Toast.makeText(getApplicationContext(), R.string.not_selected_address, Toast.LENGTH_SHORT).show();
-							binding.selectedLocationRadio.setText(R.string.click_again_to_select_address);
-							binding.selectedLocationRadio.setChecked(false);
-							binding.currentLocationRadio.setChecked(false);
-						} else {
-							newSelectedAddressDto = (FavoriteAddressDto) result.getSerializable(getString(R.string.bundle_key_selected_address_dto));
-							String text = getString(R.string.location) + ", " + newSelectedAddressDto.getAddress();
-							binding.selectedLocationRadio.setText(text);
-							binding.changeAddressBtn.setVisibility(View.VISIBLE);
-
-							Preference preference = new Preference(getApplicationContext());
-							preference.setKey(WidgetCreator.WidgetAttributes.LOCATION_TYPE.name());
-							onPreferenceChangeListener.onPreferenceChange(preference, LocationType.SelectedAddress.name());
-
-							SharedPreferences.Editor editor = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId),
-									MODE_PRIVATE).edit();
-
-							editor.putString(AbstractAppWidgetProvider.WidgetDataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
-									.putString(AbstractAppWidgetProvider.WidgetDataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
-									.putString(AbstractAppWidgetProvider.WidgetDataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude())
-									.putString(AbstractAppWidgetProvider.WidgetDataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).apply();
-						}
-					}
-
-				});
 	}
 
 	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(

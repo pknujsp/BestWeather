@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.retrofit.util;
 
 import android.util.ArrayMap;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -20,6 +21,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 public abstract class MultipleJsonDownloader {
+	private static final String tag = "MultipleJsonDownloader";
 	private volatile int requestCount;
 	private volatile int responseCount;
 	private AlertDialog loadingDialog;
@@ -107,8 +109,10 @@ public abstract class MultipleJsonDownloader {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
 		}
 		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, response));
+		Log.e(tag, "requestCount : " + requestCount + ", responseCount : " + responseCount);
 
 		if (requestCount == ++responseCount) {
+			Log.e(tag, "requestCount : " + requestCount + ", responseCount : " + responseCount);
 			onResult();
 		}
 	}
@@ -119,8 +123,10 @@ public abstract class MultipleJsonDownloader {
 		}
 
 		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, t));
+		Log.e(tag, "requestCount : " + requestCount + ", responseCount : " + responseCount);
 
 		if (requestCount == ++responseCount) {
+			Log.e(tag, "requestCount : " + requestCount + ", responseCount : " + responseCount);
 			onResult();
 		}
 	}
@@ -133,16 +139,19 @@ public abstract class MultipleJsonDownloader {
 		private RequestParameter requestParameter;
 		private Response<?> response;
 		private Throwable t;
+		private boolean successful;
 
 		public ResponseResult() {
 		}
 
 		public ResponseResult(RequestParameter requestParameter, Throwable t) {
 			this.t = t;
+			successful = false;
 		}
 
 		public ResponseResult(RequestParameter requestParameter, Response<?> response) {
 			this.response = response;
+			successful = true;
 		}
 
 		public Response<?> getResponse() {
@@ -163,6 +172,10 @@ public abstract class MultipleJsonDownloader {
 
 		public RequestParameter getRequestParameter() {
 			return requestParameter;
+		}
+
+		public boolean isSuccessful() {
+			return successful;
 		}
 	}
 }

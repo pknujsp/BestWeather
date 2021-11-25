@@ -16,8 +16,10 @@
         <androidx.core.widget.NestedScrollView
             android:id="@+id/root_scroll_View"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:overScrollMode="never"
+            android:scrollbars="none"
             android:paddingLeft="8dp"
             android:paddingRight="8dp">
 
@@ -30,11 +32,11 @@
                     android:id="@+id/address_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="24dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
                     android:text="addressName"
                     android:textColor="?attr/textColor"
-                    android:textSize="18sp" />
+                    android:textSize="17sp" />
 
                 <HorizontalScrollView
                     android:id="@+id/scrollview"
@@ -79,90 +81,15 @@
 
                 </HorizontalScrollView>
 
-                <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/adViewBelowScrollView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    ads:adSize="BANNER"
-                    ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
-
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="@dimen/weatherDataSourceIconSize"
-                            android:layout_height="@dimen/weatherDataSourceIconSize"
-                            android:layout_gravity="center"
-                            android:layout_marginRight="8dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/kma"
-                            android:visibility="visible" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/kma"
-                            android:textColor="?attr/textColor" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="@dimen/weatherDataSourceIconSize"
-                            android:layout_height="@dimen/weatherDataSourceIconSize"
-                            android:layout_gravity="center"
-                            android:layout_marginRight="8dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/accu"
-                            android:visibility="visible" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/accu_weather"
-                            android:textColor="?attr/textColor" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="@dimen/weatherDataSourceIconSize"
-                            android:layout_height="@dimen/weatherDataSourceIconSize"
-                            android:layout_gravity="center"
-                            android:layout_marginRight="8dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/owm"
-                            android:visibility="visible" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/owm"
-                            android:textColor="?attr/textColor" />
-                    </LinearLayout>
-                </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
+
+        <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adViewBelowScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
 
     </LinearLayout>
 </layout>

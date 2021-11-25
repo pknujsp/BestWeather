@@ -1,15 +1,11 @@
 package com.lifedawn.bestweather.findaddress;
 
 import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,8 +18,9 @@ import android.widget.Toast;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.CustomEditText;
-import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentFindAddressBinding;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -42,34 +39,22 @@ public class FindAddressFragment extends Fragment {
 	private WeatherViewModel weatherViewModel;
 	private boolean selectedAddress = false;
 	private FavoriteAddressDto newFavoriteAddressDto;
-	private String fragmentRequestKey;
+	private String requestFragment;
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private OnResultFragmentListener onResultFragmentListener;
+
+	public FindAddressFragment setOnResultFragmentListener(OnResultFragmentListener onResultFragmentListener) {
+		this.onResultFragmentListener = onResultFragmentListener;
+		return this;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
-		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_from_main_to_find_address), this,
-				new FragmentResultListener() {
-					@Override
-					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
-						fragmentRequestKey = getString(R.string.key_back_from_find_address_to_main);
-					}
-				});
-		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_from_favorite_to_find_address), this,
-				new FragmentResultListener() {
-					@Override
-					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
-						fragmentRequestKey = getString(R.string.key_back_from_find_address_to_favorite);
-					}
-				});
-		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_from_intro_to_find_address), this,
-				new FragmentResultListener() {
-					@Override
-					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
-						fragmentRequestKey = getString(R.string.key_back_from_find_address_to_intro);
-					}
-				});
+
+		Bundle bundle = getArguments();
+		requestFragment = bundle.getString(BundleKey.RequestFragment.name());
 	}
 
 	@Override
@@ -201,11 +186,13 @@ public class FindAddressFragment extends Fragment {
 	@Override
 	public void onDestroy() {
 		Bundle bundle = new Bundle();
-		bundle.putBoolean(getString(R.string.bundle_key_selected_address_dto), selectedAddress);
+		bundle.putString(BundleKey.LastFragment.name(), FindAddressFragment.class.getName());
+		bundle.putBoolean(BundleKey.SelectedAddressDto.name(), selectedAddress);
 		if (selectedAddress) {
-			bundle.putInt(getString(R.string.bundle_key_new_favorite_address_dto_id), newFavoriteAddressDto.getId());
+			bundle.putInt(BundleKey.newFavoriteAddressDtoId.name(), newFavoriteAddressDto.getId());
 		}
-		getParentFragmentManager().setFragmentResult(fragmentRequestKey, bundle);
+
+		onResultFragmentListener.onResultFragment(bundle);
 		super.onDestroy();
 	}
 

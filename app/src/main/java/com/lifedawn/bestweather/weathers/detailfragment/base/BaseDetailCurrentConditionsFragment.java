@@ -15,6 +15,7 @@ import androidx.gridlayout.widget.GridLayout;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailCurrentConditionsBinding;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
@@ -42,9 +43,9 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
 		Bundle bundle = getArguments();
-		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
-		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
-		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
+		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
+		latitude = bundle.getDouble(BundleKey.Latitude.name());
+		longitude = bundle.getDouble(BundleKey.Longitude.name());
 
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
 		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));

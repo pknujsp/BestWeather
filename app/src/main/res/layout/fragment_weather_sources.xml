@@ -19,16 +19,25 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp">
 
+                <ImageView
+                    android:id="@+id/accuicon"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/accu_weather_name"
+                    android:layout_alignBottom="@id/accu_weather_name"
+                    android:layout_alignParentLeft="true"
+                    android:src="@drawable/accuicon" />
+
                 <TextView
                     android:id="@+id/accu_weather_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
                     android:layout_marginTop="32dp"
+                    android:layout_toRightOf="@id/accuicon"
                     android:text="@string/accu_weather"
                     android:textColor="@color/black"
-                    android:textSize="24sp" />
+                    android:textSize="22sp" />
 
                 <TextView
                     android:id="@+id/accu_weather_description"
@@ -37,7 +46,7 @@
                     android:layout_below="@id/accu_weather_name"
                     android:layout_alignLeft="@id/accu_weather_name"
                     android:text="@string/pref_summary_accu_weather"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/accu_weather"
@@ -55,15 +64,24 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp">
 
+                <ImageView
+                    android:id="@+id/owmicon"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/open_weather_map_name"
+                    android:layout_alignBottom="@id/open_weather_map_name"
+                    android:layout_alignParentLeft="true"
+                    android:src="@drawable/owmicon" />
+
                 <TextView
                     android:id="@+id/open_weather_map_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@id/owmicon"
                     android:text="@string/owm"
                     android:textColor="@color/black"
-                    android:textSize="24sp" />
+                    android:textSize="22sp" />
 
                 <TextView
                     android:id="@+id/open_weather_map_description"
@@ -72,7 +90,7 @@
                     android:layout_below="@id/open_weather_map_name"
                     android:layout_alignLeft="@id/open_weather_map_name"
                     android:text="@string/pref_summary_open_weather_map"
-                    android:textSize="16sp" />
+                    android:textSize="15sp" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/open_weather_map"
@@ -92,12 +110,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="32dp">
 
+                <ImageView
+                    android:id="@+id/kmaicon"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/kma_top_priority_title"
+                    android:layout_alignBottom="@id/kma_top_priority_title"
+                    android:layout_alignParentLeft="true"
+                    android:src="@drawable/kmaicon" />
+
                 <TextView
                     android:id="@+id/kma_top_priority_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_toLeftOf="@id/kma_top_priority"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@id/kmaicon"
                     android:text="@string/pref_title_kma_top_priority"
                     android:textColor="@color/black"
                     android:textSize="17sp" />

@@ -25,6 +25,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 
+import java.io.Serializable;
+
 public class Gps {
 	private LocationManager locationManager;
 	private LocationListener locationListener;
@@ -251,8 +253,10 @@ public class Gps {
 		closeDialog();
 	}
 
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+	}
 
-	public interface LocationCallback {
+	public interface LocationCallback extends Serializable {
 		enum Fail {
 			DISABLED_GPS, REJECT_PERMISSION
 		}

@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
@@ -80,10 +81,10 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				detailHourlyForecastFragment.setFinalHourlyForecastList(finalHourlyForecastList);
 
 				Bundle bundle = new Bundle();
-				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
-				bundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
-				bundle.putDouble(getString(R.string.bundle_key_latitude), latitude);
-				bundle.putDouble(getString(R.string.bundle_key_longitude), longitude);
+				bundle.putString(BundleKey.AddressName.name(), addressName);
+				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
+				bundle.putDouble(BundleKey.Latitude.name(), latitude);
+				bundle.putDouble(BundleKey.Longitude.name(), longitude);
 
 				detailHourlyForecastFragment.setArguments(bundle);
 

@@ -436,39 +436,6 @@
     <string name="flickr_rain">rain</string>
     <string name="flickr_snow">snow</string>
 
-    <!-- bundle keys -->
-    <string name="bundle_key_latitude">bundle_key_latitude</string>
-    <string name="bundle_key_longitude">bundle_key_longitude</string>
-    <string name="bundle_key_address_name">bundle_key_address_name</string>
-    <string name="bundle_key_country_code">bundle_key_country_code</string>
-    <string name="bundle_key_main_weather_data_source">bundle_key_main_weather_data_source</string>
-    <string name="bundle_key_timezone">bundle_key_timezone</string>
-    <string name="bundle_key_selected_address_dto">bundle_key_selected_address_dto</string>
-    <string name="bundle_key_location_type">bundle_key_location_type</string>
-    <string name="bundle_key_new_favorite_address_dto_id">bundle_key_new_favorite_address_dto_id</string>
-    <string name="bundle_key_new_favorite_address_list">bundle_key_new_favorite_address_list</string>
-    <string name="bundle_key_changed_use_current_location">bundle_key_changed_use_current_location</string>
-    <string name="bundle_key_refresh">bundle_key_refresh</string>
-    <string name="bundle_key_igps">bundle_key_igps</string>
-    <string name="bundle_key_using_current_location">bundle_key_using_current_location</string>
-    <string name="bundle_key_widget_class_name">bundle_key_widget_class_name</string>
-    <string name="bundle_key_widget_layout_id">bundle_key_widget_layout_id</string>
-
-    <!-- fragment result key -->
-    <string name="key_from_favorite_to_find_address">key_from_favorite_to_find_address</string>
-    <string name="key_from_main_to_find_address">key_from_main_to_find_address</string>
-    <string name="key_from_main_to_favorite">key_from_main_to_favorite</string>
-    <string name="key_back_from_find_address_to_main">key_back_from_find_address_to_main</string>
-    <string name="key_back_from_favorite_to_main">key_back_from_favorite_to_main</string>
-    <string name="key_back_from_find_address_to_favorite">key_back_from_find_address_to_favorite</string>
-    <string name="key_from_intro_to_find_address">key_from_intro_to_find_address</string>
-    <string name="key_current_location">key_current_location</string>
-    <string name="key_selected_location">key_selected_location</string>
-    <string name="key_back_from_find_address_to_intro">key_back_from_find_address_to_intro</string>
-    <string name="key_from_widget_config_main_to_favorites">key_from_widget_config_main_to_favorites</string>
-    <string name="key_back_from_favorites_to_widget_config_main">key_back_from_favorites_to_widget_config_main</string>
-    <string name="key_back_from_find_address_to_widget_config_main">key_back_from_find_address_to_widget_config_main</string>
-    <string name="key_from_widget_config_main_to_find_address">key_from_widget_config_main_to_find_address</string>
 
     <!-- intent action -->
     <string name="com.lifedawn.bestweather.action.REFRESH" translatable="false">com.lifedawn.bestweather.action.REFRESH</string>

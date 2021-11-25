@@ -43,6 +43,7 @@ import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
 import com.lifedawn.bestweather.weathers.view.NonScrolledView;
+import com.lifedawn.bestweather.weathers.view.NotScrolledView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 
 import org.jetbrains.annotations.NotNull;
@@ -313,9 +314,9 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 		binding.datetime.addView(dateRow, rowLayoutParams);
 		LinearLayout view = null;
-		nonScrolledViews = new NonScrolledView[weatherSourceTypeList.size()];
+		notScrolledViews = new NotScrolledView[weatherSourceTypeList.size()];
 
-		LinearLayout.LayoutParams nonScrollRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+		LinearLayout.LayoutParams nonScrollRowLayoutParams = new LinearLayout.LayoutParams(valueRowWidth,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		nonScrollRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 		int nonScrollViewMargin = (int) getResources().getDimension(R.dimen.nonScrollViewTopBottomMargin);
@@ -332,23 +333,30 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			iconTextRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
 
 			String sourceName;
+			int logoId;
 			switch (weatherSourceTypeList.get(i)) {
 				case KMA:
 					view = binding.kma;
 					sourceName = getString(R.string.kma);
+					logoId = R.drawable.kmaicon;
 					break;
 				case ACCU_WEATHER:
 					view = binding.accu;
 					sourceName = getString(R.string.accu_weather);
+					logoId = R.drawable.accuicon;
 					break;
 				default:
 					view = binding.owm;
 					sourceName = getString(R.string.owm);
+					logoId = R.drawable.owmicon;
 					break;
 			}
-			nonScrolledViews[i] = new NonScrolledView(getContext(), FragmentType.Comparison, valueRowWidth, columnWidth, sourceName);
+			notScrolledViews[i] = new NotScrolledView(getContext());
+			notScrolledViews[i].setImg(logoId);
+			notScrolledViews[i].setText(sourceName);
 
-			view.addView(nonScrolledViews[i], nonScrollRowLayoutParams);
+			//view.addView(nonScrolledViews[i], nonScrollRowLayoutParams);
+			view.addView(notScrolledViews[i], nonScrollRowLayoutParams);
 			view.addView(weatherIconRows.get(i), specificRowLayoutParams);
 			view.addView(probabilityOfPrecipitationRows.get(i), iconTextRowLayoutParams);
 			if (weatherSourceTypeList.get(i) != WeatherSourceType.KMA) {

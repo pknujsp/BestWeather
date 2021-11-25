@@ -29,7 +29,9 @@ import android.widget.Toast;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Gps;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
+import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentIntroBinding;
 import com.lifedawn.bestweather.databinding.FragmentIntroTransactionBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
@@ -68,26 +70,6 @@ public class IntroFragment extends Fragment {
 				gps.runGps(requireActivity(), locationCallback);
 			}
 		});
-		getParentFragmentManager().setFragmentResultListener(getString(R.string.key_back_from_find_address_to_intro), this,
-				new FragmentResultListener() {
-					@Override
-					public void onFragmentResult(@NonNull @NotNull String requestKey, @NonNull @NotNull Bundle result) {
-						final boolean isSelectedNewAddress = result.getBoolean(getString(R.string.bundle_key_selected_address_dto));
-
-						if (isSelectedNewAddress) {
-							final int newFavoriteAddressDtoId = result.getInt(getString(R.string.bundle_key_new_favorite_address_dto_id));
-							sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
-									newFavoriteAddressDtoId).putString(getString(R.string.pref_key_last_selected_location_type),
-									LocationType.SelectedAddress.name()).putBoolean(getString(R.string.pref_key_show_intro), false).apply();
-
-							MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-							getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, mainTransactionFragment,
-									mainTransactionFragment.getTag()).commit();
-						} else {
-
-						}
-					}
-				});
 	}
 
 	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(
@@ -164,8 +146,29 @@ public class IntroFragment extends Fragment {
 		@Override
 		public void onFailed(Fail fail) {
 			FindAddressFragment findAddressFragment = new FindAddressFragment();
-			getParentFragmentManager().clearFragmentResult(getString(R.string.key_from_intro_to_find_address));
-			getParentFragmentManager().setFragmentResult(getString(R.string.key_from_intro_to_find_address), new Bundle());
+			Bundle bundle = new Bundle();
+			bundle.putString(BundleKey.RequestFragment.name(), IntroFragment.class.getName());
+			findAddressFragment.setArguments(bundle);
+
+			findAddressFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+				@Override
+				public void onResultFragment(Bundle result) {
+					final boolean isSelectedNewAddress = result.getBoolean(BundleKey.SelectedAddressDto.name());
+
+					if (isSelectedNewAddress) {
+						final int newFavoriteAddressDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name());
+						sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
+								newFavoriteAddressDtoId).putString(getString(R.string.pref_key_last_selected_location_type),
+								LocationType.SelectedAddress.name()).putBoolean(getString(R.string.pref_key_show_intro), false).apply();
+
+						MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
+						getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, mainTransactionFragment,
+								mainTransactionFragment.getTag()).commit();
+					} else {
+
+					}
+				}
+			});
 
 			getParentFragmentManager().beginTransaction().hide(IntroFragment.this).add(R.id.fragment_container, findAddressFragment,
 					getString(R.string.tag_find_address_fragment)).addToBackStack(getString(R.string.tag_find_address_fragment)).commit();

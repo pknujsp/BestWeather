@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
@@ -70,8 +71,8 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 				detailDailyForecastFragment.setDailyForecastsList(fiveDaysOfDailyForecastsResponse.getDailyForecasts());
 
 				Bundle bundle = new Bundle();
-				bundle.putString(getString(R.string.bundle_key_address_name), addressName);
-				bundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
+				bundle.putString(BundleKey.AddressName.name(), addressName);
+				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 				detailDailyForecastFragment.setArguments(bundle);
 
 				String tag = getString(R.string.tag_detail_daily_forecast_fragment);

@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ForecastViewType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
@@ -71,10 +72,10 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 				ForecastViewType.List.name()));
 
 		Bundle bundle = getArguments();
-		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
-		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
-		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
-		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
+		addressName = bundle.getString(BundleKey.AddressName.name());
+		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
+		latitude = bundle.getDouble(BundleKey.Latitude.name());
+		longitude = bundle.getDouble(BundleKey.Longitude.name());
 	}
 
 	@Nullable

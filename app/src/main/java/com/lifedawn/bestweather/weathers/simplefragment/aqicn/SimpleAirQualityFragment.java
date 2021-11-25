@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
@@ -53,12 +54,12 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Bundle bundle = getArguments();
-		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
-		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
-		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
-		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
-		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(getString(R.string.bundle_key_main_weather_data_source));
-		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		latitude = bundle.getDouble(BundleKey.Latitude.name());
+		longitude = bundle.getDouble(BundleKey.Longitude.name());
+		addressName = bundle.getString(BundleKey.AddressName.name());
+		countryCode = bundle.getString(BundleKey.CountryCode.name());
+		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(BundleKey.WeatherDataSource.name());
+		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
@@ -84,9 +85,9 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 				detailAirQualityFragment.setResponse(geolocalizedFeedResponse);
 
 				Bundle bundle = new Bundle();
-				bundle.putSerializable(getString(R.string.bundle_key_timezone), zoneId);
-				bundle.putDouble(getString(R.string.bundle_key_latitude), latitude);
-				bundle.putDouble(getString(R.string.bundle_key_longitude), longitude);
+				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
+				bundle.putDouble(BundleKey.Latitude.name(), latitude);
+				bundle.putDouble(BundleKey.Longitude.name(), longitude);
 				detailAirQualityFragment.setArguments(bundle);
 
 				String tag = getString(R.string.tag_detail_air_quality_fragment);

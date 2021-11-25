@@ -22,6 +22,7 @@ import androidx.preference.PreferenceManager;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.FragmentAirQualityDetailBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
@@ -62,9 +63,9 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		super.onCreate(savedInstanceState);
 
 		Bundle bundle = getArguments();
-		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
-		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
-		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
+		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
+		latitude = bundle.getDouble(BundleKey.Latitude.name());
+		longitude = bundle.getDouble(BundleKey.Longitude.name());
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));

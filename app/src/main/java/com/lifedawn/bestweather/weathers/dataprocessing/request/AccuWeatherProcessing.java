@@ -185,6 +185,8 @@ public class AccuWeatherProcessing {
 			Call<JsonElement> geoPositionCall = getGeoPositionSearch(context, geoPositionSearchParameter, new JsonDownloader() {
 				@Override
 				public void onResponseResult(Response<?> response) {
+					multipleJsonDownloader.processResult(WeatherSourceType.ACCU_WEATHER, geoPositionSearchParameter,
+							RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH, response);
 					GeoPositionResponse geoPositionResponse = AccuWeatherResponseProcessor.getGeoPositionObjFromJson(
 							response.body().toString());
 					requestWeatherDataIfHasLocationKey(requestAccu, geoPositionResponse.getKey(), multipleJsonDownloader);

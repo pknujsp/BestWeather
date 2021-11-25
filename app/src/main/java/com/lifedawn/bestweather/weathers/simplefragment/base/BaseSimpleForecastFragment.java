@@ -21,6 +21,7 @@ import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleForecastBinding;
@@ -49,33 +50,33 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	protected ZoneId zoneId;
 	protected NetworkStatus networkStatus;
 	protected boolean needCompare;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		
+
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
 		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
-		
-		
+
+
 		Bundle bundle = getArguments();
-		latitude = bundle.getDouble(getString(R.string.bundle_key_latitude));
-		longitude = bundle.getDouble(getString(R.string.bundle_key_longitude));
-		addressName = bundle.getString(getString(R.string.bundle_key_address_name));
-		countryCode = bundle.getString(getString(R.string.bundle_key_country_code));
-		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(getString(R.string.bundle_key_main_weather_data_source));
-		zoneId = (ZoneId) bundle.getSerializable(getString(R.string.bundle_key_timezone));
+		latitude = bundle.getDouble(BundleKey.Latitude.name());
+		longitude = bundle.getDouble(BundleKey.Longitude.name());
+		addressName = bundle.getString(BundleKey.AddressName.name());
+		countryCode = bundle.getString(BundleKey.CountryCode.name());
+		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(BundleKey.WeatherDataSource.name());
+		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = BaseLayoutSimpleForecastBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -89,13 +90,13 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 							@Override
 							public void run() {
 								binding.weatherCardViewHeader.compareForecast.setClickable(true);
-								
+
 							}
 						});
 					}
 				}
 			}
-			
+
 			@Override
 			public void onLost(Network network) {
 				super.onLost(network);
@@ -105,7 +106,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 							@Override
 							public void run() {
 								binding.weatherCardViewHeader.compareForecast.setClickable(false);
-								
+
 							}
 						});
 					}
@@ -120,14 +121,14 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 				}
 			}
 		});
-		
+
 	}
-	
+
 	@Override
 	public void setValuesToViews() {
-	
+
 	}
-	
+
 	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewHeight) {
 		ImageView labelView = new ImageView(getContext());
 		labelView.setImageDrawable(ContextCompat.getDrawable(getContext(), labelImgId));
@@ -140,12 +141,12 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 				Toast.makeText(getContext(), labelDescription, Toast.LENGTH_SHORT).show();
 			}
 		});
-		
+
 		int width = (int) getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, viewHeight);
 		layoutParams.gravity = Gravity.CENTER;
 		labelView.setLayoutParams(layoutParams);
-		
+
 		binding.labels.addView(labelView);
 		return labelView;
 	}
