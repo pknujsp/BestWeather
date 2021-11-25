@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
@@ -60,9 +61,10 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				comparisonFragment.setArguments(getArguments());
 
 				String tag = getString(R.string.tag_comparison_fragment);
-				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
+				FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
+
 				fragmentManager.beginTransaction().hide(
-						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
+						fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
 						comparisonFragment, tag).addToBackStack(tag).commit();
 			}
 		});
@@ -80,9 +82,10 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				detailDailyForecastFragment.setArguments(bundle);
 
 				String tag = getString(R.string.tag_detail_daily_forecast_fragment);
-				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
+				FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
+
 				fragmentManager.beginTransaction().hide(
-						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
+						fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
 						detailDailyForecastFragment, tag).addToBackStack(tag).commit();
 			}
 		});

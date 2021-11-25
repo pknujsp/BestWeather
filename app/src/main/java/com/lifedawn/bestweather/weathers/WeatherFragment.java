@@ -1,16 +1,29 @@
 package com.lifedawn.bestweather.weathers;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
@@ -18,13 +31,24 @@ import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
+import com.lifedawn.bestweather.commons.classes.Gps;
+import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqicn;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
@@ -38,10 +62,16 @@ import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
+import com.lifedawn.bestweather.findaddress.FindAddressFragment;
+import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
+import com.lifedawn.bestweather.main.MainActivity;
+import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.parameters.flickr.FlickrGetPhotosFromGalleryParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
@@ -51,6 +81,7 @@ import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
@@ -71,31 +102,47 @@ import com.lifedawn.bestweather.weathers.simplefragment.openweathermap.dailyfore
 import com.lifedawn.bestweather.weathers.simplefragment.openweathermap.hourlyforecast.OwmSimpleHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.SunsetriseFragment;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
+import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class WeatherFragment extends Fragment {
+public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadImgOfCurrentConditions, IGps {
+	private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
+	private static final Map<String, WeatherResponseObj> FINAL_RESPONSE_MAP = new HashMap<>();
+	private static final Map<String, Drawable> backgroundImgMap = new HashMap<>();
+
 	private FragmentWeatherBinding binding;
 	private FavoriteAddressDto selectedFavoriteAddressDto;
 	private LocationType locationType;
-	private WeatherViewModel.ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions;
 	private WeatherViewModel weatherViewModel;
 	private OnResultFragmentListener onResultFragmentListener;
+	private View.OnClickListener menuOnClickListener;
+	private Gps gps;
+	private NetworkStatus networkStatus;
+	private Gps.LocationCallback locationCallbackInMainFragment;
+
 
 	private WeatherSourceType mainWeatherSourceType;
 	private Double latitude;
@@ -103,14 +150,11 @@ public class WeatherFragment extends Fragment {
 	private String countryCode;
 	private String addressName;
 	private SharedPreferences sharedPreferences;
-	private IGps iGps;
-
 
 	private MultipleJsonDownloader multipleJsonDownloader;
-	private static ExecutorService executors = Executors.newSingleThreadExecutor();
-	public static final Map<String, WeatherResponseObj> finalResponseMap = new HashMap<>();
+	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
 
-	static class WeatherResponseObj {
+	static class WeatherResponseObj implements Serializable {
 		final MultipleJsonDownloader multipleJsonDownloader;
 		final WeatherSourceType requestWeatherSourceType;
 
@@ -120,21 +164,51 @@ public class WeatherFragment extends Fragment {
 		}
 	}
 
+	public WeatherFragment setMenuOnClickListener(View.OnClickListener menuOnClickListener) {
+		this.menuOnClickListener = menuOnClickListener;
+		return this;
+	}
+
+	public WeatherFragment setiRefreshFavoriteLocationListOnSideNav(IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav) {
+		this.iRefreshFavoriteLocationListOnSideNav = iRefreshFavoriteLocationListOnSideNav;
+		return this;
+	}
+
 	public WeatherFragment setOnResultFragmentListener(OnResultFragmentListener onResultFragmentListener) {
 		this.onResultFragmentListener = onResultFragmentListener;
 		return this;
 	}
 
+	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+		@Override
+		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
+		                              @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+			super.onFragmentCreated(fm, f, savedInstanceState);
+		}
+
+	};
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		Bundle bundle = getArguments();
+		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
+		networkStatus = new NetworkStatus(getContext(), new ConnectivityManager.NetworkCallback());
+		gps = new Gps(requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
-		iLoadImgOfCurrentConditions = weatherViewModel.getiLoadImgOfCurrentConditions();
-		locationType = LocationType.valueOf(bundle.getString(BundleKey.LocationType.name()));
+		weatherViewModel.setiLoadImgOfCurrentConditions(this);
+		locationCallbackInMainFragment = weatherViewModel.getLocationCallback();
+	}
+
+	@Override
+	public void onHiddenChanged(boolean hidden) {
+		super.onHiddenChanged(hidden);
+		if (hidden) {
+			getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		} else {
+			getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		}
 	}
 
 	@Override
@@ -146,20 +220,88 @@ public class WeatherFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+		FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.mainLayout.getLayoutParams();
+		layoutParams.topMargin = MainActivity.getHeightOfStatusBar(getContext());
+		binding.mainLayout.setLayoutParams(layoutParams);
+
 		MobileAds.initialize(getContext());
 		AdRequest adRequest = new AdRequest.Builder().build();
+
 		binding.adViewBelowAirQuality.loadAd(adRequest);
 		binding.adViewBottom.loadAd(adRequest);
 
 		binding.adViewBelowAirQuality.setVisibility(View.GONE);
 		binding.adViewBottom.setVisibility(View.GONE);
 
-		Bundle result = getArguments();
+		binding.mainToolbar.openNavigationDrawer.setOnClickListener(menuOnClickListener);
+		binding.mainToolbar.gps.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (networkStatus.networkAvailable()) {
+					gps.runGps(requireActivity(), locationCallback);
+				}
+			}
+		});
+
+		binding.mainToolbar.find.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (networkStatus.networkAvailable()) {
+					FindAddressFragment findAddressFragment = new FindAddressFragment();
+					Bundle bundle = new Bundle();
+					bundle.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
+					findAddressFragment.setArguments(bundle);
+
+					findAddressFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+						@Override
+						public void onResultFragment(Bundle result) {
+							final boolean isSelectedNewAddress = result.getBoolean(BundleKey.SelectedAddressDto.name());
+
+							if (isSelectedNewAddress) {
+								final int newFavoriteAddressDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name());
+								sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
+										newFavoriteAddressDtoId).apply();
+								iRefreshFavoriteLocationListOnSideNav.refreshFavoriteLocationsList(result.getString(BundleKey.LastFragment.name()), result);
+							}
+						}
+					});
+
+					getParentFragmentManager().beginTransaction().hide(WeatherFragment.this).add(R.id.fragment_container,
+							findAddressFragment, getString(R.string.tag_find_address_fragment)).addToBackStack(
+							getString(R.string.tag_find_address_fragment)).commit();
+				}
+			}
+		});
+
+		binding.mainToolbar.refresh.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (networkStatus.networkAvailable()) {
+					requestNewData();
+				}
+			}
+		});
+	}
+
+	public void load(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
+		Glide.with(this).clear(binding.currentConditionsImg);
+
+		binding.mainToolbar.gps.setVisibility(locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
+		binding.mainToolbar.find.setVisibility(locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
+
+		Bundle bundle = new Bundle();
+		bundle.putSerializable(BundleKey.SelectedAddressDto.name(), favoriteAddressDto);
+		bundle.putSerializable(BundleKey.IGps.name(), (IGps) this);
+		bundle.putString(BundleKey.LocationType.name(), locationType.name());
+		bundle.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
+
+		locationType = LocationType.valueOf(bundle.getString(BundleKey.LocationType.name()));
 
 		if (locationType == LocationType.CurrentLocation) {
 			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
 					getString(R.string.pref_key_last_selected_location_type), locationType.name()).apply();
-			iGps = (IGps) result.getSerializable(BundleKey.IGps.name());
 
 			latitude = Double.parseDouble(
 					sharedPreferences.getString(getString(R.string.pref_key_last_current_location_latitude), "0.0"));
@@ -168,16 +310,15 @@ public class WeatherFragment extends Fragment {
 
 			if (latitude == 0.0 && longitude == 0.0) {
 				//최근에 현재위치로 잡힌 위치가 없으므로 현재 위치 요청
-				iGps.requestCurrentLocation();
+				requestCurrentLocation();
 			} else {
 				//위/경도에 해당하는 지역명을 불러오고, 날씨 데이터 다운로드
 				//이미 존재하는 날씨 데이터면 다운로드X
 				requestAddressOfLocation(latitude, longitude, !containWeatherData(latitude, longitude));
 			}
 		} else {
-			selectedFavoriteAddressDto = (FavoriteAddressDto) result.getSerializable(
+			selectedFavoriteAddressDto = (FavoriteAddressDto) bundle.getSerializable(
 					BundleKey.SelectedAddressDto.name());
-			iGps = (IGps) result.getSerializable(BundleKey.IGps.name());
 
 			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
 					selectedFavoriteAddressDto.getId()).putString(getString(R.string.pref_key_last_selected_location_type),
@@ -193,18 +334,12 @@ public class WeatherFragment extends Fragment {
 
 			if (containWeatherData(latitude, longitude)) {
 				//기존 데이터 표시
-				mainWeatherSourceType = finalResponseMap.get(latitude.toString() + longitude.toString()).requestWeatherSourceType;
+				mainWeatherSourceType = FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).requestWeatherSourceType;
 				reDraw();
 			} else {
 				requestNewData();
 			}
 		}
-
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
 	}
 
 	@Override
@@ -212,11 +347,219 @@ public class WeatherFragment extends Fragment {
 		if (multipleJsonDownloader != null) {
 			multipleJsonDownloader.cancel();
 		}
+		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		super.onDestroy();
 	}
 
+
+	@Override
+	public void loadImgOfCurrentConditions(WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude,
+	                                       ZoneId zoneId) {
+		Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
+
+		SunriseSunsetCalculator sunRiseSunsetCalculator = new SunriseSunsetCalculator(
+				new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), currentCalendar.getTimeZone());
+		Calendar sunRiseCalendar = sunRiseSunsetCalculator.getOfficialSunriseCalendarForDate(currentCalendar);
+		Calendar sunSetCalendar = sunRiseSunsetCalculator.getOfficialSunsetCalendarForDate(currentCalendar);
+
+		if (sunRiseCalendar == null || sunSetCalendar == null) {
+			return;
+		}
+
+		final long currentTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(currentCalendar.getTimeInMillis());
+		final long sunRiseTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunRiseCalendar.getTimeInMillis());
+		final long sunSetTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunSetCalendar.getTimeInMillis());
+
+		String time = null;
+		//현재 시각 파악 : 낮, 밤, 일출, 일몰(+-20분)
+		if (currentTimeMinutes < sunRiseTimeMinutes - 2) {
+			//새벽
+			time = "night";
+		} else if (currentTimeMinutes <= sunRiseTimeMinutes + 20) {
+			//일출
+			time = "sunrise";
+		} else if (currentTimeMinutes > sunRiseTimeMinutes + 20 && currentTimeMinutes <= sunSetTimeMinutes - 20) {
+			//낮
+			time = "day";
+		} else if (currentTimeMinutes < sunSetTimeMinutes + 2) {
+			//일몰
+			time = "sunset";
+		} else {
+			//밤
+			time = "night";
+		}
+
+		String weather = null;
+		switch (weatherSourceType) {
+			case KMA:
+				String code = val.substring(0, 1);
+				weather = val.contains("_sky") ? KmaResponseProcessor.getSkyFlickrGalleryName(
+						code) : KmaResponseProcessor.getPtyFlickrGalleryName(code);
+				break;
+			case ACCU_WEATHER:
+				weather = AccuWeatherResponseProcessor.getFlickrGalleryName(val);
+				break;
+			case OPEN_WEATHER_MAP:
+				weather = OpenWeatherMapResponseProcessor.getFlickrGalleryName(val);
+				break;
+		}
+
+		final String galleryName = time + " " + weather;
+		// time : sunrise, sunset, day, night
+		// weather : clear, partly cloudy, mostly cloudy, overcast, rain, snow
+
+		//이미 다운로드 된 이미지가 있으면 다운로드 하지 않음
+		if (backgroundImgMap.containsKey(galleryName)) {
+			Glide.with(WeatherFragment.this).load(backgroundImgMap.get(galleryName)).transition(
+					DrawableTransitionOptions.withCrossFade(500)).into(binding.currentConditionsImg);
+		} else {
+			FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
+			photosFromGalleryParameter.setGalleryId(FlickrUtil.getWeatherGalleryId(galleryName));
+
+			Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
+			Call<JsonElement> call = querys.getPhotosFromGallery(photosFromGalleryParameter.getMap());
+			call.enqueue(new Callback<JsonElement>() {
+				@Override
+				public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+					if (getActivity() == null) {
+						return;
+					}
+
+					Gson gson = new Gson();
+					PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
+							PhotosFromGalleryResponse.class);
+
+					if (photosFromGalleryResponse.getStat().equals("ok")) {
+						if (!photosFromGalleryResponse.getPhotos().getTotal().equals("0")) {
+							// https://live.staticflickr.com/65535/50081787401_355bcec912_b.jpg
+							// https://live.staticflickr.com/server/id_secret_size.jpg
+							int randomIdx = new Random().nextInt(Integer.parseInt(photosFromGalleryResponse.getPhotos().getTotal()));
+							PhotosFromGalleryResponse.Photos.Photo photo = photosFromGalleryResponse.getPhotos().getPhoto().get(randomIdx);
+							final String imgUrl = "https://live.staticflickr.com/" + photo.getServer() + "/" + photo.getId() + "_" + photo.getSecret() + "_b.jpg";
+
+							//Glide.with(WeatherMainFragment.this).load(url).into(binding.currentConditionsImg);
+							Target<Drawable> img = new CustomTarget<Drawable>() {
+								@Override
+								public void onResourceReady(@NonNull @NotNull Drawable resource,
+								                            @Nullable @org.jetbrains.annotations.Nullable Transition<? super Drawable> transition) {
+									if (getActivity() == null) {
+										return;
+									}
+									backgroundImgMap.put(galleryName, resource);
+									Glide.with(WeatherFragment.this).load(resource).transition(
+											DrawableTransitionOptions.withCrossFade(500)).into(binding.currentConditionsImg);
+								}
+
+								@Override
+								public void onLoadCleared(@Nullable @org.jetbrains.annotations.Nullable Drawable placeholder) {
+
+								}
+							};
+							Glide.with(WeatherFragment.this).load(imgUrl).into(img);
+						} else {
+
+						}
+					} else {
+
+					}
+				}
+
+				@Override
+				public void onFailure(Call<JsonElement> call, Throwable t) {
+
+				}
+			});
+		}
+	}
+
+	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(
+			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+				@Override
+				public void onActivityResult(ActivityResult result) {
+					//gps 사용확인 화면에서 나온뒤 현재 위치 다시 파악
+					LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+					boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+					if (isGpsEnabled) {
+						binding.mainToolbar.gps.callOnClick();
+					} else {
+						locationCallback.onFailed(Gps.LocationCallback.Fail.DISABLED_GPS);
+					}
+				}
+			});
+
+	private final ActivityResultLauncher<Intent> moveToAppDetailSettingsLauncher = registerForActivityResult(
+			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+				@Override
+				public void onActivityResult(ActivityResult result) {
+					if (ContextCompat.checkSelfPermission(getContext(),
+							Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+						sharedPreferences.edit().putBoolean(
+								getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false).apply();
+						binding.mainToolbar.gps.callOnClick();
+					} else {
+						locationCallback.onFailed(Gps.LocationCallback.Fail.REJECT_PERMISSION);
+					}
+
+				}
+			});
+
+	private final ActivityResultLauncher<String> requestLocationPermissionLauncher = registerForActivityResult(
+			new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+				@Override
+				public void onActivityResult(Boolean isGranted) {
+					//gps사용 권한
+					//허가남 : 현재 위치 다시 파악
+					//거부됨 : 작업 취소
+					//계속 거부 체크됨 : 작업 취소
+					if (isGranted) {
+						sharedPreferences.edit().putBoolean(
+								getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false).apply();
+						binding.mainToolbar.gps.callOnClick();
+					} else {
+						if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+							sharedPreferences.edit().putBoolean(
+									getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), true).apply();
+						}
+						locationCallback.onFailed(Gps.LocationCallback.Fail.REJECT_PERMISSION);
+					}
+				}
+			});
+
+	private final Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
+		@Override
+		public void onSuccessful(Location location) {
+			//현재 위치 파악 성공
+			//현재 위/경도 좌표를 최근 현재위치의 위/경도로 등록
+			//날씨 데이터 요청
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putString(getString(R.string.pref_key_last_current_location_latitude), String.valueOf(location.getLatitude())).putString(
+					getString(R.string.pref_key_last_current_location_longitude), String.valueOf(location.getLongitude())).apply();
+
+			onChangedCurrentLocation(location);
+			locationCallbackInMainFragment.onSuccessful(location);
+		}
+
+		@Override
+		public void onFailed(Fail fail) {
+			locationCallbackInMainFragment.onFailed(fail);
+
+			if (fail == Fail.DISABLED_GPS) {
+				Toast.makeText(getContext(), R.string.request_to_make_gps_on, Toast.LENGTH_SHORT).show();
+			} else if (fail == Fail.REJECT_PERMISSION) {
+				Toast.makeText(getContext(), R.string.message_needs_location_permission, Toast.LENGTH_SHORT).show();
+			}
+		}
+	};
+
+	@Override
+	public void requestCurrentLocation() {
+		binding.mainToolbar.gps.callOnClick();
+	}
+
+
 	private boolean containWeatherData(Double latitude, Double longitude) {
-		return finalResponseMap.containsKey(latitude.toString() + longitude.toString());
+		return FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString());
 	}
 
 
@@ -253,7 +596,7 @@ public class WeatherFragment extends Fragment {
 								requestNewData();
 							} else {
 								//이미 데이터가 있으면 다시 그림
-								mainWeatherSourceType = finalResponseMap.get(
+								mainWeatherSourceType = FINAL_RESPONSE_MAP.get(
 										latitude.toString() + longitude.toString()).requestWeatherSourceType;
 								reDraw();
 							}
@@ -288,14 +631,15 @@ public class WeatherFragment extends Fragment {
 
 
 	public void reDraw() {
-		setWeatherFragments(mainWeatherSourceType, finalResponseMap.get(latitude.toString() + longitude.toString()).multipleJsonDownloader,
+		//날씨 프래그먼트 다시 그림
+		setWeatherFragments(mainWeatherSourceType, FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleJsonDownloader,
 				latitude, longitude, null);
 	}
 
 	public void onChangedCurrentLocation(Location currentLocation) {
 		this.latitude = currentLocation.getLatitude();
 		this.longitude = currentLocation.getLongitude();
-		finalResponseMap.remove(latitude.toString() + longitude.toString());
+		FINAL_RESPONSE_MAP.remove(latitude.toString() + longitude.toString());
 		requestAddressOfLocation(latitude, longitude, true);
 	}
 
@@ -328,7 +672,7 @@ public class WeatherFragment extends Fragment {
 		};
 		multipleJsonDownloader.setLoadingDialog(loadingDialog);
 
-		executors.execute(new Runnable() {
+		EXECUTOR_SERVICE.execute(new Runnable() {
 			@Override
 			public void run() {
 				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleJsonDownloader);
@@ -361,7 +705,7 @@ public class WeatherFragment extends Fragment {
 			}
 		};
 		multipleJsonDownloader.setLoadingDialog(loadingDialog);
-		executors.execute(new Runnable() {
+		EXECUTOR_SERVICE.execute(new Runnable() {
 			@Override
 			public void run() {
 				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleJsonDownloader);
@@ -448,7 +792,7 @@ public class WeatherFragment extends Fragment {
 		WeatherResponseObj weatherResponseObj = new WeatherResponseObj(jsonResultObj.multipleJsonDownloader,
 				jsonResultObj.requestWeatherSource);
 
-		finalResponseMap.put(latitude.toString() + longitude.toString(), weatherResponseObj);
+		FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
 		setWeatherFragments(jsonResultObj.requestWeatherSource, jsonResultObj.multipleJsonDownloader, latitude, longitude,
 				jsonResultObj.multipleJsonDownloader.getLoadingDialog());
 	}
@@ -540,7 +884,7 @@ public class WeatherFragment extends Fragment {
 			}
 		}
 
-		executors.execute(new Runnable() {
+		EXECUTOR_SERVICE.execute(new Runnable() {
 			@Override
 			public void run() {
 				MainProcessing.reRequestWeatherDataBySameWeatherSourceIfFailed(getContext(), latitude, longitude, newRequestWeatherSources,
@@ -558,7 +902,7 @@ public class WeatherFragment extends Fragment {
 		setRequestWeatherSourceWithSourceType(jsonResultObj.requestWeatherSource, newRequestWeatherSources);
 		jsonResultObj.requestWeatherSources = newRequestWeatherSources;
 
-		executors.execute(new Runnable() {
+		EXECUTOR_SERVICE.execute(new Runnable() {
 			@Override
 			public void run() {
 				MainProcessing.reRequestWeatherDataByAnotherWeatherSourceIfFailed(getContext(), latitude, longitude, lastWeatherSourceType,
@@ -711,7 +1055,7 @@ public class WeatherFragment extends Fragment {
 				break;
 		}
 		mainWeatherSourceType = requestWeatherSourceType;
-		iLoadImgOfCurrentConditions.loadImgOfCurrentConditions(mainWeatherSourceType, currentConditionsWeatherVal, latitude, longitude,
+		loadImgOfCurrentConditions(mainWeatherSourceType, currentConditionsWeatherVal, latitude, longitude,
 				zoneId);
 
 		if (getActivity() != null) {
@@ -740,7 +1084,7 @@ public class WeatherFragment extends Fragment {
 			finalSimpleCurrentConditionsFragment.setArguments(defaultBundle);
 			finalDetailCurrentConditionsFragment.setArguments(defaultBundle);
 
-			ValueUnits clockUnit = ValueUnits.enumOf(
+			ValueUnits clockUnit = ValueUnits.valueOf(
 					sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
 			getActivity().runOnUiThread(new Runnable() {
 				@Override

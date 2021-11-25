@@ -130,7 +130,6 @@
     <!-- fragment tag -->
     <string name="tag_favorites_fragment">tag_favorites_fragment</string>
     <string name="tag_settings_main_fragment">tag_settings_main_fragment</string>
-    <string name="tag_weather_main_fragment">tag_weather_main_fragment</string>
     <string name="tag_units_fragment">tag_units_fragment</string>
     <string name="tag_weather_data_sources_fragment">tag_weather_data_sources_fragment</string>
     <string name="tag_find_address_fragment">tag_find_address_fragment</string>
@@ -140,7 +139,6 @@
     <string name="tag_detail_current_conditions_fragment">tag_detail_current_conditions_fragment</string>
     <string name="tag_simple_air_quality_fragment">tag_simple_air_quality_fragment</string>
     <string name="tag_sun_set_rise_fragment">tag_sun_set_rise_fragment</string>
-    <string name="tag_weather_fragment">tag_weather_fragment</string>
     <string name="tag_detail_hourly_forecast_fragment">tag_detail_hourly_forecast_fragment</string>
     <string name="tag_comparison_fragment">tag_comparison_fragment</string>
     <string name="tag_detail_air_quality_fragment">tag_detail_air_quality_fragment</string>

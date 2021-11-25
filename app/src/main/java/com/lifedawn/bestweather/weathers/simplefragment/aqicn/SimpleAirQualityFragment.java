@@ -24,6 +24,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.theme.AppTheme;
+import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.detailfragment.aqicn.DetailAirQualityFragment;
@@ -91,9 +92,10 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 				detailAirQualityFragment.setArguments(bundle);
 
 				String tag = getString(R.string.tag_detail_air_quality_fragment);
-				FragmentManager fragmentManager = getParentFragment().getParentFragment().getParentFragmentManager();
+				FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
+
 				fragmentManager.beginTransaction().hide(
-						fragmentManager.findFragmentByTag(getString(R.string.tag_weather_main_fragment))).add(R.id.fragment_container,
+						fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
 						detailAirQualityFragment, tag).addToBackStack(tag).commit();
 			}
 		});
