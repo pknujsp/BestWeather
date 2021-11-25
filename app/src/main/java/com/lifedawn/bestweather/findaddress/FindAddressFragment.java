@@ -158,7 +158,6 @@ public class FindAddressFragment extends Fragment {
 					@Override
 					public void run() {
 						binding.progressResultView.onStarted();
-
 					}
 				});
 

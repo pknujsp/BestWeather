@@ -16,10 +16,14 @@ public class Geocoding {
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
+				if (query.isEmpty()) {
+					callback.onReverseGeocodingResult(new ArrayList<>());
+					return;
+				}
 				Geocoder geocoder = new Geocoder(context);
 
 				try {
-					List<Address> addressList = geocoder.getFromLocationName(query, 20);
+					List<Address> addressList = geocoder.getFromLocationName(query, 5);
 					List<Integer> errors = new ArrayList<>();
 					for (int i = addressList.size() - 1; i >= 0; i--) {
 						if (addressList.get(i).getCountryName() == null || addressList.get(i).getCountryCode() == null) {
