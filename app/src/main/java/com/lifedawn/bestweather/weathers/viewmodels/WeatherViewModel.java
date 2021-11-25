@@ -16,6 +16,7 @@ import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -97,7 +98,7 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 		currentLocationLiveData.setValue(addressName);
 	}
 
-	public interface ILoadImgOfCurrentConditions {
+	public interface ILoadImgOfCurrentConditions extends Serializable {
 		void loadImgOfCurrentConditions(WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude, ZoneId zoneId);
 	}
 

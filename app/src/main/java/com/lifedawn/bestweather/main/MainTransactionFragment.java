@@ -313,7 +313,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 				binding.drawerLayout.openDrawer(binding.sideNavigation);
 			}
 		});
-		weatherMainFragment.setiRefreshFavoriteLocationListOnSideNav(this);
+		weatherMainFragment.setiRefreshFavoriteLocationListOnSideNav((IRefreshFavoriteLocationListOnSideNav) this);
 
 		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), weatherMainFragment,
 				getString(R.string.tag_weather_main_fragment)).commit();

@@ -49,6 +49,7 @@ import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherMainBinding;
+import com.lifedawn.bestweather.databinding.FragmentWeatherMainBindingImpl;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MainActivity;
@@ -81,7 +82,6 @@ import retrofit2.Response;
 
 public class WeatherMainFragment extends Fragment implements WeatherViewModel.ILoadImgOfCurrentConditions, IGps {
 	private static final Map<String, Drawable> backgroundImgMap = new HashMap<>();
-
 	private FragmentWeatherMainBinding binding;
 	private View.OnClickListener menuOnClickListener;
 	private WeatherViewModel weatherViewModel;
@@ -98,14 +98,12 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		this.menuOnClickListener = menuOnClickListener;
 	}
 
-	public WeatherMainFragment setiRefreshFavoriteLocationListOnSideNav(IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav) {
+	public void setiRefreshFavoriteLocationListOnSideNav(IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav) {
 		this.iRefreshFavoriteLocationListOnSideNav = iRefreshFavoriteLocationListOnSideNav;
-		return this;
 	}
 
-	public WeatherMainFragment setOnResultFragmentListener(OnResultFragmentListener onResultFragmentListener) {
+	public void setOnResultFragmentListener(OnResultFragmentListener onResultFragmentListener) {
 		this.onResultFragmentListener = onResultFragmentListener;
-		return this;
 	}
 
 	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
@@ -149,10 +147,6 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 	}
 
-	@Override
-	public void onSaveInstanceState(@NonNull @NotNull Bundle outState) {
-		super.onSaveInstanceState(outState);
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -214,8 +208,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 								final int newFavoriteAddressDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name());
 								sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
 										newFavoriteAddressDtoId).apply();
-								iRefreshFavoriteLocationListOnSideNav.refreshFavoriteLocationsList(result.getString(BundleKey.LastFragment.name()),
-										result);
+								iRefreshFavoriteLocationListOnSideNav.refreshFavoriteLocationsList(result.getString(BundleKey.LastFragment.name()), result);
 							}
 						}
 					});
@@ -252,9 +245,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 
 		Bundle bundle = new Bundle();
 		bundle.putSerializable(BundleKey.SelectedAddressDto.name(), favoriteAddressDto);
-		IGps iGps = (IGps) this;
-		bundle.putSerializable(BundleKey.IGps.name(), iGps);
-
+		bundle.putSerializable(BundleKey.IGps.name(), (IGps) this);
 		bundle.putString(BundleKey.LocationType.name(), locationType.name());
 		bundle.putString(BundleKey.RequestFragment.name(), WeatherMainFragment.class.getName());
 
