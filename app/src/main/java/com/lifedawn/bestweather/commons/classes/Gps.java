@@ -235,7 +235,7 @@ public class Gps {
 			public void onClick(DialogInterface dialogInterface, int i) {
 				callback.onFailed(LocationCallback.Fail.DISABLED_GPS);
 			}
-		}).setCancelable(false).show();
+		}).setCancelable(false).create().show();
 	}
 
 	private void closeDialog() {
@@ -253,10 +253,7 @@ public class Gps {
 		closeDialog();
 	}
 
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-	}
-
-	public interface LocationCallback extends Serializable {
+	public interface LocationCallback {
 		enum Fail {
 			DISABLED_GPS, REJECT_PERMISSION
 		}

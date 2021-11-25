@@ -49,7 +49,6 @@ import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherMainBinding;
-import com.lifedawn.bestweather.databinding.FragmentWeatherMainBindingImpl;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MainActivity;
@@ -67,7 +66,6 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -117,6 +115,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 					loadingDialog = null;
 				}
 			}
+
 		}
 
 		@Override
@@ -390,6 +389,7 @@ public class WeatherMainFragment extends Fragment implements WeatherViewModel.IL
 					//gps 사용확인 화면에서 나온뒤 현재 위치 다시 파악
 					LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
 					boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
 					if (isGpsEnabled) {
 						binding.mainToolbar.gps.callOnClick();
 					} else {
