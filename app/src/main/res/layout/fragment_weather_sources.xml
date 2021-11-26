@@ -90,7 +90,7 @@
                     android:layout_below="@id/open_weather_map_name"
                     android:layout_alignLeft="@id/open_weather_map_name"
                     android:text="@string/pref_summary_open_weather_map"
-                    android:textSize="15sp" />
+                    android:textSize="14sp" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/open_weather_map"

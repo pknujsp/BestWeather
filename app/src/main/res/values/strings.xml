@@ -475,6 +475,11 @@
     <string name="kma_less_than_1mm">1.0mm 미만</string>
     <string name="kma_no_snow">적설없음</string>
     <string name="empty_search_query">검색어를 입력해주세요</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="notification">알림</string>
+    <string name="always_notification">항상 표시되는 알림</string>
+    <string name="daily_notification">당일 알림</string>
 
 
 </resources>

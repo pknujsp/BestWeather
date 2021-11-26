@@ -109,6 +109,18 @@
                 android:resource="@xml/widget_current_hourly_daily_info" />
         </receiver>
 
+        <receiver
+            android:name=".notification.NotificationReceiver"
+            android:enabled="true">
+
+            <intent-filter android:priority="1">
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+        </receiver>
+
+        <service android:name=".notification.always.AlwaysNotiService"/>
+        <service android:name=".notification.daily.DailyNotiService"/>
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

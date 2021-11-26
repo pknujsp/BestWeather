@@ -34,6 +34,7 @@ import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentMainBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
+import com.lifedawn.bestweather.notification.NotificationSettingsFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.settings.fragments.SettingsMainFragment;
@@ -189,9 +190,11 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
 		binding.sideNavMenu.favorites.setOnClickListener(sideNavOnClickListener);
 		binding.sideNavMenu.settings.setOnClickListener(sideNavOnClickListener);
-		binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+		binding.sideNavMenu.notificationSettings.setOnClickListener(sideNavOnClickListener);
 
 		int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
 		binding.sideNavMenu.currentLocationLayout.setPadding(padding, MainActivity.getHeightOfStatusBar(getContext()) + padding, padding,
@@ -467,6 +470,15 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 							binding.fragmentContainer.getId(), settingsMainFragment,
 							getString(R.string.tag_settings_main_fragment)).addToBackStack(
 							getString(R.string.tag_settings_main_fragment)).commit();
+					break;
+				case R.id.notificationSettings:
+					NotificationSettingsFragment notificationSettingsFragment = new NotificationSettingsFragment();
+					String tag = NotificationSettingsFragment.class.getName();
+
+					getChildFragmentManager().beginTransaction().hide(
+							getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName())).add(
+							binding.fragmentContainer.getId(), notificationSettingsFragment,
+							tag).addToBackStack(tag).commit();
 					break;
 			}
 			binding.drawerLayout.closeDrawer(binding.sideNavigation, false);
