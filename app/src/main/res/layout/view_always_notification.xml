@@ -125,17 +125,17 @@
 
         </RelativeLayout>
 
-        <androidx.gridlayout.widget.GridLayout
+        <GridLayout
             android:id="@+id/hourlyForecastLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            app:alignmentMode="alignBounds"
-            app:columnCount="6"
-            app:orientation="horizontal"
-            app:rowCount="1"
-            app:rowOrderPreserved="false"
-            app:useDefaultMargins="false" />
+            android:alignmentMode="alignBounds"
+            android:columnCount="6"
+            android:orientation="horizontal"
+            android:rowCount="1"
+            android:rowOrderPreserved="false"
+            android:useDefaultMargins="false" />
     </LinearLayout>
 
 </FrameLayout>

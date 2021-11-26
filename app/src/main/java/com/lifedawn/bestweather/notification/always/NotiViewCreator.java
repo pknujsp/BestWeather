@@ -1,42 +1,82 @@
 package com.lifedawn.bestweather.notification.always;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.gridlayout.widget.GridLayout;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.LocationType;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.notification.NotificationKey;
+import com.lifedawn.bestweather.notification.NotificationType;
+
+import java.time.format.DateTimeFormatter;
 
 public class NotiViewCreator {
+	private static final String ALWAYS_NOTI_SHARED_PREFERENCES = "ALWAYS_NOTI_SHARED_PREFERENCES";
+	private static final String DAILY_NOTI_SHARED_PREFERENCES = "DAILY_NOTI_SHARED_PREFERENCES";
+	
+	private final NotificationType notificationType;
 	private LayoutInflater layoutInflater;
-
-	public final View addHourlyForecastItem(int labelDescriptionId, String value, @NonNull Integer labelIconId, Integer valueIconId) {
-		View gridItem = layoutInflater.inflate(R.layout.view_hourly_forecast_item_in_widget, null, false);
-
-		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
-		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
-		((TextView) gridItem.findViewById(R.id.value)).setText(value);
-		if (valueIconId == null) {
-			gridItem.findViewById(R.id.value_img).setVisibility(View.GONE);
+	private Context context;
+	
+	private LocationType locationType;
+	private WeatherSourceType weatherSourceType;
+	private boolean kmaTopPriority;
+	private long updateInterval;
+	private int selectedAddressDtoId;
+	
+	public NotiViewCreator(Context context, NotificationType notificationType) {
+		this.context = context;
+		this.layoutInflater = LayoutInflater.from(context);
+		this.notificationType = notificationType;
+		
+		loadPreferences();
+	}
+	
+	public void loadPreferences() {
+		SharedPreferences notiPreferences = null;
+		if (notificationType == NotificationType.Always) {
+			notiPreferences = context.getSharedPreferences(ALWAYS_NOTI_SHARED_PREFERENCES, Context.MODE_PRIVATE);
 		} else {
-			((ImageView) gridItem.findViewById(R.id.value_img)).setImageResource(valueIconId);
+			notiPreferences = context.getSharedPreferences(DAILY_NOTI_SHARED_PREFERENCES, Context.MODE_PRIVATE);
 		}
-
-		int cellCount = binding.conditionsGrid.getChildCount();
-		int row = cellCount / 4;
-		int column = cellCount % 4;
-
-		GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
-
-		layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
-		layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
-
-		binding.conditionsGrid.addView(gridItem, layoutParams);
-
-
-		return gridItem;
+		
+		locationType = LocationType.valueOf(
+				notiPreferences.getString(NotificationKey.NotiAttributes.LOCATION_TYPE.name(), LocationType.SelectedAddress.name()));
+		weatherSourceType = WeatherSourceType.valueOf(notiPreferences.getString(NotificationKey.NotiAttributes.WEATHER_SOURCE_TYPE.name(),
+				WeatherSourceType.OPEN_WEATHER_MAP.name()));
+		kmaTopPriority = notiPreferences.getBoolean(NotificationKey.NotiAttributes.TOP_PRIORITY_KMA.name(), false);
+		updateInterval = notiPreferences.getLong(NotificationKey.NotiAttributes.UPDATE_INTERVAL.name(), 0L);
+		selectedAddressDtoId = notiPreferences.getInt(NotificationKey.NotiAttributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
+	}
+	
+	public RemoteViews createRemoteViews() {
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_always_notification);
+		
+		//hourly forecast
+		for (int i = 0; i < 6; i++) {
+			remoteViews.addView(R.id.hourlyForecastLayout, addHourlyForecastItem(null, 0, null, i));
+		}
+		
+		return remoteViews;
+	}
+	
+	public RemoteViews addHourlyForecastItem(String hours, int iconId, String temp, int count) {
+		final RemoteViews itemRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_notification);
+		
+		itemRemoteViews.setImageViewResource(R.id.hourly_weather_icon, iconId);
+		itemRemoteViews.setTextViewText(R.id.hourly_temperature, temp);
+		itemRemoteViews.setTextViewText(R.id.hourly_clock, hours);
+		
+		return itemRemoteViews;
 	}
 }
