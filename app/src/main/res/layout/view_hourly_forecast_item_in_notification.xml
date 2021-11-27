@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root_layout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
     android:layout_gravity="center"
+    android:layout_weight="1"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="4dp">
+    android:padding="4dp"
+    android:weightSum="1.0">
 
     <TextView
         android:id="@+id/hourly_clock"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="3dp"
+        android:layout_weight="0.15"
+        android:autoSizeTextType="uniform"
         android:gravity="center"
         android:text="@string/clock"
-        android:textColor="@color/white"
-        android:textSize="@dimen/clockTextSizeInHourly" />
+        android:textAlignment="center"
+        android:textColor="@color/white" />
 
     <ImageView
         android:id="@+id/hourly_weather_icon"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginBottom="2dp"
+        android:layout_weight="0.7"
         android:adjustViewBounds="true"
         android:gravity="center"
         android:scaleType="fitCenter"
@@ -33,10 +37,12 @@
     <TextView
         android:id="@+id/hourly_temperature"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0.15"
+        android:autoSizeTextType="uniform"
         android:gravity="center"
         android:text="20º"
-        android:textColor="@color/white"
-        android:textSize="@dimen/tempTextSizeInHourly" />
+        android:textAlignment="center"
+        android:textColor="@color/white" />
 
 </LinearLayout>

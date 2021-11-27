@@ -3,18 +3,21 @@
     android:id="@+id/hourly_forecast_rows"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:weightSum="1.0">
 
     <LinearLayout
         android:id="@+id/hourly_forecast_row_1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
         android:orientation="horizontal" />
 
     <LinearLayout
         android:id="@+id/hourly_forecast_row_2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
         android:orientation="horizontal" />
 
 </LinearLayout>

@@ -12,6 +12,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.notification.NotificationKey;
+import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.widget.WidgetCreator;
 
 public class AlwaysNotiService extends Service {
@@ -26,10 +27,8 @@ public class AlwaysNotiService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		final String action = intent.getAction();
 		
-		NotiViewCreator notiViewCreator = new NotiViewCreator(getApplicationContext());
-		
-		
-		
+		NotiViewCreator notiViewCreator = new NotiViewCreator(getApplicationContext(), NotificationType.Always);
+
 		return START_STICKY;
 	}
 	

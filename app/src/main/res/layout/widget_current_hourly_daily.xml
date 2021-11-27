@@ -23,9 +23,17 @@
             android:id="@+id/watch_current"
             layout="@layout/layout_watch_and_current_in_widget" />
 
-        <include layout="@layout/simple_hourly_forecast_view_in_widget" />
+        <include
+            layout="@layout/simple_hourly_forecast_view_in_widget"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2" />
 
-        <include layout="@layout/simple_daily_forecast_view_in_widget" />
+        <include
+            layout="@layout/simple_daily_forecast_view_in_widget"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
     </LinearLayout>
 
     <ProgressBar
