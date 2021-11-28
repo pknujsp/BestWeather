@@ -98,8 +98,9 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 							.setHour(String.valueOf(finalHourlyForecast.getFcstDateTime().getHour()))
 							.setTemp(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit) + tempDegree)
 							.setRainVolume(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ? null :
-									finalHourlyForecast.getRainPrecipitation1Hour())
-							.setWeatherIconId(KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(), isNight));
+									finalHourlyForecast.getRainPrecipitation1Hour().replace("mm",""))
+							.setWeatherIconId(KmaResponseProcessor.getWeatherSkyAndPtyIconImg(finalHourlyForecast.getPrecipitationType(),
+									finalHourlyForecast.getSky(), isNight));
 
 					if (finalHourlyForecast.getProbabilityOfPrecipitation() != null) {
 						item.setPop(finalHourlyForecast.getProbabilityOfPrecipitation() + percent);

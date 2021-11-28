@@ -11,28 +11,25 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.forremoteviews.DataSaver;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
-import com.lifedawn.bestweather.widget.dto.CurrentConditionsObj;
-import com.lifedawn.bestweather.widget.dto.DailyForecastObj;
-import com.lifedawn.bestweather.widget.dto.HeaderObj;
-import com.lifedawn.bestweather.widget.dto.HourlyForecastObj;
-import com.lifedawn.bestweather.widget.dto.WeatherJsonObj;
+import com.lifedawn.bestweather.forremoteviews.dto.CurrentConditionsObj;
+import com.lifedawn.bestweather.forremoteviews.dto.DailyForecastObj;
+import com.lifedawn.bestweather.forremoteviews.dto.HeaderObj;
+import com.lifedawn.bestweather.forremoteviews.dto.HourlyForecastObj;
+import com.lifedawn.bestweather.forremoteviews.dto.WeatherJsonObj;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -59,12 +56,6 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 	private int airQualityInCurrentTextSize;
 	private int precipitationInCurrentTextSize;
 
-	private int clockInHourlyTextSize;
-	private int tempInHourlyTextSize;
-
-	private int dateInDailyTextSize;
-	private int tempInDailyTextSize;
-
 	private final Context context;
 	private WidgetUpdateCallback widgetUpdateCallback;
 
@@ -75,6 +66,8 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 	private final String timeFormat;
 	private final DateTimeFormatter dateTimeFormatter;
 	private final ValueUnits clockUnit;
+
+	private DataSaver dataSaver = new DataSaver();
 
 	public static String getSharedPreferenceName(int appWidgetId) {
 		return WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId;
@@ -96,41 +89,6 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 
 		public enum Current {
 			TEMP_TEXT_IN_CURRENT, REAL_FEEL_TEMP_TEXT_IN_CURRENT, AIR_QUALITY_TEXT_IN_CURRENT, PRECIPITATION_TEXT_IN_CURRENT
-		}
-
-		public enum Hourly {
-			CLOCK_TEXT_IN_HOURLY, TEMP_TEXT_IN_HOURLY
-		}
-
-		public enum Daily {
-			DATE_TEXT_IN_DAILY, TEMP_TEXT_IN_DAILY
-		}
-	}
-
-	public static class WidgetJsonKey {
-
-		public enum Root {
-			successful
-		}
-
-		public enum Type {
-			ForecastJson, Header, Current, Hourly, Daily, zoneId
-		}
-
-		public enum Header {
-			address, refreshDateTime
-		}
-
-		public enum Current {
-			weatherIcon, temp, realFeelTemp, airQuality, precipitation
-		}
-
-		public enum Hourly {
-			forecasts, clock, temp, weatherIcon
-		}
-
-		public enum Daily {
-			forecasts, date, minTemp, maxTemp, leftWeatherIcon, rightWeatherIcon, isSingle
 		}
 	}
 
@@ -179,12 +137,6 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 		editor.putInt(WidgetTextViews.Current.AIR_QUALITY_TEXT_IN_CURRENT.name(), context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrent));
 		editor.putInt(WidgetTextViews.Current.PRECIPITATION_TEXT_IN_CURRENT.name(), context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrent));
 
-		editor.putInt(WidgetTextViews.Hourly.CLOCK_TEXT_IN_HOURLY.name(), context.getResources().getDimensionPixelSize(R.dimen.clockTextSizeInHourly));
-		editor.putInt(WidgetTextViews.Hourly.TEMP_TEXT_IN_HOURLY.name(), context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInHourly));
-
-		editor.putInt(WidgetTextViews.Daily.DATE_TEXT_IN_DAILY.name(), context.getResources().getDimensionPixelSize(R.dimen.dateTextSizeInDaily));
-		editor.putInt(WidgetTextViews.Daily.TEMP_TEXT_IN_DAILY.name(), context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInDaily));
-
 		editor.putInt(WidgetTextViews.Clock.DATE_TEXT_IN_CLOCK.name(),
 				context.getResources().getDimensionPixelSize(R.dimen.dateTextSizeInClock));
 		editor.putInt(WidgetTextViews.Clock.TIME_TEXT_IN_CLOCK.name(), context.getResources().getDimensionPixelSize(R.dimen.timeTextSizeInClock));
@@ -222,16 +174,6 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 		precipitationInCurrentTextSize = sharedPreferences.getInt(WidgetTextViews.Current.PRECIPITATION_TEXT_IN_CURRENT.name(),
 				precipitationInCurrentTextSize);
 
-		clockInHourlyTextSize = sharedPreferences.getInt(WidgetTextViews.Hourly.CLOCK_TEXT_IN_HOURLY.name(),
-				clockInHourlyTextSize);
-		tempInHourlyTextSize = sharedPreferences.getInt(WidgetTextViews.Hourly.TEMP_TEXT_IN_HOURLY.name(),
-				tempInHourlyTextSize);
-
-		dateInDailyTextSize = sharedPreferences.getInt(WidgetTextViews.Daily.DATE_TEXT_IN_DAILY.name(),
-				dateInDailyTextSize);
-		tempInDailyTextSize = sharedPreferences.getInt(WidgetTextViews.Daily.TEMP_TEXT_IN_DAILY.name(),
-				tempInDailyTextSize);
-
 		dateInClockTextSize = sharedPreferences.getInt(WidgetTextViews.Clock.DATE_TEXT_IN_CLOCK.name(), dateInClockTextSize);
 		timeInClockTextSize = sharedPreferences.getInt(WidgetTextViews.Clock.TIME_TEXT_IN_CLOCK.name(), timeInClockTextSize);
 
@@ -243,20 +185,20 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 	private void changeTextSize(RemoteViews remoteViews, int layoutId) {
 		if (layoutId == R.layout.widget_current) {
 			setHeaderViews(remoteViews, getTempHeaderObj());
-			setCurrentConditionsViews(remoteViews, getTempCurrentConditionsObj());
+			setCurrentConditionsViews(remoteViews, dataSaver.getTempCurrentConditionsObj());
 		} else if (layoutId == R.layout.widget_current_hourly) {
 			setHeaderViews(remoteViews, getTempHeaderObj());
-			setCurrentConditionsViews(remoteViews, getTempCurrentConditionsObj());
-			setHourlyForecastViews(remoteViews, getTempHourlyForecastObjs());
+			setCurrentConditionsViews(remoteViews, dataSaver.getTempCurrentConditionsObj());
+			setHourlyForecastViews(remoteViews, dataSaver.getTempHourlyForecastObjs());
 		} else if (layoutId == R.layout.widget_current_daily) {
 			setHeaderViews(remoteViews, getTempHeaderObj());
-			setCurrentConditionsViews(remoteViews, getTempCurrentConditionsObj());
-			setDailyForecastViews(remoteViews, getTempDailyForecastObjs());
+			setCurrentConditionsViews(remoteViews, dataSaver.getTempCurrentConditionsObj());
+			setDailyForecastViews(remoteViews, dataSaver.getTempDailyForecastObjs());
 		} else if (layoutId == R.layout.widget_current_hourly_daily) {
 			setHeaderViews(remoteViews, getTempHeaderObj());
-			setCurrentConditionsViews(remoteViews, getTempCurrentConditionsObj());
-			setHourlyForecastViews(remoteViews, getTempHourlyForecastObjs());
-			setDailyForecastViews(remoteViews, getTempDailyForecastObjs());
+			setCurrentConditionsViews(remoteViews, dataSaver.getTempCurrentConditionsObj());
+			setHourlyForecastViews(remoteViews, dataSaver.getTempHourlyForecastObjs());
+			setDailyForecastViews(remoteViews, dataSaver.getTempDailyForecastObjs());
 		}
 	}
 
@@ -364,7 +306,7 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 		List<HourlyForecastObj> hourlyForecastObjList = hourlyForecasts.getHourlyForecastObjs();
 
 		for (int i = 0; i < 10; i++) {
-			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_widget);
+			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_linear);
 
 			zonedDateTime = ZonedDateTime.parse(hourlyForecastObjList.get(i).getClock());
 			if (zonedDateTime.getHour() == 0) {
@@ -377,9 +319,6 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 			childRemoteViews.setTextViewText(R.id.hourly_temperature, ValueUnits.convertTemperature(hourlyForecastObjList.get(i).getTemp(),
 					tempUnit) + tempDegree);
 			childRemoteViews.setImageViewResource(R.id.hourly_weather_icon, hourlyForecastObjList.get(i).getWeatherIcon());
-
-			childRemoteViews.setTextViewTextSize(R.id.hourly_clock, TypedValue.COMPLEX_UNIT_PX, clockInHourlyTextSize);
-			childRemoteViews.setTextViewTextSize(R.id.hourly_temperature, TypedValue.COMPLEX_UNIT_PX, tempInHourlyTextSize);
 
 			if (i >= 5) {
 				remoteViews.addView(R.id.hourly_forecast_row_2, childRemoteViews);
@@ -398,15 +337,12 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 		List<DailyForecastObj> dailyForecastObjList = dailyForecasts.getDailyForecastObjs();
 
 		for (int day = 0; day < 4; day++) {
-			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_daily_forecast_item_in_widget);
+			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_daily_forecast_item_in_linear);
 
 			childRemoteViews.setTextViewText(R.id.daily_date, ZonedDateTime.parse(dailyForecastObjList.get(day).getDate()).format(dateFormatter));
 			childRemoteViews.setTextViewText(R.id.daily_temperature, ValueUnits.convertTemperature(dailyForecastObjList.get(day).getMinTemp(),
 					tempUnit) + tempDegree + " / " + ValueUnits.convertTemperature(dailyForecastObjList.get(day).getMaxTemp(),
 					tempUnit) + tempDegree);
-
-			childRemoteViews.setTextViewTextSize(R.id.daily_date, TypedValue.COMPLEX_UNIT_PX, dateInDailyTextSize);
-			childRemoteViews.setTextViewTextSize(R.id.daily_temperature, TypedValue.COMPLEX_UNIT_PX, tempInDailyTextSize);
 
 			childRemoteViews.setViewVisibility(R.id.daily_left_weather_icon, View.VISIBLE);
 			childRemoteViews.setViewVisibility(R.id.daily_right_weather_icon, View.VISIBLE);
@@ -430,152 +366,10 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 		return tempHeaderObj;
 	}
 
-	public CurrentConditionsObj getTempCurrentConditionsObj() {
-		CurrentConditionsObj currentConditionsObj = new CurrentConditionsObj(true);
-		currentConditionsObj.setWeatherIcon(R.drawable.day_clear);
-
-		String temp = "20";
-		currentConditionsObj.setTemp(temp);
-		currentConditionsObj.setRealFeelTemp(temp);
-		currentConditionsObj.setAirQuality("10");
-		currentConditionsObj.setPrecipitation(null);
-		currentConditionsObj.setZoneId(ZoneId.systemDefault().getId());
-		return currentConditionsObj;
-	}
-
-	public WeatherJsonObj.HourlyForecasts getTempHourlyForecastObjs() {
-		WeatherJsonObj.HourlyForecasts hourlyForecasts = new WeatherJsonObj.HourlyForecasts();
-		List<HourlyForecastObj> tempHourlyForecastObjs = new ArrayList<>();
-		hourlyForecasts.setHourlyForecastObjs(tempHourlyForecastObjs);
-		ZonedDateTime now = ZonedDateTime.now();
-		hourlyForecasts.setZoneId(now.getZone().getId());
-
-		String temp = "20";
-
-		for (int i = 0; i < 10; i++) {
-			HourlyForecastObj hourlyForecastObj = new HourlyForecastObj(true);
-			hourlyForecastObj.setWeatherIcon(R.drawable.day_clear);
-			hourlyForecastObj.setClock(now.toString());
-			hourlyForecastObj.setTemp(temp);
-			tempHourlyForecastObjs.add(hourlyForecastObj);
-
-			now = now.plusHours(1);
-		}
-		return hourlyForecasts;
-	}
-
-	public WeatherJsonObj.DailyForecasts getTempDailyForecastObjs() {
-		WeatherJsonObj.DailyForecasts dailyForecasts = new WeatherJsonObj.DailyForecasts();
-		List<DailyForecastObj> tempDailyForecastObjs = new ArrayList<>();
-		dailyForecasts.setDailyForecastObjs(tempDailyForecastObjs);
-		ZonedDateTime now = ZonedDateTime.now();
-		dailyForecasts.setZoneId(now.getZone().getId());
-
-		String temp = "20";
-
-		for (int i = 0; i < 5; i++) {
-			DailyForecastObj dailyForecastObj = new DailyForecastObj(true, false);
-			dailyForecastObj.setLeftWeatherIcon(R.drawable.day_clear);
-			dailyForecastObj.setRightWeatherIcon(R.drawable.night_clear);
-			dailyForecastObj.setDate(now.toString());
-			dailyForecastObj.setMinTemp(temp);
-			dailyForecastObj.setMaxTemp(temp);
-			tempDailyForecastObjs.add(dailyForecastObj);
-
-			now = now.plusDays(1);
-		}
-		return dailyForecasts;
-	}
-
 	public static WeatherJsonObj getSavedWeatherData(int appWidgetId, Context context) {
-		SharedPreferences sharedPreferences = context.getSharedPreferences(getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE);
-		WeatherJsonObj weatherJsonObj = new Gson().fromJson(sharedPreferences.getString(WidgetJsonKey.Type.ForecastJson.name(), ""),
-				WeatherJsonObj.class);
-
-		return weatherJsonObj;
+		return DataSaver.getSavedWeatherData(context, getSharedPreferenceName(appWidgetId));
 	}
 
-
-	public static void saveWeatherData(int appWidgetId, Context context, @Nullable HeaderObj headerObj,
-	                                   @Nullable CurrentConditionsObj currentConditionsObj,
-	                                   @Nullable WeatherJsonObj.HourlyForecasts hourlyForecastObjs,
-	                                   @Nullable WeatherJsonObj.DailyForecasts dailyForecastObjs) {
-		JsonObject weatherDataJsonObject = new JsonObject();
-
-		if (headerObj != null) {
-			JsonObject rootObject = new JsonObject();
-			rootObject.addProperty(WidgetJsonKey.Header.address.name(), headerObj.getAddress());
-			rootObject.addProperty(WidgetJsonKey.Header.refreshDateTime.name(), headerObj.getRefreshDateTime());
-
-			weatherDataJsonObject.add(WidgetJsonKey.Type.Header.name(), rootObject);
-		}
-		if (currentConditionsObj != null) {
-			if (currentConditionsObj.isSuccessful()) {
-				JsonObject rootObject = new JsonObject();
-				rootObject.addProperty(WidgetJsonKey.Current.weatherIcon.name(), currentConditionsObj.getWeatherIcon());
-				rootObject.addProperty(WidgetJsonKey.Current.temp.name(), currentConditionsObj.getTemp());
-				rootObject.addProperty(WidgetJsonKey.Current.realFeelTemp.name(), currentConditionsObj.getRealFeelTemp());
-				rootObject.addProperty(WidgetJsonKey.Current.airQuality.name(), currentConditionsObj.getAirQuality());
-				rootObject.addProperty(WidgetJsonKey.Current.precipitation.name(), currentConditionsObj.getPrecipitation());
-				rootObject.addProperty(WidgetJsonKey.Type.zoneId.name(), currentConditionsObj.getZoneId());
-
-				weatherDataJsonObject.add(WidgetJsonKey.Type.Current.name(), rootObject);
-			}
-		}
-		if (hourlyForecastObjs != null) {
-			JsonArray forecasts = new JsonArray();
-
-			for (HourlyForecastObj hourlyForecastObj : hourlyForecastObjs.getHourlyForecastObjs()) {
-				JsonObject forecastObject = new JsonObject();
-				forecastObject.addProperty(WidgetJsonKey.Hourly.clock.name(), hourlyForecastObj.getClock());
-				forecastObject.addProperty(WidgetJsonKey.Hourly.weatherIcon.name(), hourlyForecastObj.getWeatherIcon());
-				forecastObject.addProperty(WidgetJsonKey.Hourly.temp.name(), hourlyForecastObj.getTemp());
-
-				forecasts.add(forecastObject);
-			}
-
-			if (!forecasts.isEmpty()) {
-				JsonObject rootObject = new JsonObject();
-				rootObject.add(WidgetJsonKey.Hourly.forecasts.name(), forecasts);
-				rootObject.addProperty(WidgetJsonKey.Type.zoneId.name(), hourlyForecastObjs.getZoneId());
-
-				weatherDataJsonObject.add(WidgetJsonKey.Type.Hourly.name(), rootObject);
-			}
-		}
-		if (dailyForecastObjs != null) {
-			JsonArray forecasts = new JsonArray();
-
-			for (DailyForecastObj dailyForecastObj : dailyForecastObjs.getDailyForecastObjs()) {
-				JsonObject forecastObject = new JsonObject();
-				forecastObject.addProperty(WidgetJsonKey.Daily.date.name(), dailyForecastObj.getDate());
-				forecastObject.addProperty(WidgetJsonKey.Daily.isSingle.name(), dailyForecastObj.isSingle());
-				forecastObject.addProperty(WidgetJsonKey.Daily.leftWeatherIcon.name(), dailyForecastObj.getLeftWeatherIcon());
-				forecastObject.addProperty(WidgetJsonKey.Daily.rightWeatherIcon.name(), dailyForecastObj.getRightWeatherIcon());
-				forecastObject.addProperty(WidgetJsonKey.Daily.minTemp.name(), dailyForecastObj.getMinTemp());
-				forecastObject.addProperty(WidgetJsonKey.Daily.maxTemp.name(), dailyForecastObj.getMaxTemp());
-
-				forecasts.add(forecastObject);
-			}
-
-			if (!forecasts.isEmpty()) {
-				JsonObject rootObject = new JsonObject();
-				rootObject.add(WidgetJsonKey.Daily.forecasts.name(), forecasts);
-				rootObject.addProperty(WidgetJsonKey.Type.zoneId.name(), dailyForecastObjs.getZoneId());
-
-				weatherDataJsonObject.add(WidgetJsonKey.Type.Daily.name(), rootObject);
-			}
-		}
-
-		if (weatherDataJsonObject.size() <= 1) {
-			weatherDataJsonObject.addProperty(WidgetJsonKey.Root.successful.name(), false);
-		} else {
-			weatherDataJsonObject.addProperty(WidgetJsonKey.Root.successful.name(), true);
-		}
-
-		SharedPreferences.Editor editor = context.getSharedPreferences(getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE).edit();
-		editor.putString(WidgetJsonKey.Type.ForecastJson.name(), weatherDataJsonObject.toString()).apply();
-		Log.e(tag, "new saved json : " + weatherDataJsonObject.toString());
-	}
 
 	public interface WidgetUpdateCallback {
 		void updateWidget();

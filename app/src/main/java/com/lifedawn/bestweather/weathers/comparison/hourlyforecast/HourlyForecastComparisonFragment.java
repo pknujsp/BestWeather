@@ -288,7 +288,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					probabilityOfPrecipitationList.add(finalHourlyForecastObj.e.getProbabilityOfPrecipitation() == null ? "-" :
 							finalHourlyForecastObj.e.getProbabilityOfPrecipitation() + percent);
 					precipitationVolumeList.add(finalHourlyForecastObj.e.getRainPrecipitation1Hour().equals(lessThan1mm) ? zero :
-							finalHourlyForecastObj.e.getRainPrecipitation1Hour());
+							finalHourlyForecastObj.e.getRainPrecipitation1Hour().replace("mm",""));
 
 					if (finalHourlyForecastObj.e.getSnowPrecipitation1Hour() != null) {
 						if (!finalHourlyForecastObj.e.getSnowPrecipitation1Hour().equals(noSnow)) {
@@ -309,7 +309,9 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					isNight = SunRiseSetUtil.isNight(itemCalendar, sunRise, sunSet);
 
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-							KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecastObj.e.getSky(), isNight))));
+							KmaResponseProcessor.getWeatherSkyAndPtyIconImg(finalHourlyForecastObj.e.getPrecipitationType(),
+									finalHourlyForecastObj.e.getSky(),
+									isNight))));
 				}
 
 			} else if (weatherSourceTypeList.get(i) == WeatherSourceType.ACCU_WEATHER) {

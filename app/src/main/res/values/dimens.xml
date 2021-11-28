@@ -77,14 +77,11 @@
     <dimen name="realFeelTempTextSizeInCurrent">12sp</dimen>
     <dimen name="airQualityTextSizeInCurrent">12sp</dimen>
     <dimen name="precipitationTextSizeInCurrent">12sp</dimen>
-    <dimen name="dateTextSizeInDaily">11sp</dimen>
-    <dimen name="tempTextSizeInDaily">11sp</dimen>
-    <dimen name="clockTextSizeInHourly">11sp</dimen>
-    <dimen name="tempTextSizeInHourly">11sp</dimen>
     <dimen name="dateTextSizeInClock">14sp</dimen>
     <dimen name="timeTextSizeInClock">20sp</dimen>
     <dimen name="btnSizeInToolbar">24dp</dimen>
     <dimen name="searchviewPaddingHorizontal">16dp</dimen>
     <dimen name="searchviewPaddingVertical">8dp</dimen>
+    <dimen name="defaultImageSizeInDrawableWithText">18dp</dimen>
 
 </resources>

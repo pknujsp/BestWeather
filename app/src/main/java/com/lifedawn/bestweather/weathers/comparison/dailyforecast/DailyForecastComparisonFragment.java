@@ -261,7 +261,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 						pop = item.e.getAmProbabilityOfPrecipitation() + " / " + item.e.getPmProbabilityOfPrecipitation();
 						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
 								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(item.e.getAmSky(), false)),
-								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(item.e.getPmSky(), true))));
+								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(item.e.getPmSky(), false))));
 					}
 					probabilityOfPrecipitationList.add(pop);
 

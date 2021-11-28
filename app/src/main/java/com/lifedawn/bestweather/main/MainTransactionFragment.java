@@ -34,7 +34,7 @@ import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentMainBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
-import com.lifedawn.bestweather.notification.NotificationSettingsFragment;
+import com.lifedawn.bestweather.notification.NotificationFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.settings.fragments.SettingsMainFragment;
@@ -472,12 +472,12 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 							getString(R.string.tag_settings_main_fragment)).commit();
 					break;
 				case R.id.notificationSettings:
-					NotificationSettingsFragment notificationSettingsFragment = new NotificationSettingsFragment();
-					String tag = NotificationSettingsFragment.class.getName();
+					NotificationFragment notificationFragment = new NotificationFragment();
+					String tag = NotificationFragment.class.getName();
 
 					getChildFragmentManager().beginTransaction().hide(
 							getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName())).add(
-							binding.fragmentContainer.getId(), notificationSettingsFragment,
+							binding.fragmentContainer.getId(), notificationFragment,
 							tag).addToBackStack(tag).commit();
 					break;
 			}

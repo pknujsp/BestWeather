@@ -1,11 +1,12 @@
 package com.lifedawn.bestweather.notification;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,8 +22,35 @@ import com.lifedawn.bestweather.notification.daily.DailyNotificationSettingsFrag
 import org.jetbrains.annotations.NotNull;
 
 
-public class NotificationSettingsFragment extends Fragment {
+public class NotificationFragment extends Fragment {
 	private FragmentNotificationBinding binding;
+
+	private FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+		@Override
+		public void onFragmentAttached(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f, @NonNull @NotNull Context context) {
+			super.onFragmentAttached(fm, f, context);
+			binding.rootScrollView.setVisibility(View.GONE);
+			binding.fragmentContainer.setVisibility(View.VISIBLE);
+		}
+
+		@Override
+		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+			super.onFragmentCreated(fm, f, savedInstanceState);
+			if (f instanceof AlwaysNotificationSettingsFragment) {
+				binding.toolbar.fragmentTitle.setText(R.string.always_notification);
+			} else if (f instanceof AlwaysNotificationSettingsFragment) {
+				binding.toolbar.fragmentTitle.setText(R.string.daily_notification);
+			}
+		}
+
+		@Override
+		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
+			super.onFragmentDestroyed(fm, f);
+			binding.toolbar.fragmentTitle.setText(R.string.notification);
+			binding.rootScrollView.setVisibility(View.VISIBLE);
+			binding.fragmentContainer.setVisibility(View.GONE);
+		}
+	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +68,8 @@ public class NotificationSettingsFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		binding.rootScrollView.setVisibility(View.VISIBLE);
+		binding.fragmentContainer.setVisibility(View.GONE);
 		binding.toolbar.fragmentTitle.setText(R.string.notification);
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -59,7 +89,7 @@ public class NotificationSettingsFragment extends Fragment {
 				String tag = AlwaysNotificationSettingsFragment.class.getName();
 
 				getParentFragmentManager().beginTransaction()
-						.hide(NotificationSettingsFragment.this).add(R.id.fragment_container, alwaysNotificationSettingsFragment, tag)
+						.hide(NotificationFragment.this).add(R.id.fragment_container, alwaysNotificationSettingsFragment, tag)
 						.addToBackStack(tag).commit();
 			}
 		});
@@ -71,7 +101,7 @@ public class NotificationSettingsFragment extends Fragment {
 				String tag = DailyNotificationSettingsFragment.class.getName();
 
 				getParentFragmentManager().beginTransaction()
-						.hide(NotificationSettingsFragment.this).add(R.id.fragment_container, dailyNotificationSettingsFragment, tag)
+						.hide(NotificationFragment.this).add(R.id.fragment_container, dailyNotificationSettingsFragment, tag)
 						.addToBackStack(tag).commit();
 			}
 		});

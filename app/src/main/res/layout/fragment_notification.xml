@@ -18,6 +18,15 @@
                 android:layout_height="?attr/actionBarSize"
                 android:layout_alignParentTop="true" />
 
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@id/adViewBottom"
+                android:layout_below="@id/toolbar"
+                android:visibility="gone" />
+
+
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/root_scroll_View"
                 android:layout_width="match_parent"

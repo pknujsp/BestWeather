@@ -148,6 +148,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 					AppWidgetManager.EXTRA_APPWIDGET_ID,
 					AppWidgetManager.INVALID_APPWIDGET_ID);
 		}
+
 		Log.e("configure", "appwidgetId : " + appWidgetId);
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
@@ -530,12 +531,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 		editor.putInt(WidgetCreator.WidgetTextViews.Current.REAL_FEEL_TEMP_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.realFeelTempTextSizeInCurrent) + extraSize);
 		editor.putInt(WidgetCreator.WidgetTextViews.Current.AIR_QUALITY_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrent) + extraSize);
 		editor.putInt(WidgetCreator.WidgetTextViews.Current.PRECIPITATION_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrent) + extraSize);
-
-		editor.putInt(WidgetCreator.WidgetTextViews.Hourly.CLOCK_TEXT_IN_HOURLY.name(), getResources().getDimensionPixelSize(R.dimen.clockTextSizeInHourly) + extraSize);
-		editor.putInt(WidgetCreator.WidgetTextViews.Hourly.TEMP_TEXT_IN_HOURLY.name(), getResources().getDimensionPixelSize(R.dimen.tempTextSizeInHourly) + extraSize);
-
-		editor.putInt(WidgetCreator.WidgetTextViews.Daily.DATE_TEXT_IN_DAILY.name(), getResources().getDimensionPixelSize(R.dimen.dateTextSizeInDaily) + extraSize);
-		editor.putInt(WidgetCreator.WidgetTextViews.Daily.TEMP_TEXT_IN_DAILY.name(), getResources().getDimensionPixelSize(R.dimen.tempTextSizeInDaily) + extraSize);
 
 		editor.putInt(WidgetCreator.WidgetTextViews.Clock.DATE_TEXT_IN_CLOCK.name(),
 				getResources().getDimensionPixelSize(R.dimen.dateTextSizeInClock) + extraSize);

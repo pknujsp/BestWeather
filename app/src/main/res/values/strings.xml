@@ -480,6 +480,7 @@
     <string name="notification">알림</string>
     <string name="always_notification">항상 표시되는 알림</string>
     <string name="daily_notification">당일 알림</string>
+    <string name="use_always_notification">항상 표시되는 알림 사용</string>
 
 
 </resources>

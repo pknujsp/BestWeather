@@ -153,7 +153,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
 					KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getAmSky(), false)),
 					ContextCompat.getDrawable(context,
-							KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getPmSky(), true))));
+							KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getPmSky(), false))));
 		}
 		for (; index < finalDailyForecastList.size(); index++) {
 			minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));

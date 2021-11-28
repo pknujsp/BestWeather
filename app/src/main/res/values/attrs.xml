@@ -63,4 +63,12 @@
             <enum name="gone" value="8" />
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="DrawableTextViewGroup">
+        <attr name="drawableColor" format="color" />
+        <attr name="drawableSize" format="dimension" />
+        <attr name="drawableSrc" format="reference" />
+        <attr name="text" format="string" />
+        <attr name="textColor"/>
+    </declare-styleable>
 </resources>

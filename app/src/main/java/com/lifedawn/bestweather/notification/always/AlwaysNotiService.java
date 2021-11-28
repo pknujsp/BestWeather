@@ -2,18 +2,14 @@ package com.lifedawn.bestweather.notification.always;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.notification.NotificationKey;
+import com.lifedawn.bestweather.notification.NotiViewCreator;
 import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.widget.WidgetCreator;
 
 public class AlwaysNotiService extends Service {
 	
@@ -26,8 +22,7 @@ public class AlwaysNotiService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		final String action = intent.getAction();
-		
-		NotiViewCreator notiViewCreator = new NotiViewCreator(getApplicationContext(), NotificationType.Always);
+
 
 		return START_STICKY;
 	}

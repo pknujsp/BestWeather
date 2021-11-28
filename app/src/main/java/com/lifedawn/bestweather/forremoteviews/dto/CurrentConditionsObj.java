@@ -1,9 +1,7 @@
-package com.lifedawn.bestweather.widget.dto;
+package com.lifedawn.bestweather.forremoteviews.dto;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
-import java.time.ZoneId;
 
 public class CurrentConditionsObj {
 	@Expose

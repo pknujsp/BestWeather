@@ -174,7 +174,8 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			dayOfYear = finalHourlyForecast.getFcstDateTime().getDayOfYear();
 
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
-					ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(),
+					ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyAndPtyIconImg(
+							finalHourlyForecast.getPrecipitationType(), finalHourlyForecast.getSky(),
 							SunRiseSetUtil.isNight(calendar,
 									sunRiseSetObjMap.get(dayOfYear).getSunrise(),
 									sunRiseSetObjMap.get(dayOfYear).getSunset()
@@ -184,7 +185,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			probabilityOfPrecipitationList.add(finalHourlyForecast.getProbabilityOfPrecipitation() == null ? "-" :
 					finalHourlyForecast.getProbabilityOfPrecipitation() + percent);
 			rainVolumeList.add(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ? zero :
-					finalHourlyForecast.getRainPrecipitation1Hour());
+					finalHourlyForecast.getRainPrecipitation1Hour().replace("mm",""));
 			if (finalHourlyForecast.getSnowPrecipitation1Hour() != null) {
 				if (!finalHourlyForecast.getSnowPrecipitation1Hour().equals(noSnow)) {
 					if (!haveSnow) {

@@ -77,7 +77,7 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 						item.setPop(finalDailyForecast.getAmProbabilityOfPrecipitation() + percent + "/" + finalDailyForecast.getPmProbabilityOfPrecipitation() + percent)
 								.setSingle(false)
 								.setLeftWeatherIconId(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getAmSky(), false))
-								.setRightWeatherIconId(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), true));
+								.setRightWeatherIconId(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), false));
 					}
 					dailyForecastListItemObjs.add(item);
 				}
@@ -159,7 +159,7 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
 								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getAmSky(), false)),
 								ContextCompat.getDrawable(context,
-										KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), true))));
+										KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), false))));
 					}
 					probabilityOfPrecipitationList.add(pop);
 				}
