@@ -8,8 +8,6 @@ import android.widget.RemoteViews;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.notification.NotiViewCreator;
-import com.lifedawn.bestweather.notification.NotificationType;
 
 public class AlwaysNotiService extends Service {
 	

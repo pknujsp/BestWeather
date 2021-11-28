@@ -1,7 +1,6 @@
 package com.lifedawn.bestweather.notification;
 
 import android.Manifest;
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,11 +29,10 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
@@ -43,8 +41,9 @@ import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentBaseNotificationSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
-import com.lifedawn.bestweather.notification.always.AlwaysNotificationSettingsFragment;
+import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 import com.lifedawn.bestweather.widget.AbstractAppWidgetProvider;
 
 
@@ -52,20 +51,20 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-public abstract class BaseNotificationSettingsFragment extends Fragment implements NotiViewCreator.NotificationUpdateCallback {
+public abstract class BaseNotificationSettingsFragment extends Fragment implements AlwaysNotiViewCreator.NotificationUpdateCallback {
 	protected FragmentBaseNotificationSettingsBinding binding;
 	protected boolean isKr;
 	protected FavoriteAddressDto newSelectedAddressDto;
 	protected Gps gps;
-	protected NotiViewCreator notiViewCreator;
+	protected AlwaysNotiViewCreator alwaysNotiViewCreator;
 	protected NotificationType notificationType;
 	private long[] intervalsLong;
 	private boolean initializing = true;
+	private WeatherViewModel weatherViewModel;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 	}
 
 	@Override
@@ -78,6 +77,7 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		weatherViewModel = new ViewModelProvider(this).get(WeatherViewModel.class);
 
 		gps = new Gps(requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
 		initLocation();
@@ -96,6 +96,10 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 
 			if (notiPreferences.getString(NotificationKey.NotiAttributes.LOCATION_TYPE.name(), LocationType.SelectedAddress.name()).equals(LocationType.SelectedAddress.name())) {
 				binding.selectedLocationRadio.setChecked(true);
+				String text =
+						getString(R.string.location) + ", " + notiPreferences.getString(AbstractAppWidgetProvider.WidgetDataKeys.ADDRESS_NAME.name(), "");
+				binding.selectedLocationRadio.setText(text);
+				binding.changeAddressBtn.setVisibility(View.VISIBLE);
 			} else {
 				binding.currentLocationRadio.setChecked(true);
 			}
@@ -113,18 +117,18 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 
 			long autoRefreshInterval = notiPreferences.getLong(NotificationKey.NotiAttributes.UPDATE_INTERVAL.name(), 0L);
 			final String[] intervalsStr = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
-			int i = 0;
-			for (; i < intervalsStr.length; i++) {
+
+			for (int i = 0; i < intervalsStr.length; i++) {
 				if (Long.parseLong(intervalsStr[i]) == autoRefreshInterval) {
+					binding.autoRefreshIntervalSpinner.setSelection(i);
 					break;
 				}
 			}
-			refreshIntervalOnItemSelectedListener.onItemSelected(null, null, i, 0);
 		}
 
-		notiViewCreator = new NotiViewCreator(getContext(), notificationType, this);
-		notiPreferences.registerOnSharedPreferenceChangeListener(notiViewCreator);
-		notiViewCreator.onSharedPreferenceChanged(notiPreferences, null);
+		alwaysNotiViewCreator = new AlwaysNotiViewCreator(getActivity().getApplicationContext(), this);
+		notiPreferences.registerOnSharedPreferenceChangeListener(alwaysNotiViewCreator);
+		alwaysNotiViewCreator.onSharedPreferenceChanged(notiPreferences, null);
 
 		binding.notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
@@ -134,10 +138,17 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 				if (!isChecked) {
 					getContext().getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE).edit().clear().apply();
 				} else {
-					notiViewCreator.initValues(getContext().getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE));
-					initLocation();
-					initWeatherDataSource();
-					initAutoRefreshInterval();
+					alwaysNotiViewCreator.initValues(getContext().getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE));
+
+					binding.currentLocationRadio.setChecked(false);
+					binding.selectedLocationRadio.setChecked(false);
+					if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_accu_weather), true)) {
+						binding.accuWeatherRadio.setChecked(true);
+					} else {
+						binding.owmRadio.setChecked(true);
+					}
+					binding.kmaTopPrioritySwitch.setChecked(false);
+					binding.autoRefreshIntervalSpinner.setSelection(0);
 				}
 
 			}
@@ -150,7 +161,7 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 
 	@Override
 	public void onDestroy() {
-		getContext().getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(notiViewCreator);
+		getContext().getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(alwaysNotiViewCreator);
 		super.onDestroy();
 	}
 
@@ -188,25 +199,24 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 
 		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, intervalsDescription);
 		binding.autoRefreshIntervalSpinner.setAdapter(spinnerAdapter);
-		binding.autoRefreshIntervalSpinner.setOnItemSelectedListener(refreshIntervalOnItemSelectedListener);
+		binding.autoRefreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				if (!initializing) {
+					long autoRefreshInterval = intervalsLong[position];
+					Preference preference = new Preference(getContext());
+					preference.setKey(NotificationKey.NotiAttributes.UPDATE_INTERVAL.name());
+					onPreferenceChangeListener.onPreferenceChange(preference, autoRefreshInterval);
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
+			}
+		});
 	}
 
-	private AdapterView.OnItemSelectedListener refreshIntervalOnItemSelectedListener = new AdapterView.OnItemSelectedListener() {
-		@Override
-		public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-			if (!initializing) {
-				long autoRefreshInterval = intervalsLong[position];
-				Preference preference = new Preference(getContext());
-				preference.setKey(NotificationKey.NotiAttributes.UPDATE_INTERVAL.name());
-				onPreferenceChangeListener.onPreferenceChange(preference, autoRefreshInterval);
-			}
-		}
-
-		@Override
-		public void onNothingSelected(AdapterView<?> parent) {
-
-		}
-	};
 
 	private void initWeatherDataSource() {
 		Locale locale = null;
@@ -222,14 +232,6 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 			binding.kmaTopPrioritySwitch.setVisibility(View.VISIBLE);
 		} else {
 			binding.kmaTopPrioritySwitch.setVisibility(View.GONE);
-		}
-
-		//기본 날씨 제공사 확인
-
-		if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_accu_weather), true)) {
-			binding.accuWeatherRadio.setChecked(true);
-		} else {
-			binding.owmRadio.setChecked(true);
 		}
 
 		binding.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -410,8 +412,8 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 	public void updateNotification() {
 		binding.previewLayout.removeAllViews();
 
-		RemoteViews removeViews = notiViewCreator.createRemoteViews(true);
-		View previewWidgetView = removeViews.apply(getContext(), binding.previewLayout);
+		RemoteViews removeViews = alwaysNotiViewCreator.createRemoteViews(true);
+		View previewWidgetView = removeViews.apply(getActivity().getApplicationContext(), binding.previewLayout);
 		binding.previewLayout.addView(previewWidgetView);
 	}
 }

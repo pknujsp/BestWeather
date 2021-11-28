@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.notification;
+package com.lifedawn.bestweather.notification.always;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,6 +12,9 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.forremoteviews.DataSaver;
+import com.lifedawn.bestweather.notification.NotificationKey;
+import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.forremoteviews.dto.CurrentConditionsObj;
 import com.lifedawn.bestweather.forremoteviews.dto.DailyForecastObj;
@@ -22,11 +25,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class NotiViewCreator implements SharedPreferences.OnSharedPreferenceChangeListener {
-
-	private final NotificationType notificationType;
+public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferenceChangeListener {
+	private final NotificationType notificationType = NotificationType.Always;
 	private final NotificationUpdateCallback notificationUpdateCallback;
-	private LayoutInflater layoutInflater;
 	private Context context;
 
 	private LocationType locationType;
@@ -36,11 +37,10 @@ public class NotiViewCreator implements SharedPreferences.OnSharedPreferenceChan
 	private int selectedAddressDtoId;
 	private final ValueUnits tempUnit;
 	private final String tempDegree;
+	private DataSaver dataSaver = new DataSaver();
 
-	public NotiViewCreator(Context context, NotificationType notificationType, NotificationUpdateCallback notificationUpdateCallback) {
+	public AlwaysNotiViewCreator(Context context, NotificationUpdateCallback notificationUpdateCallback) {
 		this.context = context;
-		this.layoutInflater = LayoutInflater.from(context);
-		this.notificationType = notificationType;
 		this.notificationUpdateCallback = notificationUpdateCallback;
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -75,29 +75,18 @@ public class NotiViewCreator implements SharedPreferences.OnSharedPreferenceChan
 	}
 
 	public RemoteViews createRemoteViews(boolean temp) {
-		RemoteViews remoteViews = null;
-		if (notificationType == NotificationType.Always) {
-			remoteViews = createAlwaysNotificationRemoteViews();
-		} else {
-
-		}
-
+		RemoteViews remoteViews = createAlwaysNotificationRemoteViews(temp);
 		return remoteViews;
 	}
 
-	private RemoteViews createAlwaysNotificationRemoteViews() {
+	private RemoteViews createAlwaysNotificationRemoteViews(boolean temp) {
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_always_notification);
 
-		//setCurrentConditionsViews(remoteViews, );
-		//setHourlyForecastViews(remoteViews, );
-		return remoteViews;
+		if (temp) {
+			setCurrentConditionsViews(remoteViews, dataSaver.getTempCurrentConditionsObj());
+			setHourlyForecastViews(remoteViews, dataSaver.getTempHourlyForecastObjs(6));
+		}
 
-	}
-
-	private RemoteViews createDailyNotificationRemoteViews() {
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_daily_notification);
-
-		//setHourlyForecastViews(remoteViews, );
 		return remoteViews;
 	}
 
@@ -105,22 +94,13 @@ public class NotiViewCreator implements SharedPreferences.OnSharedPreferenceChan
 		if (currentConditionsObj == null) {
 			return;
 		}
-
-		if (currentConditionsObj.getRealFeelTemp() == null) {
-			remoteViews.setViewVisibility(R.id.current_realfeel_temperature, View.GONE);
-		} else {
-			remoteViews.setViewVisibility(R.id.current_realfeel_temperature, View.VISIBLE);
-			remoteViews.setTextViewText(R.id.current_realfeel_temperature,
-					context.getString(R.string.real_feel_temperature_simple) + " : " + ValueUnits.convertTemperature(currentConditionsObj.getRealFeelTemp(),
-							tempUnit) + tempDegree);
-		}
-		remoteViews.setTextViewText(R.id.current_airquality, currentConditionsObj.getAirQuality() == null ? context.getString(R.string.not_data)
+		remoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsObj.getWeatherIcon());
+		remoteViews.setTextViewText(R.id.airQuality, currentConditionsObj.getAirQuality() == null ? context.getString(R.string.not_data)
 				: AqicnResponseProcessor.getGradeDescription((int) Double.parseDouble(currentConditionsObj.getAirQuality())));
-		remoteViews.setTextViewText(R.id.current_precipitation, currentConditionsObj.getPrecipitation() == null ?
+		remoteViews.setTextViewText(R.id.precipitation, currentConditionsObj.getPrecipitation() == null ?
 				context.getString(R.string.not_precipitation) : currentConditionsObj.getPrecipitation() + "mm");
-		remoteViews.setTextViewText(R.id.current_temperature, ValueUnits.convertTemperature(currentConditionsObj.getTemp(),
+		remoteViews.setTextViewText(R.id.temp, ValueUnits.convertTemperature(currentConditionsObj.getTemp(),
 				tempUnit) + tempDegree);
-		remoteViews.setImageViewResource(R.id.current_weather_icon, currentConditionsObj.getWeatherIcon());
 	}
 
 	public void setHourlyForecastViews(RemoteViews remoteViews, WeatherJsonObj.HourlyForecasts hourlyForecasts) {
@@ -128,14 +108,13 @@ public class NotiViewCreator implements SharedPreferences.OnSharedPreferenceChan
 			return;
 		}
 
-		remoteViews.removeAllViews(R.id.hourly_forecast_row_1);
-		remoteViews.removeAllViews(R.id.hourly_forecast_row_2);
+		remoteViews.removeAllViews(R.id.hourlyForecast);
 		String clock = null;
 		ZonedDateTime zonedDateTime = null;
 
 		List<HourlyForecastObj> hourlyForecastObjList = hourlyForecasts.getHourlyForecastObjs();
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < hourlyForecastObjList.size(); i++) {
 			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_linear);
 
 			zonedDateTime = ZonedDateTime.parse(hourlyForecastObjList.get(i).getClock());
@@ -150,11 +129,7 @@ public class NotiViewCreator implements SharedPreferences.OnSharedPreferenceChan
 					tempUnit) + tempDegree);
 			childRemoteViews.setImageViewResource(R.id.hourly_weather_icon, hourlyForecastObjList.get(i).getWeatherIcon());
 
-			if (i >= 5) {
-				remoteViews.addView(R.id.hourly_forecast_row_2, childRemoteViews);
-			} else {
-				remoteViews.addView(R.id.hourly_forecast_row_1, childRemoteViews);
-			}
+			remoteViews.addView(R.id.hourlyForecast, childRemoteViews);
 		}
 	}
 
@@ -162,7 +137,7 @@ public class NotiViewCreator implements SharedPreferences.OnSharedPreferenceChan
 		if (dailyForecasts == null) {
 			return;
 		}
-		remoteViews.removeAllViews(R.id.daily_forecast_row);
+		remoteViews.removeAllViews(R.id.dailyForecast);
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern_of_daily_forecast_in_widget));
 		List<DailyForecastObj> dailyForecastObjList = dailyForecasts.getDailyForecastObjs();
 
@@ -185,7 +160,7 @@ public class NotiViewCreator implements SharedPreferences.OnSharedPreferenceChan
 				childRemoteViews.setImageViewResource(R.id.daily_right_weather_icon, dailyForecastObjList.get(day).getRightWeatherIcon());
 			}
 
-			remoteViews.addView(R.id.daily_forecast_row, childRemoteViews);
+			remoteViews.addView(R.id.dailyForecast, childRemoteViews);
 		}
 	}
 

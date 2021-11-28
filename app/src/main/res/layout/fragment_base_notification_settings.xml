@@ -10,13 +10,13 @@
         android:layout_above="@id/adViewBottom"
         android:layout_below="@id/toolbar"
         android:orientation="vertical"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp">
+        android:paddingHorizontal="16dp">
 
         <FrameLayout
             android:id="@+id/preview_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/light_blue_600"
             android:minHeight="40dp"
             android:paddingHorizontal="18dp"
             android:paddingVertical="12dp" />

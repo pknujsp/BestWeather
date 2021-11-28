@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.forremoteviews;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -63,7 +62,7 @@ public class DataSaver {
 		return currentConditionsObj;
 	}
 
-	public WeatherJsonObj.HourlyForecasts getTempHourlyForecastObjs() {
+	public WeatherJsonObj.HourlyForecasts getTempHourlyForecastObjs(int size) {
 		WeatherJsonObj.HourlyForecasts hourlyForecasts = new WeatherJsonObj.HourlyForecasts();
 		List<HourlyForecastObj> tempHourlyForecastObjs = new ArrayList<>();
 		hourlyForecasts.setHourlyForecastObjs(tempHourlyForecastObjs);
@@ -72,7 +71,7 @@ public class DataSaver {
 
 		String temp = "20";
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < size; i++) {
 			HourlyForecastObj hourlyForecastObj = new HourlyForecastObj(true);
 			hourlyForecastObj.setWeatherIcon(R.drawable.day_clear);
 			hourlyForecastObj.setClock(now.toString());
@@ -84,7 +83,7 @@ public class DataSaver {
 		return hourlyForecasts;
 	}
 
-	public WeatherJsonObj.DailyForecasts getTempDailyForecastObjs() {
+	public WeatherJsonObj.DailyForecasts getTempDailyForecastObjs(int size) {
 		WeatherJsonObj.DailyForecasts dailyForecasts = new WeatherJsonObj.DailyForecasts();
 		List<DailyForecastObj> tempDailyForecastObjs = new ArrayList<>();
 		dailyForecasts.setDailyForecastObjs(tempDailyForecastObjs);
@@ -93,7 +92,7 @@ public class DataSaver {
 
 		String temp = "20";
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < size; i++) {
 			DailyForecastObj dailyForecastObj = new DailyForecastObj(true, false);
 			dailyForecastObj.setLeftWeatherIcon(R.drawable.day_clear);
 			dailyForecastObj.setRightWeatherIcon(R.drawable.night_clear);

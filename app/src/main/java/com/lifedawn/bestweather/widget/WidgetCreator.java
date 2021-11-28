@@ -13,7 +13,6 @@ import android.widget.RemoteViews;
 
 import androidx.preference.PreferenceManager;
 
-import com.google.gson.Gson;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
@@ -189,16 +188,16 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 		} else if (layoutId == R.layout.widget_current_hourly) {
 			setHeaderViews(remoteViews, getTempHeaderObj());
 			setCurrentConditionsViews(remoteViews, dataSaver.getTempCurrentConditionsObj());
-			setHourlyForecastViews(remoteViews, dataSaver.getTempHourlyForecastObjs());
+			setHourlyForecastViews(remoteViews, dataSaver.getTempHourlyForecastObjs(10));
 		} else if (layoutId == R.layout.widget_current_daily) {
 			setHeaderViews(remoteViews, getTempHeaderObj());
 			setCurrentConditionsViews(remoteViews, dataSaver.getTempCurrentConditionsObj());
-			setDailyForecastViews(remoteViews, dataSaver.getTempDailyForecastObjs());
+			setDailyForecastViews(remoteViews, dataSaver.getTempDailyForecastObjs(5));
 		} else if (layoutId == R.layout.widget_current_hourly_daily) {
 			setHeaderViews(remoteViews, getTempHeaderObj());
 			setCurrentConditionsViews(remoteViews, dataSaver.getTempCurrentConditionsObj());
-			setHourlyForecastViews(remoteViews, dataSaver.getTempHourlyForecastObjs());
-			setDailyForecastViews(remoteViews, dataSaver.getTempDailyForecastObjs());
+			setHourlyForecastViews(remoteViews, dataSaver.getTempHourlyForecastObjs(10));
+			setDailyForecastViews(remoteViews, dataSaver.getTempDailyForecastObjs(5));
 		}
 	}
 

@@ -3,8 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/blue"
-    android:minHeight="88dp"
     android:padding="8dp">
 
     <LinearLayout
@@ -18,8 +16,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|right"
             android:drawableRight="@drawable/refresh"
+            android:drawableTint="@color/white"
             android:gravity="center_vertical"
             android:text="refreshDateTime"
+            android:textColor="@color/white"
             android:textSize="12sp" />
 
         <RelativeLayout
@@ -82,28 +82,67 @@
                     android:textColor="@color/white" />
             </LinearLayout>
 
-            <include
-                android:id="@+id/airQuality"
-                layout="@layout/viewgroup_drawable_with_text"
+
+            <LinearLayout
+                android:id="@+id/airQualityLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@id/descriptionAndTempLayout"
                 android:layout_marginBottom="4dp"
-                android:layout_toRightOf="@id/descriptionAndTempLayout" />
+                android:layout_toRightOf="@id/descriptionAndTempLayout"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-            <include
-                android:id="@+id/precipitation"
-                layout="@layout/viewgroup_drawable_with_text"
+                <ImageView
+                    android:id="@+id/drawable"
+                    android:layout_width="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_height="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_marginRight="6dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/pm10" />
+
+                <TextView
+                    android:id="@+id/text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:autoSizeTextType="uniform"
+                    android:maxLines="1"
+                    android:text="@string/good"
+                    android:textColor="@color/defaultTextColorInDrawableWithText" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/airQuality"
-                android:layout_alignLeft="@id/airQuality" />
+                android:layout_below="@id/airQualityLayout"
+                android:layout_alignLeft="@id/airQualityLayout"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_height="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_marginRight="6dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/precipitationvolume" />
+
+                <TextView
+                    android:id="@+id/precipitation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:autoSizeTextType="uniform"
+                    android:maxLines="1"
+                    android:text="text"
+                    android:textColor="@color/defaultTextColorInDrawableWithText" />
+
+            </LinearLayout>
+
         </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="120dp"
             android:orientation="vertical">
 
             <LinearLayout
