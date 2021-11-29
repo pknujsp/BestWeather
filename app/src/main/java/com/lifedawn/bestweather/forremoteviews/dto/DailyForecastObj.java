@@ -32,6 +32,15 @@ public class DailyForecastObj {
 	@SerializedName("rightWeatherIcon")
 	private int rightWeatherIcon;
 
+	@Expose
+	@SerializedName("leftPop")
+	private String leftPop;
+
+	@Expose
+	@SerializedName("rightPop")
+	private String rightPop;
+
+
 	public DailyForecastObj(boolean successful, boolean isSingle) {
 		this.successful = successful;
 		this.isSingle = isSingle;
@@ -94,5 +103,21 @@ public class DailyForecastObj {
 
 	public void setRightWeatherIcon(int rightWeatherIcon) {
 		this.rightWeatherIcon = rightWeatherIcon;
+	}
+
+	public String getLeftPop() {
+		return leftPop;
+	}
+
+	public void setLeftPop(String leftPop) {
+		this.leftPop = leftPop;
+	}
+
+	public String getRightPop() {
+		return rightPop;
+	}
+
+	public void setRightPop(String rightPop) {
+		this.rightPop = rightPop;
 	}
 }

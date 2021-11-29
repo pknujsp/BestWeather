@@ -5,7 +5,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RemoteViews;
 
 import com.lifedawn.bestweather.notification.BaseNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.NotificationType;
@@ -14,6 +17,16 @@ import org.jetbrains.annotations.NotNull;
 
 
 public class DailyNotificationSettingsFragment extends BaseNotificationSettingsFragment {
+
+	@Override
+	public void onSwitchEnableNotification(boolean isChecked) {
+
+	}
+
+	@Override
+	public void initPreferences() {
+
+	}
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -28,9 +41,34 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 
 	}
 
+	@Override
+	public void onSelectedAddress() {
+
+	}
+
+	@Override
+	public void onSelectedCurrentLocation() {
+
+	}
+
+
+	@Override
+	public void updateNotification(RemoteViews remoteViews) {
+
+	}
+
+	@Override
+	public void onSelectedAutoRefreshInterval(long val) {
+
+	}
 
 	@Override
 	public void updateNotification() {
 
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 }

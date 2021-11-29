@@ -46,7 +46,7 @@
         android:visibility="gone" />
 
     <include
-        layout="@layout/layout_warning_in_widget"
+        layout="@layout/layout_warning_for_remoteviews"
         android:visibility="gone" />
 
 </FrameLayout>

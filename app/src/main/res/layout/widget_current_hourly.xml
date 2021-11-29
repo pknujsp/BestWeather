@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:background="?attr/appWidgetBackgroundColor"
     android:clickable="true"
     android:focusable="true"
@@ -24,7 +24,11 @@
             android:id="@+id/watch_current"
             layout="@layout/layout_watch_and_current_in_widget" />
 
-        <include layout="@layout/simple_hourly_forecast_view_in_widget" />
+        <include
+            layout="@layout/simple_hourly_forecast_view_in_widget"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
     </LinearLayout>
 
@@ -38,7 +42,7 @@
         android:visibility="gone" />
 
     <include
-        layout="@layout/layout_warning_in_widget"
+        layout="@layout/layout_warning_for_remoteviews"
         android:visibility="gone" />
 
 

@@ -483,4 +483,11 @@
     <string name="use_always_notification">항상 표시되는 알림 사용</string>
 
 
+    <!-- notification -->
+    <string name="notificationAlwaysChannelName">항상 알림</string>
+    <string name="notificationAlwaysChannelDescription">날씨 정보를 항상 표시합니다</string>
+
+    <string name="notificationDailyChannelName">매일 알림</string>
+    <string name="notificationDailyChannelDescription">매일 정해진 시각에 날씨 정보를 알립니다</string>
+
 </resources>

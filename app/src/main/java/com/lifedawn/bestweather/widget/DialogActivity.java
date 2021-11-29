@@ -16,6 +16,7 @@ import android.widget.RemoteViews;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
+import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.databinding.ActivityDialogBinding;
 import com.lifedawn.bestweather.main.MainActivity;
 
@@ -35,11 +36,11 @@ public class DialogActivity extends Activity {
 
 		Bundle bundle = getIntent().getExtras();
 		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		remoteViews = bundle.getParcelable(WidgetCreator.WidgetAttributes.REMOTE_VIEWS.name());
+		remoteViews = bundle.getParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name());
 
 		SharedPreferences sharedPreferences =
 				getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE);
-		locationType = LocationType.valueOf(sharedPreferences.getString(WidgetCreator.WidgetAttributes.LOCATION_TYPE.name(),
+		locationType = LocationType.valueOf(sharedPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(),
 				LocationType.CurrentLocation.name()));
 
 		String[] listItems = null;
@@ -80,7 +81,7 @@ public class DialogActivity extends Activity {
 
 							Bundle bundle = new Bundle();
 							bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-							bundle.putParcelable(WidgetCreator.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
+							bundle.putParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
 							refreshIntent.putExtras(bundle);
 
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, refreshIntent,
@@ -96,7 +97,7 @@ public class DialogActivity extends Activity {
 							refreshCurrentLocationIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH_CURRENT_LOCATION));
 							Bundle bundle = new Bundle();
 							bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-							bundle.putParcelable(WidgetCreator.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
+							bundle.putParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
 							refreshCurrentLocationIntent.putExtras(bundle);
 
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId,

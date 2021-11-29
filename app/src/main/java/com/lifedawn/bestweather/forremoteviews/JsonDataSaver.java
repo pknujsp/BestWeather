@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.dto.CurrentConditionsObj;
 import com.lifedawn.bestweather.forremoteviews.dto.DailyForecastObj;
 import com.lifedawn.bestweather.forremoteviews.dto.HeaderObj;
@@ -20,34 +21,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DataSaver {
+public class JsonDataSaver {
 
-	public static class JsonKey {
-
-		public enum Root {
-			successful
-		}
-
-		public enum Type {
-			ForecastJson, Header, Current, Hourly, Daily, zoneId
-		}
-
-		public enum Header {
-			address, refreshDateTime
-		}
-
-		public enum Current {
-			weatherIcon, temp, realFeelTemp, airQuality, precipitation
-		}
-
-		public enum Hourly {
-			forecasts, clock, temp, weatherIcon
-		}
-
-		public enum Daily {
-			forecasts, date, minTemp, maxTemp, leftWeatherIcon, rightWeatherIcon, isSingle
-		}
-	}
 
 	public CurrentConditionsObj getTempCurrentConditionsObj() {
 		CurrentConditionsObj currentConditionsObj = new CurrentConditionsObj(true);
@@ -108,7 +83,7 @@ public class DataSaver {
 
 	public static WeatherJsonObj getSavedWeatherData(Context context, String sharedPreferenceName) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences(sharedPreferenceName, Context.MODE_PRIVATE);
-		WeatherJsonObj weatherJsonObj = new Gson().fromJson(sharedPreferences.getString(JsonKey.Type.ForecastJson.name(), ""),
+		WeatherJsonObj weatherJsonObj = new Gson().fromJson(sharedPreferences.getString(WidgetNotiConstants.JsonKey.Type.ForecastJson.name(), ""),
 				WeatherJsonObj.class);
 
 		return weatherJsonObj;
@@ -123,22 +98,22 @@ public class DataSaver {
 
 		if (headerObj != null) {
 			JsonObject rootObject = new JsonObject();
-			rootObject.addProperty(JsonKey.Header.address.name(), headerObj.getAddress());
-			rootObject.addProperty(JsonKey.Header.refreshDateTime.name(), headerObj.getRefreshDateTime());
+			rootObject.addProperty(WidgetNotiConstants.JsonKey.Header.address.name(), headerObj.getAddress());
+			rootObject.addProperty(WidgetNotiConstants.JsonKey.Header.refreshDateTime.name(), headerObj.getRefreshDateTime());
 
-			weatherDataJsonObject.add(JsonKey.Type.Header.name(), rootObject);
+			weatherDataJsonObject.add(WidgetNotiConstants.JsonKey.Type.Header.name(), rootObject);
 		}
 		if (currentConditionsObj != null) {
 			if (currentConditionsObj.isSuccessful()) {
 				JsonObject rootObject = new JsonObject();
-				rootObject.addProperty(JsonKey.Current.weatherIcon.name(), currentConditionsObj.getWeatherIcon());
-				rootObject.addProperty(JsonKey.Current.temp.name(), currentConditionsObj.getTemp());
-				rootObject.addProperty(JsonKey.Current.realFeelTemp.name(), currentConditionsObj.getRealFeelTemp());
-				rootObject.addProperty(JsonKey.Current.airQuality.name(), currentConditionsObj.getAirQuality());
-				rootObject.addProperty(JsonKey.Current.precipitation.name(), currentConditionsObj.getPrecipitation());
-				rootObject.addProperty(JsonKey.Type.zoneId.name(), currentConditionsObj.getZoneId());
+				rootObject.addProperty(WidgetNotiConstants.JsonKey.Current.weatherIcon.name(), currentConditionsObj.getWeatherIcon());
+				rootObject.addProperty(WidgetNotiConstants.JsonKey.Current.temp.name(), currentConditionsObj.getTemp());
+				rootObject.addProperty(WidgetNotiConstants.JsonKey.Current.realFeelTemp.name(), currentConditionsObj.getRealFeelTemp());
+				rootObject.addProperty(WidgetNotiConstants.JsonKey.Current.airQuality.name(), currentConditionsObj.getAirQuality());
+				rootObject.addProperty(WidgetNotiConstants.JsonKey.Current.precipitation.name(), currentConditionsObj.getPrecipitation());
+				rootObject.addProperty(WidgetNotiConstants.JsonKey.Type.zoneId.name(), currentConditionsObj.getZoneId());
 
-				weatherDataJsonObject.add(JsonKey.Type.Current.name(), rootObject);
+				weatherDataJsonObject.add(WidgetNotiConstants.JsonKey.Type.Current.name(), rootObject);
 			}
 		}
 		if (hourlyForecastObjs != null) {
@@ -146,19 +121,19 @@ public class DataSaver {
 
 			for (HourlyForecastObj hourlyForecastObj : hourlyForecastObjs.getHourlyForecastObjs()) {
 				JsonObject forecastObject = new JsonObject();
-				forecastObject.addProperty(JsonKey.Hourly.clock.name(), hourlyForecastObj.getClock());
-				forecastObject.addProperty(JsonKey.Hourly.weatherIcon.name(), hourlyForecastObj.getWeatherIcon());
-				forecastObject.addProperty(JsonKey.Hourly.temp.name(), hourlyForecastObj.getTemp());
+				forecastObject.addProperty(WidgetNotiConstants.JsonKey.Hourly.clock.name(), hourlyForecastObj.getClock());
+				forecastObject.addProperty(WidgetNotiConstants.JsonKey.Hourly.weatherIcon.name(), hourlyForecastObj.getWeatherIcon());
+				forecastObject.addProperty(WidgetNotiConstants.JsonKey.Hourly.temp.name(), hourlyForecastObj.getTemp());
 
 				forecasts.add(forecastObject);
 			}
 
 			if (!forecasts.isEmpty()) {
 				JsonObject rootObject = new JsonObject();
-				rootObject.add(JsonKey.Hourly.forecasts.name(), forecasts);
-				rootObject.addProperty(JsonKey.Type.zoneId.name(), hourlyForecastObjs.getZoneId());
+				rootObject.add(WidgetNotiConstants.JsonKey.Hourly.forecasts.name(), forecasts);
+				rootObject.addProperty(WidgetNotiConstants.JsonKey.Type.zoneId.name(), hourlyForecastObjs.getZoneId());
 
-				weatherDataJsonObject.add(JsonKey.Type.Hourly.name(), rootObject);
+				weatherDataJsonObject.add(WidgetNotiConstants.JsonKey.Type.Hourly.name(), rootObject);
 			}
 		}
 		if (dailyForecastObjs != null) {
@@ -166,32 +141,34 @@ public class DataSaver {
 
 			for (DailyForecastObj dailyForecastObj : dailyForecastObjs.getDailyForecastObjs()) {
 				JsonObject forecastObject = new JsonObject();
-				forecastObject.addProperty(JsonKey.Daily.date.name(), dailyForecastObj.getDate());
-				forecastObject.addProperty(JsonKey.Daily.isSingle.name(), dailyForecastObj.isSingle());
-				forecastObject.addProperty(JsonKey.Daily.leftWeatherIcon.name(), dailyForecastObj.getLeftWeatherIcon());
-				forecastObject.addProperty(JsonKey.Daily.rightWeatherIcon.name(), dailyForecastObj.getRightWeatherIcon());
-				forecastObject.addProperty(JsonKey.Daily.minTemp.name(), dailyForecastObj.getMinTemp());
-				forecastObject.addProperty(JsonKey.Daily.maxTemp.name(), dailyForecastObj.getMaxTemp());
+				forecastObject.addProperty(WidgetNotiConstants.JsonKey.Daily.date.name(), dailyForecastObj.getDate());
+				forecastObject.addProperty(WidgetNotiConstants.JsonKey.Daily.isSingle.name(), dailyForecastObj.isSingle());
+				forecastObject.addProperty(WidgetNotiConstants.JsonKey.Daily.leftWeatherIcon.name(), dailyForecastObj.getLeftWeatherIcon());
+				forecastObject.addProperty(WidgetNotiConstants.JsonKey.Daily.rightWeatherIcon.name(), dailyForecastObj.getRightWeatherIcon());
+				forecastObject.addProperty(WidgetNotiConstants.JsonKey.Daily.minTemp.name(), dailyForecastObj.getMinTemp());
+				forecastObject.addProperty(WidgetNotiConstants.JsonKey.Daily.maxTemp.name(), dailyForecastObj.getMaxTemp());
+				forecastObject.addProperty(WidgetNotiConstants.JsonKey.Daily.leftPop.name(), dailyForecastObj.getLeftPop());
+				forecastObject.addProperty(WidgetNotiConstants.JsonKey.Daily.rightPop.name(), dailyForecastObj.getRightPop());
 
 				forecasts.add(forecastObject);
 			}
 
 			if (!forecasts.isEmpty()) {
 				JsonObject rootObject = new JsonObject();
-				rootObject.add(JsonKey.Daily.forecasts.name(), forecasts);
-				rootObject.addProperty(JsonKey.Type.zoneId.name(), dailyForecastObjs.getZoneId());
+				rootObject.add(WidgetNotiConstants.JsonKey.Daily.forecasts.name(), forecasts);
+				rootObject.addProperty(WidgetNotiConstants.JsonKey.Type.zoneId.name(), dailyForecastObjs.getZoneId());
 
-				weatherDataJsonObject.add(JsonKey.Type.Daily.name(), rootObject);
+				weatherDataJsonObject.add(WidgetNotiConstants.JsonKey.Type.Daily.name(), rootObject);
 			}
 		}
 
 		if (weatherDataJsonObject.size() <= 1) {
-			weatherDataJsonObject.addProperty(JsonKey.Root.successful.name(), false);
+			weatherDataJsonObject.addProperty(WidgetNotiConstants.JsonKey.Root.successful.name(), false);
 		} else {
-			weatherDataJsonObject.addProperty(JsonKey.Root.successful.name(), true);
+			weatherDataJsonObject.addProperty(WidgetNotiConstants.JsonKey.Root.successful.name(), true);
 		}
 
 		SharedPreferences.Editor editor = context.getSharedPreferences(sharedPreferenceName, Context.MODE_PRIVATE).edit();
-		editor.putString(JsonKey.Type.ForecastJson.name(), weatherDataJsonObject.toString()).apply();
+		editor.putString(WidgetNotiConstants.JsonKey.Type.ForecastJson.name(), weatherDataJsonObject.toString()).commit();
 	}
 }

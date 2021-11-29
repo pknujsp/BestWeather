@@ -38,13 +38,13 @@ import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentBaseNotificationSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
-import com.lifedawn.bestweather.widget.AbstractAppWidgetProvider;
 
 
 import org.jetbrains.annotations.NotNull;
@@ -58,13 +58,43 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 	protected Gps gps;
 	protected AlwaysNotiViewCreator alwaysNotiViewCreator;
 	protected NotificationType notificationType;
-	private long[] intervalsLong;
-	private boolean initializing = true;
-	private WeatherViewModel weatherViewModel;
+	protected long[] intervalsLong;
+	protected WeatherViewModel weatherViewModel;
+	protected NotificationHelper notificationHelper;
+	protected Preference.OnPreferenceChangeListener onPreferenceChangeListener;
+	protected boolean originalEnabled;
+
+
+	abstract public void onSwitchEnableNotification(boolean isChecked);
+
+	abstract public void initPreferences();
+
+	abstract public void onSelectedAutoRefreshInterval(long val);
+
+	abstract public void updateNotification();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		notificationHelper = new NotificationHelper(getActivity().getApplicationContext());
+		weatherViewModel = new ViewModelProvider(this).get(WeatherViewModel.class);
+		gps = new Gps(requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
+
+		Locale locale = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			locale = getResources().getConfiguration().getLocales().get(0);
+		} else {
+			locale = getResources().getConfiguration().locale;
+		}
+		String country = locale.getCountry();
+		isKr = country.equals("KR");
+
+		final String[] intervalsStr = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
+		intervalsLong = new long[intervalsStr.length];
+
+		for (int i = 0; i < intervalsStr.length; i++) {
+			intervalsLong[i] = Long.parseLong(intervalsStr[i]);
+		}
 	}
 
 	@Override
@@ -77,87 +107,18 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		weatherViewModel = new ViewModelProvider(this).get(WeatherViewModel.class);
 
-		gps = new Gps(requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
-		initLocation();
-		initWeatherDataSource();
-		initAutoRefreshInterval();
-
-		SharedPreferences notiPreferences = getContext().getSharedPreferences(notificationType.getPreferenceName(),
-				Context.MODE_PRIVATE);
-
-		if (notiPreferences.getAll().isEmpty()) {
-			binding.notificationSwitch.setChecked(false);
-			binding.settingsLayout.setVisibility(View.GONE);
+		if (isKr) {
+			binding.kmaTopPrioritySwitch.setVisibility(View.VISIBLE);
 		} else {
-			binding.notificationSwitch.setChecked(true);
-			binding.settingsLayout.setVisibility(View.VISIBLE);
-
-			if (notiPreferences.getString(NotificationKey.NotiAttributes.LOCATION_TYPE.name(), LocationType.SelectedAddress.name()).equals(LocationType.SelectedAddress.name())) {
-				binding.selectedLocationRadio.setChecked(true);
-				String text =
-						getString(R.string.location) + ", " + notiPreferences.getString(AbstractAppWidgetProvider.WidgetDataKeys.ADDRESS_NAME.name(), "");
-				binding.selectedLocationRadio.setText(text);
-				binding.changeAddressBtn.setVisibility(View.VISIBLE);
-			} else {
-				binding.currentLocationRadio.setChecked(true);
-			}
-
-			if (notiPreferences.getString(NotificationKey.NotiAttributes.WEATHER_SOURCE_TYPE.name(),
-					WeatherSourceType.OPEN_WEATHER_MAP.name()).equals(WeatherSourceType.OPEN_WEATHER_MAP.name())) {
-				binding.owmRadio.setChecked(true);
-			} else {
-				binding.accuWeatherRadio.setChecked(true);
-			}
-
-			if (notiPreferences.getBoolean(NotificationKey.NotiAttributes.TOP_PRIORITY_KMA.name(), true)) {
-				binding.kmaTopPrioritySwitch.setChecked(true);
-			}
-
-			long autoRefreshInterval = notiPreferences.getLong(NotificationKey.NotiAttributes.UPDATE_INTERVAL.name(), 0L);
-			final String[] intervalsStr = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
-
-			for (int i = 0; i < intervalsStr.length; i++) {
-				if (Long.parseLong(intervalsStr[i]) == autoRefreshInterval) {
-					binding.autoRefreshIntervalSpinner.setSelection(i);
-					break;
-				}
-			}
+			binding.kmaTopPrioritySwitch.setVisibility(View.GONE);
 		}
 
-		alwaysNotiViewCreator = new AlwaysNotiViewCreator(getActivity().getApplicationContext(), this);
-		notiPreferences.registerOnSharedPreferenceChangeListener(alwaysNotiViewCreator);
-		alwaysNotiViewCreator.onSharedPreferenceChanged(notiPreferences, null);
-
-		binding.notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				binding.settingsLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-
-				if (!isChecked) {
-					getContext().getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE).edit().clear().apply();
-				} else {
-					alwaysNotiViewCreator.initValues(getContext().getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE));
-
-					binding.currentLocationRadio.setChecked(false);
-					binding.selectedLocationRadio.setChecked(false);
-					if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_accu_weather), true)) {
-						binding.accuWeatherRadio.setChecked(true);
-					} else {
-						binding.owmRadio.setChecked(true);
-					}
-					binding.kmaTopPrioritySwitch.setChecked(false);
-					binding.autoRefreshIntervalSpinner.setSelection(0);
-				}
-
-			}
-		});
-
-
-		updateNotification();
-		initializing = false;
+		String[] intervalsDescription = getResources().getStringArray(R.array.AutoRefreshIntervals);
+		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, intervalsDescription);
+		binding.autoRefreshIntervalSpinner.setAdapter(spinnerAdapter);
 	}
+
 
 	@Override
 	public void onDestroy() {
@@ -165,49 +126,18 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 		super.onDestroy();
 	}
 
-	Preference.OnPreferenceChangeListener onPreferenceChangeListener = new Preference.OnPreferenceChangeListener() {
-		@Override
-		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			SharedPreferences.Editor editor = getContext().getSharedPreferences(notificationType.getPreferenceName(),
-					Context.MODE_PRIVATE).edit();
-			String key = preference.getKey();
 
-			if (key.equals(NotificationKey.NotiAttributes.UPDATE_INTERVAL.name()))
-				editor.putLong(key, (long) newValue);
-			else if (key.equals(NotificationKey.NotiAttributes.LOCATION_TYPE.name()))
-				editor.putString(key, (String) newValue);
-			else if (key.equals(NotificationKey.NotiAttributes.TOP_PRIORITY_KMA.name()))
-				editor.putBoolean(key, (boolean) newValue);
-			else if (key.equals(NotificationKey.NotiAttributes.SELECTED_ADDRESS_DTO_ID.name()))
-				editor.putInt(key, (int) newValue);
-			else if (key.equals(NotificationKey.NotiAttributes.WEATHER_SOURCE_TYPE.name()))
-				editor.putString(key, (String) newValue);
-
-			editor.apply();
-			return true;
-		}
-	};
-
-	private void initAutoRefreshInterval() {
-		final String[] intervalsDescription = getResources().getStringArray(R.array.AutoRefreshIntervals);
-		final String[] intervalsStr = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
-		intervalsLong = new long[intervalsStr.length];
-
-		for (int i = 0; i < intervalsStr.length; i++) {
-			intervalsLong[i] = Long.parseLong(intervalsStr[i]);
-		}
-
-		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, intervalsDescription);
-		binding.autoRefreshIntervalSpinner.setAdapter(spinnerAdapter);
+	protected void initAutoRefreshInterval() {
 		binding.autoRefreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				if (!initializing) {
-					long autoRefreshInterval = intervalsLong[position];
-					Preference preference = new Preference(getContext());
-					preference.setKey(NotificationKey.NotiAttributes.UPDATE_INTERVAL.name());
-					onPreferenceChangeListener.onPreferenceChange(preference, autoRefreshInterval);
-				}
+				long autoRefreshInterval = intervalsLong[position];
+				Preference preference = new Preference(getContext());
+				preference.setKey(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name());
+
+				onPreferenceChangeListener.onPreferenceChange(preference, autoRefreshInterval);
+
+				onSelectedAutoRefreshInterval(autoRefreshInterval);
 			}
 
 			@Override
@@ -218,59 +148,41 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 	}
 
 
-	private void initWeatherDataSource() {
-		Locale locale = null;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			locale = getResources().getConfiguration().getLocales().get(0);
-		} else {
-			locale = getResources().getConfiguration().locale;
-		}
-		String country = locale.getCountry();
-		isKr = country.equals("KR");
-
-		if (isKr) {
-			binding.kmaTopPrioritySwitch.setVisibility(View.VISIBLE);
-		} else {
-			binding.kmaTopPrioritySwitch.setVisibility(View.GONE);
-		}
-
+	protected void initWeatherDataSource() {
 		binding.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				if (!initializing) {
-					Preference preference = new Preference(getContext());
-					preference.setKey(NotificationKey.NotiAttributes.WEATHER_SOURCE_TYPE.name());
-					onPreferenceChangeListener.onPreferenceChange(preference, checkedId == R.id.accu_weather_radio ? WeatherSourceType.ACCU_WEATHER.name()
-							: WeatherSourceType.OPEN_WEATHER_MAP.name());
-				}
+				Preference preference = new Preference(getContext());
+				preference.setKey(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name());
+				onPreferenceChangeListener.onPreferenceChange(preference, checkedId == R.id.accu_weather_radio ? WeatherSourceType.ACCU_WEATHER.name()
+						: WeatherSourceType.OPEN_WEATHER_MAP.name());
+				updateNotification();
 			}
 		});
 		binding.kmaTopPrioritySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (!initializing) {
-					Preference preference = new Preference(getContext());
-					preference.setKey(NotificationKey.NotiAttributes.TOP_PRIORITY_KMA.name());
-					onPreferenceChangeListener.onPreferenceChange(preference, isChecked);
-				}
+				Preference preference = new Preference(getContext());
+				preference.setKey(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name());
+				onPreferenceChangeListener.onPreferenceChange(preference, isChecked);
+				updateNotification();
 			}
 		});
 
 	}
 
-	private void initLocation() {
+	protected void initLocation() {
 		binding.currentLocationRadio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (!initializing) {
-					if (isChecked) {
-						//현재 위치
-						//위치 권한, gps on 확인
-						if (gps.checkPermissionAndGpsEnabled(getActivity(), locationCallback)) {
-							Preference preference = new Preference(getContext());
-							preference.setKey(NotificationKey.NotiAttributes.LOCATION_TYPE.name());
-							onPreferenceChangeListener.onPreferenceChange(preference, LocationType.CurrentLocation.name());
-						}
+				if (isChecked) {
+					//현재 위치
+					//위치 권한, gps on 확인
+					if (gps.checkPermissionAndGpsEnabled(getActivity(), locationCallback)) {
+						Preference preference = new Preference(getContext());
+						preference.setKey(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name());
+						onPreferenceChangeListener.onPreferenceChange(preference, LocationType.CurrentLocation.name());
+						onSelectedCurrentLocation();
 					}
 				}
 			}
@@ -279,12 +191,9 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 		binding.selectedLocationRadio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (!initializing) {
-
-					if (isChecked) {
-						if (newSelectedAddressDto == null) {
-							openFavoritesFragment();
-						}
+				if (isChecked) {
+					if (newSelectedAddressDto == null) {
+						openFavoritesFragment();
 					}
 				}
 			}
@@ -298,7 +207,7 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 		});
 	}
 
-	private void openFavoritesFragment() {
+	protected void openFavoritesFragment() {
 		FavoritesFragment favoritesFragment = new FavoritesFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString(BundleKey.RequestFragment.name(), BaseNotificationSettingsFragment.class.getName());
@@ -319,16 +228,18 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 					binding.changeAddressBtn.setVisibility(View.VISIBLE);
 
 					Preference preference = new Preference(getContext());
-					preference.setKey(NotificationKey.NotiAttributes.LOCATION_TYPE.name());
+					preference.setKey(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name());
 					onPreferenceChangeListener.onPreferenceChange(preference, LocationType.SelectedAddress.name());
 
 					SharedPreferences.Editor editor = getContext().getSharedPreferences(notificationType.getPreferenceName(),
 							Context.MODE_PRIVATE).edit();
 
-					editor.putString(AbstractAppWidgetProvider.WidgetDataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
-							.putString(AbstractAppWidgetProvider.WidgetDataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
-							.putString(AbstractAppWidgetProvider.WidgetDataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude())
-							.putString(AbstractAppWidgetProvider.WidgetDataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).apply();
+					editor.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
+							.putString(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
+							.putString(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude())
+							.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).commit();
+
+					onSelectedAddress();
 				}
 			}
 		});
@@ -336,6 +247,10 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 				getString(R.string.tag_favorites_fragment))
 				.addToBackStack(getString(R.string.tag_favorites_fragment)).commit();
 	}
+
+	abstract public void onSelectedAddress();
+
+	abstract public void onSelectedCurrentLocation();
 
 	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(
 			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
@@ -409,11 +324,7 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 	};
 
 	@Override
-	public void updateNotification() {
-		binding.previewLayout.removeAllViews();
+	public void updateNotification(RemoteViews remoteViews) {
 
-		RemoteViews removeViews = alwaysNotiViewCreator.createRemoteViews(true);
-		View previewWidgetView = removeViews.apply(getActivity().getApplicationContext(), binding.previewLayout);
-		binding.previewLayout.addView(previewWidgetView);
 	}
 }

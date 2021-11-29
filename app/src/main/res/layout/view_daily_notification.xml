@@ -7,6 +7,7 @@
     android:padding="8dp">
 
     <LinearLayout
+        android:id="@+id/content_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -156,4 +157,17 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/white"
+        android:visibility="gone" />
+
+    <include
+        layout="@layout/layout_warning_for_remoteviews"
+        android:visibility="gone" />
 </FrameLayout>

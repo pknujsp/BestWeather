@@ -43,8 +43,8 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
-	private SharedPreferences sharedPreferences;
 	private NetworkStatus networkStatus;
+	private SharedPreferences sharedPreferences;
 
 	public static void setWindowFlag(Activity activity, final int bits, boolean on) {
 		Window win = activity.getWindow();
@@ -79,14 +79,7 @@ public class MainActivity extends AppCompatActivity {
 			finish();
 		}
 
-		initPreferences();
-		WeatherResponseProcessor.init(getApplicationContext());
-		AccuWeatherResponseProcessor.init(getApplicationContext());
-		AqicnResponseProcessor.init(getApplicationContext());
-		KmaResponseProcessor.init(getApplicationContext());
-		OpenWeatherMapResponseProcessor.init(getApplicationContext());
-		FlickrUtil.init(getApplicationContext());
-		UvIndexProcessor.init(getApplicationContext());
+
 
 		AppThemes appTheme = AppThemes.enumOf(sharedPreferences.getString(getString(R.string.pref_key_app_theme), AppThemes.BLACK.name()));
 		if (appTheme == AppThemes.BLACK) {
@@ -117,34 +110,5 @@ public class MainActivity extends AppCompatActivity {
 
 	}
 
-	private void initPreferences() {
-		try {
-			if (sharedPreferences.getAll().isEmpty()) {
-				SharedPreferences.Editor editor = sharedPreferences.edit();
-				editor.putString(getString(R.string.pref_key_app_theme), AppThemes.BLACK.name());
-				editor.putBoolean(getString(R.string.pref_key_accu_weather), true);
-				editor.putBoolean(getString(R.string.pref_key_open_weather_map), true);
-				editor.putString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name());
-				editor.putString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name());
-				editor.putString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name());
-				editor.putString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name());
-				editor.putBoolean(getString(R.string.pref_key_use_current_location), true);
-				editor.putBoolean(getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false);
-				editor.putBoolean(getString(R.string.pref_key_show_intro), true);
 
-				Locale locale;
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-					locale = getResources().getConfiguration().getLocales().get(0);
-				} else {
-					locale = getResources().getConfiguration().locale;
-				}
-
-				editor.putBoolean(getString(R.string.pref_key_kma_top_priority), false).putBoolean(
-						getString(R.string.pref_key_accu_weather), false).putBoolean(getString(R.string.pref_key_open_weather_map),
-						true).apply();
-			}
-		} catch (NullPointerException e) {
-
-		}
-	}
 }

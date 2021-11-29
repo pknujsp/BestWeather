@@ -49,6 +49,7 @@ import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.ActivityConfigureWidgetBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
@@ -75,7 +76,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 		@Override
 		public void handleOnBackPressed() {
 			if (!getSupportFragmentManager().popBackStackImmediate()) {
-				getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE).edit().clear().apply();
 				setResult(RESULT_CANCELED);
 				finish();
 			}
@@ -104,7 +104,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 
 
 	private boolean isReadStoragePermissionGranted() {
-		if (Build.VERSION.SDK_INT >= 23) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
 					== PackageManager.PERMISSION_GRANTED) {
 				return true;
@@ -214,8 +214,17 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 	@Override
 	protected void onDestroy() {
 		widgetCreator.removeWidgetUpdateCallback();
-		getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(widgetCreator);
+		SharedPreferences sharedPreferences = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE);
+		sharedPreferences.unregisterOnSharedPreferenceChangeListener(widgetCreator);
 		widgetCreator = null;
+
+		if (sharedPreferences.getAll().isEmpty()) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+				deleteSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId));
+			} else {
+				getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE).edit().clear().apply();
+			}
+		}
 		super.onDestroy();
 	}
 
@@ -225,21 +234,21 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 			SharedPreferences.Editor editor = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE).edit();
 			String key = preference.getKey();
 
-			if (key.equals(WidgetCreator.WidgetAttributes.BACKGROUND_ALPHA.name()))
+			if (key.equals(WidgetNotiConstants.WidgetAttributes.BACKGROUND_ALPHA.name()))
 				editor.putInt(key, (int) newValue);
-			else if (key.equals(WidgetCreator.WidgetAttributes.UPDATE_INTERVAL.name()))
+			else if (key.equals(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name()))
 				editor.putLong(key, (long) newValue);
-			else if (key.equals(WidgetCreator.WidgetAttributes.LOCATION_TYPE.name()))
+			else if (key.equals(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name()))
 				editor.putString(key, (String) newValue);
-			else if (key.equals(WidgetCreator.WidgetAttributes.DISPLAY_CLOCK.name()))
+			else if (key.equals(WidgetNotiConstants.WidgetAttributes.DISPLAY_CLOCK.name()))
 				editor.putBoolean(key, (boolean) newValue);
-			else if (key.equals(WidgetCreator.WidgetAttributes.DISPLAY_LOCAL_CLOCK.name()))
+			else if (key.equals(WidgetNotiConstants.WidgetAttributes.DISPLAY_LOCAL_CLOCK.name()))
 				editor.putBoolean(key, (boolean) newValue);
-			else if (key.equals(WidgetCreator.WidgetAttributes.TOP_PRIORITY_KMA.name()))
+			else if (key.equals(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name()))
 				editor.putBoolean(key, (boolean) newValue);
-			else if (key.equals(WidgetCreator.WidgetAttributes.SELECTED_ADDRESS_DTO_ID.name()))
+			else if (key.equals(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name()))
 				editor.putInt(key, (int) newValue);
-			else if (key.equals(WidgetCreator.WidgetAttributes.WEATHER_SOURCE_TYPE.name()))
+			else if (key.equals(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name()))
 				editor.putString(key, (String) newValue);
 
 			editor.apply();
@@ -287,7 +296,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				binding.displayLocalDatetimeSwitch.setVisibility(isChecked ? View.VISIBLE : View.GONE);
 				Preference preference = new Preference(getApplicationContext());
-				preference.setKey(WidgetCreator.WidgetAttributes.DISPLAY_CLOCK.name());
+				preference.setKey(WidgetNotiConstants.WidgetAttributes.DISPLAY_CLOCK.name());
 				onPreferenceChangeListener.onPreferenceChange(preference, isChecked);
 			}
 		});
@@ -295,7 +304,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Preference preference = new Preference(getApplicationContext());
-				preference.setKey(WidgetCreator.WidgetAttributes.DISPLAY_LOCAL_CLOCK.name());
+				preference.setKey(WidgetNotiConstants.WidgetAttributes.DISPLAY_LOCAL_CLOCK.name());
 				onPreferenceChangeListener.onPreferenceChange(preference, isChecked);
 			}
 		});
@@ -318,7 +327,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				long autoRefreshInterval = intervalsLong[position];
 				Preference preference = new Preference(getApplicationContext());
-				preference.setKey(WidgetCreator.WidgetAttributes.UPDATE_INTERVAL.name());
+				preference.setKey(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name());
 				onPreferenceChangeListener.onPreferenceChange(preference, autoRefreshInterval);
 			}
 
@@ -358,7 +367,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				Preference preference = new Preference(getApplicationContext());
-				preference.setKey(WidgetCreator.WidgetAttributes.WEATHER_SOURCE_TYPE.name());
+				preference.setKey(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name());
 				onPreferenceChangeListener.onPreferenceChange(preference, checkedId == 0 ? WeatherSourceType.ACCU_WEATHER.name()
 						: WeatherSourceType.OPEN_WEATHER_MAP.name());
 			}
@@ -367,7 +376,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Preference preference = new Preference(getApplicationContext());
-				preference.setKey(WidgetCreator.WidgetAttributes.TOP_PRIORITY_KMA.name());
+				preference.setKey(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name());
 				onPreferenceChangeListener.onPreferenceChange(preference, isChecked);
 			}
 		});
@@ -383,7 +392,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 					//위치 권한, gps on 확인
 					if (gps.checkPermissionAndGpsEnabled(ConfigureWidgetActivity.this, locationCallback)) {
 						Preference preference = new Preference(getApplicationContext());
-						preference.setKey(WidgetCreator.WidgetAttributes.LOCATION_TYPE.name());
+						preference.setKey(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name());
 						onPreferenceChangeListener.onPreferenceChange(preference, LocationType.CurrentLocation.name());
 					}
 				}
@@ -430,16 +439,16 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 					binding.changeAddressBtn.setVisibility(View.VISIBLE);
 
 					Preference preference = new Preference(getApplicationContext());
-					preference.setKey(WidgetCreator.WidgetAttributes.LOCATION_TYPE.name());
+					preference.setKey(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name());
 					onPreferenceChangeListener.onPreferenceChange(preference, LocationType.SelectedAddress.name());
 
 					SharedPreferences.Editor editor = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId),
 							MODE_PRIVATE).edit();
 
-					editor.putString(AbstractAppWidgetProvider.WidgetDataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
-							.putString(AbstractAppWidgetProvider.WidgetDataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
-							.putString(AbstractAppWidgetProvider.WidgetDataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude())
-							.putString(AbstractAppWidgetProvider.WidgetDataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).apply();
+					editor.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
+							.putString(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
+							.putString(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude())
+							.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).apply();
 				}
 			}
 		});
@@ -524,17 +533,18 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 		final int extraSize = value > 0 ? absSize : absSize * -1;
 		SharedPreferences.Editor editor = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE).edit();
 
-		editor.putInt(WidgetCreator.WidgetTextViews.Header.ADDRESS_TEXT_IN_HEADER.name(), getResources().getDimensionPixelSize(R.dimen.addressTextSizeInHeader) + extraSize);
-		editor.putInt(WidgetCreator.WidgetTextViews.Header.REFRESH_TEXT_IN_HEADER.name(), getResources().getDimensionPixelSize(R.dimen.refreshTextSizeInHeader) + extraSize);
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Header.ADDRESS_TEXT_IN_HEADER.name(),
+				getResources().getDimensionPixelSize(R.dimen.addressTextSizeInHeader) + extraSize);
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Header.REFRESH_TEXT_IN_HEADER.name(), getResources().getDimensionPixelSize(R.dimen.refreshTextSizeInHeader) + extraSize);
 
-		editor.putInt(WidgetCreator.WidgetTextViews.Current.TEMP_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.tempTextSizeInCurrent) + extraSize);
-		editor.putInt(WidgetCreator.WidgetTextViews.Current.REAL_FEEL_TEMP_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.realFeelTempTextSizeInCurrent) + extraSize);
-		editor.putInt(WidgetCreator.WidgetTextViews.Current.AIR_QUALITY_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrent) + extraSize);
-		editor.putInt(WidgetCreator.WidgetTextViews.Current.PRECIPITATION_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrent) + extraSize);
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.TEMP_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.tempTextSizeInCurrent) + extraSize);
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.REAL_FEEL_TEMP_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.realFeelTempTextSizeInCurrent) + extraSize);
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.AIR_QUALITY_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrent) + extraSize);
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.PRECIPITATION_TEXT_IN_CURRENT.name(), getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrent) + extraSize);
 
-		editor.putInt(WidgetCreator.WidgetTextViews.Clock.DATE_TEXT_IN_CLOCK.name(),
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Clock.DATE_TEXT_IN_CLOCK.name(),
 				getResources().getDimensionPixelSize(R.dimen.dateTextSizeInClock) + extraSize);
-		editor.putInt(WidgetCreator.WidgetTextViews.Clock.TIME_TEXT_IN_CLOCK.name(),
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Clock.TIME_TEXT_IN_CLOCK.name(),
 				getResources().getDimensionPixelSize(R.dimen.timeTextSizeInClock) + extraSize);
 
 		editor.apply();
@@ -542,7 +552,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 
 	private void setBackgroundAlpha(int alpha) {
 		Preference preference = new Preference(getApplicationContext());
-		preference.setKey(WidgetCreator.WidgetAttributes.BACKGROUND_ALPHA.name());
+		preference.setKey(WidgetNotiConstants.WidgetAttributes.BACKGROUND_ALPHA.name());
 		onPreferenceChangeListener.onPreferenceChange(preference, 100 - alpha);
 		Log.e(tag, "background alpha : " + (100 - alpha));
 	}
