@@ -33,6 +33,10 @@ public class CurrentConditionsObj {
 	private int weatherIcon;
 
 	@Expose
+	@SerializedName("windSpeed")
+	private String windSpeed;
+
+	@Expose
 	@SerializedName("zoneId")
 	private String zoneId;
 
@@ -105,5 +109,13 @@ public class CurrentConditionsObj {
 
 	public void setPrecipitationType(String precipitationType) {
 		this.precipitationType = precipitationType;
+	}
+
+	public String getWindSpeed() {
+		return windSpeed;
+	}
+
+	public void setWindSpeed(String windSpeed) {
+		this.windSpeed = windSpeed;
 	}
 }

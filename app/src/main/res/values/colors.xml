@@ -44,4 +44,5 @@
 
 
     <color name="defaultTextColorInDrawableWithText">#FFFFFF</color>
+    <color name="iconGray">#685D5D</color>
 </resources>

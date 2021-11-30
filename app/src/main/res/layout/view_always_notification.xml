@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
+    android:layout_height="140dp"
     android:background="@color/app_main_color"
     android:padding="8dp">
 
@@ -31,7 +31,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginRight="12dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/temp_icon" />
+                android:src="@drawable/day_clear" />
 
             <TextView
                 android:id="@+id/temp"
@@ -45,7 +45,8 @@
                 android:maxLines="1"
                 android:text="20º"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textScaleX="0.9"
+                android:textSize="19sp" />
 
 
             <LinearLayout
@@ -60,7 +61,6 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:id="@+id/drawable"
                     android:layout_width="@dimen/defaultImageSizeInDrawableWithText"
                     android:layout_height="@dimen/defaultImageSizeInDrawableWithText"
                     android:layout_marginRight="6dp"
@@ -68,7 +68,7 @@
                     android:src="@drawable/pm10" />
 
                 <TextView
-                    android:id="@+id/text"
+                    android:id="@+id/airQuality"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:autoSizeTextType="uniform"
@@ -80,6 +80,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/precipitationLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@id/weatherIcon"
@@ -94,7 +95,8 @@
                     android:layout_height="@dimen/defaultImageSizeInDrawableWithText"
                     android:layout_marginRight="6dp"
                     android:scaleType="centerInside"
-                    android:src="@drawable/precipitationvolume" />
+                    android:src="@drawable/precipitationvolume"
+                    app:tint="@color/iconGray" />
 
                 <TextView
                     android:id="@+id/precipitation"
@@ -103,7 +105,37 @@
                     android:autoSizeTextType="uniform"
                     android:gravity="center_vertical"
                     android:maxLines="1"
-                    android:text="text"
+                    android:text="@string/not_precipitation"
+                    android:textColor="@color/defaultTextColorInDrawableWithText" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/weatherIcon"
+                android:layout_alignBottom="@id/weatherIcon"
+                android:layout_marginRight="16dp"
+                android:layout_toRightOf="@id/precipitationLayout"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_height="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_marginRight="6dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/windspeed"
+                    app:tint="@color/iconGray" />
+
+                <TextView
+                    android:id="@+id/windSpeed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:text="2.3m/s"
                     android:textColor="@color/defaultTextColorInDrawableWithText" />
 
             </LinearLayout>
@@ -119,9 +151,9 @@
             <LinearLayout
                 android:id="@+id/hourlyForecast"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:orientation="horizontal" />
-
 
         </LinearLayout>
     </LinearLayout>

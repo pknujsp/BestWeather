@@ -2,8 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="88dp"
+    android:layout_height="180dp"
+    android:background="@color/app_main_color"
     android:padding="8dp">
 
     <LinearLayout
@@ -12,150 +12,156 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/refreshDateTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|right"
-            android:drawableRight="@drawable/refresh"
-            android:gravity="center_vertical"
-            android:text="refreshDateTime"
-            android:textSize="12sp" />
+        <include
+            android:id="@+id/header"
+            layout="@layout/header_view_in_widget" />
 
-        <TextView
-            android:id="@+id/address"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:text="addressName"
-            android:textColor="@color/blue"
-            android:textSize="15sp" />
+
+        <RelativeLayout
+            android:id="@+id/currentConditionsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <ImageView
+                android:id="@+id/weatherIcon"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="12dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/day_clear" />
+
+            <TextView
+                android:id="@+id/temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/weatherIcon"
+                android:layout_alignBottom="@id/weatherIcon"
+                android:layout_marginRight="16dp"
+                android:layout_toRightOf="@id/weatherIcon"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:text="20º"
+                android:textColor="@color/white"
+                android:textScaleX="0.9"
+                android:textSize="19sp" />
+
+
+            <LinearLayout
+                android:id="@+id/airQualityLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/weatherIcon"
+                android:layout_alignBottom="@id/weatherIcon"
+                android:layout_marginRight="16dp"
+                android:layout_toRightOf="@id/temp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_height="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_marginRight="6dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/pm10" />
+
+                <TextView
+                    android:id="@+id/airQuality"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:text="@string/good"
+                    android:textColor="@color/defaultTextColorInDrawableWithText" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/precipitationLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/weatherIcon"
+                android:layout_alignBottom="@id/weatherIcon"
+                android:layout_marginRight="16dp"
+                android:layout_toRightOf="@id/airQualityLayout"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_height="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_marginRight="6dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/precipitationvolume"
+                    app:tint="@color/iconGray" />
+
+                <TextView
+                    android:id="@+id/precipitation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:text="@string/not_precipitation"
+                    android:textColor="@color/defaultTextColorInDrawableWithText" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/weatherIcon"
+                android:layout_alignBottom="@id/weatherIcon"
+                android:layout_marginRight="16dp"
+                android:layout_toRightOf="@id/precipitationLayout"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_height="@dimen/defaultImageSizeInDrawableWithText"
+                    android:layout_marginRight="6dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/windspeed"
+                    app:tint="@color/iconGray" />
+
+                <TextView
+                    android:id="@+id/windSpeed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:autoSizeTextType="uniform"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:text="2.3m/s"
+                    android:textColor="@color/defaultTextColorInDrawableWithText" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/currentConditionsLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:id="@+id/weatherIcon"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/day_clear" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/weatherDescription"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="맑음"
-                            android:textColor="@color/black"
-                            android:textSize="19sp" />
-
-                        <TextView
-                            android:id="@+id/temp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="20º"
-                            android:textColor="@color/black"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/precipitationLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_marginRight="8dp"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/precipitationvolume" />
-
-                    <TextView
-                        android:id="@+id/precipitation"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/not_precipitation"
-                        android:textColor="@color/black"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/airQualityLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_marginRight="8dp"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/pm10" />
-
-                    <TextView
-                        android:id="@+id/airQuality"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/good"
-                        android:textColor="@color/black"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:id="@+id/hourlyForecast1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="horizontal" />
 
-                <LinearLayout
-                    android:id="@+id/hourlyForecast"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:orientation="horizontal" />
-
-
-                <LinearLayout
-                    android:id="@+id/dailyForecast"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:orientation="horizontal" />
-
-            </LinearLayout>
-
+            <LinearLayout
+                android:id="@+id/hourlyForecast2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal" />
         </LinearLayout>
-
     </LinearLayout>
 
     <ProgressBar

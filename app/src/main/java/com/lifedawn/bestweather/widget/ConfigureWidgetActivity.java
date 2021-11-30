@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
@@ -53,7 +52,6 @@ import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.ActivityConfigureWidgetBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
-import com.lifedawn.bestweather.main.MainTransactionFragment;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
@@ -140,7 +138,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 		getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
 		setBackgroundImg();
 
-		gps = new Gps(requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
+		gps = new Gps(getApplicationContext(), requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
 		Bundle bundle = getIntent().getExtras();
 
 		if (bundle != null) {

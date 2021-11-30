@@ -44,8 +44,8 @@ public class IntroFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		gps = new Gps(requestOnGpsLauncher, requestLocationPermissionLauncher,
-				moveToAppDetailSettingsLauncher);
+		gps = new Gps(getContext(), requestOnGpsLauncher,
+				requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 	}
 

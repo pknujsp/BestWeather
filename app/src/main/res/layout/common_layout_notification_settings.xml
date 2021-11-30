@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/WidgetConfigureLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/location" />
+
+        <RadioGroup
+            android:id="@+id/location_radio_group"
+            style="@style/WidgetConfigureConfig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/current_location_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/current_location" />
+
+            <RadioButton
+                android:id="@+id/selected_location_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/selected_location" />
+
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/change_address_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="@string/change_address"
+            android:visibility="gone" />
+
+        <TextView
+            style="@style/WidgetConfigureLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/pref_title_weather_data_sources" />
+
+        <RadioGroup
+            android:id="@+id/weather_data_source_radio_group"
+            style="@style/WidgetConfigureConfig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/accu_weather_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/accu_weather" />
+
+            <RadioButton
+                android:id="@+id/owm_radio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/owm" />
+
+        </RadioGroup>
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/kma_top_priority_switch"
+            style="@style/WidgetConfigureLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/pref_title_kma_top_priority" />
+
+        <TextView
+            android:id="@+id/autoRefreshIntervalLabel"
+            style="@style/WidgetConfigureLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/auto_refresh_interval" />
+
+        <Spinner
+            android:id="@+id/auto_refresh_interval_spinner"
+            style="@style/WidgetConfigureConfig"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/alarmClockLabel"
+            style="@style/WidgetConfigureLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/alarmClock" />
+
+        <TextView
+            android:id="@+id/alarmClock"
+            style="@style/WidgetConfigureLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:text="08:00"
+            android:textColor="@color/blue" />
+
+    </LinearLayout>
+</layout>

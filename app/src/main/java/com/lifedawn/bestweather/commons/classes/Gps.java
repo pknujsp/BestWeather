@@ -11,61 +11,59 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.provider.Settings;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 
-import java.io.Serializable;
-
 public class Gps {
-	private LocationManager locationManager;
+	private final LocationManager locationManager;
+	private final Context context;
+
 	private LocationListener locationListener;
 	private AlertDialog dialog;
 	private ActivityResultLauncher<Intent> requestOnGpsLauncher;
 	private ActivityResultLauncher<String> requestLocationPermissionLauncher;
 	private ActivityResultLauncher<Intent> moveToAppDetailSettingsLauncher;
 
-	public Gps(ActivityResultLauncher<Intent> requestOnGpsLauncher, ActivityResultLauncher<String> requestLocationPermissionLauncher, ActivityResultLauncher<Intent> moveToAppDetailSettingsLauncher) {
+	public Gps(Context context, ActivityResultLauncher<Intent> requestOnGpsLauncher, ActivityResultLauncher<String> requestLocationPermissionLauncher, ActivityResultLauncher<Intent> moveToAppDetailSettingsLauncher) {
 		this.requestOnGpsLauncher = requestOnGpsLauncher;
 		this.requestLocationPermissionLauncher = requestLocationPermissionLauncher;
 		this.moveToAppDetailSettingsLauncher = moveToAppDetailSettingsLauncher;
+		this.context = context;
+		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 	}
 
 	public void runGps(Activity activity, LocationCallback callback) {
 		//권한 확인
-		Context context = activity.getApplicationContext();
 		dialog = ProgressDialog.show(activity, context.getString(R.string.msg_finding_current_location), null);
-
-		if (locationManager == null) {
-			locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		}
 
 		final boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 		final boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-		int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+		final int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 
 		if (permission == PackageManager.PERMISSION_GRANTED) {
 			if (isGpsEnabled) {
+				HandlerThread handlerThread = new HandlerThread("LocationThread");
+				handlerThread.start();
+				Looper looper = handlerThread.getLooper();
+
 				locationListener = new LocationListener() {
 					boolean isCompleted = false;
 
 					@Override
 					public void onLocationChanged(Location location) {
-						if (locationManager == null) {
-							return;
-						}
-
 						if (!isCompleted) {
+							handlerThread.quit();
 							isCompleted = true;
 							clear();
 							callback.onSuccessful(location);
@@ -88,10 +86,12 @@ public class Gps {
 					}
 				};
 
-				locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+
+				//locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener, looper);
 
 				if (isNetworkEnabled) {
-					locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
+					locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener, looper);
 				}
 			} else {
 				clear();
@@ -119,24 +119,21 @@ public class Gps {
 
 	public void runGps(Context context, LocationCallback callback) {
 		//권한 확인
-		if (locationManager == null) {
-			locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		}
-
 		final boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 		final boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 		int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+
+		HandlerThread handlerThread = new HandlerThread("LocationThread");
+		handlerThread.start();
+		Looper looper = handlerThread.getLooper();
 
 		locationListener = new LocationListener() {
 			boolean isCompleted = false;
 
 			@Override
 			public void onLocationChanged(Location location) {
-				if (locationManager == null) {
-					return;
-				}
-
 				if (!isCompleted) {
+					handlerThread.quit();
 					isCompleted = true;
 					clear();
 					callback.onSuccessful(location);
@@ -158,20 +155,18 @@ public class Gps {
 
 			}
 		};
-		locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+
+
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener, looper);
 
 		if (isNetworkEnabled) {
-			locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
+			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener, looper);
 		}
 
 	}
 
 
 	public boolean checkPermissionAndGpsEnabled(Activity activity, LocationCallback locationCallback) {
-		if (locationManager == null) {
-			locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-		}
-
 		final int permission = ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION);
 		final boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
@@ -202,10 +197,6 @@ public class Gps {
 	}
 
 	public boolean checkPermissionAndGpsEnabled(Context context, LocationCallback locationCallback) {
-		if (locationManager == null) {
-			locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		}
-
 		final int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 		final boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 

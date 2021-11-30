@@ -35,6 +35,7 @@ public class JsonDataSaver {
 		currentConditionsObj.setPrecipitation(null);
 		currentConditionsObj.setZoneId(ZoneId.systemDefault().getId());
 		currentConditionsObj.setPrecipitationType(null);
+		currentConditionsObj.setWindSpeed("2.2");
 		return currentConditionsObj;
 	}
 

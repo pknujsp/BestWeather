@@ -16,7 +16,7 @@ public class WidgetNotiConstants {
 		}
 
 		public enum Current {
-			weatherIcon, temp, realFeelTemp, airQuality, precipitation
+			weatherIcon, temp, realFeelTemp, airQuality, precipitation, windSpeed
 		}
 
 		public enum Hourly {
@@ -57,8 +57,8 @@ public class WidgetNotiConstants {
 		}
 	}
 
-	public enum NotiAttributes {
-
+	public enum DailyNotiAttributes {
+		ALARM_CLOCK
 	}
 
 }

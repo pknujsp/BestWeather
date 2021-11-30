@@ -6,6 +6,8 @@ import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import androidx.preference.PreferenceManager;
+
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
@@ -14,6 +16,7 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.dto.CurrentConditionsObj;
@@ -200,6 +203,10 @@ public class WeatherDataRequest {
 		CurrentConditionsObj currentConditionsObj = new CurrentConditionsObj();
 		boolean successfulResponse = true;
 
+		ValueUnits windUnit =
+				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_wind),
+						ValueUnits.mPerSec.name()));
+
 		switch (weatherSourceType) {
 			case KMA:
 				if (KmaResponseProcessor.successfulVilageResponse((Response<VilageFcstResponse>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponse())) {
@@ -210,6 +217,7 @@ public class WeatherDataRequest {
 					currentConditionsObj.setTemp(finalCurrentConditions.getTemperature());
 					currentConditionsObj.setPrecipitation(finalCurrentConditions.getPrecipitation1Hour().equals("0") ? null : finalCurrentConditions.getPrecipitation1Hour());
 					currentConditionsObj.setRealFeelTemp(null);
+					currentConditionsObj.setWindSpeed(ValueUnits.convertWindSpeed(finalCurrentConditions.getWindSpeed(), windUnit).toString());
 
 					SharedPreferences sharedPreferences =
 							context.getSharedPreferences(preferenceName,
@@ -247,6 +255,8 @@ public class WeatherDataRequest {
 					currentConditionsObj.setPrecipitation(item.getPrecip1hr() == null ? null : item.getPrecip1hr().getMetric().getValue());
 					currentConditionsObj.setWeatherIcon(AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon()));
 					currentConditionsObj.setPrecipitationType(AccuWeatherResponseProcessor.getPty(item.getPrecipitationType()));
+					currentConditionsObj.setWindSpeed(ValueUnits.convertVisibilityForAccu(item.getWind().getSpeed().getMetric().getValue(),
+							windUnit));
 
 				} else {
 					successfulResponse = false;
@@ -262,6 +272,7 @@ public class WeatherDataRequest {
 
 					currentConditionsObj.setTemp(current.getTemp());
 					currentConditionsObj.setRealFeelTemp(current.getFeelsLike());
+					currentConditionsObj.setWindSpeed(ValueUnits.convertWindSpeed(current.getWind_speed(), windUnit).toString());
 
 					if (current.getRain() != null) {
 						currentConditionsObj.setPrecipitation(current.getRain().getPrecipitation1Hour());

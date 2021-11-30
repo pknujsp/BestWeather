@@ -79,6 +79,8 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 		super.onViewCreated(view, savedInstanceState);
 		binding.toolbar.fragmentTitle.setText(R.string.always_notification);
 		binding.notificationSwitch.setText(R.string.use_always_notification);
+		binding.commons.alarmClock.setVisibility(View.GONE);
+		binding.commons.alarmClockLabel.setVisibility(View.GONE);
 
 		binding.notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
@@ -115,27 +117,27 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 
 			if (notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), LocationType.SelectedAddress.name()).equals(LocationType.SelectedAddress.name())) {
 				selectedFavoriteLocation = true;
-				binding.selectedLocationRadio.setChecked(true);
+				binding.commons.selectedLocationRadio.setChecked(true);
 				String text = getString(R.string.location) + ", " + notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name()
 						, "");
-				binding.selectedLocationRadio.setText(text);
-				binding.changeAddressBtn.setVisibility(View.VISIBLE);
+				binding.commons.selectedLocationRadio.setText(text);
+				binding.commons.changeAddressBtn.setVisibility(View.VISIBLE);
 			} else {
-				binding.currentLocationRadio.setChecked(true);
+				binding.commons.currentLocationRadio.setChecked(true);
 			}
 
 			WeatherSourceType defaultWeatherSourceType = WeatherSourceType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
 					WeatherSourceType.OPEN_WEATHER_MAP.name()));
 			if (defaultWeatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
-				binding.owmRadio.setChecked(true);
+				binding.commons.owmRadio.setChecked(true);
 			} else if (defaultWeatherSourceType == WeatherSourceType.ACCU_WEATHER) {
-				binding.accuWeatherRadio.setChecked(true);
+				binding.commons.accuWeatherRadio.setChecked(true);
 			} else {
-				binding.kmaTopPrioritySwitch.setChecked(true);
+				binding.commons.kmaTopPrioritySwitch.setChecked(true);
 			}
 
 			if (notiPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), true)) {
-				binding.kmaTopPrioritySwitch.setChecked(true);
+				binding.commons.kmaTopPrioritySwitch.setChecked(true);
 			}
 
 			long autoRefreshInterval = notiPreferences.getLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L);
@@ -143,7 +145,7 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 
 			for (int i = 0; i < intervalsStr.length; i++) {
 				if (Long.parseLong(intervalsStr[i]) == autoRefreshInterval) {
-					binding.autoRefreshIntervalSpinner.setSelection(i);
+					binding.commons.autoRefreshIntervalSpinner.setSelection(i);
 					break;
 				}
 			}
@@ -245,16 +247,16 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 			initPreferences();
 			alwaysNotiViewCreator.loadPreferences();
 
-			binding.locationRadioGroup.clearCheck();
+			binding.commons.locationRadioGroup.clearCheck();
 			if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_accu_weather), true)) {
-				binding.accuWeatherRadio.setChecked(true);
+				binding.commons.accuWeatherRadio.setChecked(true);
 			} else {
-				binding.owmRadio.setChecked(true);
+				binding.commons.owmRadio.setChecked(true);
 			}
-			binding.selectedLocationRadio.setText(R.string.selected_location);
-			binding.changeAddressBtn.setVisibility(View.GONE);
-			binding.kmaTopPrioritySwitch.setChecked(false);
-			binding.autoRefreshIntervalSpinner.setSelection(0);
+			binding.commons.selectedLocationRadio.setText(R.string.selected_location);
+			binding.commons.changeAddressBtn.setVisibility(View.GONE);
+			binding.commons.kmaTopPrioritySwitch.setChecked(false);
+			binding.commons.autoRefreshIntervalSpinner.setSelection(0);
 
 			alwaysNotiViewCreator.makeNotification(alwaysNotiViewCreator.createRemoteViews(true), R.drawable.temp_icon);
 			initializing = false;

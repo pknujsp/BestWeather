@@ -29,7 +29,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
@@ -44,14 +43,13 @@ import com.lifedawn.bestweather.databinding.FragmentBaseNotificationSettingsBind
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-public abstract class BaseNotificationSettingsFragment extends Fragment implements AlwaysNotiViewCreator.NotificationUpdateCallback {
+public abstract class BaseNotificationSettingsFragment extends Fragment implements NotificationUpdateCallback {
 	protected FragmentBaseNotificationSettingsBinding binding;
 	protected boolean isKr;
 	protected FavoriteAddressDto newSelectedAddressDto;
@@ -78,7 +76,7 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		notificationHelper = new NotificationHelper(getActivity().getApplicationContext());
-		gps = new Gps(requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
+		gps = new Gps(getContext(), requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
 
 		Locale locale = null;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -116,13 +114,13 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 		});
 
 		if (isKr) {
-			binding.kmaTopPrioritySwitch.setVisibility(View.VISIBLE);
+			binding.commons.kmaTopPrioritySwitch.setVisibility(View.VISIBLE);
 		} else {
-			binding.kmaTopPrioritySwitch.setVisibility(View.GONE);
+			binding.commons.kmaTopPrioritySwitch.setVisibility(View.GONE);
 		}
 
 		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.AutoRefreshIntervals));
-		binding.autoRefreshIntervalSpinner.setAdapter(spinnerAdapter);
+		binding.commons.autoRefreshIntervalSpinner.setAdapter(spinnerAdapter);
 
 		initLocation();
 		initWeatherDataSource();
@@ -137,7 +135,7 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 
 
 	protected void initAutoRefreshInterval() {
-		binding.autoRefreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+		binding.commons.autoRefreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				Preference preference = new Preference(getContext());
@@ -157,7 +155,7 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 
 
 	protected void initWeatherDataSource() {
-		binding.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				Preference preference = new Preference(getContext());
@@ -169,7 +167,7 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 				onCheckedWeatherDataSource(checked);
 			}
 		});
-		binding.kmaTopPrioritySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+		binding.commons.kmaTopPrioritySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				Preference preference = new Preference(getContext());
@@ -182,17 +180,17 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 	}
 
 	protected void initLocation() {
-		binding.locationRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+		binding.commons.locationRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				if (checkedId == binding.currentLocationRadio.getId() && binding.currentLocationRadio.isChecked()) {
+				if (checkedId == binding.commons.currentLocationRadio.getId() && binding.commons.currentLocationRadio.isChecked()) {
 					if (gps.checkPermissionAndGpsEnabled(getActivity(), locationCallback)) {
 						Preference preference = new Preference(getContext());
 						preference.setKey(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name());
 						onPreferenceChangeListener.onPreferenceChange(preference, LocationType.CurrentLocation.name());
 						onSelectedCurrentLocation();
 					}
-				} else if(checkedId == binding.selectedLocationRadio.getId() && binding.selectedLocationRadio.isChecked()) {
+				} else if(checkedId == binding.commons.selectedLocationRadio.getId() && binding.commons.selectedLocationRadio.isChecked()) {
 					if (!selectedFavoriteLocation) {
 						openFavoritesFragment();
 					}
@@ -200,7 +198,7 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 			}
 		});
 
-		binding.changeAddressBtn.setOnClickListener(new View.OnClickListener() {
+		binding.commons.changeAddressBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				openFavoritesFragment();
@@ -220,15 +218,15 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 				if (result.getSerializable(BundleKey.SelectedAddressDto.name()) == null) {
 					if (!selectedFavoriteLocation) {
 						Toast.makeText(getContext(), R.string.not_selected_address, Toast.LENGTH_SHORT).show();
-						binding.selectedLocationRadio.setText(R.string.click_again_to_select_address);
-						binding.selectedLocationRadio.setChecked(false);
-						binding.currentLocationRadio.setChecked(false);
+						binding.commons.selectedLocationRadio.setText(R.string.click_again_to_select_address);
+						binding.commons.selectedLocationRadio.setChecked(false);
+						binding.commons.currentLocationRadio.setChecked(false);
 					}
 				} else {
 					newSelectedAddressDto = (FavoriteAddressDto) result.getSerializable(BundleKey.SelectedAddressDto.name());
 					String text = getString(R.string.location) + ", " + newSelectedAddressDto.getAddress();
-					binding.selectedLocationRadio.setText(text);
-					binding.changeAddressBtn.setVisibility(View.VISIBLE);
+					binding.commons.selectedLocationRadio.setText(text);
+					binding.commons.changeAddressBtn.setVisibility(View.VISIBLE);
 					selectedFavoriteLocation = true;
 
 					Preference preference = new Preference(getContext());
@@ -325,7 +323,7 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 				Toast.makeText(getContext(), R.string.message_needs_location_permission, Toast.LENGTH_SHORT).show();
 			}
 
-			binding.locationRadioGroup.clearCheck();
+			binding.commons.locationRadioGroup.clearCheck();
 
 		}
 	};
