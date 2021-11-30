@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.google.gson.JsonElement;
+import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqicn;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
@@ -122,9 +123,15 @@ public class WeatherDataRequest {
 	                            MultipleJsonDownloader multipleJsonDownloader) {
 		SharedPreferences attributes =
 				context.getSharedPreferences(preferenceName, Context.MODE_PRIVATE);
-		final WeatherSourceType weatherSourceType =
+		WeatherSourceType weatherSourceType =
 				WeatherSourceType.valueOf(attributes.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
 						WeatherSourceType.OPEN_WEATHER_MAP.name()));
+		String countryCode = attributes.getString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), "");
+		if (attributes.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), true) &&
+				countryCode.equals("KR")) {
+			weatherSourceType = WeatherSourceType.KMA;
+		}
+
 		ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources =
 				makeRequestWeatherSources(weatherSourceType);
 
@@ -133,10 +140,11 @@ public class WeatherDataRequest {
 		Double latitude = Double.parseDouble(attributes.getString(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), "0.0"));
 		Double longitude = Double.parseDouble(attributes.getString(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), "0.0"));
 
+		WeatherSourceType finalWeatherSourceType = weatherSourceType;
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				initWeatherSourceUniqueValues(weatherSourceType);
+				initWeatherSourceUniqueValues(finalWeatherSourceType);
 				MainProcessing.requestNewWeatherData(context, latitude, longitude,
 						requestWeatherSources, multipleJsonDownloader);
 			}
@@ -222,6 +230,7 @@ public class WeatherDataRequest {
 					boolean isNight = SunRiseSetUtil.isNight(calendar, sunRise, sunSet);
 
 					currentConditionsObj.setWeatherIcon(KmaResponseProcessor.getWeatherPtyIconImg(finalCurrentConditions.getPrecipitationType(), isNight));
+					currentConditionsObj.setPrecipitationType(KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()));
 				} else {
 					successfulResponse = false;
 				}
@@ -237,6 +246,7 @@ public class WeatherDataRequest {
 					currentConditionsObj.setRealFeelTemp(item.getRealFeelTemperature().getMetric().getValue());
 					currentConditionsObj.setPrecipitation(item.getPrecip1hr() == null ? null : item.getPrecip1hr().getMetric().getValue());
 					currentConditionsObj.setWeatherIcon(AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon()));
+					currentConditionsObj.setPrecipitationType(AccuWeatherResponseProcessor.getPty(item.getPrecipitationType()));
 
 				} else {
 					successfulResponse = false;
@@ -255,8 +265,10 @@ public class WeatherDataRequest {
 
 					if (current.getRain() != null) {
 						currentConditionsObj.setPrecipitation(current.getRain().getPrecipitation1Hour());
+						currentConditionsObj.setPrecipitationType(context.getString(R.string.rain));
 					} else if (current.getSnow() != null) {
 						currentConditionsObj.setPrecipitation(current.getSnow().getPrecipitation1Hour());
+						currentConditionsObj.setPrecipitationType(context.getString(R.string.snow));
 					}
 					currentConditionsObj.setWeatherIcon(OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId()
 							, current.getWeather().get(0).getIcon().contains("n")));

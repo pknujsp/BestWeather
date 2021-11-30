@@ -95,7 +95,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			if (f instanceof SettingsMainFragment) {
 				final boolean newUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location),
 						true);
-				final LocationType lastSelectedLocationType = LocationType.enumOf(
+				final LocationType lastSelectedLocationType = LocationType.valueOf(
 						sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
 								LocationType.CurrentLocation.name()));
 
@@ -231,7 +231,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
 				final boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), true);
-				final LocationType lastSelectedLocationType = LocationType.enumOf(
+				final LocationType lastSelectedLocationType = LocationType.valueOf(
 						sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
 								LocationType.CurrentLocation.name()));
 				setCurrentLocationState(usingCurrentLocation);
@@ -336,7 +336,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	private void processIfPreviousFragmentIsFavorite(Bundle bundle) {
 		final int lastSelectedFavoriteAddressId =
 				sharedPreferences.getInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1);
-		final LocationType lastSelectedLocationType = LocationType.enumOf(
+		final LocationType lastSelectedLocationType = LocationType.valueOf(
 				sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type), LocationType.CurrentLocation.name()));
 
 		if (lastSelectedLocationType == LocationType.SelectedAddress) {
@@ -458,10 +458,12 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 						}
 					});
 
+					String tag = FavoritesFragment.class.getName();
+
 					getChildFragmentManager().beginTransaction().hide(
 							getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName())).add(
 							binding.fragmentContainer.getId(), favoritesFragment,
-							getString(R.string.tag_favorites_fragment)).addToBackStack(getString(R.string.tag_favorites_fragment)).commit();
+							tag).addToBackStack(tag).commit();
 					break;
 				case R.id.settings:
 					SettingsMainFragment settingsMainFragment = new SettingsMainFragment();
@@ -473,12 +475,12 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 					break;
 				case R.id.notificationSettings:
 					NotificationFragment notificationFragment = new NotificationFragment();
-					String tag = NotificationFragment.class.getName();
+					String favTag = NotificationFragment.class.getName();
 
 					getChildFragmentManager().beginTransaction().hide(
 							getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName())).add(
 							binding.fragmentContainer.getId(), notificationFragment,
-							tag).addToBackStack(tag).commit();
+							favTag).addToBackStack(favTag).commit();
 					break;
 			}
 			binding.drawerLayout.closeDrawer(binding.sideNavigation, false);

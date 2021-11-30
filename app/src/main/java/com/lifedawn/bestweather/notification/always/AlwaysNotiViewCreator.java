@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
@@ -43,6 +45,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.prefs.PreferenceChangeListener;
 
 public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferenceChangeListener {
 	private final NotificationType notificationType = NotificationType.Always;
@@ -53,7 +56,7 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 	private WeatherSourceType weatherSourceType;
 	private boolean kmaTopPriority;
 	private long updateInterval;
-	private int selectedAddressDtoId;
+	private Integer selectedAddressDtoId;
 	private final ValueUnits tempUnit;
 	private final String tempDegree;
 	private JsonDataSaver jsonDataSaver = new JsonDataSaver();
@@ -75,18 +78,6 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 		notificationHelper = new NotificationHelper(context);
 	}
 
-	public void loadPreferences() {
-		SharedPreferences notiPreferences = null;
-		notiPreferences = context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
-
-		locationType = LocationType.valueOf(
-				notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), LocationType.SelectedAddress.name()));
-		weatherSourceType = WeatherSourceType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
-				WeatherSourceType.OPEN_WEATHER_MAP.name()));
-		kmaTopPriority = notiPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false);
-		updateInterval = notiPreferences.getLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L);
-		selectedAddressDtoId = notiPreferences.getInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
-	}
 
 	public RemoteViews createRemoteViews(boolean temp) {
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_always_notification);
@@ -96,7 +87,7 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, refreshIntent,
 				PendingIntent.FLAG_CANCEL_CURRENT);
 
-		remoteViews.setOnClickPendingIntent(R.id.refreshDateTime, pendingIntent);
+		remoteViews.setOnClickPendingIntent(R.id.refresh, pendingIntent);
 
 		if (temp) {
 			setCurrentConditionsViews(remoteViews, jsonDataSaver.getTempCurrentConditionsObj());
@@ -108,24 +99,19 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 
 	public void initNotification() {
 		//초기화
+		if (locationType == null) {
+			return;
+		}
+
 		RemoteViews remoteViews = createRemoteViews(false);
-		makeNotification(remoteViews);
+		makeNotification(remoteViews, R.drawable.temp_icon);
 
 		RemoteViewProcessor.onBeginProcess(remoteViews);
-		makeNotification(remoteViews);
+		makeNotification(remoteViews, R.drawable.temp_icon);
 
 		if (locationType == LocationType.CurrentLocation) {
 			loadCurrentLocation(context, remoteViews);
 		} else {
-			SharedPreferences sharedPreferences = context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
-
-			if (sharedPreferences.getString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), "").equals("KR")) {
-				if (kmaTopPriority) {
-					weatherSourceType = WeatherSourceType.KMA;
-					sharedPreferences.edit().putString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
-							WeatherSourceType.KMA.name()).commit();
-				}
-			}
 			loadWeatherData(context, remoteViews);
 		}
 	}
@@ -140,13 +126,8 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 						final SharedPreferences sharedPreferences =
 								context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
 						SharedPreferences.Editor editor = sharedPreferences.edit();
-
 						String countryCode = addressList.get(0).getCountryCode();
-						if (countryCode.equals("KR")) {
-							if (sharedPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false)) {
-								editor.putString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(), WeatherSourceType.KMA.name());
-							}
-						}
+
 						editor.putString(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), String.valueOf(addressList.get(0).getLatitude()))
 								.putString(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), String.valueOf(addressList.get(0).getLongitude()))
 								.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), countryCode)
@@ -177,7 +158,7 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, PendingIntent.getActivity(context, 0, intent,
 						PendingIntent.FLAG_UPDATE_CURRENT));
 				RemoteViewProcessor.onErrorProcess(remoteViews, errorMsg, btnMsg);
-				makeNotification(remoteViews);
+				makeNotification(remoteViews, R.drawable.temp_icon);
 			}
 		};
 
@@ -189,7 +170,7 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 
 	public void loadWeatherData(Context context, RemoteViews remoteViews) {
 		RemoteViewProcessor.onBeginProcess(remoteViews);
-		makeNotification(remoteViews);
+		makeNotification(remoteViews, R.drawable.temp_icon);
 
 		WeatherDataRequest weatherDataRequest = new WeatherDataRequest(context);
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
@@ -212,7 +193,6 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 		Set<RequestWeatherDataType> set = new HashSet<>();
 		set.add(RequestWeatherDataType.currentConditions);
 		set.add(RequestWeatherDataType.hourlyForecast);
-		//set.add(RequestWeatherDataType.dailyForecast);
 		return set;
 	}
 
@@ -222,9 +202,14 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 		SharedPreferences sharedPreferences =
 				context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
 
-		final WeatherSourceType requestWeatherSourceType =
+		WeatherSourceType requestWeatherSourceType =
 				WeatherSourceType.valueOf(sharedPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
 						WeatherSourceType.OPEN_WEATHER_MAP.name()));
+		String countryCode = sharedPreferences.getString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), "");
+		if (sharedPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), true) &&
+				countryCode.equals("KR")) {
+			requestWeatherSourceType = WeatherSourceType.KMA;
+		}
 
 		CurrentConditionsObj currentConditionsObj = null;
 		WeatherJsonObj.HourlyForecasts hourlyForecastObjs = null;
@@ -271,22 +256,33 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 			}
 		}
 
+		int icon = R.drawable.temp_icon;
+
 		if (successful) {
 			RemoteViewProcessor.onSuccessfulProcess(remoteViews);
+			icon = currentConditionsObj.getWeatherIcon();
 		}
 
-		makeNotification(remoteViews);
+		makeNotification(remoteViews, icon);
 		JsonDataSaver.saveWeatherData(notificationType.getPreferenceName(), context, headerObj, currentConditionsObj, hourlyForecastObjs,
 				dailyForecasts);
 	}
 
-	public void makeNotification(RemoteViews remoteViews) {
+	public void makeNotification(RemoteViews remoteViews, int icon) {
 		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(notificationType);
 		notificationObj.getNotificationBuilder().setOngoing(true);
+		notificationObj.getNotificationBuilder().setSmallIcon(icon);
+		notificationObj.getNotificationBuilder().setShowWhen(false);
+		notificationObj.getNotificationBuilder().setStyle(new NotificationCompat.BigTextStyle());
+		notificationObj.getNotificationBuilder().setPriority(NotificationCompat.PRIORITY_MAX);
+		notificationObj.getNotificationBuilder().setVibrate(new long[]{0L});
+
 
 		notificationObj.getNotificationBuilder().setCustomContentView(remoteViews);
-		notificationUpdateCallback.updateNotification(remoteViews);
-
+		notificationObj.getNotificationBuilder().setCustomBigContentView(remoteViews);
+		if (notificationUpdateCallback != null) {
+			notificationUpdateCallback.updateNotification(remoteViews);
+		}
 		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
 		Notification notification = notificationObj.getNotificationBuilder().build();
 		notificationManager.notify(notificationObj.getNotificationId(), notification);
@@ -297,7 +293,7 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 			return;
 		}
 		remoteViews.setTextViewText(R.id.address, headerObj.getAddress());
-		remoteViews.setTextViewText(R.id.refreshDateTime, ZonedDateTime.parse(headerObj.getRefreshDateTime()).format(dateTimeFormatter));
+		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(headerObj.getRefreshDateTime()).format(dateTimeFormatter));
 	}
 
 	public void setCurrentConditionsViews(RemoteViews remoteViews, CurrentConditionsObj currentConditionsObj) {
@@ -308,7 +304,8 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 		remoteViews.setTextViewText(R.id.airQuality, currentConditionsObj.getAirQuality() == null ? context.getString(R.string.not_data)
 				: AqicnResponseProcessor.getGradeDescription((int) Double.parseDouble(currentConditionsObj.getAirQuality())));
 		remoteViews.setTextViewText(R.id.precipitation, currentConditionsObj.getPrecipitation() == null ?
-				context.getString(R.string.not_precipitation) : currentConditionsObj.getPrecipitation() + "mm");
+				context.getString(R.string.not_precipitation) :
+				currentConditionsObj.getPrecipitationType() + ", " + currentConditionsObj.getPrecipitation() + "mm");
 		remoteViews.setTextViewText(R.id.temp, ValueUnits.convertTemperature(currentConditionsObj.getTemp(),
 				tempUnit) + tempDegree);
 	}
@@ -376,14 +373,38 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		locationType = LocationType.valueOf(sharedPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(),
-				LocationType.CurrentLocation.name()));
-		weatherSourceType = WeatherSourceType.valueOf(sharedPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
-				WeatherSourceType.OPEN_WEATHER_MAP.name()));
-		kmaTopPriority = sharedPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), kmaTopPriority);
-		updateInterval = sharedPreferences.getLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), updateInterval);
-		selectedAddressDtoId = sharedPreferences.getInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
+		if (key.equals(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name())) {
+			String locationTypeStr = sharedPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), "");
+			locationType = locationTypeStr.isEmpty() ? null : LocationType.valueOf(locationTypeStr);
+		}
+		if (key.equals(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name())) {
+			weatherSourceType = WeatherSourceType.valueOf(sharedPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
+					WeatherSourceType.OPEN_WEATHER_MAP.name()));
+		}
+		if (key.equals(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name())) {
+			kmaTopPriority = sharedPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), kmaTopPriority);
+		}
+		if (key.equals(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name())) {
+			updateInterval = sharedPreferences.getLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), updateInterval);
+		}
+		if (key.equals(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name())) {
+			selectedAddressDtoId = sharedPreferences.getInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
+		}
 	}
+
+	public void loadPreferences() {
+		SharedPreferences notiPreferences = null;
+		notiPreferences = context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
+
+		String locationTypeStr = notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), "");
+		locationType = locationTypeStr.isEmpty() ? null : LocationType.valueOf(locationTypeStr);
+		weatherSourceType = WeatherSourceType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
+				WeatherSourceType.OPEN_WEATHER_MAP.name()));
+		kmaTopPriority = notiPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false);
+		updateInterval = notiPreferences.getLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L);
+		selectedAddressDtoId = notiPreferences.getInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
+	}
+
 
 	public LocationType getLocationType() {
 		return locationType;
@@ -404,6 +425,7 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 	public int getSelectedAddressDtoId() {
 		return selectedAddressDtoId;
 	}
+
 
 	public interface NotificationUpdateCallback {
 		void updateNotification(RemoteViews remoteViews);

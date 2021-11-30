@@ -2,136 +2,174 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-
-    <LinearLayout
-        android:id="@+id/widget_settings_container"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/adViewBottom"
-        android:layout_below="@id/toolbar"
-        android:orientation="vertical"
-        android:paddingHorizontal="16dp">
+        android:background="?attr/backgroundColor">
 
-        <FrameLayout
-            android:id="@+id/preview_layout"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false"
-            android:minHeight="40dp"
-            android:paddingHorizontal="18dp"
-            android:paddingVertical="12dp" />
+            android:layout_height="match_parent">
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/scroll_view"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:overScrollMode="never"
-            android:scrollbars="none">
+            <include
+                android:id="@+id/toolbar"
+                layout="@layout/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_alignParentTop="true" />
 
-            <LinearLayout
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/root_scroll_View"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/notificationSwitch"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:checked="false"
-                    android:text="@string/use_always_notification" />
+                android:layout_above="@id/adViewBottom"
+                android:layout_below="@id/toolbar"
+                android:overScrollMode="never"
+                android:paddingHorizontal="16dp"
+                android:scrollbars="none">
 
                 <LinearLayout
-                    android:id="@+id/settingsLayout"
+                    android:id="@+id/widget_settings_container"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_above="@id/adViewBottom"
+                    android:layout_below="@id/toolbar"
                     android:orientation="vertical">
 
-                    <TextView
-                        style="@style/WidgetConfigureLabel"
+                    <FrameLayout
+                        android:id="@+id/preview_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/location" />
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:minHeight="40dp"
+                        android:paddingHorizontal="18dp"
+                        android:paddingVertical="12dp" />
 
-                    <RadioGroup
-                        android:id="@+id/location_radio_group"
-                        style="@style/WidgetConfigureConfig"
+                    <androidx.core.widget.NestedScrollView
+                        android:id="@+id/scroll_view"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:overScrollMode="never"
+                        android:scrollbars="none">
 
-                        <RadioButton
-                            android:id="@+id/current_location_radio"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/current_location" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
 
-                        <RadioButton
-                            android:id="@+id/selected_location_radio"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/selected_location" />
+                            <androidx.appcompat.widget.SwitchCompat
+                                android:id="@+id/notificationSwitch"
+                                android:layout_width="match_parent"
+                                android:checked="true"
+                                android:layout_height="wrap_content"
+                                android:text="@string/use_always_notification" />
 
-                    </RadioGroup>
+                            <LinearLayout
+                                android:id="@+id/settingsLayout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
 
-                    <Button
-                        android:id="@+id/change_address_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/change_address"
-                        android:visibility="gone" />
+                                <TextView
+                                    style="@style/WidgetConfigureLabel"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/location" />
 
-                    <TextView
-                        style="@style/WidgetConfigureLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/pref_title_weather_data_sources" />
+                                <RadioGroup
+                                    android:id="@+id/location_radio_group"
+                                    style="@style/WidgetConfigureConfig"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
 
-                    <RadioGroup
-                        android:id="@+id/weather_data_source_radio_group"
-                        style="@style/WidgetConfigureConfig"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                                    <RadioButton
+                                        android:id="@+id/current_location_radio"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/current_location" />
 
-                        <RadioButton
-                            android:id="@+id/accu_weather_radio"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/accu_weather" />
+                                    <RadioButton
+                                        android:id="@+id/selected_location_radio"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/selected_location" />
 
-                        <RadioButton
-                            android:id="@+id/owm_radio"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/owm" />
+                                </RadioGroup>
 
-                    </RadioGroup>
+                                <Button
+                                    android:id="@+id/change_address_btn"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="4dp"
+                                    android:text="@string/change_address"
+                                    android:visibility="gone" />
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/kma_top_priority_switch"
-                        style="@style/WidgetConfigureLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:checked="false"
-                        android:text="@string/pref_title_kma_top_priority" />
+                                <TextView
+                                    style="@style/WidgetConfigureLabel"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/pref_title_weather_data_sources" />
 
-                    <TextView
-                        style="@style/WidgetConfigureLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/auto_refresh_interval" />
+                                <RadioGroup
+                                    android:id="@+id/weather_data_source_radio_group"
+                                    style="@style/WidgetConfigureConfig"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content">
 
-                    <Spinner
-                        android:id="@+id/auto_refresh_interval_spinner"
-                        style="@style/WidgetConfigureConfig"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                                    <RadioButton
+                                        android:id="@+id/accu_weather_radio"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/accu_weather" />
+
+                                    <RadioButton
+                                        android:id="@+id/owm_radio"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="@string/owm" />
+
+                                </RadioGroup>
+
+                                <androidx.appcompat.widget.SwitchCompat
+                                    android:id="@+id/kma_top_priority_switch"
+                                    style="@style/WidgetConfigureLabel"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:checked="false"
+                                    android:text="@string/pref_title_kma_top_priority" />
+
+                                <TextView
+                                    style="@style/WidgetConfigureLabel"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/auto_refresh_interval" />
+
+                                <Spinner
+                                    android:id="@+id/auto_refresh_interval_spinner"
+                                    style="@style/WidgetConfigureConfig"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+
+                            </LinearLayout>
+                        </LinearLayout>
+                    </androidx.core.widget.NestedScrollView>
 
                 </LinearLayout>
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
 
-    </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+
+            <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/adViewBottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                ads:adSize="BANNER"
+                ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+        </RelativeLayout>
+
+    </FrameLayout>
+
 
 </layout>

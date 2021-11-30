@@ -10,8 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RemoteViews;
 
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.notification.BaseNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +44,7 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 	}
 
 	@Override
-	public void onSelectedAddress() {
+	public void onSelectedFavoriteLocation(FavoriteAddressDto favoriteAddressDto) {
 
 	}
 
@@ -63,9 +65,15 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 	}
 
 	@Override
-	public void updateNotification() {
+	public void onCheckedKmaPriority(boolean checked) {
 
 	}
+
+	@Override
+	public void onCheckedWeatherDataSource(WeatherSourceType weatherSourceType) {
+
+	}
+
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

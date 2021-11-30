@@ -21,6 +21,10 @@ public class CurrentConditionsObj {
 	private String precipitation;
 
 	@Expose
+	@SerializedName("precipitationType")
+	private String precipitationType;
+
+	@Expose
 	@SerializedName("airQuality")
 	private String airQuality;
 
@@ -93,5 +97,13 @@ public class CurrentConditionsObj {
 
 	public String getZoneId() {
 		return zoneId;
+	}
+
+	public String getPrecipitationType() {
+		return precipitationType;
+	}
+
+	public void setPrecipitationType(String precipitationType) {
+		this.precipitationType = precipitationType;
 	}
 }

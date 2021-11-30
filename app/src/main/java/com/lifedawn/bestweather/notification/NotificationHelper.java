@@ -22,9 +22,8 @@ public class NotificationHelper {
 
 	private void createNotificationChannel(NotificationObj notificationObj) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			int importance = NotificationManager.IMPORTANCE_DEFAULT;
-
-			NotificationChannel channel = new NotificationChannel(notificationObj.channelId, notificationObj.channelName, importance);
+			NotificationChannel channel = new NotificationChannel(notificationObj.channelId, notificationObj.channelName,
+					NotificationManager.IMPORTANCE_HIGH);
 			channel.setDescription(notificationObj.channelDescription);
 
 			NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
@@ -46,8 +45,6 @@ public class NotificationHelper {
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationObj.channelId)
 				.setSmallIcon(R.drawable.temp_icon)
-				.setStyle(new NotificationCompat.DecoratedCustomViewStyle())
-				.setPriority(NotificationCompat.PRIORITY_DEFAULT)
 				.setContentIntent(pendingIntent)
 				.setAutoCancel(false);
 

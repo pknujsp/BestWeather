@@ -176,12 +176,6 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 		if (locationType == LocationType.CurrentLocation) {
 			loadCurrentLocation(context, remoteViews, appWidgetId);
 		} else {
-			if (sharedPreferences.getString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), "").equals("KR")) {
-				if (sharedPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false)) {
-					sharedPreferences.edit().putString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
-							WeatherSourceType.KMA.name()).apply();
-				}
-			}
 			loadWeatherData(context, AppWidgetManager.getInstance(context), remoteViews, appWidgetId);
 		}
 	}
@@ -224,11 +218,6 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 						SharedPreferences.Editor editor = widgetAttributes.edit();
 
 						String countryCode = addressList.get(0).getCountryCode();
-						if (countryCode.equals("KR")) {
-							if (widgetAttributes.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false)) {
-								editor.putString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(), WeatherSourceType.KMA.name());
-							}
-						}
 						editor.putString(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), String.valueOf(addressList.get(0).getLatitude()))
 								.putString(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), String.valueOf(addressList.get(0).getLongitude()))
 								.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), countryCode)
@@ -309,9 +298,14 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 		WidgetCreator widgetCreator = new WidgetCreator(context, this);
 		widgetCreator.onSharedPreferenceChanged(widgetAttributes, null);
 
-		final WeatherSourceType requestWeatherSourceType =
+		 WeatherSourceType requestWeatherSourceType =
 				WeatherSourceType.valueOf(widgetAttributes.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
 						WeatherSourceType.OPEN_WEATHER_MAP.name()));
+		String countryCode = widgetAttributes.getString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), "");
+		if (widgetAttributes.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), true) &&
+				countryCode.equals("KR")) {
+			requestWeatherSourceType = WeatherSourceType.KMA;
+		}
 
 		CurrentConditionsObj currentConditionsObj = null;
 		WeatherJsonObj.HourlyForecasts hourlyForecastObjs = null;

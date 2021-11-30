@@ -34,6 +34,7 @@ public class JsonDataSaver {
 		currentConditionsObj.setAirQuality("10");
 		currentConditionsObj.setPrecipitation(null);
 		currentConditionsObj.setZoneId(ZoneId.systemDefault().getId());
+		currentConditionsObj.setPrecipitationType(null);
 		return currentConditionsObj;
 	}
 

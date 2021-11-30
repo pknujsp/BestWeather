@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
 
 public class NotificationReceiver extends BroadcastReceiver {
 
@@ -14,7 +15,9 @@ public class NotificationReceiver extends BroadcastReceiver {
 		String action = intent.getAction();
 
 		if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-
+			AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(context, null);
+			alwaysNotiViewCreator.loadPreferences();
+			alwaysNotiViewCreator.initNotification();
 		}
 	}
 }

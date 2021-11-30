@@ -251,7 +251,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 			else if (key.equals(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name()))
 				editor.putString(key, (String) newValue);
 
-			editor.apply();
+			editor.commit();
 			return true;
 		}
 	};
@@ -452,8 +452,11 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 				}
 			}
 		});
-		getSupportFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), favoritesFragment, getString(R.string.tag_favorites_fragment))
-				.addToBackStack(getString(R.string.tag_favorites_fragment)).commit();
+
+		String tag = FavoritesFragment.class.getName();
+
+		getSupportFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), favoritesFragment, tag)
+				.addToBackStack(tag).commit();
 	}
 
 	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(
