@@ -184,13 +184,17 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 				if (checkedId == binding.commons.currentLocationRadio.getId() && binding.commons.currentLocationRadio.isChecked()) {
-					if (gps.checkPermissionAndGpsEnabled(getActivity(), locationCallback)) {
-						Preference preference = new Preference(getContext());
-						preference.setKey(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name());
-						onPreferenceChangeListener.onPreferenceChange(preference, LocationType.CurrentLocation.name());
-						onSelectedCurrentLocation();
-					}
-				} else if(checkedId == binding.commons.selectedLocationRadio.getId() && binding.commons.selectedLocationRadio.isChecked()) {
+					binding.commons.changeAddressBtn.setVisibility(View.GONE);
+					binding.commons.selectedAddressName.setVisibility(View.GONE);
+
+					Preference preference = new Preference(getContext());
+					preference.setKey(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name());
+					onPreferenceChangeListener.onPreferenceChange(preference, LocationType.CurrentLocation.name());
+					onSelectedCurrentLocation();
+				} else if (checkedId == binding.commons.selectedLocationRadio.getId() && binding.commons.selectedLocationRadio.isChecked()) {
+					binding.commons.changeAddressBtn.setVisibility(View.VISIBLE);
+					binding.commons.selectedAddressName.setVisibility(View.VISIBLE);
+
 					if (!selectedFavoriteLocation) {
 						openFavoritesFragment();
 					}
@@ -218,16 +222,13 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 				if (result.getSerializable(BundleKey.SelectedAddressDto.name()) == null) {
 					if (!selectedFavoriteLocation) {
 						Toast.makeText(getContext(), R.string.not_selected_address, Toast.LENGTH_SHORT).show();
-						binding.commons.selectedLocationRadio.setText(R.string.click_again_to_select_address);
-						binding.commons.selectedLocationRadio.setChecked(false);
-						binding.commons.currentLocationRadio.setChecked(false);
+						binding.commons.currentLocationRadio.setChecked(true);
 					}
 				} else {
-					newSelectedAddressDto = (FavoriteAddressDto) result.getSerializable(BundleKey.SelectedAddressDto.name());
-					String text = getString(R.string.location) + ", " + newSelectedAddressDto.getAddress();
-					binding.commons.selectedLocationRadio.setText(text);
-					binding.commons.changeAddressBtn.setVisibility(View.VISIBLE);
 					selectedFavoriteLocation = true;
+
+					newSelectedAddressDto = (FavoriteAddressDto) result.getSerializable(BundleKey.SelectedAddressDto.name());
+					binding.commons.selectedAddressName.setText(newSelectedAddressDto.getAddress());
 
 					Preference preference = new Preference(getContext());
 					preference.setKey(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name());
@@ -322,9 +323,6 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 			} else if (fail == Fail.REJECT_PERMISSION) {
 				Toast.makeText(getContext(), R.string.message_needs_location_permission, Toast.LENGTH_SHORT).show();
 			}
-
-			binding.commons.locationRadioGroup.clearCheck();
-
 		}
 	};
 

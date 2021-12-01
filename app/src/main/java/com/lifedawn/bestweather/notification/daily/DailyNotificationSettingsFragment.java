@@ -45,6 +45,7 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 	private boolean initializing = true;
 	private ValueUnits clockUnit;
 	private DateTimeFormatter dateTimeFormatter;
+	private AlarmManager alarmManager;
 
 
 	@Override
@@ -91,6 +92,9 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 		};
 
 		dailyNotiViewCreator = new DailyNotiViewCreator(getActivity().getApplicationContext());
+
+		alarmManager =
+				(AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
 	}
 
 
@@ -156,6 +160,7 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 						onPreferenceChangeListener.onPreferenceChange(preference, newLocalTime);
 
 						binding.commons.alarmClock.setText(newLocalTime.format(dateTimeFormatter));
+						cancelAlarm();
 						enqueueWork(newLocalTime.toString());
 					}
 				});
@@ -272,16 +277,14 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 		LocalTime localTime = LocalTime.parse(alarmClock);
 		calendar.set(Calendar.HOUR_OF_DAY, localTime.getHour());
 		calendar.set(Calendar.MINUTE, localTime.getMinute());
+		calendar.set(Calendar.SECOND, 0);
 
 		Intent refreshIntent = new Intent(getContext(), NotificationReceiver.class);
 		refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 		refreshIntent.putExtra(NotificationType.class.getName(), notificationType);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 20, refreshIntent,
-				PendingIntent.FLAG_NO_CREATE);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 20, refreshIntent, 0);
 
-		AlarmManager alarmManager =
-				(AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
 				AlarmManager.INTERVAL_DAY, pendingIntent);
 	}
 
@@ -289,11 +292,8 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 		Intent refreshIntent = new Intent(getContext(), NotificationReceiver.class);
 		refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 		refreshIntent.putExtra(NotificationType.class.getName(), notificationType);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 20, refreshIntent,
-				PendingIntent.FLAG_NO_CREATE);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 20, refreshIntent, 0);
 
-		AlarmManager alarmManager =
-				(AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
 		alarmManager.cancel(pendingIntent);
 	}
 

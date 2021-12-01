@@ -51,13 +51,17 @@
 
     <style name="CustomDialog" parent="Theme.AppCompat.Light.Dialog"></style>
 
-    <style name="WidgetConfigureLabel" parent="Widget.AppCompat.TextView">
+    <style name="SettingsLabel" parent="Widget.AppCompat.TextView">
         <item name="android:textSize">14sp</item>
-        <item name="android:layout_marginBottom">4dp</item>
         <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="WidgetConfigureConfig" parent="">
         <item name="android:layout_marginBottom">4dp</item>
+    </style>
+
+    <style name="SettingsValue" parent="Widget.AppCompat.TextView">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 </resources>

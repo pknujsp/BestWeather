@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="3dp"
-        android:layout_weight="0.2"
+        android:layout_weight="0.22"
         android:autoSizeMinTextSize="10sp"
         android:autoSizeTextType="uniform"
         android:gravity="center"
@@ -22,7 +22,6 @@
         android:maxLines="1"
         android:text="@string/clock"
         android:textAlignment="center"
-
         android:textColor="@color/white" />
 
     <ImageView
@@ -30,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginBottom="3dp"
-        android:layout_weight="0.6"
+        android:layout_weight="0.56"
         android:adjustViewBounds="true"
         android:gravity="center"
         android:padding="2dp"
@@ -42,7 +41,7 @@
         android:id="@+id/hourly_temperature"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.2"
+        android:layout_weight="0.22"
         android:autoSizeMinTextSize="10sp"
         android:autoSizeTextType="uniform"
         android:gravity="center"

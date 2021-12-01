@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:maxLines="1"
+        android:minLines="1"
+        android:text="@string/address_name"
+        android:textColor="@color/textColorInNotification"
+        android:textSize="@dimen/addressTextSizeInHeader" />
+
+    <TextView
+        android:id="@+id/refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableRight="@drawable/refresh"
+        android:drawableTint="@color/iconGray"
+        android:gravity="center_vertical"
+        android:text="@string/updated_time"
+        android:textColor="@color/textColorInNotification"
+        android:textSize="@dimen/refreshTextSizeInHeader" />
+
+</LinearLayout>

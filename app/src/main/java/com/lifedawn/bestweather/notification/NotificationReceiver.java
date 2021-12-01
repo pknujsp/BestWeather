@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.util.Log;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
@@ -21,6 +22,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 			@Override
 			public void run() {
 				String action = intent.getAction();
+				Log.e("NotificationReceiver", action);
 
 				if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
 					NotificationType notificationType = (NotificationType) intent.getSerializableExtra(NotificationType.class.getName());

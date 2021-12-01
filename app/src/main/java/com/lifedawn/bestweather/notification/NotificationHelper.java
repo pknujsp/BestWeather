@@ -62,6 +62,7 @@ public class NotificationHelper {
 				break;
 			}
 		}
+
 	}
 
 	private NotificationObj getNotificationObj(NotificationType notificationType) {

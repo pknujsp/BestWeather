@@ -2,8 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="140dp"
-    android:background="@color/app_main_color"
+    android:layout_height="150dp"
+    android:background="@color/white"
     android:padding="8dp">
 
     <LinearLayout
@@ -14,8 +14,7 @@
 
         <include
             android:id="@+id/header"
-            layout="@layout/header_view_in_widget" />
-
+            layout="@layout/view_header_in_notification" />
 
         <RelativeLayout
             android:id="@+id/currentConditionsLayout"
@@ -39,12 +38,12 @@
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@id/weatherIcon"
                 android:layout_alignBottom="@id/weatherIcon"
-                android:layout_marginRight="16dp"
+                android:layout_marginRight="14dp"
                 android:layout_toRightOf="@id/weatherIcon"
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:text="20º"
-                android:textColor="@color/white"
+                android:textColor="@color/textColorInNotification"
                 android:textScaleX="0.9"
                 android:textSize="19sp" />
 
@@ -75,7 +74,7 @@
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="@string/good"
-                    android:textColor="@color/defaultTextColorInDrawableWithText" />
+                    android:textColor="@color/textColorInNotification" />
 
             </LinearLayout>
 
@@ -106,7 +105,7 @@
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="@string/not_precipitation"
-                    android:textColor="@color/defaultTextColorInDrawableWithText" />
+                    android:textColor="@color/textColorInNotification" />
 
             </LinearLayout>
 
@@ -136,7 +135,7 @@
                     android:gravity="center_vertical"
                     android:maxLines="1"
                     android:text="2.3m/s"
-                    android:textColor="@color/defaultTextColorInDrawableWithText" />
+                    android:textColor="@color/textColorInNotification" />
 
             </LinearLayout>
 
@@ -164,7 +163,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:indeterminate="true"
-        android:indeterminateTint="@color/white"
+        android:indeterminateTint="@color/iconGray"
         android:visibility="gone" />
 
     <include

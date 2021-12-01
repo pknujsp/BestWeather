@@ -14,6 +14,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
 
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +65,7 @@ public class OwmSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 			binding.precipitation.setVisibility(View.GONE);
 		}
 
+		binding.wind.setText(WeatherResponseProcessor.getWindSpeedDescription(current.getWind_speed()));
 
 		binding.weatherIcon.setImageDrawable(ContextCompat.getDrawable(getContext(),
 				OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId(), false)));

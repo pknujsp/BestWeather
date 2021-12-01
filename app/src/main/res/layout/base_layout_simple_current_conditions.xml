@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -12,12 +13,20 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/wind"
+                style="@style/text_shadow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="wind"
+                android:textSize="18sp" />
+
+            <TextView
                 android:id="@+id/precipitation"
                 style="@style/text_shadow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="강수형태, N mm"
-                android:textSize="19sp" />
+                android:text="precipitation"
+                android:textSize="18sp" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -28,6 +37,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
+                    android:layout_marginTop="2dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -47,7 +57,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:singleLine="true"
-                        android:text="하늘상태"
+                        android:text="weather"
                         android:textSize="23sp" />
 
                 </LinearLayout>
@@ -63,8 +73,9 @@
                     android:orientation="vertical">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="12dp"
+                        android:layout_width="38dp"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
                         android:scaleType="fitCenter"
                         android:src="@drawable/flickrlogo" />
 
@@ -74,7 +85,7 @@
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:text="image"
-                        android:textSize="12sp" />
+                        android:textSize="11sp" />
                 </LinearLayout>
             </RelativeLayout>
 
@@ -91,7 +102,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:includeFontPadding="false"
-                    android:text="기온"
+                    android:text="temp"
                     android:textSize="62sp" />
 
                 <GridLayout

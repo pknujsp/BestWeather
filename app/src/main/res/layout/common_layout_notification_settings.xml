@@ -7,7 +7,7 @@
         android:orientation="vertical">
 
         <TextView
-            style="@style/WidgetConfigureLabel"
+            style="@style/SettingsLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/location" />
@@ -30,18 +30,36 @@
                 android:layout_height="wrap_content"
                 android:text="@string/selected_location" />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/change_address_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/change_address"
+                    android:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/selectedAddressName"
+                    style="@style/SettingsValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:text="selectedAddressName" />
+
+
+            </LinearLayout>
+
+
         </RadioGroup>
 
-        <Button
-            android:id="@+id/change_address_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:text="@string/change_address"
-            android:visibility="gone" />
 
         <TextView
-            style="@style/WidgetConfigureLabel"
+            style="@style/SettingsLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/pref_title_weather_data_sources" />
@@ -68,7 +86,7 @@
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/kma_top_priority_switch"
-            style="@style/WidgetConfigureLabel"
+            style="@style/SettingsLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="false"
@@ -76,7 +94,7 @@
 
         <TextView
             android:id="@+id/autoRefreshIntervalLabel"
-            style="@style/WidgetConfigureLabel"
+            style="@style/SettingsLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/auto_refresh_interval" />
@@ -89,16 +107,17 @@
 
         <TextView
             android:id="@+id/alarmClockLabel"
-            style="@style/WidgetConfigureLabel"
-            android:layout_width="match_parent"
+            style="@style/SettingsLabel"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/alarmClock" />
 
         <TextView
             android:id="@+id/alarmClock"
-            style="@style/WidgetConfigureLabel"
-            android:layout_width="match_parent"
+            style="@style/SettingsLabel"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="right"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:text="08:00"

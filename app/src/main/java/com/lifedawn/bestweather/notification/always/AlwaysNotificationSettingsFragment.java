@@ -38,6 +38,7 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		notificationType = NotificationType.Always;
+		initPreferences();
 		originalEnabled = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(notificationType.getPreferenceName(),
 				false);
 
@@ -71,6 +72,7 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 		};
 
 		alwaysNotiViewCreator = new AlwaysNotiViewCreator(getActivity().getApplicationContext(), this);
+		alwaysNotiViewCreator.loadPreferences();
 	}
 
 
@@ -87,70 +89,47 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				binding.settingsLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
 
-				if (initializing) {
-					return;
-				}
-				PreferenceManager.getDefaultSharedPreferences(getContext()).edit()
-						.putBoolean(notificationType.getPreferenceName(), isChecked).commit();
+				if (!initializing) {
+					PreferenceManager.getDefaultSharedPreferences(getContext()).edit()
+							.putBoolean(notificationType.getPreferenceName(), isChecked).commit();
 
-				if (!isChecked) {
-					alwaysNotiViewCreator = null;
-					notificationHelper.cancelNotification(notificationType.getNotificationId());
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-						getContext().deleteSharedPreferences(notificationType.getPreferenceName());
-					} else {
-						getContext().getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE).edit().clear().commit();
-					}
-				} else {
-
+					onSwitchEnableNotification(isChecked);
 				}
 
-				onSwitchEnableNotification(isChecked);
 			}
 		});
 		binding.notificationSwitch.setChecked(originalEnabled);
-		SharedPreferences notiPreferences = getActivity().getApplicationContext().getSharedPreferences(notificationType.getPreferenceName(),
-				Context.MODE_PRIVATE);
 
-		if (originalEnabled) {
-			alwaysNotiViewCreator.loadPreferences();
-
-			if (notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), LocationType.SelectedAddress.name()).equals(LocationType.SelectedAddress.name())) {
-				selectedFavoriteLocation = true;
-				binding.commons.selectedLocationRadio.setChecked(true);
-				String text = getString(R.string.location) + ", " + notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name()
-						, "");
-				binding.commons.selectedLocationRadio.setText(text);
-				binding.commons.changeAddressBtn.setVisibility(View.VISIBLE);
-			} else {
-				binding.commons.currentLocationRadio.setChecked(true);
-			}
-
-			WeatherSourceType defaultWeatherSourceType = WeatherSourceType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
-					WeatherSourceType.OPEN_WEATHER_MAP.name()));
-			if (defaultWeatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
-				binding.commons.owmRadio.setChecked(true);
-			} else if (defaultWeatherSourceType == WeatherSourceType.ACCU_WEATHER) {
-				binding.commons.accuWeatherRadio.setChecked(true);
-			} else {
-				binding.commons.kmaTopPrioritySwitch.setChecked(true);
-			}
-
-			if (notiPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), true)) {
-				binding.commons.kmaTopPrioritySwitch.setChecked(true);
-			}
-
-			long autoRefreshInterval = notiPreferences.getLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L);
-			final String[] intervalsStr = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
-
-			for (int i = 0; i < intervalsStr.length; i++) {
-				if (Long.parseLong(intervalsStr[i]) == autoRefreshInterval) {
-					binding.commons.autoRefreshIntervalSpinner.setSelection(i);
-					break;
-				}
-			}
+		if (alwaysNotiViewCreator.getLocationType() == LocationType.SelectedAddress) {
+			selectedFavoriteLocation = true;
+			binding.commons.selectedLocationRadio.setChecked(true);
+			binding.commons.selectedAddressName.setText(alwaysNotiViewCreator.getAddressName());
+		} else {
+			binding.commons.currentLocationRadio.setChecked(true);
 		}
 
+		WeatherSourceType defaultWeatherSourceType = alwaysNotiViewCreator.getWeatherSourceType();
+		if (defaultWeatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
+			binding.commons.owmRadio.setChecked(true);
+		} else if (defaultWeatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+			binding.commons.accuWeatherRadio.setChecked(true);
+		} else {
+			binding.commons.kmaTopPrioritySwitch.setChecked(true);
+		}
+
+		if (alwaysNotiViewCreator.isKmaTopPriority()) {
+			binding.commons.kmaTopPrioritySwitch.setChecked(true);
+		}
+
+		long autoRefreshInterval = alwaysNotiViewCreator.getUpdateInterval();
+		final String[] intervalsStr = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
+
+		for (int i = 0; i < intervalsStr.length; i++) {
+			if (Long.parseLong(intervalsStr[i]) == autoRefreshInterval) {
+				binding.commons.autoRefreshIntervalSpinner.setSelection(i);
+				break;
+			}
+		}
 
 		RemoteViews remoteViews = alwaysNotiViewCreator.createRemoteViews(true);
 		View previewWidgetView = remoteViews.apply(getActivity().getApplicationContext(), binding.previewLayout);
@@ -161,13 +140,6 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 
 	@Override
 	public void onDestroy() {
-		if (alwaysNotiViewCreator != null && alwaysNotiViewCreator.getLocationType() == null) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-				getContext().deleteSharedPreferences(notificationType.getPreferenceName());
-			} else {
-				getContext().getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE).edit().clear().commit();
-			}
-		}
 		super.onDestroy();
 	}
 
@@ -208,7 +180,6 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 	@Override
 	public void onSelectedAutoRefreshInterval(long val) {
 		if (!initializing) {
-
 			WorkManager workManager = WorkManager.getInstance(getActivity().getApplicationContext());
 			workManager.cancelAllWorkByTag(notificationType.getPreferenceName());
 
@@ -228,39 +199,27 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 
 	@Override
 	public void initPreferences() {
-		SharedPreferences.Editor editor = getContext().getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE).edit();
-		editor.putString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), null);
-		editor.putString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(), WeatherSourceType.OPEN_WEATHER_MAP.name());
-		editor.putBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false);
-		editor.putLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L);
-		editor.putInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
+		SharedPreferences sharedPreferences = getContext().getSharedPreferences(notificationType.getPreferenceName(),
+				Context.MODE_PRIVATE);
 
-		editor.commit();
+		if (sharedPreferences.getAll().isEmpty()) {
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), LocationType.CurrentLocation.name());
+			editor.putString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(), WeatherSourceType.OPEN_WEATHER_MAP.name());
+			editor.putBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false);
+			editor.putLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L);
+			editor.putInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
+
+			editor.commit();
+		}
 	}
 
 	@Override
 	public void onSwitchEnableNotification(boolean isChecked) {
 		if (isChecked) {
-			alwaysNotiViewCreator = new AlwaysNotiViewCreator(getActivity().getApplicationContext(), this);
-			initializing = true;
-			selectedFavoriteLocation = false;
-			initPreferences();
-			alwaysNotiViewCreator.loadPreferences();
-
-			binding.commons.locationRadioGroup.clearCheck();
-			if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_accu_weather), true)) {
-				binding.commons.accuWeatherRadio.setChecked(true);
-			} else {
-				binding.commons.owmRadio.setChecked(true);
-			}
-			binding.commons.selectedLocationRadio.setText(R.string.selected_location);
-			binding.commons.changeAddressBtn.setVisibility(View.GONE);
-			binding.commons.kmaTopPrioritySwitch.setChecked(false);
-			binding.commons.autoRefreshIntervalSpinner.setSelection(0);
-
-			alwaysNotiViewCreator.makeNotification(alwaysNotiViewCreator.createRemoteViews(true), R.drawable.temp_icon);
-			initializing = false;
+			alwaysNotiViewCreator.initNotification();
 		} else {
+			notificationHelper.cancelNotification(notificationType.getNotificationId());
 			WorkManager workManager = WorkManager.getInstance(getActivity().getApplicationContext());
 			workManager.cancelAllWorkByTag(notificationType.getPreferenceName());
 		}

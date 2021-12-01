@@ -15,6 +15,7 @@ import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
@@ -50,6 +51,11 @@ import java.util.Set;
 public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferenceChangeListener {
 	private final NotificationType notificationType = NotificationType.Always;
 	private final NotificationUpdateCallback notificationUpdateCallback;
+	private final ValueUnits windSpeedUnit;
+	private final DateTimeFormatter dateTimeFormatter;
+	private final ValueUnits tempUnit;
+	private final String tempDegree;
+
 	private Context context;
 
 	private LocationType locationType;
@@ -57,12 +63,10 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 	private boolean kmaTopPriority;
 	private long updateInterval;
 	private Integer selectedAddressDtoId;
-	private final ValueUnits tempUnit;
-	private final String tempDegree;
+
 	private JsonDataSaver jsonDataSaver = new JsonDataSaver();
-	private final DateTimeFormatter dateTimeFormatter;
 	private NotificationHelper notificationHelper;
-	private final ValueUnits windSpeedUnit;
+	private String addressName;
 
 	public AlwaysNotiViewCreator(Context context, NotificationUpdateCallback notificationUpdateCallback) {
 		this.context = context;
@@ -102,11 +106,6 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 	}
 
 	public void initNotification() {
-		//초기화
-		if (locationType == null) {
-			return;
-		}
-
 		RemoteViews remoteViews = createRemoteViews(false);
 		makeNotification(remoteViews, R.drawable.temp_icon);
 
@@ -281,12 +280,9 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 		notificationObj.getNotificationBuilder().setPriority(NotificationCompat.PRIORITY_MAX);
 		notificationObj.getNotificationBuilder().setVibrate(new long[]{0L});
 
-
 		notificationObj.getNotificationBuilder().setCustomContentView(remoteViews);
 		notificationObj.getNotificationBuilder().setCustomBigContentView(remoteViews);
-		if (notificationUpdateCallback != null) {
-			notificationUpdateCallback.updateNotification(remoteViews);
-		}
+
 		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
 		Notification notification = notificationObj.getNotificationBuilder().build();
 		notificationManager.notify(notificationObj.getNotificationId(), notification);
@@ -328,6 +324,7 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 		ZonedDateTime zonedDateTime = null;
 
 		List<HourlyForecastObj> hourlyForecastObjList = hourlyForecasts.getHourlyForecastObjs();
+		final int textColor = ContextCompat.getColor(context, R.color.textColorInNotification);
 
 		for (int i = 0; i < 7; i++) {
 			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_linear);
@@ -343,6 +340,9 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 			childRemoteViews.setTextViewText(R.id.hourly_temperature, ValueUnits.convertTemperature(hourlyForecastObjList.get(i).getTemp(),
 					tempUnit) + tempDegree);
 			childRemoteViews.setImageViewResource(R.id.hourly_weather_icon, hourlyForecastObjList.get(i).getWeatherIcon());
+
+			childRemoteViews.setTextColor(R.id.hourly_clock, textColor);
+			childRemoteViews.setTextColor(R.id.hourly_temperature, textColor);
 
 			remoteViews.addView(R.id.hourlyForecast, childRemoteViews);
 		}
@@ -414,8 +414,8 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 		kmaTopPriority = notiPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false);
 		updateInterval = notiPreferences.getLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L);
 		selectedAddressDtoId = notiPreferences.getInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
+		addressName = notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), "");
 	}
-
 
 	public LocationType getLocationType() {
 		return locationType;
@@ -437,6 +437,7 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 		return selectedAddressDtoId;
 	}
 
-
-
+	public String getAddressName() {
+		return addressName;
+	}
 }

@@ -58,7 +58,7 @@
                     tools:context=".widget.ConfigureWidgetActivity">
 
                     <TextView
-                        style="@style/WidgetConfigureLabel"
+                        style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/text_size" />
@@ -74,7 +74,7 @@
                         android:valueTo="4" />
 
                     <TextView
-                        style="@style/WidgetConfigureLabel"
+                        style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/background_transparency" />
@@ -87,7 +87,7 @@
                         android:max="100" />
 
                     <TextView
-                        style="@style/WidgetConfigureLabel"
+                        style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/location" />
@@ -121,7 +121,7 @@
                         android:visibility="gone" />
 
                     <TextView
-                        style="@style/WidgetConfigureLabel"
+                        style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/pref_title_weather_data_sources" />
@@ -148,14 +148,14 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/kma_top_priority_switch"
-                        style="@style/WidgetConfigureLabel"
+                        style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:checked="false"
                         android:text="@string/pref_title_kma_top_priority" />
 
                     <TextView
-                        style="@style/WidgetConfigureLabel"
+                        style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/auto_refresh_interval" />
@@ -168,7 +168,7 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/display_datetime_switch"
-                        style="@style/WidgetConfigureLabel"
+                        style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:checked="true"
@@ -176,7 +176,7 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/display_local_datetime_switch"
-                        style="@style/WidgetConfigureLabel"
+                        style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/display_local_datetime" />

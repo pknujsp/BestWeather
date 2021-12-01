@@ -15,7 +15,7 @@
         android:layout_marginBottom="4dp"
         android:text="warning"
         android:textAlignment="center"
-        android:textColor="@color/white"
+        android:textColor="@color/textColorInNotification"
         android:textSize="14sp" />
 
     <TextView
@@ -26,5 +26,5 @@
         android:background="@drawable/btn_background"
         android:clickable="true"
         android:text="processBtn"
-        android:textColor="@color/white" />
+        android:textColor="@color/textColorInNotification" />
 </LinearLayout>

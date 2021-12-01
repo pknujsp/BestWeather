@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
@@ -86,5 +87,6 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 		String temp = ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(),
 				tempUnit) + ValueUnits.convertToStr(getContext(), tempUnit);
 		binding.temperature.setText(temp);
+		binding.wind.setText(WeatherResponseProcessor.getWindSpeedDescription(finalCurrentConditions.getWindSpeed()));
 	}
 }
