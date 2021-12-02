@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -91,7 +92,11 @@ public class AlwaysNotiViewCreator implements SharedPreferences.OnSharedPreferen
 
 		Intent refreshIntent = new Intent(context, NotificationReceiver.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-		refreshIntent.putExtra(NotificationType.class.getName(), notificationType);
+		Bundle bundle = new Bundle();
+		bundle.putString(NotificationType.class.getName(),notificationType.name());
+
+		refreshIntent.putExtras(bundle);
+
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 10, refreshIntent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 

@@ -174,6 +174,33 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		return WEATHER_PTY_ICON_DESCRIPTION_MAP.get(code);
 	}
 
+	public static String convertSkyPtyToMid(String sky, String pty) {
+		if (pty.equals("0")) {
+			switch (sky) {
+				case "1":
+					return "맑음";
+				case "3":
+					return "구름많음";
+				default:
+					return "흐림";
+			}
+		} else {
+			switch (pty) {
+				case "1":
+				case "5":
+					return "흐리고 비";
+				case "2":
+				case "6":
+					return "흐리고 비/눈";
+				case "3":
+				case "7":
+					return "흐리고 눈";
+				default:
+					return "흐리고 소나기";
+			}
+		}
+	}
+
 	public static String getPtyFlickrGalleryName(String code) {
 		return PTY_FLICKR_MAP.get(code);
 	}
@@ -305,6 +332,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		} catch (Exception e) {
 
 		}
+
 		//3일 후로 이동
 		now = now.plusDays(3).withHour(0).withMinute(0).withSecond(0).withNano(0);
 
@@ -353,9 +381,84 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		return finalDailyForecastList;
 	}
 
+	public static List<FinalDailyForecast> getDailyForecastList(List<FinalDailyForecast> finalDailyForecasts,
+	                                                            List<FinalHourlyForecast> finalHourlyForecasts) {
+		final ZonedDateTime firstDateTimeOfDaily = ZonedDateTime.of(finalDailyForecasts.get(0).getDate().toLocalDateTime(),
+				finalDailyForecasts.get(0).getDate().getZone());
+
+		ZonedDateTime criteriaDateTime = ZonedDateTime.now(firstDateTimeOfDaily.getZone());
+		criteriaDateTime = criteriaDateTime.withHour(23);
+		criteriaDateTime = criteriaDateTime.withMinute(59);
+
+		int beginIdx = 0;
+		for (; beginIdx < finalHourlyForecasts.size(); beginIdx++) {
+			if (criteriaDateTime.isBefore(finalHourlyForecasts.get(beginIdx).getFcstDateTime())) {
+				break;
+			}
+		}
+		int minTemp = Integer.MAX_VALUE;
+		int maxTemp = Integer.MIN_VALUE;
+		int hours = 0;
+		String amSky = null;
+		String pmSky = null;
+		String amPop = null;
+		String pmPop = null;
+		ZonedDateTime dateTime = null;
+
+		int temp = 0;
+
+		for (; beginIdx < finalHourlyForecasts.size(); beginIdx++) {
+			if (firstDateTimeOfDaily.getDayOfYear() == finalHourlyForecasts.get(beginIdx).getFcstDateTime().getDayOfYear()) {
+				if (finalHourlyForecasts.get(beginIdx).getFcstDateTime().getHour() == 1) {
+					break;
+				}
+			}
+
+			hours = finalHourlyForecasts.get(beginIdx).getFcstDateTime().getHour();
+
+			if (hours == 0 && minTemp != Integer.MAX_VALUE) {
+				dateTime = ZonedDateTime.of(finalHourlyForecasts.get(beginIdx).getFcstDateTime().toLocalDateTime(),
+						finalHourlyForecasts.get(beginIdx).getFcstDateTime().getZone());
+				dateTime = dateTime.minusDays(1);
+				FinalDailyForecast finalDailyForecast = new FinalDailyForecast(dateTime, amSky, pmSky, amPop, pmPop,
+						String.valueOf(minTemp), String.valueOf(maxTemp));
+				finalDailyForecasts.add(finalDailyForecast);
+
+				minTemp = Integer.MAX_VALUE;
+				maxTemp = Integer.MIN_VALUE;
+			} else {
+				temp = (int) Double.parseDouble(finalHourlyForecasts.get(beginIdx).getTemp1Hour());
+
+				if (hours < 12) {
+					minTemp = Math.min(minTemp, temp);
+				} else {
+					maxTemp = Math.max(maxTemp, temp);
+				}
+
+				if (hours == 9) {
+					amSky = convertSkyPtyToMid(finalHourlyForecasts.get(beginIdx).getSky(),
+							finalHourlyForecasts.get(beginIdx).getPrecipitationType());
+					amPop = finalHourlyForecasts.get(beginIdx).getProbabilityOfPrecipitation();
+				} else if (hours == 15) {
+					pmSky = convertSkyPtyToMid(finalHourlyForecasts.get(beginIdx).getSky(),
+							finalHourlyForecasts.get(beginIdx).getPrecipitationType());
+					pmPop = finalHourlyForecasts.get(beginIdx).getProbabilityOfPrecipitation();
+				}
+
+			}
+		}
+
+		Collections.sort(finalDailyForecasts, new Comparator<FinalDailyForecast>() {
+			@Override
+			public int compare(FinalDailyForecast t1, FinalDailyForecast t2) {
+				return t1.getDate().compareTo(t2.getDate());
+			}
+		});
+		return finalDailyForecasts;
+	}
+
 	public static boolean successfulVilageResponse(Response<VilageFcstResponse> response) {
 		if (response.isSuccessful()) {
-			final String successfulCode = "00";
 
 			if (response.body() == null) {
 				return false;
@@ -363,6 +466,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 				if (response.body().getKmaHeader() == null) {
 					return false;
 				}
+				final String successfulCode = "00";
 
 				if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
 					return true;
@@ -377,7 +481,6 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 	public static boolean successfulMidLandFcstResponse(Response<MidLandFcstResponse> response) {
 		if (response.isSuccessful()) {
-			final String successfulCode = "00";
 
 			if (response.body() == null) {
 				return false;
@@ -385,6 +488,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 				if (response.body().getKmaHeader() == null) {
 					return false;
 				}
+
+				final String successfulCode = "00";
 
 				if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
 					return true;
@@ -399,11 +504,12 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 	public static boolean successfulMidTaFcstResponse(Response<MidTaResponse> response) {
 		if (response.isSuccessful()) {
-			final String successfulCode = "00";
 
 			if (response.body() == null) {
 				return false;
 			} else {
+				final String successfulCode = "00";
+
 				if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
 					return true;
 				} else {

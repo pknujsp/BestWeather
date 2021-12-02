@@ -109,7 +109,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
 
 		final int COLUMN_COUNT = finalDailyForecastList.size();
-		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCDaily);
+		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyAccuKma);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 
 		/*
@@ -117,7 +117,6 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		addLabelView(R.drawable.day_clear, getString(R.string.weather), WEATHER_ROW_HEIGHT);
 		addLabelView(R.drawable.pop, getString(R.string.probability_of_precipitation), DEFAULT_TEXT_ROW_HEIGHT);
 		addLabelView(R.drawable.temperature, getString(R.string.temperature), TEMP_ROW_HEIGHT);
-
 		 */
 
 		TextValueView dateRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, (int) getResources().getDimension(R.dimen.multipleDateTextRowHeightInCOMMON), COLUMN_WIDTH);
@@ -131,38 +130,36 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE", Locale.getDefault());
 
-		for (FinalDailyForecast forecast : finalDailyForecastList) {
-			dateList.add(forecast.getDate().format(dateTimeFormatter));
-		}
-		dateRow.setValueList(dateList);
-
 		//기온, 강수확률, 강수량
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		String percent = "%";
 
-		int index = 0;
-		for (; index < 5; index++) {
-			minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
-			maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
+		for (int index = 0; index < finalDailyForecastList.size(); index++) {
+			dateList.add(finalDailyForecastList.get(index).getDate().format(dateTimeFormatter));
 
-			probabilityOfPrecipitationList.add(
-					finalDailyForecastList.get(index).getAmProbabilityOfPrecipitation() + percent + "/" + finalDailyForecastList.get(
-							index).getPmProbabilityOfPrecipitation() + percent);
-			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-					KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getAmSky(), false)),
-					ContextCompat.getDrawable(context,
-							KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getPmSky(), false))));
-		}
-		for (; index < finalDailyForecastList.size(); index++) {
-			minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
-			maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
+			if (finalDailyForecastList.get(index).isSingle()) {
+				minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
+				maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
 
-			probabilityOfPrecipitationList.add(finalDailyForecastList.get(index).getProbabilityOfPrecipitation() + percent);
-			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-					KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getSky(), false))));
+				probabilityOfPrecipitationList.add(finalDailyForecastList.get(index).getProbabilityOfPrecipitation() + percent);
+				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
+						KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getSky(), false))));
+			} else {
+				minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
+				maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
+
+				probabilityOfPrecipitationList.add(
+						finalDailyForecastList.get(index).getAmProbabilityOfPrecipitation() + percent + "/" + finalDailyForecastList.get(
+								index).getPmProbabilityOfPrecipitation() + percent);
+				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
+						KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getAmSky(), false)),
+						ContextCompat.getDrawable(context,
+								KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getPmSky(), false))));
+			}
 		}
+		dateRow.setValueList(dateList);
 
 		weatherIconRow.setIcons(weatherIconObjList);
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);

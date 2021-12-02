@@ -28,7 +28,9 @@
 
     <!-- simple, comparison : SC로 축약 -->
     <dimen name="valueColumnWidthInSCHourly">60dp</dimen>
-    <dimen name="valueColumnWidthInSCDaily">83dp</dimen>
+    <dimen name="valueColumnWidthInSCDaily">90dp</dimen>
+    <dimen name="valueColumnWidthInSDailyAccuKma">84dp</dimen>
+    <dimen name="valueColumnWidthInSDailyOwm">75dp</dimen>
     <dimen name="defaultValueRowHeightInSC">35dp</dimen>
 
     <dimen name="doubleTemperatureRowHeightInSC">90dp</dimen>

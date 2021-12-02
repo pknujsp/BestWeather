@@ -11,14 +11,15 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
+        android:name=".main.InitApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.White"
-        android:name=".main.InitApp"
         android:usesCleartextTraffic="true">
+
 
         <activity
             android:name=".widget.ConfigureWidgetActivity"
@@ -51,8 +52,6 @@
             android:label="@string/current_conditions">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 
@@ -60,16 +59,12 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_current_info" />
         </receiver>
-
-
         <receiver
             android:name=".widget.WidgetProviderCurrentHourly"
             android:enabled="true"
             android:label="@string/widget_current_hourly">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 
@@ -77,15 +72,12 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_current_hourly_info" />
         </receiver>
-
         <receiver
             android:name=".widget.WidgetProviderCurrentDaily"
             android:enabled="true"
             android:label="@string/widget_current_daily">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 
@@ -93,17 +85,12 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_current_daily_info" />
         </receiver>
-
-
         <receiver
             android:name=".widget.WidgetProviderCurrentHourlyDaily"
             android:enabled="true"
             android:label="@string/widget_current_hourly_daily">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-
-            <intent-filter android:priority="1">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 
@@ -111,15 +98,13 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_current_hourly_daily_info" />
         </receiver>
-
         <receiver
             android:name=".notification.NotificationReceiver"
-            android:enabled="true">
-
-            <intent-filter android:priority="1">
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
-
         </receiver>
 
         <meta-data

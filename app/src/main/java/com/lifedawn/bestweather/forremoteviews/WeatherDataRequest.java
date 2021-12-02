@@ -82,7 +82,8 @@ public class WeatherDataRequest {
 				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST).addRequestServiceType(RetrofitClient.ServiceType.VILAGE_FCST);
 			}
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-				requestKma.addRequestServiceType(RetrofitClient.ServiceType.MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.MID_TA_FCST);
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.MID_TA_FCST)
+						.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST).addRequestServiceType(RetrofitClient.ServiceType.VILAGE_FCST);
 			}
 		} else if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
 			RequestAccu requestAccu = (RequestAccu) requestWeatherSources.get(weatherSourceType);
@@ -419,14 +420,29 @@ public class WeatherDataRequest {
 
 		switch (weatherSourceType) {
 			case KMA:
-				if (KmaResponseProcessor.successfulMidLandFcstResponse((Response<MidLandFcstResponse>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponse())
-						&& KmaResponseProcessor.successfulMidTaFcstResponse((Response<MidTaResponse>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_TA_FCST).getResponse())) {
+
+				MultipleJsonDownloader.ResponseResult midLandFcstResponse =
+						multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_LAND_FCST);
+				MultipleJsonDownloader.ResponseResult midTaFcstResponse =
+						multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_TA_FCST);
+				MultipleJsonDownloader.ResponseResult vilageFcstResponse =
+						multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.VILAGE_FCST);
+				MultipleJsonDownloader.ResponseResult ultraSrtFcstResponse =
+						multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
+
+				if (midLandFcstResponse.isSuccessful() && midTaFcstResponse.isSuccessful() &&
+						vilageFcstResponse.isSuccessful() && ultraSrtFcstResponse.isSuccessful()) {
+					List<FinalHourlyForecast> finalHourlyForecasts =
+							KmaResponseProcessor.getFinalHourlyForecastList((VilageFcstResponse) ultraSrtFcstResponse.getResponse().body()
+									, (VilageFcstResponse) vilageFcstResponse.getResponse().body());
 					List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastList(
 							(MidLandFcstResponse)
-									multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponse().body(),
+									midLandFcstResponse.getResponse().body(),
 							(MidTaResponse)
-									multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.MID_TA_FCST).getResponse().body(),
+									midTaFcstResponse.getResponse().body(),
 							Long.parseLong(multipleJsonDownloader.get("tmFc")));
+					KmaResponseProcessor.getDailyForecastList(finalDailyForecastList, finalHourlyForecasts);
+
 					zoneId = KmaResponseProcessor.getZoneId();
 
 					int index = 0;
@@ -434,7 +450,7 @@ public class WeatherDataRequest {
 					for (FinalDailyForecast finalDailyForecast : finalDailyForecastList) {
 						DailyForecastObj dailyForecastObj;
 
-						if (index > 4) {
+						if (finalDailyForecast.isSingle()) {
 							dailyForecastObj = new DailyForecastObj(true, true);
 							dailyForecastObj.setLeftWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false));
 							dailyForecastObj.setLeftPop(finalDailyForecast.getProbabilityOfPrecipitation());

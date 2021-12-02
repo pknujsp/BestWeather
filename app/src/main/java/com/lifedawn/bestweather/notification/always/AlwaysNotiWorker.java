@@ -1,40 +1,51 @@
 package com.lifedawn.bestweather.notification.always;
 
-import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
-import android.widget.RemoteViews;
+import android.content.Intent;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.work.WorkRequest;
+import androidx.work.Worker;
 import androidx.work.WorkerParameters;
+import androidx.work.impl.model.WorkSpec;
 
-import com.lifedawn.bestweather.notification.BaseNotiWorker;
-import com.lifedawn.bestweather.notification.NotificationHelper;
+import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.notification.NotificationReceiver;
 import com.lifedawn.bestweather.notification.NotificationType;
 
 import org.jetbrains.annotations.NotNull;
 
-public class AlwaysNotiWorker extends BaseNotiWorker {
+import java.util.Set;
+import java.util.UUID;
+
+public class AlwaysNotiWorker extends Worker {
+
 	public AlwaysNotiWorker(@NonNull @NotNull Context context, @NonNull @NotNull WorkerParameters workerParams) {
 		super(context, workerParams);
 	}
 
 	@NonNull
+	@NotNull
 	@Override
-	public @NotNull Result doWork() {
-		refreshNotification();
-		return Result.success();
-	}
-
-	@Override
-	protected void refreshNotification() {
+	public Result doWork() {
 		Context context = getApplicationContext();
-		NotificationHelper notificationHelper = new NotificationHelper(context);
-		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Always);
 
-		AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(context, null);
-		RemoteViews remoteViews = alwaysNotiViewCreator.createRemoteViews(false);
+		Intent refreshIntent = new Intent(context, NotificationReceiver.class);
+		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+		Bundle bundle = new Bundle();
+		bundle.putString(NotificationType.class.getName(), NotificationType.Always.name());
 
-		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-		notificationManager.notify(notificationObj.getNotificationId(), notificationObj.getNotificationBuilder().build());
+		refreshIntent.putExtras(bundle);
+
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 11, refreshIntent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+		try {
+			pendingIntent.send();
+		} catch (PendingIntent.CanceledException e) {
+			e.printStackTrace();
+		}
+		return Result.success();
 	}
 }

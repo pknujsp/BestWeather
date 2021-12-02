@@ -14,6 +14,7 @@ import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
@@ -62,6 +63,8 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 	private final DateTimeFormatter dateTimeFormatter;
 	private NotificationHelper notificationHelper;
 
+	private String addressName;
+
 	public DailyNotiViewCreator(Context context) {
 		this.context = context;
 
@@ -86,10 +89,6 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 
 	public void initNotification() {
 		//초기화
-		if (locationType == null) {
-			return;
-		}
-
 		if (locationType == LocationType.CurrentLocation) {
 			loadCurrentLocation();
 		} else {
@@ -303,6 +302,8 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 
 		List<HourlyForecastObj> hourlyForecastObjList = hourlyForecasts.getHourlyForecastObjs();
 
+		final int textColor = ContextCompat.getColor(context, R.color.textColorInNotification);
+
 		for (int i = 0; i < 16; i++) {
 			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_linear);
 
@@ -314,6 +315,8 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 			}
 
 			childRemoteViews.setTextViewText(R.id.hourly_clock, clock);
+			childRemoteViews.setTextColor(R.id.hourly_clock, textColor);
+			childRemoteViews.setTextColor(R.id.hourly_temperature, textColor);
 			childRemoteViews.setTextViewText(R.id.hourly_temperature, ValueUnits.convertTemperature(hourlyForecastObjList.get(i).getTemp(),
 					tempUnit) + tempDegree);
 			childRemoteViews.setImageViewResource(R.id.hourly_weather_icon, hourlyForecastObjList.get(i).getWeatherIcon());
@@ -396,6 +399,7 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 		updateInterval = notiPreferences.getLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L);
 		selectedAddressDtoId = notiPreferences.getInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
 		alarmClock = notiPreferences.getString(WidgetNotiConstants.DailyNotiAttributes.ALARM_CLOCK.name(), LocalTime.now().toString());
+		addressName = notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), "");
 	}
 
 	public String getAlarmClock() {
@@ -420,5 +424,9 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 
 	public int getSelectedAddressDtoId() {
 		return selectedAddressDtoId;
+	}
+
+	public String getAddressName() {
+		return addressName;
 	}
 }

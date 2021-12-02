@@ -97,7 +97,7 @@ public class KmaAreaCodeDto {
 	}
 
 	public void setX(String x) {
-		this.x = x;
+		this.x = x.contains(".0") ? x.replace(".0", "") : x;
 	}
 
 	public String getY() {
@@ -105,7 +105,8 @@ public class KmaAreaCodeDto {
 	}
 
 	public void setY(String y) {
-		this.y = y;
+		this.y = y.contains(".0") ? y.replace(".0", "") : y;
+
 	}
 
 	public String getLongitudeHours() {

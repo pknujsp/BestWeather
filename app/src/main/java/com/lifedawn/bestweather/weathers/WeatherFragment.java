@@ -1015,6 +1015,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						(MidLandFcstResponse) arrayMap.get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponse().body(),
 						(MidTaResponse) arrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST).getResponse().body(),
 						Long.parseLong(multipleJsonDownloader.get("tmFc")));
+				finalDailyForecastList = KmaResponseProcessor.getDailyForecastList(finalDailyForecastList, finalHourlyForecastList);
 
 				KmaSimpleCurrentConditionsFragment kmaSimpleCurrentConditionsFragment = new KmaSimpleCurrentConditionsFragment();
 				KmaSimpleHourlyForecastFragment kmaSimpleHourlyForecastFragment = new KmaSimpleHourlyForecastFragment();

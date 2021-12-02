@@ -1,6 +1,9 @@
 package com.lifedawn.bestweather.notification.always;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +16,7 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.RemoteViews;
@@ -22,17 +26,21 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.notification.BaseNotificationSettingsFragment;
+import com.lifedawn.bestweather.notification.NotificationReceiver;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 
 public class AlwaysNotificationSettingsFragment extends BaseNotificationSettingsFragment {
 	private AlwaysNotiViewCreator alwaysNotiViewCreator;
 	private boolean initializing = true;
+	private AlarmManager alarmManager;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -73,6 +81,8 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 
 		alwaysNotiViewCreator = new AlwaysNotiViewCreator(getActivity().getApplicationContext(), this);
 		alwaysNotiViewCreator.loadPreferences();
+
+		alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
 	}
 
 
@@ -177,23 +187,34 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 		}
 	}
 
+
+	private void cancelAutoRefresh() {
+		Intent refreshIntent = new Intent(getContext(), NotificationReceiver.class);
+		refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 11, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		alarmManager.cancel(pendingIntent);
+	}
+
 	@Override
 	public void onSelectedAutoRefreshInterval(long val) {
 		if (!initializing) {
-			WorkManager workManager = WorkManager.getInstance(getActivity().getApplicationContext());
-			workManager.cancelAllWorkByTag(notificationType.getPreferenceName());
+			cancelAutoRefresh();
 
 			if (val == 0) {
 				return;
 			}
 
-			WorkRequest refreshWeathersWorker =
-					new PeriodicWorkRequest.Builder(AlwaysNotiWorker.class,
-							val, TimeUnit.MILLISECONDS,
-							5, TimeUnit.MINUTES)
-							.addTag(notificationType.getPreferenceName())
-							.build();
-			workManager.enqueue(refreshWeathersWorker);
+			Intent refreshIntent = new Intent(getContext(), NotificationReceiver.class);
+			refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+			Bundle bundle = new Bundle();
+			bundle.putString(NotificationType.class.getName(), notificationType.name());
+
+			refreshIntent.putExtras(bundle);
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 11, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+			alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
+					val, pendingIntent);
 		}
 	}
 
@@ -218,10 +239,10 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 	public void onSwitchEnableNotification(boolean isChecked) {
 		if (isChecked) {
 			alwaysNotiViewCreator.initNotification();
+			onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getUpdateInterval());
 		} else {
 			notificationHelper.cancelNotification(notificationType.getNotificationId());
-			WorkManager workManager = WorkManager.getInstance(getActivity().getApplicationContext());
-			workManager.cancelAllWorkByTag(notificationType.getPreferenceName());
+			cancelAutoRefresh();
 		}
 	}
 

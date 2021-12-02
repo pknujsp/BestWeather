@@ -61,7 +61,6 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 				DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
 				List<DailyForecastListItemObj> dailyForecastListItemObjs = new ArrayList<>();
 
-				int index = 0;
 				for (FinalDailyForecast finalDailyForecast : finalDailyForecastList) {
 					DailyForecastListItemObj item = new DailyForecastListItemObj();
 					item.setDate(finalDailyForecast.getDate().format(dateFormatter))
@@ -69,7 +68,7 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 							.setMinTemp(ValueUnits.convertTemperature(finalDailyForecast.getMinTemp(), tempUnit) + tempDegree)
 							.setMaxTemp(ValueUnits.convertTemperature(finalDailyForecast.getMaxTemp(), tempUnit) + tempDegree);
 
-					if (index++ > 4) {
+					if (finalDailyForecast.isSingle()) {
 						item.setPop(finalDailyForecast.getProbabilityOfPrecipitation() + percent)
 								.setSingle(true)
 								.setLeftWeatherIconId(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false));
@@ -141,7 +140,6 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 				List<String> probabilityOfPrecipitationList = new ArrayList<>();
 				List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 
-				int index = 0;
 				String pop = null;
 				String percent = "%";
 
@@ -149,7 +147,7 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 					minTempList.add(ValueUnits.convertTemperature(finalDailyForecast.getMinTemp(), tempUnit));
 					maxTempList.add(ValueUnits.convertTemperature(finalDailyForecast.getMaxTemp(), tempUnit));
 
-					if (index++ > 4) {
+					if (finalDailyForecast.isSingle()) {
 						pop = finalDailyForecast.getProbabilityOfPrecipitation() + percent;
 						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
 								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false))));

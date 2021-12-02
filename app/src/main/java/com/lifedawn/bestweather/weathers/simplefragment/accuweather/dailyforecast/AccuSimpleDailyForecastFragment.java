@@ -107,7 +107,7 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		List<FiveDaysOfDailyForecastsResponse.DailyForecasts> items = fiveDaysOfDailyForecastsResponse.getDailyForecasts();
 
 		final int columnCount = items.size();
-		final int columnWidth = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCDaily);
+		final int columnWidth = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyAccuKma);
 		final int viewWidth = columnCount * columnWidth;
 
 		/*
@@ -124,8 +124,10 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 				columnWidth);
 		IconTextView probabilityOfPrecipitationRow = new IconTextView(context, FragmentType.Simple, viewWidth,
 				columnWidth, R.drawable.pop);
-		IconTextView precipitationVolumeRow = new IconTextView(context, FragmentType.Simple, viewWidth,
-				columnWidth, R.drawable.precipitationvolume);
+		IconTextView rainVolumeRow = new IconTextView(context, FragmentType.Simple, viewWidth,
+				columnWidth, R.drawable.raindrop);
+		IconTextView snowVolumeRow = new IconTextView(context, FragmentType.Simple, viewWidth,
+				columnWidth, R.drawable.snowparticle);
 
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE", Locale.getDefault());
 
@@ -135,9 +137,12 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
-		List<String> precipitationVolumeList = new ArrayList<>();
+		List<String> rainVolumeList = new ArrayList<>();
+		List<String> snowVolumeList = new ArrayList<>();
 
 		String percent = "%";
+		String zero = "0.0";
+		boolean haveSnow = false;
 
 		for (FiveDaysOfDailyForecastsResponse.DailyForecasts dailyForecasts : items) {
 			dateList.add(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(dailyForecasts.getEpochDate()) * 1000L,
@@ -151,14 +156,24 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 
 			probabilityOfPrecipitationList.add(
 					dailyForecasts.getDay().getPrecipitationProbability() + percent + "/" + dailyForecasts.getNight().getPrecipitationProbability() + percent);
-			precipitationVolumeList.add(
-					dailyForecasts.getDay().getTotalLiquid().getValue() + "/" + dailyForecasts.getNight().getTotalLiquid().getValue());
+			rainVolumeList.add(
+					dailyForecasts.getDay().getRain().getValue() + "/" + dailyForecasts.getNight().getRain().getValue());
+			snowVolumeList.add(
+					dailyForecasts.getDay().getSnow().getValue() + " / " + dailyForecasts.getNight().getSnow().getValue());
+
+			if (!haveSnow) {
+				if (!dailyForecasts.getDay().getSnow().getValue().equals(zero) ||
+						!dailyForecasts.getNight().getSnow().getValue().equals(zero)) {
+					haveSnow = true;
+				}
+			}
 		}
 
 		weatherIconRow.setIcons(weatherIconObjList);
 		dateRow.setValueList(dateList);
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
-		precipitationVolumeRow.setValueList(precipitationVolumeList);
+		rainVolumeRow.setValueList(rainVolumeList);
+		snowVolumeRow.setValueList(snowVolumeList);
 		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(getContext(), FragmentType.Simple, viewWidth, TEMP_ROW_HEIGHT,
 				columnWidth, minTempList, maxTempList);
 
@@ -179,7 +194,10 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		binding.forecastView.addView(dateRow, dateRowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
 		binding.forecastView.addView(probabilityOfPrecipitationRow, iconTextRowLayoutParams);
-		binding.forecastView.addView(precipitationVolumeRow, iconTextRowLayoutParams);
+		binding.forecastView.addView(rainVolumeRow, iconTextRowLayoutParams);
+		if (haveSnow) {
+			binding.forecastView.addView(snowVolumeRow, iconTextRowLayoutParams);
+		}
 
 		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);

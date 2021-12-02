@@ -14,6 +14,7 @@ public class FinalDailyForecast {
 	private String probabilityOfPrecipitation;
 	private String minTemp;
 	private String maxTemp;
+	private boolean isSingle;
 
 	public FinalDailyForecast(ZonedDateTime date, String amSky, String pmSky, String amProbabilityOfPrecipitation,
 	                          String pmProbabilityOfPrecipitation, String minTemp, String maxTemp) {
@@ -24,6 +25,7 @@ public class FinalDailyForecast {
 		this.pmProbabilityOfPrecipitation = pmProbabilityOfPrecipitation;
 		this.minTemp = minTemp;
 		this.maxTemp = maxTemp;
+		this.isSingle = false;
 	}
 
 	public FinalDailyForecast(ZonedDateTime date, String sky, String probabilityOfPrecipitation, String minTemp, String maxTemp) {
@@ -32,6 +34,7 @@ public class FinalDailyForecast {
 		this.probabilityOfPrecipitation = probabilityOfPrecipitation;
 		this.minTemp = minTemp;
 		this.maxTemp = maxTemp;
+		this.isSingle = true;
 	}
 
 	public ZonedDateTime getDate() {
@@ -114,4 +117,9 @@ public class FinalDailyForecast {
 		this.maxTemp = maxTemp;
 		return this;
 	}
+
+	public boolean isSingle() {
+		return isSingle;
+	}
+
 }

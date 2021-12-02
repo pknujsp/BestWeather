@@ -90,7 +90,6 @@
                     android:id="@+id/rain_volume_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="3dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -106,7 +105,7 @@
                         android:id="@+id/rain_volume"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="100%"
+                        android:text="1.0mm"
                         android:textColor="@color/blue"
 
                         android:textSize="13sp" />
@@ -117,9 +116,10 @@
                     android:id="@+id/snow_volume_layout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="3dp"
+                    android:layout_marginTop="2dp"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="visible">
 
                     <ImageView
                         android:layout_width="20dp"
@@ -133,7 +133,7 @@
                         android:id="@+id/snow_volume"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="100%"
+                        android:text="1cm"
                         android:textColor="@color/blue"
                         android:textSize="13sp" />
 

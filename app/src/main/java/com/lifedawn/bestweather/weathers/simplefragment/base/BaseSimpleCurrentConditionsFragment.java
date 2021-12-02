@@ -110,26 +110,41 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	public void setAqiValuesToViews() {
 		if (airQualityResponse != null) {
 			if (airQualityResponse.getStatus().equals("ok")) {
-				if (airQualityResponse.getData().getIaqi().getPm10() == null) {
-					binding.pm10Grade.setText(R.string.not_data);
-				} else {
-					binding.pm10Grade.setText(AqicnResponseProcessor.getGradeDescription(
-							Integer.parseInt(airQualityResponse.getData().getIaqi().getPm10().getValue())));
+				GeolocalizedFeedResponse.Data.IAqi iAqi = airQualityResponse.getData().getIaqi();
+				int val = Integer.MIN_VALUE;
+
+				if (iAqi.getO3() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getO3().getValue()));
 				}
-				if (airQualityResponse.getData().getIaqi().getPm25() == null) {
-					binding.pm25Grade.setText(R.string.not_data);
-				} else {
-					binding.pm25Grade.setText(AqicnResponseProcessor.getGradeDescription(
-							Integer.parseInt(airQualityResponse.getData().getIaqi().getPm25().getValue())));
+				if (iAqi.getPm25() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getPm25().getValue()));
+				}
+				if (iAqi.getPm10() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getPm10().getValue()));
+				}
+				if (iAqi.getNo2() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getNo2().getValue()));
+				}
+				if (iAqi.getSo2() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getSo2().getValue()));
+				}
+				if (iAqi.getCo() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getCo().getValue()));
+				}
+				if (iAqi.getDew() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getDew().getValue()));
 				}
 
+				if (val == Integer.MIN_VALUE) {
+					binding.airQuality.setText(R.string.not_data);
+				} else {
+					binding.airQuality.setText(AqicnResponseProcessor.getGradeDescription(val));
+				}
 			} else {
-				binding.pm10Grade.setText(R.string.not_data);
-				binding.pm25Grade.setText(R.string.not_data);
+				binding.airQuality.setText(R.string.not_data);
 			}
 		} else {
-			binding.pm10Grade.setText(R.string.not_data);
-			binding.pm25Grade.setText(R.string.not_data);
+			binding.airQuality.setText(R.string.not_data);
 		}
 	}
 

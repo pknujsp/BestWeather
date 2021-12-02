@@ -108,18 +108,8 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<OneCallResponse.Daily> items = oneCallResponse.getDaily();
 
 		final int COLUMN_COUNT = items.size();
-		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCDaily);
+		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyOwm);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
-
-		/*
-		addLabelView(R.drawable.date, getString(R.string.date), DATE_ROW_HEIGHT);
-		addLabelView(R.drawable.day_clear, getString(R.string.weather), WEATHER_ROW_HEIGHT);
-		addLabelView(R.drawable.pop, getString(R.string.probability_of_precipitation), DEFAULT_TEXT_ROW_HEIGHT);
-		addLabelView(R.drawable.rainvolume, getString(R.string.rain_volume), DEFAULT_TEXT_ROW_HEIGHT);
-		ImageView snowVolumeLabel = addLabelView(R.drawable.snowvolume, getString(R.string.snow_volume), DEFAULT_TEXT_ROW_HEIGHT);
-		addLabelView(R.drawable.temperature, getString(R.string.temperature), TEMP_ROW_HEIGHT);
-
-		 */
 
 		TextValueView dateRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, (int) getResources().getDimension(R.dimen.multipleDateTextRowHeightInCOMMON),
 				COLUMN_WIDTH);
@@ -147,6 +137,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		String rainVolume = null;
 		String snowVolume = null;
 		String percent = "%";
+		String zero = "0.0";
 
 		boolean haveSnowVolumes = false;
 
@@ -156,13 +147,13 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			minTempList.add(ValueUnits.convertTemperature(item.getTemp().getMin(), tempUnit));
 			maxTempList.add(ValueUnits.convertTemperature(item.getTemp().getMax(), tempUnit));
 
-			rainVolume = item.getRain() == null ? "0.0" : item.getRain();
+			rainVolume = item.getRain() == null ? zero : item.getRain();
 			if (item.getSnow() != null) {
 				if (!haveSnowVolumes) {
 					haveSnowVolumes = true;
 				}
 			}
-			snowVolume = item.getSnow() == null ? "0.0" : item.getSnow();
+			snowVolume = item.getSnow() == null ? zero : item.getSnow();
 			snowVolumeList.add(snowVolume);
 
 			probabilityOfPrecipitationList.add((int) (Double.parseDouble(item.getPop()) * 100.0) + percent);

@@ -60,9 +60,8 @@ public class OwmSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 				precipitation = getString(R.string.snow) + ", " + current.getSnow().getPrecipitation1Hour() + precipitationUnit;
 			}
 			binding.precipitation.setText(precipitation);
-			binding.precipitation.setVisibility(View.VISIBLE);
 		} else {
-			binding.precipitation.setVisibility(View.GONE);
+			binding.precipitation.setText(R.string.not_precipitation);
 		}
 
 		binding.wind.setText(WeatherResponseProcessor.getWindSpeedDescription(current.getWind_speed()));
