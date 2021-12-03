@@ -20,6 +20,7 @@ import androidx.preference.PreferenceManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.Gps;
+import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
@@ -62,11 +63,14 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 	private JsonDataSaver jsonDataSaver = new JsonDataSaver();
 	private final DateTimeFormatter dateTimeFormatter;
 	private NotificationHelper notificationHelper;
+	private NetworkStatus networkStatus;
 
 	private String addressName;
 
 	public DailyNotiViewCreator(Context context) {
 		this.context = context;
+
+		networkStatus = NetworkStatus.getInstance(context);
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
@@ -88,6 +92,13 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 	}
 
 	public void initNotification() {
+		if (!networkStatus.networkAvailable()) {
+			RemoteViews remoteViews = createRemoteViews();
+			RemoteViewProcessor.onErrorProcess(remoteViews, context.getString(R.string.need_to_connect_network),
+					context.getString(R.string.connect_network));
+			makeNotification(remoteViews, R.drawable.temp_icon);
+			return;
+		}
 		//초기화
 		if (locationType == LocationType.CurrentLocation) {
 			loadCurrentLocation();

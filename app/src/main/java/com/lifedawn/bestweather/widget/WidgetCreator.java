@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -32,10 +31,18 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChangeListener {
-	private static final String tag = "WidgetCreator";
+public class WidgetCreator {
+	private final int appWidgetId;
+	private final ValueUnits tempUnit;
+	private final String tempDegree;
 
-	private int appWidgetId;
+	private final String dateFormat;
+	private final String timeFormat;
+	private final DateTimeFormatter dateTimeFormatter;
+	private final ValueUnits clockUnit;
+	private final Context context;
+
+
 	private int backgroundAlpha;
 	private LocationType locationType;
 	private WeatherSourceType weatherSourceType;
@@ -56,21 +63,12 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 	private int airQualityInCurrentTextSize;
 	private int precipitationInCurrentTextSize;
 
-	private final Context context;
 	private WidgetUpdateCallback widgetUpdateCallback;
 
-	private final ValueUnits tempUnit;
-	private final String tempDegree;
-
-	private final String dateFormat;
-	private final String timeFormat;
-	private final DateTimeFormatter dateTimeFormatter;
-	private final ValueUnits clockUnit;
 
 	private JsonDataSaver jsonDataSaver = new JsonDataSaver();
 
 	public static String getSharedPreferenceName(int appWidgetId) {
-		Log.e(tag, "getSharedPreferenceName appWidgetId : " + appWidgetId);
 		return WidgetNotiConstants.WidgetAttributes.WIDGET_ATTRIBUTES_ID.name() + appWidgetId;
 	}
 
@@ -78,9 +76,10 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 		widgetUpdateCallback = null;
 	}
 
-	public WidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback) {
+	public WidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		this.context = context;
 		this.widgetUpdateCallback = widgetUpdateCallback;
+		this.appWidgetId = appWidgetId;
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
@@ -95,44 +94,34 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 		tempDegree = context.getString(R.string.degree_symbol);
 	}
 
-	public void setIntialValues(int appWidgetId, SharedPreferences sharedPreferences) {
-		SharedPreferences.Editor editor = sharedPreferences.edit();
 
-		editor.putInt(WidgetNotiConstants.WidgetAttributes.APP_WIDGET_ID.name(), appWidgetId);
-		editor.putInt(WidgetNotiConstants.WidgetAttributes.BACKGROUND_ALPHA.name(), 100);
-		editor.putString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), LocationType.CurrentLocation.name());
-		editor.putString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
-				PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.pref_key_accu_weather),
-						true) ? WeatherSourceType.ACCU_WEATHER.name() : WeatherSourceType.OPEN_WEATHER_MAP.name());
+	public void loadDefaultPreferences() {
+		backgroundAlpha = 100;
+		locationType = LocationType.CurrentLocation;
+		weatherSourceType =
+				PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.pref_key_accu_weather), false)
+						? WeatherSourceType.ACCU_WEATHER : WeatherSourceType.OPEN_WEATHER_MAP;
+		kmaTopPriority = false;
+		updateInterval = 0L;
+		displayClock = true;
+		displayLocalClock = false;
+		selectedAddressDtoId = 0;
 
-		editor.putBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false);
-		editor.putLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0);
-		editor.putBoolean(WidgetNotiConstants.WidgetAttributes.DISPLAY_CLOCK.name(), true);
-		editor.putBoolean(WidgetNotiConstants.WidgetAttributes.DISPLAY_LOCAL_CLOCK.name(), false);
-		editor.putInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
+		addressInHeaderTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInHeader);
+		refreshInHeaderTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshTextSizeInHeader);
 
-		editor.putInt(WidgetNotiConstants.WidgetTextViews.Header.ADDRESS_TEXT_IN_HEADER.name(),
-				context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInHeader));
-		editor.putInt(WidgetNotiConstants.WidgetTextViews.Header.REFRESH_TEXT_IN_HEADER.name(), context.getResources().getDimensionPixelSize(R.dimen.refreshTextSizeInHeader));
+		tempInCurrentTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInCurrent);
+		realFeelTempInCurrentTextSize = context.getResources().getDimensionPixelSize(R.dimen.realFeelTempTextSizeInCurrent);
+		airQualityInCurrentTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrent);
+		precipitationInCurrentTextSize = context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrent);
 
-		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.TEMP_TEXT_IN_CURRENT.name(), context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInCurrent));
-		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.REAL_FEEL_TEMP_TEXT_IN_CURRENT.name(), context.getResources().getDimensionPixelSize(R.dimen.realFeelTempTextSizeInCurrent));
-		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.AIR_QUALITY_TEXT_IN_CURRENT.name(), context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrent));
-		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.PRECIPITATION_TEXT_IN_CURRENT.name(), context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrent));
-
-		editor.putInt(WidgetNotiConstants.WidgetTextViews.Clock.DATE_TEXT_IN_CLOCK.name(),
-				context.getResources().getDimensionPixelSize(R.dimen.dateTextSizeInClock));
-		editor.putInt(WidgetNotiConstants.WidgetTextViews.Clock.TIME_TEXT_IN_CLOCK.name(), context.getResources().getDimensionPixelSize(R.dimen.timeTextSizeInClock));
-
-		editor.commit();
+		dateInClockTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTextSizeInClock);
+		timeInClockTextSize = context.getResources().getDimensionPixelSize(R.dimen.timeTextSizeInClock);
 	}
 
+	public void loadSavedPreferences() {
+		SharedPreferences sharedPreferences = context.getSharedPreferences(getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE);
 
-	@Override
-	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-		Log.e(tag, "onSharedPreferenceChanged In WidgetCreator");
-
-		appWidgetId = sharedPreferences.getInt(WidgetNotiConstants.WidgetAttributes.APP_WIDGET_ID.name(), appWidgetId);
 		backgroundAlpha = sharedPreferences.getInt(WidgetNotiConstants.WidgetAttributes.BACKGROUND_ALPHA.name(), backgroundAlpha);
 		locationType = LocationType.valueOf(sharedPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(),
 				LocationType.CurrentLocation.name()));
@@ -160,11 +149,38 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 
 		dateInClockTextSize = sharedPreferences.getInt(WidgetNotiConstants.WidgetTextViews.Clock.DATE_TEXT_IN_CLOCK.name(), dateInClockTextSize);
 		timeInClockTextSize = sharedPreferences.getInt(WidgetNotiConstants.WidgetTextViews.Clock.TIME_TEXT_IN_CLOCK.name(), timeInClockTextSize);
-
-		if (widgetUpdateCallback != null) {
-			widgetUpdateCallback.updateWidget();
-		}
 	}
+
+	public void saveFinalWidgetPreferences() {
+		SharedPreferences.Editor editor =
+				context.getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE).edit();
+
+		editor.putInt(WidgetNotiConstants.WidgetAttributes.APP_WIDGET_ID.name(), appWidgetId);
+		editor.putInt(WidgetNotiConstants.WidgetAttributes.BACKGROUND_ALPHA.name(), backgroundAlpha);
+		editor.putString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), locationType.name());
+		editor.putString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(), weatherSourceType.name());
+
+		editor.putBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), kmaTopPriority);
+		editor.putLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), updateInterval);
+		editor.putBoolean(WidgetNotiConstants.WidgetAttributes.DISPLAY_CLOCK.name(), displayClock);
+		editor.putBoolean(WidgetNotiConstants.WidgetAttributes.DISPLAY_LOCAL_CLOCK.name(), displayLocalClock);
+		editor.putInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), selectedAddressDtoId);
+
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Header.ADDRESS_TEXT_IN_HEADER.name(),
+				addressInHeaderTextSize);
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Header.REFRESH_TEXT_IN_HEADER.name(), refreshInHeaderTextSize);
+
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.TEMP_TEXT_IN_CURRENT.name(), tempInCurrentTextSize);
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.REAL_FEEL_TEMP_TEXT_IN_CURRENT.name(), realFeelTempInCurrentTextSize);
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.AIR_QUALITY_TEXT_IN_CURRENT.name(), airQualityInCurrentTextSize);
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Current.PRECIPITATION_TEXT_IN_CURRENT.name(), precipitationInCurrentTextSize);
+
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Clock.DATE_TEXT_IN_CLOCK.name(), dateInClockTextSize);
+		editor.putInt(WidgetNotiConstants.WidgetTextViews.Clock.TIME_TEXT_IN_CLOCK.name(), timeInClockTextSize);
+
+		editor.commit();
+	}
+
 
 	private void changeTextSize(RemoteViews remoteViews, int layoutId) {
 		if (layoutId == R.layout.widget_current) {
@@ -187,8 +203,6 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 	}
 
 	public RemoteViews createRemoteViews(boolean needTempData) {
-		Log.e(tag, "createRemoteViews - appWidgetId : " + appWidgetId);
-
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		int layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
@@ -212,7 +226,6 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent(remoteViews, appWidgetId));
 
 		setClockTimeZone(remoteViews, ZoneId.systemDefault());
-
 		return remoteViews;
 	}
 
@@ -240,10 +253,6 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 	}
 
 	public void setHeaderViews(RemoteViews remoteViews, HeaderObj headerObj) {
-		if (headerObj == null) {
-			return;
-		}
-
 		remoteViews.setTextViewTextSize(R.id.address, TypedValue.COMPLEX_UNIT_PX, addressInHeaderTextSize);
 		remoteViews.setTextViewTextSize(R.id.refresh, TypedValue.COMPLEX_UNIT_PX, refreshInHeaderTextSize);
 		remoteViews.setTextViewText(R.id.address, headerObj.getAddress());
@@ -251,9 +260,6 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 	}
 
 	public void setCurrentConditionsViews(RemoteViews remoteViews, CurrentConditionsObj currentConditionsObj) {
-		if (currentConditionsObj == null) {
-			return;
-		}
 
 		if (currentConditionsObj.getRealFeelTemp() == null) {
 			remoteViews.setViewVisibility(R.id.current_realfeel_temperature, View.GONE);
@@ -278,10 +284,6 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 	}
 
 	public void setHourlyForecastViews(RemoteViews remoteViews, WeatherJsonObj.HourlyForecasts hourlyForecasts) {
-		if (hourlyForecasts == null) {
-			return;
-		}
-
 		remoteViews.removeAllViews(R.id.hourly_forecast_row_1);
 		remoteViews.removeAllViews(R.id.hourly_forecast_row_2);
 		String clock = null;
@@ -313,9 +315,6 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 	}
 
 	public void setDailyForecastViews(RemoteViews remoteViews, WeatherJsonObj.DailyForecasts dailyForecasts) {
-		if (dailyForecasts == null) {
-			return;
-		}
 		remoteViews.removeAllViews(R.id.daily_forecast_row);
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern_of_daily_forecast_in_widget));
 		List<DailyForecastObj> dailyForecastObjList = dailyForecasts.getDailyForecastObjs();
@@ -350,8 +349,135 @@ public class WidgetCreator implements SharedPreferences.OnSharedPreferenceChange
 		return tempHeaderObj;
 	}
 
+	public int getBackgroundAlpha() {
+		return backgroundAlpha;
+	}
+
+	public void setBackgroundAlpha(int backgroundAlpha) {
+		this.backgroundAlpha = backgroundAlpha;
+	}
+
+	public LocationType getLocationType() {
+		return locationType;
+	}
+
+	public void setLocationType(LocationType locationType) {
+		this.locationType = locationType;
+	}
+
+	public WeatherSourceType getWeatherSourceType() {
+		return weatherSourceType;
+	}
+
+	public void setWeatherSourceType(WeatherSourceType weatherSourceType) {
+		this.weatherSourceType = weatherSourceType;
+	}
+
+	public boolean isKmaTopPriority() {
+		return kmaTopPriority;
+	}
+
+	public void setKmaTopPriority(boolean kmaTopPriority) {
+		this.kmaTopPriority = kmaTopPriority;
+	}
+
+	public long getUpdateInterval() {
+		return updateInterval;
+	}
+
+	public void setUpdateInterval(long updateInterval) {
+		this.updateInterval = updateInterval;
+	}
+
+	public boolean isDisplayClock() {
+		return displayClock;
+	}
+
+	public void setDisplayClock(boolean displayClock) {
+		this.displayClock = displayClock;
+	}
+
+	public boolean isDisplayLocalClock() {
+		return displayLocalClock;
+	}
+
+	public void setDisplayLocalClock(boolean displayLocalClock) {
+		this.displayLocalClock = displayLocalClock;
+	}
+
+	public int getSelectedAddressDtoId() {
+		return selectedAddressDtoId;
+	}
+
+	public void setSelectedAddressDtoId(int selectedAddressDtoId) {
+		this.selectedAddressDtoId = selectedAddressDtoId;
+	}
+
+	public int getAddressInHeaderTextSize() {
+		return addressInHeaderTextSize;
+	}
+
+	public void setAddressInHeaderTextSize(int addressInHeaderTextSize) {
+		this.addressInHeaderTextSize = addressInHeaderTextSize;
+	}
+
+	public int getRefreshInHeaderTextSize() {
+		return refreshInHeaderTextSize;
+	}
+
+	public void setRefreshInHeaderTextSize(int refreshInHeaderTextSize) {
+		this.refreshInHeaderTextSize = refreshInHeaderTextSize;
+	}
+
+	public int getDateInClockTextSize() {
+		return dateInClockTextSize;
+	}
+
+	public void setDateInClockTextSize(int dateInClockTextSize) {
+		this.dateInClockTextSize = dateInClockTextSize;
+	}
+
+	public int getTimeInClockTextSize() {
+		return timeInClockTextSize;
+	}
+
+	public void setTimeInClockTextSize(int timeInClockTextSize) {
+		this.timeInClockTextSize = timeInClockTextSize;
+	}
+
+	public int getTempInCurrentTextSize() {
+		return tempInCurrentTextSize;
+	}
+
+	public void setTempInCurrentTextSize(int tempInCurrentTextSize) {
+		this.tempInCurrentTextSize = tempInCurrentTextSize;
+	}
+
+	public int getRealFeelTempInCurrentTextSize() {
+		return realFeelTempInCurrentTextSize;
+	}
+
+	public void setRealFeelTempInCurrentTextSize(int realFeelTempInCurrentTextSize) {
+		this.realFeelTempInCurrentTextSize = realFeelTempInCurrentTextSize;
+	}
+
+	public int getAirQualityInCurrentTextSize() {
+		return airQualityInCurrentTextSize;
+	}
+
+	public void setAirQualityInCurrentTextSize(int airQualityInCurrentTextSize) {
+		this.airQualityInCurrentTextSize = airQualityInCurrentTextSize;
+	}
+
+	public int getPrecipitationInCurrentTextSize() {
+		return precipitationInCurrentTextSize;
+	}
+
+	public void setPrecipitationInCurrentTextSize(int precipitationInCurrentTextSize) {
+		this.precipitationInCurrentTextSize = precipitationInCurrentTextSize;
+	}
 
 	public interface WidgetUpdateCallback {
-		void updateWidget();
+		void updatePreview();
 	}
 }

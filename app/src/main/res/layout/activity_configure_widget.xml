@@ -35,6 +35,8 @@
                     android:id="@+id/preview_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:clickable="false"
+                    android:focusable="false"
                     android:minHeight="40dp"
                     android:paddingHorizontal="18dp"
                     android:paddingVertical="12dp" />
@@ -110,15 +112,31 @@
                             android:layout_height="wrap_content"
                             android:text="@string/selected_location" />
 
-                    </RadioGroup>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="right"
+                            android:orientation="horizontal">
 
-                    <Button
-                        android:id="@+id/change_address_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/change_address"
-                        android:visibility="gone" />
+                            <Button
+                                android:id="@+id/change_address_btn"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/change_address"
+                                android:visibility="visible" />
+
+                            <TextView
+                                android:id="@+id/selectedAddressName"
+                                style="@style/SettingsValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="16dp"
+                                android:text="selectedAddressName" />
+
+
+                        </LinearLayout>
+
+                    </RadioGroup>
 
                     <TextView
                         style="@style/SettingsLabel"

@@ -19,11 +19,13 @@ public class TextValueView extends View {
 	private final FragmentType fragmentType;
 
 	private final int viewWidth;
-	private final int viewHeight;
+	private int viewHeight;
 	private final int columnWidth;
 	private final TextPaint valueTextPaint;
 	private final Rect valueTextRect;
 	private List<String> valueList;
+	private int textSize;
+	private int padding;
 
 
 	public TextValueView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
@@ -46,6 +48,15 @@ public class TextValueView extends View {
 	public TextValueView setValueList(List<String> valueList) {
 		this.valueList = valueList;
 		return this;
+	}
+
+	public void setTextSize(int textSizeSp) {
+		this.textSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics());
+		valueTextPaint.setTextSize(textSize);
+		valueTextPaint.getTextBounds("A", 0, 1, valueTextRect);
+
+		padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6f, getResources().getDisplayMetrics());
+		viewHeight = valueTextRect.height() + padding * 2;
 	}
 
 	@Override
@@ -78,9 +89,8 @@ public class TextValueView extends View {
 		canvas.save();
 
 		float textHeight = valueTextRect.height();
-		int numberOfTextLines = sl.getLineCount();
 		float textYCoordinate = viewHeight / 2f + valueTextRect.exactCenterY() -
-				((numberOfTextLines * textHeight) / 2);
+				((sl.getLineCount() * textHeight) / 2);
 
 		final float columnCenterX = columnWidth / 2f;
 		float textXCoordinate = columnCenterX

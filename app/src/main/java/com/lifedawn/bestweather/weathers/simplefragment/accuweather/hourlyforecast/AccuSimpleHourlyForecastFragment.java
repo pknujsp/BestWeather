@@ -160,6 +160,8 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		dateRow.init(dateTimeList);
 		clockRow.setClockList(dateTimeList);
 		tempRow.setValueList(tempList);
+		tempRow.setTextSize(16);
+
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 		precipitationVolumeRow.setValueList(precipitationVolumeList);
 

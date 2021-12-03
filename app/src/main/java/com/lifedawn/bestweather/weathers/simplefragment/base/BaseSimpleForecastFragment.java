@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
@@ -80,39 +81,23 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		networkStatus = new NetworkStatus(getContext(), new ConnectivityManager.NetworkCallback() {
-			@Override
-			public void onAvailable(Network network) {
-				super.onAvailable(network);
-				if (needCompare) {
-					if (getActivity() != null) {
-						getActivity().runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								binding.weatherCardViewHeader.compareForecast.setClickable(true);
 
-							}
-						});
+		networkStatus = NetworkStatus.getInstance(getContext());
+		networkStatus.observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+			@Override
+			public void onChanged(Boolean available) {
+				if (available) {
+					if (needCompare) {
+						binding.weatherCardViewHeader.compareForecast.setClickable(true);
 					}
-				}
-			}
-
-			@Override
-			public void onLost(Network network) {
-				super.onLost(network);
-				if (needCompare) {
-					if (getActivity() != null) {
-						getActivity().runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								binding.weatherCardViewHeader.compareForecast.setClickable(false);
-
-							}
-						});
+				} else {
+					if (needCompare) {
+						binding.weatherCardViewHeader.compareForecast.setClickable(false);
 					}
 				}
 			}
 		});
+
 		binding.scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
 			@Override
 			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {

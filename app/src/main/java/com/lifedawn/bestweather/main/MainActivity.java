@@ -20,6 +20,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.ads.MobileAds;
@@ -72,14 +73,10 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-		networkStatus = new NetworkStatus(getApplicationContext(), new ConnectivityManager.NetworkCallback() {
-		});
-		if (!networkStatus.networkAvailable()) {
-			Toast.makeText(this, getString(R.string.need_to_connect_network), Toast.LENGTH_SHORT).show();
+		networkStatus = NetworkStatus.getInstance(getApplicationContext());
+		if(!networkStatus.networkAvailable()){
 			finish();
 		}
-
-
 
 		AppThemes appTheme = AppThemes.enumOf(sharedPreferences.getString(getString(R.string.pref_key_app_theme), AppThemes.BLACK.name()));
 		if (appTheme == AppThemes.BLACK) {

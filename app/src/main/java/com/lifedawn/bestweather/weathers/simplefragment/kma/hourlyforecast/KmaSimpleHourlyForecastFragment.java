@@ -60,7 +60,6 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		setValuesToViews();
 		binding.labels.setVisibility(View.GONE);
 
-
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -185,7 +184,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			probabilityOfPrecipitationList.add(finalHourlyForecast.getProbabilityOfPrecipitation() == null ? "-" :
 					finalHourlyForecast.getProbabilityOfPrecipitation() + percent);
 			rainVolumeList.add(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ? zero :
-					finalHourlyForecast.getRainPrecipitation1Hour().replace("mm",""));
+					finalHourlyForecast.getRainPrecipitation1Hour().replace("mm", ""));
 			if (finalHourlyForecast.getSnowPrecipitation1Hour() != null) {
 				if (!finalHourlyForecast.getSnowPrecipitation1Hour().equals(noSnow)) {
 					if (!haveSnow) {
@@ -199,6 +198,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			}
 		}
 
+		tempRow.setTextSize(16);
 		tempRow.setValueList(tempList);
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 		rainVolumeRow.setValueList(rainVolumeList);

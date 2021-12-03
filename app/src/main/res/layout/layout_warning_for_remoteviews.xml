@@ -26,5 +26,5 @@
         android:background="@drawable/btn_background"
         android:clickable="true"
         android:text="processBtn"
-        android:textColor="@color/textColorInNotification" />
+        android:textColor="@color/white" />
 </LinearLayout>

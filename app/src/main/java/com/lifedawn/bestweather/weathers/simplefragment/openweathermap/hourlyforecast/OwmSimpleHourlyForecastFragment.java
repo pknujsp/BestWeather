@@ -168,6 +168,8 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		dateRow.init(dateTimeList);
 		clockRow.setClockList(dateTimeList);
 		tempRow.setValueList(tempList);
+		tempRow.setTextSize(16);
+
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 		rainVolumeRow.setValueList(rainVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);

@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.Gps;
+import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
@@ -52,7 +53,6 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 		for (int widgetId : allWidgetIds) {
 			reDrawWidget(context, appWidgetManager, widgetId);
 		}
-
 	}
 
 	@Override
@@ -88,23 +88,18 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 	}
 
 	@Override
-	public void updateWidget() {
+	public void updatePreview() {
 
 	}
 
 	protected void reDrawWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
-		Log.e(tag, "reDraw appWidgetId : " + appWidgetId);
-		if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null) {
-			return;
-		}
-		
 		SharedPreferences sharedPreferences = context.getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE);
 		if (sharedPreferences.getAll().isEmpty()) {
 			return;
 		}
 
-		WidgetCreator widgetViewCreator = new WidgetCreator(context, this);
-		widgetViewCreator.onSharedPreferenceChanged(sharedPreferences, null);
+		WidgetCreator widgetViewCreator = new WidgetCreator(context, this, appWidgetId);
+		widgetViewCreator.loadSavedPreferences();
 
 		WeatherJsonObj weatherJsonObj = JsonDataSaver.getSavedWeatherData(context, WidgetCreator.getSharedPreferenceName(appWidgetId));
 		RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
@@ -131,24 +126,33 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 		final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
 		final SharedPreferences sharedPreferences = context.getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId),
 				Context.MODE_PRIVATE);
-		WidgetCreator widgetCreator = new WidgetCreator(context, null);
-		widgetCreator.onSharedPreferenceChanged(sharedPreferences, null);
+		WidgetCreator widgetCreator = new WidgetCreator(context, null, appWidgetId);
+		widgetCreator.loadSavedPreferences();
+
 		final RemoteViews remoteViews = widgetCreator.createRemoteViews(false);
+		final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
-		RemoteViewProcessor.onBeginProcess(remoteViews);
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+		NetworkStatus networkStatus = NetworkStatus.getInstance(context);
+		if (networkStatus.networkAvailable()) {
+			RemoteViewProcessor.onBeginProcess(remoteViews);
+			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
-		final LocationType locationType =
-				LocationType.valueOf(sharedPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(),
-						LocationType.CurrentLocation.name()));
+			LocationType locationType =
+					LocationType.valueOf(sharedPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(),
+							LocationType.CurrentLocation.name()));
 
-		if (locationType == LocationType.CurrentLocation) {
-			loadCurrentLocation(context, remoteViews, appWidgetId);
+			if (locationType == LocationType.CurrentLocation) {
+				loadCurrentLocation(context, remoteViews, appWidgetId);
+			} else {
+				loadWeatherData(context, AppWidgetManager.getInstance(context), remoteViews, appWidgetId);
+			}
 		} else {
-			loadWeatherData(context, AppWidgetManager.getInstance(context), remoteViews, appWidgetId);
+			RemoteViewProcessor.onErrorProcess(remoteViews, context.getString(R.string.disconnected_network),
+					context.getString(R.string.connect_network));
+			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 		}
 	}
+
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -240,9 +244,6 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 			@Override
 			public void onResult() {
 				Log.e(tag, "onResult");
-				if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null) {
-					return;
-				}
 				setResultViews(context, appWidgetId, remoteViews, appWidgetManager, this, requestWeatherDataTypeSet);
 			}
 
@@ -265,10 +266,10 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 		SharedPreferences widgetAttributes =
 				context.getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE);
 
-		WidgetCreator widgetCreator = new WidgetCreator(context, this);
-		widgetCreator.onSharedPreferenceChanged(widgetAttributes, null);
+		WidgetCreator widgetCreator = new WidgetCreator(context, this, appWidgetId);
+		widgetCreator.loadSavedPreferences();
 
-		 WeatherSourceType requestWeatherSourceType =
+		WeatherSourceType requestWeatherSourceType =
 				WeatherSourceType.valueOf(widgetAttributes.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
 						WeatherSourceType.OPEN_WEATHER_MAP.name()));
 		String countryCode = widgetAttributes.getString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), "");

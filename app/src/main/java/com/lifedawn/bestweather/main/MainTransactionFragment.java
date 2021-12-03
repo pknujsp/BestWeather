@@ -145,7 +145,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 
-		networkStatus = new NetworkStatus(getContext(), new ConnectivityManager.NetworkCallback());
+		networkStatus = NetworkStatus.getInstance(getContext());
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 

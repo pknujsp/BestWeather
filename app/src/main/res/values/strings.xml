@@ -491,5 +491,6 @@
     <string name="notificationDailyChannelDescription">매일 정해진 시각에 날씨 정보를 알립니다</string>
     <string name="use_daily_notification">당일 알림 사용</string>
     <string name="alarmClock">알림 시각</string>
+    <string name="connect_network">네트워크 연결</string>
 
 </resources>

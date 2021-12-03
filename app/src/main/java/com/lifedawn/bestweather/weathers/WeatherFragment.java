@@ -193,7 +193,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
-		networkStatus = new NetworkStatus(getContext(), new ConnectivityManager.NetworkCallback());
+		networkStatus = NetworkStatus.getInstance(getContext());
 		gps = new Gps(getContext(), requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
