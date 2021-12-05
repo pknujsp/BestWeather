@@ -3,8 +3,6 @@ package com.lifedawn.bestweather.forremoteviews;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.ArrayMap;
-import android.util.Log;
-import android.widget.RemoteViews;
 
 import androidx.preference.PreferenceManager;
 
@@ -45,7 +43,6 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.F
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
-import com.lifedawn.bestweather.widget.WidgetCreator;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import java.time.ZoneId;
@@ -197,22 +194,24 @@ public class WeatherDataRequest {
 
 	public CurrentConditionsObj getCurrentConditions(Context context, WeatherSourceType weatherSourceType,
 	                                                 MultipleJsonDownloader multipleJsonDownloader, String preferenceName) {
-		final ZonedDateTime updatedTime = ZonedDateTime.of(multipleJsonDownloader.getLocalDateTime().toLocalDate(),
-				multipleJsonDownloader.getLocalDateTime().toLocalTime(), ZoneId.systemDefault());
+		final ZonedDateTime updatedTime = ZonedDateTime.of(multipleJsonDownloader.getLocalDateTime().toLocalDateTime(), ZoneId.systemDefault());
 
 		ZoneId zoneId = null;
 		CurrentConditionsObj currentConditionsObj = new CurrentConditionsObj();
 		boolean successfulResponse = true;
 
-		ValueUnits windUnit =
+		final ValueUnits windUnit =
 				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_wind),
 						ValueUnits.mPerSec.name()));
 
 		switch (weatherSourceType) {
 			case KMA:
-				if (KmaResponseProcessor.successfulVilageResponse((Response<VilageFcstResponse>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponse())) {
+				MultipleJsonDownloader.ResponseResult kmaResponseResult =
+						multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
+
+				if (kmaResponseResult.isSuccessful()) {
 					FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(
-							(VilageFcstResponse) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponse().body());
+							(VilageFcstResponse) kmaResponseResult.getResponse().body());
 					zoneId = KmaResponseProcessor.getZoneId();
 
 					currentConditionsObj.setTemp(finalCurrentConditions.getTemperature());
@@ -221,8 +220,7 @@ public class WeatherDataRequest {
 					currentConditionsObj.setWindSpeed(ValueUnits.convertWindSpeed(finalCurrentConditions.getWindSpeed(), windUnit).toString());
 
 					SharedPreferences sharedPreferences =
-							context.getSharedPreferences(preferenceName,
-									Context.MODE_PRIVATE);
+							context.getSharedPreferences(preferenceName, Context.MODE_PRIVATE);
 
 					final double latitude = Double.parseDouble(sharedPreferences.getString(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), "0.0"));
 					final double longitude = Double.parseDouble(sharedPreferences.getString(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), "0.0"));
@@ -236,18 +234,21 @@ public class WeatherDataRequest {
 
 					Calendar sunRise = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(calendar);
 					Calendar sunSet = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(calendar);
-					boolean isNight = SunRiseSetUtil.isNight(calendar, sunRise, sunSet);
 
-					currentConditionsObj.setWeatherIcon(KmaResponseProcessor.getWeatherPtyIconImg(finalCurrentConditions.getPrecipitationType(), isNight));
+					currentConditionsObj.setWeatherIcon(KmaResponseProcessor.getWeatherPtyIconImg(finalCurrentConditions.getPrecipitationType()
+							, SunRiseSetUtil.isNight(calendar, sunRise, sunSet)));
 					currentConditionsObj.setPrecipitationType(KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()));
 				} else {
 					successfulResponse = false;
 				}
 				break;
 			case ACCU_WEATHER:
-				if (AccuWeatherResponseProcessor.successfulResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS))) {
+				MultipleJsonDownloader.ResponseResult accuResponseResult =
+						multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS);
+
+				if (accuResponseResult.isSuccessful()) {
 					CurrentConditionsResponse currentConditionsResponse = AccuWeatherResponseProcessor.getCurrentConditionsObjFromJson(
-							(JsonElement) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponse().body());
+							(JsonElement) accuResponseResult.getResponse().body());
 					CurrentConditionsResponse.Item item = currentConditionsResponse.getItems().get(0);
 					zoneId = ZonedDateTime.parse(item.getLocalObservationDateTime()).getZone();
 
@@ -258,16 +259,17 @@ public class WeatherDataRequest {
 					currentConditionsObj.setPrecipitationType(AccuWeatherResponseProcessor.getPty(item.getPrecipitationType()));
 					currentConditionsObj.setWindSpeed(ValueUnits.convertVisibilityForAccu(item.getWind().getSpeed().getMetric().getValue(),
 							windUnit));
-
 				} else {
 					successfulResponse = false;
 				}
 				break;
 			case OPEN_WEATHER_MAP:
-				if (OpenWeatherMapResponseProcessor.successfulResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.OPEN_WEATHER_MAP).get(RetrofitClient.ServiceType.OWM_ONE_CALL))) {
+				MultipleJsonDownloader.ResponseResult owmResponseResult =
+						multipleJsonDownloader.getResponseMap().get(WeatherSourceType.OPEN_WEATHER_MAP).get(RetrofitClient.ServiceType.OWM_ONE_CALL);
+
+				if (owmResponseResult.isSuccessful()) {
 					OneCallResponse oneCallResponse =
-							OpenWeatherMapResponseProcessor.getOneCallObjFromJson(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.OPEN_WEATHER_MAP)
-									.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponse().body().toString());
+							OpenWeatherMapResponseProcessor.getOneCallObjFromJson(owmResponseResult.getResponse().body().toString());
 					OneCallResponse.Current current = oneCallResponse.getCurrent();
 					zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
 
@@ -289,18 +291,24 @@ public class WeatherDataRequest {
 				}
 				break;
 		}
-		String airQuality = null;
-		if (AqicnResponseProcessor.successfulResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.AQICN).get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED))) {
-			GeolocalizedFeedResponse geolocalizedFeedResponse =
-					AqicnResponseProcessor.getAirQualityObjFromJson((Response<JsonElement>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.AQICN).get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED).getResponse());
-			airQuality = geolocalizedFeedResponse.getData().getIaqi().getPm10() == null ? null :
-					geolocalizedFeedResponse.getData().getIaqi().getPm10().getValue();
-		} else {
-			airQuality = null;
-		}
-		currentConditionsObj.setAirQuality(airQuality);
 		currentConditionsObj.setSuccessful(successfulResponse);
-		currentConditionsObj.setZoneId(successfulResponse ? zoneId.getId() : null);
+		if (successfulResponse) {
+			String airQuality = null;
+
+			MultipleJsonDownloader.ResponseResult aqiCnResponseResult =
+					multipleJsonDownloader.getResponseMap().get(WeatherSourceType.AQICN).get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
+
+			if (aqiCnResponseResult.isSuccessful()) {
+				GeolocalizedFeedResponse geolocalizedFeedResponse =
+						AqicnResponseProcessor.getAirQualityObjFromJson((Response<JsonElement>) aqiCnResponseResult.getResponse());
+				airQuality = geolocalizedFeedResponse.getData().getIaqi().getPm10() == null ? null :
+						geolocalizedFeedResponse.getData().getIaqi().getPm10().getValue();
+			} else {
+				airQuality = null;
+			}
+			currentConditionsObj.setAirQuality(airQuality);
+			currentConditionsObj.setZoneId(successfulResponse ? zoneId.getId() : null);
+		}
 		return currentConditionsObj;
 	}
 
@@ -313,20 +321,23 @@ public class WeatherDataRequest {
 
 		switch (weatherSourceType) {
 			case KMA:
-				if (KmaResponseProcessor.successfulVilageResponse((Response<VilageFcstResponse>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponse()) &&
-						KmaResponseProcessor.successfulVilageResponse((Response<VilageFcstResponse>) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.VILAGE_FCST).getResponse())) {
+				MultipleJsonDownloader.ResponseResult ultraSrtFcstResponseResult =
+						multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
+				MultipleJsonDownloader.ResponseResult vilageFcstResponseResult =
+						multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.VILAGE_FCST);
+
+				if (ultraSrtFcstResponseResult.isSuccessful() && vilageFcstResponseResult.isSuccessful()) {
 					List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
-							(VilageFcstResponse) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponse().body(),
-							(VilageFcstResponse) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.VILAGE_FCST).getResponse().body());
+							(VilageFcstResponse) ultraSrtFcstResponseResult.getResponse().body(),
+							(VilageFcstResponse) vilageFcstResponseResult.getResponse().body());
 					zoneId = KmaResponseProcessor.getZoneId();
 
 					ZonedDateTime begin = ZonedDateTime.of(finalHourlyForecastList.get(0).getFcstDateTime().toLocalDateTime(), zoneId);
 					ZonedDateTime end =
 							ZonedDateTime.of(finalHourlyForecastList.get(finalHourlyForecastList.size() - 1).getFcstDateTime().toLocalDateTime(),
 									zoneId);
-					SharedPreferences sharedPreferences =
-							context.getSharedPreferences(sharedPreferenceName,
-									Context.MODE_PRIVATE);
+					SharedPreferences sharedPreferences = context.getSharedPreferences(sharedPreferenceName,
+							Context.MODE_PRIVATE);
 
 					final double latitude = Double.parseDouble(sharedPreferences.getString(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), "0.0"));
 					final double longitude = Double.parseDouble(sharedPreferences.getString(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), "0.0"));
@@ -337,7 +348,7 @@ public class WeatherDataRequest {
 					Calendar itemCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
 
 					for (FinalHourlyForecast hourlyForecast : finalHourlyForecastList) {
-						HourlyForecastObj hourlyForecastObj = new HourlyForecastObj(true);
+						HourlyForecastObj hourlyForecastObj = new HourlyForecastObj();
 
 						fcstDateTime = ZonedDateTime.of(hourlyForecast.getFcstDateTime().toLocalDateTime(), zoneId);
 						hourlyForecastObj.setClock(fcstDateTime.toString());
@@ -360,14 +371,16 @@ public class WeatherDataRequest {
 				}
 				break;
 			case ACCU_WEATHER:
-				if (AccuWeatherResponseProcessor.successfulResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_12_HOURLY))) {
+				MultipleJsonDownloader.ResponseResult accuResponseResult =
+						multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_12_HOURLY);
+				if (accuResponseResult.isSuccessful()) {
 					TwelveHoursOfHourlyForecastsResponse hourlyForecastResponse = AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
-							(JsonElement) multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER).get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponse().body());
+							(JsonElement) accuResponseResult.getResponse().body());
 					List<TwelveHoursOfHourlyForecastsResponse.Item> hourlyForecastList = hourlyForecastResponse.getItems();
 					zoneId = ZonedDateTime.parse(hourlyForecastList.get(0).getDateTime()).getZone();
 
 					for (TwelveHoursOfHourlyForecastsResponse.Item hourlyForecast : hourlyForecastList) {
-						HourlyForecastObj hourlyForecastObj = new HourlyForecastObj(true);
+						HourlyForecastObj hourlyForecastObj = new HourlyForecastObj();
 
 						hourlyForecastObj.setClock(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourlyForecast.getEpochDateTime()) * 1000L, zoneId).toString());
 						hourlyForecastObj.setTemp(hourlyForecast.getTemperature().getValue());
@@ -381,15 +394,17 @@ public class WeatherDataRequest {
 				break;
 
 			case OPEN_WEATHER_MAP:
-				if (OpenWeatherMapResponseProcessor.successfulResponse(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.OPEN_WEATHER_MAP).get(RetrofitClient.ServiceType.OWM_ONE_CALL))) {
+				MultipleJsonDownloader.ResponseResult owmResponseResult =
+						multipleJsonDownloader.getResponseMap().get(WeatherSourceType.OPEN_WEATHER_MAP).get(RetrofitClient.ServiceType.OWM_ONE_CALL);
+				if (owmResponseResult.isSuccessful()) {
 					OneCallResponse oneCallResponse =
-							OpenWeatherMapResponseProcessor.getOneCallObjFromJson(multipleJsonDownloader.getResponseMap().get(WeatherSourceType.OPEN_WEATHER_MAP).get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponse().body().toString());
+							OpenWeatherMapResponseProcessor.getOneCallObjFromJson(owmResponseResult.getResponse().body().toString());
 					zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
 
 					List<OneCallResponse.Hourly> hourly = oneCallResponse.getHourly();
 
 					for (OneCallResponse.Hourly item : hourly) {
-						HourlyForecastObj hourlyForecastObj = new HourlyForecastObj(true);
+						HourlyForecastObj hourlyForecastObj = new HourlyForecastObj();
 
 						hourlyForecastObj.setClock(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getDt()) * 1000L,
 								zoneId).toString());
@@ -406,9 +421,11 @@ public class WeatherDataRequest {
 
 		}
 		WeatherJsonObj.HourlyForecasts hourlyForecasts = new WeatherJsonObj.HourlyForecasts();
-		hourlyForecasts.setHourlyForecastObjs(hourlyForecastObjList);
-		hourlyForecasts.setZoneId(successfulResponse ? zoneId.getId() : null);
-
+		hourlyForecasts.setSuccessful(successfulResponse);
+		if (successfulResponse) {
+			hourlyForecasts.setHourlyForecastObjs(hourlyForecastObjList);
+			hourlyForecasts.setZoneId(successfulResponse ? zoneId.getId() : null);
+		}
 		return hourlyForecasts;
 	}
 
@@ -451,11 +468,11 @@ public class WeatherDataRequest {
 						DailyForecastObj dailyForecastObj;
 
 						if (finalDailyForecast.isSingle()) {
-							dailyForecastObj = new DailyForecastObj(true, true);
+							dailyForecastObj = new DailyForecastObj(true);
 							dailyForecastObj.setLeftWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false));
 							dailyForecastObj.setLeftPop(finalDailyForecast.getProbabilityOfPrecipitation());
 						} else {
-							dailyForecastObj = new DailyForecastObj(true, false);
+							dailyForecastObj = new DailyForecastObj(false);
 							dailyForecastObj.setLeftWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getAmSky(), false));
 							dailyForecastObj.setRightWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), false));
 							dailyForecastObj.setLeftPop(finalDailyForecast.getAmProbabilityOfPrecipitation());
@@ -483,7 +500,7 @@ public class WeatherDataRequest {
 					zoneId = ZonedDateTime.parse(dailyForecasts.get(0).getDateTime()).getZone();
 
 					for (FiveDaysOfDailyForecastsResponse.DailyForecasts item : dailyForecasts) {
-						DailyForecastObj dailyForecastObj = new DailyForecastObj(true, false);
+						DailyForecastObj dailyForecastObj = new DailyForecastObj(false);
 
 						dailyForecastObj.setDate(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getEpochDate()) * 1000L, zoneId).toString());
 
@@ -509,7 +526,7 @@ public class WeatherDataRequest {
 					List<OneCallResponse.Daily> daily = oneCallResponse.getDaily();
 
 					for (OneCallResponse.Daily item : daily) {
-						DailyForecastObj dailyForecastObj = new DailyForecastObj(true, true);
+						DailyForecastObj dailyForecastObj = new DailyForecastObj(true);
 						dailyForecastObj.setDate(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getDt()) * 1000L,
 								zoneId).toString());
 						dailyForecastObj.setMinTemp(item.getTemp().getMin());
@@ -526,9 +543,11 @@ public class WeatherDataRequest {
 		}
 
 		WeatherJsonObj.DailyForecasts dailyForecasts = new WeatherJsonObj.DailyForecasts();
-		dailyForecasts.setDailyForecastObjs(dailyForecastObjList);
-		dailyForecasts.setZoneId(successfulResponse ? zoneId.getId() : null);
-
+		dailyForecasts.setSuccessful(successfulResponse);
+		if (successfulResponse) {
+			dailyForecasts.setDailyForecastObjs(dailyForecastObjList);
+			dailyForecasts.setZoneId(successfulResponse ? zoneId.getId() : null);
+		}
 		return dailyForecasts;
 	}
 }

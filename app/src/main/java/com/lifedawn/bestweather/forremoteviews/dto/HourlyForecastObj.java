@@ -5,10 +5,6 @@ import com.google.gson.annotations.SerializedName;
 
 public class HourlyForecastObj {
 	@Expose
-	@SerializedName("successful")
-	private boolean successful;
-
-	@Expose
 	@SerializedName("clock")
 	private String clock;
 
@@ -20,21 +16,11 @@ public class HourlyForecastObj {
 	@SerializedName("weatherIcon")
 	private int weatherIcon;
 
-	public HourlyForecastObj(boolean successful) {
-		this.successful = successful;
-	}
 
 	public HourlyForecastObj() {
 
 	}
 
-	public boolean isSuccessful() {
-		return successful;
-	}
-
-	public void setSuccessful(boolean successful) {
-		this.successful = successful;
-	}
 
 	public String getClock() {
 		return clock;

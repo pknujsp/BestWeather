@@ -458,67 +458,68 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static boolean successfulVilageResponse(Response<VilageFcstResponse> response) {
-		if (response.isSuccessful()) {
-
-			if (response.body() == null) {
-				return false;
-			} else {
-				if (response.body().getKmaHeader() == null) {
-					return false;
-				}
-				final String successfulCode = "00";
-
-				if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-		} else {
+		if (response == null) {
 			return false;
 		}
+
+		if (response.body() == null) {
+			return false;
+		} else {
+			if (response.body().getKmaHeader() == null) {
+				return false;
+			}
+			final String successfulCode = "00";
+
+			if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
 	}
 
 	public static boolean successfulMidLandFcstResponse(Response<MidLandFcstResponse> response) {
-		if (response.isSuccessful()) {
-
-			if (response.body() == null) {
-				return false;
-			} else {
-				if (response.body().getKmaHeader() == null) {
-					return false;
-				}
-
-				final String successfulCode = "00";
-
-				if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-		} else {
+		if (response == null) {
 			return false;
 		}
+		if (response.body() == null) {
+			return false;
+		} else {
+			if (response.body().getKmaHeader() == null) {
+				return false;
+			}
+
+			final String successfulCode = "00";
+
+			if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
 	}
 
 	public static boolean successfulMidTaFcstResponse(Response<MidTaResponse> response) {
-		if (response.isSuccessful()) {
-
-			if (response.body() == null) {
-				return false;
-			} else {
-				final String successfulCode = "00";
-
-				if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-		} else {
+		if (response == null) {
 			return false;
 		}
+		if (response.body() == null) {
+			return false;
+		} else {
+			if (response.body().getKmaHeader() == null) {
+				return false;
+			}
+			final String successfulCode = "00";
+
+			if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
 	}
 
 	public static UltraSrtNcstRoot getUltraSrtNcstObjFromJson(String response) {

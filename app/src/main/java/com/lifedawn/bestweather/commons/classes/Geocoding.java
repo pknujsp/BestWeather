@@ -8,7 +8,9 @@ import com.lifedawn.bestweather.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Pattern;
 
 public class Geocoding {
 
@@ -20,7 +22,8 @@ public class Geocoding {
 					callback.onReverseGeocodingResult(new ArrayList<>());
 					return;
 				}
-				Geocoder geocoder = new Geocoder(context);
+
+				Geocoder geocoder = new Geocoder(context, Locale.getDefault());
 
 				try {
 					List<Address> addressList = geocoder.getFromLocationName(query, 5);

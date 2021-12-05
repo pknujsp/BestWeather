@@ -35,7 +35,6 @@ import com.lifedawn.bestweather.forremoteviews.dto.HourlyForecastObj;
 import com.lifedawn.bestweather.forremoteviews.dto.WeatherJsonObj;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -65,6 +64,8 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 	private NotificationHelper notificationHelper;
 	private NetworkStatus networkStatus;
 
+	private DailyNotiHelper dailyNotiHelper;
+
 	private String addressName;
 
 	public DailyNotiViewCreator(Context context) {
@@ -83,6 +84,8 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 		dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? context.getString(R.string.datetime_pattern_clock12) :
 				context.getString(R.string.datetime_pattern_clock24));
 		notificationHelper = new NotificationHelper(context);
+
+		dailyNotiHelper = new DailyNotiHelper(context);
 	}
 
 
@@ -94,8 +97,8 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 	public void initNotification() {
 		if (!networkStatus.networkAvailable()) {
 			RemoteViews remoteViews = createRemoteViews();
-			RemoteViewProcessor.onErrorProcess(remoteViews, context.getString(R.string.need_to_connect_network),
-					context.getString(R.string.connect_network));
+			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK);
+			remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, dailyNotiHelper.getRefreshPendingIntent());
 			makeNotification(remoteViews, R.drawable.temp_icon);
 			return;
 		}
@@ -132,27 +135,22 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 			@Override
 			public void onFailed(Fail fail) {
 				Intent intent = null;
-				String errorMsg = null;
-				String btnMsg = null;
+				RemoteViewProcessor.ErrorType errorType = null;
 
 				if (fail == Fail.REJECT_PERMISSION) {
-					errorMsg = context.getString(R.string.message_needs_location_permission);
-					btnMsg = context.getString(R.string.check_permission);
+					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_REJECTED;
 					intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
 					intent.setData(Uri.fromParts("package", context.getPackageName(), null));
 				} else {
-					errorMsg = context.getString(R.string.request_to_make_gps_on);
-					btnMsg = context.getString(R.string.enable_gps);
+					errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
 					intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 				}
 
-				/*
+				RemoteViews remoteViews = createRemoteViews();
 				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, PendingIntent.getActivity(context, 0, intent,
 						PendingIntent.FLAG_UPDATE_CURRENT));
-				RemoteViewProcessor.onErrorProcess(remoteViews, errorMsg, btnMsg);
+				RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
 				makeNotification(remoteViews, R.drawable.temp_icon);
-
-				 */
 			}
 		};
 
@@ -219,40 +217,41 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 			currentConditionsObj = weatherDataRequest.getCurrentConditions(context, requestWeatherSourceType, multipleJsonDownloader,
 					notificationType.getPreferenceName());
 
-			if (!currentConditionsObj.isSuccessful()) {
-				RemoteViewProcessor.onErrorProcess(remoteViews, context.getString(R.string.update_failed), context.getString(R.string.again));
-				successful = false;
-			} else {
+			if (currentConditionsObj.isSuccessful()) {
 				setCurrentConditionsViews(remoteViews, currentConditionsObj);
+			} else {
+				successful = false;
 			}
 		}
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
 			hourlyForecastObjs = weatherDataRequest.getHourlyForecasts(context, requestWeatherSourceType, multipleJsonDownloader,
 					notificationType.getPreferenceName());
 
-			if (hourlyForecastObjs.getHourlyForecastObjs().isEmpty() && successful) {
-				RemoteViewProcessor.onErrorProcess(remoteViews, context.getString(R.string.update_failed), context.getString(R.string.again));
-				successful = false;
-			} else if (!hourlyForecastObjs.getHourlyForecastObjs().isEmpty()) {
+			if (hourlyForecastObjs.isSuccessful()) {
 				setHourlyForecastViews(remoteViews, hourlyForecastObjs);
+			} else {
+				successful = false;
 			}
 
 		}
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
 			dailyForecasts = weatherDataRequest.getDailyForecasts(requestWeatherSourceType, multipleJsonDownloader);
 
-			if (dailyForecasts.getDailyForecastObjs().isEmpty() && successful) {
-				RemoteViewProcessor.onErrorProcess(remoteViews, context.getString(R.string.update_failed), context.getString(R.string.again));
-				successful = false;
-			} else if (!dailyForecasts.getDailyForecastObjs().isEmpty()) {
+			if (dailyForecasts.isSuccessful()) {
 				//setDailyForecastViews(remoteViews, dailyForecasts);
+			} else {
+				successful = false;
 			}
 		}
-		int icon = R.drawable.temp_icon;
+		int icon = 0;
 
 		if (successful) {
 			RemoteViewProcessor.onSuccessfulProcess(remoteViews);
 			icon = currentConditionsObj.getWeatherIcon();
+		} else {
+			icon = R.drawable.temp_icon;
+			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, dailyNotiHelper.getRefreshPendingIntent());
 		}
 
 		makeNotification(remoteViews, icon);
@@ -275,17 +274,11 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 	}
 
 	public void setHeaderViews(RemoteViews remoteViews, HeaderObj headerObj) {
-		if (headerObj == null) {
-			return;
-		}
 		remoteViews.setTextViewText(R.id.address, headerObj.getAddress());
 		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(headerObj.getRefreshDateTime()).format(dateTimeFormatter));
 	}
 
 	public void setCurrentConditionsViews(RemoteViews remoteViews, CurrentConditionsObj currentConditionsObj) {
-		if (currentConditionsObj == null) {
-			return;
-		}
 		remoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsObj.getWeatherIcon());
 		remoteViews.setTextViewText(R.id.airQuality, currentConditionsObj.getAirQuality() == null ? context.getString(R.string.not_data)
 				: AqicnResponseProcessor.getGradeDescription((int) Double.parseDouble(currentConditionsObj.getAirQuality())));
@@ -302,10 +295,6 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 	}
 
 	public void setHourlyForecastViews(RemoteViews remoteViews, WeatherJsonObj.HourlyForecasts hourlyForecasts) {
-		if (hourlyForecasts == null) {
-			return;
-		}
-
 		remoteViews.removeAllViews(R.id.hourlyForecast1);
 		remoteViews.removeAllViews(R.id.hourlyForecast2);
 		String clock = null;
@@ -342,9 +331,6 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 
 	/*
 	public void setDailyForecastViews(RemoteViews remoteViews, WeatherJsonObj.DailyForecasts dailyForecasts) {
-		if (dailyForecasts == null) {
-			return;
-		}
 		remoteViews.removeAllViews(R.id.dailyForecast);
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern_of_daily_forecast_in_widget));
 		List<DailyForecastObj> dailyForecastObjList = dailyForecasts.getDailyForecastObjs();

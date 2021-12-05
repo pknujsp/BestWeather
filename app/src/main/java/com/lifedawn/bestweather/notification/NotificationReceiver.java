@@ -14,7 +14,9 @@ import android.util.Log;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.notification.always.AlwaysNotiHelper;
 import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
+import com.lifedawn.bestweather.notification.daily.DailyNotiHelper;
 import com.lifedawn.bestweather.notification.daily.DailyNotiViewCreator;
 
 import java.time.LocalTime;
@@ -61,44 +63,16 @@ public class NotificationReceiver extends BroadcastReceiver {
 						alwaysNotiViewCreator.initNotification();
 
 						if (alwaysNotiViewCreator.getUpdateInterval() > 0) {
-							Intent refreshIntent = new Intent(context, NotificationReceiver.class);
-							refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-							Bundle bundle = new Bundle();
-							bundle.putString(NotificationType.class.getName(), NotificationType.Always.name());
-
-							refreshIntent.putExtras(bundle);
-							PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 11, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-							AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-							alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
-									alwaysNotiViewCreator.getUpdateInterval(), pendingIntent);
+							AlwaysNotiHelper alwaysNotiHelper = new AlwaysNotiHelper(context);
+							alwaysNotiHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getUpdateInterval());
 						}
 					}
 
 					if (enabledDailyNotification) {
 						DailyNotiViewCreator dailyNotiViewCreator = new DailyNotiViewCreator(context);
 						dailyNotiViewCreator.loadPreferences();
-
-						LocalTime localTime = LocalTime.parse(dailyNotiViewCreator.getAlarmClock());
-
-						Calendar calendar = Calendar.getInstance();
-						calendar.set(Calendar.HOUR_OF_DAY, localTime.getHour());
-						calendar.set(Calendar.MINUTE, localTime.getMinute());
-						calendar.set(Calendar.SECOND, 0);
-
-						Intent refreshIntent = new Intent(context, NotificationReceiver.class);
-						refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-						Bundle bundle = new Bundle();
-						bundle.putString(NotificationType.class.getName(), NotificationType.Daily.name());
-
-						refreshIntent.putExtras(bundle);
-						PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 20, refreshIntent,
-								PendingIntent.FLAG_UPDATE_CURRENT);
-
-						AlarmManager alarmManager =
-								(AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-						alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-								AlarmManager.INTERVAL_DAY, pendingIntent);
+						DailyNotiHelper dailyNotiHelper = new DailyNotiHelper(context);
+						dailyNotiHelper.setAlarm(dailyNotiViewCreator.getAlarmClock());
 					}
 				}
 			}

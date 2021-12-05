@@ -194,7 +194,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 		binding.sideNavMenu.favorites.setOnClickListener(sideNavOnClickListener);
 		binding.sideNavMenu.settings.setOnClickListener(sideNavOnClickListener);
-		binding.sideNavMenu.notificationSettings.setOnClickListener(sideNavOnClickListener);
+		binding.sideNavMenu.notificationAlarmSettings.setOnClickListener(sideNavOnClickListener);
 
 		int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
 		binding.sideNavMenu.currentLocationLayout.setPadding(padding, MainActivity.getHeightOfStatusBar(getContext()) + padding, padding,
@@ -473,7 +473,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 							getString(R.string.tag_settings_main_fragment)).addToBackStack(
 							getString(R.string.tag_settings_main_fragment)).commit();
 					break;
-				case R.id.notificationSettings:
+				case R.id.notificationAlarmSettings:
 					NotificationFragment notificationFragment = new NotificationFragment();
 					String favTag = NotificationFragment.class.getName();
 

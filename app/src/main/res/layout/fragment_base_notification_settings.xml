@@ -22,7 +22,6 @@
                 android:id="@+id/root_scroll_View"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_above="@id/adViewBottom"
                 android:layout_below="@id/toolbar"
                 android:overScrollMode="never"
                 android:paddingHorizontal="16dp"
@@ -32,8 +31,6 @@
                     android:id="@+id/widget_settings_container"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_above="@id/adViewBottom"
-                    android:layout_below="@id/toolbar"
                     android:orientation="vertical">
 
                     <FrameLayout
@@ -85,13 +82,6 @@
 
             </androidx.core.widget.NestedScrollView>
 
-            <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/adViewBottom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                ads:adSize="BANNER"
-                ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
         </RelativeLayout>
 
     </FrameLayout>

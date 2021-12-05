@@ -1,37 +1,16 @@
 package com.lifedawn.bestweather.forremoteviews;
 
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Location;
-import android.net.Uri;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import androidx.annotation.Nullable;
-
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.classes.Gps;
-import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
-import com.lifedawn.bestweather.forremoteviews.dto.CurrentConditionsObj;
-import com.lifedawn.bestweather.forremoteviews.dto.HeaderObj;
-import com.lifedawn.bestweather.forremoteviews.dto.WeatherJsonObj;
-import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
-import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
-
-import java.time.ZoneId;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class RemoteViewProcessor {
+
+	public enum ErrorType {
+		UNAVAILABLE_NETWORK, FAILED_LOAD_WEATHER_DATA, GPS_OFF, GPS_PERMISSION_REJECTED
+	}
 
 	public static void onBeginProcess(RemoteViews remoteViews) {
 		remoteViews.setViewVisibility(R.id.progressbar, View.VISIBLE);
@@ -45,15 +24,36 @@ public class RemoteViewProcessor {
 		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
 	}
 
-	public static void onErrorProcess(RemoteViews remoteViews, String errorMsg, String btnMsg) {
+	public static void onErrorProcess(RemoteViews remoteViews, Context context, ErrorType errorType) {
 		remoteViews.setViewVisibility(R.id.warning_layout, View.VISIBLE);
 		remoteViews.setViewVisibility(R.id.content_container, View.GONE);
 		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
-		remoteViews.setTextViewText(R.id.warning, errorMsg);
-		remoteViews.setTextViewText(R.id.warning_process_btn, btnMsg);
+
+		switch (errorType) {
+			case GPS_OFF:
+				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.request_to_make_gps_on));
+				remoteViews.setTextViewText(R.id.warning_process_btn, context.getString(R.string.enable_gps));
+				remoteViews.setViewVisibility(R.id.warning_process_btn, View.VISIBLE);
+
+				break;
+			case FAILED_LOAD_WEATHER_DATA:
+				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.update_failed));
+				remoteViews.setTextViewText(R.id.warning_process_btn, context.getString(R.string.again));
+				remoteViews.setViewVisibility(R.id.warning_process_btn, View.VISIBLE);
+				break;
+			case GPS_PERMISSION_REJECTED:
+				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.message_needs_location_permission));
+				remoteViews.setTextViewText(R.id.warning_process_btn, context.getString(R.string.check_permission));
+				remoteViews.setViewVisibility(R.id.warning_process_btn, View.VISIBLE);
+				break;
+			case UNAVAILABLE_NETWORK:
+				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.need_to_connect_network));
+				remoteViews.setTextViewText(R.id.warning_process_btn, context.getString(R.string.again));
+				remoteViews.setViewVisibility(R.id.warning_process_btn, View.VISIBLE);
+				break;
+		}
+
 	}
-
-
 
 
 }

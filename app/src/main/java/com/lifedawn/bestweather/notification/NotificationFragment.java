@@ -1,13 +1,10 @@
 package com.lifedawn.bestweather.notification;
 
-import android.content.Context;
 import android.os.Bundle;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +13,7 @@ import android.view.ViewGroup;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.alarm.AlarmListFragment;
 import com.lifedawn.bestweather.databinding.FragmentNotificationBinding;
 import com.lifedawn.bestweather.notification.always.AlwaysNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.daily.DailyNotificationSettingsFragment;
@@ -75,6 +73,18 @@ public class NotificationFragment extends Fragment {
 
 				getParentFragmentManager().beginTransaction().hide(NotificationFragment.this).add(R.id.fragment_container,
 						dailyNotificationSettingsFragment, tag)
+						.addToBackStack(tag).commit();
+			}
+		});
+
+		binding.always.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				AlarmListFragment alarmListFragment = new AlarmListFragment();
+				String tag = AlarmListFragment.class.getName();
+
+				getParentFragmentManager().beginTransaction().hide(NotificationFragment.this).add(R.id.fragment_container,
+						alarmListFragment, tag)
 						.addToBackStack(tag).commit();
 			}
 		});

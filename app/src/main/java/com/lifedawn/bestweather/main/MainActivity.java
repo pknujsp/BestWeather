@@ -74,7 +74,8 @@ public class MainActivity extends AppCompatActivity {
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		networkStatus = NetworkStatus.getInstance(getApplicationContext());
-		if(!networkStatus.networkAvailable()){
+		if (!networkStatus.networkAvailable()) {
+			Toast.makeText(this, R.string.disconnected_network, Toast.LENGTH_SHORT).show();
 			finish();
 		}
 

@@ -22,62 +22,66 @@
                 android:id="@+id/root_scroll_View"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_above="@id/adViewBottom"
                 android:layout_below="@id/toolbar"
                 android:overScrollMode="never"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
+                android:paddingHorizontal="16dp"
                 android:scrollbars="none">
 
                 <LinearLayout
+                    android:id="@+id/settings_container"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/always"
+                        android:id="@+id/hours"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
                         android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="16dp"
-                        android:text="@string/always_notification"
-                        android:textColor="@color/black"
-                        android:textSize="15sp" />
+                        android:clickable="true"
+                        android:text="07:00"
+                        android:textAlignment="center"
+                        android:textColor="@color/blue"
+                        android:textSize="60sp" />
 
                     <TextView
-                        android:id="@+id/daily"
+                        style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="16dp"
-                        android:text="@string/daily_notification"
-                        android:textColor="@color/black"
-                        android:textSize="15sp" />
+                        android:text="@string/alarmDays" />
 
                     <TextView
-                        android:id="@+id/alarm"
+                        style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="16dp"
-                        android:text="@string/alarm"
-                        android:textColor="@color/black"
-                        android:textSize="15sp" />
+                        android:text="@string/alarmSound" />
+
+                    <TextView
+                        style="@style/SettingsLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/alarmVibration" />
+
+                    <TextView
+                        style="@style/SettingsLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/againAlarming" />
+
+                    <Button
+                        android:id="@+id/check"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/createAlarm" />
+
                 </LinearLayout>
 
             </androidx.core.widget.NestedScrollView>
 
-            <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/adViewBottom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                ads:adSize="BANNER"
-                ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
         </RelativeLayout>
 
     </FrameLayout>
+
+
 </layout>

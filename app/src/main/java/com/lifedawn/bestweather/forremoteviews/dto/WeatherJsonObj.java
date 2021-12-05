@@ -37,6 +37,18 @@ public class WeatherJsonObj {
 		@SerializedName("forecasts")
 		private List<HourlyForecastObj> hourlyForecastObjs;
 
+		@Expose
+		@SerializedName("successful")
+		private boolean successful;
+
+		public boolean isSuccessful() {
+			return successful;
+		}
+
+		public void setSuccessful(boolean successful) {
+			this.successful = successful;
+		}
+
 		public List<HourlyForecastObj> getHourlyForecastObjs() {
 			return hourlyForecastObjs;
 		}
@@ -62,6 +74,18 @@ public class WeatherJsonObj {
 		@Expose
 		@SerializedName("forecasts")
 		private List<DailyForecastObj> dailyForecastObjs;
+
+		@Expose
+		@SerializedName("successful")
+		private boolean successful;
+
+		public boolean isSuccessful() {
+			return successful;
+		}
+
+		public void setSuccessful(boolean successful) {
+			this.successful = successful;
+		}
 
 		public List<DailyForecastObj> getDailyForecastObjs() {
 			return dailyForecastObjs;

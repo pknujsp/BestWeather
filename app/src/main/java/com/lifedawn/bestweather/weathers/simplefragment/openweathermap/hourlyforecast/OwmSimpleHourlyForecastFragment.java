@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -192,7 +193,11 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		if (haveSnowVolumes) {
 			binding.forecastView.addView(snowVolumeRow, iconTextRowLayoutParams);
 		}
-		binding.forecastView.addView(tempRow, rowLayoutParams);
+
+		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		tempRowLayoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
+		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
 	}
 

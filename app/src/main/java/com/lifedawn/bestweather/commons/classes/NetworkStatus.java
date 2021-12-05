@@ -54,7 +54,6 @@ public class NetworkStatus extends LiveData<Boolean> {
 
 	public boolean networkAvailable() {
 		if (connectivityManager.getActiveNetwork() == null) {
-			Toast.makeText(context, context.getString(R.string.disconnected_network), Toast.LENGTH_SHORT).show();
 			return false;
 		} else {
 			NetworkCapabilities nc = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
@@ -62,7 +61,6 @@ public class NetworkStatus extends LiveData<Boolean> {
 			if (nc.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
 				return true;
 			} else {
-				Toast.makeText(context, context.getString(R.string.disconnected_network), Toast.LENGTH_SHORT).show();
 				return false;
 			}
 		}

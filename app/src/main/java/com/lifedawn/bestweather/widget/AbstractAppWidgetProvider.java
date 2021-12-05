@@ -111,10 +111,13 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 				widgetViewCreator.setHourlyForecastViews(remoteViews, weatherJsonObj.getHourlyForecasts());
 				widgetViewCreator.setDailyForecastViews(remoteViews, weatherJsonObj.getDailyForecasts());
 				widgetViewCreator.setClockTimeZone(remoteViews, ZoneId.of(weatherJsonObj.getCurrentConditionsObj().getZoneId()));
+			} else {
+				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetViewCreator.getOnClickedPendingIntent(remoteViews, appWidgetId));
+				RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
 			}
 		} else {
 			remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetViewCreator.getOnClickedPendingIntent(remoteViews, appWidgetId));
-			RemoteViewProcessor.onErrorProcess(remoteViews, context.getString(R.string.update_failed), context.getString(R.string.again));
+			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
 		}
 
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
@@ -147,8 +150,8 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 				loadWeatherData(context, AppWidgetManager.getInstance(context), remoteViews, appWidgetId);
 			}
 		} else {
-			RemoteViewProcessor.onErrorProcess(remoteViews, context.getString(R.string.disconnected_network),
-					context.getString(R.string.connect_network));
+			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK);
+			setRefreshPendingIntent(remoteViews, appWidgetId, context);
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 		}
 	}
@@ -179,6 +182,20 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 		}
 	}
 
+	public void setRefreshPendingIntent(RemoteViews remoteViews, int appWidgetId, Context context) {
+		Intent refreshIntent = new Intent(context, getThis());
+		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+
+		Bundle bundle = new Bundle();
+		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+		bundle.putParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
+		refreshIntent.putExtras(bundle);
+
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId, refreshIntent,
+				PendingIntent.FLAG_CANCEL_CURRENT);
+		remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, pendingIntent);
+	}
+
 	public void loadCurrentLocation(Context context, RemoteViews remoteViews, int appWidgetId) {
 		Log.e(tag, "loadCurrentLocation");
 		Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
@@ -205,22 +222,19 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 			@Override
 			public void onFailed(Fail fail) {
 				Intent intent = null;
-				String errorMsg = null;
-				String btnMsg = null;
+				RemoteViewProcessor.ErrorType errorType = null;
 
 				if (fail == Fail.REJECT_PERMISSION) {
-					errorMsg = context.getString(R.string.message_needs_location_permission);
-					btnMsg = context.getString(R.string.check_permission);
+					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_REJECTED;
 					intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
 					intent.setData(Uri.fromParts("package", context.getPackageName(), null));
 				} else {
-					errorMsg = context.getString(R.string.request_to_make_gps_on);
-					btnMsg = context.getString(R.string.enable_gps);
+					errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
 					intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 				}
 
 				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT));
-				RemoteViewProcessor.onErrorProcess(remoteViews, errorMsg, btnMsg);
+				RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
 				AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 			}
@@ -234,27 +248,32 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 
 
 	public void loadWeatherData(Context context, AppWidgetManager appWidgetManager, RemoteViews remoteViews, int appWidgetId) {
-		RemoteViewProcessor.onBeginProcess(remoteViews);
-		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+		NetworkStatus networkStatus = NetworkStatus.getInstance(context);
+		if (networkStatus.networkAvailable()) {
 
-		WeatherDataRequest weatherDataRequest = new WeatherDataRequest(context);
-		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
+			RemoteViewProcessor.onBeginProcess(remoteViews);
+			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
-		multipleJsonDownloader = new MultipleJsonDownloader() {
-			@Override
-			public void onResult() {
-				Log.e(tag, "onResult");
-				setResultViews(context, appWidgetId, remoteViews, appWidgetManager, this, requestWeatherDataTypeSet);
-			}
+			WeatherDataRequest weatherDataRequest = new WeatherDataRequest(context);
+			final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
 
-			@Override
-			public void onCanceled() {
-				Log.e(tag, "canceled");
-			}
-		};
-		weatherDataRequest.loadWeatherData(context, WidgetCreator.getSharedPreferenceName(appWidgetId),
-				requestWeatherDataTypeSet, multipleJsonDownloader);
+			multipleJsonDownloader = new MultipleJsonDownloader() {
+				@Override
+				public void onResult() {
+					setResultViews(context, appWidgetId, remoteViews, appWidgetManager, this, requestWeatherDataTypeSet);
+				}
 
+				@Override
+				public void onCanceled() {
+					Log.e(tag, "canceled");
+				}
+			};
+			weatherDataRequest.loadWeatherData(context, WidgetCreator.getSharedPreferenceName(appWidgetId),
+					requestWeatherDataTypeSet, multipleJsonDownloader);
+		} else {
+			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK);
+			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+		}
 	}
 
 
@@ -293,37 +312,31 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
 			currentConditionsObj = weatherDataRequest.getCurrentConditions(context, requestWeatherSourceType, multipleJsonDownloader,
 					WidgetCreator.getSharedPreferenceName(appWidgetId));
-			if (!currentConditionsObj.isSuccessful()) {
-				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetCreator.getOnClickedPendingIntent(remoteViews, appWidgetId));
-				RemoteViewProcessor.onErrorProcess(remoteViews, context.getString(R.string.update_failed), context.getString(R.string.again));
-				successful = false;
-			} else {
+			if (currentConditionsObj.isSuccessful()) {
 				widgetCreator.setCurrentConditionsViews(remoteViews, currentConditionsObj);
 				zoneId = ZoneId.of(currentConditionsObj.getZoneId());
+			} else {
+				successful = false;
 			}
 		}
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
 			hourlyForecastObjs = weatherDataRequest.getHourlyForecasts(context, requestWeatherSourceType, multipleJsonDownloader,
 					WidgetCreator.getSharedPreferenceName(appWidgetId));
-			if (hourlyForecastObjs.getHourlyForecastObjs().isEmpty() && successful) {
-				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetCreator.getOnClickedPendingIntent(remoteViews, appWidgetId));
-				RemoteViewProcessor.onErrorProcess(remoteViews, context.getString(R.string.update_failed), context.getString(R.string.again));
-				successful = false;
-			} else if (!hourlyForecastObjs.getHourlyForecastObjs().isEmpty()) {
+			if (hourlyForecastObjs.isSuccessful()) {
 				zoneId = ZoneId.of(hourlyForecastObjs.getZoneId());
 				widgetCreator.setHourlyForecastViews(remoteViews, hourlyForecastObjs);
+			} else {
+				successful = false;
 			}
 
 		}
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
 			dailyForecasts = weatherDataRequest.getDailyForecasts(requestWeatherSourceType, multipleJsonDownloader);
-			if (dailyForecasts.getDailyForecastObjs().isEmpty() && successful) {
-				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetCreator.getOnClickedPendingIntent(remoteViews, appWidgetId));
-				RemoteViewProcessor.onErrorProcess(remoteViews, context.getString(R.string.update_failed), context.getString(R.string.again));
-				successful = false;
-			} else if (!dailyForecasts.getDailyForecastObjs().isEmpty()) {
+			if (dailyForecasts.isSuccessful()) {
 				zoneId = ZoneId.of(dailyForecasts.getZoneId());
 				widgetCreator.setDailyForecastViews(remoteViews, dailyForecasts);
+			} else {
+				successful = false;
 			}
 		}
 
@@ -331,6 +344,9 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 			boolean displayLocalClock = widgetAttributes.getBoolean(WidgetNotiConstants.WidgetAttributes.DISPLAY_LOCAL_CLOCK.name(), false);
 			widgetCreator.setClockTimeZone(remoteViews, displayLocalClock ? zoneId : ZoneId.systemDefault());
 			RemoteViewProcessor.onSuccessfulProcess(remoteViews);
+		} else {
+			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			setRefreshPendingIntent(remoteViews, appWidgetId, context);
 		}
 		JsonDataSaver.saveWeatherData(WidgetCreator.getSharedPreferenceName(appWidgetId), context, headerObj, currentConditionsObj, hourlyForecastObjs,
 				dailyForecasts);

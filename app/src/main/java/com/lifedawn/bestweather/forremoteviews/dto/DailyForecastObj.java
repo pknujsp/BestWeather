@@ -41,21 +41,10 @@ public class DailyForecastObj {
 	private String rightPop;
 
 
-	public DailyForecastObj(boolean successful, boolean isSingle) {
-		this.successful = successful;
+	public DailyForecastObj(boolean isSingle) {
 		this.isSingle = isSingle;
 	}
 
-	public DailyForecastObj() {
-	}
-
-	public boolean isSuccessful() {
-		return successful;
-	}
-
-	public void setSuccessful(boolean successful) {
-		this.successful = successful;
-	}
 
 	public boolean isSingle() {
 		return isSingle;

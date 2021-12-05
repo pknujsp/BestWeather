@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 public class AlwaysNotificationSettingsFragment extends BaseNotificationSettingsFragment {
 	private AlwaysNotiViewCreator alwaysNotiViewCreator;
 	private boolean initializing = true;
-	private AlarmManager alarmManager;
+	private AlwaysNotiHelper alwaysNotiHelper;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -82,7 +82,7 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 		alwaysNotiViewCreator = new AlwaysNotiViewCreator(getActivity().getApplicationContext(), this);
 		alwaysNotiViewCreator.loadPreferences();
 
-		alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+		alwaysNotiHelper = new AlwaysNotiHelper(getActivity().getApplicationContext());
 	}
 
 
@@ -187,34 +187,10 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 		}
 	}
 
-
-	private void cancelAutoRefresh() {
-		Intent refreshIntent = new Intent(getContext(), NotificationReceiver.class);
-		refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 11, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		alarmManager.cancel(pendingIntent);
-	}
-
 	@Override
 	public void onSelectedAutoRefreshInterval(long val) {
 		if (!initializing) {
-			cancelAutoRefresh();
-
-			if (val == 0) {
-				return;
-			}
-
-			Intent refreshIntent = new Intent(getContext(), NotificationReceiver.class);
-			refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-			Bundle bundle = new Bundle();
-			bundle.putString(NotificationType.class.getName(), notificationType.name());
-
-			refreshIntent.putExtras(bundle);
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 11, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-			alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
-					val, pendingIntent);
+			alwaysNotiHelper.onSelectedAutoRefreshInterval(val);
 		}
 	}
 
@@ -242,7 +218,7 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 			onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getUpdateInterval());
 		} else {
 			notificationHelper.cancelNotification(notificationType.getNotificationId());
-			cancelAutoRefresh();
+			alwaysNotiHelper.cancelAutoRefresh();
 		}
 	}
 

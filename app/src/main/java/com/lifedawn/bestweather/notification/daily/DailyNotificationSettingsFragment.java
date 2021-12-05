@@ -41,7 +41,7 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 	private boolean initializing = true;
 	private ValueUnits clockUnit;
 	private DateTimeFormatter dateTimeFormatter;
-	private AlarmManager alarmManager;
+	private DailyNotiHelper dailyNotiHelper;
 
 
 	@Override
@@ -60,8 +60,8 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 
 		dailyNotiViewCreator = new DailyNotiViewCreator(getActivity().getApplicationContext());
 		dailyNotiViewCreator.loadPreferences();
-		alarmManager =
-				(AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+
+		dailyNotiHelper = new DailyNotiHelper(getActivity().getApplicationContext());
 
 		onPreferenceChangeListener = new Preference.OnPreferenceChangeListener() {
 			@Override
@@ -148,8 +148,8 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 						onPreferenceChangeListener.onPreferenceChange(preference, newLocalTime);
 
 						binding.commons.alarmClock.setText(newLocalTime.format(dateTimeFormatter));
-						cancelAlarm();
-						setAlarm(newLocalTime.toString());
+						dailyNotiHelper.cancelAlarm();
+						dailyNotiHelper.setAlarm(newLocalTime.toString());
 					}
 				});
 				timePicker.addOnNegativeButtonClickListener(new View.OnClickListener() {
@@ -249,40 +249,13 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 
 	}
 
-	public void setAlarm(String alarmClock) {
-		LocalTime localTime = LocalTime.parse(alarmClock);
-
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.HOUR_OF_DAY, localTime.getHour());
-		calendar.set(Calendar.MINUTE, localTime.getMinute());
-		calendar.set(Calendar.SECOND, 0);
-
-		Intent refreshIntent = new Intent(getContext(), NotificationReceiver.class);
-		refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-		Bundle bundle = new Bundle();
-		bundle.putString(NotificationType.class.getName(), notificationType.name());
-
-		refreshIntent.putExtras(bundle);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 20, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-				AlarmManager.INTERVAL_DAY, pendingIntent);
-	}
-
-	private void cancelAlarm() {
-		Intent refreshIntent = new Intent(getContext(), NotificationReceiver.class);
-		refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), 20, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		alarmManager.cancel(pendingIntent);
-	}
 
 	@Override
 	public void onSwitchEnableNotification(boolean isChecked) {
 		if (isChecked) {
-			setAlarm(dailyNotiViewCreator.getAlarmClock());
+			dailyNotiHelper.setAlarm(dailyNotiViewCreator.getAlarmClock());
 		} else {
-			cancelAlarm();
+			dailyNotiHelper.cancelAlarm();
 		}
 	}
 }
