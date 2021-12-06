@@ -490,6 +490,11 @@
 
     <string name="notificationDailyChannelName">매일 알림</string>
     <string name="notificationDailyChannelDescription">매일 정해진 시각에 날씨 정보를 알립니다</string>
+
+    <string name="notificationAlarmChannelName">알람</string>
+    <string name="notificationAlarmChannelDescription">설정한 요일, 시각에 알람 표시</string>
+
+
     <string name="use_daily_notification">당일 알림 사용</string>
     <string name="alarmClock">알림 시각</string>
     <string name="connect_network">네트워크 연결</string>
@@ -527,5 +532,9 @@
     <string name="count">회</string>
     <string name="pleaseSelectDay">알람을 울릴 요일을 선택해주세요</string>
     <string name="registeredAlarm">알람 등록되었습니다</string>
+    <string name="cancelAlarm">알람 종료</string>
+    <string name="ringAgain">다시 울림</string>
+    <string name="precipitation">강수</string>
+
 
 </resources>

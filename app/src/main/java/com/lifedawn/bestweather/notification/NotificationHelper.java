@@ -33,7 +33,6 @@ public class NotificationHelper {
 
 	public NotificationObj createNotification(NotificationType notificationType) {
 		final NotificationObj notificationObj = getNotificationObj(notificationType);
-		//cancelNotification(notificationObj.notificationId);
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			createNotificationChannel(notificationObj);
@@ -70,10 +69,14 @@ public class NotificationHelper {
 			return new NotificationObj(NotificationType.Always.getNotificationId(),
 					NotificationType.Always.getChannelId(), context.getString(R.string.notificationAlwaysChannelName),
 					context.getString(R.string.notificationAlwaysChannelDescription));
-		} else {
+		} else if (notificationType == NotificationType.Daily) {
 			return new NotificationObj(NotificationType.Daily.getNotificationId(),
 					NotificationType.Daily.getChannelId(), context.getString(R.string.notificationDailyChannelName),
 					context.getString(R.string.notificationDailyChannelDescription));
+		} else {
+			return new NotificationObj(NotificationType.Alarm.getNotificationId(),
+					NotificationType.Alarm.getChannelId(), context.getString(R.string.notificationAlarmChannelName),
+					context.getString(R.string.notificationAlarmChannelDescription));
 		}
 	}
 

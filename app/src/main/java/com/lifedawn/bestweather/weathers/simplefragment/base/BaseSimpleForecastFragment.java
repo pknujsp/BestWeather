@@ -114,25 +114,5 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 
 	}
 
-	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewHeight) {
-		ImageView labelView = new ImageView(getContext());
-		labelView.setImageDrawable(ContextCompat.getDrawable(getContext(), labelImgId));
-		labelView.setClickable(true);
-		labelView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-		labelView.setImageTintList(ColorStateList.valueOf(AppTheme.getColor(getContext(), R.attr.iconColor)));
-		labelView.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Toast.makeText(getContext(), labelDescription, Toast.LENGTH_SHORT).show();
-			}
-		});
 
-		int width = (int) getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, viewHeight);
-		layoutParams.gravity = Gravity.CENTER;
-		labelView.setLayoutParams(layoutParams);
-
-		binding.labels.addView(labelView);
-		return labelView;
-	}
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
@@ -65,6 +67,7 @@ public class AlarmListFragment extends Fragment {
 		});
 
 		binding.alarmList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+		binding.alarmList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 		alarmListAdapter = new AlarmListAdapter(getContext(), new OnClickedListViewItemListener<AlarmDto>() {
 			@Override
 			public void onClickedItem(AlarmDto e) {
@@ -153,7 +156,7 @@ public class AlarmListFragment extends Fragment {
 	}
 
 	public static class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.ViewHolder> {
-		private List<AlarmDto> alarmDtoList;
+		private List<AlarmDto> alarmDtoList = new ArrayList<>();
 		private Context context;
 		private OnClickedListViewItemListener<AlarmDto> onClickedItemListener;
 		private OnCheckedSwitchInListListener<AlarmDto> onCheckedSwitchInListListener;
@@ -240,8 +243,7 @@ public class AlarmListFragment extends Fragment {
 
 					}
 
-					index++;
-					if (count != index) {
+					if (count != ++index) {
 						stringBuilder.append(" ");
 					}
 				}

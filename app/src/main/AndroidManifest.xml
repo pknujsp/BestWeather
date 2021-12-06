@@ -20,8 +20,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.White"
         android:usesCleartextTraffic="true">
-
-
+        <activity
+            android:name=".alarm.AlarmActivity"
+            android:theme="@style/AppTheme.White"></activity>
         <activity
             android:name=".widget.ConfigureWidgetActivity"
             android:theme="@style/AppTheme.White">

@@ -41,7 +41,7 @@ public class AlarmUtil {
 	public static void cancelAlarm(Context context, AlarmDto alarmDto) {
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmManager.cancel(PendingIntent.getBroadcast(context, 10000 + alarmDto.getId(), new Intent(context, AlarmReceiver.class),
-				PendingIntent.FLAG_NO_CREATE));
+				0));
 	}
 
 	public static void modifyAlarm(Context context, AlarmDto alarmDto) {

@@ -58,8 +58,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.hourly_forecast);
-		setValuesToViews();
-		binding.labels.setVisibility(View.GONE);
+		setValuesToViews(binding.forecastView, dateRow, finalHourlyForecastList);
 
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -107,6 +106,10 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 	@Override
 	public void setValuesToViews() {
+		super.setValuesToViews();
+	}
+
+	public void setValuesToViews(LinearLayout forecastView, DateView dateRow, List<FinalHourlyForecast> finalHourlyForecastList) {
 		//kma hourly forecast simple : 날짜, 시각, 날씨, 기온, 강수확률, 강수량
 		Context context = getContext();
 
@@ -118,15 +121,6 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		final int columnCount = finalHourlyForecastList.size();
 		final int columnWidth = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCHourly);
 		final int viewWidth = columnCount * columnWidth;
-
-		/*
-		addLabelView(R.drawable.date, getString(R.string.date), dateRowHeight);
-		addLabelView(R.drawable.time, getString(R.string.clock), clockRowHeight);
-		addLabelView(R.drawable.temp_icon, getString(R.string.weather), weatherRowHeight);
-		addLabelView(R.drawable.temp_icon, getString(R.string.temperature), defaultTextRowHeight);
-		addLabelView(R.drawable.temp_icon, getString(R.string.probability_of_precipitation), defaultTextRowHeight);
-		addLabelView(R.drawable.temp_icon, getString(R.string.precipitation_volume), defaultTextRowHeight);
-		 */
 
 		dateRow = new DateView(context, FragmentType.Simple, viewWidth, dateRowHeight, columnWidth);
 		ClockView clockRow = new ClockView(context, FragmentType.Simple, viewWidth, clockRowHeight, columnWidth);
@@ -225,7 +219,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		tempRowLayoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,4, getResources().getDisplayMetrics());
+		tempRowLayoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
 	}

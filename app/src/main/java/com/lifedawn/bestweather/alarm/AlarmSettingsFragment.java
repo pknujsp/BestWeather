@@ -424,7 +424,14 @@ public class AlarmSettingsFragment extends Fragment {
 					alarmRepository.add(newAlarmDto, new DbQueryCallback<AlarmDto>() {
 						@Override
 						public void onResultSuccessful(AlarmDto result) {
-							AlarmUtil.registerAlarm(getContext(), result);
+							getActivity().runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									AlarmUtil.registerAlarm(getContext(), result);
+									getParentFragmentManager().popBackStackImmediate();
+								}
+							});
+
 						}
 
 						@Override
@@ -437,7 +444,13 @@ public class AlarmSettingsFragment extends Fragment {
 					alarmRepository.update(savedAlarmDto, new DbQueryCallback<AlarmDto>() {
 						@Override
 						public void onResultSuccessful(AlarmDto result) {
-							AlarmUtil.modifyAlarm(getContext(), savedAlarmDto);
+							getActivity().runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									AlarmUtil.modifyAlarm(getContext(), savedAlarmDto);
+									getParentFragmentManager().popBackStackImmediate();
+								}
+							});
 						}
 
 						@Override
@@ -446,7 +459,6 @@ public class AlarmSettingsFragment extends Fragment {
 						}
 					});
 				}
-				getParentFragmentManager().popBackStackImmediate();
 			}
 		});
 
