@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbarSize="2dp"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/enableAgainAlarmSwitch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/repeatAlarm" />
+
+                <LinearLayout
+                    android:id="@+id/settingsLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/SettingsLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/interval" />
+
+                    <RadioGroup
+                        android:id="@+id/intervalGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginBottom="16dp">
+
+                        <RadioButton
+                            android:id="@+id/fiveMin"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:tag="5"
+                            android:text="@string/fiveMinutes" />
+
+                        <RadioButton
+                            android:id="@+id/tenMin"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:tag="10"
+                            android:text="@string/tenMinutes" />
+
+                        <RadioButton
+                            android:id="@+id/fifteenMin"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:tag="15"
+                            android:text="@string/fifteenMinutes" />
+
+                        <RadioButton
+                            android:id="@+id/thirtyMin"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:tag="30"
+                            android:text="@string/thirtyMinutes" />
+                    </RadioGroup>
+
+
+                    <TextView
+                        style="@style/SettingsLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/repeat" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/endlessRepeatSwitch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/endlessRepeat" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <RadioGroup
+                            android:id="@+id/repeatGroup"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <RadioButton
+                                android:id="@+id/one"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:tag="1"
+
+                                android:text="@string/oneCount" />
+
+                            <RadioButton
+                                android:id="@+id/two"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:tag="2"
+
+                                android:text="@string/twoCount" />
+
+                            <RadioButton
+                                android:id="@+id/three"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:tag="3"
+
+                                android:text="@string/threeCount" />
+
+                            <RadioButton
+                                android:id="@+id/five"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:tag="5"
+                                android:text="@string/fiveCount" />
+                        </RadioGroup>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+
+        </androidx.core.widget.NestedScrollView>
+
+    </FrameLayout>
+</layout>

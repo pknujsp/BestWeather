@@ -77,7 +77,7 @@ public class NotificationFragment extends Fragment {
 			}
 		});
 
-		binding.always.setOnClickListener(new View.OnClickListener() {
+		binding.alarm.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				AlarmListFragment alarmListFragment = new AlarmListFragment();

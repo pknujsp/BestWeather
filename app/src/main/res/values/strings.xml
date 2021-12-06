@@ -440,6 +440,7 @@
     <string name="com.lifedawn.bestweather.action.SHOW_DIALOG" translatable="false">com.lifedawn.bestweather.action.SHOW_DIALOG</string>
     <string name="com.lifedawn.bestweather.action.REFRESH_CURRENT_LOCATION" translatable="false">com.lifedawn.bestweather.action.REFRESH_CURRENT_LOCATION</string>
     <string name="com.lifedawn.bestweather.action.INIT" translatable="false">com.lifedawn.bestweather.action.INIT</string>
+    <string name="com.lifedawn.bestweather.action.ALARM" translatable="false">com.lifedawn.bestweather.action.ALARM</string>
 
     <!-- auto refresh interval -->
     <string name="minutes_30">30분</string>
@@ -498,6 +499,33 @@
     <string name="alarmDays">요일</string>
     <string name="alarmSound">소리</string>
     <string name="alarmVibration">진동</string>
-    <string name="againAlarming">다시 울림</string>
+    <string name="repeatAlarm">다시 울림</string>
+    <string name="simpleSunday">일</string>
+    <string name="simpleMonday">월</string>
+    <string name="simpleTuesday">화</string>
+    <string name="simpleWednesday">수</string>
+    <string name="simpleThursday">목</string>
+    <string name="simpleFriday">금</string>
+    <string name="simpleSaturday">토</string>
+    <string name="silent">무음</string>
+    <string name="alarmSoundVolume">소리 크기</string>
+    <string name="fiveMinutes">5분</string>
+    <string name="tenMinutes">10분</string>
+    <string name="fifteenMinutes">15분</string>
+    <string name="thirtyMinutes">30분</string>
+    <string name="interval">간격</string>
+    <string name="repeat">반복</string>
+    <string name="endlessRepeat">계속 반복</string>
+    <string name="oneCount">1회</string>
+    <string name="twoCount">2회</string>
+    <string name="threeCount">3회</string>
+    <string name="fiveCount">5회</string>
+    <string name="disabledRepeatAlarm">반복 없음</string>
+    <string name="minute">분</string>
+    <string name="evenryMinutes">분 마다</string>
+    <string name="endless">계속</string>
+    <string name="count">회</string>
+    <string name="pleaseSelectDay">알람을 울릴 요일을 선택해주세요</string>
+    <string name="registeredAlarm">알람 등록되었습니다</string>
 
 </resources>

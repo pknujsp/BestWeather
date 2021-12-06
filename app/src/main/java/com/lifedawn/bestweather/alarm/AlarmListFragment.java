@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.alarm;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,21 +12,38 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
+import android.widget.Toast;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.interfaces.OnCheckedSwitchInListListener;
+import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
 import com.lifedawn.bestweather.databinding.FragmentAlarmListBinding;
 import com.lifedawn.bestweather.databinding.ViewAlarmItemBinding;
-import com.lifedawn.bestweather.notification.NotificationFragment;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
+import com.lifedawn.bestweather.room.dto.AlarmDto;
+import com.lifedawn.bestweather.room.repository.AlarmRepository;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
 
 
 public class AlarmListFragment extends Fragment {
 	private FragmentAlarmListBinding binding;
+	private AlarmRepository alarmRepository;
+	private AlarmListAdapter alarmListAdapter;
+	private DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a hh:mm");
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		alarmRepository = new AlarmRepository(getContext());
 	}
 
 	@Override
@@ -47,6 +65,44 @@ public class AlarmListFragment extends Fragment {
 		});
 
 		binding.alarmList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+		alarmListAdapter = new AlarmListAdapter(getContext(), new OnClickedListViewItemListener<AlarmDto>() {
+			@Override
+			public void onClickedItem(AlarmDto e) {
+				AlarmSettingsFragment alarmSettingsFragment = new AlarmSettingsFragment();
+				String tag = AlarmSettingsFragment.class.getName();
+
+				Bundle bundle = new Bundle();
+				bundle.putBoolean(BundleKey.addAlarmSession.name(), false);
+				bundle.putInt(BundleKey.dtoId.name(), e.getId());
+				alarmSettingsFragment.setArguments(bundle);
+
+				getParentFragmentManager().beginTransaction().hide(AlarmListFragment.this).add(R.id.fragment_container,
+						alarmSettingsFragment, tag)
+						.addToBackStack(tag).commit();
+			}
+		}, new OnCheckedSwitchInListListener<AlarmDto>() {
+			@Override
+			public void onCheckedSwitch(AlarmDto alarmDto, boolean isChecked) {
+				alarmDto.setEnabled(isChecked ? 1 : 0);
+				alarmRepository.update(alarmDto, new DbQueryCallback<AlarmDto>() {
+					@Override
+					public void onResultSuccessful(AlarmDto result) {
+						AlarmUtil.modifyAlarm(getContext(), alarmDto);
+					}
+
+					@Override
+					public void onResultNoData() {
+
+					}
+				});
+
+				if (isChecked) {
+					String text = LocalTime.parse(alarmDto.getAlarmTime()).format(hoursFormatter) + ", " + getString(R.string.registeredAlarm);
+					Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+		binding.alarmList.setAdapter(alarmListAdapter);
 
 		binding.addBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -54,30 +110,81 @@ public class AlarmListFragment extends Fragment {
 				AlarmSettingsFragment alarmSettingsFragment = new AlarmSettingsFragment();
 				String tag = AlarmSettingsFragment.class.getName();
 
+				Bundle bundle = new Bundle();
+				bundle.putBoolean(BundleKey.addAlarmSession.name(), true);
+				alarmSettingsFragment.setArguments(bundle);
+
 				getParentFragmentManager().beginTransaction().hide(AlarmListFragment.this).add(R.id.fragment_container,
 						alarmSettingsFragment, tag)
 						.addToBackStack(tag).commit();
 			}
 		});
+		loadAlarmList();
+	}
+
+	@Override
+	public void onHiddenChanged(boolean hidden) {
+		super.onHiddenChanged(hidden);
+		if (!hidden) {
+			loadAlarmList();
+		}
+	}
+
+	private void loadAlarmList() {
+		alarmRepository.getAll(new DbQueryCallback<List<AlarmDto>>() {
+			@Override
+			public void onResultSuccessful(List<AlarmDto> result) {
+				if (getActivity() != null) {
+					getActivity().runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							alarmListAdapter.setAlarmDtoList(result);
+							alarmListAdapter.notifyDataSetChanged();
+						}
+					});
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
 	}
 
 	public static class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.ViewHolder> {
+		private List<AlarmDto> alarmDtoList;
+		private Context context;
+		private OnClickedListViewItemListener<AlarmDto> onClickedItemListener;
+		private OnCheckedSwitchInListListener<AlarmDto> onCheckedSwitchInListListener;
+		private DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a hh:mm");
+
+		public AlarmListAdapter(Context context, OnClickedListViewItemListener<AlarmDto> onClickedItemListener,
+		                        OnCheckedSwitchInListListener<AlarmDto> onCheckedSwitchInListListener) {
+			this.onClickedItemListener = onClickedItemListener;
+			this.context = context;
+			this.onCheckedSwitchInListListener = onCheckedSwitchInListListener;
+		}
+
+		public void setAlarmDtoList(List<AlarmDto> alarmDtoList) {
+			this.alarmDtoList = alarmDtoList;
+		}
 
 		@NonNull
 		@NotNull
 		@Override
 		public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-			return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.view_alarm_item, null, false));
+			return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.view_alarm_item, null, false));
 		}
 
 		@Override
 		public void onBindViewHolder(@NonNull @NotNull AlarmListFragment.AlarmListAdapter.ViewHolder holder, int position) {
-
+			holder.onBind();
 		}
 
 		@Override
 		public int getItemCount() {
-			return 0;
+			return alarmDtoList.size();
 		}
 
 		public class ViewHolder extends RecyclerView.ViewHolder {
@@ -86,10 +193,61 @@ public class AlarmListFragment extends Fragment {
 			public ViewHolder(@NonNull @NotNull View itemView) {
 				super(itemView);
 				binding = ViewAlarmItemBinding.bind(itemView);
+				binding.getRoot().setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						onClickedItemListener.onClickedItem(alarmDtoList.get(getAdapterPosition()));
+					}
+				});
+				binding.alarmSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+					@Override
+					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+						onCheckedSwitchInListListener.onCheckedSwitch(alarmDtoList.get(getAdapterPosition()), isChecked);
+					}
+				});
 			}
 
 			public void onBind() {
+				AlarmDto alarmDto = alarmDtoList.get(getAdapterPosition());
+				binding.alarmSwitch.setChecked(alarmDto.getEnabled() == 1);
+				binding.hours.setText(LocalTime.parse(alarmDto.getAlarmTime()).format(hoursFormatter));
 
+				Set<Integer> days = AlarmUtil.parseDays(alarmDto.getAlarmDays());
+				StringBuilder stringBuilder = new StringBuilder();
+
+				final int count = days.size();
+				int index = 0;
+				for (Integer d : days) {
+					if (d == Calendar.SUNDAY) {
+						stringBuilder.append(context.getString(R.string.simpleSunday));
+					} else if (d == Calendar.MONDAY) {
+						stringBuilder.append(context.getString(R.string.simpleMonday));
+
+					} else if (d == Calendar.TUESDAY) {
+						stringBuilder.append(context.getString(R.string.simpleTuesday));
+
+					} else if (d == Calendar.WEDNESDAY) {
+						stringBuilder.append(context.getString(R.string.simpleWednesday));
+
+					} else if (d == Calendar.THURSDAY) {
+						stringBuilder.append(context.getString(R.string.simpleThursday));
+
+					} else if (d == Calendar.FRIDAY) {
+						stringBuilder.append(context.getString(R.string.simpleFriday));
+
+					} else if (d == Calendar.SATURDAY) {
+						stringBuilder.append(context.getString(R.string.simpleSaturday));
+
+					}
+
+					index++;
+					if (count != index) {
+						stringBuilder.append(" ");
+					}
+				}
+
+				binding.enabledDays.setText(stringBuilder.toString());
+				binding.location.setText(alarmDto.getLocationAddressName());
 			}
 		}
 	}

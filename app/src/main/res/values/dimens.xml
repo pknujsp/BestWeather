@@ -85,5 +85,6 @@
     <dimen name="searchviewPaddingHorizontal">16dp</dimen>
     <dimen name="searchviewPaddingVertical">8dp</dimen>
     <dimen name="defaultImageSizeInDrawableWithText">18dp</dimen>
+    <dimen name="dayCheckBoxHeight">42dp</dimen>
 
 </resources>

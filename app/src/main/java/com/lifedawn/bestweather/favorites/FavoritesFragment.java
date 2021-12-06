@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.alarm.AlarmSettingsFragment;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
@@ -87,7 +88,8 @@ public class FavoritesFragment extends Fragment {
 				if (requestFragment.equals(MainTransactionFragment.class.getName())) {
 					checkHaveLocations();
 				} else if (requestFragment.equals(ConfigureWidgetActivity.class.getName()) ||
-						requestFragment.equals(BaseNotificationSettingsFragment.class.getName())) {
+						requestFragment.equals(BaseNotificationSettingsFragment.class.getName()) ||
+						requestFragment.equals(AlarmSettingsFragment.class.getName())) {
 					if (!clickedItem) {
 						Bundle bundle = new Bundle();
 						bundle.putSerializable(BundleKey.SelectedAddressDto.name(), null);
@@ -369,7 +371,8 @@ public class FavoritesFragment extends Fragment {
 
 	private void onClickedItem(FavoriteAddressDto favoriteAddressDto) {
 		if (requestFragment.equals(ConfigureWidgetActivity.class.getName()) ||
-				requestFragment.equals(BaseNotificationSettingsFragment.class.getName())) {
+				requestFragment.equals(BaseNotificationSettingsFragment.class.getName()) ||
+				requestFragment.equals(AlarmSettingsFragment.class.getName())) {
 			Bundle bundle = new Bundle();
 			bundle.putSerializable(BundleKey.SelectedAddressDto.name(), favoriteAddressDto);
 			onResultFragmentListener.onResultFragment(bundle);
