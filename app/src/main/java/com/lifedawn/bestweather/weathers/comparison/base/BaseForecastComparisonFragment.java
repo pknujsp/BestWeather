@@ -21,7 +21,6 @@ import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
-import com.lifedawn.bestweather.weathers.view.NonScrolledView;
 import com.lifedawn.bestweather.weathers.view.NotScrolledView;
 
 import org.jetbrains.annotations.NotNull;

@@ -24,7 +24,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastF
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.DoubleWindDirectionView;
-import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 
 import org.jetbrains.annotations.NotNull;

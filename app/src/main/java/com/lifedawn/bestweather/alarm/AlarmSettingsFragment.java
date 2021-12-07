@@ -350,16 +350,20 @@ public class AlarmSettingsFragment extends Fragment {
 			binding.alarmVibartor.setChecked(true);
 			binding.repeat.setText(R.string.disabledRepeatAlarm);
 			binding.hours.setText(LocalTime.parse(newAlarmDto.getAlarmTime()).format(hoursFormatter));
+
+			initializing = false;
 		} else {
 			int savedDtoId = getArguments().getInt(BundleKey.dtoId.name());
 			alarmRepository.get(savedDtoId, new DbQueryCallback<AlarmDto>() {
 				@Override
 				public void onResultSuccessful(AlarmDto result) {
-					savedAlarmDto = result;
+
 					if (getActivity() != null) {
 						getActivity().runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
+								savedAlarmDto = result;
+
 								binding.hours.setText(LocalTime.parse(savedAlarmDto.getAlarmTime()).format(hoursFormatter));
 								Set<Integer> daySet = AlarmUtil.parseDays(savedAlarmDto.getAlarmDays());
 
@@ -398,6 +402,8 @@ public class AlarmSettingsFragment extends Fragment {
 								if (savedAlarmDto.getAddedLocation() == 1) {
 									binding.location.setText(savedAlarmDto.getLocationAddressName());
 								}
+
+								initializing = false;
 							}
 						});
 					}
@@ -462,7 +468,6 @@ public class AlarmSettingsFragment extends Fragment {
 			}
 		});
 
-		initializing = false;
 	}
 
 	private void initDaysCheckBoxes() {
@@ -509,6 +514,8 @@ public class AlarmSettingsFragment extends Fragment {
 					Uri uri = result.getData().getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
 					if (uri != null) {
 						binding.alarmSoundLayout.setVisibility(View.VISIBLE);
+						Ringtone ringtone = RingtoneManager.getRingtone(getContext(), uri);
+						binding.alarmSound.setText(ringtone.getTitle(getContext()));
 
 						if (newAlarmSession) {
 							newAlarmDto.setAlarmSoundUri(uri.toString());
@@ -517,8 +524,7 @@ public class AlarmSettingsFragment extends Fragment {
 							savedAlarmDto.setAlarmSoundUri(uri.toString());
 							savedAlarmDto.setAlarmSoundVolume((int) binding.alarmSoundVolume.getValue());
 						}
-						Ringtone ringtone = RingtoneManager.getRingtone(getContext(), uri);
-						binding.alarmSound.setText(ringtone.getTitle(getContext()));
+
 					}
 				}
 			});

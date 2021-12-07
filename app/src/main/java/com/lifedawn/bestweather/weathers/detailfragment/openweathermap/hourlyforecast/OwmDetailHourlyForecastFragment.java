@@ -24,7 +24,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastF
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
-import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
@@ -77,8 +77,8 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				//순서 : 날짜, 시각, 날씨상태, 기온, 체감기온, 강수확률, 강우량, 강설량, 풍향, 풍속, 바람세기, 돌풍
 				//기압, 습도, 이슬점, 운량, 시정, 자외선
 
-				dateRow = new DateView(context, FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
-				ClockView clockRow = new ClockView(context, FragmentType.Detail, viewWidth, clockRowHeight, columnWidth);
+				dateRow = new DateView(context, FragmentType.Detail, viewWidth, columnWidth);
+				ClockView clockRow = new ClockView(context, FragmentType.Detail, viewWidth, columnWidth);
 				SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Detail, viewWidth, weatherRowHeight,
 						columnWidth);
 				TextValueView realFeelTempRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);

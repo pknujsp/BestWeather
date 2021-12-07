@@ -24,7 +24,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastF
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
-import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
@@ -129,8 +129,8 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 				final int viewWidth = columnsCount * columnWidth;
 
 
-				dateRow = new DateView(context, FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
-				ClockView clockRow = new ClockView(context, FragmentType.Detail, viewWidth, clockRowHeight, columnWidth);
+				dateRow = new DateView(context, FragmentType.Detail, viewWidth, columnWidth);
+				ClockView clockRow = new ClockView(context, FragmentType.Detail, viewWidth, columnWidth);
 				SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Detail, viewWidth, weatherRowHeight,
 						columnWidth);
 				TextValueView realFeelTempRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight, columnWidth);

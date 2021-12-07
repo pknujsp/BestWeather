@@ -28,7 +28,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.JsonDataSaver;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
-import com.lifedawn.bestweather.forremoteviews.WeatherDataRequest;
+import com.lifedawn.bestweather.forremoteviews.WeatherDataRequestForRemote;
 import com.lifedawn.bestweather.forremoteviews.dto.CurrentConditionsObj;
 import com.lifedawn.bestweather.forremoteviews.dto.HeaderObj;
 import com.lifedawn.bestweather.forremoteviews.dto.HourlyForecastObj;
@@ -161,7 +161,7 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 	}
 
 	public void loadWeatherData() {
-		WeatherDataRequest weatherDataRequest = new WeatherDataRequest(context);
+		WeatherDataRequestForRemote weatherDataRequestForRemote = new WeatherDataRequestForRemote(context);
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
 
 		MultipleJsonDownloader multipleJsonDownloader = new MultipleJsonDownloader() {
@@ -174,7 +174,7 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 			public void onCanceled() {
 			}
 		};
-		weatherDataRequest.loadWeatherData(context, notificationType.getPreferenceName(),
+		weatherDataRequestForRemote.loadWeatherData(context, notificationType.getPreferenceName(),
 				requestWeatherDataTypeSet, multipleJsonDownloader);
 	}
 
@@ -204,9 +204,9 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 		WeatherJsonObj.HourlyForecasts hourlyForecastObjs = null;
 		WeatherJsonObj.DailyForecasts dailyForecasts = null;
 
-		WeatherDataRequest weatherDataRequest = new WeatherDataRequest(context);
+		WeatherDataRequestForRemote weatherDataRequestForRemote = new WeatherDataRequestForRemote(context);
 
-		HeaderObj headerObj = weatherDataRequest.getHeader(context, notificationType.getPreferenceName());
+		HeaderObj headerObj = weatherDataRequestForRemote.getHeader(context, notificationType.getPreferenceName());
 
 		RemoteViews remoteViews = createRemoteViews();
 		setHeaderViews(remoteViews, headerObj);
@@ -214,7 +214,7 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 		boolean successful = true;
 
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
-			currentConditionsObj = weatherDataRequest.getCurrentConditions(context, requestWeatherSourceType, multipleJsonDownloader,
+			currentConditionsObj = weatherDataRequestForRemote.getCurrentConditions(context, requestWeatherSourceType, multipleJsonDownloader,
 					notificationType.getPreferenceName());
 
 			if (currentConditionsObj.isSuccessful()) {
@@ -224,7 +224,7 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 			}
 		}
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
-			hourlyForecastObjs = weatherDataRequest.getHourlyForecasts(context, requestWeatherSourceType, multipleJsonDownloader,
+			hourlyForecastObjs = weatherDataRequestForRemote.getHourlyForecasts(context, requestWeatherSourceType, multipleJsonDownloader,
 					notificationType.getPreferenceName());
 
 			if (hourlyForecastObjs.isSuccessful()) {
@@ -235,7 +235,7 @@ public class DailyNotiViewCreator implements SharedPreferences.OnSharedPreferenc
 
 		}
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-			dailyForecasts = weatherDataRequest.getDailyForecasts(requestWeatherSourceType, multipleJsonDownloader);
+			dailyForecasts = weatherDataRequestForRemote.getDailyForecasts(requestWeatherSourceType, multipleJsonDownloader);
 
 			if (dailyForecasts.isSuccessful()) {
 				//setDailyForecastViews(remoteViews, dailyForecasts);

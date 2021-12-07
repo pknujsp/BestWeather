@@ -14,9 +14,9 @@ import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.theme.AppTheme;
+import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AirQualityBarView extends View {
@@ -31,6 +31,7 @@ public class AirQualityBarView extends View {
 	private Paint barPaint;
 	private TextPaint gradeValueIntPaint;
 	private TextPaint gradeStrPaint;
+	private int padding;
 
 	private Rect barRect = new Rect();
 	private Rect gradeValueIntRect = new Rect();
@@ -53,6 +54,8 @@ public class AirQualityBarView extends View {
 		this.barWidth = (int) getResources().getDimension(R.dimen.barWidthInAirQualityBarView);
 		this.barTopBottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, getResources().getDisplayMetrics());
 		this.barMinHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, getResources().getDisplayMetrics());
+
+		padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6f, getResources().getDisplayMetrics());
 
 		String gradeValueIntStr = "10";
 		String gradeStr = context.getString(R.string.good);
@@ -98,6 +101,18 @@ public class AirQualityBarView extends View {
 		}
 		this.minGradeValue = min;
 		this.maxGradeValue = max;
+	}
+
+	public void setGradeIntTextSize(int textSizeSp) {
+		String gradeValueIntStr = "10";
+		gradeValueIntPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics()));
+		gradeValueIntPaint.getTextBounds(gradeValueIntStr, 0, gradeValueIntStr.length(), gradeValueIntRect);
+	}
+
+	public void setGradeDescriptionTextSize(int textSizeSp) {
+		String gradeStr = getContext().getString(R.string.good);
+		gradeStrPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics()));
+		gradeStrPaint.getTextBounds(gradeStr, 0, gradeStr.length(), gradeStrRect);
 	}
 
 	@Override

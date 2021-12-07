@@ -9,12 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.View;
 
-import androidx.core.content.ContextCompat;
-
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.theme.AppTheme;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.FragmentType;
 
 import java.util.ArrayList;
 import java.util.List;

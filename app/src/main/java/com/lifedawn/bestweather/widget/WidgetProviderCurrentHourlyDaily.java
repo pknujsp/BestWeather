@@ -41,6 +41,8 @@ public class WidgetProviderCurrentHourlyDaily extends AbstractAppWidgetProvider 
 		set.add(RequestWeatherDataType.currentConditions);
 		set.add(RequestWeatherDataType.hourlyForecast);
 		set.add(RequestWeatherDataType.dailyForecast);
+		set.add(RequestWeatherDataType.airQuality);
+
 		return set;
 	}
 

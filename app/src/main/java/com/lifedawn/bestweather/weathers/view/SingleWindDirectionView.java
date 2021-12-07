@@ -1,30 +1,17 @@
 package com.lifedawn.bestweather.weathers.view;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import androidx.appcompat.widget.DrawableUtils;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.weathers.FragmentType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SingleWindDirectionView extends LinearLayout {

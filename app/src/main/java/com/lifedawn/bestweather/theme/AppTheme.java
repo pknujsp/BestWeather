@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.TypedValue;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.FragmentType;
 
 public class AppTheme {
 	public static int getColor(Context context, int id) {

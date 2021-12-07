@@ -29,7 +29,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponsePr
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.detailfragment.aqicn.DetailAirQualityFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
-import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.FragmentType;
 
 import org.jetbrains.annotations.NotNull;
 

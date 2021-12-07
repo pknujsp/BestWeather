@@ -26,10 +26,7 @@ import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
-import com.lifedawn.bestweather.retrofit.responses.kma.json.ultrasrtfcstresponse.UltraSrtFcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
-import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstresponse.VilageFcstRoot;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast.HourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.comparison.base.BaseForecastComparisonFragment;
@@ -42,9 +39,8 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.F
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
-import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
-import com.lifedawn.bestweather.weathers.view.NonScrolledView;
 import com.lifedawn.bestweather.weathers.view.NotScrolledView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
@@ -54,7 +50,6 @@ import org.jetbrains.annotations.NotNull;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -187,8 +182,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		final int valueRowWidth = columnWidth * columnsCount;
 
 		//날짜, 시각, 날씨, 기온, 강수량, 강수확률
-		dateRow = new DateView(getContext(), FragmentType.Comparison, valueRowWidth, dateValueRowHeight, columnWidth);
-		ClockView clockRow = new ClockView(getContext(), FragmentType.Comparison, valueRowWidth, clockValueRowHeight, columnWidth);
+		dateRow = new DateView(getContext(), FragmentType.Comparison, valueRowWidth, columnWidth);
+		ClockView clockRow = new ClockView(getContext(), FragmentType.Comparison, valueRowWidth, columnWidth);
 		SingleWeatherIconView[] weatherIconRows = new SingleWeatherIconView[columnsCount];
 		TextValueView[] tempRows = new TextValueView[columnsCount];
 		IconTextView[] rainVolumeRows = new IconTextView[columnsCount];

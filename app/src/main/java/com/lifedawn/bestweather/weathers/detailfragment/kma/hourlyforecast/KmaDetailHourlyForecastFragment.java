@@ -25,7 +25,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastF
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
-import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
@@ -36,7 +36,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -161,8 +160,8 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				final int columnWidth = (int) getResources().getDimension(R.dimen.valueColumnWidthInDHourly);
 				final int viewWidth = columnsCount * columnWidth;
 
-				dateRow = new DateView(context, FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
-				ClockView clockRow = new ClockView(context, FragmentType.Detail, viewWidth, clockRowHeight, columnWidth);
+				dateRow = new DateView(context, FragmentType.Detail, viewWidth, columnWidth);
+				ClockView clockRow = new ClockView(context, FragmentType.Detail, viewWidth, columnWidth);
 				SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Detail, viewWidth, weatherRowHeight,
 						columnWidth);
 				TextValueView probabilityOfPrecipitationRow = new TextValueView(context, FragmentType.Detail, viewWidth, defaultTextRowHeight,

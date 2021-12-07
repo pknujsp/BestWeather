@@ -9,11 +9,9 @@ import android.text.TextPaint;
 import android.util.TypedValue;
 import android.view.View;
 
-import androidx.preference.PreferenceManager;
-
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.theme.AppTheme;
+import com.lifedawn.bestweather.weathers.FragmentType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +48,7 @@ public class DetailDoubleTemperatureView extends View {
 
 		tempPaint = new TextPaint();
 		tempPaint.setTextAlign(Paint.Align.CENTER);
-		tempPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, getResources().getDisplayMetrics()));
+		tempPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 13f, getResources().getDisplayMetrics()));
 		tempPaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
 		linePaint = new Paint();
@@ -97,12 +95,13 @@ public class DetailDoubleTemperatureView extends View {
 		this.maxTemp = max;
 		this.minTemp = min;
 
-		ValueUnits unit =
-				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_temp),
-						ValueUnits.celsius.name()));
 		tempUnit = context.getString(R.string.degree_symbol);
 
 		setWillNotDraw(false);
+	}
+
+	public void setMaxTempTextSize(int textSizeSp) {
+		tempPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics()));
 	}
 
 

@@ -9,12 +9,9 @@ import android.text.TextPaint;
 import android.util.TypedValue;
 import android.view.View;
 
-import androidx.preference.PreferenceManager;
-
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.ValueUnit;
 import com.lifedawn.bestweather.theme.AppTheme;
+import com.lifedawn.bestweather.weathers.FragmentType;
 
 import java.util.List;
 
@@ -63,9 +60,6 @@ public class DetailSingleTemperatureView extends View {
 		CIRCLE_PAINT.setStyle(Paint.Style.FILL);
 		CIRCLE_PAINT.setColor(Color.DKGRAY);
 
-		ValueUnits unit =
-				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_temp),
-						ValueUnits.celsius.name()));
 		tempUnit = context.getString(R.string.degree_symbol);
 
 		RADIUS = getResources().getDimension(R.dimen.circleRadiusInSingleTemperature);
@@ -88,6 +82,10 @@ public class DetailSingleTemperatureView extends View {
 		MIN_TEMP = min;
 
 		setWillNotDraw(false);
+	}
+
+	public void setTempTextSize(int textSizeSp) {
+		TEMP_PAINT.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, textSizeSp, getResources().getDisplayMetrics()));
 	}
 
 	@Override

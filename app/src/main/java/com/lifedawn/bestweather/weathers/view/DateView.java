@@ -4,13 +4,15 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.util.TypedValue;
 import android.view.View;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.theme.AppTheme;
+import com.lifedawn.bestweather.weathers.FragmentType;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -21,34 +23,37 @@ public class DateView extends View {
 
 	private final TextPaint dateTextPaint;
 	private final int viewWidth;
-	private final int viewHeight;
 	private final int columnWidth;
-	private final int textHeight;
 	private final DateTimeFormatter dateTimeFormatter;
 	private List<DateValue> dateValueList;
 	private int currentX;
 	private int firstColX;
+	private int textHeight;
 
-	public DateView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
+	private int textSize;
+	private Rect rect = new Rect();
+	private int padding;
+	private int viewHeight;
+
+	public DateView(Context context, FragmentType fragmentType, int viewWidth, int columnWidth) {
 		super(context);
 		this.fragmentType = fragmentType;
 		this.viewWidth = viewWidth;
-		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;
-		dateTimeFormatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern));
+		dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE");
+		padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6f, getResources().getDisplayMetrics());
 
 		dateTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		dateTextPaint.setTextAlign(Paint.Align.CENTER);
 		dateTextPaint.setTextSize(context.getResources().getDimension(R.dimen.dateValueTextSizeInSCD));
 		dateTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
-		Rect rect = new Rect();
-		ZonedDateTime now = ZonedDateTime.now();
-		String val = now.format(dateTimeFormatter);
-		dateTextPaint.getTextBounds(val, 0, val.length(), rect);
-		textHeight = rect.height();
-
 		setWillNotDraw(false);
+	}
+
+	public void setTextSize(int textSizeSp) {
+		this.textSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics());
+		dateTextPaint.setTextSize(textSize);
 	}
 
 	public void init(List<ZonedDateTime> dateTimeList) {
@@ -82,6 +87,13 @@ public class DateView extends View {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		ZonedDateTime now = ZonedDateTime.now();
+		String val = now.format(dateTimeFormatter);
+		dateTextPaint.getTextBounds(val, 0, val.length(), rect);
+		StaticLayout.Builder builder = StaticLayout.Builder.obtain(val, 0, val.length(), dateTextPaint, columnWidth);
+		StaticLayout sl = builder.build();
+		viewHeight = rect.height() * sl.getLineCount() + padding * 2;
+
 		setMeasuredDimension(viewWidth, viewHeight);
 	}
 
@@ -101,13 +113,34 @@ public class DateView extends View {
 			} else if (currentX < dateValue.beginX) {
 				dateValue.lastX = dateValue.beginX;
 			}
-			canvas.drawText(dateValue.date.format(dateTimeFormatter), dateValue.lastX, y, dateTextPaint);
+			//canvas.drawText(dateValue.date.format(dateTimeFormatter), dateValue.lastX, y, dateTextPaint);
+			drawText(canvas, dateValue.date.format(dateTimeFormatter), dateValue.lastX);
 		}
 	}
 
 	public void reDraw(int newX) {
 		this.currentX = newX;
 		invalidate();
+	}
+
+	private void drawText(Canvas canvas, String textOnCanvas, float x) {
+		dateTextPaint.getTextBounds(textOnCanvas, 0, textOnCanvas.length(), rect);
+		StaticLayout.Builder builder = StaticLayout.Builder.obtain(textOnCanvas, 0, textOnCanvas.length(), dateTextPaint, columnWidth);
+		StaticLayout sl = builder.build();
+
+		canvas.save();
+
+		float textHeight = rect.height();
+		float textYCoordinate = viewHeight / 2f + rect.exactCenterY() -
+				((sl.getLineCount() * textHeight) / 2);
+
+		final float columnCenterX = columnWidth / 2f;
+		float textXCoordinate = columnCenterX + rect.left;
+
+		canvas.translate(x, textYCoordinate);
+
+		sl.draw(canvas);
+		canvas.restore();
 	}
 
 

@@ -26,14 +26,13 @@ import com.lifedawn.bestweather.weathers.detailfragment.accuweather.hourlyforeca
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
-import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -125,8 +124,8 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 
 		 */
 
-		dateRow = new DateView(context, FragmentType.Simple, viewWidth, dateRowHeight, columnWidth);
-		ClockView clockRow = new ClockView(context, FragmentType.Simple, viewWidth, clockRowHeight, columnWidth);
+		dateRow = new DateView(context, FragmentType.Simple, viewWidth, columnWidth);
+		ClockView clockRow = new ClockView(context, FragmentType.Simple, viewWidth, columnWidth);
 		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Simple, viewWidth, weatherRowHeight,
 				columnWidth);
 		TextValueView tempRow = new TextValueView(context, FragmentType.Simple, viewWidth, defaultTextRowHeight, columnWidth);

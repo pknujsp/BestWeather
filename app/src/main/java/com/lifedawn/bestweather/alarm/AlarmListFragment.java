@@ -1,10 +1,12 @@
 package com.lifedawn.bestweather.alarm;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -196,6 +198,42 @@ public class AlarmListFragment extends Fragment {
 			public ViewHolder(@NonNull @NotNull View itemView) {
 				super(itemView);
 				binding = ViewAlarmItemBinding.bind(itemView);
+			}
+
+			public void onBind() {
+				AlarmDto alarmDto = alarmDtoList.get(getAdapterPosition());
+				binding.alarmSwitch.setChecked(alarmDto.getEnabled() == 1);
+				binding.hours.setText(LocalTime.parse(alarmDto.getAlarmTime()).format(hoursFormatter));
+
+				Set<Integer> days = AlarmUtil.parseDays(alarmDto.getAlarmDays());
+
+				for (Integer d : days) {
+					if (d == Calendar.SUNDAY) {
+						binding.sun.setTextColor(ContextCompat.getColor(context, R.color.alarmEnabledDayHighlightColor));
+						binding.sun.setTypeface(Typeface.DEFAULT_BOLD);
+					} else if (d == Calendar.MONDAY) {
+						binding.mon.setTextColor(ContextCompat.getColor(context, R.color.alarmEnabledDayHighlightColor));
+						binding.mon.setTypeface(Typeface.DEFAULT_BOLD);
+					} else if (d == Calendar.TUESDAY) {
+						binding.tue.setTextColor(ContextCompat.getColor(context, R.color.alarmEnabledDayHighlightColor));
+						binding.tue.setTypeface(Typeface.DEFAULT_BOLD);
+					} else if (d == Calendar.WEDNESDAY) {
+						binding.wed.setTextColor(ContextCompat.getColor(context, R.color.alarmEnabledDayHighlightColor));
+						binding.wed.setTypeface(Typeface.DEFAULT_BOLD);
+					} else if (d == Calendar.THURSDAY) {
+						binding.thu.setTextColor(ContextCompat.getColor(context, R.color.alarmEnabledDayHighlightColor));
+						binding.thu.setTypeface(Typeface.DEFAULT_BOLD);
+					} else if (d == Calendar.FRIDAY) {
+						binding.fri.setTextColor(ContextCompat.getColor(context, R.color.alarmEnabledDayHighlightColor));
+						binding.fri.setTypeface(Typeface.DEFAULT_BOLD);
+					} else if (d == Calendar.SATURDAY) {
+						binding.sat.setTextColor(ContextCompat.getColor(context, R.color.alarmEnabledDayHighlightColor));
+						binding.sat.setTypeface(Typeface.DEFAULT_BOLD);
+					}
+				}
+
+				binding.location.setText(alarmDto.getLocationAddressName());
+
 				binding.getRoot().setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -208,48 +246,6 @@ public class AlarmListFragment extends Fragment {
 						onCheckedSwitchInListListener.onCheckedSwitch(alarmDtoList.get(getAdapterPosition()), isChecked);
 					}
 				});
-			}
-
-			public void onBind() {
-				AlarmDto alarmDto = alarmDtoList.get(getAdapterPosition());
-				binding.alarmSwitch.setChecked(alarmDto.getEnabled() == 1);
-				binding.hours.setText(LocalTime.parse(alarmDto.getAlarmTime()).format(hoursFormatter));
-
-				Set<Integer> days = AlarmUtil.parseDays(alarmDto.getAlarmDays());
-				StringBuilder stringBuilder = new StringBuilder();
-
-				final int count = days.size();
-				int index = 0;
-				for (Integer d : days) {
-					if (d == Calendar.SUNDAY) {
-						stringBuilder.append(context.getString(R.string.simpleSunday));
-					} else if (d == Calendar.MONDAY) {
-						stringBuilder.append(context.getString(R.string.simpleMonday));
-
-					} else if (d == Calendar.TUESDAY) {
-						stringBuilder.append(context.getString(R.string.simpleTuesday));
-
-					} else if (d == Calendar.WEDNESDAY) {
-						stringBuilder.append(context.getString(R.string.simpleWednesday));
-
-					} else if (d == Calendar.THURSDAY) {
-						stringBuilder.append(context.getString(R.string.simpleThursday));
-
-					} else if (d == Calendar.FRIDAY) {
-						stringBuilder.append(context.getString(R.string.simpleFriday));
-
-					} else if (d == Calendar.SATURDAY) {
-						stringBuilder.append(context.getString(R.string.simpleSaturday));
-
-					}
-
-					if (count != ++index) {
-						stringBuilder.append(" ");
-					}
-				}
-
-				binding.enabledDays.setText(stringBuilder.toString());
-				binding.location.setText(alarmDto.getLocationAddressName());
 			}
 		}
 	}

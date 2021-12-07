@@ -22,7 +22,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapR
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
-import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;

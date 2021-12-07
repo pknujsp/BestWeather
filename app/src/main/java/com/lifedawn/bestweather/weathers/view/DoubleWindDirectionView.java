@@ -1,10 +1,7 @@
 package com.lifedawn.bestweather.weathers.view;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -16,8 +13,7 @@ import android.widget.LinearLayout;
 import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.Wind;
-import com.lifedawn.bestweather.theme.AppTheme;
+import com.lifedawn.bestweather.weathers.FragmentType;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.theme.AppTheme;
+import com.lifedawn.bestweather.weathers.FragmentType;
 
 import java.util.List;
 
@@ -22,15 +23,15 @@ public class IconTextView extends View {
 
 	private final int viewWidth;
 	private final int columnWidth;
-	private final int valueTextHeight;
 	private final TextPaint valueTextPaint;
-	private final int iconSize;
-	private final Rect iconRect;
-	private final int margin;
+	private int iconSize;
+	private final Rect iconRect = new Rect();
+	private final int spacingBetweenIconAndValue;
 
 	private Drawable icon;
 	private List<String> valueList;
 	private Rect textRect = new Rect();
+	private int padding;
 
 
 	public IconTextView(Context context, FragmentType fragmentType, int viewWidth, int columnWidth,
@@ -44,20 +45,15 @@ public class IconTextView extends View {
 		valueTextPaint.setTextAlign(Paint.Align.LEFT);
 		valueTextPaint.setTextSize(context.getResources().getDimension(R.dimen.iconValueTextSizeInSCD));
 		valueTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
-
-		Rect rect = new Rect();
-		valueTextPaint.getTextBounds("화", 0, 1, rect);
-		valueTextHeight = rect.height();
-
-		iconRect = new Rect();
+		String tempStr = "테스트";
+		valueTextPaint.getTextBounds(tempStr, 0, tempStr.length(), textRect);
 
 		icon = ContextCompat.getDrawable(context, iconId);
 		icon.setTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.blue)));
 
-		margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, getResources().getDisplayMetrics());
-		int extraSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, getResources().getDisplayMetrics());
+		spacingBetweenIconAndValue = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, getResources().getDisplayMetrics());
+		padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, getResources().getDisplayMetrics());
 
-		iconSize = valueTextHeight + extraSize * 2;
 		setWillNotDraw(false);
 	}
 
@@ -66,12 +62,19 @@ public class IconTextView extends View {
 		return this;
 	}
 
+	public void setValueTextSize(int textSizeSp) {
+		valueTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics()));
+		String tempStr = "테스트";
+		valueTextPaint.getTextBounds(tempStr, 0, tempStr.length(), textRect);
+	}
+
 	public List<String> getValueList() {
 		return valueList;
 	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		iconSize = textRect.height() + padding * 2;
 		setMeasuredDimension(viewWidth, iconSize);
 	}
 
@@ -86,19 +89,19 @@ public class IconTextView extends View {
 
 		int column = 0;
 		int itemWidth = 0;
-		iconRect.top = 0;
-		iconRect.bottom = getHeight();
+		iconRect.top = padding;
+		iconRect.bottom = getHeight() - padding;
 
 		for (String value : valueList) {
 			valueTextPaint.getTextBounds(value, 0, value.length(), textRect);
-			itemWidth = iconSize + margin + textRect.width();
+			itemWidth = iconSize + spacingBetweenIconAndValue + textRect.width();
 			iconRect.left = (column * columnWidth) + (columnWidth - itemWidth) / 2;
 			iconRect.right = iconRect.left + iconSize;
 
 			icon.setBounds(iconRect);
 			icon.draw(canvas);
 
-			canvas.drawText(value, iconRect.right + margin, iconRect.centerY() + textRect.height() / 2f, valueTextPaint);
+			canvas.drawText(value, iconRect.right + spacingBetweenIconAndValue, iconRect.centerY() + textRect.height() / 2f, valueTextPaint);
 			column++;
 		}
 	}

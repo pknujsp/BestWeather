@@ -28,7 +28,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.JsonDataSaver;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
-import com.lifedawn.bestweather.forremoteviews.WeatherDataRequest;
+import com.lifedawn.bestweather.forremoteviews.WeatherDataRequestForRemote;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.forremoteviews.dto.CurrentConditionsObj;
 import com.lifedawn.bestweather.forremoteviews.dto.HeaderObj;
@@ -254,7 +254,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 			RemoteViewProcessor.onBeginProcess(remoteViews);
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
-			WeatherDataRequest weatherDataRequest = new WeatherDataRequest(context);
+			WeatherDataRequestForRemote weatherDataRequestForRemote = new WeatherDataRequestForRemote(context);
 			final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
 
 			multipleJsonDownloader = new MultipleJsonDownloader() {
@@ -268,7 +268,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 					Log.e(tag, "canceled");
 				}
 			};
-			weatherDataRequest.loadWeatherData(context, WidgetCreator.getSharedPreferenceName(appWidgetId),
+			weatherDataRequestForRemote.loadWeatherData(context, WidgetCreator.getSharedPreferenceName(appWidgetId),
 					requestWeatherDataTypeSet, multipleJsonDownloader);
 		} else {
 			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK);
@@ -301,16 +301,16 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 		WeatherJsonObj.HourlyForecasts hourlyForecastObjs = null;
 		WeatherJsonObj.DailyForecasts dailyForecasts = null;
 
-		WeatherDataRequest weatherDataRequest = new WeatherDataRequest(context);
+		WeatherDataRequestForRemote weatherDataRequestForRemote = new WeatherDataRequestForRemote(context);
 
-		HeaderObj headerObj = weatherDataRequest.getHeader(context, WidgetCreator.getSharedPreferenceName(appWidgetId));
+		HeaderObj headerObj = weatherDataRequestForRemote.getHeader(context, WidgetCreator.getSharedPreferenceName(appWidgetId));
 		widgetCreator.setHeaderViews(remoteViews, headerObj);
 
 		boolean successful = true;
 		ZoneId zoneId = null;
 
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
-			currentConditionsObj = weatherDataRequest.getCurrentConditions(context, requestWeatherSourceType, multipleJsonDownloader,
+			currentConditionsObj = weatherDataRequestForRemote.getCurrentConditions(context, requestWeatherSourceType, multipleJsonDownloader,
 					WidgetCreator.getSharedPreferenceName(appWidgetId));
 			if (currentConditionsObj.isSuccessful()) {
 				widgetCreator.setCurrentConditionsViews(remoteViews, currentConditionsObj);
@@ -320,7 +320,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 			}
 		}
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
-			hourlyForecastObjs = weatherDataRequest.getHourlyForecasts(context, requestWeatherSourceType, multipleJsonDownloader,
+			hourlyForecastObjs = weatherDataRequestForRemote.getHourlyForecasts(context, requestWeatherSourceType, multipleJsonDownloader,
 					WidgetCreator.getSharedPreferenceName(appWidgetId));
 			if (hourlyForecastObjs.isSuccessful()) {
 				zoneId = ZoneId.of(hourlyForecastObjs.getZoneId());
@@ -331,7 +331,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 
 		}
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-			dailyForecasts = weatherDataRequest.getDailyForecasts(requestWeatherSourceType, multipleJsonDownloader);
+			dailyForecasts = weatherDataRequestForRemote.getDailyForecasts(requestWeatherSourceType, multipleJsonDownloader);
 			if (dailyForecasts.isSuccessful()) {
 				zoneId = ZoneId.of(dailyForecasts.getZoneId());
 				widgetCreator.setDailyForecastViews(remoteViews, dailyForecasts);

@@ -43,6 +43,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.F
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import java.time.ZoneId;
@@ -59,65 +60,14 @@ import java.util.concurrent.Executors;
 
 import retrofit2.Response;
 
-public class WeatherDataRequest {
+public class WeatherDataRequestForRemote {
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 	private Context context;
 
-	public WeatherDataRequest(Context context) {
+	public WeatherDataRequestForRemote(Context context) {
 		this.context = context;
 	}
 
-	private void setRequestWeatherSources(WeatherSourceType weatherSourceType,
-	                                      ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
-	                                      Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
-		if (weatherSourceType == WeatherSourceType.KMA) {
-			RequestKma requestKma = (RequestKma) requestWeatherSources.get(weatherSourceType);
-			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
-				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
-			}
-			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
-				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST).addRequestServiceType(RetrofitClient.ServiceType.VILAGE_FCST);
-			}
-			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-				requestKma.addRequestServiceType(RetrofitClient.ServiceType.MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.MID_TA_FCST)
-						.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST).addRequestServiceType(RetrofitClient.ServiceType.VILAGE_FCST);
-			}
-		} else if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
-			RequestAccu requestAccu = (RequestAccu) requestWeatherSources.get(weatherSourceType);
-			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
-				requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS);
-			}
-			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
-				requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_12_HOURLY);
-			}
-			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-				requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY);
-			}
-		} else if (weatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
-			RequestOwm requestOwm = (RequestOwm) requestWeatherSources.get(weatherSourceType);
-			Set<OneCallParameter.OneCallApis> excludeSet = new HashSet<>();
-			excludeSet.add(OneCallParameter.OneCallApis.daily);
-			excludeSet.add(OneCallParameter.OneCallApis.hourly);
-			excludeSet.add(OneCallParameter.OneCallApis.minutely);
-			excludeSet.add(OneCallParameter.OneCallApis.alerts);
-			excludeSet.add(OneCallParameter.OneCallApis.current);
-			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
-				excludeSet.remove(OneCallParameter.OneCallApis.current);
-			}
-			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
-				excludeSet.remove(OneCallParameter.OneCallApis.hourly);
-			}
-			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-				excludeSet.remove(OneCallParameter.OneCallApis.daily);
-			}
-			requestOwm.setExcludeApis(excludeSet);
-			requestOwm.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
-		}
-
-		RequestAqicn requestAqicn = new RequestAqicn();
-		requestAqicn.addRequestServiceType(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
-		requestWeatherSources.put(WeatherSourceType.AQICN, requestAqicn);
-	}
 
 	public void loadWeatherData(Context context, String preferenceName,
 	                            Set<RequestWeatherDataType> requestWeatherDataTypeSet,
@@ -136,7 +86,7 @@ public class WeatherDataRequest {
 		ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources =
 				makeRequestWeatherSources(weatherSourceType);
 
-		setRequestWeatherSources(weatherSourceType, requestWeatherSources, requestWeatherDataTypeSet);
+		WeatherRequestUtil.setRequestWeatherSourceWithSourceType(weatherSourceType, requestWeatherSources, requestWeatherDataTypeSet);
 
 		Double latitude = Double.parseDouble(attributes.getString(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), "0.0"));
 		Double longitude = Double.parseDouble(attributes.getString(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), "0.0"));

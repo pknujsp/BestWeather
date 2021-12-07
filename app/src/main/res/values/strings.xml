@@ -535,6 +535,11 @@
     <string name="cancelAlarm">알람 종료</string>
     <string name="ringAgain">다시 울림</string>
     <string name="precipitation">강수</string>
+    <string name="againAlarmAfterNMinutes">분 후 다시 울림</string>
+
+    <string name="com_lifedawn_bestweather_action_RING_AGAIN">com_lifedawn_bestweather_action_RING_AGAIN</string>
+    <string name="com_lifedawn_bestweather_action_END_ALARM">com_lifedawn_bestweather_action_END_ALARM</string>
+    <string name="com_lifedawn_bestweather_action_SILENT_ALARM">com_lifedawn_bestweather_action_SILENT_ALARM</string>
 
 
 </resources>

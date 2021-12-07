@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.weathers.view;
+package com.lifedawn.bestweather.weathers;
 
 public enum FragmentType {
 	Simple, Detail, Comparison

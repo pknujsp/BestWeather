@@ -4,13 +4,15 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.util.TypedValue;
 import android.view.View;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.theme.AppTheme;
+import com.lifedawn.bestweather.weathers.FragmentType;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -19,31 +21,28 @@ public class ClockView extends View {
 	private final FragmentType fragmentType;
 
 	private final int viewWidth;
-	private final int viewHeight;
+	private int viewHeight;
 	private final int columnWidth;
-	private final int clockTextHeight;
 	private final TextPaint clockPaint;
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("H");
 
-
+	private Rect rect = new Rect();
 	private List<ZonedDateTime> clockList;
+	private int padding;
 
-	public ClockView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
+	public ClockView(Context context, FragmentType fragmentType, int viewWidth, int columnWidth) {
 		super(context);
 		this.fragmentType = fragmentType;
 		this.viewWidth = viewWidth;
-		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;
+
 		clockPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		clockPaint.setTextAlign(Paint.Align.CENTER);
 		clockPaint.setTextSize(context.getResources().getDimension(R.dimen.clockValueTextSizeInSCD));
 		clockPaint.setColor(AppTheme.getTextColor(context, fragmentType));
+		padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6f, getResources().getDisplayMetrics());
 
-		Rect rect = new Rect();
-		clockPaint.getTextBounds("0", 0, 1, rect);
-		clockTextHeight = rect.height();
 		setWillNotDraw(false);
-
 	}
 
 	public ClockView setClockList(List<ZonedDateTime> clockList) {
@@ -51,8 +50,20 @@ public class ClockView extends View {
 		return this;
 	}
 
+
+	public void setTextSize(int textSizeSp) {
+		clockPaint.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics()));
+	}
+
+
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		String val = "24";
+		clockPaint.getTextBounds(val, 0, val.length(), rect);
+		StaticLayout.Builder builder = StaticLayout.Builder.obtain(val, 0, val.length(), clockPaint, columnWidth);
+		StaticLayout sl = builder.build();
+		viewHeight = rect.height() * sl.getLineCount() + padding * 2;
+
 		setMeasuredDimension(viewWidth, viewHeight);
 	}
 
@@ -67,7 +78,7 @@ public class ClockView extends View {
 
 		float x = 0f;
 		final float columnCenterX = columnWidth / 2f;
-		final float y = getHeight() / 2f + clockTextHeight / 2f;
+		final float y = getHeight() / 2f + rect.height() / 2f;
 
 		int column = 0;
 		for (ZonedDateTime clock : clockList) {

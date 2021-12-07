@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers.simplefragment.base;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.net.ConnectivityManager;
@@ -24,6 +25,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleForecastBinding;
 import com.lifedawn.bestweather.theme.AppTheme;
@@ -33,6 +35,8 @@ import com.lifedawn.bestweather.weathers.view.DateView;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class BaseSimpleForecastFragment extends Fragment implements IWeatherValues {
@@ -51,6 +55,22 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	protected ZoneId zoneId;
 	protected NetworkStatus networkStatus;
 	protected boolean needCompare;
+	protected Map<WeatherDataType, Integer> textSizeMap = new HashMap<>();
+	protected Integer cardBackgroundColor;
+
+	protected int headerVisibility = View.VISIBLE;
+
+	public void setHeaderVisibility(int headerVisibility) {
+		this.headerVisibility = headerVisibility;
+	}
+
+	public void setTextSizeMap(Map<WeatherDataType, Integer> textSizeMap) {
+		this.textSizeMap = textSizeMap;
+	}
+
+	public void setCardBackgroundColor(Integer cardBackgroundColor) {
+		this.cardBackgroundColor = cardBackgroundColor;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -82,6 +102,10 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
+		if (cardBackgroundColor != null) {
+			binding.card.setBackgroundColor(cardBackgroundColor);
+		}
+		binding.weatherCardViewHeader.getRoot().setVisibility(headerVisibility);
 		networkStatus = NetworkStatus.getInstance(getContext());
 		networkStatus.observe(getViewLifecycleOwner(), new Observer<Boolean>() {
 			@Override

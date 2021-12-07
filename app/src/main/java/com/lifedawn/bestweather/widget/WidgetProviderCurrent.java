@@ -39,6 +39,7 @@ public class WidgetProviderCurrent extends AbstractAppWidgetProvider {
 	Set<RequestWeatherDataType> getRequestWeatherDataTypeSet() {
 		Set<RequestWeatherDataType> set = new HashSet<>();
 		set.add(RequestWeatherDataType.currentConditions);
+		set.add(RequestWeatherDataType.airQuality);
 		return set;
 	}
 

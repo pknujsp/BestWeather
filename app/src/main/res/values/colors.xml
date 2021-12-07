@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="app_main_color">#FF6BACE2</color>
+    <color name="darkForecastCardBackgroundColor">#B3000000</color>
 
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
@@ -47,5 +48,11 @@
     <color name="defaultTextColorInDrawableWithText">#FFFFFF</color>
     <color name="iconGray">#685D5D</color>
 
+    <color name="alarmEnabledDayHighlightColor">#005395</color>
+    <color name="alarmEnabledDayNotHighlightColor">#717171</color>
+    <color name="alarmBackgroundColor">#B3655E5E</color>
+
+    <color name="cancelAlarmBackgroundColor">#FF6200EE</color>
+    <color name="ringAgainBackgroundColor">#685D5D</color>
 
 </resources>

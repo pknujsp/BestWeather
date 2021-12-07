@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
@@ -26,12 +27,10 @@ import com.lifedawn.bestweather.weathers.detailfragment.kma.hourlyforecast.KmaDe
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
-import com.lifedawn.bestweather.weathers.view.FragmentType;
+import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
 import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
-import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
-import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -51,14 +50,13 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		needCompare = true;
-
 	}
 
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.hourly_forecast);
-		setValuesToViews(binding.forecastView, dateRow, finalHourlyForecastList);
+		setValuesToViews();
 
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -104,17 +102,12 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		return this;
 	}
 
+
 	@Override
 	public void setValuesToViews() {
-		super.setValuesToViews();
-	}
-
-	public void setValuesToViews(LinearLayout forecastView, DateView dateRow, List<FinalHourlyForecast> finalHourlyForecastList) {
 		//kma hourly forecast simple : 날짜, 시각, 날씨, 기온, 강수확률, 강수량
 		Context context = getContext();
 
-		final int dateRowHeight = (int) context.getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
-		final int clockRowHeight = (int) context.getResources().getDimension(R.dimen.clockValueRowHeightInCOMMON);
 		final int weatherRowHeight = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int defaultTextRowHeight = (int) context.getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
@@ -122,8 +115,9 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		final int columnWidth = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCHourly);
 		final int viewWidth = columnCount * columnWidth;
 
-		dateRow = new DateView(context, FragmentType.Simple, viewWidth, dateRowHeight, columnWidth);
-		ClockView clockRow = new ClockView(context, FragmentType.Simple, viewWidth, clockRowHeight, columnWidth);
+		dateRow = new DateView(context, FragmentType.Simple, viewWidth, columnWidth);
+
+		ClockView clockRow = new ClockView(context, FragmentType.Simple, viewWidth, columnWidth);
 		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Simple, viewWidth, weatherRowHeight,
 				columnWidth);
 		TextValueView tempRow = new TextValueView(context, FragmentType.Simple, viewWidth, defaultTextRowHeight, columnWidth);
@@ -133,6 +127,24 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				columnWidth, R.drawable.raindrop);
 		IconTextView snowVolumeRow = new IconTextView(context, FragmentType.Simple, viewWidth,
 				columnWidth, R.drawable.snowparticle);
+
+		if (textSizeMap.containsKey(WeatherDataType.date)) {
+			dateRow.setTextSize(textSizeMap.get(WeatherDataType.date));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.temp)) {
+			tempRow.setTextSize(textSizeMap.get(WeatherDataType.temp));
+		}else{
+			tempRow.setTextSize(16);
+		}
+		if (textSizeMap.containsKey(WeatherDataType.pop)) {
+			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.rainVolume)) {
+			rainVolumeRow.setValueTextSize(textSizeMap.get(WeatherDataType.rainVolume));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.snowVolume)) {
+			snowVolumeRow.setValueTextSize(textSizeMap.get(WeatherDataType.snowVolume));
+		}
 
 		//시각 --------------------------------------------------------------------------
 		List<ZonedDateTime> dateTimeList = new ArrayList<>();
@@ -158,6 +170,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		final String lessThan1mm = getString(R.string.kma_less_than_1mm);
 		final String noSnow = getString(R.string.kma_no_snow);
 		final String zero = "0.0";
+		final String zeroPrecipitation = "강수없음";
 		String tempUnitStr = getString(R.string.degree_symbol);
 		String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
 
@@ -179,7 +192,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			probabilityOfPrecipitationList.add(finalHourlyForecast.getProbabilityOfPrecipitation() == null ? "-" :
 					finalHourlyForecast.getProbabilityOfPrecipitation() + percent);
 			rainVolumeList.add(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ? zero :
-					finalHourlyForecast.getRainPrecipitation1Hour().replace("mm", ""));
+					finalHourlyForecast.getRainPrecipitation1Hour().replace("mm", "").replace(zeroPrecipitation, zero));
 			if (finalHourlyForecast.getSnowPrecipitation1Hour() != null) {
 				if (!finalHourlyForecast.getSnowPrecipitation1Hour().equals(noSnow)) {
 					if (!haveSnow) {
@@ -193,7 +206,6 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			}
 		}
 
-		tempRow.setTextSize(16);
 		tempRow.setValueList(tempList);
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 		rainVolumeRow.setValueList(rainVolumeList);
@@ -219,7 +231,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		tempRowLayoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
+		tempRowLayoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2, getResources().getDisplayMetrics());
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
 	}

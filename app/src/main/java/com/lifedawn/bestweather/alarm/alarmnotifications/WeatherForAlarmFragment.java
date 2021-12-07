@@ -23,7 +23,9 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.FragmentWeatherForAlarmBinding;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
@@ -47,6 +49,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.F
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.weathers.detailfragment.accuweather.currentconditions.AccuDetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.kma.currentconditions.KmaDetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.currentconditions.OwmDetailCurrentConditionsFragment;
@@ -54,6 +57,7 @@ import com.lifedawn.bestweather.weathers.simplefragment.accuweather.currentcondi
 import com.lifedawn.bestweather.weathers.simplefragment.accuweather.dailyforecast.AccuSimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.accuweather.hourlyforecast.AccuSimpleHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.SimpleAirQualityFragment;
+import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.kma.currentconditions.KmaSimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.kma.dailyforecast.KmaSimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.kma.hourlyforecast.KmaSimpleHourlyForecastFragment;
@@ -71,6 +75,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -111,96 +116,33 @@ public class WeatherForAlarmFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		loadWeatherData();
-	}
+		binding.progressResultView.setContentView(binding.weatherContentsLayout);
 
-	private void loadWeatherData() {
-		ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
-		RequestAqicn requestAqicn = new RequestAqicn();
-		requestAqicn.addRequestServiceType(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
-		requestWeatherSources.put(WeatherSourceType.AQICN, requestAqicn);
+		Set<RequestWeatherDataType> requestWeatherDataTypeSet = new HashSet<>();
+		requestWeatherDataTypeSet.add(RequestWeatherDataType.currentConditions);
+		requestWeatherDataTypeSet.add(RequestWeatherDataType.hourlyForecast);
+		requestWeatherDataTypeSet.add(RequestWeatherDataType.airQuality);
 
-		//메인 날씨 제공사만 요청
-		final WeatherSourceType requestWeatherSourceType = getMainWeatherSourceType(alarmDto.getLocationCountryCode());
-		setRequestWeatherSourceWithSourceType(requestWeatherSourceType, requestWeatherSources);
-		final Double latitude = Double.parseDouble(alarmDto.getLocationLatitude());
-		final Double longitude = Double.parseDouble(alarmDto.getLocationLongitude());
+		WeatherRequestUtil.loadWeatherData(getContext(), executorService, alarmDto.getLocationCountryCode(),
+				Double.parseDouble(alarmDto.getLocationLatitude()),
+				Double.parseDouble(alarmDto.getLocationLongitude()), requestWeatherDataTypeSet,
+				new MultipleJsonDownloader() {
+					@Override
+					public void onResult() {
+						setWeatherFragments(this);
+					}
 
-		final MultipleJsonDownloader multipleJsonDownloader = new MultipleJsonDownloader() {
-			@Override
-			public void onResult() {
-				setWeatherFragments(requestWeatherSourceType, this);
-			}
+					@Override
+					public void onCanceled() {
 
-			@Override
-			public void onCanceled() {
-
-			}
-		};
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleJsonDownloader);
-			}
-		});
+					}
+				});
 	}
 
 
-	private void setRequestWeatherSourceWithSourceType(WeatherSourceType weatherSourceType,
-	                                                   ArrayMap<WeatherSourceType, RequestWeatherSource> newRequestWeatherSources) {
-		switch (weatherSourceType) {
-			case KMA:
-				RequestKma requestKma = new RequestKma();
-				requestKma.addRequestServiceType(
-						RetrofitClient.ServiceType.ULTRA_SRT_FCST).addRequestServiceType(
-						RetrofitClient.ServiceType.VILAGE_FCST);
-				newRequestWeatherSources.put(WeatherSourceType.KMA, requestKma);
-				break;
-			case OPEN_WEATHER_MAP:
-				RequestOwm requestOwm = new RequestOwm();
-				requestOwm.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
-				Set<OneCallParameter.OneCallApis> excludes = new HashSet<>();
-				excludes.add(OneCallParameter.OneCallApis.minutely);
-				excludes.add(OneCallParameter.OneCallApis.alerts);
-				excludes.add(OneCallParameter.OneCallApis.daily);
-				requestOwm.setExcludeApis(excludes);
-
-				newRequestWeatherSources.put(WeatherSourceType.OPEN_WEATHER_MAP, requestOwm);
-				break;
-			case ACCU_WEATHER:
-				RequestAccu requestAccu = new RequestAccu();
-				requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).addRequestServiceType(
-						RetrofitClient.ServiceType.ACCU_12_HOURLY);
-
-				newRequestWeatherSources.put(WeatherSourceType.ACCU_WEATHER, requestAccu);
-				break;
-			default:
-				break;
-		}
-	}
-
-	public WeatherSourceType getMainWeatherSourceType(@NonNull String countryCode) {
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		WeatherSourceType mainWeatherSourceType = null;
-
-		if (sharedPreferences.getBoolean(getString(R.string.pref_key_accu_weather), true)) {
-			mainWeatherSourceType = WeatherSourceType.ACCU_WEATHER;
-		} else {
-			mainWeatherSourceType = WeatherSourceType.OPEN_WEATHER_MAP;
-		}
-
-		if (countryCode.equals("KR")) {
-			boolean kmaIsTopPriority = sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), true);
-			if (kmaIsTopPriority) {
-				mainWeatherSourceType = WeatherSourceType.KMA;
-			}
-		}
-
-		return mainWeatherSourceType;
-	}
-
-
-	private void setWeatherFragments(WeatherSourceType requestWeatherSourceType, MultipleJsonDownloader multipleJsonDownloader) {
+	private void setWeatherFragments(MultipleJsonDownloader multipleJsonDownloader) {
+		final WeatherSourceType requestWeatherSourceType = WeatherRequestUtil.getMainWeatherSourceType(getContext(),
+				alarmDto.getLocationCountryCode());
 		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult>> responseMap = multipleJsonDownloader.getResponseMap();
 
 		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult> arrayMap = responseMap.get(
@@ -242,7 +184,14 @@ public class WeatherForAlarmFragment extends Fragment {
 			setCurrentConditions(multipleJsonDownloader, requestWeatherSourceType);
 			setHourlyForecast(multipleJsonDownloader, requestWeatherSourceType);
 		} else {
-
+			if (getActivity() != null) {
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						binding.progressResultView.onFailed(getString(R.string.msg_failed_update));
+					}
+				});
+			}
 		}
 
 	}
@@ -419,7 +368,7 @@ public class WeatherForAlarmFragment extends Fragment {
 		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult> arrayMap = multipleJsonDownloader.getResponseMap().get(
 				weatherSourceType);
 
-		Fragment hourlyForecastFragment = null;
+		BaseSimpleForecastFragment hourlyForecastFragment = null;
 
 		switch (weatherSourceType) {
 			case KMA:
@@ -432,6 +381,7 @@ public class WeatherForAlarmFragment extends Fragment {
 
 				KmaSimpleHourlyForecastFragment kmaSimpleHourlyForecastFragment = new KmaSimpleHourlyForecastFragment();
 				kmaSimpleHourlyForecastFragment.setFinalHourlyForecastList(finalHourlyForecastList);
+				kmaSimpleHourlyForecastFragment.setHeaderVisibility(View.GONE);
 				hourlyForecastFragment = kmaSimpleHourlyForecastFragment;
 
 				zoneId = KmaResponseProcessor.getZoneId();
@@ -445,6 +395,8 @@ public class WeatherForAlarmFragment extends Fragment {
 
 				AccuSimpleHourlyForecastFragment accuSimpleHourlyForecastFragment = new AccuSimpleHourlyForecastFragment();
 				accuSimpleHourlyForecastFragment.setTwelveHoursOfHourlyForecastsResponse(twelveHoursOfHourlyForecastsResponse);
+				accuSimpleHourlyForecastFragment.setHeaderVisibility(View.GONE);
+
 				hourlyForecastFragment = accuSimpleHourlyForecastFragment;
 
 				zoneId = ZonedDateTime.parse(twelveHoursOfHourlyForecastsResponse.getItems().get(0).getDateTime()).getZone();
@@ -456,6 +408,8 @@ public class WeatherForAlarmFragment extends Fragment {
 
 				OwmSimpleHourlyForecastFragment owmSimpleHourlyForecastFragment = new OwmSimpleHourlyForecastFragment();
 				owmSimpleHourlyForecastFragment.setOneCallResponse(oneCallResponse);
+				owmSimpleHourlyForecastFragment.setHeaderVisibility(View.GONE);
+
 				hourlyForecastFragment = owmSimpleHourlyForecastFragment;
 
 				zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
@@ -471,6 +425,16 @@ public class WeatherForAlarmFragment extends Fragment {
 		defaultBundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 
 		hourlyForecastFragment.setArguments(defaultBundle);
+
+		Map<WeatherDataType, Integer> textSizeMap = new HashMap<>();
+		textSizeMap.put(WeatherDataType.date, 15);
+		textSizeMap.put(WeatherDataType.time, 15);
+		textSizeMap.put(WeatherDataType.pop, 14);
+		textSizeMap.put(WeatherDataType.rainVolume, 14);
+		textSizeMap.put(WeatherDataType.snowVolume, 14);
+		textSizeMap.put(WeatherDataType.temp, 18);
+		hourlyForecastFragment.setTextSizeMap(textSizeMap);
+		hourlyForecastFragment.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.transparent));
 
 		if (getActivity() != null) {
 			final Fragment finalHourlyForecastFragment = hourlyForecastFragment;

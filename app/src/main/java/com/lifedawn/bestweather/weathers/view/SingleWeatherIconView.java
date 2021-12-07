@@ -6,10 +6,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import androidx.core.content.ContextCompat;
-
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.weathers.FragmentType;
 
 import java.util.ArrayList;
 import java.util.List;

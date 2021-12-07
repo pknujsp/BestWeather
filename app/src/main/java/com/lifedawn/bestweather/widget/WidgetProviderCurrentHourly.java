@@ -40,6 +40,8 @@ public class WidgetProviderCurrentHourly extends AbstractAppWidgetProvider {
 		Set<RequestWeatherDataType> set = new HashSet<>();
 		set.add(RequestWeatherDataType.currentConditions);
 		set.add(RequestWeatherDataType.hourlyForecast);
+		set.add(RequestWeatherDataType.airQuality);
+
 		return set;
 	}
 
