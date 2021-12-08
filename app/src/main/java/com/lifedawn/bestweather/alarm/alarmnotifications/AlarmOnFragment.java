@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.alarm.alarmnotifications;
 
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.IBinder;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import android.view.ViewGroup;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.AlarmReceiver;
 import com.lifedawn.bestweather.alarm.AlarmUtil;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.databinding.FragmentAlarmingBinding;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -38,15 +41,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
-public class AlarmOnFragment extends Fragment {
+public class AlarmOnFragment extends Fragment implements OnEndListener {
 	private FragmentAlarmingBinding binding;
 	private AlarmDto alarmDto;
 	private AlarmRepository alarmRepository;
 	private Bundle bundle;
-	private Vibrator vibrator;
-	private int originalAlarmVolume;
-	private AudioManager audioManager;
-	private MediaPlayer mediaPlayer;
+
 
 	private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mm");
 	private final DateTimeFormatter amPmFormatter = DateTimeFormatter.ofPattern("a");
@@ -56,6 +56,7 @@ public class AlarmOnFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		alarmRepository = new AlarmRepository(getContext());
 		bundle = getArguments();
+
 	}
 
 	@Override
@@ -86,7 +87,7 @@ public class AlarmOnFragment extends Fragment {
 			public void onResultSuccessful(AlarmDto result) {
 				alarmDto = result;
 
-				getActivity().runOnUiThread(new Runnable() {
+				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						if (alarmDto.getAddedLocation() == 1) {
@@ -100,47 +101,11 @@ public class AlarmOnFragment extends Fragment {
 											WeatherForAlarmFragment.class.getName()).commit();
 						}
 
-						if (alarmDto.getAlarmVibration() == 1) {
-							vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
-							final long[] vibratePattern = new long[]{600, 1000, 500, 1100};
-
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-								vibrator.vibrate(VibrationEffect.createWaveform(vibratePattern, 0));
-							} else {
-								vibrator.vibrate(vibratePattern, 0);
-							}
-						}
-
-						if (alarmDto.getEnableSound() == 1) {
-							audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
-							originalAlarmVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
-
-							final float volume = alarmDto.getAlarmSoundVolume() / 100f;
-							int newVolume = (int) (volume * audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM));
-							audioManager.setStreamVolume(AudioManager.STREAM_ALARM, newVolume, AudioManager.FLAG_PLAY_SOUND);
-
-							mediaPlayer = new MediaPlayer();
-							try {
-								Uri uri = Uri.parse(alarmDto.getAlarmSoundUri());
-
-								mediaPlayer.setDataSource(getContext(), uri);
-								mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-								mediaPlayer.setLooping(true);
-								mediaPlayer.setVolume(1f, 1f);
-
-								mediaPlayer.prepare();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-							mediaPlayer.start();
-						}
-
 						final boolean repeat = alarmDto.getRepeat() == 1;
 
-						SharedPreferences repeatAlarmLogSharedPreferences =
-								getContext().getSharedPreferences(RepeatAlarmConstants.repeatAlarmLog.name(), Context.MODE_PRIVATE);
+						getContext().getSharedPreferences(RepeatAlarmConstants.repeatAlarmLog.name(), Context.MODE_PRIVATE);
 						if (repeat) {
-							if (repeatAlarmLogSharedPreferences.getInt(RepeatAlarmConstants.getPreferenceName(alarmDto.getId()), 0) > alarmDto.getRepeatCount()) {
+							if (AlarmUtil.getRepeatCount(getContext(), alarmDto.getId()) >= alarmDto.getRepeatCount()) {
 								binding.ringAgainBtn.setVisibility(View.INVISIBLE);
 							} else {
 								String text = alarmDto.getRepeatInterval() + getString(R.string.againAlarmAfterNMinutes);
@@ -148,16 +113,13 @@ public class AlarmOnFragment extends Fragment {
 								binding.ringAgainBtn.setOnClickListener(new View.OnClickListener() {
 									@Override
 									public void onClick(View v) {
-										int newRepeatCount = AlarmUtil.upRepeatCount(getContext(), alarmDto.getId());
-
-										if (alarmDto.getRepeatCount() >= newRepeatCount + 1) {
-											PendingIntent pendingIntent = AlarmReceiver.getRingAgainPendingIntent(getContext(), alarmDto.getId());
-											try {
-												pendingIntent.send();
-											} catch (PendingIntent.CanceledException e) {
-												e.printStackTrace();
-											}
+										PendingIntent pendingIntent = AlarmReceiver.getRingAgainPendingIntent(getContext(), alarmDto.getId());
+										try {
+											pendingIntent.send();
+										} catch (PendingIntent.CanceledException e) {
+											e.printStackTrace();
 										}
+
 										end();
 									}
 								});
@@ -181,30 +143,26 @@ public class AlarmOnFragment extends Fragment {
 		binding.alarmEndsBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (alarmDto.getRepeat() == 1) {
-					AlarmUtil.clearRepeatCount(getContext(), alarmDto.getId());
-				}
 				end();
-
 			}
 		});
 
 	}
 
-	private void end() {
-		if (vibrator != null) {
-			vibrator.cancel();
-		}
-		if (mediaPlayer != null) {
-			mediaPlayer.stop();
-			audioManager.setStreamVolume(AudioManager.STREAM_ALARM, originalAlarmVolume, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
-		}
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
+
+	public void end() {
 		PendingIntent pendingIntent = AlarmReceiver.getEndAlarmPendingIntent(getContext(), alarmDto.getId());
 		try {
 			pendingIntent.send();
 		} catch (PendingIntent.CanceledException e) {
 			e.printStackTrace();
 		}
-		getActivity().finishAndRemoveTask();
 	}
+
+
 }

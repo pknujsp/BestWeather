@@ -50,7 +50,7 @@
 
     <color name="alarmEnabledDayHighlightColor">#005395</color>
     <color name="alarmEnabledDayNotHighlightColor">#717171</color>
-    <color name="alarmBackgroundColor">#B3655E5E</color>
+    <color name="alarmBackgroundColor">#878686</color>
 
     <color name="cancelAlarmBackgroundColor">#FF6200EE</color>
     <color name="ringAgainBackgroundColor">#685D5D</color>

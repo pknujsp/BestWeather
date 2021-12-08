@@ -5,7 +5,8 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/alarmBackgroundColor">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -17,15 +18,26 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/addressName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:gravity="center"
+                    android:text="addressName"
+                    android:textColor="@color/white"
+                    android:textSize="20sp" />
+
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="4dp">
 
                     <ImageView
                         android:id="@+id/weatherIcon"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentTop="true"
                         android:layout_marginRight="4dp"
@@ -41,7 +53,8 @@
                         android:layout_toRightOf="@id/weatherIcon"
                         android:gravity="center"
                         android:text="20º"
-                        android:textColor="@color/black"
+                        android:textColor="@color/white"
+
                         android:textSize="24sp" />
 
                     <LinearLayout
@@ -56,8 +69,9 @@
                             android:id="@+id/airQuality"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="4dp"
                             android:text="대기 상태 : 좋음"
+                            android:textColor="@color/white"
+
                             android:textSize="16sp" />
 
                         <TextView
@@ -65,6 +79,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="강수 : 강수없음"
+                            android:textColor="@color/white"
+
                             android:textSize="16sp" />
 
                     </LinearLayout>

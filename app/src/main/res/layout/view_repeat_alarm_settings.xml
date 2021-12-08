@@ -19,8 +19,9 @@
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/enableAgainAlarmSwitch"
+                    style="@style/Switch"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+
                     android:layout_marginBottom="16dp"
                     android:text="@string/repeatAlarm" />
 
@@ -81,53 +82,48 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/endlessRepeatSwitch"
+                        style="@style/Switch"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
                         android:text="@string/endlessRepeat" />
 
-                    <LinearLayout
+
+                    <RadioGroup
+                        android:id="@+id/repeatCountGroup"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
+                        android:layout_height="wrap_content">
 
-                        <RadioGroup
-                            android:id="@+id/repeatGroup"
+                        <RadioButton
+                            android:id="@+id/one"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:tag="1"
 
-                            <RadioButton
-                                android:id="@+id/one"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:tag="1"
+                            android:text="@string/oneCount" />
 
-                                android:text="@string/oneCount" />
+                        <RadioButton
+                            android:id="@+id/two"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:tag="2"
 
-                            <RadioButton
-                                android:id="@+id/two"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:tag="2"
+                            android:text="@string/twoCount" />
 
-                                android:text="@string/twoCount" />
+                        <RadioButton
+                            android:id="@+id/three"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:tag="3"
 
-                            <RadioButton
-                                android:id="@+id/three"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:tag="3"
+                            android:text="@string/threeCount" />
 
-                                android:text="@string/threeCount" />
+                        <RadioButton
+                            android:id="@+id/five"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:tag="5"
+                            android:text="@string/fiveCount" />
+                    </RadioGroup>
 
-                            <RadioButton
-                                android:id="@+id/five"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:tag="5"
-                                android:text="@string/fiveCount" />
-                        </RadioGroup>
-
-                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
 

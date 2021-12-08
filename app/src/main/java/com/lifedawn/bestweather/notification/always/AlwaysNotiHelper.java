@@ -40,10 +40,11 @@ public class AlwaysNotiHelper {
 	}
 
 	public void cancelAutoRefresh() {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 11, new Intent(context, NotificationReceiver.class), PendingIntent.FLAG_NO_CREATE);
-
-		alarmManager.cancel(pendingIntent);
-		pendingIntent.cancel();
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 11, new Intent(context, NotificationReceiver.class), 0);
+		if (pendingIntent != null) {
+			alarmManager.cancel(pendingIntent);
+			pendingIntent.cancel();
+		}
 	}
 
 }

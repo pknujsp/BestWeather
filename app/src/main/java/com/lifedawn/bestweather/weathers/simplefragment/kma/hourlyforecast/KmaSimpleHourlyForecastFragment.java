@@ -133,7 +133,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		}
 		if (textSizeMap.containsKey(WeatherDataType.temp)) {
 			tempRow.setTextSize(textSizeMap.get(WeatherDataType.temp));
-		}else{
+		} else {
 			tempRow.setTextSize(16);
 		}
 		if (textSizeMap.containsKey(WeatherDataType.pop)) {
@@ -144,6 +144,22 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		}
 		if (textSizeMap.containsKey(WeatherDataType.snowVolume)) {
 			snowVolumeRow.setValueTextSize(textSizeMap.get(WeatherDataType.snowVolume));
+		}
+
+		if (textColorMap.containsKey(WeatherDataType.date)) {
+			dateRow.setTextColor(textColorMap.get(WeatherDataType.date));
+		}
+		if (textColorMap.containsKey(WeatherDataType.temp)) {
+			tempRow.setTextColor(textColorMap.get(WeatherDataType.temp));
+		}
+		if (textColorMap.containsKey(WeatherDataType.pop)) {
+			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherDataType.pop));
+		}
+		if (textColorMap.containsKey(WeatherDataType.rainVolume)) {
+			rainVolumeRow.setTextColor(textColorMap.get(WeatherDataType.rainVolume));
+		}
+		if (textColorMap.containsKey(WeatherDataType.snowVolume)) {
+			snowVolumeRow.setTextColor(textColorMap.get(WeatherDataType.snowVolume));
 		}
 
 		//시각 --------------------------------------------------------------------------

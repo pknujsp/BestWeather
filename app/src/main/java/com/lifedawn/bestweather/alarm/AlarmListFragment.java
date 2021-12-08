@@ -1,6 +1,8 @@
 package com.lifedawn.bestweather.alarm;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
@@ -232,6 +234,7 @@ public class AlarmListFragment extends Fragment {
 					}
 				}
 
+				binding.location.setVisibility(alarmDto.getAddedLocation() == 1 ? View.VISIBLE : View.GONE);
 				binding.location.setText(alarmDto.getLocationAddressName());
 
 				binding.getRoot().setOnClickListener(new View.OnClickListener() {

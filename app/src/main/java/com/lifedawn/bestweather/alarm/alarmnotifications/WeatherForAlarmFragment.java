@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.alarm.alarmnotifications;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -117,6 +118,8 @@ public class WeatherForAlarmFragment extends Fragment {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.progressResultView.setContentView(binding.weatherContentsLayout);
+
+		binding.addressName.setText(alarmDto.getLocationAddressName());
 
 		Set<RequestWeatherDataType> requestWeatherDataTypeSet = new HashSet<>();
 		requestWeatherDataTypeSet.add(RequestWeatherDataType.currentConditions);
@@ -433,7 +436,17 @@ public class WeatherForAlarmFragment extends Fragment {
 		textSizeMap.put(WeatherDataType.rainVolume, 14);
 		textSizeMap.put(WeatherDataType.snowVolume, 14);
 		textSizeMap.put(WeatherDataType.temp, 18);
+
+		Map<WeatherDataType, Integer> textColorMap = new HashMap<>();
+		textColorMap.put(WeatherDataType.date, Color.WHITE);
+		textColorMap.put(WeatherDataType.time, Color.WHITE);
+		textColorMap.put(WeatherDataType.pop, Color.WHITE);
+		textColorMap.put(WeatherDataType.rainVolume, Color.WHITE);
+		textColorMap.put(WeatherDataType.snowVolume, Color.WHITE);
+		textColorMap.put(WeatherDataType.temp, Color.WHITE);
+
 		hourlyForecastFragment.setTextSizeMap(textSizeMap);
+		hourlyForecastFragment.setTextColorMap(textColorMap);
 		hourlyForecastFragment.setCardBackgroundColor(ContextCompat.getColor(getContext(), R.color.transparent));
 
 		if (getActivity() != null) {

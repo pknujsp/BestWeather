@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
@@ -30,7 +31,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentAlarmSettingsBinding;
-import com.lifedawn.bestweather.databinding.ViewAgainAlarmingSettingsBinding;
+import com.lifedawn.bestweather.databinding.ViewRepeatAlarmSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.AlarmDto;
@@ -272,7 +273,7 @@ public class AlarmSettingsFragment extends Fragment {
 					repeatCount = savedAlarmDto.getRepeatCount();
 				}
 
-				ViewAgainAlarmingSettingsBinding againSettingsViewBinding = ViewAgainAlarmingSettingsBinding.inflate(getLayoutInflater());
+				ViewRepeatAlarmSettingsBinding againSettingsViewBinding = ViewRepeatAlarmSettingsBinding.inflate(getLayoutInflater());
 
 				AlertDialog dialog = new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.repeatAlarm)
 						.setView(againSettingsViewBinding.getRoot())
@@ -284,8 +285,8 @@ public class AlarmSettingsFragment extends Fragment {
 										Integer.parseInt((String) againSettingsViewBinding.intervalGroup.findViewById(
 												againSettingsViewBinding.intervalGroup.getCheckedRadioButtonId()).getTag());
 								final int newRepeatCount = againSettingsViewBinding.endlessRepeatSwitch.isChecked() ?
-										Integer.MAX_VALUE : Integer.parseInt((String) againSettingsViewBinding.repeatGroup.findViewById(
-										againSettingsViewBinding.repeatGroup.getCheckedRadioButtonId()).getTag());
+										Integer.MAX_VALUE : Integer.parseInt((String) againSettingsViewBinding.repeatCountGroup.findViewById(
+										againSettingsViewBinding.repeatCountGroup.getCheckedRadioButtonId()).getTag());
 
 								if (newAlarmSession) {
 									newAlarmDto.setRepeat(newRepeat ? 1 : 0);
@@ -306,10 +307,27 @@ public class AlarmSettingsFragment extends Fragment {
 							}
 						}).create();
 
-				dialog.show();
+				againSettingsViewBinding.enableAgainAlarmSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+					@Override
+					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+						againSettingsViewBinding.settingsLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+					}
+				});
+
+				againSettingsViewBinding.endlessRepeatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+					@Override
+					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+						againSettingsViewBinding.repeatCountGroup.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+					}
+				});
+
 
 				againSettingsViewBinding.enableAgainAlarmSwitch.setChecked(repeat);
+				againSettingsViewBinding.settingsLayout.setVisibility(repeat ? View.VISIBLE : View.GONE);
+
 				againSettingsViewBinding.endlessRepeatSwitch.setChecked(repeatCount == Integer.MAX_VALUE);
+				againSettingsViewBinding.repeatCountGroup.setVisibility(repeatCount == Integer.MAX_VALUE ? View.VISIBLE : View.GONE);
+
 
 				switch (repeatInterval) {
 					case 10:
@@ -340,81 +358,9 @@ public class AlarmSettingsFragment extends Fragment {
 						break;
 				}
 
+				dialog.show();
 			}
 		});
-
-		//시각, 요일, 소리 활성화, 소리 값, 소리 크기, 진동 활성화, 다시 울림
-		if (newAlarmSession) {
-			binding.enableAlarmSoundSwitch.setChecked(newAlarmDto.getEnableSound() == 1);
-			binding.alarmSound.setText(ringtone.getTitle(getContext()));
-			binding.alarmVibartor.setChecked(true);
-			binding.repeat.setText(R.string.disabledRepeatAlarm);
-			binding.hours.setText(LocalTime.parse(newAlarmDto.getAlarmTime()).format(hoursFormatter));
-
-			initializing = false;
-		} else {
-			int savedDtoId = getArguments().getInt(BundleKey.dtoId.name());
-			alarmRepository.get(savedDtoId, new DbQueryCallback<AlarmDto>() {
-				@Override
-				public void onResultSuccessful(AlarmDto result) {
-
-					if (getActivity() != null) {
-						getActivity().runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								savedAlarmDto = result;
-
-								binding.hours.setText(LocalTime.parse(savedAlarmDto.getAlarmTime()).format(hoursFormatter));
-								Set<Integer> daySet = AlarmUtil.parseDays(savedAlarmDto.getAlarmDays());
-
-								if (daySet.contains(Calendar.SUNDAY))
-									binding.sunday.setChecked(true);
-								if (daySet.contains(Calendar.MONDAY))
-									binding.monday.setChecked(true);
-								if (daySet.contains(Calendar.TUESDAY))
-									binding.tuesday.setChecked(true);
-								if (daySet.contains(Calendar.WEDNESDAY))
-									binding.wednesday.setChecked(true);
-								if (daySet.contains(Calendar.THURSDAY))
-									binding.thursday.setChecked(true);
-								if (daySet.contains(Calendar.FRIDAY))
-									binding.friday.setChecked(true);
-								if (daySet.contains(Calendar.SATURDAY))
-									binding.saturday.setChecked(true);
-
-								binding.enableAlarmSoundSwitch.setChecked(savedAlarmDto.getEnableSound() == 1);
-								if (savedAlarmDto.getEnableSound() == 1) {
-									ringtone = RingtoneManager.getRingtone(getContext(), Uri.parse(savedAlarmDto.getAlarmSoundUri()));
-								} else {
-									Uri defaultAlarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-									ringtone = RingtoneManager.getRingtone(getContext(), defaultAlarmUri);
-								}
-								binding.alarmSound.setText(ringtone.getTitle(getContext()));
-
-								binding.alarmSoundVolume.setValue(savedAlarmDto.getAlarmSoundVolume());
-								binding.alarmVibartor.setChecked(savedAlarmDto.getAlarmVibration() == 1);
-
-								if (savedAlarmDto.getRepeat() == 1) {
-									binding.repeat.setText(AlarmUtil.parseRepeat(getContext(), savedAlarmDto.getRepeatInterval(),
-											savedAlarmDto.getRepeatCount()));
-								}
-
-								if (savedAlarmDto.getAddedLocation() == 1) {
-									binding.location.setText(savedAlarmDto.getLocationAddressName());
-								}
-
-								initializing = false;
-							}
-						});
-					}
-				}
-
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
-		}
 
 		binding.check.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -470,6 +416,83 @@ public class AlarmSettingsFragment extends Fragment {
 
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (!newAlarmSession) {
+			int savedDtoId = getArguments().getInt(BundleKey.dtoId.name());
+			alarmRepository.get(savedDtoId, new DbQueryCallback<AlarmDto>() {
+				@Override
+				public void onResultSuccessful(AlarmDto result) {
+
+					if (getActivity() != null) {
+						getActivity().runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								savedAlarmDto = result;
+
+								binding.hours.setText(LocalTime.parse(savedAlarmDto.getAlarmTime()).format(hoursFormatter));
+								Set<Integer> daySet = AlarmUtil.parseDays(savedAlarmDto.getAlarmDays());
+
+								if (daySet.contains(Calendar.SUNDAY))
+									binding.sunday.setChecked(true);
+								if (daySet.contains(Calendar.MONDAY))
+									binding.monday.setChecked(true);
+								if (daySet.contains(Calendar.TUESDAY))
+									binding.tuesday.setChecked(true);
+								if (daySet.contains(Calendar.WEDNESDAY))
+									binding.wednesday.setChecked(true);
+								if (daySet.contains(Calendar.THURSDAY))
+									binding.thursday.setChecked(true);
+								if (daySet.contains(Calendar.FRIDAY))
+									binding.friday.setChecked(true);
+								if (daySet.contains(Calendar.SATURDAY))
+									binding.saturday.setChecked(true);
+
+								binding.enableAlarmSoundSwitch.setChecked(savedAlarmDto.getEnableSound() == 1);
+
+								if (savedAlarmDto.getEnableSound() == 1) {
+									ringtone = RingtoneManager.getRingtone(getContext(), Uri.parse(savedAlarmDto.getAlarmSoundUri()));
+								} else {
+									Uri defaultAlarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+									ringtone = RingtoneManager.getRingtone(getContext(), defaultAlarmUri);
+								}
+								binding.alarmSound.setText(ringtone.getTitle(getContext()));
+
+								binding.alarmSoundVolume.setValue(savedAlarmDto.getAlarmSoundVolume());
+								binding.alarmVibartor.setChecked(savedAlarmDto.getAlarmVibration() == 1);
+
+								if (savedAlarmDto.getRepeat() == 1) {
+									binding.repeat.setText(AlarmUtil.parseRepeat(getContext(), savedAlarmDto.getRepeatInterval(),
+											savedAlarmDto.getRepeatCount()));
+								}
+
+								if (savedAlarmDto.getAddedLocation() == 1) {
+									binding.location.setText(savedAlarmDto.getLocationAddressName());
+								}
+
+								initializing = false;
+							}
+						});
+					}
+				}
+
+				@Override
+				public void onResultNoData() {
+
+				}
+			});
+		} else {
+			binding.enableAlarmSoundSwitch.setChecked(newAlarmDto.getEnableSound() == 1);
+			binding.alarmSound.setText(ringtone.getTitle(getContext()));
+			binding.alarmVibartor.setChecked(true);
+			binding.repeat.setText(R.string.disabledRepeatAlarm);
+			binding.hours.setText(LocalTime.parse(newAlarmDto.getAlarmTime()).format(hoursFormatter));
+
+			initializing = false;
+		}
+	}
+
 	private void initDaysCheckBoxes() {
 		CompoundButton.OnCheckedChangeListener onCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
 			@Override
@@ -501,7 +524,7 @@ public class AlarmSettingsFragment extends Fragment {
 		binding.wednesday.setOnCheckedChangeListener(onCheckedChangeListener);
 		binding.thursday.setOnCheckedChangeListener(onCheckedChangeListener);
 		binding.friday.setOnCheckedChangeListener(onCheckedChangeListener);
-		binding.tuesday.setOnCheckedChangeListener(onCheckedChangeListener);
+		binding.saturday.setOnCheckedChangeListener(onCheckedChangeListener);
 	}
 
 	private final ActivityResultLauncher<Intent> ringtoneLauncher = registerForActivityResult(

@@ -6,14 +6,23 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.os.PowerManager;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.os.HandlerCompat;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.alarm.alarmnotifications.AlarmService;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
@@ -42,51 +51,41 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 				if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_ALARM))) {
 					final int alarmDtoId = intent.getExtras().getInt(BundleKey.dtoId.name());
+
 					alarmRepository.get(alarmDtoId, new DbQueryCallback<AlarmDto>() {
 						@Override
 						public void onResultSuccessful(AlarmDto result) {
-							AlarmUtil.registerAlarm(context, result);
-							Set<Integer> daySet = AlarmUtil.parseDays(result.getAlarmDays());
-							Calendar now = Calendar.getInstance();
-							LocalDateTime now2 = LocalDateTime.now();
-							DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("a h:mm");
+							MainThreadWorker.runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									AlarmUtil.registerAlarm(context, result);
+									Set<Integer> daySet = AlarmUtil.parseDays(result.getAlarmDays());
+									Calendar now = Calendar.getInstance();
 
-							if (daySet.contains(now.get(Calendar.DAY_OF_WEEK))) {
-								RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_always_notification);
-								remoteViews.setTextViewText(R.id.time, now2.format(dateTimeFormatter));
+									if (daySet.contains(now.get(Calendar.DAY_OF_WEEK))) {
+										Intent alarmIntent = new Intent(context, AlarmActivity.class);
+										alarmIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+										Bundle bundle = new Bundle();
+										bundle.putInt(BundleKey.dtoId.name(), alarmDtoId);
+										alarmIntent.putExtras(bundle);
 
-								if (result.getRepeat() == 1) {
-									String text = result.getRepeatInterval() + context.getString(R.string.againAlarmAfterNMinutes);
-									PendingIntent ringAgainIntent = AlarmReceiver.getRingAgainPendingIntent(context, alarmDtoId);
-									remoteViews.setOnClickPendingIntent(R.id.ringAgainBtn, ringAgainIntent);
+										Intent alarmService = new Intent(context, AlarmService.class);
+										Bundle alarmBundle = new Bundle();
+										alarmBundle.putSerializable(AlarmDto.class.getName(), result);
+										alarmBundle.putInt(BundleKey.dtoId.name(), alarmDtoId);
+
+										alarmService.putExtras(alarmBundle);
+
+										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+											context.startForegroundService(alarmService);
+										} else {
+											context.startService(alarmService);
+										}
+
+										context.startActivity(alarmIntent);
+									}
 								}
-
-								//알람 종료 처리 코드 추가하기
-								remoteViews.setViewVisibility(R.id.ringAgainBtn, result.getRepeat() == 1 ? View.VISIBLE : View.GONE);
-
-								NotificationHelper notificationHelper = new NotificationHelper(context);
-								NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Alarm);
-								notificationObj.getNotificationBuilder().setPriority(Notification.PRIORITY_MAX);
-								notificationObj.getNotificationBuilder().setStyle(new NotificationCompat.BigTextStyle());
-								notificationObj.getNotificationBuilder().setCategory(NotificationCompat.CATEGORY_ALARM);
-								notificationObj.getNotificationBuilder().setSmallIcon(R.drawable.alarm);
-								notificationObj.getNotificationBuilder().setCustomContentView(remoteViews);
-								notificationObj.getNotificationBuilder().setCustomBigContentView(remoteViews);
-								notificationObj.getNotificationBuilder().setVibrate(new long[]{0L});
-								notificationObj.getNotificationBuilder().setContentIntent(null);
-
-								NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-								notificationManager.notify(notificationObj.getNotificationId(), notificationObj.getNotificationBuilder().build());
-
-								Intent alarmIntent = new Intent(context, AlarmActivity.class);
-								alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-								Bundle bundle = new Bundle();
-								bundle.putInt(BundleKey.dtoId.name(), alarmDtoId);
-								alarmIntent.putExtras(bundle);
-
-								context.startActivity(alarmIntent);
-								//fullscreen intent
-							}
+							});
 						}
 
 						@Override
@@ -113,6 +112,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 					});
 				} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_RING_AGAIN))) {
 					final int alarmDtoId = intent.getExtras().getInt(BundleKey.dtoId.name());
+					AlarmUtil.upRepeatCount(context, alarmDtoId);
+
 					alarmRepository.get(alarmDtoId, new DbQueryCallback<AlarmDto>() {
 						@Override
 						public void onResultSuccessful(AlarmDto result) {
@@ -126,6 +127,16 @@ public class AlarmReceiver extends BroadcastReceiver {
 					});
 
 				} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_END_ALARM))) {
+					final int alarmDtoId = intent.getExtras().getInt(BundleKey.dtoId.name());
+
+					Intent alarmService = new Intent(context, AlarmService.class);
+					context.stopService(alarmService);
+
+					AlarmUtil.clearRepeatCount(context, alarmDtoId);
+
+					Intent endAlarmActivityIntent = new Intent(context.getString(R.string.com_lifedawn_bestweather_action_END_ALARM));
+					context.sendBroadcast(endAlarmActivityIntent);
+
 					NotificationHelper notificationHelper = new NotificationHelper(context);
 					notificationHelper.cancelNotification(NotificationType.Alarm.getNotificationId());
 				}

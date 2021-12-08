@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
-
     <application
         android:name=".main.InitApp"
         android:allowBackup="true"
@@ -21,13 +20,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.White"
         android:usesCleartextTraffic="true">
+
         <activity
             android:name=".alarm.AlarmActivity"
             android:showForAllUsers="true"
             android:showOnLockScreen="true"
             android:showWhenLocked="true"
             android:theme="@style/AppTheme.White"
-            android:turnScreenOn="true"></activity>
+            android:turnScreenOn="true" />
         <activity
             android:name=".widget.ConfigureWidgetActivity"
             android:theme="@style/AppTheme.White">
@@ -121,6 +121,11 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".alarm.alarmnotifications.AlarmService"
+            android:enabled="true"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

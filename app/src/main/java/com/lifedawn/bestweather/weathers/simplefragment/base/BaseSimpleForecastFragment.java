@@ -56,6 +56,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	protected NetworkStatus networkStatus;
 	protected boolean needCompare;
 	protected Map<WeatherDataType, Integer> textSizeMap = new HashMap<>();
+	protected Map<WeatherDataType, Integer> textColorMap = new HashMap<>();
 	protected Integer cardBackgroundColor;
 
 	protected int headerVisibility = View.VISIBLE;
@@ -66,6 +67,10 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 
 	public void setTextSizeMap(Map<WeatherDataType, Integer> textSizeMap) {
 		this.textSizeMap = textSizeMap;
+	}
+
+	public void setTextColorMap(Map<WeatherDataType, Integer> textColorMap) {
+		this.textColorMap = textColorMap;
 	}
 
 	public void setCardBackgroundColor(Integer cardBackgroundColor) {

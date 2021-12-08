@@ -59,6 +59,10 @@ public class TextValueView extends View {
 		viewHeight = valueTextRect.height() + padding * 2;
 	}
 
+	public void setTextColor(int textColor) {
+		valueTextPaint.setColor(textColor);
+	}
+
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		setMeasuredDimension(viewWidth, viewHeight);

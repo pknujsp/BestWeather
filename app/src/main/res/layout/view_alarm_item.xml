@@ -118,11 +118,9 @@
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/alarmSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/Switch"
                 android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:checked="false" />
+                android:layout_centerVertical="true" />
 
         </RelativeLayout>
 

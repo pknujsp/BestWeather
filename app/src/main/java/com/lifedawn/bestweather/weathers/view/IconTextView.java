@@ -68,6 +68,10 @@ public class IconTextView extends View {
 		valueTextPaint.getTextBounds(tempStr, 0, tempStr.length(), textRect);
 	}
 
+	public void setTextColor(int textColor) {
+		valueTextPaint.setColor(textColor);
+	}
+
 	public List<String> getValueList() {
 		return valueList;
 	}

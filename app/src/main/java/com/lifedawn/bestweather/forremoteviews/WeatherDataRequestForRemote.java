@@ -242,7 +242,10 @@ public class WeatherDataRequestForRemote {
 				break;
 		}
 		currentConditionsObj.setSuccessful(successfulResponse);
+		currentConditionsObj.setZoneId(successfulResponse ? zoneId.getId() : null);
+
 		if (successfulResponse) {
+			/*
 			String airQuality = null;
 
 			MultipleJsonDownloader.ResponseResult aqiCnResponseResult =
@@ -257,7 +260,8 @@ public class WeatherDataRequestForRemote {
 				airQuality = null;
 			}
 			currentConditionsObj.setAirQuality(airQuality);
-			currentConditionsObj.setZoneId(successfulResponse ? zoneId.getId() : null);
+			
+			 */
 		}
 		return currentConditionsObj;
 	}

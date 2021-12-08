@@ -540,6 +540,8 @@
     <string name="com_lifedawn_bestweather_action_RING_AGAIN">com_lifedawn_bestweather_action_RING_AGAIN</string>
     <string name="com_lifedawn_bestweather_action_END_ALARM">com_lifedawn_bestweather_action_END_ALARM</string>
     <string name="com_lifedawn_bestweather_action_SILENT_ALARM">com_lifedawn_bestweather_action_SILENT_ALARM</string>
+    <string name="clickToSnoozeOrCancelAlarm">알람을 다시 울림/종료하시려면 눌러주세요</string>
+    <string name="beginAlarm">알람 시작</string>
 
 
 </resources>

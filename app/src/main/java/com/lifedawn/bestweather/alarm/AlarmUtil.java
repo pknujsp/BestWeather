@@ -120,4 +120,12 @@ public class AlarmUtil {
 
 		return repeatCount;
 	}
+
+	public static int getRepeatCount(Context context, int alarmDtoId) {
+		SharedPreferences repeatAlarmLogSharedPreferences =
+				context.getSharedPreferences(RepeatAlarmConstants.repeatAlarmLog.name(), Context.MODE_PRIVATE);
+		int repeatCount = repeatAlarmLogSharedPreferences.getInt(RepeatAlarmConstants.getPreferenceName(alarmDtoId), 0);
+
+		return repeatCount;
+	}
 }

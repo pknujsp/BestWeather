@@ -56,6 +56,10 @@ public class DateView extends View {
 		dateTextPaint.setTextSize(textSize);
 	}
 
+	public void setTextColor(int textColor) {
+		dateTextPaint.setColor(textColor);
+	}
+
 	public void init(List<ZonedDateTime> dateTimeList) {
 		ZonedDateTime date = ZonedDateTime.of(dateTimeList.get(0).toLocalDateTime(), dateTimeList.get(0).getZone());
 		ZonedDateTime lastDate = ZonedDateTime.of(date.toLocalDateTime(), date.getZone());
