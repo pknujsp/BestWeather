@@ -8,21 +8,17 @@ import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.appwidget.AppWidgetManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -36,28 +32,33 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.material.slider.Slider;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.ActivityConfigureWidgetBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
+import com.lifedawn.bestweather.room.dto.WidgetDto;
+import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.WidgetCurrentCreator;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
 
-public class ConfigureWidgetActivity extends AppCompatActivity implements WidgetCreator.WidgetUpdateCallback {
+public class ConfigureWidgetActivity extends AppCompatActivity implements AbstractWidgetCreator.WidgetUpdateCallback {
 	private ActivityConfigureWidgetBinding binding;
-	private int appWidgetId;
-	private int layoutId;
+	private Integer appWidgetId;
+	private Integer layoutId;
 	private boolean isKr;
+	private WidgetDto widgetDto;
 
 	private FavoriteAddressDto newSelectedAddressDto;
 
-	private WidgetCreator widgetCreator;
+	private AbstractWidgetCreator widgetCreator;
 	private AppWidgetManager appWidgetManager;
 	private boolean selectedFavoriteLocation;
 
@@ -140,8 +141,14 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 		appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
 
-		widgetCreator = new WidgetCreator(getApplicationContext(), this, appWidgetId);
-		widgetCreator.loadDefaultPreferences();
+		if (layoutId == R.layout.widget_current) {
+			widgetCreator = new WidgetCurrentCreator(getApplicationContext(), this, appWidgetId);
+		} else if (layoutId == R.layout.widget_current_hourly) {
+		} else if (layoutId == R.layout.widget_current_daily) {
+		} else if (layoutId == R.layout.widget_current_hourly_daily) {
+		}
+
+		widgetDto = widgetCreator.loadDefaultSettings();
 		updatePreview();
 
 		//위치, 날씨제공사, 대한민국 최우선, 자동 업데이트 간격, 날짜와 시각표시,
@@ -152,8 +159,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 		initDisplayDateTime();
 		initTextSize();
 		initBackground();
-
-		binding.currentLocationRadio.setChecked(true);
 
 		binding.check.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -168,50 +173,56 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 				} else if (layoutId == R.layout.widget_current_hourly_daily) {
 					widgetProviderClass = WidgetProviderCurrentHourlyDaily.class;
 				}
+
 				if (binding.selectedLocationRadio.isChecked()) {
-					SharedPreferences.Editor editor = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId),
-							MODE_PRIVATE).edit();
-
-					editor.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
-							.putString(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
-							.putString(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude())
-							.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).commit();
+					widgetDto.setAddressName(newSelectedAddressDto.getAddress());
+					widgetDto.setCountryCode(newSelectedAddressDto.getAddress());
+					widgetDto.setLatitude(Double.parseDouble(newSelectedAddressDto.getLatitude()));
+					widgetDto.setLongitude(Double.parseDouble(newSelectedAddressDto.getLongitude()));
 				}
-				widgetCreator.saveFinalWidgetPreferences();
+				Class<?> finalWidgetProviderClass = widgetProviderClass;
 
-				Intent resultValue = new Intent();
-				resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-				setResult(RESULT_OK, resultValue);
+				widgetCreator.savedSettings(widgetDto, new DbQueryCallback<WidgetDto>() {
+					@Override
+					public void onResultSuccessful(WidgetDto result) {
+						MainThreadWorker.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								Intent resultValue = new Intent();
+								resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+								setResult(RESULT_OK, resultValue);
 
-				Intent intent = new Intent(getApplicationContext(), widgetProviderClass);
-				intent.setAction(getString(R.string.com_lifedawn_bestweather_action_INIT));
-				Bundle initBundle = new Bundle();
+								Intent intent = new Intent(getApplicationContext(), finalWidgetProviderClass);
+								intent.setAction(getString(R.string.com_lifedawn_bestweather_action_INIT));
+								Bundle initBundle = new Bundle();
 
-				initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-				intent.putExtras(initBundle);
+								initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+								intent.putExtras(initBundle);
 
-				PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent, 0);
-				try {
-					pendingIntent.send();
-				} catch (PendingIntent.CanceledException e) {
-					e.printStackTrace();
-				}
-				finish();
+								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent, 0);
+								try {
+									pendingIntent.send();
+								} catch (PendingIntent.CanceledException e) {
+									e.printStackTrace();
+								}
+								finishAndRemoveTask();
+							}
+						});
+					}
+
+					@Override
+					public void onResultNoData() {
+
+					}
+				});
+
+
 			}
 		});
 	}
 
 	@Override
 	protected void onDestroy() {
-		SharedPreferences sharedPreferences = getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE);
-
-		if (sharedPreferences.getAll().isEmpty()) {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-				deleteSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId));
-			} else {
-				getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE).edit().clear().apply();
-			}
-		}
 		super.onDestroy();
 	}
 
@@ -238,12 +249,12 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 		binding.textSizeSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
 			@Override
 			public void onStartTrackingTouch(@NonNull @NotNull Slider slider) {
-				setTextSizeInWidget(slider.getValue());
+				setTextSizeInWidget((int) slider.getValue());
 			}
 
 			@Override
 			public void onStopTrackingTouch(@NonNull @NotNull Slider slider) {
-				setTextSizeInWidget(slider.getValue());
+				setTextSizeInWidget((int) slider.getValue());
 			}
 		});
 	}
@@ -253,15 +264,14 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				binding.displayLocalDatetimeSwitch.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-				widgetCreator.setDisplayClock(isChecked);
+				widgetDto.setDisplayClock(isChecked);
 				updatePreview();
 			}
 		});
 		binding.displayLocalDatetimeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				widgetCreator.setDisplayLocalClock(isChecked);
-				updatePreview();
+				widgetDto.setDisplayLocalClock(isChecked);
 			}
 		});
 	}
@@ -282,7 +292,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				long autoRefreshInterval = intervalsLong[position];
-				widgetCreator.setUpdateInterval(autoRefreshInterval);
+				widgetDto.setUpdateIntervalMillis(autoRefreshInterval);
 			}
 
 			@Override
@@ -319,15 +329,15 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 		binding.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				widgetCreator.setWeatherSourceType(checkedId == 0 ? WeatherSourceType.ACCU_WEATHER
-						: WeatherSourceType.OPEN_WEATHER_MAP);
+				widgetDto.setWeatherSourceType(checkedId == 0 ? WeatherSourceType.ACCU_WEATHER.name()
+						: WeatherSourceType.OPEN_WEATHER_MAP.name());
 			}
 		});
 
 		binding.kmaTopPrioritySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				widgetCreator.setKmaTopPriority(isChecked);
+				widgetDto.setTopPriorityKma(isChecked);
 			}
 		});
 
@@ -341,10 +351,12 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 					binding.changeAddressBtn.setVisibility(View.GONE);
 					binding.selectedAddressName.setVisibility(View.GONE);
 
-					widgetCreator.setLocationType(LocationType.CurrentLocation);
+					widgetDto.setLocationType(LocationType.CurrentLocation.name());
 				} else if (checkedId == binding.selectedLocationRadio.getId() && binding.selectedLocationRadio.isChecked()) {
 					binding.changeAddressBtn.setVisibility(View.VISIBLE);
 					binding.selectedAddressName.setVisibility(View.VISIBLE);
+
+					widgetDto.setLocationType(LocationType.SelectedAddress.name());
 
 					if (!selectedFavoriteLocation) {
 						openFavoritesFragment();
@@ -384,32 +396,18 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Widget
 		});
 
 		String tag = FavoritesFragment.class.getName();
-
 		getSupportFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), favoritesFragment, tag)
 				.addToBackStack(tag).commit();
 	}
 
 
-	private void setTextSizeInWidget(float value) {
-		int absSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, Math.abs(value), getResources().getDisplayMetrics());
-		final int extraSize = value > 0 ? absSize : absSize * -1;
-
-		widgetCreator.setAddressInHeaderTextSize(getResources().getDimensionPixelSize(R.dimen.addressTextSizeInHeader) + extraSize);
-		widgetCreator.setRefreshInHeaderTextSize(getResources().getDimensionPixelSize(R.dimen.refreshTextSizeInHeader) + extraSize);
-
-		widgetCreator.setTempInCurrentTextSize(getResources().getDimensionPixelSize(R.dimen.tempTextSizeInCurrent) + extraSize);
-		widgetCreator.setRealFeelTempInCurrentTextSize(getResources().getDimensionPixelSize(R.dimen.realFeelTempTextSizeInCurrent) + extraSize);
-		widgetCreator.setAirQualityInCurrentTextSize(getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrent) + extraSize);
-		widgetCreator.setPrecipitationInCurrentTextSize(getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrent) + extraSize);
-
-		widgetCreator.setDateInClockTextSize(getResources().getDimensionPixelSize(R.dimen.dateTextSizeInClock) + extraSize);
-		widgetCreator.setTimeInClockTextSize(getResources().getDimensionPixelSize(R.dimen.timeTextSizeInClock) + extraSize);
-
+	private void setTextSizeInWidget(int value) {
+		widgetCreator.setTextSize(value);
 		updatePreview();
 	}
 
 	private void setBackgroundAlpha(int alpha) {
-		widgetCreator.setBackgroundAlpha(100 - alpha);
+		widgetDto.setBackgroundAlpha(100 - alpha);
 		updatePreview();
 	}
 

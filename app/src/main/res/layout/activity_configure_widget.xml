@@ -23,7 +23,9 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:focusable="false">
 
                 <ImageView
                     android:id="@+id/wallpaper"
@@ -72,8 +74,8 @@
                         android:layout_height="wrap_content"
                         android:stepSize="1"
                         android:value="0"
-                        android:valueFrom="-4"
-                        android:valueTo="4" />
+                        android:valueFrom="-5"
+                        android:valueTo="5" />
 
                     <TextView
                         style="@style/SettingsLabel"
@@ -104,6 +106,7 @@
                             android:id="@+id/current_location_radio"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:checked="true"
                             android:text="@string/current_location" />
 
                         <RadioButton

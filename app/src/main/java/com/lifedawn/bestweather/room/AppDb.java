@@ -9,11 +9,13 @@ import androidx.room.RoomDatabase;
 import com.lifedawn.bestweather.room.dao.AlarmDao;
 import com.lifedawn.bestweather.room.dao.FavoriteAddressDao;
 import com.lifedawn.bestweather.room.dao.KmaAreaCodesDao;
+import com.lifedawn.bestweather.room.dao.WidgetDao;
 import com.lifedawn.bestweather.room.dto.AlarmDto;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.dto.KmaAreaCodeDto;
+import com.lifedawn.bestweather.room.dto.WidgetDto;
 
-@Database(entities = {KmaAreaCodeDto.class, FavoriteAddressDto.class, AlarmDto.class}, version = 1, exportSchema = false)
+@Database(entities = {KmaAreaCodeDto.class, FavoriteAddressDto.class, AlarmDto.class, WidgetDto.class}, version = 1, exportSchema = false)
 public abstract class AppDb extends RoomDatabase {
 	private static volatile AppDb instance = null;
 
@@ -22,6 +24,8 @@ public abstract class AppDb extends RoomDatabase {
 	public abstract FavoriteAddressDao favoriteAddressDao();
 
 	public abstract AlarmDao alarmDao();
+
+	public abstract WidgetDao widgetDao();
 
 	public static synchronized AppDb getInstance(Context context) {
 		if (instance == null) {

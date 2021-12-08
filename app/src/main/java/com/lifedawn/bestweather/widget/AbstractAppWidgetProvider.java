@@ -26,19 +26,19 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
-import com.lifedawn.bestweather.forremoteviews.JsonDataSaver;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 import com.lifedawn.bestweather.forremoteviews.WeatherDataRequestForRemote;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
-import com.lifedawn.bestweather.forremoteviews.dto.CurrentConditionsObj;
-import com.lifedawn.bestweather.forremoteviews.dto.HeaderObj;
-import com.lifedawn.bestweather.forremoteviews.dto.WeatherJsonObj;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
+import com.lifedawn.bestweather.room.dto.WidgetDto;
+import com.lifedawn.bestweather.room.repository.WidgetRepository;
+import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implements WidgetCreator.WidgetUpdateCallback {
+public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	private static final String tag = "AppWidgetProvider";
 	private MultipleJsonDownloader multipleJsonDownloader;
 
@@ -76,85 +76,11 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 			multipleJsonDownloader.cancel();
 		}
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			for (int appWidgetId : appWidgetIds) {
-				context.deleteSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId));
-			}
-		} else {
-			for (int appWidgetId : appWidgetIds) {
-				context.getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE).edit().clear().apply();
-			}
-		}
 	}
 
-	@Override
-	public void updatePreview() {
+	abstract protected void reDrawWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId);
 
-	}
-
-	protected void reDrawWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
-		SharedPreferences sharedPreferences = context.getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE);
-		if (sharedPreferences.getAll().isEmpty()) {
-			return;
-		}
-
-		WidgetCreator widgetViewCreator = new WidgetCreator(context, this, appWidgetId);
-		widgetViewCreator.loadSavedPreferences();
-
-		WeatherJsonObj weatherJsonObj = JsonDataSaver.getSavedWeatherData(context, WidgetCreator.getSharedPreferenceName(appWidgetId));
-		RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
-
-		if (weatherJsonObj != null) {
-			if (weatherJsonObj.isSuccessful()) {
-				widgetViewCreator.setHeaderViews(remoteViews, weatherJsonObj.getHeaderObj());
-				widgetViewCreator.setCurrentConditionsViews(remoteViews, weatherJsonObj.getCurrentConditionsObj());
-				widgetViewCreator.setHourlyForecastViews(remoteViews, weatherJsonObj.getHourlyForecasts());
-				widgetViewCreator.setDailyForecastViews(remoteViews, weatherJsonObj.getDailyForecasts());
-				widgetViewCreator.setClockTimeZone(remoteViews, ZoneId.of(weatherJsonObj.getCurrentConditionsObj().getZoneId()));
-			} else {
-				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetViewCreator.getOnClickedPendingIntent(remoteViews, appWidgetId));
-				RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-			}
-		} else {
-			remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetViewCreator.getOnClickedPendingIntent(remoteViews, appWidgetId));
-			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-		}
-
-		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-	}
-
-
-	public void init(Context context, Bundle bundle) {
-		//초기화
-		final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		final SharedPreferences sharedPreferences = context.getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId),
-				Context.MODE_PRIVATE);
-		WidgetCreator widgetCreator = new WidgetCreator(context, null, appWidgetId);
-		widgetCreator.loadSavedPreferences();
-
-		final RemoteViews remoteViews = widgetCreator.createRemoteViews(false);
-		final AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-
-		NetworkStatus networkStatus = NetworkStatus.getInstance(context);
-		if (networkStatus.networkAvailable()) {
-			RemoteViewProcessor.onBeginProcess(remoteViews);
-			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-
-			LocationType locationType =
-					LocationType.valueOf(sharedPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(),
-							LocationType.CurrentLocation.name()));
-
-			if (locationType == LocationType.CurrentLocation) {
-				loadCurrentLocation(context, remoteViews, appWidgetId);
-			} else {
-				loadWeatherData(context, AppWidgetManager.getInstance(context), remoteViews, appWidgetId);
-			}
-		} else {
-			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK);
-			setRefreshPendingIntent(remoteViews, appWidgetId, context);
-			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-		}
-	}
+	abstract protected void init(Context context, Bundle bundle);
 
 
 	@Override
@@ -182,7 +108,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 		}
 	}
 
-	public void setRefreshPendingIntent(RemoteViews remoteViews, int appWidgetId, Context context) {
+	public final void setRefreshPendingIntent(RemoteViews remoteViews, int appWidgetId, Context context) {
 		Intent refreshIntent = new Intent(context, getThis());
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
@@ -204,17 +130,28 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
 					public void onGeocodingResult(List<Address> addressList) {
-						final SharedPreferences widgetAttributes =
-								context.getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE);
-						SharedPreferences.Editor editor = widgetAttributes.edit();
+						WidgetRepository widgetRepository = new WidgetRepository(context);
+						widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
+							@Override
+							public void onResultSuccessful(WidgetDto result) {
+								WidgetDto widgetDto = result;
+								Address address = addressList.get(0);
 
-						String countryCode = addressList.get(0).getCountryCode();
-						editor.putString(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), String.valueOf(addressList.get(0).getLatitude()))
-								.putString(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), String.valueOf(addressList.get(0).getLongitude()))
-								.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), countryCode)
-								.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), addressList.get(0).getAddressLine(0)).commit();
+								widgetDto.setAddressName(address.getAddressLine(0));
+								widgetDto.setCountryCode(address.getCountryCode());
+								widgetDto.setLatitude(address.getLatitude());
+								widgetDto.setLongitude(address.getLongitude());
 
-						loadWeatherData(context, AppWidgetManager.getInstance(context), remoteViews, appWidgetId);
+								loadWeatherData(context, AppWidgetManager.getInstance(context), remoteViews, appWidgetId);
+							}
+
+							@Override
+							public void onResultNoData() {
+
+							}
+						});
+
+
 					}
 				});
 			}
@@ -268,7 +205,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 					Log.e(tag, "canceled");
 				}
 			};
-			weatherDataRequestForRemote.loadWeatherData(context, WidgetCreator.getSharedPreferenceName(appWidgetId),
+			weatherDataRequestForRemote.loadWeatherData(context, AbstractWidgetCreator.getSharedPreferenceName(appWidgetId),
 					requestWeatherDataTypeSet, multipleJsonDownloader);
 		} else {
 			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK);
@@ -283,10 +220,10 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 	protected final void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, AppWidgetManager appWidgetManager,
 	                                    @Nullable MultipleJsonDownloader multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		SharedPreferences widgetAttributes =
-				context.getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE);
+				context.getSharedPreferences(AbstractWidgetCreator.getSharedPreferenceName(appWidgetId), Context.MODE_PRIVATE);
 
-		WidgetCreator widgetCreator = new WidgetCreator(context, this, appWidgetId);
-		widgetCreator.loadSavedPreferences();
+		AbstractWidgetCreator abstractWidgetCreator = new AbstractWidgetCreator(context, this, appWidgetId);
+		abstractWidgetCreator.loadSavedPreferences();
 
 		WeatherSourceType requestWeatherSourceType =
 				WeatherSourceType.valueOf(widgetAttributes.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
@@ -303,17 +240,17 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 
 		WeatherDataRequestForRemote weatherDataRequestForRemote = new WeatherDataRequestForRemote(context);
 
-		HeaderObj headerObj = weatherDataRequestForRemote.getHeader(context, WidgetCreator.getSharedPreferenceName(appWidgetId));
-		widgetCreator.setHeaderViews(remoteViews, headerObj);
+		HeaderObj headerObj = weatherDataRequestForRemote.getHeader(context, AbstractWidgetCreator.getSharedPreferenceName(appWidgetId));
+		abstractWidgetCreator.setHeaderViews(remoteViews, headerObj);
 
 		boolean successful = true;
 		ZoneId zoneId = null;
 
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
 			currentConditionsObj = weatherDataRequestForRemote.getCurrentConditions(context, requestWeatherSourceType, multipleJsonDownloader,
-					WidgetCreator.getSharedPreferenceName(appWidgetId));
+					AbstractWidgetCreator.getSharedPreferenceName(appWidgetId));
 			if (currentConditionsObj.isSuccessful()) {
-				widgetCreator.setCurrentConditionsViews(remoteViews, currentConditionsObj);
+				abstractWidgetCreator.setCurrentConditionsViews(remoteViews, currentConditionsObj);
 				zoneId = ZoneId.of(currentConditionsObj.getZoneId());
 			} else {
 				successful = false;
@@ -321,10 +258,10 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 		}
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
 			hourlyForecastObjs = weatherDataRequestForRemote.getHourlyForecasts(context, requestWeatherSourceType, multipleJsonDownloader,
-					WidgetCreator.getSharedPreferenceName(appWidgetId));
+					AbstractWidgetCreator.getSharedPreferenceName(appWidgetId));
 			if (hourlyForecastObjs.isSuccessful()) {
 				zoneId = ZoneId.of(hourlyForecastObjs.getZoneId());
-				widgetCreator.setHourlyForecastViews(remoteViews, hourlyForecastObjs);
+				abstractWidgetCreator.setHourlyForecastViews(remoteViews, hourlyForecastObjs);
 			} else {
 				successful = false;
 			}
@@ -334,7 +271,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 			dailyForecasts = weatherDataRequestForRemote.getDailyForecasts(requestWeatherSourceType, multipleJsonDownloader);
 			if (dailyForecasts.isSuccessful()) {
 				zoneId = ZoneId.of(dailyForecasts.getZoneId());
-				widgetCreator.setDailyForecastViews(remoteViews, dailyForecasts);
+				abstractWidgetCreator.setDailyForecastViews(remoteViews, dailyForecasts);
 			} else {
 				successful = false;
 			}
@@ -342,13 +279,13 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider implem
 
 		if (successful) {
 			boolean displayLocalClock = widgetAttributes.getBoolean(WidgetNotiConstants.WidgetAttributes.DISPLAY_LOCAL_CLOCK.name(), false);
-			widgetCreator.setClockTimeZone(remoteViews, displayLocalClock ? zoneId : ZoneId.systemDefault());
+			abstractWidgetCreator.setClockTimeZone(remoteViews, displayLocalClock ? zoneId : ZoneId.systemDefault());
 			RemoteViewProcessor.onSuccessfulProcess(remoteViews);
 		} else {
 			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
 			setRefreshPendingIntent(remoteViews, appWidgetId, context);
 		}
-		JsonDataSaver.saveWeatherData(WidgetCreator.getSharedPreferenceName(appWidgetId), context, headerObj, currentConditionsObj, hourlyForecastObjs,
+		JsonDataSaver.saveWeatherData(AbstractWidgetCreator.getSharedPreferenceName(appWidgetId), context, headerObj, currentConditionsObj, hourlyForecastObjs,
 				dailyForecasts);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}

@@ -260,7 +260,7 @@ public class WeatherDataRequestForRemote {
 				airQuality = null;
 			}
 			currentConditionsObj.setAirQuality(airQuality);
-			
+
 			 */
 		}
 		return currentConditionsObj;

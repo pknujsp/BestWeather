@@ -1,9 +1,6 @@
 package com.lifedawn.bestweather.notification.daily;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -23,9 +20,7 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
-import com.lifedawn.bestweather.forremoteviews.JsonDataSaver;
 import com.lifedawn.bestweather.notification.BaseNotificationSettingsFragment;
-import com.lifedawn.bestweather.notification.NotificationReceiver;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
@@ -33,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 
 
 public class DailyNotificationSettingsFragment extends BaseNotificationSettingsFragment {

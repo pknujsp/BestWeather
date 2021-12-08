@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:singleLine="true"
+        android:text="10.1 Tue"
         android:textColor="@color/white"
         android:textSize="@dimen/dateTextSizeInClock" />
 
@@ -20,6 +21,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:singleLine="true"
+        android:text="12:00"
         android:textColor="@color/white"
         android:textSize="@dimen/timeTextSizeInClock" />
 

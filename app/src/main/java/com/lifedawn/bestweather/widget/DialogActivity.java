@@ -15,10 +15,15 @@ import android.view.ContextThemeWrapper;
 import android.widget.RemoteViews;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.databinding.ActivityDialogBinding;
 import com.lifedawn.bestweather.main.MainActivity;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
+import com.lifedawn.bestweather.room.dto.WidgetDto;
+import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.WidgetCurrentCreator;
 
 public class DialogActivity extends Activity {
 	private ActivityDialogBinding binding;
@@ -26,6 +31,7 @@ public class DialogActivity extends Activity {
 	private int appWidgetId;
 	private RemoteViews remoteViews;
 	private LocationType locationType;
+	private AbstractWidgetCreator widgetCreator;
 
 
 	@Override
@@ -38,22 +44,11 @@ public class DialogActivity extends Activity {
 		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
 		remoteViews = bundle.getParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name());
 
-		SharedPreferences sharedPreferences =
-				getSharedPreferences(WidgetCreator.getSharedPreferenceName(appWidgetId), MODE_PRIVATE);
-		locationType = LocationType.valueOf(sharedPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(),
-				LocationType.CurrentLocation.name()));
-
-		String[] listItems = null;
-		if (locationType == LocationType.CurrentLocation) {
-			listItems = new String[]{getString(R.string.open_app),
-					getString(R.string.cancel), getString(R.string.refresh), getString(R.string.refresh_current_location)};
-		} else {
-			listItems = new String[]{getString(R.string.open_app), getString(R.string.cancel), getString(R.string.refresh)};
-		}
-
-		int widgetLayoutId = AppWidgetManager.getInstance(getApplicationContext()).getAppWidgetInfo(appWidgetId).initialLayout;
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+		int widgetLayoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
 
 		if (widgetLayoutId == R.layout.widget_current) {
+			widgetCreator = new WidgetCurrentCreator(getApplicationContext(), null, appWidgetId);
 			widgetClass = WidgetProviderCurrent.class;
 		} else if (widgetLayoutId == R.layout.widget_current_hourly) {
 			widgetClass = WidgetProviderCurrentHourly.class;
@@ -63,54 +58,81 @@ public class DialogActivity extends Activity {
 			widgetClass = WidgetProviderCurrentHourlyDaily.class;
 		}
 
-		new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light_Dialog))
-				.setTitle(getString(R.string.widget_control))
-				.setCancelable(false)
-				.setItems(listItems, new DialogInterface.OnClickListener() {
+		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
+			@Override
+			public void onResultSuccessful(WidgetDto result) {
+				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						if (which == 0) {
-							Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-							intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-							startActivity(intent);
-						} else if (which == 1) {
+					public void run() {
+						locationType = LocationType.valueOf(result.getLocationType());
 
-						} else if (which == 2) {
-							Intent refreshIntent = new Intent(getApplicationContext(), widgetClass);
-							refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-
-							Bundle bundle = new Bundle();
-							bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-							bundle.putParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
-							refreshIntent.putExtras(bundle);
-
-							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, refreshIntent,
-									PendingIntent.FLAG_CANCEL_CURRENT);
-							try {
-								pendingIntent.send();
-							} catch (PendingIntent.CanceledException e) {
-								e.printStackTrace();
-							}
-						} else if (which == 3) {
-							//현재 위치 업데이트
-							Intent refreshCurrentLocationIntent = new Intent(getApplicationContext(), widgetClass);
-							refreshCurrentLocationIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH_CURRENT_LOCATION));
-							Bundle bundle = new Bundle();
-							bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-							bundle.putParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
-							refreshCurrentLocationIntent.putExtras(bundle);
-
-							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId,
-									refreshCurrentLocationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-							try {
-								pendingIntent.send();
-							} catch (PendingIntent.CanceledException e) {
-								e.printStackTrace();
-							}
+						String[] listItems = null;
+						if (locationType == LocationType.CurrentLocation) {
+							listItems = new String[]{getString(R.string.open_app),
+									getString(R.string.cancel), getString(R.string.refresh), getString(R.string.refresh_current_location)};
+						} else {
+							listItems = new String[]{getString(R.string.open_app), getString(R.string.cancel), getString(R.string.refresh)};
 						}
-						dialog.dismiss();
-						finish();
+
+						new AlertDialog.Builder(new ContextThemeWrapper(DialogActivity.this, R.style.Theme_AppCompat_Light_Dialog))
+								.setTitle(getString(R.string.widget_control))
+								.setCancelable(false)
+								.setItems(listItems, new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										if (which == 0) {
+											Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+											intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+											startActivity(intent);
+										} else if (which == 1) {
+
+										} else if (which == 2) {
+											Intent refreshIntent = new Intent(getApplicationContext(), widgetClass);
+											refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+
+											Bundle bundle = new Bundle();
+											bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+											bundle.putParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
+											refreshIntent.putExtras(bundle);
+
+											PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, refreshIntent,
+													PendingIntent.FLAG_CANCEL_CURRENT);
+											try {
+												pendingIntent.send();
+											} catch (PendingIntent.CanceledException e) {
+												e.printStackTrace();
+											}
+										} else if (which == 3) {
+											//현재 위치 업데이트
+											Intent refreshCurrentLocationIntent = new Intent(getApplicationContext(), widgetClass);
+											refreshCurrentLocationIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH_CURRENT_LOCATION));
+											Bundle bundle = new Bundle();
+											bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+											bundle.putParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
+											refreshCurrentLocationIntent.putExtras(bundle);
+
+											PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId,
+													refreshCurrentLocationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+											try {
+												pendingIntent.send();
+											} catch (PendingIntent.CanceledException e) {
+												e.printStackTrace();
+											}
+										}
+										dialog.dismiss();
+										finish();
+									}
+								}).create().show();
 					}
-				}).create().show();
+				});
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
+
+
 	}
 }
