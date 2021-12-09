@@ -1,41 +1,38 @@
 package com.lifedawn.bestweather.widget.creator;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import androidx.annotation.Nullable;
+
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
-import com.lifedawn.bestweather.theme.AppTheme;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
-import com.lifedawn.bestweather.widget.DialogActivity;
+import com.lifedawn.bestweather.widget.model.CurrentConditionsObj;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class WidgetCurrentCreator extends AbstractWidgetCreator {
-	private int addressInHeaderTextSize;
-	private int refreshInHeaderTextSize;
+	private final DateTimeFormatter refreshDateTimeFormatter;
+	private final DateTimeFormatter clockFormatter;
+	private final String clockFormat;
+	private final String refreshDateTimeFormat;
 
-	private int dateInClockTextSize;
-	private int timeInClockTextSize;
+	private int addressTextSize;
+	private int refreshDateTimeTextSize;
+	private int clockTextSize;
+	private int tempTextSize;
 
-	private int tempInCurrentTextSize;
-	private int realFeelTempInCurrentTextSize;
-	private int airQualityInCurrentTextSize;
-	private int precipitationInCurrentTextSize;
 
 	public WidgetCurrentCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
+		clockFormat = refreshDateTimeFormat = clockUnit == ValueUnits.clock12 ? "E a hh:mm" :
+				"E HH:mm";
+		refreshDateTimeFormatter = clockFormatter = DateTimeFormatter.ofPattern(clockFormat);
 	}
 
 	@Override
@@ -46,23 +43,20 @@ public class WidgetCurrentCreator extends AbstractWidgetCreator {
 
 		if (needTempData) {
 			setTempHeaderViews(remoteViews);
-			setTempAirQualityViews(remoteViews);
 			setTempCurrentConditionsViews(remoteViews);
+		}else{
+			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent(remoteViews));
 		}
-		remoteViews.setViewVisibility(R.id.watch, widgetDto.isDisplayClock() ? View.VISIBLE : View.GONE);
 
-		remoteViews.setCharSequence(R.id.date, "setFormat24Hour", dateFormat);
-		remoteViews.setCharSequence(R.id.date, "setFormat12Hour", dateFormat);
-		remoteViews.setCharSequence(R.id.time, "setFormat24Hour", timeFormat);
-		remoteViews.setCharSequence(R.id.time, "setFormat12Hour", timeFormat);
+		remoteViews.setViewVisibility(R.id.clock, widgetDto.isDisplayClock() ? View.VISIBLE : View.GONE);
+		remoteViews.setCharSequence(R.id.clock, "setFormat24Hour", clockFormat);
+		remoteViews.setCharSequence(R.id.clock, "setFormat12Hour", clockFormat);
 
-		remoteViews.setTextViewTextSize(R.id.date, TypedValue.COMPLEX_UNIT_PX, dateInClockTextSize);
-		remoteViews.setTextViewTextSize(R.id.time, TypedValue.COMPLEX_UNIT_PX, timeInClockTextSize);
+		remoteViews.setTextViewTextSize(R.id.clock, TypedValue.COMPLEX_UNIT_PX, clockTextSize);
 
 		setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
-		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent(remoteViews));
 
-		setClockTimeZone(remoteViews, ZoneId.systemDefault());
+		setClockTimeZone(remoteViews);
 		return remoteViews;
 	}
 
@@ -72,86 +66,43 @@ public class WidgetCurrentCreator extends AbstractWidgetCreator {
 				context.getResources().getDisplayMetrics());
 		final int extraSize = amount >= 0 ? absSize : absSize * -1;
 
-		addressInHeaderTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInHeader) + extraSize;
-		refreshInHeaderTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshTextSizeInHeader) + extraSize;
-
-		tempInCurrentTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInCurrent) + extraSize;
-		realFeelTempInCurrentTextSize = context.getResources().getDimensionPixelSize(R.dimen.realFeelTempTextSizeInCurrent) + extraSize;
-		airQualityInCurrentTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrent) + extraSize;
-		precipitationInCurrentTextSize = context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrent) + extraSize;
-
-		dateInClockTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTextSizeInClock) + extraSize;
-		timeInClockTextSize = context.getResources().getDimensionPixelSize(R.dimen.timeTextSizeInClock) + extraSize;
+		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInWidgetCurrent) + extraSize;
+		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshDateTimeTextSizeInWidgetCurrent) + extraSize;
+		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInWidgetCurrent) + extraSize;
+		clockTextSize = context.getResources().getDimensionPixelSize(R.dimen.clockTextSizeInWidgetCurrent) + extraSize;
 	}
 
-	public void setClockTimeZone(RemoteViews remoteViews, ZoneId zoneId) {
-		ZoneId tempZoneId = widgetDto.isDisplayLocalClock() ? ZoneId.of(zoneId.getId()) : ZoneId.systemDefault();
-
-		remoteViews.setString(R.id.date, "setTimeZone", tempZoneId.getId());
-		remoteViews.setString(R.id.time, "setTimeZone", tempZoneId.getId());
+	public void setClockTimeZone(RemoteViews remoteViews) {
+		ZoneId zoneId = widgetDto.isDisplayLocalClock() ? ZoneId.of(widgetDto.getTimeZoneId()) : ZoneId.systemDefault();
+		remoteViews.setString(R.id.clock, "setTimeZone", zoneId.getId());
 	}
 
 	public void setHeaderViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime) {
-		remoteViews.setTextViewTextSize(R.id.address, TypedValue.COMPLEX_UNIT_PX, addressInHeaderTextSize);
-		remoteViews.setTextViewTextSize(R.id.refresh, TypedValue.COMPLEX_UNIT_PX, refreshInHeaderTextSize);
-		remoteViews.setTextViewText(R.id.address, addressName);
-		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(dateTimeFormatter));
+		remoteViews.setTextViewTextSize(R.id.addressName, TypedValue.COMPLEX_UNIT_PX, addressTextSize);
+		remoteViews.setTextViewTextSize(R.id.refreshDateTime, TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
+		remoteViews.setTextViewText(R.id.addressName, addressName);
+		remoteViews.setTextViewText(R.id.refreshDateTime, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
 	}
 
 	public void setTempHeaderViews(RemoteViews remoteViews) {
-		remoteViews.setTextViewTextSize(R.id.address, TypedValue.COMPLEX_UNIT_PX, addressInHeaderTextSize);
-		remoteViews.setTextViewTextSize(R.id.refresh, TypedValue.COMPLEX_UNIT_PX, refreshInHeaderTextSize);
-		remoteViews.setTextViewText(R.id.address, context.getString(R.string.address_name));
-		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.now().format(dateTimeFormatter));
+		remoteViews.setTextViewTextSize(R.id.addressName, TypedValue.COMPLEX_UNIT_PX, addressTextSize);
+		remoteViews.setTextViewTextSize(R.id.refreshDateTime, TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
+		remoteViews.setTextViewText(R.id.addressName, context.getString(R.string.address_name));
+		remoteViews.setTextViewText(R.id.refreshDateTime, ZonedDateTime.now().format(refreshDateTimeFormatter));
 	}
 
-	public void setAirQualityViews(RemoteViews remoteViews, AirQualityObj airQualityObj) {
-		remoteViews.setTextViewText(R.id.current_airquality,
-				context.getString(R.string.air_quality) + " " + (airQualityObj.getAqi() == null ? context.getString(R.string.not_data)
-						: airQualityObj.getAqi()));
-		remoteViews.setTextViewTextSize(R.id.current_airquality, TypedValue.COMPLEX_UNIT_PX, airQualityInCurrentTextSize);
-	}
-
-	public void setTempAirQualityViews(RemoteViews remoteViews) {
-		remoteViews.setTextViewText(R.id.current_airquality, context.getString(R.string.air_quality) + " " + context.getString(R.string.good));
-		remoteViews.setTextViewTextSize(R.id.current_airquality, TypedValue.COMPLEX_UNIT_PX, airQualityInCurrentTextSize);
-	}
 
 	public void setCurrentConditionsViews(RemoteViews remoteViews, CurrentConditionsObj currentConditionsObj) {
-		if (currentConditionsObj.getRealFeelTemp() == null) {
-			remoteViews.setViewVisibility(R.id.current_realfeel_temperature, View.GONE);
-		} else {
-			remoteViews.setViewVisibility(R.id.current_realfeel_temperature, View.VISIBLE);
-			remoteViews.setTextViewText(R.id.current_realfeel_temperature,
-					context.getString(R.string.real_feel_temperature_simple) + " " + currentConditionsObj.getRealFeelTemp());
-		}
-
-		String precipitationType = currentConditionsObj.getPrecipitationType();
-		String precipitationVolume = currentConditionsObj.getPrecipitationVolume();
-
-		remoteViews.setTextViewText(R.id.current_precipitation,
-				context.getString(R.string.precipitation) + " " + precipitationType + " " + precipitationVolume);
 		remoteViews.setTextViewText(R.id.current_temperature, currentConditionsObj.getTemp());
 		remoteViews.setImageViewResource(R.id.current_weather_icon, currentConditionsObj.getWeatherIcon());
-
-		remoteViews.setTextViewTextSize(R.id.current_temperature, TypedValue.COMPLEX_UNIT_PX, tempInCurrentTextSize);
-		remoteViews.setTextViewTextSize(R.id.current_realfeel_temperature, TypedValue.COMPLEX_UNIT_PX, realFeelTempInCurrentTextSize);
-		remoteViews.setTextViewTextSize(R.id.current_precipitation, TypedValue.COMPLEX_UNIT_PX, precipitationInCurrentTextSize);
+		remoteViews.setTextViewTextSize(R.id.current_temperature, TypedValue.COMPLEX_UNIT_PX, tempTextSize);
 	}
 
 	public void setTempCurrentConditionsViews(RemoteViews remoteViews) {
-		remoteViews.setViewVisibility(R.id.current_realfeel_temperature, View.VISIBLE);
-		remoteViews.setTextViewText(R.id.current_realfeel_temperature,
-				context.getString(R.string.real_feel_temperature_simple) + " " + "20º");
-
-		remoteViews.setTextViewText(R.id.current_precipitation, context.getString(R.string.precipitation) + " "
-				+ context.getString(R.string.not_precipitation));
 		remoteViews.setTextViewText(R.id.current_temperature, "20º");
 		remoteViews.setImageViewResource(R.id.current_weather_icon, R.drawable.day_clear);
 
-		remoteViews.setTextViewTextSize(R.id.current_temperature, TypedValue.COMPLEX_UNIT_PX, tempInCurrentTextSize);
-		remoteViews.setTextViewTextSize(R.id.current_realfeel_temperature, TypedValue.COMPLEX_UNIT_PX, realFeelTempInCurrentTextSize);
-		remoteViews.setTextViewTextSize(R.id.current_precipitation, TypedValue.COMPLEX_UNIT_PX, precipitationInCurrentTextSize);
+		remoteViews.setTextViewTextSize(R.id.current_temperature, TypedValue.COMPLEX_UNIT_PX, tempTextSize);
 	}
 
 	/*
@@ -221,63 +172,4 @@ public class WidgetCurrentCreator extends AbstractWidgetCreator {
 		widgetDto.setDisplayClock(displayClock);
 	}
 
-	public static class AirQualityObj {
-		private String aqi;
-
-		public String getAqi() {
-			return aqi;
-		}
-
-		public void setAqi(String aqi) {
-			this.aqi = aqi;
-		}
-	}
-
-	public static class CurrentConditionsObj {
-		private int weatherIcon;
-		private String temp;
-		private String realFeelTemp;
-		private String precipitationVolume;
-		private String precipitationType;
-
-		public int getWeatherIcon() {
-			return weatherIcon;
-		}
-
-		public void setWeatherIcon(int weatherIcon) {
-			this.weatherIcon = weatherIcon;
-		}
-
-		public String getTemp() {
-			return temp;
-		}
-
-		public void setTemp(String temp) {
-			this.temp = temp;
-		}
-
-		public String getRealFeelTemp() {
-			return realFeelTemp;
-		}
-
-		public void setRealFeelTemp(String realFeelTemp) {
-			this.realFeelTemp = realFeelTemp;
-		}
-
-		public String getPrecipitationVolume() {
-			return precipitationVolume;
-		}
-
-		public void setPrecipitationVolume(String precipitationVolume) {
-			this.precipitationVolume = precipitationVolume;
-		}
-
-		public String getPrecipitationType() {
-			return precipitationType;
-		}
-
-		public void setPrecipitationType(String precipitationType) {
-			this.precipitationType = precipitationType;
-		}
-	}
 }

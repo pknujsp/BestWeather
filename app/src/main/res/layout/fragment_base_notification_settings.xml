@@ -14,15 +14,14 @@
             <include
                 android:id="@+id/toolbar"
                 layout="@layout/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_alignParentTop="true" />
+              />
 
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/root_scroll_View"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/toolbar"
+                android:clipToPadding="true"
                 android:overScrollMode="never"
                 android:paddingHorizontal="16dp"
                 android:scrollbars="none">
@@ -31,17 +30,20 @@
                     android:id="@+id/widget_settings_container"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:clipChildren="false"
                     android:orientation="vertical">
 
                     <FrameLayout
                         android:id="@+id/preview_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
                         android:clickable="false"
+                        android:clipChildren="false"
                         android:focusable="false"
+                        android:background="#CDCDCD"
                         android:minHeight="40dp"
-                        android:paddingHorizontal="18dp"
-                        android:paddingVertical="12dp" />
+                        android:padding="1dp" />
 
                     <androidx.core.widget.NestedScrollView
                         android:id="@+id/scroll_view"
@@ -69,8 +71,9 @@
                                 android:layout_height="wrap_content"
                                 android:orientation="vertical">
 
-                                <include layout="@layout/common_layout_notification_settings"
-                                    android:id="@+id/commons"/>
+                                <include
+                                    android:id="@+id/commons"
+                                    layout="@layout/common_layout_notification_settings" />
 
                             </LinearLayout>
 

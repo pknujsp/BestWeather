@@ -8,12 +8,12 @@ public class WidgetNotiConstants {
 		}
 
 		public enum DataKeys {
-			ADDRESS_NAME, LATITUDE, LONGITUDE, COUNTRY_CODE, TIMEZONE_ID
+			ADDRESS_NAME, LATITUDE, LONGITUDE, COUNTRY_CODE
 		}
 	}
 
 	public enum WidgetAttributes {
-		WIDGET_ATTRIBUTES_ID, APP_WIDGET_ID, BACKGROUND_ALPHA, DISPLAY_CLOCK, DISPLAY_LOCAL_CLOCK, WIDGET_CLASS, REMOTE_VIEWS
+		REMOTE_VIEWS
 	}
 
 	public enum DailyNotiAttributes {

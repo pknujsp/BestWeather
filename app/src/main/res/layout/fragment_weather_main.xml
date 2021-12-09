@@ -22,9 +22,7 @@
             <include
                 android:id="@+id/main_toolbar"
                 layout="@layout/app_main_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_gravity="top" />
+         />
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/weather_fragments_container"

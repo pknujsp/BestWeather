@@ -44,6 +44,7 @@ import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.WidgetCurrentCreator;
+import com.lifedawn.bestweather.widget.creator.WidgetCurrentHourlyDailyCreator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -143,9 +144,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 		if (layoutId == R.layout.widget_current) {
 			widgetCreator = new WidgetCurrentCreator(getApplicationContext(), this, appWidgetId);
-		} else if (layoutId == R.layout.widget_current_hourly) {
-		} else if (layoutId == R.layout.widget_current_daily) {
 		} else if (layoutId == R.layout.widget_current_hourly_daily) {
+			widgetCreator = new WidgetCurrentHourlyDailyCreator(getApplicationContext(), this, appWidgetId);
 		}
 
 		widgetDto = widgetCreator.loadDefaultSettings();
@@ -160,29 +160,27 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		initTextSize();
 		initBackground();
 
+		binding.currentLocationRadio.setChecked(true);
+
 		binding.check.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Class<?> widgetProviderClass = null;
 				if (layoutId == R.layout.widget_current) {
 					widgetProviderClass = WidgetProviderCurrent.class;
-				} else if (layoutId == R.layout.widget_current_hourly) {
-					widgetProviderClass = WidgetProviderCurrentHourly.class;
-				} else if (layoutId == R.layout.widget_current_daily) {
-					widgetProviderClass = WidgetProviderCurrentDaily.class;
 				} else if (layoutId == R.layout.widget_current_hourly_daily) {
 					widgetProviderClass = WidgetProviderCurrentHourlyDaily.class;
 				}
 
 				if (binding.selectedLocationRadio.isChecked()) {
 					widgetDto.setAddressName(newSelectedAddressDto.getAddress());
-					widgetDto.setCountryCode(newSelectedAddressDto.getAddress());
+					widgetDto.setCountryCode(newSelectedAddressDto.getCountryCode());
 					widgetDto.setLatitude(Double.parseDouble(newSelectedAddressDto.getLatitude()));
 					widgetDto.setLongitude(Double.parseDouble(newSelectedAddressDto.getLongitude()));
 				}
 				Class<?> finalWidgetProviderClass = widgetProviderClass;
 
-				widgetCreator.savedSettings(widgetDto, new DbQueryCallback<WidgetDto>() {
+				widgetCreator.saveSettings(widgetDto, new DbQueryCallback<WidgetDto>() {
 					@Override
 					public void onResultSuccessful(WidgetDto result) {
 						MainThreadWorker.runOnUiThread(new Runnable() {

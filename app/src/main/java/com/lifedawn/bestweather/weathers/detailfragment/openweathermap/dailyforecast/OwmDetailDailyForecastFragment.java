@@ -107,6 +107,8 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 
 	@Override
 	protected void setDataViewsByTable() {
+				/*
+
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -245,6 +247,8 @@ public class OwmDetailDailyForecastFragment extends BaseDetailForecastFragment {
 				}
 			}
 		});
+
+				 */
 	}
 
 

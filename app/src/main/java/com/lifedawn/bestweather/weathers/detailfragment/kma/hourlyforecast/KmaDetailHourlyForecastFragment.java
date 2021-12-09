@@ -73,6 +73,8 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				DateTimeFormatter datePattern = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
 				final String lessThan1mm = getString(R.string.kma_less_than_1mm);
 				final String noSnow = getString(R.string.kma_no_snow);
+				final String noRain = "강수없음";
+				final String zero = "0.0";
 				List<HourlyForecastListItemObj> hourlyForecastListItemObjs = new ArrayList<>();
 
 				Map<Integer, SunRiseSetUtil.SunRiseSetObj> sunSetRiseDataMap = SunRiseSetUtil.getDailySunRiseSetMap(
@@ -96,8 +98,8 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 					item.setDate(finalHourlyForecast.getFcstDateTime().format(datePattern))
 							.setHour(String.valueOf(finalHourlyForecast.getFcstDateTime().getHour()))
 							.setTemp(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit) + tempDegree)
-							.setRainVolume(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ? null :
-									finalHourlyForecast.getRainPrecipitation1Hour())
+							.setRainVolume(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ? zero + mm :
+									finalHourlyForecast.getRainPrecipitation1Hour().replace(noRain, zero + mm))
 							.setWeatherIconId(KmaResponseProcessor.getWeatherSkyAndPtyIconImg(finalHourlyForecast.getPrecipitationType(),
 									finalHourlyForecast.getSky(), isNight));
 
@@ -140,6 +142,8 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 
 	@Override
 	protected void setDataViewsByTable() {
+				/*
+
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -297,6 +301,8 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				}
 			}
 		});
+
+				 */
 	}
 
 }

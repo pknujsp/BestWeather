@@ -13,51 +13,7 @@
 
             <include
                 android:id="@+id/toolbar"
-                layout="@layout/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_alignParentTop="true" />
-
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/root_scroll_View"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@id/adViewBottom"
-                android:layout_below="@id/toolbar"
-                android:overScrollMode="never"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:id="@+id/labels"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-
-                    <HorizontalScrollView
-                        android:id="@+id/scroll_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:overScrollMode="never"
-                        android:scrollbars="none">
-
-                        <LinearLayout
-                            android:id="@+id/forecast_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical" />
-
-                    </HorizontalScrollView>
-
-                </LinearLayout>
-
-            </androidx.core.widget.NestedScrollView>
+                layout="@layout/toolbar" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/listview"

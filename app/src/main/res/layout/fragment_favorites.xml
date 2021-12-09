@@ -10,10 +10,7 @@
 
         <include
             android:id="@+id/toolbar"
-            layout="@layout/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_alignParentTop="true" />
+            layout="@layout/toolbar" />
 
         <TextView
             android:id="@+id/searchview"

@@ -28,6 +28,7 @@ import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.notification.BaseNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.NotificationReceiver;
 import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.notification.model.AlwaysNotiDataObj;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
@@ -41,50 +42,20 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 	private AlwaysNotiViewCreator alwaysNotiViewCreator;
 	private boolean initializing = true;
 	private AlwaysNotiHelper alwaysNotiHelper;
+	private AlwaysNotiDataObj alwaysNotiDataObj;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		notificationType = NotificationType.Always;
+		alwaysNotiViewCreator = new AlwaysNotiViewCreator(getActivity().getApplicationContext(), this);
+		alwaysNotiHelper = new AlwaysNotiHelper(getActivity().getApplicationContext());
+
 		initPreferences();
+		alwaysNotiDataObj = alwaysNotiViewCreator.getNotificationDataObj();
 		originalEnabled = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(notificationType.getPreferenceName(),
 				false);
-
-		onPreferenceChangeListener = new Preference.OnPreferenceChangeListener() {
-			@Override
-			public boolean onPreferenceChange(Preference preference, Object newValue) {
-				if (initializing) {
-					return false;
-				}
-
-				SharedPreferences.Editor editor = getContext().getSharedPreferences(notificationType.getPreferenceName(),
-						Context.MODE_PRIVATE).edit();
-				String key = preference.getKey();
-
-				if (key.equals(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name()))
-					editor.putLong(key, (long) newValue);
-				else if (key.equals(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name()))
-					editor.putString(key, (String) newValue);
-				else if (key.equals(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name()))
-					editor.putBoolean(key, (boolean) newValue);
-				else if (key.equals(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name()))
-					editor.putInt(key, (int) newValue);
-				else if (key.equals(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name()))
-					editor.putString(key, (String) newValue);
-
-				editor.commit();
-				alwaysNotiViewCreator.onSharedPreferenceChanged(getContext().getSharedPreferences(notificationType.getPreferenceName(),
-						Context.MODE_PRIVATE), key);
-				return true;
-			}
-		};
-
-		alwaysNotiViewCreator = new AlwaysNotiViewCreator(getActivity().getApplicationContext(), this);
-		alwaysNotiViewCreator.loadPreferences();
-
-		alwaysNotiHelper = new AlwaysNotiHelper(getActivity().getApplicationContext());
 	}
-
 
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -97,28 +68,27 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 		binding.notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				binding.settingsLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+				onSwitchEnableNotification(isChecked);
 
 				if (!initializing) {
 					PreferenceManager.getDefaultSharedPreferences(getContext()).edit()
 							.putBoolean(notificationType.getPreferenceName(), isChecked).commit();
-
-					onSwitchEnableNotification(isChecked);
 				}
 
 			}
 		});
 		binding.notificationSwitch.setChecked(originalEnabled);
+		onSwitchEnableNotification(originalEnabled);
 
-		if (alwaysNotiViewCreator.getLocationType() == LocationType.SelectedAddress) {
+		if (alwaysNotiDataObj.getLocationType() == LocationType.SelectedAddress) {
 			selectedFavoriteLocation = true;
 			binding.commons.selectedLocationRadio.setChecked(true);
-			binding.commons.selectedAddressName.setText(alwaysNotiViewCreator.getAddressName());
+			binding.commons.selectedAddressName.setText(alwaysNotiDataObj.getAddressName());
 		} else {
 			binding.commons.currentLocationRadio.setChecked(true);
 		}
 
-		WeatherSourceType defaultWeatherSourceType = alwaysNotiViewCreator.getWeatherSourceType();
+		WeatherSourceType defaultWeatherSourceType = alwaysNotiDataObj.getWeatherSourceType();
 		if (defaultWeatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
 			binding.commons.owmRadio.setChecked(true);
 		} else if (defaultWeatherSourceType == WeatherSourceType.ACCU_WEATHER) {
@@ -127,12 +97,12 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 			binding.commons.kmaTopPrioritySwitch.setChecked(true);
 		}
 
-		if (alwaysNotiViewCreator.isKmaTopPriority()) {
+		if (alwaysNotiDataObj.isTopPriorityKma()) {
 			binding.commons.kmaTopPrioritySwitch.setChecked(true);
 		}
 
-		long autoRefreshInterval = alwaysNotiViewCreator.getUpdateInterval();
 		final String[] intervalsStr = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
+		final long autoRefreshInterval = alwaysNotiDataObj.getUpdateIntervalMillis();
 
 		for (int i = 0; i < intervalsStr.length; i++) {
 			if (Long.parseLong(intervalsStr[i]) == autoRefreshInterval) {
@@ -156,6 +126,12 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 	@Override
 	public void onSelectedFavoriteLocation(FavoriteAddressDto favoriteAddressDto) {
 		if (!initializing) {
+
+			alwaysNotiDataObj.setAddressName(favoriteAddressDto.getAddress())
+					.setCountryCode(favoriteAddressDto.getCountryCode())
+					.setLatitude(Float.parseFloat(favoriteAddressDto.getLatitude())).setLongitude(Float.parseFloat(favoriteAddressDto.getLongitude()));
+			alwaysNotiDataObj.setLocationType(LocationType.SelectedAddress);
+			alwaysNotiViewCreator.savePreferences();
 			alwaysNotiViewCreator.initNotification();
 		}
 	}
@@ -163,6 +139,9 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 	@Override
 	public void onSelectedCurrentLocation() {
 		if (!initializing) {
+			alwaysNotiDataObj.setLocationType(LocationType.CurrentLocation);
+			alwaysNotiViewCreator.savePreferences();
+
 			alwaysNotiViewCreator.initNotification();
 		}
 	}
@@ -176,6 +155,9 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 	@Override
 	public void onCheckedKmaPriority(boolean checked) {
 		if (!initializing) {
+			alwaysNotiDataObj.setTopPriorityKma(checked);
+			alwaysNotiViewCreator.savePreferences();
+
 			alwaysNotiViewCreator.initNotification();
 		}
 	}
@@ -183,6 +165,9 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 	@Override
 	public void onCheckedWeatherDataSource(WeatherSourceType weatherSourceType) {
 		if (!initializing) {
+			alwaysNotiDataObj.setWeatherSourceType(weatherSourceType);
+			alwaysNotiViewCreator.savePreferences();
+
 			alwaysNotiViewCreator.initNotification();
 		}
 	}
@@ -190,36 +175,32 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 	@Override
 	public void onSelectedAutoRefreshInterval(long val) {
 		if (!initializing) {
+			alwaysNotiDataObj.setUpdateIntervalMillis(val);
+			alwaysNotiViewCreator.savePreferences();
+
 			alwaysNotiHelper.onSelectedAutoRefreshInterval(val);
 		}
 	}
 
 	@Override
 	public void initPreferences() {
-		SharedPreferences sharedPreferences = getContext().getSharedPreferences(notificationType.getPreferenceName(),
-				Context.MODE_PRIVATE);
-
-		if (sharedPreferences.getAll().isEmpty()) {
-			SharedPreferences.Editor editor = sharedPreferences.edit();
-			editor.putString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), LocationType.CurrentLocation.name());
-			editor.putString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(), WeatherSourceType.OPEN_WEATHER_MAP.name());
-			editor.putBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false);
-			editor.putLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L);
-			editor.putInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
-
-			editor.commit();
-		}
+		alwaysNotiViewCreator.loadPreferences();
 	}
 
 	@Override
 	public void onSwitchEnableNotification(boolean isChecked) {
-		if (isChecked) {
-			alwaysNotiViewCreator.initNotification();
-			onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getUpdateInterval());
-		} else {
-			notificationHelper.cancelNotification(notificationType.getNotificationId());
-			alwaysNotiHelper.cancelAutoRefresh();
+		binding.settingsLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+		if (!initializing) {
+			if (isChecked) {
+				alwaysNotiViewCreator.savePreferences();
+				alwaysNotiViewCreator.initNotification();
+				onSelectedAutoRefreshInterval(alwaysNotiDataObj.getUpdateIntervalMillis());
+			} else {
+				notificationHelper.cancelNotification(notificationType.getNotificationId());
+				alwaysNotiHelper.cancelAutoRefresh();
+			}
 		}
 	}
+
 
 }

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.util.ArrayMap;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
@@ -19,6 +20,10 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,8 +31,10 @@ import java.util.concurrent.ExecutorService;
 
 public class WeatherRequestUtil {
 	public static void loadWeatherData(Context context, ExecutorService executorService, String countryCode, Double latitude, Double longitude,
-	                                   Set<RequestWeatherDataType> requestWeatherDataTypeSet, MultipleJsonDownloader multipleJsonDownloader) {
-		final WeatherSourceType requestWeatherSourceType = getMainWeatherSourceType(context, countryCode);
+	                                   Set<RequestWeatherDataType> requestWeatherDataTypeSet,
+	                                   MultipleJsonDownloader multipleJsonDownloader, @Nullable WeatherSourceType weatherSourceType) {
+		final WeatherSourceType requestWeatherSourceType = weatherSourceType == null ? getMainWeatherSourceType(context, countryCode)
+				: weatherSourceType;
 		final ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
 		setRequestWeatherSourceWithSourceType(requestWeatherSourceType, requestWeatherSources, requestWeatherDataTypeSet);
 
@@ -39,6 +46,22 @@ public class WeatherRequestUtil {
 		});
 	}
 
+	public static void initWeatherSourceUniqueValues(WeatherSourceType weatherSourceType, boolean aqi, Context context) {
+		switch (weatherSourceType) {
+			case KMA:
+				KmaResponseProcessor.init(context);
+				break;
+			case ACCU_WEATHER:
+				AccuWeatherResponseProcessor.init(context);
+				break;
+			case OPEN_WEATHER_MAP:
+				OpenWeatherMapResponseProcessor.init(context);
+				break;
+		}
+		if (aqi) {
+			AqicnResponseProcessor.init(context);
+		}
+	}
 
 	public static void setRequestWeatherSourceWithSourceType(WeatherSourceType weatherSourceType,
 	                                                         ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,

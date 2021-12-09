@@ -140,6 +140,49 @@ public class AqicnResponseProcessor {
 		return forecastObjList;
 	}
 
+	public static String getAirQuality(Context context, GeolocalizedFeedResponse airQualityResponse) {
+		if (airQualityResponse != null) {
+			if (airQualityResponse.getStatus().equals("ok")) {
+				GeolocalizedFeedResponse.Data.IAqi iAqi = airQualityResponse.getData().getIaqi();
+				int val = Integer.MIN_VALUE;
+
+				if (iAqi.getO3() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getO3().getValue()));
+				}
+				if (iAqi.getPm25() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getPm25().getValue()));
+				}
+				if (iAqi.getPm10() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getPm10().getValue()));
+				}
+				if (iAqi.getNo2() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getNo2().getValue()));
+				}
+				if (iAqi.getSo2() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getSo2().getValue()));
+				}
+				if (iAqi.getCo() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getCo().getValue()));
+				}
+				if (iAqi.getDew() != null) {
+					val = Math.max(val, (int) Double.parseDouble(iAqi.getDew().getValue()));
+				}
+
+				if (val == Integer.MIN_VALUE) {
+					return context.getString(R.string.not_data);
+				} else {
+					return AqicnResponseProcessor.getGradeDescription(val);
+				}
+			} else {
+				return context.getString(R.string.not_data);
+
+			}
+		} else {
+			return context.getString(R.string.not_data);
+
+		}
+	}
+
 	private static LocalDate getDate(String day) {
 		LocalDate date = null;
 		try {

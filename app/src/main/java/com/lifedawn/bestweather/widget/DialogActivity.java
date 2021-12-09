@@ -24,6 +24,7 @@ import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.WidgetCurrentCreator;
+import com.lifedawn.bestweather.widget.creator.WidgetCurrentHourlyDailyCreator;
 
 public class DialogActivity extends Activity {
 	private ActivityDialogBinding binding;
@@ -50,11 +51,8 @@ public class DialogActivity extends Activity {
 		if (widgetLayoutId == R.layout.widget_current) {
 			widgetCreator = new WidgetCurrentCreator(getApplicationContext(), null, appWidgetId);
 			widgetClass = WidgetProviderCurrent.class;
-		} else if (widgetLayoutId == R.layout.widget_current_hourly) {
-			widgetClass = WidgetProviderCurrentHourly.class;
-		} else if (widgetLayoutId == R.layout.widget_current_daily) {
-			widgetClass = WidgetProviderCurrentDaily.class;
 		} else if (widgetLayoutId == R.layout.widget_current_hourly_daily) {
+			widgetCreator = new WidgetCurrentHourlyDailyCreator(getApplicationContext(), null, appWidgetId);
 			widgetClass = WidgetProviderCurrentHourlyDaily.class;
 		}
 

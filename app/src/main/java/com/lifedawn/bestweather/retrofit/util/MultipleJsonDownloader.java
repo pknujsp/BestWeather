@@ -147,11 +147,13 @@ public abstract class MultipleJsonDownloader {
 		public ResponseResult(RequestParameter requestParameter, Throwable t) {
 			this.t = t;
 			successful = false;
+			this.requestParameter = requestParameter;
 		}
 
 		public ResponseResult(RequestParameter requestParameter, Response<?> response) {
 			this.response = response;
 			successful = true;
+			this.requestParameter = requestParameter;
 		}
 
 		public Response<?> getResponse() {

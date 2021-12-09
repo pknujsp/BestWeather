@@ -66,32 +66,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_current_info" />
         </receiver>
-        <receiver
-            android:name=".widget.WidgetProviderCurrentHourly"
-            android:enabled="true"
-            android:label="@string/widget_current_hourly">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
 
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_current_hourly_info" />
-        </receiver>
-        <receiver
-            android:name=".widget.WidgetProviderCurrentDaily"
-            android:enabled="true"
-            android:label="@string/widget_current_daily">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_current_daily_info" />
-        </receiver>
         <receiver
             android:name=".widget.WidgetProviderCurrentHourlyDaily"
             android:enabled="true"

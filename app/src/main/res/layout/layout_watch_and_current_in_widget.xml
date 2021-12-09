@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:weightSum="3">
+    android:orientation="horizontal">
 
     <LinearLayout
         android:id="@+id/watch"
@@ -12,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="4dp"
         android:layout_weight="1"
+        android:gravity="center_horizontal"
         android:orientation="vertical">
 
         <android.widget.TextClock
@@ -21,7 +21,7 @@
             android:gravity="center"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textSize="@dimen/dateTextSizeInClock" />
+            android:textSize="@dimen/clockDateTextSizeInCurrentHourlyDailyWidget" />
 
 
         <android.widget.TextClock
@@ -31,7 +31,7 @@
             android:gravity="center"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textSize="@dimen/timeTextSizeInClock" />
+            android:textSize="@dimen/clockTimeTextSizeInCurrentHourlyDailyWidget" />
 
     </LinearLayout>
 
@@ -39,8 +39,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="4dp"
-
         android:layout_weight="1"
+
+        android:gravity="center"
         android:orientation="vertical">
 
         <LinearLayout
@@ -50,11 +51,11 @@
 
             <ImageView
                 android:id="@+id/current_weather_icon"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_gravity="center"
-                android:layout_marginRight="6dp"
-                android:scaleType="fitCenter"
+                android:layout_marginRight="4dp"
+                android:scaleType="centerInside"
                 android:src="@drawable/day_clear" />
 
             <TextView
@@ -62,9 +63,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="@string/temperature"
+                android:text="20º"
                 android:textColor="@color/white"
-                android:textSize="@dimen/tempTextSizeInCurrent" />
+                android:textSize="@dimen/tempTextSizeInCurrentHourlyDailyWidget" />
         </LinearLayout>
 
 
@@ -72,66 +73,36 @@
             android:id="@+id/current_realfeel_temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/real_feel_temperature"
+            android:text="Feels Like 20º"
             android:textColor="@color/white"
-            android:textSize="@dimen/realFeelTempTextSizeInCurrent" />
+            android:textSize="@dimen/feelsLikeTempTextSizeInCurrentHourlyDailyWidget" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="4dp"
         android:layout_weight="1"
+        android:gravity="center"
         android:orientation="vertical">
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/current_airquality"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:text="Air Good"
+            android:textColor="@color/white"
+            android:textSize="@dimen/airQualityTextSizeInCurrentHourlyDailyWidget" />
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center"
-                android:layout_marginRight="4dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/pm10" />
-
-            <TextView
-                android:id="@+id/current_airquality"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/air_quality"
-                android:textColor="@color/white"
-                android:textSize="@dimen/airQualityTextSizeInCurrent" />
-
-        </LinearLayout>
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/current_precipitation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:text="No Precipitation"
+            android:textColor="@color/white"
+            android:textSize="@dimen/precipitationTextSizeInCurrentHourlyDailyWidget" />
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center"
-                android:layout_marginRight="4dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/precipitationvolume" />
 
-            <TextView
-                android:id="@+id/current_precipitation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/precipitation_volume"
-                android:textColor="@color/white"
-                android:textSize="@dimen/precipitationTextSizeInCurrent" />
-
-        </LinearLayout>
     </LinearLayout>
 
 

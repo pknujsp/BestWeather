@@ -8,6 +8,8 @@ import androidx.room.Update;
 
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 
+import java.util.List;
+
 @Dao
 public interface WidgetDao {
 	@Insert
@@ -19,6 +21,12 @@ public interface WidgetDao {
 	@Query("SELECT * FROM widget_table WHERE id = :widgetDtoId")
 	WidgetDto get(long widgetDtoId);
 
+	@Query("SELECT * FROM widget_table")
+	List<WidgetDto> getAll();
+
+	@Query("DELETE FROM widget_table WHERE appWidgetId = :appWidgetId")
+	void delete(int appWidgetId);
+
 	@Update(onConflict = OnConflictStrategy.IGNORE, entity = WidgetDto.class)
-	long update(WidgetDto widgetDto);
+	int update(WidgetDto widgetDto);
 }

@@ -294,8 +294,9 @@ public final class KmaProcessing {
 						Set<RetrofitClient.ServiceType> requestTypeSet = requestKma.getRequestServiceTypes();
 
 						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_NCST)) {
-							UltraSrtNcstParameter ultraSrtNcstParameter = new UltraSrtNcstParameter();
-							ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
+							final UltraSrtNcstParameter ultraSrtNcstParameter = new UltraSrtNcstParameter();
+							ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY())
+									.setLatitude(latitude).setLongitude(longitude);
 
 							Call<VilageFcstResponse> ultraSrtNcstCall = getUltraSrtNcstData(ultraSrtNcstParameter,
 									ZonedDateTime.of(koreaLocalDateTime.toLocalDateTime(), koreaLocalDateTime.getZone()),
@@ -317,7 +318,8 @@ public final class KmaProcessing {
 						}
 						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_FCST)) {
 							UltraSrtFcstParameter ultraSrtFcstParameter = new UltraSrtFcstParameter();
-							ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
+							ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY()).setLatitude(latitude).setLongitude(longitude);
+
 
 							Call<VilageFcstResponse> ultraSrtFcstCall = getUltraSrtFcstData(ultraSrtFcstParameter,
 									ZonedDateTime.of(koreaLocalDateTime.toLocalDateTime(), koreaLocalDateTime.getZone()),
@@ -339,7 +341,8 @@ public final class KmaProcessing {
 						}
 						if (requestTypeSet.contains(RetrofitClient.ServiceType.VILAGE_FCST)) {
 							VilageFcstParameter vilageFcstParameter = new VilageFcstParameter();
-							vilageFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY());
+							vilageFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY())
+									.setLatitude(latitude).setLongitude(longitude);
 
 							Call<VilageFcstResponse> vilageFcstCall = getVilageFcstData(vilageFcstParameter,
 									ZonedDateTime.of(koreaLocalDateTime.toLocalDateTime(), koreaLocalDateTime.getZone()),
@@ -360,7 +363,8 @@ public final class KmaProcessing {
 						}
 						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_LAND_FCST)) {
 							MidLandParameter midLandParameter = new MidLandParameter();
-							midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode()).setTmFc(tmFc);
+							midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode()).setTmFc(tmFc)
+									.setLatitude(latitude).setLongitude(longitude);
 
 							Call<MidLandFcstResponse> midLandFcstCall = getMidLandFcstData(midLandParameter, new JsonDownloader() {
 								@Override
@@ -381,7 +385,8 @@ public final class KmaProcessing {
 						}
 						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_TA_FCST)) {
 							MidTaParameter midTaParameter = new MidTaParameter();
-							midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode()).setTmFc(tmFc);
+							midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode()).setTmFc(tmFc)
+									.setLatitude(latitude).setLongitude(longitude);
 
 							Call<MidTaResponse> midTaFcstCall = getMidTaData(midTaParameter, new JsonDownloader() {
 								@Override

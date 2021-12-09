@@ -15,6 +15,8 @@ public class UltraSrtFcstParameter extends RequestParameter {
 	private String baseTime;
 	private String nx;
 	private String ny;
+	private double latitude;
+	private double longitude;
 	private Map<String, String> map = new HashMap<>();
 
 	public UltraSrtFcstParameter() {
@@ -35,8 +37,6 @@ public class UltraSrtFcstParameter extends RequestParameter {
 
 		return map;
 	}
-
-
 
 
 	public String getBaseDate() {
@@ -75,5 +75,21 @@ public class UltraSrtFcstParameter extends RequestParameter {
 		return this;
 	}
 
+	public double getLatitude() {
+		return latitude;
+	}
 
+	public UltraSrtFcstParameter setLatitude(double latitude) {
+		this.latitude = latitude;
+		return this;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public UltraSrtFcstParameter setLongitude(double longitude) {
+		this.longitude = longitude;
+		return this;
+	}
 }

@@ -62,9 +62,6 @@ public class WidgetDto {
 	@ColumnInfo(name = "loadSuccessful")
 	private boolean loadSuccessful;
 
-	@ColumnInfo(name = "json")
-	private String json;
-
 	public long getId() {
 		return id;
 	}
@@ -209,11 +206,4 @@ public class WidgetDto {
 		this.loadSuccessful = loadSuccessful;
 	}
 
-	public String getJson() {
-		return json;
-	}
-
-	public void setJson(String json) {
-		this.json = json;
-	}
 }

@@ -37,14 +37,17 @@ public abstract class AbstractWidgetCreator {
 	protected final ValueUnits clockUnit;
 	protected final String tempDegree = "º";
 
-	protected final String dateFormat = "M.d E";
-	protected final String timeFormat;
-	protected final DateTimeFormatter dateTimeFormatter;
 	protected Context context;
 
 	protected WidgetUpdateCallback widgetUpdateCallback;
 	protected WidgetDto widgetDto;
 	protected WidgetRepository widgetRepository;
+
+	public AbstractWidgetCreator setWidgetDto(WidgetDto widgetDto) {
+		this.widgetDto = widgetDto;
+		setTextSize(widgetDto.getTextSizeAmount());
+		return this;
+	}
 
 	public AbstractWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		this.context = context;
@@ -56,10 +59,6 @@ public abstract class AbstractWidgetCreator {
 				ValueUnits.celsius.name()));
 		clockUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_clock),
 				ValueUnits.clock12.name()));
-
-		timeFormat = clockUnit == ValueUnits.clock12 ? context.getString(R.string.clock_12_pattern) : context.getString(R.string.clock_24_pattern);
-		dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? context.getString(R.string.datetime_pattern_clock12) :
-				context.getString(R.string.datetime_pattern_clock24));
 
 		widgetRepository = new WidgetRepository(context);
 	}
@@ -78,6 +77,8 @@ public abstract class AbstractWidgetCreator {
 		widgetDto.setTopPriorityKma(false);
 		widgetDto.setUpdateIntervalMillis(0);
 
+		setTextSize(widgetDto.getTextSizeAmount());
+
 		return widgetDto;
 	}
 
@@ -86,6 +87,11 @@ public abstract class AbstractWidgetCreator {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
 				widgetDto = result;
+
+				if (widgetDto == null) {
+					return;
+				}
+
 				setTextSize(widgetDto.getTextSizeAmount());
 				if (callback != null) {
 					callback.onResultSuccessful(result);
@@ -99,8 +105,24 @@ public abstract class AbstractWidgetCreator {
 		});
 	}
 
-	public void savedSettings(WidgetDto widgetDto, @Nullable DbQueryCallback<WidgetDto> callback) {
+	public void saveSettings(WidgetDto widgetDto, @Nullable DbQueryCallback<WidgetDto> callback) {
 		widgetRepository.add(widgetDto, new DbQueryCallback<WidgetDto>() {
+			@Override
+			public void onResultSuccessful(WidgetDto result) {
+				if (callback != null) {
+					callback.onResultSuccessful(result);
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
+	}
+
+	public void updateSettings(WidgetDto widgetDto, @Nullable DbQueryCallback<WidgetDto> callback) {
+		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
 				if (callback != null) {

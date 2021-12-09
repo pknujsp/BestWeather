@@ -15,6 +15,8 @@ public class VilageFcstParameter extends RequestParameter {
 	private String baseTime;
 	private String nx;
 	private String ny;
+	private double latitude;
+	private double longitude;
 	private Map<String, String> map = new HashMap<>();
 
 	public VilageFcstParameter() {
@@ -73,4 +75,21 @@ public class VilageFcstParameter extends RequestParameter {
 		return this;
 	}
 
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public VilageFcstParameter setLatitude(double latitude) {
+		this.latitude = latitude;
+		return this;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public VilageFcstParameter setLongitude(double longitude) {
+		this.longitude = longitude;
+		return this;
+	}
 }

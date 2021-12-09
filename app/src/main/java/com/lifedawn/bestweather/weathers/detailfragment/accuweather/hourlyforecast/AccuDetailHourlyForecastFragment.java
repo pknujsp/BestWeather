@@ -110,6 +110,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 
 	@Override
 	protected void setDataViewsByTable() {
+		/*
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -294,6 +295,8 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 			}
 		});
 
+
+		 */
 	}
 
 }

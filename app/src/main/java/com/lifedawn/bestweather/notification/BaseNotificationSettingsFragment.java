@@ -41,7 +41,6 @@ import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentBaseNotificationSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
-import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 
@@ -57,7 +56,6 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 	protected NotificationType notificationType;
 	protected long[] intervalsLong;
 	protected NotificationHelper notificationHelper;
-	protected Preference.OnPreferenceChangeListener onPreferenceChangeListener;
 	protected boolean originalEnabled;
 	protected boolean selectedFavoriteLocation;
 
@@ -138,11 +136,7 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 		binding.commons.autoRefreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				Preference preference = new Preference(getContext());
-				preference.setKey(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name());
-
 				long autoRefreshInterval = intervalsLong[position];
-				onPreferenceChangeListener.onPreferenceChange(preference, autoRefreshInterval);
 				onSelectedAutoRefreshInterval(autoRefreshInterval);
 			}
 
@@ -158,21 +152,15 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				Preference preference = new Preference(getContext());
-				preference.setKey(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name());
 
 				WeatherSourceType checked = checkedId == R.id.accu_weather_radio ? WeatherSourceType.ACCU_WEATHER
 						: WeatherSourceType.OPEN_WEATHER_MAP;
-				onPreferenceChangeListener.onPreferenceChange(preference, checked.name());
 				onCheckedWeatherDataSource(checked);
 			}
 		});
 		binding.commons.kmaTopPrioritySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				Preference preference = new Preference(getContext());
-				preference.setKey(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name());
-				onPreferenceChangeListener.onPreferenceChange(preference, isChecked);
 				onCheckedKmaPriority(isChecked);
 			}
 		});
@@ -187,9 +175,6 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 					binding.commons.changeAddressBtn.setVisibility(View.GONE);
 					binding.commons.selectedAddressName.setVisibility(View.GONE);
 
-					Preference preference = new Preference(getContext());
-					preference.setKey(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name());
-					onPreferenceChangeListener.onPreferenceChange(preference, LocationType.CurrentLocation.name());
 					onSelectedCurrentLocation();
 				} else if (checkedId == binding.commons.selectedLocationRadio.getId() && binding.commons.selectedLocationRadio.isChecked()) {
 					binding.commons.changeAddressBtn.setVisibility(View.VISIBLE);
@@ -230,16 +215,14 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 					newSelectedAddressDto = (FavoriteAddressDto) result.getSerializable(BundleKey.SelectedAddressDto.name());
 					binding.commons.selectedAddressName.setText(newSelectedAddressDto.getAddress());
 
-					Preference preference = new Preference(getContext());
-					preference.setKey(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name());
-					onPreferenceChangeListener.onPreferenceChange(preference, LocationType.SelectedAddress.name());
-
 					SharedPreferences.Editor editor = getContext().getSharedPreferences(notificationType.getPreferenceName(),
 							Context.MODE_PRIVATE).edit();
 
 					editor.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
-							.putString(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), newSelectedAddressDto.getLatitude())
-							.putString(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), newSelectedAddressDto.getLongitude())
+							.putFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(),
+									Float.parseFloat(newSelectedAddressDto.getLatitude()))
+							.putFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(),
+									Float.parseFloat(newSelectedAddressDto.getLongitude()))
 							.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).commit();
 
 					onSelectedFavoriteLocation(newSelectedAddressDto);

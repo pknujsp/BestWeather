@@ -13,6 +13,8 @@ public class MidLandParameter extends RequestParameter {
 	private String dataType = RetrofitClient.DATATYPE;
 	private String regId;
 	private String tmFc;
+	private double latitude;
+	private double longitude;
 	private Map<String, String> map = new HashMap<>();
 
 
@@ -49,6 +51,24 @@ public class MidLandParameter extends RequestParameter {
 
 	public MidLandParameter setTmFc(String tmFc) {
 		this.tmFc = tmFc;
+		return this;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public MidLandParameter setLatitude(double latitude) {
+		this.latitude = latitude;
+		return this;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public MidLandParameter setLongitude(double longitude) {
+		this.longitude = longitude;
 		return this;
 	}
 }

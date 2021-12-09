@@ -22,6 +22,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.notification.BaseNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.notification.model.DailyNotiDataObj;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +37,7 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 	private ValueUnits clockUnit;
 	private DateTimeFormatter dateTimeFormatter;
 	private DailyNotiHelper dailyNotiHelper;
-
+	private DailyNotiDataObj dailyNotiDataObj;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -50,45 +51,11 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 		dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? getString(R.string.clock_12_pattern) :
 				getString(R.string.clock_24_pattern));
 
+
+		dailyNotiViewCreator = new DailyNotiViewCreator(getActivity().getApplicationContext(), null);
 		initPreferences();
-
-		dailyNotiViewCreator = new DailyNotiViewCreator(getActivity().getApplicationContext());
-		dailyNotiViewCreator.loadPreferences();
-
+		dailyNotiDataObj = dailyNotiViewCreator.getNotificationDataObj();
 		dailyNotiHelper = new DailyNotiHelper(getActivity().getApplicationContext());
-
-		onPreferenceChangeListener = new Preference.OnPreferenceChangeListener() {
-			@Override
-			public boolean onPreferenceChange(Preference preference, Object newValue) {
-				if (initializing) {
-					return false;
-				}
-
-				SharedPreferences.Editor editor = getContext().getSharedPreferences(notificationType.getPreferenceName(),
-						Context.MODE_PRIVATE).edit();
-				String key = preference.getKey();
-
-				if (key.equals(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name()))
-					editor.putLong(key, (long) newValue);
-				else if (key.equals(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name()))
-					editor.putString(key, (String) newValue);
-				else if (key.equals(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name()))
-					editor.putBoolean(key, (boolean) newValue);
-				else if (key.equals(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name()))
-					editor.putInt(key, (int) newValue);
-				else if (key.equals(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name()))
-					editor.putString(key, (String) newValue);
-				else if (key.equals(WidgetNotiConstants.DailyNotiAttributes.ALARM_CLOCK.name()))
-					editor.putString(key, ((LocalTime) newValue).toString());
-
-				editor.commit();
-				dailyNotiViewCreator.onSharedPreferenceChanged(getContext().getSharedPreferences(notificationType.getPreferenceName(),
-						Context.MODE_PRIVATE), key);
-				return true;
-			}
-		};
-
-
 	}
 
 
@@ -104,12 +71,11 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 		binding.notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				binding.settingsLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+				onSwitchEnableNotification(isChecked);
 
 				if (!initializing) {
 					PreferenceManager.getDefaultSharedPreferences(getContext()).edit()
 							.putBoolean(notificationType.getPreferenceName(), isChecked).commit();
-					onSwitchEnableNotification(isChecked);
 				}
 
 			}
@@ -118,7 +84,7 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 		binding.commons.alarmClock.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				LocalTime localTime = LocalTime.parse(dailyNotiViewCreator.getAlarmClock());
+				LocalTime localTime = LocalTime.parse(dailyNotiViewCreator.getNotificationDataObj().getAlarmClock());
 
 				MaterialTimePicker.Builder builder = new MaterialTimePicker.Builder();
 				MaterialTimePicker timePicker =
@@ -137,9 +103,8 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 
 						LocalTime newLocalTime = LocalTime.of(newHour, newMinute, 0);
 
-						Preference preference = new Preference(getContext());
-						preference.setKey(WidgetNotiConstants.DailyNotiAttributes.ALARM_CLOCK.name());
-						onPreferenceChangeListener.onPreferenceChange(preference, newLocalTime);
+						dailyNotiDataObj.setAlarmClock(newLocalTime.toString());
+						dailyNotiViewCreator.savePreferences();
 
 						binding.commons.alarmClock.setText(newLocalTime.format(dateTimeFormatter));
 						dailyNotiHelper.cancelAlarm();
@@ -157,16 +122,17 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 		});
 
 		binding.notificationSwitch.setChecked(originalEnabled);
+		onSwitchEnableNotification(originalEnabled);
 
-		if (dailyNotiViewCreator.getLocationType() == LocationType.SelectedAddress) {
+		if (dailyNotiDataObj.getLocationType() == LocationType.SelectedAddress) {
 			selectedFavoriteLocation = true;
 			binding.commons.selectedLocationRadio.setChecked(true);
-			binding.commons.selectedAddressName.setText(dailyNotiViewCreator.getAddressName());
+			binding.commons.selectedAddressName.setText(dailyNotiDataObj.getAddressName());
 		} else {
 			binding.commons.currentLocationRadio.setChecked(true);
 		}
 
-		WeatherSourceType defaultWeatherSourceType = dailyNotiViewCreator.getWeatherSourceType();
+		WeatherSourceType defaultWeatherSourceType = dailyNotiDataObj.getWeatherSourceType();
 		if (defaultWeatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
 			binding.commons.owmRadio.setChecked(true);
 		} else if (defaultWeatherSourceType == WeatherSourceType.ACCU_WEATHER) {
@@ -175,15 +141,14 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 			binding.commons.kmaTopPrioritySwitch.setChecked(true);
 		}
 
-		if (dailyNotiViewCreator.isKmaTopPriority()) {
+		if (dailyNotiDataObj.isTopPriorityKma()) {
 			binding.commons.kmaTopPrioritySwitch.setChecked(true);
 		}
-		LocalTime localTime = LocalTime.parse(dailyNotiViewCreator.getAlarmClock());
+		LocalTime localTime = LocalTime.parse(dailyNotiDataObj.getAlarmClock());
 		binding.commons.alarmClock.setText(localTime.format(dateTimeFormatter));
 
-		JsonDataSaver jsonDataSaver = new JsonDataSaver();
-		RemoteViews remoteViews = dailyNotiViewCreator.createRemoteViews();
-		dailyNotiViewCreator.setHourlyForecastViews(remoteViews, jsonDataSaver.getTempHourlyForecastObjs(16));
+		RemoteViews remoteViews = dailyNotiViewCreator.createRemoteViews(false);
+		dailyNotiViewCreator.setTempHourlyForecastViews(remoteViews);
 
 		View previewWidgetView = remoteViews.apply(getActivity().getApplicationContext(), binding.previewLayout);
 		binding.previewLayout.addView(previewWidgetView);
@@ -198,10 +163,22 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 
 	@Override
 	public void onSelectedFavoriteLocation(FavoriteAddressDto favoriteAddressDto) {
+		if (!initializing) {
+
+			dailyNotiDataObj.setAddressName(favoriteAddressDto.getAddress())
+					.setCountryCode(favoriteAddressDto.getCountryCode())
+					.setLatitude(Float.parseFloat(favoriteAddressDto.getLatitude())).setLongitude(Float.parseFloat(favoriteAddressDto.getLongitude()));
+			dailyNotiDataObj.setLocationType(LocationType.SelectedAddress);
+			dailyNotiViewCreator.savePreferences();
+		}
 	}
 
 	@Override
 	public void onSelectedCurrentLocation() {
+		if (!initializing) {
+			dailyNotiDataObj.setLocationType(LocationType.CurrentLocation);
+			dailyNotiViewCreator.savePreferences();
+		}
 	}
 
 	@Override
@@ -212,44 +189,41 @@ public class DailyNotificationSettingsFragment extends BaseNotificationSettingsF
 
 	@Override
 	public void onCheckedKmaPriority(boolean checked) {
-	}
-
-	@Override
-	public void onCheckedWeatherDataSource(WeatherSourceType weatherSourceType) {
-	}
-
-	@Override
-	public void initPreferences() {
-		SharedPreferences sharedPreferences = getContext().getSharedPreferences(notificationType.getPreferenceName(),
-				Context.MODE_PRIVATE);
-
-		if (sharedPreferences.getAll().isEmpty()) {
-			SharedPreferences.Editor editor = getContext().getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE).edit();
-			editor.putString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), LocationType.CurrentLocation.name());
-			editor.putString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(), WeatherSourceType.OPEN_WEATHER_MAP.name());
-			editor.putBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false);
-			editor.putLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L);
-			editor.putInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0);
-
-			LocalTime localTime = LocalTime.of(8, 0);
-			editor.putString(WidgetNotiConstants.DailyNotiAttributes.ALARM_CLOCK.name(), localTime.toString());
-
-			editor.commit();
+		if (!initializing) {
+			dailyNotiDataObj.setTopPriorityKma(checked);
+			dailyNotiViewCreator.savePreferences();
 		}
 	}
 
 	@Override
-	public void onSelectedAutoRefreshInterval(long val) {
+	public void onCheckedWeatherDataSource(WeatherSourceType weatherSourceType) {
+		if (!initializing) {
+			dailyNotiDataObj.setWeatherSourceType(weatherSourceType);
+			dailyNotiViewCreator.savePreferences();
+		}
+	}
 
+	@Override
+	public void initPreferences() {
+		dailyNotiViewCreator.loadPreferences();
+	}
+
+	@Override
+	public void onSelectedAutoRefreshInterval(long val) {
+		// 사용안함
 	}
 
 
 	@Override
 	public void onSwitchEnableNotification(boolean isChecked) {
-		if (isChecked) {
-			dailyNotiHelper.setAlarm(dailyNotiViewCreator.getAlarmClock());
-		} else {
-			dailyNotiHelper.cancelAlarm();
+		binding.settingsLayout.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+
+		if (!initializing) {
+			if (isChecked) {
+				dailyNotiHelper.setAlarm(dailyNotiDataObj.getAlarmClock());
+			} else {
+				dailyNotiHelper.cancelAlarm();
+			}
 		}
 	}
 }

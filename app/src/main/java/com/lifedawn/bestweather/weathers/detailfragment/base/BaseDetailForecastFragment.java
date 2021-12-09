@@ -90,50 +90,9 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		binding.rootScrollView.setVisibility(View.GONE);
-		binding.listview.setVisibility(View.GONE);
-
 		MobileAds.initialize(getContext());
 		AdRequest adRequest = new AdRequest.Builder().build();
 		binding.adViewBottom.loadAd(adRequest);
-
-		ImageButton listLayoutBtn = new ImageButton(getContext());
-		listLayoutBtn.setImageResource(R.drawable.settings);
-		listLayoutBtn.setImageTintList(ColorStateList.valueOf(AppTheme.getColor(getContext(), R.attr.toolbarIconColor)));
-		listLayoutBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				final String[] items = new String[]{getString(R.string.list_type), getString(R.string.table_type)};
-
-				int clickedType = 0;
-				if (forecastViewType == ForecastViewType.Table) {
-					clickedType = 1;
-				}
-				int finalClickedType = clickedType;
-				new AlertDialog.Builder(getActivity()).setTitle(R.string.pref_title_forecast_view_type)
-						.setSingleChoiceItems(items, clickedType, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								if (finalClickedType != which) {
-									if (which == 0) {
-										forecastViewType = ForecastViewType.List;
-									} else {
-										forecastViewType = ForecastViewType.Table;
-									}
-									sharedPreferences.edit().putString(getString(R.string.pref_key_forecast_view_type),
-											forecastViewType.name()).apply();
-									onSelectedViewType();
-								}
-								dialog.dismiss();
-							}
-						}).create().show();
-			}
-		});
-
-		int btnSize = (int) getResources().getDimension(R.dimen.btnSizeInToolbar);
-		RelativeLayout.LayoutParams btnLayoutParams = new RelativeLayout.LayoutParams(btnSize, btnSize);
-		btnLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-		binding.toolbar.getRoot().addView(listLayoutBtn, btnLayoutParams);
 
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -141,55 +100,14 @@ public abstract class BaseDetailForecastFragment extends Fragment {
 				getParentFragmentManager().popBackStackImmediate();
 			}
 		});
-		binding.scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-			@Override
-			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-				if (dateRow != null) {
-					dateRow.reDraw(scrollX);
-				}
-			}
-		});
 
-		onSelectedViewType();
-	}
 
-	private void onSelectedViewType() {
-		if (forecastViewType == ForecastViewType.List) {
-			binding.rootScrollView.setVisibility(View.GONE);
-			binding.listview.setVisibility(View.VISIBLE);
-			setDataViewsByList();
-		} else {
-			binding.rootScrollView.setVisibility(View.VISIBLE);
-			binding.listview.setVisibility(View.GONE);
-			setDataViewsByTable();
-		}
+		setDataViewsByList();
 	}
 
 	abstract protected void setDataViewsByList();
 
 	abstract protected void setDataViewsByTable();
-
-	protected ImageView addLabelView(int labelImgId, String labelDescription, int viewHeight) {
-		ImageView labelView = new ImageView(getContext());
-		labelView.setImageDrawable(ContextCompat.getDrawable(getContext(), labelImgId));
-		labelView.setClickable(true);
-		labelView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-
-		labelView.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Toast.makeText(getContext(), labelDescription, Toast.LENGTH_SHORT).show();
-			}
-		});
-
-		int width = (int) getResources().getDimension(R.dimen.labelIconColumnWidthInCOMMON);
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, viewHeight);
-		layoutParams.gravity = Gravity.CENTER;
-		labelView.setLayoutParams(layoutParams);
-
-		binding.labels.addView(labelView);
-		return labelView;
-	}
 
 	public static class HourlyForecastListAdapter extends RecyclerView.Adapter<HourlyForecastListAdapter.ViewHolder> {
 		private List<HourlyForecastListItemObj> hourlyForecastListItemObjs = new ArrayList<>();

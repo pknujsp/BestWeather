@@ -57,6 +57,8 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 
 	@Override
 	protected void setDataViewsByTable() {
+				/*
+
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -220,6 +222,8 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 			}
 		});
 
+
+				 */
 	}
 
 	@Override

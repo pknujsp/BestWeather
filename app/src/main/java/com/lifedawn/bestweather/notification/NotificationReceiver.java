@@ -42,11 +42,11 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 					if (notificationType == NotificationType.Always) {
 						AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(context, null);
-						alwaysNotiViewCreator.loadPreferences();
+						alwaysNotiViewCreator.loadSavedPreferences();
 						alwaysNotiViewCreator.initNotification();
 					} else if (notificationType == NotificationType.Daily) {
-						DailyNotiViewCreator dailyNotiViewCreator = new DailyNotiViewCreator(context);
-						dailyNotiViewCreator.loadPreferences();
+						DailyNotiViewCreator dailyNotiViewCreator = new DailyNotiViewCreator(context,null);
+						dailyNotiViewCreator.loadSavedPreferences();
 						dailyNotiViewCreator.initNotification();
 					}
 				} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
@@ -59,20 +59,21 @@ public class NotificationReceiver extends BroadcastReceiver {
 
 					if (enabledAlwaysNotification) {
 						AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(context, null);
-						alwaysNotiViewCreator.loadPreferences();
+						alwaysNotiViewCreator.loadSavedPreferences();
 						alwaysNotiViewCreator.initNotification();
 
-						if (alwaysNotiViewCreator.getUpdateInterval() > 0) {
+						if (alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
 							AlwaysNotiHelper alwaysNotiHelper = new AlwaysNotiHelper(context);
-							alwaysNotiHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getUpdateInterval());
+							alwaysNotiHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
 						}
+
 					}
 
 					if (enabledDailyNotification) {
-						DailyNotiViewCreator dailyNotiViewCreator = new DailyNotiViewCreator(context);
-						dailyNotiViewCreator.loadPreferences();
+						DailyNotiViewCreator dailyNotiViewCreator = new DailyNotiViewCreator(context,null);
+						dailyNotiViewCreator.loadSavedPreferences();
 						DailyNotiHelper dailyNotiHelper = new DailyNotiHelper(context);
-						dailyNotiHelper.setAlarm(dailyNotiViewCreator.getAlarmClock());
+						dailyNotiHelper.setAlarm(dailyNotiViewCreator.getNotificationDataObj().getAlarmClock());
 					}
 				}
 			}
