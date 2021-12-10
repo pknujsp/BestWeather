@@ -96,4 +96,9 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">#B8A7A7</item>
+    </style>
 </resources>

@@ -106,5 +106,7 @@ public enum ValueUnits {
 		return (Double.parseDouble(val) * 100) / 10.0;
 	}
 
-
+	public static Double convertMMToCM(String val) {
+		return Double.parseDouble(val) / 10.0;
+	}
 }

@@ -1,42 +1,29 @@
 package com.lifedawn.bestweather.weathers.detailfragment.accuweather.hourlyforecast;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
-import com.lifedawn.bestweather.weathers.view.ClockView;
-import com.lifedawn.bestweather.weathers.view.DateView;
-import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
-import com.lifedawn.bestweather.weathers.FragmentType;
-import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
-import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
-import com.lifedawn.bestweather.weathers.view.TextValueView;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
+import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailHourlyForecastFragment;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment {
+public class AccuDetailHourlyForecastFragment extends BaseDetailHourlyForecastFragment {
 	private List<TwelveHoursOfHourlyForecastsResponse.Item> hourlyItemList;
 
 	@Override
@@ -60,44 +47,56 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailForecastFragment
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				Context context = getContext();
-				String tempDegree = getString(R.string.degree_symbol);
-				String percent = ValueUnits.convertToStr(context, ValueUnits.percent);
-				String mm = ValueUnits.convertToStr(context, ValueUnits.mm);
-				List<HourlyForecastListItemObj> hourlyForecastListItemObjs = new ArrayList<>();
-				DateTimeFormatter datePattern = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
+				final String tempDegree = getString(R.string.degree_symbol);
+				final String percent = "%";
+				final String mm = "mm";
 
 				final String zero = "0.0";
-				ZonedDateTime dateTime = null;
+				final String zeroSnowVolume = "0.0cm";
+				final String zeroRainVolume = "0.0mm";
+				final String pressureUnit = ValueUnits.convertToStr(getContext(), ValueUnits.hpa);
+				final String visibilityUnitStr = ValueUnits.convertToStr(getContext(), visibilityUnit);
+				final String windUnitStr = ValueUnits.convertToStr(getContext(), windUnit);
 
+				hourlyForecastDtoList = new ArrayList<>();
 				for (TwelveHoursOfHourlyForecastsResponse.Item hourly : hourlyItemList) {
-					HourlyForecastListItemObj item = new HourlyForecastListItemObj();
-					dateTime = WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L,
-							zoneId);
+					HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
 
-					item.setDate(dateTime.format(datePattern))
-							.setHour(String.valueOf(dateTime.getHour()))
+					hourlyForecastDto.setHours(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L,
+							zoneId))
 							.setTemp(ValueUnits.convertTemperature(hourly.getTemperature().getValue(), tempUnit) + tempDegree)
-							.setWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(hourly.getWeatherIcon()))
+							.setWeatherIcon(AccuWeatherResponseProcessor.getWeatherIconImg(hourly.getWeatherIcon()))
+							.setWeatherDescription(AccuWeatherResponseProcessor.getWeatherIconDescription(hourly.getWeatherIcon()))
+							.setPrecipitationVolume(hourly.getTotalLiquid().getValue() + mm)
 							.setPop((int) (Double.parseDouble(hourly.getPrecipitationProbability())) + percent)
-							.setRainVolume(hourly.getRain().getValue().equals(zero) ? null : hourly.getRain().getValue() + mm)
-							.setSnowVolume(hourly.getSnow().getValue().equals(zero) ? null :
-									ValueUnits.convertCMToMM(hourly.getSnow().getValue()) + mm);
+							.setRainVolume(hourly.getRain().getValue().equals(zero) ? zeroRainVolume : hourly.getRain().getValue() + mm)
+							.setSnowVolume(hourly.getSnow().getValue().equals(zero) ? zeroSnowVolume :
+									String.format("%.2f mm", ValueUnits.convertCMToMM(hourly.getSnow().getValue())))
+							.setFeelsLikeTemp(ValueUnits.convertTemperature(hourly.getRealFeelTemperature().getValue(), tempUnit) + tempDegree)
+							.setPor((int) (Double.parseDouble(hourly.getRainProbability())) + percent)
+							.setPos((int) (Double.parseDouble(hourly.getSnowProbability())) + percent)
+							.setPrecipitationType(AccuWeatherResponseProcessor.getPty(hourly.getPrecipitationType()))
+							.setPrecipitationTypeIcon(AccuWeatherResponseProcessor.getPtyIcon(hourly.getPrecipitationType()))
+							.setWindDirectionVal(Integer.parseInt(hourly.getWind().getDirection().getDegrees()))
+							.setWindDirection(WindDirectionConverter.windDirection(getContext(), hourly.getWind().getDirection().getDegrees()))
+							.setWindSpeed(ValueUnits.convertWindSpeedForAccu(hourly.getWind().getSpeed().getValue(), windUnit) + windUnitStr)
+							.setWindGust(ValueUnits.convertWindSpeedForAccu(hourly.getWindGust().getSpeed().getValue(), windUnit) + windUnitStr)
+							.setWindStrength(ValueUnits.convertWindSpeedForAccu(hourly.getWind().getSpeed().getValue(), ValueUnits.mPerSec).toString())
+							.setHumidity(hourly.getRelativeHumidity() + percent)
+							.setDewPointTemp(ValueUnits.convertTemperature(hourly.getDewPoint().getValue(), tempUnit) + tempDegree)
+							.setCloudiness(hourly.getCloudCover() + percent)
+							.setVisibility(ValueUnits.convertVisibilityForAccu(hourly.getVisibility().getValue(), visibilityUnit) + visibilityUnitStr);
 
-					hourlyForecastListItemObjs.add(item);
+					hourlyForecastDtoList.add(hourlyForecastDto);
 				}
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(getContext(), new OnClickedListViewItemListener<Integer>() {
-								@Override
-								public void onClickedItem(Integer position) {
-
-								}
-							});
-							adapter.setHourlyForecastListItemObjs(hourlyForecastListItemObjs);
+							HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(getContext(),
+									AccuDetailHourlyForecastFragment.this);
+							adapter.setHourlyForecastDtoList(hourlyForecastDtoList);
 							binding.listview.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 							binding.listview.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 							binding.listview.setAdapter(adapter);

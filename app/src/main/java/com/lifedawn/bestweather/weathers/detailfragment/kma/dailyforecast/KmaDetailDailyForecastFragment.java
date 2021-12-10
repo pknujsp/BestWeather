@@ -1,15 +1,10 @@
 package com.lifedawn.bestweather.weathers.detailfragment.kma.dailyforecast;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,11 +14,9 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
+import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
-import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
-import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
-import com.lifedawn.bestweather.weathers.FragmentType;
-import com.lifedawn.bestweather.weathers.view.TextValueView;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
+public class KmaDetailDailyForecastFragment extends BaseDetailDailyForecastFragment {
 	private List<FinalDailyForecast> finalDailyForecastList;
 
 	@Override
@@ -57,41 +50,44 @@ public class KmaDetailDailyForecastFragment extends BaseDetailForecastFragment {
 			public void run() {
 				String tempDegree = getString(R.string.degree_symbol);
 				String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
-				DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
-				DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
-				List<DailyForecastListItemObj> dailyForecastListItemObjs = new ArrayList<>();
+
+				dailyForecastDtoList = new ArrayList<>();
 
 				for (FinalDailyForecast finalDailyForecast : finalDailyForecastList) {
-					DailyForecastListItemObj item = new DailyForecastListItemObj();
-					item.setDate(finalDailyForecast.getDate().format(dateFormatter))
-							.setDay(finalDailyForecast.getDate().format(dayFormatter))
+					DailyForecastDto dailyForecastDto = new DailyForecastDto();
+
+					dailyForecastDto.setDate(finalDailyForecast.getDate())
 							.setMinTemp(ValueUnits.convertTemperature(finalDailyForecast.getMinTemp(), tempUnit) + tempDegree)
-							.setMaxTemp(ValueUnits.convertTemperature(finalDailyForecast.getMaxTemp(), tempUnit) + tempDegree);
+							.setMaxTemp(ValueUnits.convertTemperature(finalDailyForecast.getMaxTemp(), tempUnit) + tempDegree)
+							.setSingle(finalDailyForecast.isSingle());
+
+					DailyForecastDto.Values single = null;
+					DailyForecastDto.Values am = null;
+					DailyForecastDto.Values pm = null;
 
 					if (finalDailyForecast.isSingle()) {
-						item.setPop(finalDailyForecast.getProbabilityOfPrecipitation() + percent)
-								.setSingle(true)
-								.setLeftWeatherIconId(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false));
+						single = new DailyForecastDto.Values();
+						single.setPop(finalDailyForecast.getProbabilityOfPrecipitation() + percent)
+								.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false));
 					} else {
-						item.setPop(finalDailyForecast.getAmProbabilityOfPrecipitation() + percent + "/" + finalDailyForecast.getPmProbabilityOfPrecipitation() + percent)
-								.setSingle(false)
-								.setLeftWeatherIconId(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getAmSky(), false))
-								.setRightWeatherIconId(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), false));
+						am = new DailyForecastDto.Values();
+						pm = new DailyForecastDto.Values();
+
+						am.setPop(finalDailyForecast.getAmProbabilityOfPrecipitation() + percent)
+								.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getAmSky(), false));
+						pm.setPop(finalDailyForecast.getPmProbabilityOfPrecipitation() + percent)
+								.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), false));
 					}
-					dailyForecastListItemObjs.add(item);
+					dailyForecastDto.setSingleValues(single).setAmValues(am).setPmValues(pm);
+					dailyForecastDtoList.add(dailyForecastDto);
 				}
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							DailyForecastListAdapter adapter = new DailyForecastListAdapter(getContext(), new OnClickedListViewItemListener<Integer>() {
-								@Override
-								public void onClickedItem(Integer position) {
-
-								}
-							});
-							adapter.setDailyForecastListItemObjs(dailyForecastListItemObjs);
+							DailyForecastListAdapter adapter = new DailyForecastListAdapter(getContext(), KmaDetailDailyForecastFragment.this);
+							adapter.setDailyForecastDtoList(dailyForecastDtoList);
 							binding.listview.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 							binding.listview.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 							binding.listview.setAdapter(adapter);

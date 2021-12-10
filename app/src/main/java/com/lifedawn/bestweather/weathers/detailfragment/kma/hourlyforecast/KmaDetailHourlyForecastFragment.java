@@ -2,33 +2,23 @@ package com.lifedawn.bestweather.weathers.detailfragment.kma.hourlyforecast;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
-import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
-import com.lifedawn.bestweather.weathers.view.ClockView;
-import com.lifedawn.bestweather.weathers.view.DateView;
-import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
-import com.lifedawn.bestweather.weathers.FragmentType;
-import com.lifedawn.bestweather.weathers.view.TextValueView;
-import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
-import com.lifedawn.bestweather.weathers.view.SingleWindDirectionView;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
+import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailHourlyForecastFragment;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment {
+public class KmaDetailHourlyForecastFragment extends BaseDetailHourlyForecastFragment {
 	private List<FinalHourlyForecast> finalHourlyForecastList;
 
 	public void setFinalHourlyForecastList(List<FinalHourlyForecast> finalHourlyForecastList) {
@@ -75,7 +65,11 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				final String noSnow = getString(R.string.kma_no_snow);
 				final String noRain = "강수없음";
 				final String zero = "0.0";
-				List<HourlyForecastListItemObj> hourlyForecastListItemObjs = new ArrayList<>();
+				final String nullStr = "-";
+
+				final String zeroSnowVolume = "0.0cm";
+				final String zeroRainVolume = "0.0mm";
+				final String zeroPrecipitationVolume = getString(R.string.zeroPrecipitationVolume);
 
 				Map<Integer, SunRiseSetUtil.SunRiseSetObj> sunSetRiseDataMap = SunRiseSetUtil.getDailySunRiseSetMap(
 						ZonedDateTime.of(finalHourlyForecastList.get(0).getFcstDateTime().toLocalDateTime(), zoneId),
@@ -87,31 +81,46 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 				Calendar sunRise = null;
 				Calendar sunSet = null;
 
+				hourlyForecastDtoList = new ArrayList<>();
+
 				for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
-					HourlyForecastListItemObj item = new HourlyForecastListItemObj();
+					HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
 
 					itemCalendar.setTimeInMillis(finalHourlyForecast.getFcstDateTime().toInstant().toEpochMilli());
 					sunRise = sunSetRiseDataMap.get(finalHourlyForecast.getFcstDateTime().getDayOfYear()).getSunrise();
 					sunSet = sunSetRiseDataMap.get(finalHourlyForecast.getFcstDateTime().getDayOfYear()).getSunset();
 					isNight = SunRiseSetUtil.isNight(itemCalendar, sunRise, sunSet);
 
-					item.setDate(finalHourlyForecast.getFcstDateTime().format(datePattern))
-							.setHour(String.valueOf(finalHourlyForecast.getFcstDateTime().getHour()))
+					hourlyForecastDto.setHours(finalHourlyForecast.getFcstDateTime())
 							.setTemp(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit) + tempDegree)
-							.setRainVolume(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ? zero + mm :
-									finalHourlyForecast.getRainPrecipitation1Hour().replace(noRain, zero + mm))
-							.setWeatherIconId(KmaResponseProcessor.getWeatherSkyAndPtyIconImg(finalHourlyForecast.getPrecipitationType(),
-									finalHourlyForecast.getSky(), isNight));
+							.setRainVolume(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ? zeroRainVolume :
+									finalHourlyForecast.getRainPrecipitation1Hour().replace(noRain, zeroRainVolume))
+							.setPrecipitationVolume(zeroPrecipitationVolume)
+							.setWeatherIcon(KmaResponseProcessor.getWeatherSkyAndPtyIconImg(finalHourlyForecast.getPrecipitationType(),
+									finalHourlyForecast.getSky(), isNight))
+							.setWeatherDescription(KmaResponseProcessor.getWeatherDescription(finalHourlyForecast.getPrecipitationType(),
+									finalHourlyForecast.getSky()))
+							.setWindDirectionVal(Integer.parseInt(finalHourlyForecast.getWindDirection()))
+							.setWindDirection(WindDirectionConverter.windDirection(context, finalHourlyForecast.getWindDirection()))
+							.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(finalHourlyForecast.getWindSpeed()))
+							.setWindSpeed(ValueUnits.convertWindSpeed(finalHourlyForecast.getWindSpeed(), windUnit) + ValueUnits.convertToStr(context, windUnit))
+							.setHumidity(finalHourlyForecast.getHumidity() + percent);
 
 					if (finalHourlyForecast.getProbabilityOfPrecipitation() != null) {
-						item.setPop(finalHourlyForecast.getProbabilityOfPrecipitation() + percent);
+						hourlyForecastDto.setPop(finalHourlyForecast.getProbabilityOfPrecipitation() + percent);
+					} else {
+						hourlyForecastDto.setPop(nullStr);
 					}
 
-					if (finalHourlyForecast.getSnowPrecipitation1Hour() != null) {
-						item.setSnowVolume(finalHourlyForecast.getSnowPrecipitation1Hour().equals(noSnow) ? null :
-								finalHourlyForecast.getSnowPrecipitation1Hour());
+					if (finalHourlyForecast.getSnowPrecipitation1Hour() == null) {
+						hourlyForecastDto.setSnowVolume(zeroSnowVolume);
+					} else if (finalHourlyForecast.getSnowPrecipitation1Hour().equals(noSnow)) {
+						hourlyForecastDto.setSnowVolume(zeroSnowVolume);
+					} else {
+						hourlyForecastDto.setSnowVolume(finalHourlyForecast.getSnowPrecipitation1Hour());
 					}
-					hourlyForecastListItemObjs.add(item);
+
+					hourlyForecastDtoList.add(hourlyForecastDto);
 				}
 
 				if (getActivity() != null) {
@@ -121,13 +130,9 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailForecastFragment 
 							getActivity().runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(getContext(), new OnClickedListViewItemListener<Integer>() {
-										@Override
-										public void onClickedItem(Integer position) {
-
-										}
-									});
-									adapter.setHourlyForecastListItemObjs(hourlyForecastListItemObjs);
+									HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(getContext(),
+											KmaDetailHourlyForecastFragment.this);
+									adapter.setHourlyForecastDtoList(hourlyForecastDtoList);
 									binding.listview.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 									binding.listview.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 									binding.listview.setAdapter(adapter);

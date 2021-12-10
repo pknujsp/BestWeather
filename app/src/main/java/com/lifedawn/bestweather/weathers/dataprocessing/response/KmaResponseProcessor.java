@@ -153,6 +153,15 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		}
 	}
 
+	public static String getWeatherDescription(String pty, String sky) {
+		if (pty.equals("0")) {
+			return getWeatherSkyIconDescription(sky);
+		} else {
+			return getWeatherPtyIconDescription(pty);
+		}
+	}
+
+
 	public static String getWeatherMidIconDescription(String code) {
 		return WEATHER_MID_ICON_DESCRIPTION_MAP.get(code);
 	}

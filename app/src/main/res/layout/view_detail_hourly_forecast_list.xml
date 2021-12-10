@@ -103,7 +103,7 @@
                         android:id="@+id/rain_volume"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="1mm"
+                        android:text="1.0mm"
                         android:textColor="@color/blue"
 
                         android:textSize="13sp" />
@@ -130,7 +130,7 @@
                         android:id="@+id/snow_volume"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="1cm"
+                        android:text="1.0cm"
                         android:textColor="@color/blue"
                         android:textSize="13sp" />
 

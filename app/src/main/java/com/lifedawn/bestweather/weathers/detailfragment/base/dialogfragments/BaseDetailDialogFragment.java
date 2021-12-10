@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.weathers.detailfragment.base;
+package com.lifedawn.bestweather.weathers.detailfragment.base.dialogfragments;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class BaseDetailDialogFragment extends DialogFragment {
 	protected DialogFragmentDetailForecastBinding binding;
 	protected CompositePageTransformer compositePageTransformer;
+	protected int firstSelectedPosition;
 
 	@Override
 	public void onAttach(@NonNull @NotNull Context context) {
@@ -89,4 +90,7 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	public void onDestroy() {
 		super.onDestroy();
 	}
+
+	public abstract void setFirstSelectedPosition(int position);
+
 }

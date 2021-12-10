@@ -20,6 +20,7 @@ import retrofit2.Response;
 public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 	private static final Map<String, String> WEATHER_ICON_DESCRIPTION_MAP = new HashMap<>();
 	private static final Map<String, String> PTY_MAP = new HashMap<>();
+	private static final Map<String, Integer> PTY_ICON_MAP = new HashMap<>();
 	private static final Map<String, String> FLICKR_MAP = new HashMap<>();
 	private static final Map<String, Integer> WEATHER_ICON_ID_MAP = new HashMap<>();
 
@@ -52,6 +53,13 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 			PTY_MAP.put("Ice", context.getString(R.string.accu_weather_pty_ice));
 			PTY_MAP.put("Null", context.getString(R.string.accu_weather_pty_not));
 			PTY_MAP.put("Mixed", context.getString(R.string.accu_weather_pty_mixed));
+
+			PTY_ICON_MAP.clear();
+			PTY_ICON_MAP.put("Rain", R.drawable.raindrop);
+			PTY_ICON_MAP.put("Snow", R.drawable.snowparticle);
+			PTY_ICON_MAP.put("Ice", R.drawable.snowparticle);
+			PTY_ICON_MAP.put("Null", R.drawable.pty_null);
+			PTY_ICON_MAP.put("Mixed", R.drawable.sleet);
 		}
 	}
 
@@ -65,6 +73,10 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 
 	public static String getPty(String pty) {
 		return pty == null ? PTY_MAP.get("Null") : PTY_MAP.get(pty);
+	}
+
+	public static int getPtyIcon(String pty) {
+		return pty == null ? PTY_ICON_MAP.get("Null") : PTY_ICON_MAP.get(pty);
 	}
 
 	public static GeoPositionResponse getGeoPositionObjFromJson(String response) {

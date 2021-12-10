@@ -20,7 +20,10 @@ import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
+import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.DoubleWindDirectionView;
@@ -34,7 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment {
+public class AccuDetailDailyForecastFragment extends BaseDetailDailyForecastFragment {
 	private List<FiveDaysOfDailyForecastsResponse.DailyForecasts> dailyForecastsList;
 
 	@Override
@@ -58,56 +61,90 @@ public class AccuDetailDailyForecastFragment extends BaseDetailForecastFragment 
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				String tempDegree = getString(R.string.degree_symbol);
-				String mm = ValueUnits.convertToStr(getContext(), ValueUnits.mm);
-				String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
-				DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
-				DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
+				final String tempDegree = getString(R.string.degree_symbol);
+				final String mm = "mm";
+				final String cm = "cm";
+				final String percent = "%";
+				final String zeroSnowVolume = "0.0cm";
+				final String zeroRainVolume = "0.0mm";
+				final String zeroPrecipitationVolume = "0.0mm";
+				final String windUnitStr = ValueUnits.convertToStr(getContext(), windUnit);
 
-				List<DailyForecastListItemObj> dailyForecastListItemObjs = new ArrayList<>();
-				String zero = "0.0";
-				ZonedDateTime dateTime = null;
+				final String zero = "0.0";
+
+				dailyForecastDtoList = new ArrayList<>();
+
+				String precipitationVolume = null;
+				String rainVolume = null;
+				String snowVolume = null;
 
 				for (FiveDaysOfDailyForecastsResponse.DailyForecasts daily : dailyForecastsList) {
-					DailyForecastListItemObj item = new DailyForecastListItemObj();
-					dateTime = WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, zoneId);
+					DailyForecastDto dailyForecastDto = new DailyForecastDto();
 
-					item.setDate(dateTime.format(dateFormatter))
-							.setDay(dateTime.format(dayFormatter))
-							.setPop(daily.getDay().getPrecipitationProbability() + percent + "/" + daily.getNight().getPrecipitationProbability() + percent)
-							.setSingle(false).setLeftWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getDay().getIcon()))
-							.setRightWeatherIconId(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getNight().getIcon()))
-							.setMinTemp(ValueUnits.convertTemperature(daily.getTemperature().getMinimum().getValue(), tempUnit) + tempDegree)
-							.setMaxTemp(ValueUnits.convertTemperature(daily.getTemperature().getMaximum().getValue(), tempUnit) + tempDegree);
+					dailyForecastDto.setDate(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, zoneId))
+							.setSingle(false).setMinTemp(ValueUnits.convertTemperature(daily.getTemperature().getMinimum().getValue(), tempUnit) + tempDegree)
+							.setMaxTemp(ValueUnits.convertTemperature(daily.getTemperature().getMaximum().getValue(), tempUnit) + tempDegree)
+							.setMinFeelsLikeTemp(ValueUnits.convertTemperature(daily.getRealFeelTemperature().getMinimum().getValue(), tempUnit) + tempDegree)
+							.setMaxFeelsLikeTemp(ValueUnits.convertTemperature(daily.getRealFeelTemperature().getMinimum().getValue(),
+									tempUnit) + tempDegree);
 
-					if (daily.getDay().getRain().getValue().equals(zero) && daily.getNight().getRain().getValue().equals(zero)) {
-						item.setRainVolume(null);
-					} else {
-						item.setRainVolume(daily.getDay().getRain().getValue() + mm + "/" + daily.getNight().getRain().getValue() + mm);
-					}
+					DailyForecastDto.Values am = new DailyForecastDto.Values();
+					DailyForecastDto.Values pm = new DailyForecastDto.Values();
 
+					rainVolume = daily.getDay().getRain().getValue() + mm;
+					snowVolume = daily.getDay().getSnow().getValue() + cm;
+					precipitationVolume = daily.getDay().getTotalLiquid().getValue() + mm;
 
-					if (daily.getDay().getSnow().getValue().equals(zero) && daily.getNight().getSnow().getValue().equals(zero)) {
-						item.setSnowVolume(null);
-					} else {
-						item.setSnowVolume(ValueUnits.convertCMToMM(daily.getDay().getSnow().getValue()) + mm + "/" +
-								ValueUnits.convertCMToMM(daily.getNight().getSnow().getValue()) + mm);
-					}
+					am.setWeatherIcon(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getDay().getIcon()));
+					am.setWeatherDescription(AccuWeatherResponseProcessor.getWeatherIconDescription(daily.getDay().getIcon()));
+					am.setPop(daily.getDay().getPrecipitationProbability() + percent);
+					am.setPor(daily.getDay().getRainProbability() + percent);
+					am.setPos(daily.getDay().getSnowProbability() + percent);
+					am.setHasPrecipitationVolume(!precipitationVolume.equals(zeroPrecipitationVolume));
+					am.setPrecipitationVolume(precipitationVolume);
+					am.setHasRainVolume(!rainVolume.equals(zeroRainVolume));
+					am.setRainVolume(rainVolume);
+					am.setHasSnowVolume(!snowVolume.equals(zeroSnowVolume));
+					am.setSnowVolume(snowVolume);
+					am.setWindDirection(WindDirectionConverter.windDirection(getContext(), daily.getDay().getWind().getDirection().getDegrees()));
+					am.setWindDirectionVal(Integer.parseInt(daily.getDay().getWind().getDirection().getDegrees()));
+					am.setWindSpeed(ValueUnits.convertWindSpeedForAccu(daily.getDay().getWind().getSpeed().getValue(), windUnit) + windUnitStr);
+					am.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(ValueUnits.convertWindSpeedForAccu(daily.getDay().getWind().getSpeed().getValue(), ValueUnits.mPerSec).toString()));
+					am.setWindGust(ValueUnits.convertWindSpeedForAccu(daily.getDay().getWind().getSpeed().getValue(), windUnit) + windUnitStr);
+					am.setCloudiness(daily.getDay().getCloudCover() + percent);
 
-					dailyForecastListItemObjs.add(item);
+					rainVolume = daily.getDay().getRain().getValue() + mm;
+					snowVolume = daily.getDay().getSnow().getValue() + cm;
+					precipitationVolume = daily.getDay().getTotalLiquid().getValue() + mm;
+
+					pm.setWeatherIcon(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getNight().getIcon()));
+					pm.setWeatherDescription(AccuWeatherResponseProcessor.getWeatherIconDescription(daily.getNight().getIcon()));
+					pm.setPop(daily.getNight().getPrecipitationProbability() + percent);
+					pm.setPor(daily.getNight().getRainProbability() + percent);
+					pm.setPos(daily.getNight().getSnowProbability() + percent);
+					pm.setHasPrecipitationVolume(!precipitationVolume.equals(zeroPrecipitationVolume));
+					pm.setPrecipitationVolume(precipitationVolume);
+					pm.setHasRainVolume(!rainVolume.equals(zeroRainVolume));
+					pm.setRainVolume(rainVolume);
+					pm.setHasSnowVolume(!snowVolume.equals(zeroSnowVolume));
+					pm.setSnowVolume(snowVolume);
+					pm.setWindDirection(WindDirectionConverter.windDirection(getContext(), daily.getNight().getWind().getDirection().getDegrees()));
+					pm.setWindDirectionVal(Integer.parseInt(daily.getNight().getWind().getDirection().getDegrees()));
+					pm.setWindSpeed(ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), windUnit) + windUnitStr);
+					pm.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), ValueUnits.mPerSec).toString()));
+					pm.setWindGust(ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), windUnit) + windUnitStr);
+					pm.setCloudiness(daily.getNight().getCloudCover() + percent);
+
+					dailyForecastDto.setAmValues(am).setPmValues(pm);
+					dailyForecastDtoList.add(dailyForecastDto);
 				}
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							DailyForecastListAdapter adapter = new DailyForecastListAdapter(getContext(), new OnClickedListViewItemListener<Integer>() {
-								@Override
-								public void onClickedItem(Integer position) {
-
-								}
-							});
-							adapter.setDailyForecastListItemObjs(dailyForecastListItemObjs);
+							DailyForecastListAdapter adapter = new DailyForecastListAdapter(getContext(), AccuDetailDailyForecastFragment.this);
+							adapter.setDailyForecastDtoList(dailyForecastDtoList);
 							binding.listview.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 							binding.listview.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 							binding.listview.setAdapter(adapter);
