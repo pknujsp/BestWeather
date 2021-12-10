@@ -29,9 +29,6 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 	private LayoutInflater layoutInflater;
 	private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
 	private DateTimeFormatter hoursFormatter;
-	private final String zeroSnowVolume = "0.0cm";
-	private final String zeroRainVolume = "0.0mm";
-	private final String zeroPrecipitationVolume = "0.0mm";
 
 	private List<HourlyForecastDto> hourlyForecastDtoList;
 
@@ -88,24 +85,23 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			headerBinding.temp.setText(hourlyForecastDto.getTemp());
 			headerBinding.pop.setText(hourlyForecastDto.getPop());
 
-			if (hourlyForecastDto.getSnowVolume().equals(zeroSnowVolume)) {
+			if (!hourlyForecastDto.isHasSnow()) {
 				headerBinding.snowVolumeLayout.setVisibility(View.GONE);
 			} else {
 				headerBinding.snowVolumeLayout.setVisibility(View.VISIBLE);
 				headerBinding.snowVolume.setText(hourlyForecastDto.getSnowVolume());
 			}
-			if (hourlyForecastDto.getRainVolume().equals(zeroRainVolume)) {
+			if (!hourlyForecastDto.isHasRain()) {
 				headerBinding.rainVolumeLayout.setVisibility(View.GONE);
 			} else {
 				headerBinding.rainVolumeLayout.setVisibility(View.VISIBLE);
 				headerBinding.rainVolume.setText(hourlyForecastDto.getRainVolume());
 			}
-			if (hourlyForecastDto.getPrecipitationVolume().equals(zeroPrecipitationVolume)) {
+			if (!hourlyForecastDto.isHasPrecipitation()) {
 				headerBinding.precipitationVolumeLayout.setVisibility(View.GONE);
 			} else {
 				headerBinding.precipitationVolumeLayout.setVisibility(View.VISIBLE);
 				headerBinding.precipitationVolume.setText(hourlyForecastDto.getPrecipitationVolume());
-
 			}
 
 			//gridview구성
@@ -126,12 +122,14 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 						ContextCompat.getDrawable(context, hourlyForecastDto.getPrecipitationTypeIcon())));
 			}
 
-			if (hourlyForecastDto.getPrecipitationVolume() != null) {
+			if (hourlyForecastDto.isHasPrecipitation()) {
 				adapter.addItem(new GridItemDto(context.getString(R.string.precipitation_volume), hourlyForecastDto.getPrecipitationVolume(),
 						ContextCompat.getDrawable(context, R.drawable.precipitationvolume)));
 			}
+
 			adapter.addItem(new GridItemDto(context.getString(R.string.probability_of_precipitation), hourlyForecastDto.getPop(),
 					ContextCompat.getDrawable(context, R.drawable.pop)));
+
 			if (hourlyForecastDto.getPor() != null) {
 				adapter.addItem(new GridItemDto(context.getString(R.string.probability_of_rain), hourlyForecastDto.getPor(),
 						ContextCompat.getDrawable(context, R.drawable.por)));
@@ -141,18 +139,20 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 						ContextCompat.getDrawable(context, R.drawable.pos)));
 			}
 
-			if (hourlyForecastDto.getRainVolume() != null) {
+			if (hourlyForecastDto.isHasRain()) {
 				adapter.addItem(new GridItemDto(context.getString(R.string.rain_volume), hourlyForecastDto.getRainVolume(),
 						ContextCompat.getDrawable(context, R.drawable.raindrop)));
 			}
-			if (!hourlyForecastDto.getSnowVolume().equals(zeroSnowVolume)) {
+			if (hourlyForecastDto.isHasSnow()) {
 				adapter.addItem(new GridItemDto(context.getString(R.string.snow_volume), hourlyForecastDto.getSnowVolume(),
 						ContextCompat.getDrawable(context, R.drawable.snowparticle)));
 			}
 			adapter.addItem(new GridItemDto(context.getString(R.string.wind_direction), hourlyForecastDto.getWindDirection(),
 					ContextCompat.getDrawable(context, R.drawable.arrow), hourlyForecastDto.getWindDirectionVal()));
+
 			adapter.addItem(new GridItemDto(context.getString(R.string.wind_speed), hourlyForecastDto.getWindSpeed(),
 					ContextCompat.getDrawable(context, R.drawable.windspeed)));
+
 			if (hourlyForecastDto.getWindGust() != null) {
 				adapter.addItem(new GridItemDto(context.getString(R.string.wind_gust), hourlyForecastDto.getWindGust(),
 						ContextCompat.getDrawable(context, R.drawable.windgust)));

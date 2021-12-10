@@ -10,9 +10,9 @@
 
         <FrameLayout
             android:id="@+id/header"
-            android:padding="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:padding="16dp" />
 
         <GridView
             android:id="@+id/gridView"
@@ -20,7 +20,8 @@
             android:layout_height="match_parent"
             android:numColumns="3"
             android:overScrollMode="never"
-            android:scrollbars="none"
+            android:scrollbars="vertical"
+            android:clipToPadding="false"
             tools:listitem="@layout/grid_itemview_detail_forecast" />
     </LinearLayout>
 </layout>

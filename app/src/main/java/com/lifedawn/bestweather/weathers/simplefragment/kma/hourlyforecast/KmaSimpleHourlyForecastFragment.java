@@ -23,6 +23,7 @@ import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecas
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.detailfragment.kma.hourlyforecast.KmaDetailHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.ClockView;
@@ -134,7 +135,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		if (textSizeMap.containsKey(WeatherDataType.temp)) {
 			tempRow.setTextSize(textSizeMap.get(WeatherDataType.temp));
 		} else {
-			tempRow.setTextSize(16);
+			tempRow.setTextSize(17);
 		}
 		if (textSizeMap.containsKey(WeatherDataType.pop)) {
 			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
@@ -162,66 +163,38 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			snowVolumeRow.setTextColor(textColorMap.get(WeatherDataType.snowVolume));
 		}
 
-		//시각 --------------------------------------------------------------------------
-		List<ZonedDateTime> dateTimeList = new ArrayList<>();
-		for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
-			dateTimeList.add(finalHourlyForecast.getFcstDateTime());
-		}
-		dateRow.init(dateTimeList);
-		clockRow.setClockList(dateTimeList);
-
-		//기온, 강수확률, 강수량
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		List<String> tempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
+		List<ZonedDateTime> dateTimeList = new ArrayList<>();
 
-		Map<Integer, SunRiseSetUtil.SunRiseSetObj> sunRiseSetObjMap =
-				SunRiseSetUtil.getDailySunRiseSetMap(finalHourlyForecastList.get(0).getFcstDateTime(),
-						finalHourlyForecastList.get(finalHourlyForecastList.size() - 1).getFcstDateTime(), latitude, longitude);
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
-		int dayOfYear = 0;
-
-		final String lessThan1mm = getString(R.string.kma_less_than_1mm);
-		final String noSnow = getString(R.string.kma_no_snow);
-		final String zero = "0.0";
-		final String zeroPrecipitation = "강수없음";
-		String tempUnitStr = getString(R.string.degree_symbol);
-		String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
+		final String mm = "mm";
+		final String cm = "cm";
 
 		boolean haveSnow = false;
+		List<HourlyForecastDto> hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoList(getContext(),
+				finalHourlyForecastList, latitude, longitude, windUnit, tempUnit, zoneId);
 
-		for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
-			calendar.setTimeInMillis(finalHourlyForecast.getFcstDateTime().toInstant().toEpochMilli());
-			dayOfYear = finalHourlyForecast.getFcstDateTime().getDayOfYear();
-
+		for (HourlyForecastDto item : hourlyForecastDtoList) {
+			dateTimeList.add(item.getHours());
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
-					ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherSkyAndPtyIconImg(
-							finalHourlyForecast.getPrecipitationType(), finalHourlyForecast.getSky(),
-							SunRiseSetUtil.isNight(calendar,
-									sunRiseSetObjMap.get(dayOfYear).getSunrise(),
-									sunRiseSetObjMap.get(dayOfYear).getSunset()
-							)))));
-			tempList.add(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit) + tempUnitStr);
+					ContextCompat.getDrawable(context, item.getWeatherIcon())));
+			tempList.add(item.getTemp());
 
-			probabilityOfPrecipitationList.add(finalHourlyForecast.getProbabilityOfPrecipitation() == null ? "-" :
-					finalHourlyForecast.getProbabilityOfPrecipitation() + percent);
-			rainVolumeList.add(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ? zero :
-					finalHourlyForecast.getRainPrecipitation1Hour().replace("mm", "").replace(zeroPrecipitation, zero));
-			if (finalHourlyForecast.getSnowPrecipitation1Hour() != null) {
-				if (!finalHourlyForecast.getSnowPrecipitation1Hour().equals(noSnow)) {
-					if (!haveSnow) {
-						haveSnow = true;
-					}
+			probabilityOfPrecipitationList.add(item.getPop());
+			rainVolumeList.add(item.getRainVolume().replace(mm, ""));
+			if (item.isHasSnow()) {
+				if (!haveSnow) {
+					haveSnow = true;
 				}
-				snowVolumeList.add(finalHourlyForecast.getSnowPrecipitation1Hour().equals(noSnow) ? zero :
-						finalHourlyForecast.getSnowPrecipitation1Hour());
-			} else {
-				snowVolumeList.add(zero);
 			}
+			snowVolumeList.add(item.getSnowVolume().replace(cm, ""));
 		}
 
+		dateRow.init(dateTimeList);
+		clockRow.setClockList(dateTimeList);
 		tempRow.setValueList(tempList);
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 		rainVolumeRow.setValueList(rainVolumeList);

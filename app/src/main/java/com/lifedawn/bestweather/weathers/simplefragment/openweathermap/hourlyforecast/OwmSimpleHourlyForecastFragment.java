@@ -17,11 +17,13 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.hourlyforecast.OwmDetailHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.ClockView;
@@ -99,8 +101,6 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		//owm hourly forecast simple : 날짜, 시각, 날씨, 기온, 강수확률, 강수량, 강설량
 		Context context = getContext();
 
-		final int DATE_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
-		final int CLOCK_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.clockValueRowHeightInCOMMON);
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int DEFAULT_TEXT_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
@@ -110,28 +110,57 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCHourly);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 
-		/*
-		addLabelView(R.drawable.date, getString(R.string.date), DATE_ROW_HEIGHT);
-		addLabelView(R.drawable.time, getString(R.string.clock), CLOCK_ROW_HEIGHT);
-		addLabelView(R.drawable.day_clear, getString(R.string.weather), WEATHER_ROW_HEIGHT);
-		addLabelView(R.drawable.temperature, getString(R.string.temperature), DEFAULT_TEXT_ROW_HEIGHT);
-		addLabelView(R.drawable.pop, getString(R.string.probability_of_precipitation), DEFAULT_TEXT_ROW_HEIGHT);
-		addLabelView(R.drawable.rainvolume, getString(R.string.rain_volume), DEFAULT_TEXT_ROW_HEIGHT);
-		ImageView snowVolumeLabel = addLabelView(R.drawable.snowvolume, getString(R.string.snow_volume), DEFAULT_TEXT_ROW_HEIGHT);
-
-		 */
-
 		dateRow = new DateView(context, FragmentType.Simple, VIEW_WIDTH, COLUMN_WIDTH);
 		ClockView clockRow = new ClockView(context, FragmentType.Simple, VIEW_WIDTH, COLUMN_WIDTH);
 		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Simple, VIEW_WIDTH, WEATHER_ROW_HEIGHT,
 				COLUMN_WIDTH);
 		TextValueView tempRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, DEFAULT_TEXT_ROW_HEIGHT, COLUMN_WIDTH);
-		IconTextView probabilityOfPrecipitationRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
+		IconTextView popRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
 				COLUMN_WIDTH, R.drawable.pop);
 		IconTextView rainVolumeRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
 				COLUMN_WIDTH, R.drawable.raindrop);
 		IconTextView snowVolumeRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
 				COLUMN_WIDTH, R.drawable.snowparticle);
+
+		if (textSizeMap.containsKey(WeatherDataType.date)) {
+			dateRow.setTextSize(textSizeMap.get(WeatherDataType.date));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.time)) {
+			clockRow.setTextSize(textSizeMap.get(WeatherDataType.time));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.temp)) {
+			tempRow.setTextSize(textSizeMap.get(WeatherDataType.temp));
+		} else {
+			tempRow.setTextSize(17);
+		}
+		if (textSizeMap.containsKey(WeatherDataType.pop)) {
+			popRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.rainVolume)) {
+			rainVolumeRow.setValueTextSize(textSizeMap.get(WeatherDataType.rainVolume));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.snowVolume)) {
+			snowVolumeRow.setValueTextSize(textSizeMap.get(WeatherDataType.snowVolume));
+		}
+
+		if (textColorMap.containsKey(WeatherDataType.date)) {
+			dateRow.setTextColor(textColorMap.get(WeatherDataType.date));
+		}
+		if (textColorMap.containsKey(WeatherDataType.time)) {
+			clockRow.setTextColor(textColorMap.get(WeatherDataType.time));
+		}
+		if (textColorMap.containsKey(WeatherDataType.temp)) {
+			tempRow.setTextColor(textColorMap.get(WeatherDataType.temp));
+		}
+		if (textColorMap.containsKey(WeatherDataType.pop)) {
+			popRow.setTextColor(textColorMap.get(WeatherDataType.pop));
+		}
+		if (textColorMap.containsKey(WeatherDataType.rainVolume)) {
+			rainVolumeRow.setTextColor(textColorMap.get(WeatherDataType.rainVolume));
+		}
+		if (textColorMap.containsKey(WeatherDataType.snowVolume)) {
+			snowVolumeRow.setTextColor(textColorMap.get(WeatherDataType.snowVolume));
+		}
 
 		//시각, 기온, 강수확률, 강수량
 		List<SingleWeatherIconView.WeatherIconObj> iconObjList = new ArrayList<>();
@@ -141,27 +170,24 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
 
-		String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
-		String degree = getString(R.string.degree_symbol);
-
 		boolean haveSnowVolumes = false;
 
+		List<HourlyForecastDto> hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(),
+				items, windUnit, tempUnit, visibilityUnit, zoneId);
 
-		for (OneCallResponse.Hourly item : items) {
-			dateTimeList.add(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(item.getDt()) * 1000L, zoneId));
-			iconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-					OpenWeatherMapResponseProcessor.getWeatherIconImg(item.getWeather().get(0).getId(),
-							item.getWeather().get(0).getIcon().contains("n")))));
-			tempList.add(ValueUnits.convertTemperature(item.getTemp(), tempUnit) + degree);
-			probabilityOfPrecipitationList.add((int) (Double.parseDouble(item.getPop()) * 100.0) + percent);
-			rainVolumeList.add(item.getRain() != null ? item.getRain().getPrecipitation1Hour() : "0.0");
+		for (HourlyForecastDto item : hourlyForecastDtoList) {
+			dateTimeList.add(item.getHours());
+			iconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context, item.getWeatherIcon())));
+			tempList.add(item.getTemp());
+			probabilityOfPrecipitationList.add(item.getPop());
+			rainVolumeList.add(item.getRainVolume().replace("mm", ""));
 
-			if (item.getSnow() != null) {
+			if (item.isHasSnow()) {
 				if (!haveSnowVolumes) {
 					haveSnowVolumes = true;
 				}
 			}
-			snowVolumeList.add(item.getSnow() != null ? item.getSnow().getPrecipitation1Hour() : "0.0");
+			snowVolumeList.add(item.getSnowVolume().replace("mm", ""));
 		}
 		weatherIconRow.setWeatherImgs(iconObjList);
 		dateRow.init(dateTimeList);
@@ -169,7 +195,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		tempRow.setValueList(tempList);
 		tempRow.setTextSize(16);
 
-		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
+		popRow.setValueList(probabilityOfPrecipitationList);
 		rainVolumeRow.setValueList(rainVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);
 
@@ -186,7 +212,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		binding.forecastView.addView(dateRow, rowLayoutParams);
 		binding.forecastView.addView(clockRow, rowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
-		binding.forecastView.addView(probabilityOfPrecipitationRow, iconTextRowLayoutParams);
+		binding.forecastView.addView(popRow, iconTextRowLayoutParams);
 		binding.forecastView.addView(rainVolumeRow, iconTextRowLayoutParams);
 		if (haveSnowVolumes) {
 			binding.forecastView.addView(snowVolumeRow, iconTextRowLayoutParams);

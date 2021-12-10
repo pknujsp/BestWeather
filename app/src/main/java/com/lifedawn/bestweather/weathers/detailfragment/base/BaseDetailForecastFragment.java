@@ -111,8 +111,6 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		private OnClickedListViewItemListener<Integer> onClickedForecastItem;
 		private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
 		private DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("HH");
-		private final String zeroSnowVolume = "0.0cm";
-		private final String zeroRainVolume = "0.0mm";
 
 		public HourlyForecastListAdapter(Context context, @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
 			this.context = context;
@@ -161,18 +159,18 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 				binding.temp.setText(hourlyForecastDto.getTemp());
 				binding.pop.setText(hourlyForecastDto.getPop());
 
-				if (!hourlyForecastDto.getSnowVolume().equals(zeroSnowVolume)) {
+				if (hourlyForecastDto.isHasSnow()) {
 					binding.snowVolume.setText(hourlyForecastDto.getSnowVolume());
 					binding.snowVolumeLayout.setVisibility(View.VISIBLE);
 				} else {
 					binding.snowVolumeLayout.setVisibility(View.GONE);
 				}
 
-				if (hourlyForecastDto.getRainVolume().equals(zeroRainVolume)) {
-					binding.rainVolumeLayout.setVisibility(View.GONE);
-				} else {
+				if (hourlyForecastDto.isHasRain()) {
 					binding.rainVolume.setText(hourlyForecastDto.getRainVolume());
 					binding.rainVolumeLayout.setVisibility(View.VISIBLE);
+				} else {
+					binding.rainVolumeLayout.setVisibility(View.GONE);
 				}
 			}
 		}
@@ -186,8 +184,6 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 
 		private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
 		private DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
-		private final String zeroSnowVolume = "0.0cm";
-		private final String zeroRainVolume = "0.0mm";
 
 		public DailyForecastListAdapter(Context context, @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
 			this.context = context;

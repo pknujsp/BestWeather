@@ -52,56 +52,8 @@ public class OwmDetailDailyForecastFragment extends BaseDetailDailyForecastFragm
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				final String tempDegree = getString(R.string.degree_symbol);
-				final String mm = "mm";
-				final String percent = "%";
-				final String visibility = ValueUnits.convertToStr(getContext(), visibilityUnit);
-				final String wind = ValueUnits.convertToStr(getContext(), windUnit);
-				final String zeroSnowVolume = getString(R.string.zeroSnowVolume);
-				final String zeroRainVolume = getString(R.string.zeroRainVolume);
-				final String zeroPrecipitationVolume = getString(R.string.zeroPrecipitationVolume);
-				final String hpa = "hpa";
-
-				//순서 : 날짜, 날씨상태, 최저/최고 기온, 강수확률, 하루 강우량(nullable), 하루 강설량(nullable)
-				//풍향, 풍속, 바람세기, 돌풍(nullable), 기압, 습도, 이슬점, 운량, 자외선최고치
-
-				//아침/낮/저녁/밤 기온(체감) 제외
-				dailyForecastDtoList = new ArrayList<>();
-
-				String rainVolume = null;
-				String snowVolume = null;
-
-				for (OneCallResponse.Daily daily : dailyList) {
-					DailyForecastDto dailyForecastDto = new DailyForecastDto();
-					dailyForecastDto.setSingle(true).setSingleValues(new DailyForecastDto.Values())
-							.setDate(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, zoneId))
-							.setMinTemp(ValueUnits.convertTemperature(daily.getTemp().getMin(), tempUnit) + tempDegree)
-							.setMaxTemp(ValueUnits.convertTemperature(daily.getTemp().getMax(), tempUnit) + tempDegree);
-
-					DailyForecastDto.Values single = dailyForecastDto.getSingleValues();
-
-					rainVolume = daily.getRain() == null ? zeroRainVolume : daily.getRain() + mm;
-					snowVolume = daily.getRain() == null ? zeroRainVolume : daily.getRain() + mm;
-
-					single.setPop((int) (Double.parseDouble(daily.getPop()) * 100.0) + percent)
-							.setHasRainVolume(!rainVolume.equals(zeroRainVolume))
-							.setRainVolume(rainVolume)
-							.setHasSnowVolume(!snowVolume.equals(zeroSnowVolume))
-							.setSnowVolume(snowVolume)
-							.setWeatherIcon(OpenWeatherMapResponseProcessor.getWeatherIconImg(daily.getWeather().get(0).getId(), false))
-							.setWindDirection(WindDirectionConverter.windDirection(getContext(), daily.getWindDeg()))
-							.setWindDirectionVal(Integer.parseInt(daily.getWindDeg()))
-							.setWindSpeed(ValueUnits.convertWindSpeed(daily.getWindSpeed(), windUnit) + wind)
-							.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getWindSpeed()))
-							.setWindGust(ValueUnits.convertWindSpeed(daily.getWindGust(), windUnit) + wind)
-							.setPressure(daily.getPressure() + hpa)
-							.setHumidity(daily.getHumidity() + percent)
-							.setWeatherDescription(ValueUnits.convertTemperature(daily.getDew_point(), tempUnit) + tempDegree)
-							.setCloudiness(daily.getClouds() + percent)
-							.setUvIndex(daily.getUvi());
-
-					dailyForecastDtoList.add(dailyForecastDto);
-				}
+				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), dailyList, windUnit, tempUnit,
+						zoneId);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

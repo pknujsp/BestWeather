@@ -53,75 +53,8 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailHourlyForecastFra
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				//단기예보 : 강수확률, 강수형태(pty), 1시간강수량, 습도, 1시간신적설, 하늘상태(sky), 1시간기온, 최저/최고기온, 풍속, 풍향, 파고
-				//초단기예보 : 기온, 1시간강수량, 하늘상태(sky), 습도, 강수형태(pty), 낙뢰, 풍향, 풍속
-				//공통 : 날짜, 시각, 하늘상태, 기온, 강수확률, 강수량, 신적설, 낙뢰, 풍향, 풍속, 바람세기, 습도
-				Context context = getContext();
-				String tempDegree = getString(R.string.degree_symbol);
-				String percent = ValueUnits.convertToStr(context, ValueUnits.percent);
-				String mm = ValueUnits.convertToStr(context, ValueUnits.mm);
-				DateTimeFormatter datePattern = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
-				final String lessThan1mm = getString(R.string.kma_less_than_1mm);
-				final String noSnow = getString(R.string.kma_no_snow);
-				final String noRain = "강수없음";
-				final String zero = "0.0";
-				final String nullStr = "-";
-
-				final String zeroSnowVolume = "0.0cm";
-				final String zeroRainVolume = "0.0mm";
-				final String zeroPrecipitationVolume = getString(R.string.zeroPrecipitationVolume);
-
-				Map<Integer, SunRiseSetUtil.SunRiseSetObj> sunSetRiseDataMap = SunRiseSetUtil.getDailySunRiseSetMap(
-						ZonedDateTime.of(finalHourlyForecastList.get(0).getFcstDateTime().toLocalDateTime(), zoneId),
-						ZonedDateTime.of(finalHourlyForecastList.get(finalHourlyForecastList.size() - 1).getFcstDateTime().toLocalDateTime(),
-								zoneId), latitude, longitude);
-
-				boolean isNight = false;
-				Calendar itemCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
-				Calendar sunRise = null;
-				Calendar sunSet = null;
-
-				hourlyForecastDtoList = new ArrayList<>();
-
-				for (FinalHourlyForecast finalHourlyForecast : finalHourlyForecastList) {
-					HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
-
-					itemCalendar.setTimeInMillis(finalHourlyForecast.getFcstDateTime().toInstant().toEpochMilli());
-					sunRise = sunSetRiseDataMap.get(finalHourlyForecast.getFcstDateTime().getDayOfYear()).getSunrise();
-					sunSet = sunSetRiseDataMap.get(finalHourlyForecast.getFcstDateTime().getDayOfYear()).getSunset();
-					isNight = SunRiseSetUtil.isNight(itemCalendar, sunRise, sunSet);
-
-					hourlyForecastDto.setHours(finalHourlyForecast.getFcstDateTime())
-							.setTemp(ValueUnits.convertTemperature(finalHourlyForecast.getTemp1Hour(), tempUnit) + tempDegree)
-							.setRainVolume(finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ? zeroRainVolume :
-									finalHourlyForecast.getRainPrecipitation1Hour().replace(noRain, zeroRainVolume))
-							.setPrecipitationVolume(zeroPrecipitationVolume)
-							.setWeatherIcon(KmaResponseProcessor.getWeatherSkyAndPtyIconImg(finalHourlyForecast.getPrecipitationType(),
-									finalHourlyForecast.getSky(), isNight))
-							.setWeatherDescription(KmaResponseProcessor.getWeatherDescription(finalHourlyForecast.getPrecipitationType(),
-									finalHourlyForecast.getSky()))
-							.setWindDirectionVal(Integer.parseInt(finalHourlyForecast.getWindDirection()))
-							.setWindDirection(WindDirectionConverter.windDirection(context, finalHourlyForecast.getWindDirection()))
-							.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(finalHourlyForecast.getWindSpeed()))
-							.setWindSpeed(ValueUnits.convertWindSpeed(finalHourlyForecast.getWindSpeed(), windUnit) + ValueUnits.convertToStr(context, windUnit))
-							.setHumidity(finalHourlyForecast.getHumidity() + percent);
-
-					if (finalHourlyForecast.getProbabilityOfPrecipitation() != null) {
-						hourlyForecastDto.setPop(finalHourlyForecast.getProbabilityOfPrecipitation() + percent);
-					} else {
-						hourlyForecastDto.setPop(nullStr);
-					}
-
-					if (finalHourlyForecast.getSnowPrecipitation1Hour() == null) {
-						hourlyForecastDto.setSnowVolume(zeroSnowVolume);
-					} else if (finalHourlyForecast.getSnowPrecipitation1Hour().equals(noSnow)) {
-						hourlyForecastDto.setSnowVolume(zeroSnowVolume);
-					} else {
-						hourlyForecastDto.setSnowVolume(finalHourlyForecast.getSnowPrecipitation1Hour());
-					}
-
-					hourlyForecastDtoList.add(hourlyForecastDto);
-				}
+				hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoList(getContext(), finalHourlyForecastList, latitude,
+						longitude, windUnit, tempUnit, zoneId);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

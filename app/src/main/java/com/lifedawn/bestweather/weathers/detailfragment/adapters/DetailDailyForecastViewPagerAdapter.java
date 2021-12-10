@@ -32,9 +32,6 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 	private Context context;
 	private LayoutInflater layoutInflater;
 	private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
-	private final String zeroSnowVolume = "0.0cm";
-	private final String zeroRainVolume = "0.0mm";
-	private final String zeroPrecipitationVolume = "0.0mm";
 	private final String zeroPercent = "0%";
 
 	private List<DailyForecastDto> dailyForecastDtoList;
@@ -82,7 +79,7 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				binding.pmWeatherIcon.setVisibility(View.GONE);
 				binding.amLabel.setText(R.string.today);
 			} else {
-				binding.pmWeatherIcon.setVisibility(View.GONE);
+				binding.pmWeatherIcon.setVisibility(View.VISIBLE);
 				String text = context.getString(R.string.am) + " / " + context.getString(R.string.pm);
 				binding.amLabel.setText(text);
 			}
@@ -167,7 +164,6 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 					binding.amList.addView(view);
 				}
 			} else {
-
 				addListItem(labelValueItemList, context.getString(R.string.probability_of_rain),
 						dailyForecastDto.getAmValues().getPor(), dailyForecastDto.getPmValues().getPor());
 

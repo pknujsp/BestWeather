@@ -28,6 +28,37 @@ public class HourlyForecastDto {
 	private String precipitationType;
 	private int precipitationTypeIcon;
 
+	private boolean hasPrecipitation;
+	private boolean hasRain;
+	private boolean hasSnow;
+
+	public boolean isHasPrecipitation() {
+		return hasPrecipitation;
+	}
+
+	public HourlyForecastDto setHasPrecipitation(boolean hasPrecipitation) {
+		this.hasPrecipitation = hasPrecipitation;
+		return this;
+	}
+
+	public boolean isHasRain() {
+		return hasRain;
+	}
+
+	public HourlyForecastDto setHasRain(boolean hasRain) {
+		this.hasRain = hasRain;
+		return this;
+	}
+
+	public boolean isHasSnow() {
+		return hasSnow;
+	}
+
+	public HourlyForecastDto setHasSnow(boolean hasSnow) {
+		this.hasSnow = hasSnow;
+		return this;
+	}
+
 	public ZonedDateTime getHours() {
 		return hours;
 	}

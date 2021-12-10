@@ -16,10 +16,12 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.detailfragment.kma.dailyforecast.KmaDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
@@ -102,21 +104,12 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		// 날짜, 최저/최고 기온 ,낮과 밤의 날씨상태, 강수확률
 		Context context = getContext();
 
-		final int DATE_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
-		final int DEFAULT_TEXT_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
 
 		final int COLUMN_COUNT = finalDailyForecastList.size();
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyAccuKma);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
-
-		/*
-		addLabelView(R.drawable.date, getString(R.string.date), DATE_ROW_HEIGHT);
-		addLabelView(R.drawable.day_clear, getString(R.string.weather), WEATHER_ROW_HEIGHT);
-		addLabelView(R.drawable.pop, getString(R.string.probability_of_precipitation), DEFAULT_TEXT_ROW_HEIGHT);
-		addLabelView(R.drawable.temperature, getString(R.string.temperature), TEMP_ROW_HEIGHT);
-		 */
 
 		TextValueView dateRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, (int) getResources().getDimension(R.dimen.multipleDateTextRowHeightInCOMMON), COLUMN_WIDTH);
 		DoubleWeatherIconView weatherIconRow = new DoubleWeatherIconView(context, FragmentType.Simple, VIEW_WIDTH, WEATHER_ROW_HEIGHT,
@@ -128,34 +121,30 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<String> dateList = new ArrayList<>();
 		List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE", Locale.getDefault());
-
+		final String degree = "º";
 		//기온, 강수확률, 강수량
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
-		String percent = "%";
 
-		for (int index = 0; index < finalDailyForecastList.size(); index++) {
-			dateList.add(finalDailyForecastList.get(index).getDate().format(dateTimeFormatter));
+		List<DailyForecastDto> dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoList(getContext(), finalDailyForecastList,
+				tempUnit);
 
-			if (finalDailyForecastList.get(index).isSingle()) {
-				minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
-				maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
+		for (DailyForecastDto dailyForecastDto : dailyForecastDtoList) {
+			dateList.add(dailyForecastDto.getDate().format(dateTimeFormatter));
+			minTempList.add(Integer.parseInt(dailyForecastDto.getMinTemp().replace(degree, "")));
+			maxTempList.add(Integer.parseInt(dailyForecastDto.getMaxTemp().replace(degree, "")));
 
-				probabilityOfPrecipitationList.add(finalDailyForecastList.get(index).getProbabilityOfPrecipitation() + percent);
+			if (dailyForecastDto.isSingle()) {
+				probabilityOfPrecipitationList.add(dailyForecastDto.getSingleValues().getPop());
 				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-						KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getSky(), false))));
+						dailyForecastDto.getSingleValues().getWeatherIcon())));
 			} else {
-				minTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMinTemp()));
-				maxTempList.add(Integer.parseInt(finalDailyForecastList.get(index).getMaxTemp()));
-
 				probabilityOfPrecipitationList.add(
-						finalDailyForecastList.get(index).getAmProbabilityOfPrecipitation() + percent + "/" + finalDailyForecastList.get(
-								index).getPmProbabilityOfPrecipitation() + percent);
+						dailyForecastDto.getAmValues().getPop() + "/" + dailyForecastDto.getPmValues().getPop());
 				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-						KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getAmSky(), false)),
-						ContextCompat.getDrawable(context,
-								KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecastList.get(index).getPmSky(), false))));
+						dailyForecastDto.getAmValues().getWeatherIcon()),
+						ContextCompat.getDrawable(context, dailyForecastDto.getAmValues().getWeatherIcon())));
 			}
 		}
 		dateRow.setValueList(dateList);
@@ -179,6 +168,25 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		dateRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
 
+		if (textSizeMap.containsKey(WeatherDataType.date)) {
+			dateRow.setTextSize(textSizeMap.get(WeatherDataType.date));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.pop)) {
+			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.temp)) {
+			tempRow.setTempTextSize(textSizeMap.get(WeatherDataType.temp));
+		}
+
+		if (textColorMap.containsKey(WeatherDataType.date)) {
+			dateRow.setTextColor(textColorMap.get(WeatherDataType.date));
+		}
+		if (textColorMap.containsKey(WeatherDataType.pop)) {
+			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherDataType.pop));
+		}
+		if (textColorMap.containsKey(WeatherDataType.temp)) {
+			tempRow.setTextColor(textColorMap.get(WeatherDataType.temp));
+		}
 
 		binding.forecastView.addView(dateRow, dateRowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);

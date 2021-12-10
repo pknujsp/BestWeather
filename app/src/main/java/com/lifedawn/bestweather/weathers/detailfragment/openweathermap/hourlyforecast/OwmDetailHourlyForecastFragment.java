@@ -218,47 +218,8 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailHourlyForecastFra
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				String tempDegree = getString(R.string.degree_symbol);
-				final String percent = "%";
-				String mm = ValueUnits.convertToStr(getContext(), ValueUnits.mm);
-
-				final String windUnitStr = ValueUnits.convertToStr(getContext(), windUnit);
-				final String zeroSnowVolume = getString(R.string.zeroSnowVolume);
-				final String zeroRainVolume = getString(R.string.zeroRainVolume);
-				final String zeroPrecipitationVolume = getString(R.string.zeroPrecipitationVolume);
-				final String pressureUnit = ValueUnits.convertToStr(getContext(), ValueUnits.hpa);
-				final String visibilityUnitStr = ValueUnits.convertToStr(getContext(), visibilityUnit);
-
-				hourlyForecastDtoList = new ArrayList<>();
-
-				for (OneCallResponse.Hourly hourly : hourlyList) {
-					HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
-
-					hourlyForecastDto.setHours(WeatherResponseProcessor.convertDateTimeOfHourlyForecast
-							(Long.parseLong(hourly.getDt()) * 1000L, zoneId))
-							.setWeatherIcon(OpenWeatherMapResponseProcessor.getWeatherIconImg(hourly.getWeather().get(0).getId(),
-									hourly.getWeather().get(0).getIcon().contains("n")))
-							.setTemp(ValueUnits.convertTemperature(hourly.getTemp(), tempUnit) + tempDegree)
-							.setPop((int) (Double.parseDouble(hourly.getPop()) * 100.0) + percent)
-							.setPrecipitationVolume(zeroPrecipitationVolume)
-							.setRainVolume(hourly.getRain() == null ? zeroRainVolume : hourly.getRain().getPrecipitation1Hour() + mm)
-							.setSnowVolume(hourly.getSnow() == null ? zeroSnowVolume :
-									hourly.getSnow().getPrecipitation1Hour() + mm)
-							.setWeatherDescription(OpenWeatherMapResponseProcessor.getWeatherIconDescription(hourly.getWeather().get(0).getId()))
-							.setFeelsLikeTemp(ValueUnits.convertTemperature(hourly.getFeelsLike(), tempUnit) + tempDegree)
-							.setWindDirection(WindDirectionConverter.windDirection(getContext(), hourly.getWind_deg()))
-							.setWindDirectionVal(Integer.parseInt(hourly.getWind_deg()))
-							.setWindSpeed(ValueUnits.convertWindSpeed(hourly.getWind_speed(), windUnit) + windUnitStr)
-							.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(hourly.getWind_speed()))
-							.setWindGust(ValueUnits.convertWindSpeed(hourly.getWindGust(), windUnit) + windUnitStr)
-							.setPressure(hourly.getPressure() + pressureUnit)
-							.setHumidity(hourly.getHumidity() + percent)
-							.setCloudiness(hourly.getClouds() + percent)
-							.setVisibility(ValueUnits.convertVisibility(hourly.getVisibility(), visibilityUnit) + visibilityUnitStr)
-							.setUvIndex(hourly.getUvi());
-
-					hourlyForecastDtoList.add(hourlyForecastDto);
-				}
+				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(), hourlyList,
+						windUnit, tempUnit, visibilityUnit, zoneId);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

@@ -47,48 +47,8 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailHourlyForecastFr
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				final String tempDegree = getString(R.string.degree_symbol);
-				final String percent = "%";
-				final String mm = "mm";
-
-				final String zero = "0.0";
-				final String zeroSnowVolume = "0.0cm";
-				final String zeroRainVolume = "0.0mm";
-				final String pressureUnit = ValueUnits.convertToStr(getContext(), ValueUnits.hpa);
-				final String visibilityUnitStr = ValueUnits.convertToStr(getContext(), visibilityUnit);
-				final String windUnitStr = ValueUnits.convertToStr(getContext(), windUnit);
-
-				hourlyForecastDtoList = new ArrayList<>();
-				for (TwelveHoursOfHourlyForecastsResponse.Item hourly : hourlyItemList) {
-					HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
-
-					hourlyForecastDto.setHours(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L,
-							zoneId))
-							.setTemp(ValueUnits.convertTemperature(hourly.getTemperature().getValue(), tempUnit) + tempDegree)
-							.setWeatherIcon(AccuWeatherResponseProcessor.getWeatherIconImg(hourly.getWeatherIcon()))
-							.setWeatherDescription(AccuWeatherResponseProcessor.getWeatherIconDescription(hourly.getWeatherIcon()))
-							.setPrecipitationVolume(hourly.getTotalLiquid().getValue() + mm)
-							.setPop((int) (Double.parseDouble(hourly.getPrecipitationProbability())) + percent)
-							.setRainVolume(hourly.getRain().getValue().equals(zero) ? zeroRainVolume : hourly.getRain().getValue() + mm)
-							.setSnowVolume(hourly.getSnow().getValue().equals(zero) ? zeroSnowVolume :
-									String.format("%.2f mm", ValueUnits.convertCMToMM(hourly.getSnow().getValue())))
-							.setFeelsLikeTemp(ValueUnits.convertTemperature(hourly.getRealFeelTemperature().getValue(), tempUnit) + tempDegree)
-							.setPor((int) (Double.parseDouble(hourly.getRainProbability())) + percent)
-							.setPos((int) (Double.parseDouble(hourly.getSnowProbability())) + percent)
-							.setPrecipitationType(AccuWeatherResponseProcessor.getPty(hourly.getPrecipitationType()))
-							.setPrecipitationTypeIcon(AccuWeatherResponseProcessor.getPtyIcon(hourly.getPrecipitationType()))
-							.setWindDirectionVal(Integer.parseInt(hourly.getWind().getDirection().getDegrees()))
-							.setWindDirection(WindDirectionConverter.windDirection(getContext(), hourly.getWind().getDirection().getDegrees()))
-							.setWindSpeed(ValueUnits.convertWindSpeedForAccu(hourly.getWind().getSpeed().getValue(), windUnit) + windUnitStr)
-							.setWindGust(ValueUnits.convertWindSpeedForAccu(hourly.getWindGust().getSpeed().getValue(), windUnit) + windUnitStr)
-							.setWindStrength(ValueUnits.convertWindSpeedForAccu(hourly.getWind().getSpeed().getValue(), ValueUnits.mPerSec).toString())
-							.setHumidity(hourly.getRelativeHumidity() + percent)
-							.setDewPointTemp(ValueUnits.convertTemperature(hourly.getDewPoint().getValue(), tempUnit) + tempDegree)
-							.setCloudiness(hourly.getCloudCover() + percent)
-							.setVisibility(ValueUnits.convertVisibilityForAccu(hourly.getVisibility().getValue(), visibilityUnit) + visibilityUnitStr);
-
-					hourlyForecastDtoList.add(hourlyForecastDto);
-				}
+				hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(), hourlyItemList, windUnit,
+						tempUnit, visibilityUnit, zoneId);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

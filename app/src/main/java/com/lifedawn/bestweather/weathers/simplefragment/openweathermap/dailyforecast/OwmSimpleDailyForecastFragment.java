@@ -17,11 +17,13 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.dailyforecast.OwmDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
@@ -120,6 +122,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		IconTextView snowVolumeRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
 				COLUMN_WIDTH, R.drawable.snowparticle);
 
+
 		//시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE");
@@ -132,33 +135,30 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
 
-		String rainVolume = null;
-		String snowVolume = null;
-		String percent = "%";
-		String zero = "0.0";
-
+		final String degree = "º";
+		final String mm = "mm";
 		boolean haveSnowVolumes = false;
 
-		for (OneCallResponse.Daily item : items) {
-			dateList.add((WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getDt()) * 1000L, zoneId).format(
-					dateTimeFormatter)));
-			minTempList.add(ValueUnits.convertTemperature(item.getTemp().getMin(), tempUnit));
-			maxTempList.add(ValueUnits.convertTemperature(item.getTemp().getMax(), tempUnit));
+		List<DailyForecastDto> dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), items,
+				windUnit, tempUnit, zoneId);
 
-			rainVolume = item.getRain() == null ? zero : item.getRain();
-			if (item.getSnow() != null) {
+		for (DailyForecastDto item : dailyForecastDtoList) {
+			dateList.add(item.getDate().format(dateTimeFormatter));
+			minTempList.add(Integer.parseInt(item.getMinTemp().replace(degree, "")));
+			maxTempList.add(Integer.parseInt(item.getMaxTemp().replace(degree, "")));
+
+			if (item.getSingleValues().isHasSnowVolume()) {
 				if (!haveSnowVolumes) {
 					haveSnowVolumes = true;
 				}
 			}
-			snowVolume = item.getSnow() == null ? zero : item.getSnow();
-			snowVolumeList.add(snowVolume);
+			snowVolumeList.add(item.getSingleValues().getSnowVolume().replace(mm, ""));
 
-			probabilityOfPrecipitationList.add((int) (Double.parseDouble(item.getPop()) * 100.0) + percent);
-			rainVolumeList.add(rainVolume);
+			probabilityOfPrecipitationList.add(item.getSingleValues().getPop());
+			rainVolumeList.add(item.getSingleValues().getRainVolume().replace(mm, ""));
 
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-					OpenWeatherMapResponseProcessor.getWeatherIconImg(item.getWeather().get(0).getId(), false))));
+					item.getSingleValues().getWeatherIcon())));
 		}
 
 		dateRow.setValueList(dateList);
@@ -184,6 +184,38 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		dateRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
+
+		if (textSizeMap.containsKey(WeatherDataType.date)) {
+			dateRow.setTextSize(textSizeMap.get(WeatherDataType.date));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.pop)) {
+			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.rainVolume)) {
+			rainVolumeRow.setValueTextSize(textSizeMap.get(WeatherDataType.rainVolume));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.snowVolume)) {
+			snowVolumeRow.setValueTextSize(textSizeMap.get(WeatherDataType.snowVolume));
+		}
+		if (textSizeMap.containsKey(WeatherDataType.temp)) {
+			tempRow.setTempTextSize(textSizeMap.get(WeatherDataType.temp));
+		}
+
+		if (textColorMap.containsKey(WeatherDataType.date)) {
+			dateRow.setTextColor(textColorMap.get(WeatherDataType.date));
+		}
+		if (textColorMap.containsKey(WeatherDataType.pop)) {
+			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherDataType.pop));
+		}
+		if (textColorMap.containsKey(WeatherDataType.rainVolume)) {
+			rainVolumeRow.setTextColor(textColorMap.get(WeatherDataType.rainVolume));
+		}
+		if (textColorMap.containsKey(WeatherDataType.snowVolume)) {
+			snowVolumeRow.setTextColor(textColorMap.get(WeatherDataType.snowVolume));
+		}
+		if (textColorMap.containsKey(WeatherDataType.temp)) {
+			tempRow.setTextColor(textColorMap.get(WeatherDataType.temp));
+		}
 
 		binding.forecastView.addView(dateRow, dateRowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);

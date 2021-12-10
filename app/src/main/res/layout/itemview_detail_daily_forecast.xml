@@ -66,10 +66,9 @@
 
             <androidx.gridlayout.widget.GridLayout
                 android:id="@+id/grid"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:columnCount="2"
+                app:columnCount="1"
                 app:orientation="horizontal">
 
             </androidx.gridlayout.widget.GridLayout>
@@ -106,6 +105,7 @@
 
                 <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
+                    android:clipToPadding="false"
                     android:layout_height="match_parent">
 
                     <LinearLayout

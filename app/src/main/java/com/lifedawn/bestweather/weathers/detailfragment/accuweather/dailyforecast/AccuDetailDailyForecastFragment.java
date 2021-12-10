@@ -61,83 +61,8 @@ public class AccuDetailDailyForecastFragment extends BaseDetailDailyForecastFrag
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				final String tempDegree = getString(R.string.degree_symbol);
-				final String mm = "mm";
-				final String cm = "cm";
-				final String percent = "%";
-				final String zeroSnowVolume = "0.0cm";
-				final String zeroRainVolume = "0.0mm";
-				final String zeroPrecipitationVolume = "0.0mm";
-				final String windUnitStr = ValueUnits.convertToStr(getContext(), windUnit);
-
-				final String zero = "0.0";
-
-				dailyForecastDtoList = new ArrayList<>();
-
-				String precipitationVolume = null;
-				String rainVolume = null;
-				String snowVolume = null;
-
-				for (FiveDaysOfDailyForecastsResponse.DailyForecasts daily : dailyForecastsList) {
-					DailyForecastDto dailyForecastDto = new DailyForecastDto();
-
-					dailyForecastDto.setDate(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, zoneId))
-							.setSingle(false).setMinTemp(ValueUnits.convertTemperature(daily.getTemperature().getMinimum().getValue(), tempUnit) + tempDegree)
-							.setMaxTemp(ValueUnits.convertTemperature(daily.getTemperature().getMaximum().getValue(), tempUnit) + tempDegree)
-							.setMinFeelsLikeTemp(ValueUnits.convertTemperature(daily.getRealFeelTemperature().getMinimum().getValue(), tempUnit) + tempDegree)
-							.setMaxFeelsLikeTemp(ValueUnits.convertTemperature(daily.getRealFeelTemperature().getMinimum().getValue(),
-									tempUnit) + tempDegree);
-
-					DailyForecastDto.Values am = new DailyForecastDto.Values();
-					DailyForecastDto.Values pm = new DailyForecastDto.Values();
-
-					rainVolume = daily.getDay().getRain().getValue() + mm;
-					snowVolume = daily.getDay().getSnow().getValue() + cm;
-					precipitationVolume = daily.getDay().getTotalLiquid().getValue() + mm;
-
-					am.setWeatherIcon(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getDay().getIcon()));
-					am.setWeatherDescription(AccuWeatherResponseProcessor.getWeatherIconDescription(daily.getDay().getIcon()));
-					am.setPop(daily.getDay().getPrecipitationProbability() + percent);
-					am.setPor(daily.getDay().getRainProbability() + percent);
-					am.setPos(daily.getDay().getSnowProbability() + percent);
-					am.setHasPrecipitationVolume(!precipitationVolume.equals(zeroPrecipitationVolume));
-					am.setPrecipitationVolume(precipitationVolume);
-					am.setHasRainVolume(!rainVolume.equals(zeroRainVolume));
-					am.setRainVolume(rainVolume);
-					am.setHasSnowVolume(!snowVolume.equals(zeroSnowVolume));
-					am.setSnowVolume(snowVolume);
-					am.setWindDirection(WindDirectionConverter.windDirection(getContext(), daily.getDay().getWind().getDirection().getDegrees()));
-					am.setWindDirectionVal(Integer.parseInt(daily.getDay().getWind().getDirection().getDegrees()));
-					am.setWindSpeed(ValueUnits.convertWindSpeedForAccu(daily.getDay().getWind().getSpeed().getValue(), windUnit) + windUnitStr);
-					am.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(ValueUnits.convertWindSpeedForAccu(daily.getDay().getWind().getSpeed().getValue(), ValueUnits.mPerSec).toString()));
-					am.setWindGust(ValueUnits.convertWindSpeedForAccu(daily.getDay().getWind().getSpeed().getValue(), windUnit) + windUnitStr);
-					am.setCloudiness(daily.getDay().getCloudCover() + percent);
-
-					rainVolume = daily.getDay().getRain().getValue() + mm;
-					snowVolume = daily.getDay().getSnow().getValue() + cm;
-					precipitationVolume = daily.getDay().getTotalLiquid().getValue() + mm;
-
-					pm.setWeatherIcon(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getNight().getIcon()));
-					pm.setWeatherDescription(AccuWeatherResponseProcessor.getWeatherIconDescription(daily.getNight().getIcon()));
-					pm.setPop(daily.getNight().getPrecipitationProbability() + percent);
-					pm.setPor(daily.getNight().getRainProbability() + percent);
-					pm.setPos(daily.getNight().getSnowProbability() + percent);
-					pm.setHasPrecipitationVolume(!precipitationVolume.equals(zeroPrecipitationVolume));
-					pm.setPrecipitationVolume(precipitationVolume);
-					pm.setHasRainVolume(!rainVolume.equals(zeroRainVolume));
-					pm.setRainVolume(rainVolume);
-					pm.setHasSnowVolume(!snowVolume.equals(zeroSnowVolume));
-					pm.setSnowVolume(snowVolume);
-					pm.setWindDirection(WindDirectionConverter.windDirection(getContext(), daily.getNight().getWind().getDirection().getDegrees()));
-					pm.setWindDirectionVal(Integer.parseInt(daily.getNight().getWind().getDirection().getDegrees()));
-					pm.setWindSpeed(ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), windUnit) + windUnitStr);
-					pm.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), ValueUnits.mPerSec).toString()));
-					pm.setWindGust(ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), windUnit) + windUnitStr);
-					pm.setCloudiness(daily.getNight().getCloudCover() + percent);
-
-					dailyForecastDto.setAmValues(am).setPmValues(pm);
-					dailyForecastDtoList.add(dailyForecastDto);
-				}
+				dailyForecastDtoList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(getContext(), dailyForecastsList, windUnit,
+						tempUnit, zoneId);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

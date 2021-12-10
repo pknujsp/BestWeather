@@ -100,10 +100,13 @@ public class DetailDoubleTemperatureView extends View {
 		setWillNotDraw(false);
 	}
 
-	public void setMaxTempTextSize(int textSizeSp) {
+	public void setTempTextSize(int textSizeSp) {
 		tempPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics()));
 	}
 
+	public void setTextColor(int textColor) {
+		tempPaint.setColor(textColor);
+	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

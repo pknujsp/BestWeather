@@ -55,6 +55,9 @@ public class ClockView extends View {
 		clockPaint.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics()));
 	}
 
+	public void setTextColor(int textColor) {
+		clockPaint.setColor(textColor);
+	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

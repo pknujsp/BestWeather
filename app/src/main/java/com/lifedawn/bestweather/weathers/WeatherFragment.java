@@ -109,6 +109,7 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -144,7 +145,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private Gps gps;
 	private NetworkStatus networkStatus;
 	private Gps.LocationCallback locationCallbackInMainFragment;
-
 
 	private WeatherSourceType mainWeatherSourceType;
 	private Double latitude;
@@ -362,7 +362,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		EXECUTOR_SERVICE.execute(new Runnable() {
 			@Override
 			public void run() {
+				ZonedDateTime lastRefreshDateTime =
+						ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleJsonDownloader.getLocalDateTime().toString());
 				Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
+				currentCalendar.set(lastRefreshDateTime.getYear(), lastRefreshDateTime.getMonthValue() - 1,
+						lastRefreshDateTime.getDayOfMonth(), lastRefreshDateTime.getHour(), lastRefreshDateTime.getMinute(),
+						lastRefreshDateTime.getSecond());
 
 				SunriseSunsetCalculator sunRiseSunsetCalculator = new SunriseSunsetCalculator(
 						new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), currentCalendar.getTimeZone());

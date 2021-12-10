@@ -48,39 +48,7 @@ public class KmaDetailDailyForecastFragment extends BaseDetailDailyForecastFragm
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				String tempDegree = getString(R.string.degree_symbol);
-				String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
-
-				dailyForecastDtoList = new ArrayList<>();
-
-				for (FinalDailyForecast finalDailyForecast : finalDailyForecastList) {
-					DailyForecastDto dailyForecastDto = new DailyForecastDto();
-
-					dailyForecastDto.setDate(finalDailyForecast.getDate())
-							.setMinTemp(ValueUnits.convertTemperature(finalDailyForecast.getMinTemp(), tempUnit) + tempDegree)
-							.setMaxTemp(ValueUnits.convertTemperature(finalDailyForecast.getMaxTemp(), tempUnit) + tempDegree)
-							.setSingle(finalDailyForecast.isSingle());
-
-					DailyForecastDto.Values single = null;
-					DailyForecastDto.Values am = null;
-					DailyForecastDto.Values pm = null;
-
-					if (finalDailyForecast.isSingle()) {
-						single = new DailyForecastDto.Values();
-						single.setPop(finalDailyForecast.getProbabilityOfPrecipitation() + percent)
-								.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false));
-					} else {
-						am = new DailyForecastDto.Values();
-						pm = new DailyForecastDto.Values();
-
-						am.setPop(finalDailyForecast.getAmProbabilityOfPrecipitation() + percent)
-								.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getAmSky(), false));
-						pm.setPop(finalDailyForecast.getPmProbabilityOfPrecipitation() + percent)
-								.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), false));
-					}
-					dailyForecastDto.setSingleValues(single).setAmValues(am).setPmValues(pm);
-					dailyForecastDtoList.add(dailyForecastDto);
-				}
+				dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoList(getContext(), finalDailyForecastList, tempUnit);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {
