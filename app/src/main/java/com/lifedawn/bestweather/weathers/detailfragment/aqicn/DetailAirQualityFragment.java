@@ -33,7 +33,7 @@ import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecast
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.AirQualityBarView;
 import com.lifedawn.bestweather.weathers.FragmentType;
-import com.lifedawn.bestweather.weathers.view.TextValueView;
+import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -133,7 +133,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		}
 
 		final int dateRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInD);
-		TextValueView dateRow = new TextValueView(getContext(), FragmentType.Detail, viewWidth, dateRowHeight, columnWidth);
+		TextsView dateRow = new TextsView(getContext(), viewWidth, columnWidth, dateList);
 		AirQualityBarView pm10BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, pm10AirQualityObjList);
 		AirQualityBarView pm25BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, pm25AirQualityObjList);
 		AirQualityBarView o3BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, o3AirQualityObjList);
@@ -154,7 +154,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		binding.forecastView.addView(pm25BarView, layoutParams);
 		binding.forecastView.addView(o3BarView, layoutParams);
 
-		String notData = getString(R.string.not_data);
+		String notData = getString(R.string.noData);
 		if (iAqi.getCo() == null) {
 			addGridItem(null, R.string.co_str, R.drawable.co);
 		} else {
@@ -232,7 +232,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		((TextView) gridItem.findViewById(R.id.label)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Detail));
 		((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
 		((TextView) gridItem.findViewById(R.id.value_int)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Detail));
-		((TextView) gridItem.findViewById(R.id.value_str)).setText(value == null ? getString(R.string.not_data) : AqicnResponseProcessor.getGradeDescription(value));
+		((TextView) gridItem.findViewById(R.id.value_str)).setText(value == null ? getString(R.string.noData) : AqicnResponseProcessor.getGradeDescription(value));
 		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(value == null ? ContextCompat.getColor(getContext(), R.color.not_data_color)
 				: AqicnResponseProcessor.getGradeColorId(value));
 

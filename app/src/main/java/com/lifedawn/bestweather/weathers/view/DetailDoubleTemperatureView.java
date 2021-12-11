@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.text.TextPaint;
 import android.util.TypedValue;
@@ -26,7 +27,6 @@ public class DetailDoubleTemperatureView extends View {
 	private final int minTemp;
 	private final TextPaint tempPaint;
 	private final Paint linePaint;
-	private final Paint minMaxTempLinePaint;
 	private final Paint maxCirclePaint;
 	private final Paint minCirclePaint;
 	private final int circleRadius;
@@ -48,19 +48,14 @@ public class DetailDoubleTemperatureView extends View {
 
 		tempPaint = new TextPaint();
 		tempPaint.setTextAlign(Paint.Align.CENTER);
-		tempPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 13f, getResources().getDisplayMetrics()));
+		tempPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, getResources().getDisplayMetrics()));
 		tempPaint.setColor(AppTheme.getTextColor(context, fragmentType));
 
 		linePaint = new Paint();
 		linePaint.setAntiAlias(true);
-		linePaint.setStyle(Paint.Style.FILL);
-		linePaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.3f, getResources().getDisplayMetrics()));
+		linePaint.setStyle(Paint.Style.STROKE);
+		linePaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.4f, getResources().getDisplayMetrics()));
 		linePaint.setColor(AppTheme.getTextColor(context, fragmentType));
-
-		minMaxTempLinePaint = new Paint();
-		minMaxTempLinePaint.setAntiAlias(true);
-		minMaxTempLinePaint.setStyle(Paint.Style.FILL);
-		minMaxTempLinePaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1f, getResources().getDisplayMetrics()));
 
 		maxCirclePaint = new Paint();
 		maxCirclePaint.setAntiAlias(true);
@@ -146,6 +141,9 @@ public class DetailDoubleTemperatureView extends View {
 		float[] maxCircleXArr = new float[minTempList.size()];
 		float[] maxCircleYArr = new float[minTempList.size()];
 
+		List<PointF> minLinePointList = new ArrayList<>();
+		List<PointF> maxLinePointList = new ArrayList<>();
+
 		for (int index = 0; index < maxTempList.size(); index++) {
 			min = minTempList.get(index);
 			max = maxTempList.get(index);
@@ -154,15 +152,13 @@ public class DetailDoubleTemperatureView extends View {
 			minY = (10f * (maxTemp - min)) * SPACING + TEXT_HEIGHT + circleRadius;
 			maxY = (10f * (maxTemp - max)) * SPACING + TEXT_HEIGHT + circleRadius;
 
+
 			if (index != 0) {
-				canvas.drawLine(lastMinColumnPoint.x, lastMinColumnPoint.y, x, minY, linePaint);
-				canvas.drawLine(lastMaxColumnPoint.x, lastMaxColumnPoint.y, x, maxY, linePaint);
+				//canvas.drawLine(lastMinColumnPoint.x, lastMinColumnPoint.y, x, minY, linePaint);
+				//canvas.drawLine(lastMaxColumnPoint.x, lastMaxColumnPoint.y, x, maxY, linePaint);
 			}
 
-			canvas.drawCircle(x, minY, circleRadius, minCirclePaint);
 			canvas.drawText(minTempList.get(index).toString() + tempUnit, x, minY + circleRadius + TEXT_HEIGHT, tempPaint);
-
-			canvas.drawCircle(x, maxY, circleRadius, maxCirclePaint);
 			canvas.drawText(maxTempList.get(index).toString() + tempUnit, x, maxY - circleRadius - TEXT_HEIGHT + TEXT_ASCENT, tempPaint);
 
 			lastMinColumnPoint.set(x, minY);
@@ -172,7 +168,41 @@ public class DetailDoubleTemperatureView extends View {
 			minCircleYArr[index] = minY;
 			maxCircleXArr[index] = x;
 			maxCircleYArr[index] = maxY;
+
+			minLinePointList.add(new PointF(lastMinColumnPoint.x, lastMinColumnPoint.y));
+			maxLinePointList.add(new PointF(lastMaxColumnPoint.x, lastMaxColumnPoint.y));
 		}
+
+		final int tempsCount = minTempList.size();
+		PointF[] minPoints1 = new PointF[tempsCount];
+		PointF[] minPoints2 = new PointF[tempsCount];
+
+		PointF[] maxPoints1 = new PointF[tempsCount];
+		PointF[] maxPoints2 = new PointF[tempsCount];
+
+		for (int i = 1; i < tempsCount; i++) {
+			minPoints1[i] = new PointF((minLinePointList.get(i).x + minLinePointList.get(i - 1).x) / 2, minLinePointList.get(i - 1).y);
+			minPoints2[i] = new PointF((minLinePointList.get(i).x + minLinePointList.get(i - 1).x) / 2, minLinePointList.get(i).y);
+
+			maxPoints1[i] = new PointF((maxLinePointList.get(i).x + maxLinePointList.get(i - 1).x) / 2, maxLinePointList.get(i - 1).y);
+			maxPoints2[i] = new PointF((maxLinePointList.get(i).x + maxLinePointList.get(i - 1).x) / 2, maxLinePointList.get(i).y);
+		}
+
+		Path minPath = new Path();
+		Path maxPath = new Path();
+		minPath.moveTo(minLinePointList.get(0).x, minLinePointList.get(0).y);
+		maxPath.moveTo(maxLinePointList.get(0).x, maxLinePointList.get(0).y);
+
+		//곡선 그리기
+		for (int i = 1; i < tempsCount; i++) {
+			minPath.cubicTo(minPoints1[i].x, minPoints1[i].y, minPoints2[i].x, minPoints2[i].y, minLinePointList.get(i).x,
+					minLinePointList.get(i).y);
+			maxPath.cubicTo(maxPoints1[i].x, maxPoints1[i].y, maxPoints2[i].x, maxPoints2[i].y, maxLinePointList.get(i).x,
+					maxLinePointList.get(i).y);
+		}
+
+		canvas.drawPath(minPath, linePaint);
+		canvas.drawPath(maxPath, linePaint);
 
 		for (int i = 0; i < minCircleXArr.length; i++) {
 			canvas.drawCircle(minCircleXArr[i], minCircleYArr[i], circleRadius, minCirclePaint);

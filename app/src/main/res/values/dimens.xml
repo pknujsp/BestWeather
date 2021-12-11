@@ -67,7 +67,7 @@
     <dimen name="columnWidthInAirQualityBarView">57dp</dimen>
     <dimen name="viewHeightOfAirQualityBarView">100dp</dimen>
     <dimen name="iconValueViewMargin">6dp</dimen>
-    <dimen name="nonScrollViewTopBottomMargin">4dp</dimen>
+    <dimen name="nonScrollViewTopBottomMargin">8dp</dimen>
 
     <!-- widget -->
     <dimen name="widget_margin">6dp</dimen>
@@ -102,5 +102,6 @@
     <dimen name="toolbarHeight">46dp</dimen>
 
     <dimen name="headerViewOfDetailForecastItemHeight">140dp</dimen>
+    <dimen name="tempTopMargin">2dp</dimen>
 
 </resources>

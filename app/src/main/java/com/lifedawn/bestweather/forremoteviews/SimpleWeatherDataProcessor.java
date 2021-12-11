@@ -81,7 +81,7 @@ public class SimpleWeatherDataProcessor {
 		final ValueUnits visibilityUnit =
 				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_visibility),
 						ValueUnits.km.name()));
-		final String degree = "º";
+		final String degree = "°";
 
 		switch (weatherSourceType) {
 			case KMA:
@@ -206,7 +206,7 @@ public class SimpleWeatherDataProcessor {
 				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_visibility),
 						ValueUnits.km.name()));
 		final DateTimeFormatter hoursFormatterIfHours0 = DateTimeFormatter.ofPattern("E 0");
-		final String degree = "º";
+		final String degree = "°";
 		final String percent = "%";
 
 		switch (weatherSourceType) {
@@ -334,7 +334,7 @@ public class SimpleWeatherDataProcessor {
 				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_wind),
 						ValueUnits.mPerSec.name()));
 
-		final String degree = "º";
+		final String degree = "°";
 		final String percent = "%";
 
 		switch (weatherSourceType) {

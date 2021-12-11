@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.text.Layout;
+import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.TypedValue;
 import android.view.View;
@@ -28,6 +30,8 @@ public class IconTextView extends View {
 	private final Rect iconRect = new Rect();
 	private final int spacingBetweenIconAndValue;
 
+	private int viewHeight;
+
 	private Drawable icon;
 	private List<String> valueList;
 	private Rect textRect = new Rect();
@@ -42,19 +46,15 @@ public class IconTextView extends View {
 		this.columnWidth = columnWidth;
 
 		valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-		valueTextPaint.setTextAlign(Paint.Align.LEFT);
+		valueTextPaint.setTextAlign(Paint.Align.CENTER);
 		valueTextPaint.setTextSize(context.getResources().getDimension(R.dimen.iconValueTextSizeInSCD));
 		valueTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
-		String tempStr = "테스트";
-		valueTextPaint.getTextBounds(tempStr, 0, tempStr.length(), textRect);
 
 		icon = ContextCompat.getDrawable(context, iconId);
 		icon.setTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.blue)));
 
 		spacingBetweenIconAndValue = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, getResources().getDisplayMetrics());
 		padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, getResources().getDisplayMetrics());
-
-		setWillNotDraw(false);
 	}
 
 	public IconTextView setValueList(List<String> valueList) {
@@ -64,8 +64,6 @@ public class IconTextView extends View {
 
 	public void setValueTextSize(int textSizeSp) {
 		valueTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics()));
-		String tempStr = "테스트";
-		valueTextPaint.getTextBounds(tempStr, 0, tempStr.length(), textRect);
 	}
 
 	public void setTextColor(int textColor) {
@@ -78,8 +76,20 @@ public class IconTextView extends View {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		iconSize = textRect.height() + padding * 2;
-		setMeasuredDimension(viewWidth, iconSize);
+		iconSize = (int) valueTextPaint.getTextSize();
+
+		StaticLayout staticLayout = null;
+		viewHeight = Integer.MIN_VALUE;
+		final int availableTextWidth = columnWidth - iconSize - spacingBetweenIconAndValue;
+
+		for (String val : valueList) {
+			StaticLayout.Builder builder = StaticLayout.Builder.obtain(val, 0, val.length(), valueTextPaint, availableTextWidth);
+			staticLayout = builder.build();
+			viewHeight = Math.max(staticLayout.getHeight(), viewHeight);
+		}
+
+		viewHeight += padding * 2;
+		setMeasuredDimension(viewWidth, viewHeight);
 	}
 
 	@Override
@@ -92,20 +102,37 @@ public class IconTextView extends View {
 		super.onDraw(canvas);
 
 		int column = 0;
-		int itemWidth = 0;
-		iconRect.top = padding;
-		iconRect.bottom = getHeight() - padding;
+		iconRect.top = getHeight() / 2 - iconSize / 2;
+		iconRect.bottom = iconRect.top + iconSize;
+		StaticLayout staticLayout = null;
+		final int availableTextWidth = columnWidth - iconSize - spacingBetweenIconAndValue;
+		int moveDistance;
+		Rect textRect = new Rect();
+		final String tab = "\n";
+		String separatedStr;
 
 		for (String value : valueList) {
-			valueTextPaint.getTextBounds(value, 0, value.length(), textRect);
-			itemWidth = iconSize + spacingBetweenIconAndValue + textRect.width();
-			iconRect.left = (column * columnWidth) + (columnWidth - itemWidth) / 2;
-			iconRect.right = iconRect.left + iconSize;
+			separatedStr = value.split(tab)[0];
+			valueTextPaint.getTextBounds(separatedStr, 0, separatedStr.length(), textRect);
+			StaticLayout.Builder builder = StaticLayout.Builder.obtain(value, 0, value.length(), valueTextPaint, availableTextWidth);
+			staticLayout = builder.build();
+
+			moveDistance = (columnWidth - textRect.width()) / 4;
+
+			float x = (column * columnWidth) + (columnWidth / 2f) + moveDistance;
+			float y = viewHeight / 2f - (staticLayout.getHeight() / 2f);
+
+			iconRect.right = (int) (x - spacingBetweenIconAndValue - textRect.width() / 2);
+			iconRect.left = iconRect.right - iconSize;
 
 			icon.setBounds(iconRect);
 			icon.draw(canvas);
 
-			canvas.drawText(value, iconRect.right + spacingBetweenIconAndValue, iconRect.centerY() + textRect.height() / 2f, valueTextPaint);
+			canvas.save();
+			canvas.translate(x, y);
+			staticLayout.draw(canvas);
+			canvas.restore();
+
 			column++;
 		}
 	}

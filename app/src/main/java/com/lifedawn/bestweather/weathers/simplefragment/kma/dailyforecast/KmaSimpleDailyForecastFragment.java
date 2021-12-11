@@ -28,7 +28,7 @@ import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
-import com.lifedawn.bestweather.weathers.view.TextValueView;
+import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -111,7 +111,6 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyAccuKma);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 
-		TextValueView dateRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, (int) getResources().getDimension(R.dimen.multipleDateTextRowHeightInCOMMON), COLUMN_WIDTH);
 		DoubleWeatherIconView weatherIconRow = new DoubleWeatherIconView(context, FragmentType.Simple, VIEW_WIDTH, WEATHER_ROW_HEIGHT,
 				COLUMN_WIDTH);
 		IconTextView probabilityOfPrecipitationRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
@@ -121,7 +120,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<String> dateList = new ArrayList<>();
 		List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE", Locale.getDefault());
-		final String degree = "º";
+		final String degree = "°";
 		//기온, 강수확률, 강수량
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
@@ -138,38 +137,33 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			if (dailyForecastDto.isSingle()) {
 				probabilityOfPrecipitationList.add(dailyForecastDto.getSingleValues().getPop());
 				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-						dailyForecastDto.getSingleValues().getWeatherIcon())));
+						dailyForecastDto.getSingleValues().getWeatherIcon()), dailyForecastDto.getSingleValues().getWeatherDescription()));
 			} else {
 				probabilityOfPrecipitationList.add(
 						dailyForecastDto.getAmValues().getPop() + "/" + dailyForecastDto.getPmValues().getPop());
 				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
 						dailyForecastDto.getAmValues().getWeatherIcon()),
-						ContextCompat.getDrawable(context, dailyForecastDto.getAmValues().getWeatherIcon())));
+						ContextCompat.getDrawable(context, dailyForecastDto.getAmValues().getWeatherIcon()),
+						dailyForecastDto.getAmValues().getWeatherDescription(),
+						dailyForecastDto.getPmValues().getWeatherDescription()));
 			}
 		}
-		dateRow.setValueList(dateList);
-
 		weatherIconRow.setIcons(weatherIconObjList);
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
+
+		TextsView dateRow = new TextsView(context, VIEW_WIDTH, COLUMN_WIDTH, dateList);
 		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(getContext(), FragmentType.Simple, VIEW_WIDTH,
 				TEMP_ROW_HEIGHT, COLUMN_WIDTH, minTempList, maxTempList);
 
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		rowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-
-		LinearLayout.LayoutParams iconTextRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		iconTextRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-		iconTextRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
 
 		LinearLayout.LayoutParams dateRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		dateRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
 
 		if (textSizeMap.containsKey(WeatherDataType.date)) {
-			dateRow.setTextSize(textSizeMap.get(WeatherDataType.date));
+			dateRow.setValueTextSize(textSizeMap.get(WeatherDataType.date));
 		}
 		if (textSizeMap.containsKey(WeatherDataType.pop)) {
 			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
@@ -179,7 +173,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		}
 
 		if (textColorMap.containsKey(WeatherDataType.date)) {
-			dateRow.setTextColor(textColorMap.get(WeatherDataType.date));
+			dateRow.setValueTextColor(textColorMap.get(WeatherDataType.date));
 		}
 		if (textColorMap.containsKey(WeatherDataType.pop)) {
 			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherDataType.pop));
@@ -190,13 +184,33 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 		binding.forecastView.addView(dateRow, dateRowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
-		binding.forecastView.addView(probabilityOfPrecipitationRow, iconTextRowLayoutParams);
+		binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
+
 
 		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		tempRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 		tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
+
+/*
+		FragmentContainerView fragmentContainerView = new FragmentContainerView(getContext());
+		fragmentContainerView.setClipChildren(false);
+		fragmentContainerView.setId(R.id.fragment_container);
+
+		FrameLayout.LayoutParams fragmentContainerLayoutParams = new FrameLayout.LayoutParams(VIEW_WIDTH - COLUMN_WIDTH,
+				(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100f, getResources().getDisplayMetrics()));
+
+		binding.forecastView.addView(fragmentContainerView, fragmentContainerLayoutParams);
+
+		CubicLineChartFragment cubicLineChartFragment = new CubicLineChartFragment();
+		Bundle bundle = new Bundle();
+		bundle.putIntegerArrayList("minTempList", (ArrayList<Integer>) minTempList);
+		bundle.putIntegerArrayList("maxTempList", (ArrayList<Integer>) maxTempList);
+
+		cubicLineChartFragment.setArguments(bundle);
+		getChildFragmentManager().beginTransaction().add(R.id.fragment_container, cubicLineChartFragment).commit();
+
+ */
 	}
 }

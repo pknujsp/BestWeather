@@ -52,7 +52,7 @@
                         android:layout_alignBottom="@id/weatherIcon"
                         android:layout_toRightOf="@id/weatherIcon"
                         android:gravity="center"
-                        android:text="20º"
+                        android:text="20°"
                         android:textColor="@color/white"
 
                         android:textSize="24sp" />

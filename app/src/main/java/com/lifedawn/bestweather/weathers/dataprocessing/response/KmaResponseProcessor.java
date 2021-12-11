@@ -543,7 +543,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	                                                                List<FinalHourlyForecast> hourlyForecastList, double latitude, double longitude,
 	                                                                ValueUnits windUnit, ValueUnits tempUnit,
 	                                                                ZoneId zoneId) {
-		final String tempDegree = "º";
+		final String tempDegree = "°";
 		final String percent = "%";
 		final String lessThan1mm = "1.0mm 미만";
 		final String noSnow = "적설없음";
@@ -627,7 +627,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 	public static List<DailyForecastDto> makeDailyForecastDtoList(Context context,
 	                                                              List<FinalDailyForecast> dailyForecastList, ValueUnits tempUnit) {
-		final String tempDegree = "º";
+		final String tempDegree = "°";
 		final String percent = "%";
 
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
@@ -647,15 +647,18 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 			if (finalDailyForecast.isSingle()) {
 				single = new DailyForecastDto.Values();
 				single.setPop(finalDailyForecast.getProbabilityOfPrecipitation() + percent)
-						.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false));
+						.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false))
+						.setWeatherDescription(finalDailyForecast.getSky());
 			} else {
 				am = new DailyForecastDto.Values();
 				pm = new DailyForecastDto.Values();
 
 				am.setPop(finalDailyForecast.getAmProbabilityOfPrecipitation() + percent)
-						.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getAmSky(), false));
+						.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getAmSky(), false))
+						.setWeatherDescription(finalDailyForecast.getAmSky());
 				pm.setPop(finalDailyForecast.getPmProbabilityOfPrecipitation() + percent)
-						.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), false));
+						.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), false))
+						.setWeatherDescription(finalDailyForecast.getPmSky());
 			}
 			dailyForecastDto.setSingleValues(single).setAmValues(am).setPmValues(pm);
 			dailyForecastDtoList.add(dailyForecastDto);

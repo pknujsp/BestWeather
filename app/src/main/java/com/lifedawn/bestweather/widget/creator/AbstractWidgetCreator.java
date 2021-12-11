@@ -35,7 +35,7 @@ public abstract class AbstractWidgetCreator {
 	protected final int appWidgetId;
 	protected final ValueUnits tempUnit;
 	protected final ValueUnits clockUnit;
-	protected final String tempDegree = "º";
+	protected final String tempDegree = "°";
 
 	protected Context context;
 

@@ -82,7 +82,7 @@
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@id/current_weather_icon"
                 android:gravity="center_vertical"
-                android:text="20º"
+                android:text="20°"
                 android:textColor="@color/white"
                 android:textSize="@dimen/tempTextSizeInWidgetCurrent" />
 

@@ -24,14 +24,12 @@ public class DateView extends View {
 	private final TextPaint dateTextPaint;
 	private final int viewWidth;
 	private final int columnWidth;
-	private final DateTimeFormatter dateTimeFormatter;
+	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE");
+	;
 	private List<DateValue> dateValueList;
 	private int currentX;
 	private int firstColX;
-	private int textHeight;
 
-	private int textSize;
-	private Rect rect = new Rect();
 	private int padding;
 	private int viewHeight;
 
@@ -40,8 +38,7 @@ public class DateView extends View {
 		this.fragmentType = fragmentType;
 		this.viewWidth = viewWidth;
 		this.columnWidth = columnWidth;
-		dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE");
-		padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6f, getResources().getDisplayMetrics());
+		padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, getResources().getDisplayMetrics());
 
 		dateTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		dateTextPaint.setTextAlign(Paint.Align.CENTER);
@@ -52,8 +49,8 @@ public class DateView extends View {
 	}
 
 	public void setTextSize(int textSizeSp) {
-		this.textSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics());
-		dateTextPaint.setTextSize(textSize);
+		dateTextPaint.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp,
+				getResources().getDisplayMetrics()));
 	}
 
 	public void setTextColor(int textColor) {
@@ -91,13 +88,19 @@ public class DateView extends View {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		ZonedDateTime now = ZonedDateTime.now();
-		String val = now.format(dateTimeFormatter);
-		dateTextPaint.getTextBounds(val, 0, val.length(), rect);
-		StaticLayout.Builder builder = StaticLayout.Builder.obtain(val, 0, val.length(), dateTextPaint, columnWidth);
-		StaticLayout sl = builder.build();
-		viewHeight = rect.height() * sl.getLineCount() + padding * 2;
+		StaticLayout staticLayout = null;
+		viewHeight = Integer.MIN_VALUE;
+		String str = null;
 
+		for (DateValue val : dateValueList) {
+			str = val.date.format(dateTimeFormatter);
+			StaticLayout.Builder builder = StaticLayout.Builder.obtain(str, 0, str.length(), dateTextPaint,
+					columnWidth);
+			staticLayout = builder.build();
+			viewHeight = Math.max(staticLayout.getHeight(), viewHeight);
+		}
+
+		viewHeight += padding * 2;
 		setMeasuredDimension(viewWidth, viewHeight);
 	}
 
@@ -109,7 +112,6 @@ public class DateView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		final int y = getHeight() / 2 + textHeight / 2;
 
 		for (DateValue dateValue : dateValueList) {
 			if (currentX >= dateValue.beginX - firstColX && currentX < dateValue.endX - firstColX) {
@@ -117,7 +119,6 @@ public class DateView extends View {
 			} else if (currentX < dateValue.beginX) {
 				dateValue.lastX = dateValue.beginX;
 			}
-			//canvas.drawText(dateValue.date.format(dateTimeFormatter), dateValue.lastX, y, dateTextPaint);
 			drawText(canvas, dateValue.date.format(dateTimeFormatter), dateValue.lastX);
 		}
 	}
@@ -128,22 +129,14 @@ public class DateView extends View {
 	}
 
 	private void drawText(Canvas canvas, String textOnCanvas, float x) {
-		dateTextPaint.getTextBounds(textOnCanvas, 0, textOnCanvas.length(), rect);
 		StaticLayout.Builder builder = StaticLayout.Builder.obtain(textOnCanvas, 0, textOnCanvas.length(), dateTextPaint, columnWidth);
-		StaticLayout sl = builder.build();
+		StaticLayout staticLayout = builder.build();
+
+		float y = viewHeight / 2f - (staticLayout.getHeight() / 2f);
 
 		canvas.save();
-
-		float textHeight = rect.height();
-		float textYCoordinate = viewHeight / 2f + rect.exactCenterY() -
-				((sl.getLineCount() * textHeight) / 2);
-
-		final float columnCenterX = columnWidth / 2f;
-		float textXCoordinate = columnCenterX + rect.left;
-
-		canvas.translate(x, textYCoordinate);
-
-		sl.draw(canvas);
+		canvas.translate(x, y);
+		staticLayout.draw(canvas);
 		canvas.restore();
 	}
 

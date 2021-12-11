@@ -8,7 +8,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,22 +15,19 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.accuweather.hourlyforecast.AccuDetailHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
-import com.lifedawn.bestweather.weathers.view.ClockView;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
-import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
+import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -115,10 +111,9 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		final int viewWidth = columnCount * columnWidth;
 
 		dateRow = new DateView(context, FragmentType.Simple, viewWidth, columnWidth);
-		ClockView clockRow = new ClockView(context, FragmentType.Simple, viewWidth, columnWidth);
 		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Simple, viewWidth, weatherRowHeight,
 				columnWidth);
-		TextValueView tempRow = new TextValueView(context, FragmentType.Simple, viewWidth, defaultTextRowHeight, columnWidth);
+
 		IconTextView popRow = new IconTextView(context, FragmentType.Simple, viewWidth,
 				columnWidth, R.drawable.pop);
 		IconTextView rainVolumeRow = new IconTextView(context, FragmentType.Simple, viewWidth,
@@ -129,6 +124,7 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		//시각, 기온, 강수확률, 강수량-----
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		List<ZonedDateTime> dateTimeList = new ArrayList<>();
+		List<String> hourList = new ArrayList<>();
 		List<String> tempList = new ArrayList<>();
 		List<String> popList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
@@ -144,8 +140,9 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 
 		for (HourlyForecastDto item : hourlyForecastDtoList) {
 			dateTimeList.add(item.getHours());
+			hourList.add(String.valueOf(item.getHours().getHour()));
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
-					ContextCompat.getDrawable(context, item.getWeatherIcon())));
+					ContextCompat.getDrawable(context, item.getWeatherIcon()), item.getWeatherDescription()));
 			tempList.add(item.getTemp());
 			popList.add(item.getPop());
 			rainVolumeList.add(item.getRainVolume().replace(mm, ""));
@@ -160,32 +157,28 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 
 		weatherIconRow.setWeatherImgs(weatherIconObjList);
 		dateRow.init(dateTimeList);
-		clockRow.setClockList(dateTimeList);
-		tempRow.setValueList(tempList);
 
 		popRow.setValueList(popList);
 		rainVolumeRow.setValueList(rainVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);
 
+		TextsView clockRow = new TextsView(context, viewWidth, columnWidth, hourList);
+		TextsView tempRow = new TextsView(context, viewWidth, columnWidth, tempList);
+
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		rowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 
-		LinearLayout.LayoutParams iconTextRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		iconTextRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-		iconTextRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
 
 		if (textSizeMap.containsKey(WeatherDataType.date)) {
 			dateRow.setTextSize(textSizeMap.get(WeatherDataType.date));
 		}
 		if (textSizeMap.containsKey(WeatherDataType.time)) {
-			clockRow.setTextSize(textSizeMap.get(WeatherDataType.time));
+			clockRow.setValueTextSize(textSizeMap.get(WeatherDataType.time));
 		}
 		if (textSizeMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setTextSize(textSizeMap.get(WeatherDataType.temp));
+			tempRow.setValueTextSize(textSizeMap.get(WeatherDataType.temp));
 		} else {
-			tempRow.setTextSize(17);
+			tempRow.setValueTextSize(17);
 		}
 		if (textSizeMap.containsKey(WeatherDataType.pop)) {
 			popRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
@@ -202,10 +195,10 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 			dateRow.setTextColor(textColorMap.get(WeatherDataType.date));
 		}
 		if (textColorMap.containsKey(WeatherDataType.time)) {
-			clockRow.setTextColor(textColorMap.get(WeatherDataType.time));
+			clockRow.setValueTextColor(textColorMap.get(WeatherDataType.time));
 		}
 		if (textColorMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setTextColor(textColorMap.get(WeatherDataType.temp));
+			tempRow.setValueTextColor(textColorMap.get(WeatherDataType.temp));
 		}
 		if (textColorMap.containsKey(WeatherDataType.pop)) {
 			popRow.setTextColor(textColorMap.get(WeatherDataType.pop));
@@ -220,14 +213,14 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		binding.forecastView.addView(dateRow, rowLayoutParams);
 		binding.forecastView.addView(clockRow, rowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
-		binding.forecastView.addView(popRow, iconTextRowLayoutParams);
-		binding.forecastView.addView(rainVolumeRow, iconTextRowLayoutParams);
+		binding.forecastView.addView(popRow, rowLayoutParams);
+		binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
 		if (haveSnow) {
-			binding.forecastView.addView(snowVolumeRow, iconTextRowLayoutParams);
+			binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
 		}
 		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		tempRowLayoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, getResources().getDisplayMetrics());
+		tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
 	}

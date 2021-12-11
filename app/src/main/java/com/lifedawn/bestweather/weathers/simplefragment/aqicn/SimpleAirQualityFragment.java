@@ -124,7 +124,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 				Double.parseDouble(geolocalizedFeedResponse.getData().getCity().getGeo().get(0)),
 				Double.parseDouble(geolocalizedFeedResponse.getData().getCity().getGeo().get(1)), LocationDistance.Unit.KM);
 
-		String notData = getString(R.string.not_data);
+		String notData = getString(R.string.noData);
 
 		binding.distanceToMeasuringStation.setText(String.format("%.2f", distance) + getString(R.string.km));
 
@@ -241,7 +241,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
 		((TextView) gridItem.findViewById(R.id.value_int)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
 		((TextView) gridItem.findViewById(R.id.value_str)).setText(
-				value == null ? getString(R.string.not_data) : AqicnResponseProcessor.getGradeDescription(value));
+				value == null ? getString(R.string.noData) : AqicnResponseProcessor.getGradeDescription(value));
 		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(
 				value == null ? ContextCompat.getColor(getContext(), R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(
 						value));

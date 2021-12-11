@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -14,7 +13,6 @@ import androidx.core.content.ContextCompat;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
@@ -25,21 +23,14 @@ import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
 import com.lifedawn.bestweather.notification.model.AlwaysNotiDataObj;
-import com.lifedawn.bestweather.notification.model.NotificationDataObj;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.widget.creator.WidgetCurrentHourlyDailyCreator;
 import com.lifedawn.bestweather.widget.model.AirQualityObj;
 import com.lifedawn.bestweather.widget.model.CurrentConditionsObj;
-import com.lifedawn.bestweather.widget.model.DailyForecastObj;
 import com.lifedawn.bestweather.widget.model.HourlyForecastObj;
-import com.lifedawn.bestweather.widget.model.WeatherDataObj;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -129,7 +120,7 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 
 	public void setAirQualityViews(RemoteViews remoteViews, AirQualityObj airQualityObj) {
 		String airQuality = context.getString(R.string.air_quality) + " " + (airQualityObj.isSuccessful() ? airQualityObj.getAqi() :
-				context.getString(R.string.not_data));
+				context.getString(R.string.noData));
 		remoteViews.setTextViewText(R.id.airQuality, airQuality);
 	}
 

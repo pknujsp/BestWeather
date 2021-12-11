@@ -44,7 +44,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
     implementation 'androidx.navigation:navigation-fragment:2.3.5'
     implementation 'androidx.navigation:navigation-ui:2.3.5'
-    implementation 'com.google.android.gms:play-services-location:18.0.0'
+    implementation 'com.google.android.gms:play-services-location:19.0.0'
     implementation 'androidx.gridlayout:gridlayout:1.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'org.jetbrains:annotations:15.0'
@@ -74,4 +74,6 @@ dependencies {
 
     annotationProcessor 'com.tickaroo.tikxml:processor:0.8.13'
     implementation 'com.tickaroo.tikxml:retrofit-converter:0.8.13'
+
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }

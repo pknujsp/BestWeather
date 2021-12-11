@@ -16,21 +16,19 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.dailyforecast.OwmDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
-import com.lifedawn.bestweather.weathers.view.TextValueView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
+import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -111,8 +109,6 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyOwm);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 
-		TextValueView dateRow = new TextValueView(context, FragmentType.Simple, VIEW_WIDTH, (int) getResources().getDimension(R.dimen.multipleDateTextRowHeightInCOMMON),
-				COLUMN_WIDTH);
 		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Simple, VIEW_WIDTH, WEATHER_ROW_HEIGHT,
 				COLUMN_WIDTH);
 		IconTextView probabilityOfPrecipitationRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
@@ -121,7 +117,6 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				COLUMN_WIDTH, R.drawable.raindrop);
 		IconTextView snowVolumeRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
 				COLUMN_WIDTH, R.drawable.snowparticle);
-
 
 		//시각 --------------------------------------------------------------------------
 		List<String> dateList = new ArrayList<>();
@@ -135,7 +130,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
 
-		final String degree = "º";
+		final String degree = "°";
 		final String mm = "mm";
 		boolean haveSnowVolumes = false;
 
@@ -158,27 +153,20 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			rainVolumeList.add(item.getSingleValues().getRainVolume().replace(mm, ""));
 
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-					item.getSingleValues().getWeatherIcon())));
+					item.getSingleValues().getWeatherIcon()), item.getSingleValues().getWeatherDescription()));
 		}
 
-		dateRow.setValueList(dateList);
 		weatherIconRow.setWeatherImgs(weatherIconObjList);
 		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
 		rainVolumeRow.setValueList(rainVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);
 
+		TextsView dateRow = new TextsView(context, VIEW_WIDTH, COLUMN_WIDTH, dateList);
 		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(getContext(), FragmentType.Simple, VIEW_WIDTH,
 				TEMP_ROW_HEIGHT, COLUMN_WIDTH, minTempList, maxTempList);
 
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		rowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-
-		LinearLayout.LayoutParams iconTextRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		iconTextRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-		int margin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
-		iconTextRowLayoutParams.topMargin = margin;
 
 		LinearLayout.LayoutParams dateRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -186,7 +174,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
 
 		if (textSizeMap.containsKey(WeatherDataType.date)) {
-			dateRow.setTextSize(textSizeMap.get(WeatherDataType.date));
+			dateRow.setValueTextSize(textSizeMap.get(WeatherDataType.date));
 		}
 		if (textSizeMap.containsKey(WeatherDataType.pop)) {
 			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
@@ -202,7 +190,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		}
 
 		if (textColorMap.containsKey(WeatherDataType.date)) {
-			dateRow.setTextColor(textColorMap.get(WeatherDataType.date));
+			dateRow.setValueTextColor(textColorMap.get(WeatherDataType.date));
 		}
 		if (textColorMap.containsKey(WeatherDataType.pop)) {
 			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherDataType.pop));
@@ -219,16 +207,15 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 		binding.forecastView.addView(dateRow, dateRowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
-		binding.forecastView.addView(probabilityOfPrecipitationRow, iconTextRowLayoutParams);
-		binding.forecastView.addView(rainVolumeRow, iconTextRowLayoutParams);
+		binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
+		binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
 		if (haveSnowVolumes) {
-			binding.forecastView.addView(snowVolumeRow, iconTextRowLayoutParams);
+			binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
 		}
 
 		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		tempRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-		tempRowLayoutParams.topMargin = margin;
+		tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 	}
 

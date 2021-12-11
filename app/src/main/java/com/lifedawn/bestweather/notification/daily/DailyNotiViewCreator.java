@@ -2,29 +2,17 @@ package com.lifedawn.bestweather.notification.daily;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Location;
-import android.net.Uri;
-import android.provider.Settings;
-import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
-import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.classes.Gps;
-import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
@@ -33,26 +21,17 @@ import com.lifedawn.bestweather.notification.AbstractNotiViewCreator;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
-import com.lifedawn.bestweather.notification.model.AlwaysNotiDataObj;
 import com.lifedawn.bestweather.notification.model.DailyNotiDataObj;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.model.AirQualityObj;
 import com.lifedawn.bestweather.widget.model.CurrentConditionsObj;
-import com.lifedawn.bestweather.widget.model.DailyForecastObj;
 import com.lifedawn.bestweather.widget.model.HourlyForecastObj;
 
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class DailyNotiViewCreator extends AbstractNotiViewCreator {
 	private DailyNotiHelper dailyNotiHelper;
@@ -194,7 +173,7 @@ public class DailyNotiViewCreator extends AbstractNotiViewCreator {
 
 	public void setAirQualityViews(RemoteViews remoteViews, AirQualityObj airQualityObj) {
 		String airQuality = context.getString(R.string.air_quality) + " " + (airQualityObj.isSuccessful() ? airQualityObj.getAqi() :
-				context.getString(R.string.not_data));
+				context.getString(R.string.noData));
 		remoteViews.setTextViewText(R.id.airQuality, airQuality);
 	}
 

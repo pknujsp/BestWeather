@@ -63,7 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="20º"
+                android:text="20°"
                 android:textColor="@color/white"
                 android:textSize="@dimen/tempTextSizeInCurrentHourlyDailyWidget" />
         </LinearLayout>
@@ -73,7 +73,7 @@
             android:id="@+id/current_realfeel_temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Feels Like 20º"
+            android:text="Feels Like 20°"
             android:textColor="@color/white"
             android:textSize="@dimen/feelsLikeTempTextSizeInCurrentHourlyDailyWidget" />
 

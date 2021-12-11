@@ -1,6 +1,8 @@
 package com.lifedawn.bestweather.weathers.comparison.dailyforecast;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.view.Gravity;
@@ -19,7 +21,6 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
@@ -35,14 +36,14 @@ import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
 import com.lifedawn.bestweather.weathers.view.NotScrolledView;
-import com.lifedawn.bestweather.weathers.view.TextValueView;
+import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -74,20 +75,22 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		loadForecasts();
 	}
 
+	@SuppressLint("DefaultLocale")
 	private void setValuesToViews(DailyForecastResponse dailyForecastResponse) {
-		final int dateValueRowHeight = (int) getResources().getDimension(R.dimen.dateValueRowHeightInCOMMON);
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
-		final int defaultValueRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
 		List<WeatherSourceType> weatherSourceTypeList = new ArrayList<>();
 
-		List<ForecastObj<FinalDailyForecast>> kmaFinalDailyForecasts = null;
-		List<ForecastObj<FiveDaysOfDailyForecastsResponse.DailyForecasts>> accuFinalDailyForecasts = null;
-		List<ForecastObj<OneCallResponse.Daily>> owmFinalDailyForecasts = null;
+		List<ForecastObj<DailyForecastDto>> kmaFinalDailyForecasts = null;
+		List<ForecastObj<DailyForecastDto>> accuFinalDailyForecasts = null;
+		List<ForecastObj<DailyForecastDto>> owmFinalDailyForecasts = null;
 
 		if (dailyForecastResponse.kmaDailyForecastList != null) {
+			List<DailyForecastDto> dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoList(getContext(),
+					dailyForecastResponse.kmaDailyForecastList, tempUnit);
+
 			kmaFinalDailyForecasts = new ArrayList<>();
-			for (FinalDailyForecast finalDailyForecast : dailyForecastResponse.kmaDailyForecastList) {
+			for (DailyForecastDto finalDailyForecast : dailyForecastDtoList) {
 				kmaFinalDailyForecasts.add(new ForecastObj<>(finalDailyForecast.getDate(), finalDailyForecast));
 			}
 			weatherSourceTypeList.add(WeatherSourceType.KMA);
@@ -97,11 +100,13 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		}
 
 		if (dailyForecastResponse.accuDailyForecastsResponse != null) {
+			List<DailyForecastDto> dailyForecastDtoList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(getContext(),
+					dailyForecastResponse.accuDailyForecastsResponse.getDailyForecasts(), windUnit, tempUnit, zoneId);
 			accuFinalDailyForecasts = new ArrayList<>();
-			for (FiveDaysOfDailyForecastsResponse.DailyForecasts item : dailyForecastResponse.accuDailyForecastsResponse.getDailyForecasts()) {
+
+			for (DailyForecastDto item : dailyForecastDtoList) {
 				accuFinalDailyForecasts.add(new ForecastObj<>(
-						WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(item.getEpochDate()) * 1000L, zoneId),
-						item));
+						item.getDate(), item));
 			}
 
 			weatherSourceTypeList.add(WeatherSourceType.ACCU_WEATHER);
@@ -111,10 +116,12 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		}
 
 		if (dailyForecastResponse.owmOneCallResponse != null) {
+			List<DailyForecastDto> dailyForecastDtoList =
+					OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), dailyForecastResponse.owmOneCallResponse.getDaily(),
+							windUnit, tempUnit, zoneId);
 			owmFinalDailyForecasts = new ArrayList<>();
-			for (OneCallResponse.Daily daily : dailyForecastResponse.owmOneCallResponse.getDaily()) {
-				owmFinalDailyForecasts.add(new ForecastObj<>(
-						WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, zoneId), daily));
+			for (DailyForecastDto daily : dailyForecastDtoList) {
+				owmFinalDailyForecasts.add(new ForecastObj<>(daily.getDate(), daily));
 			}
 			weatherSourceTypeList.add(WeatherSourceType.OPEN_WEATHER_MAP);
 			binding.owm.setVisibility(View.VISIBLE);
@@ -155,6 +162,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		}
 
 		List<ZonedDateTime> dateTimeList = new ArrayList<>();
+
 		//firstDateTime부터 lastDateTime까지 추가
 		now = ZonedDateTime.of(firstDateTime.toLocalDateTime(), zoneId);
 		while (!now.isAfter(lastDateTime)) {
@@ -167,12 +175,12 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		final int valueRowWidth = columnWidth * columnsCount;
 
 		//날짜, 날씨, 기온, 강수량, 강수확률
-		TextValueView dateRow = new TextValueView(getContext(), FragmentType.Comparison, valueRowWidth, dateValueRowHeight, columnWidth);
+		TextsView dateRow = new TextsView(getContext(), valueRowWidth, columnWidth, null);
 		List<DoubleWeatherIconView> weatherIconRows = new ArrayList<>();
 		List<IconTextView> rainVolumeRows = new ArrayList<>();
 		List<IconTextView> snowVolumeRows = new ArrayList<>();
 		List<IconTextView> probabilityOfPrecipitationRows = new ArrayList<>();
-		List<TextValueView> tempRows = new ArrayList<>();
+		List<TextsView> tempRows = new ArrayList<>();
 
 		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
 			int specificRowWidth = 0;
@@ -210,7 +218,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 					new DoubleWeatherIconView(getContext(), FragmentType.Comparison, specificRowWidth, weatherValueRowHeight, columnWidth));
 			weatherIconRows.get(i).setTag(R.id.begin_column_index, beginColumnIndex);
 
-			tempRows.add(new TextValueView(getContext(), FragmentType.Comparison, specificRowWidth, defaultValueRowHeight, columnWidth));
+			tempRows.add(new TextsView(getContext(), specificRowWidth, columnWidth, null));
 			tempRows.get(i).setTag(R.id.begin_column_index, beginColumnIndex);
 
 			rainVolumeRows.add(
@@ -228,12 +236,13 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 		//날짜
 		List<String> dateList = new ArrayList<>();
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(getString(R.string.date_pattern));
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE");
 
 		for (ZonedDateTime date : dateTimeList) {
 			dateList.add(date.format(dateTimeFormatter));
 		}
 		dateRow.setValueList(dateList);
+		dateRow.setValueTextColor(Color.BLACK);
 
 		//날씨,기온,강수량,강수확률
 		//kma, accu weather, owm 순서
@@ -241,9 +250,10 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		String pop = null;
 		Context context = getContext();
 
-		final String tempUnitStr = getString(R.string.degree_symbol);
+		final String tempUnitStr = "°";
 		final String percent = "%";
-		final String zero = "0";
+		final String cm = "cm";
+		final String mm = "mm";
 
 		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
 			List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
@@ -254,73 +264,74 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			boolean haveSnow = false;
 
 			if (weatherSourceTypeList.get(i) == WeatherSourceType.KMA) {
-				for (ForecastObj<FinalDailyForecast> item : kmaFinalDailyForecasts) {
-					temp = ValueUnits.convertTemperature(item.e.getMinTemp(), tempUnit).toString() + tempUnitStr + " / " + ValueUnits.convertTemperature(
-							item.e.getMaxTemp(), tempUnit).toString() + tempUnitStr;
+				for (ForecastObj<DailyForecastDto> item : kmaFinalDailyForecasts) {
+					temp = item.e.getMinTemp() + " / " + item.e.getMaxTemp();
 					tempList.add(temp);
 
 					if (item.e.isSingle()) {
-						pop = item.e.getProbabilityOfPrecipitation() + percent;
-						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
-								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(item.e.getSky(), false))));
+						pop = item.e.getSingleValues().getPop();
+						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(getContext(), item.e.getSingleValues().getWeatherIcon()),
+								item.e.getSingleValues().getWeatherDescription()));
 					} else {
-						pop = item.e.getAmProbabilityOfPrecipitation() + percent + " / " + item.e.getPmProbabilityOfPrecipitation() + percent;
+						pop = item.e.getAmValues().getPop() + " / " + item.e.getPmValues().getPop();
 						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
-								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(item.e.getAmSky(), false)),
-								ContextCompat.getDrawable(context, KmaResponseProcessor.getWeatherMidIconImg(item.e.getPmSky(), false))));
+								ContextCompat.getDrawable(context, item.e.getAmValues().getWeatherIcon()),
+								ContextCompat.getDrawable(context, item.e.getPmValues().getWeatherIcon()),
+								item.e.getAmValues().getWeatherDescription(),
+								item.e.getPmValues().getWeatherDescription()));
 					}
 					probabilityOfPrecipitationList.add(pop);
 
 				}
 
-
 			} else if (weatherSourceTypeList.get(i) == WeatherSourceType.ACCU_WEATHER) {
-				String snowZero = "0.0";
-
-				for (ForecastObj<FiveDaysOfDailyForecastsResponse.DailyForecasts> item : accuFinalDailyForecasts) {
-					temp = ValueUnits.convertTemperature(item.e.getTemperature().getMinimum().getValue(),
-							tempUnit).toString() + tempUnitStr + " " + "/ " + ValueUnits.convertTemperature(
-							item.e.getTemperature().getMaximum().getValue(), tempUnit).toString() + tempUnitStr;
+				for (ForecastObj<DailyForecastDto> item : accuFinalDailyForecasts) {
+					temp = item.e.getMinTemp() + " / " + item.e.getMaxTemp();
 					tempList.add(temp);
 
-					pop = (int) Double.parseDouble(item.e.getDay().getPrecipitationProbability()) + percent + " / " +
-							(int) Double.parseDouble(item.e.getNight().getPrecipitationProbability()) + percent;
+					pop = item.e.getAmValues().getPop() + " / " + item.e.getPmValues().getPop();
 					probabilityOfPrecipitationList.add(pop);
+
 					rainVolumeList.add(
-							item.e.getDay().getRain().getValue() + " / " + item.e.getNight().getRain().getValue());
+							String.format("%.2f", Float.parseFloat(item.e.getAmValues().getRainVolume().replace(mm, ""))
+									+ Float.parseFloat(item.e.getPmValues().getRainVolume().replace(mm, ""))));
 					snowVolumeList.add(
-							item.e.getDay().getSnow().getValue() + " / " + item.e.getNight().getSnow().getValue());
+							String.format("%.2f", Float.parseFloat(item.e.getAmValues().getSnowVolume().replace(cm, ""))
+									+ Float.parseFloat(item.e.getPmValues().getSnowVolume().replace(cm, ""))));
 
 					if (!haveSnow) {
-						if (!item.e.getDay().getSnow().getValue().equals(snowZero) ||
-								!item.e.getNight().getSnow().getValue().equals(snowZero)) {
+						if (item.e.getAmValues().isHasSnowVolume() ||
+								item.e.getPmValues().isHasSnowVolume()) {
 							haveSnow = true;
 						}
 					}
-
 					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
-							ContextCompat.getDrawable(context, AccuWeatherResponseProcessor.getWeatherIconImg(item.e.getDay().getIcon())),
-							ContextCompat.getDrawable(context,
-									AccuWeatherResponseProcessor.getWeatherIconImg(item.e.getNight().getIcon()))));
+							ContextCompat.getDrawable(context, item.e.getAmValues().getWeatherIcon()),
+							ContextCompat.getDrawable(context, item.e.getPmValues().getWeatherIcon()),
+							item.e.getAmValues().getWeatherDescription(),
+							item.e.getPmValues().getWeatherDescription()));
 				}
 
 			} else if (weatherSourceTypeList.get(i) == WeatherSourceType.OPEN_WEATHER_MAP) {
-				for (ForecastObj<OneCallResponse.Daily> item : owmFinalDailyForecasts) {
-					temp = ValueUnits.convertTemperature(item.e.getTemp().getMin(),
-							tempUnit).toString() + tempUnitStr + " / " + ValueUnits.convertTemperature(item.e.getTemp().getMax(), tempUnit).toString() + tempUnitStr;
+				for (ForecastObj<DailyForecastDto> item : owmFinalDailyForecasts) {
+					temp = item.e.getMinTemp() + " / " + item.e.getMaxTemp();
 					tempList.add(temp);
 
-					pop = item.e.getPop();
-					probabilityOfPrecipitationList.add((int) (Double.parseDouble(pop) * 100.0) + percent);
-					rainVolumeList.add(item.e.getRain() == null ? "0.0" : item.e.getRain());
-					snowVolumeList.add(item.e.getSnow() == null ? zero : item.e.getSnow());
+					pop = item.e.getSingleValues().getPop();
+					probabilityOfPrecipitationList.add(pop);
 
-					if (!haveSnow && item.e.getSnow() != null) {
-						haveSnow = true;
+					if (item.e.getSingleValues().isHasSnowVolume()) {
+						if (!haveSnow) {
+							haveSnow = true;
+						}
 					}
+					snowVolumeList.add(item.e.getSingleValues().getSnowVolume().replace(mm, ""));
 
-					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-							OpenWeatherMapResponseProcessor.getWeatherIconImg(item.e.getWeather().get(0).getId(), false))));
+					probabilityOfPrecipitationList.add(item.e.getSingleValues().getPop());
+					rainVolumeList.add(item.e.getSingleValues().getRainVolume().replace(mm, ""));
+
+					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(getContext(), item.e.getSingleValues().getWeatherIcon()),
+							item.e.getSingleValues().getWeatherDescription()));
 				}
 
 			}
@@ -329,6 +340,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			tempRows.get(i).setValueList(tempList);
 			probabilityOfPrecipitationRows.get(i).setValueList(probabilityOfPrecipitationList);
 			rainVolumeRows.get(i).setValueList(rainVolumeList);
+
 			if (haveSnow) {
 				snowVolumeRows.get(i).setValueList(snowVolumeList);
 			}
@@ -336,7 +348,6 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		rowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 
 		binding.datetime.addView(dateRow, rowLayoutParams);
 		LinearLayout view = null;
@@ -348,15 +359,21 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		int nonScrollViewMargin = (int) getResources().getDimension(R.dimen.nonScrollViewTopBottomMargin);
 		nonScrollRowLayoutParams.setMargins(0, nonScrollViewMargin, 0, nonScrollViewMargin);
 
+		final int tempRowTopMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
+
 		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
 			LinearLayout.LayoutParams specificRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 					ViewGroup.LayoutParams.WRAP_CONTENT);
 			specificRowLayoutParams.leftMargin = columnWidth * (Integer) weatherIconRows.get(i).getTag(R.id.begin_column_index);
 
+			LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT);
+			tempRowLayoutParams.leftMargin = columnWidth * (Integer) weatherIconRows.get(i).getTag(R.id.begin_column_index);
+			tempRowLayoutParams.topMargin = tempRowTopMargin;
+
 			LinearLayout.LayoutParams iconTextRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 					ViewGroup.LayoutParams.WRAP_CONTENT);
 			iconTextRowLayoutParams.leftMargin = columnWidth * (Integer) weatherIconRows.get(i).getTag(R.id.begin_column_index);
-			iconTextRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
 
 			String sourceName;
 			int logoId;
@@ -390,7 +407,9 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 					view.addView(snowVolumeRows.get(i), iconTextRowLayoutParams);
 				}
 			}
-			view.addView(tempRows.get(i), specificRowLayoutParams);
+			tempRows.get(i).setValueTextSize(17);
+			tempRows.get(i).setValueTextColor(Color.BLACK);
+			view.addView(tempRows.get(i), tempRowLayoutParams);
 		}
 	}
 
@@ -490,6 +509,10 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 					dailyForecastResponse.kmaThrowable = midLandFcstResponse.getT();
 				} else if (midTaFcstResponse.getT() != null) {
 					dailyForecastResponse.kmaThrowable = midTaFcstResponse.getT();
+				} else if (vilageFcstResponse.getT() != null) {
+					dailyForecastResponse.kmaThrowable = vilageFcstResponse.getT();
+				} else if (ultraSrtFcstResponse.getT() != null) {
+					dailyForecastResponse.kmaThrowable = ultraSrtFcstResponse.getT();
 				}
 			}
 		}
@@ -500,7 +523,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			MultipleJsonDownloader.ResponseResult accuDailyForecastResponse = arrayMap.get(
 					RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY);
 
-			if (accuDailyForecastResponse.getT() == null) {
+			if (accuDailyForecastResponse.isSuccessful()) {
 				dailyForecastResponse.accuDailyForecastsResponse = AccuWeatherResponseProcessor.getDailyForecastObjFromJson(
 						arrayMap.get(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY).getResponse().body().toString());
 			} else {
@@ -512,7 +535,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			arrayMap = responseMap.get(WeatherSourceType.OPEN_WEATHER_MAP);
 			MultipleJsonDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
-			if (responseResult.getT() == null) {
+			if (responseResult.isSuccessful()) {
 				dailyForecastResponse.owmOneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
 						responseResult.getResponse().body().toString());
 			} else {

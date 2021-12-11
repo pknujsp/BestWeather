@@ -7,7 +7,9 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.lifedawn.bestweather.weathers.FragmentType;
 
@@ -16,7 +18,7 @@ import java.util.List;
 
 public class DoubleWeatherIconView extends View {
 	private final FragmentType fragmentType;
-	
+
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
@@ -24,15 +26,15 @@ public class DoubleWeatherIconView extends View {
 	private final int singleImgSize;
 	private final int margin;
 	private final int dividerWidth;
-	
+
 	private Rect leftImgRect = new Rect();
 	private Rect rightImgRect = new Rect();
 	private Rect singleImgRect = new Rect();
 	private Rect dividerRect = new Rect();
 	private Paint dividerPaint;
-	
+
 	private List<WeatherIconObj> weatherIconObjList = new ArrayList<>();
-	
+
 	public DoubleWeatherIconView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
 		this.fragmentType = fragmentType;
@@ -40,12 +42,12 @@ public class DoubleWeatherIconView extends View {
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;
 		this.dividerWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1f, getResources().getDisplayMetrics());
-		
+
 		int tempMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, getResources().getDisplayMetrics());
-		
+
 		singleImgSize = viewHeight - tempMargin * 2;
 		int tempImgSize = columnWidth / 2 - tempMargin * 2;
-		
+
 		if (tempImgSize > viewHeight) {
 			tempImgSize = tempImgSize - (tempImgSize - viewHeight);
 			if (columnWidth / 2 - tempImgSize > 0) {
@@ -56,7 +58,7 @@ public class DoubleWeatherIconView extends View {
 		}
 		imgSize = tempImgSize;
 		margin = tempMargin;
-		
+
 		dividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		switch (fragmentType) {
 			case Simple:
@@ -66,18 +68,47 @@ public class DoubleWeatherIconView extends View {
 				dividerPaint.setColor(Color.BLACK);
 				break;
 		}
+
+		setClickable(true);
+		setFocusable(true);
+
+		setOnTouchListener(new OnTouchListener() {
+			long actionDownMillis;
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_DOWN) {
+					actionDownMillis = System.currentTimeMillis();
+				} else if (event.getAction() == MotionEvent.ACTION_UP) {
+					if (System.currentTimeMillis() - actionDownMillis < 500 && weatherIconObjList.size() > 0) {
+						int index = (int) (event.getX() / columnWidth);
+						boolean isSingle = !weatherIconObjList.get(index).isDouble;
+						String text = null;
+						if (isSingle) {
+							text = weatherIconObjList.get(index).singleDescription;
+						} else {
+							text = weatherIconObjList.get(index).leftDescription + " / " + weatherIconObjList.get(index).rightDescription;
+						}
+
+						Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+					}
+				}
+
+				return true;
+			}
+		});
 	}
-	
+
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		setMeasuredDimension(viewWidth, viewHeight);
 	}
-	
+
 	@Override
 	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
 		super.onLayout(changed, left, top, right, bottom);
 	}
-	
+
 	@Override
 	protected void onDraw(Canvas canvas) {
 		singleImgRect.set(columnWidth / 2 - singleImgSize / 2, margin, columnWidth / 2 + singleImgSize / 2, getHeight() - margin);
@@ -85,7 +116,7 @@ public class DoubleWeatherIconView extends View {
 		rightImgRect.set(leftImgRect.right + margin * 2, leftImgRect.top, leftImgRect.right + margin * 2 + imgSize, leftImgRect.bottom);
 		dividerRect.set(leftImgRect.right + margin - dividerWidth / 2, leftImgRect.top, leftImgRect.right + margin + dividerWidth / 2,
 				leftImgRect.bottom);
-		
+
 		for (WeatherIconObj weatherIconObj : weatherIconObjList) {
 			if (weatherIconObj.isDouble) {
 				weatherIconObj.leftImg.setBounds(leftImgRect);
@@ -103,28 +134,36 @@ public class DoubleWeatherIconView extends View {
 			dividerRect.offset(columnWidth, 0);
 		}
 	}
-	
-	
+
+
 	public void setIcons(List<WeatherIconObj> weatherIconObjList) {
 		this.weatherIconObjList = weatherIconObjList;
 	}
-	
-	
+
+
 	public static class WeatherIconObj {
 		final boolean isDouble;
 		Drawable leftImg;
 		Drawable rightImg;
 		Drawable singleImg;
-		
-		public WeatherIconObj(Drawable leftDrawable, Drawable rightDrawable) {
+		String leftDescription;
+		String rightDescription;
+		String singleDescription;
+
+
+		public WeatherIconObj(Drawable leftDrawable, Drawable rightDrawable, String leftDescription, String rightDescription) {
 			this.leftImg = leftDrawable;
 			this.rightImg = rightDrawable;
+			this.leftDescription = leftDescription;
+			this.rightDescription = rightDescription;
 			this.isDouble = true;
 		}
-		
-		public WeatherIconObj(Drawable drawable) {
+
+		public WeatherIconObj(Drawable drawable, String singleDescription) {
 			this.singleImg = drawable;
+			this.singleDescription = singleDescription;
 			this.isDouble = false;
 		}
+
 	}
 }

@@ -1,40 +1,21 @@
 package com.lifedawn.bestweather.weathers.detailfragment.accuweather.dailyforecast;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailDailyForecastFragment;
-import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
-import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
-import com.lifedawn.bestweather.weathers.view.DoubleWindDirectionView;
-import com.lifedawn.bestweather.weathers.FragmentType;
-import com.lifedawn.bestweather.weathers.view.TextValueView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AccuDetailDailyForecastFragment extends BaseDetailDailyForecastFragment {

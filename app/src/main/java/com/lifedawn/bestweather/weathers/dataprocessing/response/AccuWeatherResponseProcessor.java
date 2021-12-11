@@ -129,12 +129,12 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 	                                                                List<TwelveHoursOfHourlyForecastsResponse.Item> hourlyForecastList,
 	                                                                ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit,
 	                                                                ZoneId zoneId) {
-		final String tempDegree = "º";
+		final String tempDegree = "°";
 		final String percent = "%";
 		final String mm = "mm";
 		final String cm = "cm";
 
-		final String zero = "0";
+		final String zero = "0.0";
 		final String zeroSnowVolume = "0.0cm";
 		final String zeroRainVolume = "0.0mm";
 		final String zeroTotalRiquidVolume = "0.0mm";
@@ -218,13 +218,17 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		final String cm = "cm";
 		final String percent = "%";
 		final String windUnitStr = ValueUnits.convertToStr(context, windUnit);
-		final String zero = "0";
+		final String zero = "0.0";
 
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
 
 		String totalRiquidVolume = null;
 		String rainVolume = null;
 		String snowVolume = null;
+
+		final String zeroSnowVolume = "0.0cm";
+		final String zeroRainVolume = "0.0mm";
+		final String zeroTotalRiquidVolume = "0.0mm";
 
 		boolean hasPrecipitation;
 		boolean hasRain;
@@ -248,7 +252,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 				rainVolume = daily.getDay().getRain().getValue() + mm;
 			} else {
 				hasRain = false;
-				rainVolume = null;
+				rainVolume = zeroRainVolume;
 			}
 
 			if (!daily.getDay().getSnow().getValue().equals(zero)) {
@@ -256,7 +260,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 				snowVolume = daily.getDay().getSnow().getValue() + cm;
 			} else {
 				hasSnow = false;
-				snowVolume = null;
+				snowVolume = zeroSnowVolume;
 			}
 
 			if (!daily.getDay().getTotalLiquid().getValue().equals(zero)) {
@@ -264,7 +268,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 				totalRiquidVolume = daily.getDay().getTotalLiquid().getValue() + mm;
 			} else {
 				hasPrecipitation = false;
-				totalRiquidVolume = null;
+				totalRiquidVolume = zeroTotalRiquidVolume;
 			}
 
 			am.setWeatherIcon(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getDay().getIcon()));
@@ -290,7 +294,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 				rainVolume = daily.getNight().getRain().getValue() + mm;
 			} else {
 				hasRain = false;
-				rainVolume = null;
+				rainVolume = zeroRainVolume;
 			}
 
 			if (!daily.getNight().getSnow().getValue().equals(zero)) {
@@ -298,7 +302,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 				snowVolume = daily.getNight().getSnow().getValue() + cm;
 			} else {
 				hasSnow = false;
-				snowVolume = null;
+				snowVolume = zeroSnowVolume;
 			}
 
 			if (!daily.getNight().getTotalLiquid().getValue().equals(zero)) {
@@ -306,7 +310,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 				totalRiquidVolume = daily.getNight().getTotalLiquid().getValue() + mm;
 			} else {
 				hasPrecipitation = false;
-				totalRiquidVolume = null;
+				totalRiquidVolume = zeroTotalRiquidVolume;
 			}
 
 			pm.setWeatherIcon(AccuWeatherResponseProcessor.getWeatherIconImg(daily.getNight().getIcon()));

@@ -166,7 +166,7 @@
                 android:paddingVertical="3dp"
                 android:scaleX="0.95"
                 android:singleLine="true"
-                android:text="-55º"
+                android:text="-55°"
                 android:textColor="@color/black" />
 
         </LinearLayout>

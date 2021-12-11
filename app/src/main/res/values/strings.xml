@@ -34,7 +34,7 @@
     <string name="settings">설정</string>
 
     <string name="pref_key_value_units">pref_key_value_units</string>
-    <string name="pref_summary_value_units">온도 : ºC, ºF / 풍속 : m/s, km/h 등</string>
+    <string name="pref_summary_value_units">온도 : °C, °F / 풍속 : m/s, km/h 등</string>
     <string name="pref_title_value_units">값 단위</string>
 
     <string name="pref_key_app_theme">pref_key_app_theme</string>
@@ -344,7 +344,7 @@
     <!-- etc -->
     <string name="fresh_snow_cover">신적설</string>
     <string name="thunderstorm">낙뢰</string>
-    <string name="not_data">정보없음</string>
+    <string name="noData">정보없음</string>
     <string name="message_request_double_click_for_close">한번 더 누르면 종료됩니다</string>
     <string name="msg_kma_always_enabled_in_south_korea">날씨 데이터 요청 지역이 대한민국인 경우에만 대한민국 기상청의 자료가 제공됩니다</string>
     <string name="msg_at_least_one_must_be_selected">최소 하나는 선택되어야 합니다</string>

@@ -99,7 +99,7 @@ public class WidgetCurrentCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempCurrentConditionsViews(RemoteViews remoteViews) {
-		remoteViews.setTextViewText(R.id.current_temperature, "20º");
+		remoteViews.setTextViewText(R.id.current_temperature, "20°");
 		remoteViews.setImageViewResource(R.id.current_weather_icon, R.drawable.day_clear);
 
 		remoteViews.setTextViewTextSize(R.id.current_temperature, TypedValue.COMPLEX_UNIT_PX, tempTextSize);

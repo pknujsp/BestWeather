@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.TimeZone;
 
 import retrofit2.Response;
 
@@ -169,16 +168,16 @@ public class AqicnResponseProcessor {
 				}
 
 				if (val == Integer.MIN_VALUE) {
-					return context.getString(R.string.not_data);
+					return context.getString(R.string.noData);
 				} else {
 					return AqicnResponseProcessor.getGradeDescription(val);
 				}
 			} else {
-				return context.getString(R.string.not_data);
+				return context.getString(R.string.noData);
 
 			}
 		} else {
-			return context.getString(R.string.not_data);
+			return context.getString(R.string.noData);
 
 		}
 	}

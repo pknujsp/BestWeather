@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.os.Build;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -18,7 +17,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.TimeZone;
 
 public class WidgetCurrentHourlyDailyCreator extends AbstractWidgetCreator {
 	private final DateTimeFormatter refreshDateTimeFormatter;
@@ -111,7 +109,7 @@ public class WidgetCurrentHourlyDailyCreator extends AbstractWidgetCreator {
 	public void setAirQualityViews(RemoteViews remoteViews, AirQualityObj airQualityObj) {
 		remoteViews.setTextViewText(R.id.current_airquality, context.getString(R.string.air_quality) + " " + (airQualityObj.isSuccessful() ?
 				airQualityObj.getAqi() :
-				context.getString(R.string.not_data)));
+				context.getString(R.string.noData)));
 	}
 
 

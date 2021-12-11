@@ -43,7 +43,7 @@
                 android:layout_toRightOf="@id/weatherIcon"
                 android:gravity="center_vertical"
                 android:maxLines="1"
-                android:text="20º"
+                android:text="20°"
                 android:textColor="@color/textColorInNotification"
                 android:textScaleX="0.95"
                 android:textSize="20sp" />

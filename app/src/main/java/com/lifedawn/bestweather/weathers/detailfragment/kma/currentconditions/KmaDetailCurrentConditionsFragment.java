@@ -49,6 +49,23 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 
 		binding.conditionsGrid.requestLayout();
 
+		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(new Location(latitude, longitude),
+				TimeZone.getTimeZone(zoneId.getId()));
+		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
+		Calendar sunRise = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(calendar);
+		Calendar sunSet = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(calendar);
+
+		addGridItem(R.string.weather,
+				KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()),
+				KmaResponseProcessor.getWeatherPtyIconImg(finalCurrentConditions.getPrecipitationType(), SunRiseSetUtil.isNight(calendar,
+						sunRise, sunSet)),
+				null);
+
+		addGridItem(R.string.precipitation_volume, finalCurrentConditions.getPrecipitation1Hour().equals("0") ?
+						getString(R.string.not_available) :
+						finalCurrentConditions.getPrecipitation1Hour() + ValueUnits.convertToStr(getContext(), ValueUnits.mm),
+				R.drawable.precipitationvolume, null);
+
 		addGridItem(R.string.temperature, ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(), tempUnit) + tempUnitStr,
 				R.drawable.temperature, null);
 		addGridItem(R.string.humidity, finalCurrentConditions.getHumidity() + ValueUnits.convertToStr(getContext(), ValueUnits.percent), R.drawable.humidity,
@@ -62,22 +79,7 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 				R.drawable.windspeed, null);
 		addGridItem(R.string.wind_strength, WeatherResponseProcessor.getSimpleWindSpeedDescription(finalCurrentConditions.getWindSpeed()),
 				R.drawable.windstrength, null);
-		addGridItem(R.string.precipitation_volume, finalCurrentConditions.getPrecipitation1Hour().equals("0") ?
-						getString(R.string.not_available) :
-						finalCurrentConditions.getPrecipitation1Hour() + ValueUnits.convertToStr(getContext(), ValueUnits.mm),
-				R.drawable.precipitationvolume, null);
 
-		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(new Location(latitude, longitude),
-				TimeZone.getTimeZone(zoneId.getId()));
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
-		Calendar sunRise = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(calendar);
-		Calendar sunSet = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(calendar);
-
-		addGridItem(R.string.precipitation_type,
-				KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType()),
-				KmaResponseProcessor.getWeatherPtyIconImg(finalCurrentConditions.getPrecipitationType(), SunRiseSetUtil.isNight(calendar,
-						sunRise, sunSet)),
-				null);
 
 	}
 }

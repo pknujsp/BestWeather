@@ -107,7 +107,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	                                                                List<OneCallResponse.Hourly> hourlyForecastList,
 	                                                                ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit,
 	                                                                ZoneId zoneId) {
-		final String tempDegree = "º";
+		final String tempDegree = "°";
 		final String percent = "%";
 		final String mm = "mm";
 
@@ -179,7 +179,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	                                                              List<OneCallResponse.Daily> dailyForecastList,
 	                                                              ValueUnits windUnit, ValueUnits tempUnit,
 	                                                              ZoneId zoneId) {
-		final String tempDegree = "º";
+		final String tempDegree = "°";
 		final String mm = "mm";
 		final String percent = "%";
 		final String wind = ValueUnits.convertToStr(context, windUnit);
@@ -229,6 +229,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 					.setHasSnowVolume(hasSnow)
 					.setSnowVolume(snowVolume)
 					.setWeatherIcon(OpenWeatherMapResponseProcessor.getWeatherIconImg(daily.getWeather().get(0).getId(), false))
+					.setWeatherDescription(OpenWeatherMapResponseProcessor.getWeatherIconDescription(daily.getWeather().get(0).getId()))
 					.setWindDirection(WindDirectionConverter.windDirection(context, daily.getWindDeg()))
 					.setWindDirectionVal(Integer.parseInt(daily.getWindDeg()))
 					.setWindSpeed(ValueUnits.convertWindSpeed(daily.getWindSpeed(), windUnit) + wind)
@@ -236,7 +237,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 					.setWindGust(ValueUnits.convertWindSpeed(daily.getWindGust(), windUnit) + wind)
 					.setPressure(daily.getPressure() + hpa)
 					.setHumidity(daily.getHumidity() + percent)
-					.setWeatherDescription(ValueUnits.convertTemperature(daily.getDew_point(), tempUnit) + tempDegree)
+					.setDewPointTemp(ValueUnits.convertTemperature(daily.getDew_point(), tempUnit) + tempDegree)
 					.setCloudiness(daily.getClouds() + percent)
 					.setUvIndex(daily.getUvi());
 

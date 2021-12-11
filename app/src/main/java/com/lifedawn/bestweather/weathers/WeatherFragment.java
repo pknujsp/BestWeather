@@ -364,6 +364,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			public void run() {
 				ZonedDateTime lastRefreshDateTime =
 						ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleJsonDownloader.getLocalDateTime().toString());
+				lastRefreshDateTime = lastRefreshDateTime.withZoneSameInstant(zoneId);
+
 				Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
 				currentCalendar.set(lastRefreshDateTime.getYear(), lastRefreshDateTime.getMonthValue() - 1,
 						lastRefreshDateTime.getDayOfMonth(), lastRefreshDateTime.getHour(), lastRefreshDateTime.getMinute(),

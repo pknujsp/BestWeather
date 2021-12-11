@@ -21,7 +21,6 @@ import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyfo
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.accuweather.dailyforecast.AccuDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
@@ -29,7 +28,7 @@ import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
-import com.lifedawn.bestweather.weathers.view.TextValueView;
+import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -109,7 +108,6 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		final int viewWidth = columnCount * columnWidth;
 
 
-		TextValueView dateRow = new TextValueView(context, FragmentType.Simple, viewWidth, (int) getResources().getDimension(R.dimen.multipleDateTextRowHeightInCOMMON), columnWidth);
 		DoubleWeatherIconView weatherIconRow = new DoubleWeatherIconView(context, FragmentType.Simple, viewWidth, WEATHER_ROW_HEIGHT,
 				columnWidth);
 		IconTextView popRow = new IconTextView(context, FragmentType.Simple, viewWidth,
@@ -132,27 +130,36 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 
 		final String mm = "mm";
 		final String cm = "cm";
-		final String degree = "º";
+		final String degree = "°";
 		boolean haveSnow = false;
 
 		List<DailyForecastDto> dailyForecastDtoList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(getContext(), items, windUnit,
 				tempUnit, zoneId);
 
+		int minTemp;
+		int maxTemp;
+
 		for (DailyForecastDto dailyForecasts : dailyForecastDtoList) {
 			dateList.add(dailyForecasts.getDate().format(dateTimeFormatter));
 			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
 					ContextCompat.getDrawable(context, dailyForecasts.getAmValues().getWeatherIcon()),
-					ContextCompat.getDrawable(context, dailyForecasts.getAmValues().getWeatherIcon())));
-			minTempList.add(Integer.parseInt(dailyForecasts.getMinTemp().replace(degree, "")));
-			maxTempList.add(Integer.parseInt(dailyForecasts.getMaxTemp().replace(degree, "")));
+					ContextCompat.getDrawable(context, dailyForecasts.getAmValues().getWeatherIcon()),
+					dailyForecasts.getAmValues().getWeatherDescription(),
+					dailyForecasts.getPmValues().getWeatherDescription()));
+
+			minTemp = Integer.parseInt(dailyForecasts.getMinTemp().replace(degree, ""));
+			maxTemp = Integer.parseInt(dailyForecasts.getMaxTemp().replace(degree, ""));
+
+			minTempList.add(minTemp);
+			maxTempList.add(maxTemp);
 
 			popList.add(
 					dailyForecasts.getAmValues().getPop() + " / " + dailyForecasts.getPmValues().getPop());
 			rainVolumeList.add(
-					String.format(".2f", Float.parseFloat(dailyForecasts.getAmValues().getRainVolume().replace(mm, ""))
+					String.format("%.2f", Float.parseFloat(dailyForecasts.getAmValues().getRainVolume().replace(mm, ""))
 							+ Float.parseFloat(dailyForecasts.getPmValues().getRainVolume().replace(mm, ""))));
 			snowVolumeList.add(
-					String.format(".2f", Float.parseFloat(dailyForecasts.getAmValues().getSnowVolume().replace(cm, ""))
+					String.format("%.2f", Float.parseFloat(dailyForecasts.getAmValues().getSnowVolume().replace(cm, ""))
 							+ Float.parseFloat(dailyForecasts.getPmValues().getSnowVolume().replace(cm, ""))));
 
 			if (!haveSnow) {
@@ -164,29 +171,24 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		}
 
 		weatherIconRow.setIcons(weatherIconObjList);
-		dateRow.setValueList(dateList);
 		popRow.setValueList(popList);
 		rainVolumeRow.setValueList(rainVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);
 		DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(getContext(), FragmentType.Simple, viewWidth, TEMP_ROW_HEIGHT,
 				columnWidth, minTempList, maxTempList);
 
+		TextsView dateRow = new TextsView(context, viewWidth, columnWidth, dateList);
+
+
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		rowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-
-		LinearLayout.LayoutParams iconTextRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		iconTextRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
-		iconTextRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
 
 		LinearLayout.LayoutParams dateRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		dateRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
 
 		if (textSizeMap.containsKey(WeatherDataType.date)) {
-			dateRow.setTextSize(textSizeMap.get(WeatherDataType.date));
+			dateRow.setValueTextSize(textSizeMap.get(WeatherDataType.date));
 		}
 		if (textSizeMap.containsKey(WeatherDataType.pop)) {
 			popRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
@@ -202,7 +204,7 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		}
 
 		if (textColorMap.containsKey(WeatherDataType.date)) {
-			dateRow.setTextColor(textColorMap.get(WeatherDataType.date));
+			dateRow.setValueTextColor(textColorMap.get(WeatherDataType.date));
 		}
 		if (textColorMap.containsKey(WeatherDataType.pop)) {
 			popRow.setTextColor(textColorMap.get(WeatherDataType.pop));
@@ -220,10 +222,10 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 
 		binding.forecastView.addView(dateRow, dateRowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
-		binding.forecastView.addView(popRow, iconTextRowLayoutParams);
-		binding.forecastView.addView(rainVolumeRow, iconTextRowLayoutParams);
+		binding.forecastView.addView(popRow, rowLayoutParams);
+		binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
 		if (haveSnow) {
-			binding.forecastView.addView(snowVolumeRow, iconTextRowLayoutParams);
+			binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
 		}
 
 		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,

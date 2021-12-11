@@ -222,15 +222,15 @@ public class WeatherForAlarmFragment extends Fragment {
 					}
 
 					if (val == Integer.MIN_VALUE) {
-						airQuality += getString(R.string.not_data);
+						airQuality += getString(R.string.noData);
 					} else {
 						airQuality += AqicnResponseProcessor.getGradeDescription(val);
 					}
 				} else {
-					airQuality += getString(R.string.not_data);
+					airQuality += getString(R.string.noData);
 				}
 			} else {
-				airQuality += getString(R.string.not_data);
+				airQuality += getString(R.string.noData);
 			}
 		}
 

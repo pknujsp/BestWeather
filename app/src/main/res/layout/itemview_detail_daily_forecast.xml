@@ -56,7 +56,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:includeFontPadding="false"
-                        android:text="15º / 21º"
+                        android:text="15° / 21°"
                         android:textColor="@color/black"
                         android:textSize="38sp" />
 

@@ -189,7 +189,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="4dp"
                     android:singleLine="true"
-                    android:text="-55º"
+                    android:text="-55°"
                     android:textAlignment="center"
                     android:textSize="15sp" />
 
@@ -198,7 +198,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
-                    android:text="-55º"
+                    android:text="-55°"
                     android:textAlignment="center"
                     android:textColor="@color/light_blue_900"
                     android:textSize="17sp" />
