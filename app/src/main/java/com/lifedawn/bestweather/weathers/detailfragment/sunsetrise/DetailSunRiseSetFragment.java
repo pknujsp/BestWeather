@@ -1,0 +1,311 @@
+package com.lifedawn.bestweather.weathers.detailfragment.sunsetrise;
+
+import android.graphics.Color;
+import android.graphics.PointF;
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.utils.MPPointF;
+import com.github.mikephil.charting.utils.Utils;
+import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.databinding.FragmentDetailSunRiseSetBinding;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
+import com.lifedawn.bestweather.weathers.view.DateView;
+import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
+import com.luckycatlabs.sunrisesunset.dto.Location;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+
+public class DetailSunRiseSetFragment extends Fragment {
+	private FragmentDetailSunRiseSetBinding binding;
+	private String addressName;
+	private ZoneId zoneId;
+	private Double latitude;
+	private Double longitude;
+
+	private int minusWeeks = 1;
+	private int plusWeeks = 16;
+
+	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private final DateTimeFormatter dateFormatterInInfo = DateTimeFormatter.ofPattern("yyyy M.d EEE");
+	private final SimpleDateFormat timeFormatterInInfo = new SimpleDateFormat("a hh:mm", Locale.getDefault());
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		Bundle bundle = getArguments();
+		addressName = bundle.getString(BundleKey.AddressName.name());
+		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
+		latitude = bundle.getDouble(BundleKey.Latitude.name());
+		longitude = bundle.getDouble(BundleKey.Longitude.name());
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	                         Bundle savedInstanceState) {
+		binding = FragmentDetailSunRiseSetBinding.inflate(inflater);
+		return binding.getRoot();
+	}
+
+	@Override
+	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		binding.toolbar.fragmentTitle.setText(R.string.detailSunRiseSet);
+		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				getParentFragmentManager().popBackStackImmediate();
+			}
+		});
+		binding.sunRiseSetInfoLayout.setVisibility(View.GONE);
+
+		binding.lineChart.setNoDataText(getString(R.string.failed_calculating_sun_rise_set));
+		binding.lineChart.getAxisLeft().setAxisMinimum(0f);
+		//1439 == 23:59
+		binding.lineChart.getAxisLeft().setAxisMaximum(1439f);
+		binding.lineChart.getDescription().setEnabled(false);
+		binding.lineChart.setScaleYEnabled(false);
+		binding.lineChart.getAxisRight().setEnabled(false);
+		binding.lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+		binding.lineChart.setDrawBorders(true);
+		binding.lineChart.setPinchZoom(false);
+
+		binding.lineChart.getAxisLeft().setLabelCount(8);
+		binding.lineChart.getXAxis().setLabelCount(6);
+
+		binding.lineChart.setBackgroundColor(Color.WHITE);
+		binding.lineChart.setGridBackgroundColor(ContextCompat.getColor(getContext(), R.color.dayColor));
+		binding.lineChart.setDrawGridBackground(true);
+
+		MPPointF center = binding.lineChart.getViewPortHandler().getContentCenter();
+		binding.lineChart.zoom(2f, 0f, center.x, center.y);
+
+		// 기준 날짜 1주일 전 - 기준 날짜 - 기준 날짜 3달 후
+		executorService.execute(new Runnable() {
+			@Override
+			public void run() {
+				List<SunRiseSetUtil.SunRiseSetObj> sunRiseSetObjList = calcSunRiseSets(ZonedDateTime.now(zoneId));
+
+				if (sunRiseSetObjList.isEmpty()) {
+					//error
+					binding.lineChart.setData(new LineData());
+				} else {
+					//차트 설정
+					List<Entry> sunRiseTimeDataList = new ArrayList<>();
+					List<Entry> sunSetTimeDataList = new ArrayList<>();
+					List<String> dateListForAxis = new ArrayList<>();
+					DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
+
+					int index = 0;
+					int minutes;
+
+					for (SunRiseSetUtil.SunRiseSetObj sunRiseSetObj : sunRiseSetObjList) {
+						dateListForAxis.add(sunRiseSetObj.getZonedDateTime().format(dateFormatter));
+
+						minutes = 60 * sunRiseSetObj.getSunrise().get(Calendar.HOUR_OF_DAY) +
+								sunRiseSetObj.getSunrise().get(Calendar.MINUTE);
+						sunRiseTimeDataList.add(new Entry(index, minutes, sunRiseSetObj));
+
+						minutes = 60 * sunRiseSetObj.getSunset().get(Calendar.HOUR_OF_DAY) +
+								sunRiseSetObj.getSunset().get(Calendar.MINUTE);
+						sunSetTimeDataList.add(new Entry(index, minutes, sunRiseSetObj));
+						index++;
+					}
+
+					LineDataSet sunRiseLineDataSet = new LineDataSet(sunRiseTimeDataList, "sunRise");
+					LineDataSet sunSetLineDataSet = new LineDataSet(sunSetTimeDataList, "sunSet");
+					sunRiseLineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+					sunSetLineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+
+					sunSetLineDataSet.setColor(Color.BLUE);
+					sunRiseLineDataSet.setColor(Color.BLUE);
+
+					sunSetLineDataSet.setDrawHorizontalHighlightIndicator(false);
+					sunRiseLineDataSet.setDrawHorizontalHighlightIndicator(false);
+
+					sunSetLineDataSet.setDrawCircleHole(false);
+					sunRiseLineDataSet.setDrawCircleHole(false);
+
+					sunSetLineDataSet.setDrawCircles(false);
+					sunRiseLineDataSet.setDrawCircles(false);
+
+					sunSetLineDataSet.setDrawValues(false);
+					sunRiseLineDataSet.setDrawValues(false);
+
+					sunSetLineDataSet.setLineWidth(3f);
+					sunRiseLineDataSet.setLineWidth(3f);
+
+					sunSetLineDataSet.setFillColor(Color.WHITE);
+					sunRiseLineDataSet.setFillColor(Color.WHITE);
+
+					sunSetLineDataSet.setDrawFilled(true);
+					sunRiseLineDataSet.setDrawFilled(true);
+
+					sunSetLineDataSet.setFillAlpha(255);
+					sunRiseLineDataSet.setFillAlpha(255);
+
+					sunSetLineDataSet.setFillFormatter(new IFillFormatter() {
+						@Override
+						public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
+							return binding.lineChart.getAxisLeft().getAxisMaximum();
+						}
+					});
+					sunRiseLineDataSet.setFillFormatter(new IFillFormatter() {
+						@Override
+						public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
+							return binding.lineChart.getAxisLeft().getAxisMinimum();
+						}
+					});
+
+					List<ILineDataSet> dataSets = new ArrayList<>();
+					dataSets.add(sunSetLineDataSet);
+					dataSets.add(sunRiseLineDataSet);
+
+					LineData lineData = new LineData(dataSets);
+					lineData.setValueTextColor(Color.BLUE);
+
+					binding.lineChart.setData(lineData);
+					binding.lineChart.getXAxis().setValueFormatter(new XAxisDateFormatter(dateListForAxis));
+					binding.lineChart.getAxisLeft().setValueFormatter(new YAxisTimeFormatter());
+					binding.lineChart.getXAxis().setLabelRotationAngle(320f);
+
+					binding.lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+						@Override
+						public void onValueSelected(Entry e, Highlight h) {
+							SunRiseSetUtil.SunRiseSetObj sunRiseSetObj = (SunRiseSetUtil.SunRiseSetObj) e.getData();
+							binding.date.setText(sunRiseSetObj.getZonedDateTime().format(dateFormatterInInfo));
+							binding.sunRiseTime.setText(timeFormatterInInfo.format(sunRiseSetObj.getSunrise().getTime()));
+							binding.sunSetTime.setText(timeFormatterInInfo.format(sunRiseSetObj.getSunset().getTime()));
+
+							binding.sunRiseSetInfoLayout.setVisibility(View.VISIBLE);
+						}
+
+						@Override
+						public void onNothingSelected() {
+							binding.sunRiseSetInfoLayout.setVisibility(View.GONE);
+						}
+					});
+				}
+				MainThreadWorker.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						binding.lineChart.invalidate();
+						if (sunRiseSetObjList.size() > 0) {
+							float x = Math.abs((float) (minusWeeks * 7));
+							binding.lineChart.highlightValue(new Highlight(x, 0f, 0), true);
+						}
+					}
+				});
+			}
+		});
+	}
+
+	private List<SunRiseSetUtil.SunRiseSetObj> calcSunRiseSets(ZonedDateTime criteriaZonedDateTime) {
+		final ZoneId utc0TimeZone = ZoneId.of(TimeZone.getTimeZone("UTC").getID());
+		final TimeZone realTimeZone = TimeZone.getTimeZone(zoneId.getId());
+
+		ZonedDateTime criteria = ZonedDateTime.of(criteriaZonedDateTime.toLocalDateTime(), zoneId);
+
+		ZonedDateTime beginUtc0ZonedDateTime = criteria.minusWeeks(minusWeeks);
+		ZonedDateTime beginRealZonedDateTime = criteria.minusWeeks(minusWeeks);
+		ZonedDateTime endUtc0ZonedDateTime = criteria.plusWeeks(plusWeeks);
+
+		beginUtc0ZonedDateTime = beginUtc0ZonedDateTime.withZoneSameLocal(utc0TimeZone);
+		endUtc0ZonedDateTime = endUtc0ZonedDateTime.withZoneSameLocal(utc0TimeZone);
+
+		long beginDay;
+		final long endDay = TimeUnit.MILLISECONDS.toDays(endUtc0ZonedDateTime.toInstant().toEpochMilli());
+
+		List<SunRiseSetUtil.SunRiseSetObj> list = new ArrayList<>();
+		SunriseSunsetCalculator calculator = new SunriseSunsetCalculator(new Location(latitude, longitude), realTimeZone);
+		Calendar calendar = Calendar.getInstance(realTimeZone);
+
+		do {
+			calendar.setTimeInMillis(beginRealZonedDateTime.toInstant().toEpochMilli());
+
+			SunRiseSetUtil.SunRiseSetObj sunRiseSetObj =
+					new SunRiseSetUtil.SunRiseSetObj(beginRealZonedDateTime, calculator.getOfficialSunriseCalendarForDate(calendar),
+							calculator.getOfficialSunsetCalendarForDate(calendar));
+			if (sunRiseSetObj.getSunrise() == null || sunRiseSetObj.getSunset() == null) {
+				// 일출/일몰 계산 오류 발생 하면 리스트 비우고 반환
+				list.clear();
+				break;
+			}
+
+			list.add(sunRiseSetObj);
+
+			beginUtc0ZonedDateTime = beginUtc0ZonedDateTime.plusDays(1);
+			beginRealZonedDateTime = beginRealZonedDateTime.plusDays(1);
+			beginDay = TimeUnit.MILLISECONDS.toDays(beginUtc0ZonedDateTime.toInstant().toEpochMilli());
+		} while (beginDay <= endDay);
+
+
+		return list;
+	}
+
+	public class XAxisDateFormatter extends ValueFormatter {
+		final List<String> dateList;
+		int val;
+
+		public XAxisDateFormatter(List<String> dateList) {
+			this.dateList = dateList;
+		}
+
+		@Override
+		public String getAxisLabel(float value, AxisBase axis) {
+			val = (int) value;
+
+			return (dateList.size() > val && val >= 0) ? dateList.get(val) : "";
+		}
+	}
+
+	public class YAxisTimeFormatter extends ValueFormatter {
+		final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("H:mm");
+		LocalTime localTime = LocalTime.of(0, 0);
+
+		@Override
+		public String getAxisLabel(float value, AxisBase axis) {
+			return localTime.plusMinutes((long) value).format(timeFormatter);
+		}
+	}
+}

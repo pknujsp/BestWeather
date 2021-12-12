@@ -4,7 +4,10 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,24 +21,32 @@ public class SunRiseSetUtil {
 
 	public static Map<Integer, SunRiseSetObj> getDailySunRiseSetMap(ZonedDateTime begin, ZonedDateTime end, double latitude,
 	                                                                double longitude) {
-		ZonedDateTime criteria = ZonedDateTime.of(begin.toLocalDateTime(), begin.getZone());
-		int beginDay = criteria.getDayOfYear();
-		final int endDay = end.getDayOfYear();
+		final ZoneId zoneId = begin.getZone();
+		final ZoneId utc0TimeZone = ZoneId.of(TimeZone.getTimeZone("UTC").getID());
+		final TimeZone realTimeZone = TimeZone.getTimeZone(zoneId.getId());
+
+		ZonedDateTime beginUtc0ZonedDateTime = ZonedDateTime.of(begin.toLocalDateTime(), zoneId);
+		ZonedDateTime beginRealZonedDateTime = ZonedDateTime.of(begin.toLocalDateTime(), zoneId);
+		ZonedDateTime endUtc0ZonedDateTime = ZonedDateTime.of(end.toLocalDateTime(), zoneId);
+
+		beginUtc0ZonedDateTime = beginUtc0ZonedDateTime.withZoneSameLocal(utc0TimeZone);
+		endUtc0ZonedDateTime = endUtc0ZonedDateTime.withZoneSameLocal(utc0TimeZone);
+
+		long beginDay;
+		final long endDay = TimeUnit.MILLISECONDS.toDays(endUtc0ZonedDateTime.toInstant().toEpochMilli());
 
 		Map<Integer, SunRiseSetObj> map = new HashMap<>();
-
-		SunriseSunsetCalculator calculator = new SunriseSunsetCalculator(new Location(latitude, longitude),
-				TimeZone.getTimeZone(begin.getZone().getId()));
-
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(begin.getZone().getId()));
+		SunriseSunsetCalculator calculator = new SunriseSunsetCalculator(new Location(latitude, longitude), realTimeZone);
+		Calendar calendar = Calendar.getInstance(realTimeZone);
 
 		do {
-			calendar.setTimeInMillis(criteria.toInstant().toEpochMilli());
+			calendar.setTimeInMillis(beginRealZonedDateTime.toInstant().toEpochMilli());
+			map.put(beginRealZonedDateTime.getDayOfYear(), new SunRiseSetObj(calculator.getOfficialSunriseCalendarForDate(calendar),
+					calculator.getOfficialSunsetCalendarForDate(calendar)));
 
-			map.put(beginDay, new SunRiseSetObj(calculator.getOfficialSunriseCalendarForDate(calendar), calculator.getOfficialSunsetCalendarForDate(calendar)));
-
-			criteria = criteria.plusDays(1);
-			beginDay = criteria.getDayOfYear();
+			beginUtc0ZonedDateTime = beginUtc0ZonedDateTime.plusDays(1);
+			beginRealZonedDateTime = beginRealZonedDateTime.plusDays(1);
+			beginDay = TimeUnit.MILLISECONDS.toDays(beginUtc0ZonedDateTime.toInstant().toEpochMilli());
 		} while (beginDay <= endDay);
 
 		return map;
@@ -52,10 +63,17 @@ public class SunRiseSetUtil {
 	}
 
 	public static class SunRiseSetObj {
+		ZonedDateTime zonedDateTime;
 		final Calendar sunrise;
 		final Calendar sunset;
 
 		public SunRiseSetObj(Calendar sunrise, Calendar sunset) {
+			this.sunrise = sunrise;
+			this.sunset = sunset;
+		}
+
+		public SunRiseSetObj(ZonedDateTime zonedDateTime, Calendar sunrise, Calendar sunset) {
+			this.zonedDateTime = zonedDateTime;
 			this.sunrise = sunrise;
 			this.sunset = sunset;
 		}
@@ -66,6 +84,10 @@ public class SunRiseSetUtil {
 
 		public Calendar getSunset() {
 			return sunset;
+		}
+
+		public ZonedDateTime getZonedDateTime() {
+			return zonedDateTime;
 		}
 	}
 }

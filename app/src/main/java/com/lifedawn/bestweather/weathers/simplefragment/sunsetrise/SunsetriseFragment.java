@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,8 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.FragmentSunsetriseBinding;
+import com.lifedawn.bestweather.weathers.WeatherFragment;
+import com.lifedawn.bestweather.weathers.detailfragment.sunsetrise.DetailSunRiseSetFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
@@ -71,9 +74,23 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		binding.weatherCardViewHeader.detailForecast.setVisibility(View.GONE);
-		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
+		binding.weatherCardViewHeader.detailForecast.setVisibility(View.VISIBLE);
+		binding.weatherCardViewHeader.compareForecast.setVisibility(View.INVISIBLE);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.sun_set_rise);
+		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				DetailSunRiseSetFragment detailSunRiseSetFragment = new DetailSunRiseSetFragment();
+				detailSunRiseSetFragment.setArguments(getArguments());
+				String tag = DetailSunRiseSetFragment.class.getName();
+
+				FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
+
+				fragmentManager.beginTransaction().hide(
+						fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
+						detailSunRiseSetFragment, tag).addToBackStack(tag).commit();
+			}
+		});
 
 		sunSetRiseViewGroup = new SunSetRiseViewGroup(getContext(), location, zoneId);
 		binding.rootLayout.addView(sunSetRiseViewGroup, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
