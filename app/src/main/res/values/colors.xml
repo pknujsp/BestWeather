@@ -56,4 +56,8 @@
     <color name="ringAgainBackgroundColor">#685D5D</color>
 
     <color name="dayColor">#F7BA03</color>
+
+    <color name="pm10LineColor">#0340F7</color>
+    <color name="pm25LineColor">#537E17</color>
+    <color name="o3LineColor">#6A5653</color>
 </resources>

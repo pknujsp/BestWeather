@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/backgroundColor"
@@ -17,154 +17,131 @@
             android:id="@+id/root_scroll_View"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_above="@id/adViewBelowGrid"
+            android:layout_below="@id/toolbar"
             android:overScrollMode="never"
-            android:paddingLeft="8dp"
-            android:paddingRight="8dp">
+            android:scrollbars="none">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <LinearLayout
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/pm10Chart"
+                    style="@style/ChartBackground"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:background="?attr/backgroundColor"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:id="@+id/labels"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-
-                    <HorizontalScrollView
-                        android:id="@+id/scroll_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:overScrollMode="never"
-                        android:scrollbars="none">
-
-                        <LinearLayout
-                            android:id="@+id/forecast_view"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical" />
-
-                    </HorizontalScrollView>
-                </LinearLayout>
+                    android:layout_height="350dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp" />
 
                 <androidx.gridlayout.widget.GridLayout
                     android:id="@+id/grid"
+                    style="@style/CardBackground"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginBottom="24dp"
-                    app:alignmentMode="alignBounds"
-                    app:columnCount="2"
-                    app:orientation="horizontal"
-                    app:rowCount="3" />
-
-                <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/adViewBelowGrid"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="24dp"
-                    ads:adSize="BANNER"
-                    ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/measuring_station_name"
-                    android:textColor="?attr/textColor"
-                    android:textSize="17sp" />
-
-                <TextView
-                    android:id="@+id/measuring_station_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="measuring_station_name"
-                    android:textColor="?attr/textColor"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/distance_to_measuring_station"
-                    android:textColor="?attr/textColor"
-                    android:textSize="17sp" />
-
-                <TextView
-                    android:id="@+id/distance_to_measuring_station"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:text="distance_to_measuring_station"
-                    android:textColor="?attr/textColor"
-                    android:textSize="14sp" />
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/updated_time"
-                    android:textColor="?attr/textColor"
-                    android:textSize="17sp" />
-
-                <TextView
-                    android:id="@+id/updated_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:text="updated_time"
-                    android:textColor="?attr/textColor"
-                    android:textSize="15sp" />
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/air_pollution_material_info"
-                    android:textColor="?attr/textColor"
-                    android:textSize="17sp" />
+                    app:columnCount="3"
+                    app:orientation="horizontal" />
 
                 <LinearLayout
-                    android:id="@+id/air_pollution_materials_info"
+                    style="@style/CardBackground"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:orientation="vertical" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:text="@string/aqi_grade"
-                    android:textColor="?attr/textColor"
-                    android:textSize="17sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/measuring_station_name"
+                        android:textColor="?attr/textColor"
+                        android:textSize="17sp" />
 
-                <LinearLayout
-                    android:id="@+id/aqi_grade_info"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
+                    <TextView
+                        android:id="@+id/measuring_station_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="measuring_station_name"
+                        android:textColor="?attr/textColor"
+                        android:textSize="15sp" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/distance_to_measuring_station"
+                        android:textColor="?attr/textColor"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:id="@+id/distance_to_measuring_station"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:text="distance_to_measuring_station"
+                        android:textColor="?attr/textColor"
+                        android:textSize="14sp" />
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/updated_time"
+                        android:textColor="?attr/textColor"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:id="@+id/updated_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:text="updated_time"
+                        android:textColor="?attr/textColor"
+                        android:textSize="15sp" />
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/air_pollution_material_info"
+                        android:textColor="?attr/textColor"
+                        android:textSize="17sp" />
+
+                    <LinearLayout
+                        android:id="@+id/air_pollution_materials_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="vertical" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="@string/aqi_grade"
+                        android:textColor="?attr/textColor"
+                        android:textSize="17sp" />
+
+                    <LinearLayout
+                        android:id="@+id/aqi_grade_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+                </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
-        <com.lifedawn.bestweather.commons.views.ProgressResultView
-            android:id="@+id/progress_result_view"
-            android:layout_width="wrap_content"
+
+        <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adViewBelowGrid"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
-    </LinearLayout>
+            android:layout_alignParentBottom="true"
+            ads:adSize="BANNER"
+            ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+    </RelativeLayout>
 </layout>

@@ -109,6 +109,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 		//1439 == 23:59
 		binding.lineChart.getAxisLeft().setAxisMaximum(1439f);
 		binding.lineChart.getDescription().setText(getString(R.string.date));
+		binding.lineChart.getDescription().setTextSize(15f);
 
 		binding.lineChart.setScaleYEnabled(false);
 		binding.lineChart.getAxisRight().setEnabled(false);
@@ -116,10 +117,12 @@ public class DetailSunRiseSetFragment extends Fragment {
 		binding.lineChart.setDrawBorders(true);
 		binding.lineChart.setPinchZoom(false);
 
-		binding.lineChart.getAxisLeft().setLabelCount(10);
+		binding.lineChart.getAxisLeft().setLabelCount(24);
 		binding.lineChart.getAxisLeft().setTextSize(14f);
+		binding.lineChart.getAxisLeft().setGridLineWidth(1.5f);
 		binding.lineChart.getXAxis().setLabelCount(8);
 		binding.lineChart.getXAxis().setTextSize(14f);
+		binding.lineChart.getXAxis().setGridLineWidth(1.5f);
 
 		binding.lineChart.setBackgroundColor(Color.WHITE);
 		binding.lineChart.setGridBackgroundColor(ContextCompat.getColor(getContext(), R.color.dayColor));
@@ -127,6 +130,39 @@ public class DetailSunRiseSetFragment extends Fragment {
 		binding.lineChart.getLegend().setEnabled(false);
 		binding.lineChart.getXAxis().setGranularityEnabled(true);
 		binding.lineChart.getXAxis().setGranularity(1f);
+
+		binding.lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
+			@Override
+			public void onValueSelected(Entry e, Highlight h) {
+				SunRiseSetUtil.SunRiseSetObj sunRiseSetObj = (SunRiseSetUtil.SunRiseSetObj) e.getData();
+				binding.date.setText(sunRiseSetObj.getZonedDateTime().format(dateFormatterInInfo));
+
+				LocalTime localTime = LocalTime.of(sunRiseSetObj.getSunrise().get(Calendar.HOUR_OF_DAY),
+						sunRiseSetObj.getSunrise().get(Calendar.MINUTE));
+
+				binding.sunRiseTime.setText(localTime.format(timeFormatterInInfo));
+
+				localTime = LocalTime.of(sunRiseSetObj.getSunset().get(Calendar.HOUR_OF_DAY),
+						sunRiseSetObj.getSunset().get(Calendar.MINUTE));
+				binding.sunSetTime.setText(localTime.format(timeFormatterInInfo));
+
+				binding.sunRiseSetInfoLayout.setVisibility(View.VISIBLE);
+			}
+
+			@Override
+			public void onNothingSelected() {
+				binding.sunRiseSetInfoLayout.setVisibility(View.GONE);
+			}
+		});
+
+		binding.goToToday.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				float x = Math.abs((float) (minusWeeks * 7));
+				binding.lineChart.moveViewToX(x - 1);
+				binding.lineChart.highlightValue(new Highlight(x, 0f, 0), true);
+			}
+		});
 
 		// 기준 날짜 1주일 전 - 기준 날짜 - 기준 날짜 3달 후
 		executorService.execute(new Runnable() {
@@ -171,11 +207,11 @@ public class DetailSunRiseSetFragment extends Fragment {
 					sunSetLineDataSet.setDrawHorizontalHighlightIndicator(false);
 					sunRiseLineDataSet.setDrawHorizontalHighlightIndicator(false);
 
-					sunSetLineDataSet.setHighlightLineWidth(4f);
-					sunRiseLineDataSet.setHighlightLineWidth(4f);
+					sunSetLineDataSet.setHighlightLineWidth(3f);
+					sunRiseLineDataSet.setHighlightLineWidth(3f);
 
-					sunSetLineDataSet.setHighLightColor(Color.BLUE);
-					sunRiseLineDataSet.setHighLightColor(Color.BLUE);
+					sunSetLineDataSet.setHighLightColor(Color.GRAY);
+					sunRiseLineDataSet.setHighLightColor(Color.GRAY);
 
 					sunSetLineDataSet.setDrawCircleHole(false);
 					sunRiseLineDataSet.setDrawCircleHole(false);
@@ -225,39 +261,6 @@ public class DetailSunRiseSetFragment extends Fragment {
 					binding.lineChart.getXAxis().setValueFormatter(new XAxisDateFormatter(dateListForAxis));
 					binding.lineChart.getAxisLeft().setValueFormatter(new YAxisTimeFormatter());
 					binding.lineChart.getXAxis().setLabelRotationAngle(320f);
-
-					binding.lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-						@Override
-						public void onValueSelected(Entry e, Highlight h) {
-							SunRiseSetUtil.SunRiseSetObj sunRiseSetObj = (SunRiseSetUtil.SunRiseSetObj) e.getData();
-							binding.date.setText(sunRiseSetObj.getZonedDateTime().format(dateFormatterInInfo));
-
-							LocalTime localTime = LocalTime.of(sunRiseSetObj.getSunrise().get(Calendar.HOUR_OF_DAY),
-									sunRiseSetObj.getSunrise().get(Calendar.MINUTE));
-
-							binding.sunRiseTime.setText(localTime.format(timeFormatterInInfo));
-
-							localTime = LocalTime.of(sunRiseSetObj.getSunset().get(Calendar.HOUR_OF_DAY),
-									sunRiseSetObj.getSunset().get(Calendar.MINUTE));
-							binding.sunSetTime.setText(localTime.format(timeFormatterInInfo));
-
-							binding.sunRiseSetInfoLayout.setVisibility(View.VISIBLE);
-						}
-
-						@Override
-						public void onNothingSelected() {
-							binding.sunRiseSetInfoLayout.setVisibility(View.GONE);
-						}
-					});
-
-					binding.goToToday.setOnClickListener(new View.OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							float x = Math.abs((float) (minusWeeks * 7));
-							binding.lineChart.highlightValue(new Highlight(x, 0f, 0), true);
-							binding.lineChart.moveViewToX(x - 1);
-						}
-					});
 				}
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
@@ -266,6 +269,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 						if (sunRiseSetObjList.size() > 0) {
 							binding.goToToday.callOnClick();
 						}
+						binding.lineChart.zoom(1.2f, 0f, 1f, 1f);
 					}
 				});
 			}

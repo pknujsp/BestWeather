@@ -62,6 +62,11 @@ public class AqicnResponseProcessor {
 		return AQI_GRADE_COLORS[5];
 	}
 
+	/**
+	 * grade가 -1이면 정보없음을 뜻함
+	 * @param grade
+	 * @return
+	 */
 	public static String getGradeDescription(int grade) {
 		/*
 		<item>50</item>
@@ -70,6 +75,10 @@ public class AqicnResponseProcessor {
         <item>200</item>
         <item>300</item>
 		 */
+		if (grade == -1) {
+			return "?";
+		}
+
 		for (int i = 0; i < AQI_GRADES.length; i++) {
 			if (grade <= AQI_GRADES[i]) {
 				return AQI_GRADE_DESCRIPTIONS[i];
