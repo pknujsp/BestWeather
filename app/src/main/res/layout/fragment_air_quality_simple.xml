@@ -65,11 +65,9 @@
                 android:id="@+id/grid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:alignmentMode="alignBounds"
-                app:columnCount="2"
-                app:orientation="horizontal"
-                app:rowCount="3" />
+                android:layout_gravity="center_horizontal"
+                app:columnCount="3"
+                app:orientation="horizontal" />
 
             <TextView
                 style="@style/sub_title_in_forecast_card"

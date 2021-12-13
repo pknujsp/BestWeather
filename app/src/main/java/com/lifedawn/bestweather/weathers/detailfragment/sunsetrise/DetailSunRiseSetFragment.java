@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.weathers.detailfragment.sunsetrise;
 
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,7 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -40,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -49,6 +53,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -66,8 +71,8 @@ public class DetailSunRiseSetFragment extends Fragment {
 	private int plusWeeks = 16;
 
 	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-	private final DateTimeFormatter dateFormatterInInfo = DateTimeFormatter.ofPattern("yyyy M.d EEE");
-	private final SimpleDateFormat timeFormatterInInfo = new SimpleDateFormat("a hh:mm", Locale.getDefault());
+	private final DateTimeFormatter dateFormatterInInfo = DateTimeFormatter.ofPattern("yyyy.M.d EEE");
+	private final DateTimeFormatter timeFormatterInInfo = DateTimeFormatter.ofPattern("a hh:mm");
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -103,22 +108,25 @@ public class DetailSunRiseSetFragment extends Fragment {
 		binding.lineChart.getAxisLeft().setAxisMinimum(0f);
 		//1439 == 23:59
 		binding.lineChart.getAxisLeft().setAxisMaximum(1439f);
-		binding.lineChart.getDescription().setEnabled(false);
+		binding.lineChart.getDescription().setText(getString(R.string.date));
+
 		binding.lineChart.setScaleYEnabled(false);
 		binding.lineChart.getAxisRight().setEnabled(false);
 		binding.lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
 		binding.lineChart.setDrawBorders(true);
 		binding.lineChart.setPinchZoom(false);
 
-		binding.lineChart.getAxisLeft().setLabelCount(8);
-		binding.lineChart.getXAxis().setLabelCount(6);
+		binding.lineChart.getAxisLeft().setLabelCount(10);
+		binding.lineChart.getAxisLeft().setTextSize(14f);
+		binding.lineChart.getXAxis().setLabelCount(8);
+		binding.lineChart.getXAxis().setTextSize(14f);
 
 		binding.lineChart.setBackgroundColor(Color.WHITE);
 		binding.lineChart.setGridBackgroundColor(ContextCompat.getColor(getContext(), R.color.dayColor));
 		binding.lineChart.setDrawGridBackground(true);
-
-		MPPointF center = binding.lineChart.getViewPortHandler().getContentCenter();
-		binding.lineChart.zoom(2f, 0f, center.x, center.y);
+		binding.lineChart.getLegend().setEnabled(false);
+		binding.lineChart.getXAxis().setGranularityEnabled(true);
+		binding.lineChart.getXAxis().setGranularity(1f);
 
 		// 기준 날짜 1주일 전 - 기준 날짜 - 기준 날짜 3달 후
 		executorService.execute(new Runnable() {
@@ -128,7 +136,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 
 				if (sunRiseSetObjList.isEmpty()) {
 					//error
-					binding.lineChart.setData(new LineData());
+					binding.lineChart.clearValues();
 				} else {
 					//차트 설정
 					List<Entry> sunRiseTimeDataList = new ArrayList<>();
@@ -163,8 +171,17 @@ public class DetailSunRiseSetFragment extends Fragment {
 					sunSetLineDataSet.setDrawHorizontalHighlightIndicator(false);
 					sunRiseLineDataSet.setDrawHorizontalHighlightIndicator(false);
 
+					sunSetLineDataSet.setHighlightLineWidth(4f);
+					sunRiseLineDataSet.setHighlightLineWidth(4f);
+
+					sunSetLineDataSet.setHighLightColor(Color.BLUE);
+					sunRiseLineDataSet.setHighLightColor(Color.BLUE);
+
 					sunSetLineDataSet.setDrawCircleHole(false);
 					sunRiseLineDataSet.setDrawCircleHole(false);
+
+					sunSetLineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+					sunRiseLineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
 
 					sunSetLineDataSet.setDrawCircles(false);
 					sunRiseLineDataSet.setDrawCircles(false);
@@ -172,8 +189,8 @@ public class DetailSunRiseSetFragment extends Fragment {
 					sunSetLineDataSet.setDrawValues(false);
 					sunRiseLineDataSet.setDrawValues(false);
 
-					sunSetLineDataSet.setLineWidth(3f);
-					sunRiseLineDataSet.setLineWidth(3f);
+					sunSetLineDataSet.setLineWidth(5f);
+					sunRiseLineDataSet.setLineWidth(5f);
 
 					sunSetLineDataSet.setFillColor(Color.WHITE);
 					sunRiseLineDataSet.setFillColor(Color.WHITE);
@@ -214,8 +231,15 @@ public class DetailSunRiseSetFragment extends Fragment {
 						public void onValueSelected(Entry e, Highlight h) {
 							SunRiseSetUtil.SunRiseSetObj sunRiseSetObj = (SunRiseSetUtil.SunRiseSetObj) e.getData();
 							binding.date.setText(sunRiseSetObj.getZonedDateTime().format(dateFormatterInInfo));
-							binding.sunRiseTime.setText(timeFormatterInInfo.format(sunRiseSetObj.getSunrise().getTime()));
-							binding.sunSetTime.setText(timeFormatterInInfo.format(sunRiseSetObj.getSunset().getTime()));
+
+							LocalTime localTime = LocalTime.of(sunRiseSetObj.getSunrise().get(Calendar.HOUR_OF_DAY),
+									sunRiseSetObj.getSunrise().get(Calendar.MINUTE));
+
+							binding.sunRiseTime.setText(localTime.format(timeFormatterInInfo));
+
+							localTime = LocalTime.of(sunRiseSetObj.getSunset().get(Calendar.HOUR_OF_DAY),
+									sunRiseSetObj.getSunset().get(Calendar.MINUTE));
+							binding.sunSetTime.setText(localTime.format(timeFormatterInInfo));
 
 							binding.sunRiseSetInfoLayout.setVisibility(View.VISIBLE);
 						}
@@ -225,14 +249,22 @@ public class DetailSunRiseSetFragment extends Fragment {
 							binding.sunRiseSetInfoLayout.setVisibility(View.GONE);
 						}
 					});
+
+					binding.goToToday.setOnClickListener(new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							float x = Math.abs((float) (minusWeeks * 7));
+							binding.lineChart.highlightValue(new Highlight(x, 0f, 0), true);
+							binding.lineChart.moveViewToX(x - 1);
+						}
+					});
 				}
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						binding.lineChart.invalidate();
 						if (sunRiseSetObjList.size() > 0) {
-							float x = Math.abs((float) (minusWeeks * 7));
-							binding.lineChart.highlightValue(new Highlight(x, 0f, 0), true);
+							binding.goToToday.callOnClick();
 						}
 					}
 				});
@@ -241,17 +273,28 @@ public class DetailSunRiseSetFragment extends Fragment {
 	}
 
 	private List<SunRiseSetUtil.SunRiseSetObj> calcSunRiseSets(ZonedDateTime criteriaZonedDateTime) {
-		final ZoneId utc0TimeZone = ZoneId.of(TimeZone.getTimeZone("UTC").getID());
-		final TimeZone realTimeZone = TimeZone.getTimeZone(zoneId.getId());
+		//TimeZone localTimeZone = TimeZone.getDefault();
+		//final int localOffset = localTimeZone.getRawOffset();
+		ZoneOffset zoneOffset = criteriaZonedDateTime.getOffset();
+		final int offset = zoneOffset.getTotalSeconds() * 1000;
 
+		TimeZone realTimeZone = new SimpleTimeZone(offset, "");
+		/*
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			realTimeZone = TimeZone.getTimeZone(zoneId);
+		} else {
+			realTimeZone = TimeZone.getTimeZone(zoneId.toString());
+		}
+
+		 */
 		ZonedDateTime criteria = ZonedDateTime.of(criteriaZonedDateTime.toLocalDateTime(), zoneId);
 
 		ZonedDateTime beginUtc0ZonedDateTime = criteria.minusWeeks(minusWeeks);
 		ZonedDateTime beginRealZonedDateTime = criteria.minusWeeks(minusWeeks);
 		ZonedDateTime endUtc0ZonedDateTime = criteria.plusWeeks(plusWeeks);
 
-		beginUtc0ZonedDateTime = beginUtc0ZonedDateTime.withZoneSameLocal(utc0TimeZone);
-		endUtc0ZonedDateTime = endUtc0ZonedDateTime.withZoneSameLocal(utc0TimeZone);
+		beginUtc0ZonedDateTime = beginUtc0ZonedDateTime.withZoneSameLocal(ZoneOffset.UTC);
+		endUtc0ZonedDateTime = endUtc0ZonedDateTime.withZoneSameLocal(ZoneOffset.UTC);
 
 		long beginDay;
 		final long endDay = TimeUnit.MILLISECONDS.toDays(endUtc0ZonedDateTime.toInstant().toEpochMilli());
@@ -271,7 +314,6 @@ public class DetailSunRiseSetFragment extends Fragment {
 				list.clear();
 				break;
 			}
-
 			list.add(sunRiseSetObj);
 
 			beginUtc0ZonedDateTime = beginUtc0ZonedDateTime.plusDays(1);

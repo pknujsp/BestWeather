@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.weathers.detailfragment.aqicn;
 
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -134,6 +135,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 		final int dateRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInD);
 		TextsView dateRow = new TextsView(getContext(), viewWidth, columnWidth, dateList);
+		dateRow.setValueTextColor(Color.BLACK);
 		AirQualityBarView pm10BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, pm10AirQualityObjList);
 		AirQualityBarView pm25BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, pm25AirQualityObjList);
 		AirQualityBarView o3BarView = new AirQualityBarView(getContext(), FragmentType.Detail, viewWidth, viewHeight, columnWidth, o3AirQualityObjList);
