@@ -69,6 +69,16 @@
         <attr name="drawableSize" format="dimension" />
         <attr name="drawableSrc" format="reference" />
         <attr name="text" format="string" />
-        <attr name="textColor"/>
+        <attr name="textColor" />
+    </declare-styleable>
+
+    <declare-styleable name="NotScrolledView">
+        <attr name="iconVisibility" format="enum">
+            <enum name="visible" value="0" />
+            <enum name="invisible" value="4" />
+            <enum name="gone" value="8" />
+        </attr>
+        <attr name="android:text" format="string" />
+        <attr name="iconSrc" format="reference" />
     </declare-styleable>
 </resources>

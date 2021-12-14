@@ -1,8 +1,6 @@
 package com.lifedawn.bestweather.weathers.detailfragment.sunsetrise;
 
 import android.graphics.Color;
-import android.graphics.PointF;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,32 +13,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IFillFormatter;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
-import com.github.mikephil.charting.utils.MPPointF;
-import com.github.mikephil.charting.utils.Utils;
+import com.github.mikephil.charting.model.GradientColor;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.databinding.FragmentDetailSunRiseSetBinding;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
-import com.lifedawn.bestweather.weathers.view.DateView;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -48,11 +37,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
@@ -102,67 +87,35 @@ public class DetailSunRiseSetFragment extends Fragment {
 				getParentFragmentManager().popBackStackImmediate();
 			}
 		});
-		binding.sunRiseSetInfoLayout.setVisibility(View.GONE);
 
-		binding.lineChart.setNoDataText(getString(R.string.failed_calculating_sun_rise_set));
-		binding.lineChart.getAxisLeft().setAxisMinimum(0f);
-		//1439 == 23:59
-		binding.lineChart.getAxisLeft().setAxisMaximum(1439f);
-		binding.lineChart.getDescription().setText(getString(R.string.date));
-		binding.lineChart.getDescription().setTextSize(15f);
+		binding.chart.setDrawGridBackground(false);
+		binding.chart.getDescription().setEnabled(false);
+		binding.chart.setScaleXEnabled(false);
+		binding.chart.setDrawValueAboveBar(true);
+		binding.chart.setHighlightFullBarEnabled(false);
+		binding.chart.setExtraOffsets(0, 10, 0, 20);
 
-		binding.lineChart.setScaleYEnabled(false);
-		binding.lineChart.getAxisRight().setEnabled(false);
-		binding.lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-		binding.lineChart.setDrawBorders(true);
-		binding.lineChart.setPinchZoom(false);
+		binding.chart.getAxisLeft().setEnabled(false);
+		binding.chart.getAxisRight().setAxisMaximum(720f);
+		binding.chart.getAxisRight().setAxisMinimum(-720f);
+		binding.chart.getAxisRight().setDrawGridLines(false);
+		binding.chart.getAxisRight().setDrawZeroLine(true);
+		binding.chart.getAxisRight().setTextSize(12f);
+		binding.chart.getAxisRight().setYOffset(-3f);
+		binding.chart.getAxisRight().setLabelCount(4);
+		binding.chart.getAxisRight().setValueFormatter(new TimeFormatter());
 
-		binding.lineChart.getAxisLeft().setLabelCount(24);
-		binding.lineChart.getAxisLeft().setTextSize(14f);
-		binding.lineChart.getAxisLeft().setGridLineWidth(1.5f);
-		binding.lineChart.getXAxis().setLabelCount(8);
-		binding.lineChart.getXAxis().setTextSize(14f);
-		binding.lineChart.getXAxis().setGridLineWidth(1.5f);
+		XAxis xAxis = binding.chart.getXAxis();
+		xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
+		xAxis.setDrawGridLines(false);
+		xAxis.setDrawAxisLine(false);
+		xAxis.setTextSize(12f);
+		xAxis.setCenterAxisLabels(false);
+		xAxis.setLabelCount(12);
+		xAxis.setGranularity(1f);
+		xAxis.setGranularityEnabled(true);
 
-		binding.lineChart.setBackgroundColor(Color.WHITE);
-		binding.lineChart.setGridBackgroundColor(ContextCompat.getColor(getContext(), R.color.dayColor));
-		binding.lineChart.setDrawGridBackground(true);
-		binding.lineChart.getLegend().setEnabled(false);
-		binding.lineChart.getXAxis().setGranularityEnabled(true);
-		binding.lineChart.getXAxis().setGranularity(1f);
-
-		binding.lineChart.setOnChartValueSelectedListener(new OnChartValueSelectedListener() {
-			@Override
-			public void onValueSelected(Entry e, Highlight h) {
-				SunRiseSetUtil.SunRiseSetObj sunRiseSetObj = (SunRiseSetUtil.SunRiseSetObj) e.getData();
-				binding.date.setText(sunRiseSetObj.getZonedDateTime().format(dateFormatterInInfo));
-
-				LocalTime localTime = LocalTime.of(sunRiseSetObj.getSunrise().get(Calendar.HOUR_OF_DAY),
-						sunRiseSetObj.getSunrise().get(Calendar.MINUTE));
-
-				binding.sunRiseTime.setText(localTime.format(timeFormatterInInfo));
-
-				localTime = LocalTime.of(sunRiseSetObj.getSunset().get(Calendar.HOUR_OF_DAY),
-						sunRiseSetObj.getSunset().get(Calendar.MINUTE));
-				binding.sunSetTime.setText(localTime.format(timeFormatterInInfo));
-
-				binding.sunRiseSetInfoLayout.setVisibility(View.VISIBLE);
-			}
-
-			@Override
-			public void onNothingSelected() {
-				binding.sunRiseSetInfoLayout.setVisibility(View.GONE);
-			}
-		});
-
-		binding.goToToday.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				float x = Math.abs((float) (minusWeeks * 7));
-				binding.lineChart.moveViewToX(x - 1);
-				binding.lineChart.highlightValue(new Highlight(x, 0f, 0), true);
-			}
-		});
+		binding.chart.getLegend().setEnabled(false);
 
 		// 기준 날짜 1주일 전 - 기준 날짜 - 기준 날짜 3달 후
 		executorService.execute(new Runnable() {
@@ -172,104 +125,69 @@ public class DetailSunRiseSetFragment extends Fragment {
 
 				if (sunRiseSetObjList.isEmpty()) {
 					//error
-					binding.lineChart.clearValues();
+					binding.chart.clearValues();
 				} else {
 					//차트 설정
-					List<Entry> sunRiseTimeDataList = new ArrayList<>();
-					List<Entry> sunSetTimeDataList = new ArrayList<>();
+					List<BarEntry> sunRiseSetTimeDataList = new ArrayList<>();
 					List<String> dateListForAxis = new ArrayList<>();
 					DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
 
+					final int rightColor = ContextCompat.getColor(getContext(), R.color.sunGradientStart);
+					final int leftColor = ContextCompat.getColor(getContext(), R.color.sunGradientEnd);
+					final int todayColor = ContextCompat.getColor(getContext(), android.R.color.holo_blue_bright);
+
 					int index = 0;
-					int minutes;
+					int leftMinutes;
+					int rightMinutes;
+
+					final int todayIndex = Math.abs(minusWeeks * 7);
+
+					int[] barColors = new int[sunRiseSetObjList.size() * 2];
+					int colorIndex = 0;
 
 					for (SunRiseSetUtil.SunRiseSetObj sunRiseSetObj : sunRiseSetObjList) {
+						if (index == todayIndex) {
+							barColors[colorIndex + 1] = todayColor;
+							barColors[colorIndex] = todayColor;
+						} else {
+							barColors[colorIndex + 1] = rightColor;
+							barColors[colorIndex] = leftColor;
+						}
+						colorIndex = colorIndex + 2;
+
 						dateListForAxis.add(sunRiseSetObj.getZonedDateTime().format(dateFormatter));
 
-						minutes = 60 * sunRiseSetObj.getSunrise().get(Calendar.HOUR_OF_DAY) +
+						leftMinutes = -720 + 60 * sunRiseSetObj.getSunrise().get(Calendar.HOUR_OF_DAY) +
 								sunRiseSetObj.getSunrise().get(Calendar.MINUTE);
-						sunRiseTimeDataList.add(new Entry(index, minutes, sunRiseSetObj));
+						rightMinutes = 60 * sunRiseSetObj.getSunset().get(Calendar.HOUR_OF_DAY) +
+								sunRiseSetObj.getSunset().get(Calendar.MINUTE) - 720;
 
-						minutes = 60 * sunRiseSetObj.getSunset().get(Calendar.HOUR_OF_DAY) +
-								sunRiseSetObj.getSunset().get(Calendar.MINUTE);
-						sunSetTimeDataList.add(new Entry(index, minutes, sunRiseSetObj));
+						sunRiseSetTimeDataList.add(new BarEntry(index, new float[]{leftMinutes, rightMinutes}, sunRiseSetObj));
 						index++;
 					}
 
-					LineDataSet sunRiseLineDataSet = new LineDataSet(sunRiseTimeDataList, "sunRise");
-					LineDataSet sunSetLineDataSet = new LineDataSet(sunSetTimeDataList, "sunSet");
-					sunRiseLineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-					sunSetLineDataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+					BarDataSet barDataSet = new BarDataSet(sunRiseSetTimeDataList, "sunRiseSet");
+					barDataSet.setDrawIcons(false);
+					barDataSet.setValueFormatter(new TimeFormatter());
+					barDataSet.setValueTextSize(12f);
+					barDataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
 
-					sunSetLineDataSet.setColor(Color.BLUE);
-					sunRiseLineDataSet.setColor(Color.BLUE);
+					barDataSet.setColors(barColors);
 
-					sunSetLineDataSet.setDrawHorizontalHighlightIndicator(false);
-					sunRiseLineDataSet.setDrawHorizontalHighlightIndicator(false);
+					BarData barData = new BarData(barDataSet);
+					barData.setHighlightEnabled(false);
 
-					sunSetLineDataSet.setHighlightLineWidth(3f);
-					sunRiseLineDataSet.setHighlightLineWidth(3f);
-
-					sunSetLineDataSet.setHighLightColor(Color.GRAY);
-					sunRiseLineDataSet.setHighLightColor(Color.GRAY);
-
-					sunSetLineDataSet.setDrawCircleHole(false);
-					sunRiseLineDataSet.setDrawCircleHole(false);
-
-					sunSetLineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-					sunRiseLineDataSet.setAxisDependency(YAxis.AxisDependency.LEFT);
-
-					sunSetLineDataSet.setDrawCircles(false);
-					sunRiseLineDataSet.setDrawCircles(false);
-
-					sunSetLineDataSet.setDrawValues(false);
-					sunRiseLineDataSet.setDrawValues(false);
-
-					sunSetLineDataSet.setLineWidth(5f);
-					sunRiseLineDataSet.setLineWidth(5f);
-
-					sunSetLineDataSet.setFillColor(Color.WHITE);
-					sunRiseLineDataSet.setFillColor(Color.WHITE);
-
-					sunSetLineDataSet.setDrawFilled(true);
-					sunRiseLineDataSet.setDrawFilled(true);
-
-					sunSetLineDataSet.setFillAlpha(255);
-					sunRiseLineDataSet.setFillAlpha(255);
-
-					sunSetLineDataSet.setFillFormatter(new IFillFormatter() {
-						@Override
-						public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
-							return binding.lineChart.getAxisLeft().getAxisMaximum();
-						}
-					});
-					sunRiseLineDataSet.setFillFormatter(new IFillFormatter() {
-						@Override
-						public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
-							return binding.lineChart.getAxisLeft().getAxisMinimum();
-						}
-					});
-
-					List<ILineDataSet> dataSets = new ArrayList<>();
-					dataSets.add(sunSetLineDataSet);
-					dataSets.add(sunRiseLineDataSet);
-
-					LineData lineData = new LineData(dataSets);
-					lineData.setValueTextColor(Color.BLUE);
-
-					binding.lineChart.setData(lineData);
-					binding.lineChart.getXAxis().setValueFormatter(new XAxisDateFormatter(dateListForAxis));
-					binding.lineChart.getAxisLeft().setValueFormatter(new YAxisTimeFormatter());
-					binding.lineChart.getXAxis().setLabelRotationAngle(320f);
+					binding.chart.setData(barData);
+					binding.chart.getXAxis().setValueFormatter(new XAxisDateFormatter(dateListForAxis));
 				}
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						binding.lineChart.invalidate();
+						binding.chart.invalidate();
+
 						if (sunRiseSetObjList.size() > 0) {
-							binding.goToToday.callOnClick();
+							binding.chart.zoom(0f, 8f, 0f, 0f);
 						}
-						binding.lineChart.zoom(1.2f, 0f, 1f, 1f);
 					}
 				});
 			}
@@ -329,7 +247,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 		return list;
 	}
 
-	public class XAxisDateFormatter extends ValueFormatter {
+	private static class XAxisDateFormatter extends ValueFormatter {
 		final List<String> dateList;
 		int val;
 
@@ -340,18 +258,28 @@ public class DetailSunRiseSetFragment extends Fragment {
 		@Override
 		public String getAxisLabel(float value, AxisBase axis) {
 			val = (int) value;
-
 			return (dateList.size() > val && val >= 0) ? dateList.get(val) : "";
 		}
 	}
 
-	public class YAxisTimeFormatter extends ValueFormatter {
+	private static class TimeFormatter extends ValueFormatter {
 		final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("H:mm");
-		LocalTime localTime = LocalTime.of(0, 0);
+		LocalTime localTime = LocalTime.of(12, 0);
 
 		@Override
 		public String getAxisLabel(float value, AxisBase axis) {
+			return convert(value);
+		}
+
+		@Override
+		public String getFormattedValue(float value) {
+			return convert(value);
+		}
+
+		private String convert(float value) {
 			return localTime.plusMinutes((long) value).format(timeFormatter);
+			//			return localTime.plusMinutes((long) value).format(timeFormatter);
 		}
 	}
+
 }

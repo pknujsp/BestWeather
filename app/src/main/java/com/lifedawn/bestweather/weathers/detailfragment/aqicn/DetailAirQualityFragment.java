@@ -5,14 +5,15 @@ import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.ArrayMap;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,7 +27,6 @@ import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -57,6 +57,8 @@ import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.FragmentType;
+import com.lifedawn.bestweather.weathers.view.NotScrolledView;
+import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -66,7 +68,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -131,19 +132,19 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 			}
 		});
 
-		binding.toolbar.fragmentTitle.setText(R.string.detail_air_quality);
+		binding.horizontalScrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+			@Override
+			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+				binding.pm10NoScrollView.reDraw(scrollX);
+				binding.pm25NoScrollView.reDraw(scrollX);
+				binding.o3NoScrollView.reDraw(scrollX);
+			}
+		});
 
-		/*
+		binding.toolbar.fragmentTitle.setText(R.string.detail_air_quality);
 		initBarChart(binding.pm10Chart);
 		initBarChart(binding.pm25Chart);
 		initBarChart(binding.o3Chart);
-
-		binding.pm10Chart.setOnChartGestureListener(new ChartGestureListener(binding.pm10Chart, binding.pm25Chart, binding.o3Chart));
-		binding.pm25Chart.setOnChartGestureListener(new ChartGestureListener(binding.pm25Chart, binding.pm10Chart, binding.o3Chart));
-		binding.o3Chart.setOnChartGestureListener(new ChartGestureListener(binding.o3Chart, binding.pm25Chart, binding.pm10Chart));
-
-		 */
-		initLineChart(binding.pm10Chart);
 
 		setAirPollutionMaterialsInfo();
 		setAqiGradeInfo();
@@ -172,7 +173,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 				airQualityForecastObjList.add(current);
 				airQualityForecastObjList.addAll(AqicnResponseProcessor.getAirQualityForecastObjList(response, zoneId));
 
-				setDataForLineChart(airQualityForecastObjList);
+				setDataForBarChart(airQualityForecastObjList);
 			}
 		});
 
@@ -247,42 +248,50 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		}
 	}
 
-	/*
+	private void setBarChartSize(BarChart barChart) {
+		float originalTop = barChart.getViewPortHandler().offsetTop();
+		float originalBottom = barChart.getViewPortHandler().offsetBottom();
+
+		barChart.setViewPortOffsets(0, originalTop, 0, originalBottom + 10);
+		barChart.getContentRect().left = 0;
+		barChart.getContentRect().right = barChart.getWidth();
+	}
+
 	private void initBarChart(BarChart barChart) {
 		barChart.setNoDataText(getString(R.string.noData));
+		barChart.getAxisRight().setEnabled(false);
+
+		barChart.setDrawBorders(false);
+		barChart.setPinchZoom(false);
 		barChart.getDescription().setEnabled(false);
 
-		barChart.getAxisRight().setEnabled(false);
-		barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
-		barChart.setDrawBorders(true);
-		barChart.setPinchZoom(false);
-		barChart.getDescription().setTextAlign(Paint.Align.RIGHT);
-		barChart.getDescription().setTextSize(15f);
-
-		barChart.getAxisLeft().setTextSize(13f);
-		barChart.getXAxis().setTextSize(14f);
-		barChart.getAxisLeft().setAxisMinimum(0);
-		barChart.setScaleYEnabled(false);
-		barChart.setScaleXEnabled(false);
+		barChart.setTouchEnabled(false);
+		barChart.setScaleEnabled(false);
 
 		barChart.setBackgroundColor(Color.WHITE);
 		barChart.setDrawGridBackground(false);
-		barChart.getAxisLeft().setDrawGridLines(false);
 		barChart.getXAxis().setDrawGridLines(false);
 		barChart.getXAxis().setGranularityEnabled(true);
 		barChart.getXAxis().setGranularity(1f);
-		barChart.setDrawValueAboveBar(true);
+		barChart.getXAxis().setTextSize(14f);
 		barChart.getXAxis().setCenterAxisLabels(false);
-		barChart.getLegend().setEnabled(false);
-		barChart.getAxisLeft().setSpaceBottom(20);
-		barChart.getAxisLeft().setSpaceTop(20);
+		barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+		barChart.getXAxis().setDrawLabels(true);
 
-		barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTH_SIDED);
-		barChart.zoom(1.3f, 0f, 0f, 0f);
+		barChart.getAxisLeft().setSpaceBottom(15);
+		barChart.getAxisLeft().setSpaceTop(15);
+		barChart.getAxisLeft().setDrawGridLines(false);
+		barChart.getAxisLeft().setAxisMinimum(0);
+		barChart.getAxisLeft().setTextSize(13f);
+		barChart.getAxisLeft().setDrawLabels(false);
+		barChart.getAxisLeft().setDrawAxisLine(false);
+
+		barChart.setDrawValueAboveBar(true);
+		barChart.getLegend().setEnabled(false);
+		barChart.fitScreen();
 	}
 
 
-	 */
 	private void initLineChart(LineChart lineChart) {
 		lineChart.getAxisLeft().setTextSize(13f);
 		lineChart.getAxisLeft().setAxisMinimum(-1f);
@@ -316,7 +325,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		lineChart.fitScreen();
 	}
 
-	/*
+
 	private void setDataForBarChart(List<AirQualityForecastObj> airQualityForecastObjList) {
 		List<BarEntry> pm10EntryList = new ArrayList<>();
 		List<BarEntry> pm25EntryList = new ArrayList<>();
@@ -352,6 +361,16 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 			pm10ColorList.add(AqicnResponseProcessor.getGradeColorId(pm10));
 			pm25ColorList.add(AqicnResponseProcessor.getGradeColorId(pm25));
 			o3ColorList.add(AqicnResponseProcessor.getGradeColorId(o3));
+
+			if (airQualityForecastObj.pm10 == null) {
+				pm10 = -1;
+			}
+			if (airQualityForecastObj.pm25 == null) {
+				pm25 = -1;
+			}
+			if (airQualityForecastObj.o3 == null) {
+				o3 = -1;
+			}
 
 			pm10GradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(pm10));
 			pm25GradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(pm25));
@@ -391,27 +410,31 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		pm25BarData.setValueFormatter(new GradeValueFormatter());
 		o3BarData.setValueFormatter(new GradeValueFormatter());
 
-		//binding.pm10Chart.setData(pm10BarData);
+		binding.pm10Chart.setData(pm10BarData);
 		binding.pm10Chart.getXAxis().setValueFormatter(pm10BottomXAxisLabelFormatter);
-		binding.pm10Chart.setXAxisRenderer(new BothAxisLabelRenderer(binding.pm10Chart.getViewPortHandler(),
-				binding.pm10Chart.getXAxis(), binding.pm10Chart.getTransformer(YAxis.AxisDependency.LEFT),
-				new TopXAxisLabelFormatter(dateList)));
 
-		//binding.pm25Chart.setData(pm25BarData);
+		binding.pm25Chart.setData(pm25BarData);
 		binding.pm25Chart.getXAxis().setValueFormatter(pm25BottomXAxisLabelFormatter);
-		binding.pm25Chart.setXAxisRenderer(new BothAxisLabelRenderer(binding.pm25Chart.getViewPortHandler(),
-				binding.pm25Chart.getXAxis(), binding.pm25Chart.getTransformer(YAxis.AxisDependency.LEFT),
-				new TopXAxisLabelFormatter(dateList)));
 
-		//binding.o3Chart.setData(o3BarData);
+		binding.o3Chart.setData(o3BarData);
 		binding.o3Chart.getXAxis().setValueFormatter(o3BottomXAxisLabelFormatter);
-		binding.o3Chart.setXAxisRenderer(new BothAxisLabelRenderer(binding.o3Chart.getViewPortHandler(),
-				binding.o3Chart.getXAxis(), binding.o3Chart.getTransformer(YAxis.AxisDependency.LEFT),
-				new TopXAxisLabelFormatter(dateList)));
 
 		MainThreadWorker.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
+				final int cellWidth = (int) getResources().getDimension(R.dimen.columnWidthInAirQualityBarView);
+				final int viewWidth = cellWidth * dateList.size();
+				TextsView dateView = new TextsView(getContext(), viewWidth, cellWidth, dateList);
+				dateView.setValueTextSize(14);
+				dateView.setValueTextColor(Color.BLACK);
+
+				binding.dateRow.removeAllViews();
+				binding.dateRow.addView(dateView);
+
+				setBarChartSize(binding.pm10Chart);
+				setBarChartSize(binding.pm25Chart);
+				setBarChartSize(binding.o3Chart);
+
 				binding.pm10Chart.invalidate();
 				binding.pm25Chart.invalidate();
 				binding.o3Chart.invalidate();
@@ -419,7 +442,6 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		});
 	}
 
-	 */
 
 	private void setDataForLineChart(List<AirQualityForecastObj> airQualityForecastObjList) {
 		List<Entry> pm10EntryList = new ArrayList<>();
@@ -484,11 +506,13 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		pm10LineDataSet.setColor(pm10LineColor);
 		pm25LineDataSet.setColor(pm25LineColor);
 		o3LineDataSet.setColor(o3LineColor);
-
+/*
 		pm10LineDataSet.setValueFormatter(new GradeValueFormatter(gradeDescriptionMap));
 		pm25LineDataSet.setValueFormatter(new GradeValueFormatter(gradeDescriptionMap));
 		o3LineDataSet.setValueFormatter(new GradeValueFormatter(gradeDescriptionMap));
 
+
+ */
 		List<ILineDataSet> dataSet = new ArrayList<>();
 		dataSet.add(pm10LineDataSet);
 		dataSet.add(pm25LineDataSet);
@@ -498,7 +522,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		lineData.setHighlightEnabled(true);
 		lineData.setDrawValues(true);
 
-		binding.pm10Chart.setData(lineData);
+		//binding.pm10Chart.setData(lineData);
 		binding.pm10Chart.getXAxis().setValueFormatter(bottomXAxisLabelFormatter);
 		binding.pm10Chart.getXAxis().setAxisMinimum(-1);
 		binding.pm10Chart.getXAxis().setAxisMaximum(lineData.getXMax() + 1);
@@ -586,34 +610,26 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 
 	protected static class BottomXAxisLabelFormatter extends ValueFormatter {
-		List<String> dateList;
+		List<String> gradeDescriptionList;
 		int val;
 
-		public BottomXAxisLabelFormatter(List<String> dateList) {
-			this.dateList = dateList;
+		public BottomXAxisLabelFormatter(List<String> gradeDescriptionList) {
+			this.gradeDescriptionList = gradeDescriptionList;
 		}
 
 
 		@Override
 		public String getAxisLabel(float value, AxisBase axis) {
 			val = (int) value;
-			return val < dateList.size() && val >= 0 ? dateList.get(val) : "";
+			return val < gradeDescriptionList.size() && val >= 0 ? gradeDescriptionList.get(val) : "";
 		}
 	}
 
 	protected static class GradeValueFormatter extends ValueFormatter {
-		ArrayMap<Integer, String> gradeDescriptionMap;
-		int val;
-
-		public GradeValueFormatter(ArrayMap<Integer, String> gradeDescriptionMap) {
-			this.gradeDescriptionMap = gradeDescriptionMap;
-		}
-
 
 		@Override
 		public String getFormattedValue(float value) {
-			val = (int) value;
-			return gradeDescriptionMap.get(val);
+			return String.valueOf((int) value);
 		}
 
 	}

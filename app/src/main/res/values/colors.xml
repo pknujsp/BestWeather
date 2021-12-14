@@ -60,4 +60,7 @@
     <color name="pm10LineColor">#0340F7</color>
     <color name="pm25LineColor">#537E17</color>
     <color name="o3LineColor">#6A5653</color>
+
+    <color name="sunGradientStart">#fff57b</color>
+    <color name="sunGradientEnd">#fb8708</color>
 </resources>

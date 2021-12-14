@@ -57,7 +57,6 @@ public class CustomSearchView extends FrameLayout {
 			a.recycle();
 		}
 
-		//LayoutInflater.from(context).inflate(R.layout.view_search, this, true);
 		binding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.view_search, this, true);
 
 		binding.back.setVisibility(backBtnVisibility);

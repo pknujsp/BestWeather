@@ -550,6 +550,7 @@
     <string name="pm">오후</string>
     <string name="today">오늘</string>
     <string name="detailSunRiseSet">상세 일출, 일몰</string>
+    <string name="currentAndForecast">현재및 예보</string>
 
 
 </resources>
