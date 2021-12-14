@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/favorite_address_background_in_side_nav"
+    android:clickable="true"
+    android:elevation="2dp"
     android:paddingLeft="12dp"
     android:paddingTop="16dp"
     android:paddingRight="12dp"

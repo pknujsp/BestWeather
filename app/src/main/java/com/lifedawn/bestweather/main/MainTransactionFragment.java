@@ -49,8 +49,8 @@ import java.util.List;
 import java.util.Set;
 
 public class MainTransactionFragment extends Fragment implements IRefreshFavoriteLocationListOnSideNav {
-	private static final int favTypeTagInFavLocItemView = R.id.locationTypeTagInFavLocItemViewInSideNav;
-	private static final int favDtoTagInFavLocItemView = R.id.favoriteLocationDtoTagInFavLocItemViewInSideNav;
+	private final int favTypeTagInFavLocItemView = R.id.locationTypeTagInFavLocItemViewInSideNav;
+	private final int favDtoTagInFavLocItemView = R.id.favoriteLocationDtoTagInFavLocItemViewInSideNav;
 
 	private FragmentMainBinding binding;
 	private WeatherViewModel weatherViewModel;
@@ -402,7 +402,10 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		layoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
+
+		int dp12 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
+		int dp16 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, getResources().getDisplayMetrics());
+		layoutParams.setMargins(dp16, 0, dp16, dp12);
 
 		binding.sideNavMenu.favoriteAddressLayout.addView(locationItemView, layoutParams);
 	}

@@ -30,6 +30,7 @@ import android.widget.Toast;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.AlarmSettingsFragment;
+import com.lifedawn.bestweather.commons.classes.RecyclerViewItemDecoration;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
@@ -184,6 +185,7 @@ public class FavoritesFragment extends Fragment {
 		});
 
 		binding.favoriteAddressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+		binding.favoriteAddressList.addItemDecoration(new RecyclerViewItemDecoration(getContext()));
 		adapter = new FavoriteAddressesAdapter();
 		adapter.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
 			@Override

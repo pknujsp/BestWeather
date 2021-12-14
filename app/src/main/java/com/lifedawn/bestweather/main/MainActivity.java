@@ -73,12 +73,6 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-		networkStatus = NetworkStatus.getInstance(getApplicationContext());
-		if (!networkStatus.networkAvailable()) {
-			Toast.makeText(this, R.string.disconnected_network, Toast.LENGTH_SHORT).show();
-			finish();
-		}
-
 		AppThemes appTheme = AppThemes.enumOf(sharedPreferences.getString(getString(R.string.pref_key_app_theme), AppThemes.BLACK.name()));
 		if (appTheme == AppThemes.BLACK) {
 			setTheme(R.style.AppTheme_Black);
@@ -87,6 +81,12 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+		networkStatus = NetworkStatus.getInstance(getApplicationContext());
+		if (!networkStatus.networkAvailable()) {
+			Toast.makeText(this, R.string.disconnected_network, Toast.LENGTH_SHORT).show();
+			finish();
+		}
 
 		// 초기화
 		MobileAds.initialize(this, new OnInitializationCompleteListener() {
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 					introTransactionFragment.getTag()).commit();
 		} else {
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, mainTransactionFragment.getTag()).commit();
+			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commit();
 		}
 
 	}

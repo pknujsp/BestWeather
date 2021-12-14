@@ -20,7 +20,8 @@
             android:layout_marginBottom="4dp"
             android:text="@string/current_location"
             android:textColor="@color/white"
-            android:textSize="15sp" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/address_name"
@@ -35,45 +36,24 @@
         android:id="@+id/favorite_address_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp" />
+        android:layout_marginTop="12dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="vertical" />
 
     <TextView
         android:id="@+id/favorites"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:gravity="center_vertical"
-        android:paddingLeft="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:text="@string/favorite"
-        android:textColor="@color/black" />
+        style="@style/TextViewInSideNav"
+        android:layout_marginTop="16dp"
+        android:text="@string/favorite" />
 
     <TextView
         android:id="@+id/notificationAlarmSettings"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:gravity="center_vertical"
-        android:paddingLeft="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:text="@string/notificationAndAlarm"
-        android:textColor="@color/black" />
+        style="@style/TextViewInSideNav"
+        android:text="@string/notificationAndAlarm" />
 
     <TextView
         android:id="@+id/settings"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:gravity="center_vertical"
-        android:paddingLeft="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:text="@string/settings"
-        android:textColor="@color/black" />
+        style="@style/TextViewInSideNav"
+        android:text="@string/settings" />
 </LinearLayout>

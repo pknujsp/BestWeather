@@ -24,8 +24,10 @@
             android:clickable="true"
             android:focusable="true"
             android:gravity="center_vertical"
-            android:paddingHorizontal="@dimen/searchviewPaddingHorizontal"
-            android:paddingVertical="@dimen/searchviewPaddingVertical"
+            android:paddingLeft="@dimen/searchviewPaddingHorizontal"
+            android:paddingTop="@dimen/searchviewPaddingVertical"
+            android:paddingRight="@dimen/searchviewPaddingHorizontal"
+            android:paddingBottom="@dimen/searchviewPaddingVertical"
             android:text="@string/find_address"
             app:drawableRightCompat="@drawable/search" />
 
@@ -34,10 +36,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/searchview"
+            android:layout_marginTop="12dp"
+            android:clipToPadding="false"
             android:orientation="vertical"
             android:overScrollMode="never"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
             tools:listitem="@layout/favorite_address_item" />
 
         <com.lifedawn.bestweather.commons.views.ProgressResultView
