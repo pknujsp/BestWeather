@@ -43,8 +43,10 @@ import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.WidgetCurrentCreator;
-import com.lifedawn.bestweather.widget.creator.WidgetCurrentHourlyDailyCreator;
+import com.lifedawn.bestweather.widget.creator.CurrentWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.FullWidgetCreator;
+import com.lifedawn.bestweather.widget.widgetprovider.CurrentWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FullWidgetProvider;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -143,9 +145,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
 
 		if (layoutId == R.layout.widget_current) {
-			widgetCreator = new WidgetCurrentCreator(getApplicationContext(), this, appWidgetId);
-		} else if (layoutId == R.layout.widget_current_hourly_daily) {
-			widgetCreator = new WidgetCurrentHourlyDailyCreator(getApplicationContext(), this, appWidgetId);
+			widgetCreator = new CurrentWidgetCreator(getApplicationContext(), this, appWidgetId);
+		} else if (layoutId == R.layout.widget_full) {
+			widgetCreator = new FullWidgetCreator(getApplicationContext(), this, appWidgetId);
 		}
 
 		widgetDto = widgetCreator.loadDefaultSettings();
@@ -167,9 +169,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			public void onClick(View v) {
 				Class<?> widgetProviderClass = null;
 				if (layoutId == R.layout.widget_current) {
-					widgetProviderClass = WidgetProviderCurrent.class;
-				} else if (layoutId == R.layout.widget_current_hourly_daily) {
-					widgetProviderClass = WidgetProviderCurrentHourlyDaily.class;
+					widgetProviderClass = CurrentWidgetProvider.class;
+				} else if (layoutId == R.layout.widget_full) {
+					widgetProviderClass = FullWidgetProvider.class;
 				}
 
 				if (binding.selectedLocationRadio.isChecked()) {

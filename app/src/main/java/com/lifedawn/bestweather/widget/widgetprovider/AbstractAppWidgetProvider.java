@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.widget;
+package com.lifedawn.bestweather.widget.widgetprovider;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;

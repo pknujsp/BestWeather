@@ -1,14 +1,11 @@
-package com.lifedawn.bestweather.widget;
+package com.lifedawn.bestweather.widget.widgetprovider;
 
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 
-import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
@@ -17,12 +14,12 @@ import com.lifedawn.bestweather.room.dto.WidgetDto;
 import java.util.Set;
 
 
-public class WidgetSimple extends AbstractAppWidgetProvider {
+public class FirstSimpleWidgetProvider extends AbstractAppWidgetProvider {
 
 
 	@Override
 	Class<?> getThis() {
-		return WidgetSimple.class;
+		return FirstSimpleWidgetProvider.class;
 	}
 
 	@Override

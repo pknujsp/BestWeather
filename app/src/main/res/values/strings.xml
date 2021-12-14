@@ -27,7 +27,7 @@
     <string name="current_conditions">현재 날씨</string>
     <string name="hourly_forecast">시간별 예보</string>
     <string name="daily_forecast">일별 예보</string>
-    <string name="air_quality">대기 상태</string>
+    <string name="air_quality">대기질</string>
     <string name="sun_set_rise">일출, 일몰</string>
 
     <!-- preference -->
@@ -458,10 +458,13 @@
     <string name="datetime_pattern_in_detail_forecast_clock12">M.d E a h</string>
     <string name="datetime_pattern_in_detail_forecast_clock24">M.d E HH</string>
 
+    <!-- widget -->
     <string name="widget_current_label">현재</string>
-    <string name="widget_current_hourly">현재/시간별</string>
-    <string name="widget_current_hourly_daily">현재/시간별/일별</string>
-    <string name="widget_current_daily">현재/일별</string>
+    <string name="widgetCurrent">현재</string>
+    <string name="widgetFull">현재/시간별/일별 종합</string>
+    <string name="widgetSimple1">현재/시간별 간단히</string>
+    <string name="widgetSimple2">현재/일별 간단히</string>
+
 
     <string name="real_feel_temperature_simple">체감</string>
     <string name="time_pattern_if_hours_0_of_hourly_forecast_in_widget">E 0</string>
@@ -551,7 +554,6 @@
     <string name="today">오늘</string>
     <string name="detailSunRiseSet">상세 일출, 일몰</string>
     <string name="currentAndForecast">현재및 예보</string>
-    <string name="widgetSimple">간편 위젯</string>
 
 
 </resources>

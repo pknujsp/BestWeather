@@ -8,15 +8,14 @@
 
     <TextView
         android:id="@+id/warning"
-        style="@style/text_shadow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="4dp"
         android:text="warning"
         android:textAlignment="center"
-        android:textColor="@color/textColorInNotification"
-        android:textSize="14sp" />
+        android:textColor="@color/black"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/warning_process_btn"

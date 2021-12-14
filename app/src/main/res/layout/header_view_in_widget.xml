@@ -1,30 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/address"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/refresh"
         android:maxLines="1"
         android:minLines="1"
         android:text="@string/address_name"
-        android:textColor="@color/white"
-        android:textSize="@dimen/addressTextSizeInHeader" />
+        android:textColor="@color/widgetTextColor"
+        android:textSize="@dimen/addressTextSizeInCommonWidgetHeader" />
 
     <TextView
         android:id="@+id/refresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableRight="@drawable/refresh"
-        android:drawableTint="@color/white"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/icon"
         android:gravity="center_vertical"
         android:text="@string/updated_time"
-        android:textColor="@color/white"
-        android:textSize="@dimen/refreshTextSizeInHeader" />
+        android:textColor="@color/widgetTextColor"
+        android:textSize="@dimen/refreshDateTimeTextSizeInCommonWidgetHeader" />
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/refresh"
+        android:layout_alignBottom="@id/refresh"
+        android:layout_alignParentRight="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/refresh" />
+
+</RelativeLayout>

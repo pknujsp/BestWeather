@@ -16,7 +16,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class WidgetCurrentCreator extends AbstractWidgetCreator {
+public class CurrentWidgetCreator extends AbstractWidgetCreator {
 	private final DateTimeFormatter refreshDateTimeFormatter;
 	private final DateTimeFormatter clockFormatter;
 	private final String clockFormat;
@@ -28,7 +28,7 @@ public class WidgetCurrentCreator extends AbstractWidgetCreator {
 	private int tempTextSize;
 
 
-	public WidgetCurrentCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
+	public CurrentWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
 		clockFormat = refreshDateTimeFormat = clockUnit == ValueUnits.clock12 ? "E a hh:mm" :
 				"E HH:mm";
@@ -104,68 +104,6 @@ public class WidgetCurrentCreator extends AbstractWidgetCreator {
 
 		remoteViews.setTextViewTextSize(R.id.current_temperature, TypedValue.COMPLEX_UNIT_PX, tempTextSize);
 	}
-
-	/*
-	public void setHourlyForecastViews(RemoteViews remoteViews, WeatherJsonObj.HourlyForecasts hourlyForecasts) {
-		remoteViews.removeAllViews(R.id.hourly_forecast_row_1);
-		remoteViews.removeAllViews(R.id.hourly_forecast_row_2);
-		String clock = null;
-		ZonedDateTime zonedDateTime = null;
-
-		List<HourlyForecastObj> hourlyForecastObjList = hourlyForecasts.getHourlyForecastObjs();
-
-		for (int i = 0; i < 12; i++) {
-			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_linear);
-
-			zonedDateTime = ZonedDateTime.parse(hourlyForecastObjList.get(i).getClock());
-			if (zonedDateTime.getHour() == 0) {
-				clock = zonedDateTime.format(DateTimeFormatter.ofPattern(context.getString(R.string.time_pattern_if_hours_0_of_hourly_forecast_in_widget)));
-			} else {
-				clock = String.valueOf(zonedDateTime.getHour());
-			}
-
-			childRemoteViews.setTextViewText(R.id.hourly_clock, clock);
-			childRemoteViews.setTextViewText(R.id.hourly_temperature, ValueUnits.convertTemperature(hourlyForecastObjList.get(i).getTemp(),
-					tempUnit) + tempDegree);
-			childRemoteViews.setImageViewResource(R.id.hourly_weather_icon, hourlyForecastObjList.get(i).getWeatherIcon());
-
-			if (i >= 6) {
-				remoteViews.addView(R.id.hourly_forecast_row_2, childRemoteViews);
-			} else {
-				remoteViews.addView(R.id.hourly_forecast_row_1, childRemoteViews);
-			}
-		}
-	}
-
-	public void setDailyForecastViews(RemoteViews remoteViews, WeatherJsonObj.DailyForecasts dailyForecasts) {
-		remoteViews.removeAllViews(R.id.daily_forecast_row);
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern_of_daily_forecast_in_widget));
-		List<DailyForecastObj> dailyForecastObjList = dailyForecasts.getDailyForecastObjs();
-
-		for (int day = 0; day < 4; day++) {
-			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_daily_forecast_item_in_linear);
-
-			childRemoteViews.setTextViewText(R.id.daily_date, ZonedDateTime.parse(dailyForecastObjList.get(day).getDate()).format(dateFormatter));
-			childRemoteViews.setTextViewText(R.id.daily_temperature, ValueUnits.convertTemperature(dailyForecastObjList.get(day).getMinTemp(),
-					tempUnit) + tempDegree + " / " + ValueUnits.convertTemperature(dailyForecastObjList.get(day).getMaxTemp(),
-					tempUnit) + tempDegree);
-
-			childRemoteViews.setViewVisibility(R.id.daily_left_weather_icon, View.VISIBLE);
-			childRemoteViews.setViewVisibility(R.id.daily_right_weather_icon, View.VISIBLE);
-
-			if (dailyForecastObjList.get(day).isSingle()) {
-				childRemoteViews.setImageViewResource(R.id.daily_left_weather_icon, dailyForecastObjList.get(day).getLeftWeatherIcon());
-				childRemoteViews.setViewVisibility(R.id.daily_left_weather_icon, View.GONE);
-			} else {
-				childRemoteViews.setImageViewResource(R.id.daily_left_weather_icon, dailyForecastObjList.get(day).getLeftWeatherIcon());
-				childRemoteViews.setImageViewResource(R.id.daily_right_weather_icon, dailyForecastObjList.get(day).getRightWeatherIcon());
-			}
-
-			remoteViews.addView(R.id.daily_forecast_row, childRemoteViews);
-		}
-	}
-
-	 */
 
 	@Override
 	public void setDisplayClock(boolean displayClock) {

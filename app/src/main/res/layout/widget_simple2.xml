@@ -46,7 +46,7 @@
                     android:singleLine="true"
                     android:text="12:00"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/clockTextSizeInSimple1Widget" />
+                    android:textSize="@dimen/clockTextSizeInSimple2Widget" />
 
 
                 <TextView
@@ -55,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:text="20°"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/tempTextSizeInSimple1Widget" />
+                    android:textSize="@dimen/tempTextSizeInSimple2Widget" />
 
             </LinearLayout>
 
@@ -72,7 +72,7 @@
                     android:layout_marginBottom="2dp"
                     android:text="@string/not_precipitation"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/precipitationTextSizeInSimple1Widget" />
+                    android:textSize="@dimen/precipitationTextSizeInSimple2Widget" />
 
                 <TextView
                     android:id="@+id/airQuality"
@@ -80,11 +80,11 @@
                     android:layout_height="wrap_content"
                     android:text="@string/air_quality"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/airQualityTextSizeInSimple1Widget" />
+                    android:textSize="@dimen/airQualityTextSizeInSimple2Widget" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/dailyForecastView"
+                android:id="@+id/hourlyForecastView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal" />

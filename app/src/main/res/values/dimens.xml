@@ -73,8 +73,7 @@
     <dimen name="widget_margin">6dp</dimen>
     <dimen name="widget_padding">6dp</dimen>
 
-    <dimen name="addressTextSizeInHeader">11sp</dimen>
-    <dimen name="refreshTextSizeInHeader">11sp</dimen>
+
     <dimen name="tempTextSizeInCurrent">18sp</dimen>
     <dimen name="realFeelTempTextSizeInCurrent">12sp</dimen>
     <dimen name="airQualityTextSizeInCurrent">12sp</dimen>
@@ -86,20 +85,48 @@
     <dimen name="searchviewPaddingVertical">8dp</dimen>
     <dimen name="defaultImageSizeInDrawableWithText">18dp</dimen>
     <dimen name="dayCheckBoxHeight">42dp</dimen>
-    <dimen name="dateTextSizeInWidgetCurrent">12sp</dimen>
-    <dimen name="timeTextSizeInWidgetCurrent">15sp</dimen>
-    <dimen name="tempTextSizeInWidgetCurrent">20sp</dimen>
-    <dimen name="dateTimeTextSizeInWidgetCurrent">15sp</dimen>
-    <dimen name="addressTextSizeInWidgetCurrent">12sp</dimen>
-    <dimen name="refreshDateTimeTextSizeInWidgetCurrent">13sp</dimen>
-    <dimen name="clockTextSizeInWidgetCurrent">18sp</dimen>
-    <dimen name="clockDateTextSizeInCurrentHourlyDailyWidget">14sp</dimen>
-    <dimen name="clockTimeTextSizeInCurrentHourlyDailyWidget">21sp</dimen>
-    <dimen name="tempTextSizeInCurrentHourlyDailyWidget">20sp</dimen>
-    <dimen name="feelsLikeTempTextSizeInCurrentHourlyDailyWidget">14sp</dimen>
-    <dimen name="airQualityTextSizeInCurrentHourlyDailyWidget">14sp</dimen>
-    <dimen name="precipitationTextSizeInCurrentHourlyDailyWidget">14sp</dimen>
+
+
     <dimen name="toolbarHeight">46dp</dimen>
+
+
+    <!-- widget text size -->
+
+    <!-- commons -->
+    <dimen name="addressTextSizeInCommonWidgetHeader">12sp</dimen>
+    <dimen name="refreshDateTimeTextSizeInCommonWidgetHeader">12sp</dimen>
+    <!-- -->
+
+    <!-- current widget -->
+    <dimen name="dateClockTextSizeInCurrentWidget">13sp</dimen>
+    <dimen name="timeClockTextSizeInCurrentWidget">26sp</dimen>
+    <dimen name="tempTextSizeInCurrentWidget">28sp</dimen>
+    <dimen name="airQualityTextSizeInCurrentWidget">14sp</dimen>
+    <dimen name="precipitationTextSizeInCurrentWidget">14sp</dimen>
+    <!-- -->
+
+    <!-- simple 1 widget -->
+    <dimen name="clockTextSizeInSimple1Widget">21sp</dimen>
+    <dimen name="tempTextSizeInSimple1Widget">18sp</dimen>
+    <dimen name="airQualityTextSizeInSimple1Widget">13sp</dimen>
+    <dimen name="precipitationTextSizeInSimple1Widget">13sp</dimen>
+    <!-- -->
+
+    <!-- simple 2 widget -->
+    <dimen name="clockTextSizeInSimple2Widget">21sp</dimen>
+    <dimen name="tempTextSizeInSimple2Widget">18sp</dimen>
+    <dimen name="airQualityTextSizeInSimple2Widget">13sp</dimen>
+    <dimen name="precipitationTextSizeInSimple2Widget">13sp</dimen>
+    <!-- -->
+
+    <!-- full widget -->
+    <dimen name="dateClockTextSizeInFullWidget">13sp</dimen>
+    <dimen name="timeClockTextSizeInFullWidget">23sp</dimen>
+    <dimen name="tempTextSizeInFullWidget">26sp</dimen>
+    <dimen name="airQualityTextSizeInFullWidget">14sp</dimen>
+    <dimen name="precipitationTextSizeInFullWidget">14sp</dimen>
+    <!-- -->
+
 
     <dimen name="headerViewOfDetailForecastItemHeight">140dp</dimen>
     <dimen name="tempTopMargin">2dp</dimen>

@@ -18,7 +18,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class WidgetCurrentHourlyDailyCreator extends AbstractWidgetCreator {
+public class FullWidgetCreator extends AbstractWidgetCreator {
 	private final DateTimeFormatter refreshDateTimeFormatter;
 	private final String clockDateFormat;
 	private final String clockTimeFormat;
@@ -32,7 +32,7 @@ public class WidgetCurrentHourlyDailyCreator extends AbstractWidgetCreator {
 	private int aqiTextSize;
 	private int precipitationTextSize;
 
-	public WidgetCurrentHourlyDailyCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
+	public FullWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
 		clockDateFormat = "M.d E";
 		clockTimeFormat = clockUnit == ValueUnits.clock12 ? "a hh:mm" :
@@ -84,8 +84,8 @@ public class WidgetCurrentHourlyDailyCreator extends AbstractWidgetCreator {
 				context.getResources().getDisplayMetrics());
 		final int extraSize = amount >= 0 ? absSize : absSize * -1;
 
-		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInHeader) + extraSize;
-		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshTextSizeInHeader) + extraSize;
+		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInCommonWidgetHeader) + extraSize;
+		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshDateTimeTextSizeInCommonWidgetHeader) + extraSize;
 		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInCurrentHourlyDailyWidget) + extraSize;
 		clockDateTextSize = context.getResources().getDimensionPixelSize(R.dimen.clockDateTextSizeInCurrentHourlyDailyWidget) + extraSize;
 		clockTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.clockTimeTextSizeInCurrentHourlyDailyWidget) + extraSize;

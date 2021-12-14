@@ -8,7 +8,6 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
@@ -23,8 +22,10 @@ import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.WidgetCurrentCreator;
-import com.lifedawn.bestweather.widget.creator.WidgetCurrentHourlyDailyCreator;
+import com.lifedawn.bestweather.widget.creator.CurrentWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.FullWidgetCreator;
+import com.lifedawn.bestweather.widget.widgetprovider.CurrentWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FullWidgetProvider;
 
 public class DialogActivity extends Activity {
 	private ActivityDialogBinding binding;
@@ -49,11 +50,11 @@ public class DialogActivity extends Activity {
 		int widgetLayoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
 
 		if (widgetLayoutId == R.layout.widget_current) {
-			widgetCreator = new WidgetCurrentCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = WidgetProviderCurrent.class;
-		} else if (widgetLayoutId == R.layout.widget_current_hourly_daily) {
-			widgetCreator = new WidgetCurrentHourlyDailyCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = WidgetProviderCurrentHourlyDaily.class;
+			widgetCreator = new CurrentWidgetCreator(getApplicationContext(), null, appWidgetId);
+			widgetClass = CurrentWidgetProvider.class;
+		} else if (widgetLayoutId == R.layout.widget_full) {
+			widgetCreator = new FullWidgetCreator(getApplicationContext(), null, appWidgetId);
+			widgetClass = FullWidgetProvider.class;
 		}
 
 		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {

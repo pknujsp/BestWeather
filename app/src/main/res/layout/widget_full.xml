@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_layout"
     style="@style/WidgetBackground"
     android:layout_width="match_parent"
@@ -20,37 +19,38 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/clockLayout"
+                android:id="@+id/watch"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:visibility="g">
+                android:orientation="vertical">
 
                 <android.widget.TextClock
                     android:id="@+id/dateClock"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:singleLine="true"
-                    android:text="10.1 Monday"
+                    android:text="10.1 Mon"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/dateClockTextSizeInCurrentWidget" />
+                    android:textSize="@dimen/dateClockTextSizeInFullWidget" />
+
 
                 <android.widget.TextClock
-                    android:id="@+id/timeClock"
+                    android:id="@+id/time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:singleLine="true"
-                    android:text="12:00"
+                    android:text="11:30"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/timeClockTextSizeInCurrentWidget" />
+                    android:textSize="@dimen/timeClockTextSizeInFullWidget" />
 
             </LinearLayout>
 
@@ -61,10 +61,11 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
+
                 <ImageView
                     android:id="@+id/current_weather_icon"
-                    android:layout_width="46dp"
-                    android:layout_height="46dp"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
                     android:layout_marginRight="4dp"
                     android:scaleType="centerInside"
                     android:src="@drawable/day_clear" />
@@ -75,52 +76,54 @@
                     android:layout_height="wrap_content"
                     android:text="20°"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/tempTextSizeInCurrentWidget" />
+                    android:textSize="@dimen/tempTextSizeInFullWidget" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/airQuality"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/air_quality"
+                    android:textColor="@color/widgetTextColor"
+                    android:textSize="@dimen/airQualityTextSizeInFullWidget" />
+
+                <TextView
+                    android:id="@+id/precipitation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/not_precipitation"
+                    android:textColor="@color/widgetTextColor"
+                    android:textSize="@dimen/precipitationTextSizeInFullWidget" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
-        <View
-            style="@style/Divider"
-            android:layout_marginLeft="24dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginBottom="4dp" />
-
-        <LinearLayout
+        <include
+            layout="@layout/simple_hourly_forecast_view_in_widget"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:layout_weight="2" />
 
-            <TextView
-                android:id="@+id/precipitation"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/not_precipitation"
-                android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/precipitationTextSizeInCurrentWidget" />
-
-            <TextView
-                android:id="@+id/airQuality"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="@string/air_quality"
-                android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/airQualityTextSizeInCurrentWidget" />
-        </LinearLayout>
-
+        <include
+            layout="@layout/simple_daily_forecast_view_in_widget"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
     </LinearLayout>
-
 
     <ProgressBar
         android:id="@+id/progressbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:indeterminate="true"
         android:indeterminateTint="@color/blue"
@@ -128,10 +131,6 @@
 
     <include
         layout="@layout/layout_warning_for_remoteviews"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
         android:visibility="gone" />
-
 
 </FrameLayout>

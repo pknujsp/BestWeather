@@ -15,7 +15,7 @@
         android:minLines="1"
         android:text="@string/address_name"
         android:textColor="@color/textColorInNotification"
-        android:textSize="@dimen/addressTextSizeInHeader" />
+        android:textSize="@dimen/addressTextSizeInCommonWidgetHeader" />
 
     <TextView
         android:id="@+id/refresh"
@@ -25,7 +25,7 @@
         android:gravity="center_vertical"
         android:text="@string/updated_time"
         android:textColor="@color/textColorInNotification"
-        android:textSize="@dimen/refreshTextSizeInHeader" />
+        android:textSize="@dimen/refreshDateTimeTextSizeInCommonWidgetHeader" />
 
     <ImageView
         android:layout_width="16dp"

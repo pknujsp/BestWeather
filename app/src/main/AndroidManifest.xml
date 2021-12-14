@@ -21,6 +21,7 @@
         android:theme="@style/AppTheme.White"
         android:usesCleartextTraffic="true">
 
+
         <activity
             android:name=".alarm.AlarmActivity"
             android:showForAllUsers="true"
@@ -54,9 +55,9 @@
         </activity>
 
         <receiver
-            android:name=".widget.WidgetProviderCurrent"
+            android:name=".widget.widgetprovider.CurrentWidgetProvider"
             android:enabled="true"
-            android:label="@string/current_conditions">
+            android:label="@string/widgetCurrent">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -67,9 +68,9 @@
                 android:resource="@xml/widget_current_info" />
         </receiver>
         <receiver
-            android:name=".widget.WidgetProviderCurrentHourlyDaily"
+            android:name=".widget.widgetprovider.FullWidgetProvider"
             android:enabled="true"
-            android:label="@string/widget_current_hourly_daily">
+            android:label="@string/widgetFull">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -77,24 +78,33 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_current_hourly_daily_info" />
+                android:resource="@xml/widget_full_info" />
         </receiver>
-
         <receiver
-            android:name=".widget.WidgetSimple"
+            android:name=".widget.widgetprovider.FirstSimpleWidgetProvider"
             android:enabled="true"
-            android:label="@string/widgetSimple">
+            android:label="@string/widgetSimple1">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
 
-
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_simple_info" />
+                android:resource="@xml/widget_simple1_info" />
         </receiver>
 
+        <receiver android:name=".widget.widgetprovider.SecSimpleWidgetProvider"
+            android:enabled="true"
+            android:label="@string/widgetSimple2">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_simple2_info" />
+        </receiver>
 
         <receiver
             android:name=".notification.NotificationReceiver"
