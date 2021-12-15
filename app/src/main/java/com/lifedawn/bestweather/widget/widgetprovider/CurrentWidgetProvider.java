@@ -15,13 +15,13 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
-import com.lifedawn.bestweather.forremoteviews.SimpleWeatherDataProcessor;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.CurrentWidgetCreator;
-import com.lifedawn.bestweather.widget.model.CurrentConditionsObj;
 import com.lifedawn.bestweather.widget.model.WeatherDataObj;
 
 import java.time.ZoneId;
@@ -68,8 +68,10 @@ public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
 					WidgetHelper widgetHelper = new WidgetHelper(context);
 					for (WidgetDto widgetDto : list) {
 						if (widgetDto.getUpdateIntervalMillis() > 0) {
-							widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId(),
-									CurrentWidgetProvider.class);
+							if (!widgetHelper.repeating(widgetDto.getAppWidgetId(), CurrentWidgetProvider.class)) {
+								widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId(),
+										CurrentWidgetProvider.class);
+							}
 						}
 					}
 				}
@@ -162,26 +164,24 @@ public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
 
 	@Override
 	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, WeatherSourceType requestWeatherSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleJsonDownloader multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
-		CurrentConditionsObj currentConditionsObj = null;
-
 		ZoneId zoneId = null;
 		CurrentWidgetCreator currentWidgetCreator = new CurrentWidgetCreator(context, null, appWidgetId);
 		currentWidgetCreator.setWidgetDto(widgetDto);
 
-		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
-			currentConditionsObj = SimpleWeatherDataProcessor.getCurrentConditionsObj(context, requestWeatherSourceType,
-					multipleJsonDownloader);
-			if (currentConditionsObj.isSuccessful()) {
-				widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getLocalDateTime().toString());
-				currentWidgetCreator.setCurrentConditionsViews(remoteViews, currentConditionsObj);
-				currentWidgetCreator.setHeaderViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime());
-				zoneId = ZoneId.of(currentConditionsObj.getTimeZoneId());
+		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleJsonDownloader,
+				requestWeatherSourceType);
+		boolean successful = false;
 
-				currentWidgetCreator.setClockTimeZone(remoteViews);
-				widgetDto.setTimeZoneId(zoneId.getId());
-			}
+		if (currentConditionsDto != null) {
+			widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getLocalDateTime().toString());
+			currentWidgetCreator.setCurrentConditionsViews(remoteViews, currentConditionsDto);
+			currentWidgetCreator.setHeaderViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime());
+			zoneId = currentConditionsDto.getCurrentTime().getZone();
+
+			currentWidgetCreator.setClockTimeZone(remoteViews);
+			widgetDto.setTimeZoneId(zoneId.getId());
+			successful = true;
 		}
-		boolean successful = currentConditionsObj.isSuccessful();
 
 		WeatherDataObj weatherDataObj = new WeatherDataObj();
 		weatherDataObj.setSuccessful(successful);

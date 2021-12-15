@@ -22,7 +22,7 @@ import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.accuweather.dailyforecast.AccuDetailDailyForecastFragment;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
@@ -134,7 +134,7 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		boolean haveSnow = false;
 
 		List<DailyForecastDto> dailyForecastDtoList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(getContext(), items, windUnit,
-				tempUnit, zoneId);
+				tempUnit);
 
 		int minTemp;
 		int maxTemp;

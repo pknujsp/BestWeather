@@ -4,11 +4,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
-import com.lifedawn.bestweather.retrofit.responses.kma.json.kmacommons.KmaHeader;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstItem;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstRoot;
@@ -20,15 +17,18 @@ import com.lifedawn.bestweather.retrofit.responses.kma.json.ultrasrtncstresponse
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstItem;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstresponse.VilageFcstRoot;
-import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
+import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
+import com.luckycatlabs.sunrisesunset.dto.Location;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -229,6 +229,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	public static FinalCurrentConditions getFinalCurrentConditions(VilageFcstResponse ultraSrtNcstResponse) {
 		FinalCurrentConditions finalCurrentConditions = new FinalCurrentConditions();
 		List<VilageFcstItem> items = ultraSrtNcstResponse.getBody().getItems().getItem();
+
+		finalCurrentConditions.setBaseDateTime(items.get(0).getBaseDate() + items.get(0).getBaseTime());
 
 		for (VilageFcstItem item : items) {
 			if (item.getCategory().equals(T1H)) {
@@ -541,8 +543,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoList(Context context,
 	                                                                List<FinalHourlyForecast> hourlyForecastList, double latitude, double longitude,
-	                                                                ValueUnits windUnit, ValueUnits tempUnit,
-	                                                                ZoneId zoneId) {
+	                                                                ValueUnits windUnit, ValueUnits tempUnit) {
 		final String tempDegree = "°";
 		final String percent = "%";
 		final String lessThan1mm = "1.0mm 미만";
@@ -552,6 +553,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		final String zeroRainVolume = "0.0mm";
 		final String zeroSnowVolume = "0.0cm";
 		final String zeroPrecipitationVolume = "0.0mm";
+
+		ZoneId zoneId = ZoneId.of("Asia/Seoul");
 
 		final Map<Integer, SunRiseSetUtil.SunRiseSetObj> sunSetRiseDataMap = SunRiseSetUtil.getDailySunRiseSetMap(
 				ZonedDateTime.of(hourlyForecastList.get(0).getFcstDateTime().toLocalDateTime(), zoneId),
@@ -666,6 +669,47 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		return dailyForecastDtoList;
 	}
 
+	public static CurrentConditionsDto makeCurrentConditionsDto(Context context,
+	                                                            FinalCurrentConditions item,
+	                                                            ValueUnits windUnit, ValueUnits tempUnit, Double latitude,
+	                                                            Double longitude) {
+		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+		final String percent = "%";
+
+		CurrentConditionsDto currentConditionsDto = new CurrentConditionsDto();
+
+		final TimeZone koreaTimeZone = TimeZone.getTimeZone("Asia/Seoul");
+		final ZoneId koreaZoneId = ZoneId.of("Asia/Seoul");
+		SunriseSunsetCalculator sunriseSunsetCalculator = new SunriseSunsetCalculator(new Location(latitude, longitude),
+				koreaTimeZone);
+		Calendar calendar = Calendar.getInstance(koreaTimeZone);
+		Calendar sunRise = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(calendar);
+		Calendar sunSet = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(calendar);
+
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+		LocalDateTime localDateTime = LocalDateTime.parse(item.getBaseDateTime(), dateTimeFormatter);
+		ZonedDateTime currentTime = ZonedDateTime.of(localDateTime, koreaZoneId);
+
+		currentConditionsDto.setCurrentTime(currentTime);
+		currentConditionsDto.setWeatherDescription(KmaResponseProcessor.getWeatherPtyIconDescription(item.getPrecipitationType()));
+		currentConditionsDto.setWeatherIcon(KmaResponseProcessor.getWeatherPtyIconImg(item.getPrecipitationType(),
+				SunRiseSetUtil.isNight(calendar, sunRise, sunSet)));
+		currentConditionsDto.setTemp(ValueUnits.convertTemperature(item.getTemperature(), tempUnit) + tempUnitStr);
+		currentConditionsDto.setHumidity(item.getHumidity() + percent);
+		currentConditionsDto.setWindDirectionDegree(Integer.parseInt(item.getWindDirection()));
+		currentConditionsDto.setWindDirection(WindDirectionConverter.windDirection(context, item.getWindDirection()));
+		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(item.getWindSpeed(), windUnit) + ValueUnits.convertToStr(context,
+				windUnit));
+
+		currentConditionsDto.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWindSpeed()));
+		currentConditionsDto.setPrecipitationType(item.getPrecipitationType());
+
+		if (!item.getPrecipitation1Hour().equals("0")) {
+			currentConditionsDto.setPrecipitationVolume(item.getPrecipitation1Hour() + "mm");
+		}
+
+		return currentConditionsDto;
+	}
 
 	public static UltraSrtNcstRoot getUltraSrtNcstObjFromJson(String response) {
 		return new Gson().fromJson(response, UltraSrtNcstRoot.class);

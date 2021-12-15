@@ -38,7 +38,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProc
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
@@ -101,7 +101,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 		if (dailyForecastResponse.accuDailyForecastsResponse != null) {
 			List<DailyForecastDto> dailyForecastDtoList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(getContext(),
-					dailyForecastResponse.accuDailyForecastsResponse.getDailyForecasts(), windUnit, tempUnit, zoneId);
+					dailyForecastResponse.accuDailyForecastsResponse.getDailyForecasts(), windUnit, tempUnit);
 			accuFinalDailyForecasts = new ArrayList<>();
 
 			for (DailyForecastDto item : dailyForecastDtoList) {
@@ -117,8 +117,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 		if (dailyForecastResponse.owmOneCallResponse != null) {
 			List<DailyForecastDto> dailyForecastDtoList =
-					OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), dailyForecastResponse.owmOneCallResponse.getDaily(),
-							windUnit, tempUnit, zoneId);
+					OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), dailyForecastResponse.owmOneCallResponse,
+							windUnit, tempUnit);
 			owmFinalDailyForecasts = new ArrayList<>();
 			for (DailyForecastDto daily : dailyForecastDtoList) {
 				owmFinalDailyForecasts.add(new ForecastObj<>(daily.getDate(), daily));

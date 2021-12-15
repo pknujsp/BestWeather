@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.weathers.dataprocessing.response;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -13,18 +12,18 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.dailyforecast.
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast.HourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import retrofit2.Response;
 
@@ -104,9 +103,8 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoList(Context context,
-	                                                                List<OneCallResponse.Hourly> hourlyForecastList,
-	                                                                ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit,
-	                                                                ZoneId zoneId) {
+	                                                                OneCallResponse oneCallResponse,
+	                                                                ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
 		final String tempDegree = "°";
 		final String percent = "%";
 		final String mm = "mm";
@@ -123,11 +121,11 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		boolean hasRain;
 		boolean hasSnow;
 
+		ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 
-		for (OneCallResponse.Hourly hourly : hourlyForecastList) {
+		for (OneCallResponse.Hourly hourly : oneCallResponse.getHourly()) {
 			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
-
 
 			if (hourly.getRain() == null) {
 				hasRain = false;
@@ -176,9 +174,8 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 
 	public static List<DailyForecastDto> makeDailyForecastDtoList(Context context,
-	                                                              List<OneCallResponse.Daily> dailyForecastList,
-	                                                              ValueUnits windUnit, ValueUnits tempUnit,
-	                                                              ZoneId zoneId) {
+	                                                              OneCallResponse oneCallResponse,
+	                                                              ValueUnits windUnit, ValueUnits tempUnit) {
 		final String tempDegree = "°";
 		final String mm = "mm";
 		final String percent = "%";
@@ -192,13 +189,14 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 		//아침/낮/저녁/밤 기온(체감) 제외
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
+		ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
 
 		String rainVolume;
 		String snowVolume;
 		boolean hasRain;
 		boolean hasSnow;
 
-		for (OneCallResponse.Daily daily : dailyForecastList) {
+		for (OneCallResponse.Daily daily : oneCallResponse.getDaily()) {
 			DailyForecastDto dailyForecastDto = new DailyForecastDto();
 			dailyForecastDto.setSingle(true).setSingleValues(new DailyForecastDto.Values())
 					.setDate(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, zoneId))
@@ -246,6 +244,58 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		return dailyForecastDtoList;
 	}
 
+
+	public static CurrentConditionsDto makeCurrentConditionsDto(Context context,
+	                                                            OneCallResponse oneCallResponse,
+	                                                            ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
+
+		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+		final String percent = "%";
+		final ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
+
+		CurrentConditionsDto currentConditionsDto = new CurrentConditionsDto();
+		OneCallResponse.Current item = oneCallResponse.getCurrent();
+
+		currentConditionsDto.setCurrentTime(WeatherResponseProcessor.convertDateTimeOfCurrentConditions(Long.parseLong(item.getDt()) * 1000L
+				, zoneId));
+		currentConditionsDto.setWeatherDescription(OpenWeatherMapResponseProcessor.getWeatherIconDescription(item.getWeather().get(0).getId()));
+		currentConditionsDto.setWeatherIcon(OpenWeatherMapResponseProcessor.getWeatherIconImg(item.getWeather().get(0).getId(),
+				item.getWeather().get(0).getIcon().contains("n")));
+		currentConditionsDto.setTemp(ValueUnits.convertTemperature(item.getTemp(), tempUnit) + tempUnitStr);
+		currentConditionsDto.setFeelsLikeTemp(ValueUnits.convertTemperature(item.getFeelsLike(), tempUnit) + tempUnitStr);
+		currentConditionsDto.setHumidity(item.getHumidity() + percent);
+		currentConditionsDto.setDewPoint(ValueUnits.convertTemperature(item.getDewPoint(), tempUnit) + tempUnitStr);
+		currentConditionsDto.setWindDirectionDegree(Integer.parseInt(item.getWind_deg()));
+		currentConditionsDto.setWindDirection(WindDirectionConverter.windDirection(context, item.getWind_deg()));
+		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(item.getWind_speed(), windUnit) + ValueUnits.convertToStr(context, windUnit));
+		if (item.getWindGust() != null) {
+			currentConditionsDto.setWindGust(ValueUnits.convertWindSpeed(item.getWindGust(), windUnit) + ValueUnits.convertToStr(context,
+					windUnit));
+		}
+		currentConditionsDto.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWind_speed()));
+		currentConditionsDto.setPressure(item.getPressure() + "hpa");
+		currentConditionsDto.setUvIndex(item.getUvi());
+		currentConditionsDto.setVisibility(ValueUnits.convertVisibility(item.getVisibility(),
+				visibilityUnit) + ValueUnits.convertToStr(context, visibilityUnit));
+		currentConditionsDto.setCloudiness(item.getClouds() + percent);
+
+		double precipitationVolume = 0.0;
+
+		if (item.getRain() != null) {
+			precipitationVolume += Double.parseDouble(item.getRain().getPrecipitation1Hour());
+			currentConditionsDto.setRainVolume(item.getRain().getPrecipitation1Hour() + "mm");
+		}
+		if (item.getSnow() != null) {
+			precipitationVolume += Double.parseDouble(item.getSnow().getPrecipitation1Hour());
+			currentConditionsDto.setSnowVolume(item.getSnow().getPrecipitation1Hour() + "mm");
+		}
+
+		if (precipitationVolume > 0.0) {
+			currentConditionsDto.setPrecipitationVolume(String.format(Locale.getDefault(), "%.2f mm", precipitationVolume));
+		}
+
+		return currentConditionsDto;
+	}
 
 	public static DailyForecast getDailyForecastObjFromJson(String response) {
 		return new Gson().fromJson(response, DailyForecast.class);

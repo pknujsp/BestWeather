@@ -8,10 +8,14 @@ import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,6 +68,7 @@ public class AqicnResponseProcessor {
 
 	/**
 	 * grade가 -1이면 정보없음을 뜻함
+	 *
 	 * @param grade
 	 * @return
 	 */
@@ -192,14 +197,8 @@ public class AqicnResponseProcessor {
 	}
 
 	private static LocalDate getDate(String day) {
-		LocalDate date = null;
-		try {
-			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-			date = LocalDate.parse(day, dateTimeFormatter);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return date;
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		return LocalDate.parse(day, dateTimeFormatter);
 	}
 
 	public static boolean successfulResponse(MultipleJsonDownloader.ResponseResult result) {
@@ -214,5 +213,146 @@ public class AqicnResponseProcessor {
 		} else {
 			return false;
 		}
+	}
+
+	public static AirQualityDto makeAirQualityDto(Context context, GeolocalizedFeedResponse geolocalizedFeedResponse, ZoneOffset zoneOffset) {
+		GeolocalizedFeedResponse.Data data = geolocalizedFeedResponse.getData();
+		AirQualityDto airQualityDto = new AirQualityDto();
+		airQualityDto.setAqi((int) Double.parseDouble(data.getAqi()));
+		airQualityDto.setIdx(Integer.parseInt(data.getIdx()));
+
+		airQualityDto.setCityName(data.getCity().getName());
+		airQualityDto.setAqiCnUrl(data.getCity().getUrl());
+		airQualityDto.setTime(ZonedDateTime.parse(data.getTime().getIso()));
+
+		//------------------Current------------------------------------------------------------------------------
+		AirQualityDto.Current current = new AirQualityDto.Current();
+		airQualityDto.setCurrent(current);
+		GeolocalizedFeedResponse.Data.IAqi iAqi = data.getIaqi();
+
+		if (iAqi.getPm10() != null) {
+			current.setPm10((int) Double.parseDouble(iAqi.getPm10().getValue()));
+		}
+		if (iAqi.getPm25() != null) {
+			current.setPm25((int) Double.parseDouble(iAqi.getPm25().getValue()));
+		}
+		if (iAqi.getDew() != null) {
+			current.setDew((int) Double.parseDouble(iAqi.getDew().getValue()));
+		}
+		if (iAqi.getCo() != null) {
+			current.setCo((int) Double.parseDouble(iAqi.getCo().getValue()));
+		}
+		if (iAqi.getSo2() != null) {
+			current.setSo2((int) Double.parseDouble(iAqi.getSo2().getValue()));
+		}
+		if (iAqi.getNo2() != null) {
+			current.setNo2((int) Double.parseDouble(iAqi.getNo2().getValue()));
+		}
+		if (iAqi.getO3() != null) {
+			current.setO3((int) Double.parseDouble(iAqi.getO3().getValue()));
+		}
+
+		//---------- dailyforecast-----------------------------------------------------------------------
+		ArrayMap<String, AirQualityDto.DailyForecast> forecastArrMap = new ArrayMap<>();
+		final ZonedDateTime todayDate = ZonedDateTime.now(zoneOffset);
+		ZonedDateTime date = ZonedDateTime.of(todayDate.toLocalDateTime(), zoneOffset);
+		LocalDate localDate = null;
+
+		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm10Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm10();
+		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm10Forecast) {
+			localDate = getDate(valueMap.getDay());
+			date = date.withYear(localDate.getYear()).withMonth(localDate.getMonthValue()).withDayOfMonth(localDate.getDayOfMonth());
+
+			if (date.isBefore(todayDate)) {
+				continue;
+			}
+			if (!forecastArrMap.containsKey(valueMap.getDay())) {
+				AirQualityDto.DailyForecast dailyForecast = new AirQualityDto.DailyForecast();
+				dailyForecast.setDate(date);
+				forecastArrMap.put(valueMap.getDay(), dailyForecast);
+			}
+			AirQualityDto.DailyForecast.Val pm10 = new AirQualityDto.DailyForecast.Val();
+			pm10.setAvg((int) Double.parseDouble(valueMap.getAvg()));
+			pm10.setMax((int) Double.parseDouble(valueMap.getMax()));
+			pm10.setMin((int) Double.parseDouble(valueMap.getMin()));
+
+			forecastArrMap.get(valueMap.getDay()).setPm10(pm10);
+		}
+
+		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm25Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm25();
+		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm25Forecast) {
+			localDate = getDate(valueMap.getDay());
+			date = date.withYear(localDate.getYear()).withMonth(localDate.getMonthValue()).withDayOfMonth(localDate.getDayOfMonth());
+
+			if (date.isBefore(todayDate)) {
+				continue;
+			}
+			if (!forecastArrMap.containsKey(valueMap.getDay())) {
+				AirQualityDto.DailyForecast dailyForecast = new AirQualityDto.DailyForecast();
+				dailyForecast.setDate(date);
+				forecastArrMap.put(valueMap.getDay(), dailyForecast);
+			}
+			AirQualityDto.DailyForecast.Val pm25 = new AirQualityDto.DailyForecast.Val();
+			pm25.setAvg((int) Double.parseDouble(valueMap.getAvg()));
+			pm25.setMax((int) Double.parseDouble(valueMap.getMax()));
+			pm25.setMin((int) Double.parseDouble(valueMap.getMin()));
+
+			forecastArrMap.get(valueMap.getDay()).setPm25(pm25);
+		}
+
+		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> o3Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getO3();
+		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : o3Forecast) {
+			localDate = getDate(valueMap.getDay());
+			date = date.withYear(localDate.getYear()).withMonth(localDate.getMonthValue()).withDayOfMonth(localDate.getDayOfMonth());
+
+			if (date.isBefore(todayDate)) {
+				continue;
+			}
+			if (!forecastArrMap.containsKey(valueMap.getDay())) {
+				AirQualityDto.DailyForecast dailyForecast = new AirQualityDto.DailyForecast();
+				dailyForecast.setDate(date);
+				forecastArrMap.put(valueMap.getDay(), dailyForecast);
+			}
+			AirQualityDto.DailyForecast.Val o3 = new AirQualityDto.DailyForecast.Val();
+			o3.setAvg((int) Double.parseDouble(valueMap.getAvg()));
+			o3.setMax((int) Double.parseDouble(valueMap.getMax()));
+			o3.setMin((int) Double.parseDouble(valueMap.getMin()));
+
+			forecastArrMap.get(valueMap.getDay()).setO3(o3);
+		}
+
+		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> uviForecast =
+				geolocalizedFeedResponse.getData().getForecast().getDaily().getUvi();
+		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : uviForecast) {
+			localDate = getDate(valueMap.getDay());
+			date = date.withYear(localDate.getYear()).withMonth(localDate.getMonthValue()).withDayOfMonth(localDate.getDayOfMonth());
+
+			if (date.isBefore(todayDate)) {
+				continue;
+			}
+			if (!forecastArrMap.containsKey(valueMap.getDay())) {
+				AirQualityDto.DailyForecast dailyForecast = new AirQualityDto.DailyForecast();
+				dailyForecast.setDate(date);
+				forecastArrMap.put(valueMap.getDay(), dailyForecast);
+			}
+			AirQualityDto.DailyForecast.Val uvi = new AirQualityDto.DailyForecast.Val();
+			uvi.setAvg((int) Double.parseDouble(valueMap.getAvg()));
+			uvi.setMax((int) Double.parseDouble(valueMap.getMax()));
+			uvi.setMin((int) Double.parseDouble(valueMap.getMin()));
+
+			forecastArrMap.get(valueMap.getDay()).setUvi(uvi);
+		}
+
+		AirQualityDto.DailyForecast[] forecastObjArr = new AirQualityDto.DailyForecast[1];
+		List<AirQualityDto.DailyForecast> dailyForecastList = Arrays.asList(forecastArrMap.values().toArray(forecastObjArr));
+		Collections.sort(dailyForecastList, new Comparator<AirQualityDto.DailyForecast>() {
+			@Override
+			public int compare(AirQualityDto.DailyForecast forecastObj, AirQualityDto.DailyForecast t1) {
+				return forecastObj.getDate().compareTo(t1.getDate());
+			}
+		});
+
+		airQualityDto.setDailyForecastList(dailyForecastList);
+		return airQualityDto;
 	}
 }

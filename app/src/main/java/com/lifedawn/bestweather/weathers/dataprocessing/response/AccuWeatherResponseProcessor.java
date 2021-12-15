@@ -13,10 +13,12 @@ import com.lifedawn.bestweather.retrofit.responses.accuweather.geopositionsearch
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -127,8 +129,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoList(Context context,
 	                                                                List<TwelveHoursOfHourlyForecastsResponse.Item> hourlyForecastList,
-	                                                                ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit,
-	                                                                ZoneId zoneId) {
+	                                                                ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
 		final String tempDegree = "°";
 		final String percent = "%";
 		final String mm = "mm";
@@ -148,6 +149,8 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		boolean hasPrecipitation;
 		boolean hasSnow;
 		boolean hasRain;
+
+		ZoneId zoneId = ZonedDateTime.parse(hourlyForecastList.get(0).getDateTime()).getZone();
 
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 		for (TwelveHoursOfHourlyForecastsResponse.Item hourly : hourlyForecastList) {
@@ -211,8 +214,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 
 
 	public static List<DailyForecastDto> makeDailyForecastDtoList(Context context,
-	                                                              List<FiveDaysOfDailyForecastsResponse.DailyForecasts> dailyForecastList, ValueUnits windUnit, ValueUnits tempUnit,
-	                                                              ZoneId zoneId) {
+	                                                              List<FiveDaysOfDailyForecastsResponse.DailyForecasts> dailyForecastList, ValueUnits windUnit, ValueUnits tempUnit) {
 		final String tempDegree = context.getString(R.string.degree_symbol);
 		final String mm = "mm";
 		final String cm = "cm";
@@ -233,6 +235,8 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		boolean hasPrecipitation;
 		boolean hasRain;
 		boolean hasSnow;
+
+		ZoneId zoneId = ZonedDateTime.parse(dailyForecastList.get(0).getDateTime()).getZone();
 
 		for (FiveDaysOfDailyForecastsResponse.DailyForecasts daily : dailyForecastList) {
 			DailyForecastDto dailyForecastDto = new DailyForecastDto();
@@ -335,5 +339,41 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 			dailyForecastDtoList.add(dailyForecastDto);
 		}
 		return dailyForecastDtoList;
+	}
+
+	public static CurrentConditionsDto makeCurrentConditionsDto(Context context,
+	                                                            CurrentConditionsResponse.Item item,
+	                                                            ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
+		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+		final String percent = "%";
+
+		CurrentConditionsDto currentConditionsDto = new CurrentConditionsDto();
+
+		currentConditionsDto.setCurrentTime(ZonedDateTime.parse(item.getLocalObservationDateTime()));
+		currentConditionsDto.setWeatherDescription(AccuWeatherResponseProcessor.getWeatherIconDescription(item.getWeatherIcon()));
+		currentConditionsDto.setWeatherIcon(AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon()));
+		currentConditionsDto.setTemp(ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(), tempUnit) + tempUnitStr);
+		currentConditionsDto.setFeelsLikeTemp(ValueUnits.convertTemperature(item.getRealFeelTemperature().getMetric().getValue(),
+				tempUnit) + tempUnitStr);
+		currentConditionsDto.setHumidity(item.getRelativeHumidity() + percent);
+		currentConditionsDto.setDewPoint(ValueUnits.convertTemperature(item.getDewPoint().getMetric().getValue(), tempUnit) + tempUnitStr);
+		currentConditionsDto.setWindDirectionDegree(Integer.parseInt(item.getWind().getDirection().getDegrees()));
+		currentConditionsDto.setWindDirection(WindDirectionConverter.windDirection(context, item.getWind().getDirection().getDegrees()));
+		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeedForAccu(item.getWind().getSpeed().getMetric().getValue(), windUnit) + ValueUnits.convertToStr(context, windUnit));
+		currentConditionsDto.setWindGust(ValueUnits.convertWindSpeedForAccu(item.getWindGust().getSpeed().getMetric().getValue(),
+				windUnit) + ValueUnits.convertToStr(context, windUnit));
+		currentConditionsDto.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()));
+		currentConditionsDto.setPressure(item.getPressure().getMetric().getValue() + "hpa");
+		currentConditionsDto.setUvIndex(item.getuVIndex());
+		currentConditionsDto.setVisibility(ValueUnits.convertVisibilityForAccu(item.getVisibility().getMetric().getValue(),
+				visibilityUnit) + ValueUnits.convertToStr(context, visibilityUnit));
+		currentConditionsDto.setCloudiness(item.getCloudCover() + percent);
+		currentConditionsDto.setPrecipitationType(AccuWeatherResponseProcessor.getPty(item.getPrecipitationType()));
+
+		if (!item.getPrecip1hr().getMetric().getValue().equals("0.0")) {
+			currentConditionsDto.setPrecipitationVolume(item.getPrecip1hr().getMetric().getValue() + "mm");
+		}
+
+		return currentConditionsDto;
 	}
 }

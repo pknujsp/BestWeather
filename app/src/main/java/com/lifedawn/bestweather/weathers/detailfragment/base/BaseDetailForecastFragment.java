@@ -23,8 +23,8 @@ import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailForecastBinding;
 import com.lifedawn.bestweather.databinding.ViewDetailDailyForecastListBinding;
 import com.lifedawn.bestweather.databinding.ViewDetailHourlyForecastListBinding;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DateView;
 
 import org.jetbrains.annotations.NotNull;

@@ -51,4 +51,10 @@ public class WidgetHelper {
 		}
 	}
 
+	public boolean repeating(int appWidgetId, Class<?> widgetReceiverClass) {
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, widgetReceiverClass),
+				PendingIntent.FLAG_NO_CREATE);
+		return pendingIntent != null;
+	}
+
 }

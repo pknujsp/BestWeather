@@ -16,19 +16,22 @@ import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
-import com.lifedawn.bestweather.forremoteviews.SimpleWeatherDataProcessor;
 import com.lifedawn.bestweather.notification.AbstractNotiViewCreator;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
 import com.lifedawn.bestweather.notification.model.DailyNotiDataObj;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
-import com.lifedawn.bestweather.widget.model.AirQualityObj;
-import com.lifedawn.bestweather.widget.model.CurrentConditionsObj;
-import com.lifedawn.bestweather.widget.model.HourlyForecastObj;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.models.AirQualityDto;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -80,29 +83,38 @@ public class DailyNotiViewCreator extends AbstractNotiViewCreator {
 	@Override
 	protected void setResultViews(Context context, RemoteViews remoteViews, WeatherSourceType requestWeatherSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleJsonDownloader multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
+		ZoneOffset zoneOffset = null;
 		setHeaderViews(remoteViews, notificationDataObj.getAddressName(), multipleJsonDownloader.getLocalDateTime().toString());
 		int icon = R.drawable.temp_icon;
 
-		final CurrentConditionsObj currentConditionsObj = SimpleWeatherDataProcessor.getCurrentConditionsObj(context, requestWeatherSourceType,
-				multipleJsonDownloader);
-		if (currentConditionsObj.isSuccessful()) {
-			setCurrentConditionsViews(remoteViews, currentConditionsObj);
-			zoneId = ZoneId.of(currentConditionsObj.getTimeZoneId());
-			icon = currentConditionsObj.getWeatherIcon();
+		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleJsonDownloader,
+				requestWeatherSourceType);
+		if (currentConditionsDto != null) {
+			zoneId = currentConditionsDto.getCurrentTime().getZone();
+			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
+			setCurrentConditionsViews(remoteViews, currentConditionsDto);
 		}
 
-		final List<HourlyForecastObj> hourlyForecastObjList = SimpleWeatherDataProcessor.getHourlyForecasts(context,
-				requestWeatherSourceType, multipleJsonDownloader);
-		if (!hourlyForecastObjList.isEmpty()) {
-			setHourlyForecastViews(remoteViews, hourlyForecastObjList);
+		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleJsonDownloader,
+				requestWeatherSourceType);
+		if (!hourlyForecastDtoList.isEmpty()) {
+			setHourlyForecastViews(remoteViews, hourlyForecastDtoList);
 		}
 
-		final AirQualityObj airQualityObj = SimpleWeatherDataProcessor.getAirQualityObj(context, multipleJsonDownloader);
-		if (airQualityObj.isSuccessful()) {
-			setAirQualityViews(remoteViews, airQualityObj);
-		}
 
-		final boolean successful = currentConditionsObj.isSuccessful() && !hourlyForecastObjList.isEmpty();
+		AirQualityDto airQualityDto = null;
+		if (zoneOffset != null) {
+			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleJsonDownloader,
+					requestWeatherSourceType, zoneOffset);
+			if (airQualityDto != null) {
+				setAirQualityViews(remoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
+			} else {
+				setAirQualityViews(remoteViews, context.getString(R.string.noData));
+			}
+		} else {
+			setAirQualityViews(remoteViews, context.getString(R.string.noData));
+		}
+		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty();
 
 		if (successful) {
 			RemoteViewProcessor.onSuccessfulProcess(remoteViews);
@@ -171,9 +183,8 @@ public class DailyNotiViewCreator extends AbstractNotiViewCreator {
 		editor.commit();
 	}
 
-	public void setAirQualityViews(RemoteViews remoteViews, AirQualityObj airQualityObj) {
-		String airQuality = context.getString(R.string.air_quality) + " " + (airQualityObj.isSuccessful() ? airQualityObj.getAqi() :
-				context.getString(R.string.noData));
+	public void setAirQualityViews(RemoteViews remoteViews, String value) {
+		String airQuality = context.getString(R.string.air_quality) + ": " + value;
 		remoteViews.setTextViewText(R.id.airQuality, airQuality);
 	}
 
@@ -182,25 +193,39 @@ public class DailyNotiViewCreator extends AbstractNotiViewCreator {
 		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(dateTime).format(dateTimeFormatter));
 	}
 
-	public void setCurrentConditionsViews(RemoteViews remoteViews, CurrentConditionsObj currentConditionsObj) {
-		remoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsObj.getWeatherIcon());
-		remoteViews.setTextViewText(R.id.precipitation, currentConditionsObj.getPrecipitationType() + " " + currentConditionsObj.getPrecipitationVolume());
+	public void setCurrentConditionsViews(RemoteViews remoteViews, CurrentConditionsDto currentConditionsDto) {
+		remoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
+		String precipitation = "";
+		if (currentConditionsDto.isHasPrecipitationVolume()) {
+			precipitation += context.getString(R.string.precipitation) + ": " + currentConditionsDto.getPrecipitationVolume();
+		} else {
+			precipitation = context.getString(R.string.not_precipitation);
+		}
+		remoteViews.setTextViewText(R.id.precipitation, precipitation);
 		String windSpeedStr =
-				context.getString(R.string.wind) + " " + currentConditionsObj.getWindSpeed();
+				context.getString(R.string.wind) + ": " + currentConditionsDto.getWindSpeed();
 		remoteViews.setTextViewText(R.id.windSpeed, windSpeedStr);
-		remoteViews.setTextViewText(R.id.temp, currentConditionsObj.getTemp());
+		remoteViews.setTextViewText(R.id.temp, currentConditionsDto.getTemp());
 	}
 
-	public void setHourlyForecastViews(RemoteViews remoteViews, List<HourlyForecastObj> hourlyForecastObjList) {
+	public void setHourlyForecastViews(RemoteViews remoteViews, List<HourlyForecastDto> hourlyForecastDtoList) {
 		remoteViews.removeAllViews(R.id.hourlyForecast);
 		final int textColor = ContextCompat.getColor(context, R.color.textColorInNotification);
+		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E 0");
+		String hours = null;
 
 		for (int i = 0; i < 16; i++) {
 			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_linear);
 
-			childRemoteViews.setTextViewText(R.id.hourly_clock, hourlyForecastObjList.get(i).getHours());
-			childRemoteViews.setTextViewText(R.id.hourly_temperature, hourlyForecastObjList.get(i).getTemp());
-			childRemoteViews.setImageViewResource(R.id.hourly_weather_icon, hourlyForecastObjList.get(i).getWeatherIcon());
+			if (hourlyForecastDtoList.get(i).getHours().getHour() == 0) {
+				hours = hourlyForecastDtoList.get(i).getHours().format(hour0Formatter);
+			} else {
+				hours = String.valueOf(hourlyForecastDtoList.get(i).getHours().getHour());
+			}
+
+			childRemoteViews.setTextViewText(R.id.hourly_clock, hours);
+			childRemoteViews.setTextViewText(R.id.hourly_temperature, hourlyForecastDtoList.get(i).getTemp());
+			childRemoteViews.setImageViewResource(R.id.hourly_weather_icon, hourlyForecastDtoList.get(i).getWeatherIcon());
 
 			childRemoteViews.setTextColor(R.id.hourly_clock, textColor);
 			childRemoteViews.setTextColor(R.id.hourly_temperature, textColor);

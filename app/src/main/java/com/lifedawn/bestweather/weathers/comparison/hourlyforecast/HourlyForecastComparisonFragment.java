@@ -35,7 +35,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResp
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
@@ -91,7 +91,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 		if (hourlyForecastResponse.kmaSuccessful) {
 			List<HourlyForecastDto> hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoList(getContext(),
-					hourlyForecastResponse.kmaHourlyForecastList, latitude, longitude, windUnit, tempUnit, zoneId);
+					hourlyForecastResponse.kmaHourlyForecastList, latitude, longitude, windUnit, tempUnit);
 
 			kmaFinalHourlyForecasts = new ArrayList<>();
 			for (HourlyForecastDto finalHourlyForecast : hourlyForecastDtoList) {
@@ -106,7 +106,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 		if (hourlyForecastResponse.accuSuccessful) {
 			List<HourlyForecastDto> hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(),
-					hourlyForecastResponse.accuHourlyForecastsResponse.getItems(), windUnit, tempUnit, visibilityUnit, zoneId);
+					hourlyForecastResponse.accuHourlyForecastsResponse.getItems(), windUnit, tempUnit, visibilityUnit);
 			accuFinalHourlyForecasts = new ArrayList<>();
 			for (HourlyForecastDto finalHourlyForecast : hourlyForecastDtoList) {
 				accuFinalHourlyForecasts.add(new ForecastObj<>(finalHourlyForecast.getHours(), finalHourlyForecast));
@@ -120,7 +120,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 		if (hourlyForecastResponse.owmSuccessful) {
 			List<HourlyForecastDto> hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(),
-					hourlyForecastResponse.owmOneCallResponse.getHourly(), windUnit, tempUnit, visibilityUnit, zoneId);
+					hourlyForecastResponse.owmOneCallResponse, windUnit, tempUnit, visibilityUnit);
 			owmFinalHourlyForecasts = new ArrayList<>();
 
 			for (HourlyForecastDto finalHourlyForecast : hourlyForecastDtoList) {

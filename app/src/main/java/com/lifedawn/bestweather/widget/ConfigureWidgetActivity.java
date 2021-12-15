@@ -44,7 +44,9 @@ import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.CurrentWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.FirstSimpleWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.FullWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.SecSimpleWidgetCreator;
 import com.lifedawn.bestweather.widget.widgetprovider.CurrentWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FullWidgetProvider;
 
@@ -148,6 +150,10 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			widgetCreator = new CurrentWidgetCreator(getApplicationContext(), this, appWidgetId);
 		} else if (layoutId == R.layout.widget_full) {
 			widgetCreator = new FullWidgetCreator(getApplicationContext(), this, appWidgetId);
+		} else if (layoutId == R.layout.widget_simple) {
+			widgetCreator = new FirstSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
+		} else if (layoutId == R.layout.widget_simple2) {
+			widgetCreator = new SecSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
 		}
 
 		widgetDto = widgetCreator.loadDefaultSettings();

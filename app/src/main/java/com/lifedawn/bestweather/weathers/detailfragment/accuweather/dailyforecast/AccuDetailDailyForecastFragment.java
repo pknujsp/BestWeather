@@ -43,7 +43,7 @@ public class AccuDetailDailyForecastFragment extends BaseDetailDailyForecastFrag
 			@Override
 			public void run() {
 				dailyForecastDtoList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(getContext(), dailyForecastsList, windUnit,
-						tempUnit, zoneId);
+						tempUnit);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

@@ -2,7 +2,7 @@ package com.lifedawn.bestweather.weathers.detailfragment.base;
 
 import com.lifedawn.bestweather.weathers.detailfragment.base.dialogfragments.DetailDailyForecastDialogFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.base.dialogfragments.DetailHourlyForecastDialogFragment;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 
 import java.util.List;
 

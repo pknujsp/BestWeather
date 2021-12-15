@@ -10,26 +10,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.ValuesUnit;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailDailyForecastFragment;
-import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailForecastFragment;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class OwmDetailDailyForecastFragment extends BaseDetailDailyForecastFragment {
-	private List<OneCallResponse.Daily> dailyList;
+	private OneCallResponse oneCallResponse;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -42,8 +32,9 @@ public class OwmDetailDailyForecastFragment extends BaseDetailDailyForecastFragm
 		binding.toolbar.fragmentTitle.setText(R.string.detail_daily_forecast);
 	}
 
-	public OwmDetailDailyForecastFragment setDailyList(List<OneCallResponse.Daily> dailyList) {
-		this.dailyList = dailyList;
+
+	public OwmDetailDailyForecastFragment setOneCallResponse(OneCallResponse oneCallResponse) {
+		this.oneCallResponse = oneCallResponse;
 		return this;
 	}
 
@@ -52,8 +43,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailDailyForecastFragm
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), dailyList, windUnit, tempUnit,
-						zoneId);
+				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), oneCallResponse, windUnit, tempUnit);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

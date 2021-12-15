@@ -1,60 +1,71 @@
 package com.lifedawn.bestweather.widget.model;
 
+import com.lifedawn.bestweather.weathers.models.AirQualityDto;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
+
 import java.util.List;
 
 public class WeatherDataObj {
 	private boolean isSuccessful;
 	private String refreshDateTime;
-	private CurrentConditionsObj currentConditionsObj;
-	private List<HourlyForecastObj> hourlyForecastObjList;
-	private List<DailyForecastObj> dailyForecastObjList;
-	private AirQualityObj airQualityObj;
+	private CurrentConditionsDto currentConditionsDto;
+	private List<HourlyForecastDto> hourlyForecastDtoList;
+	private List<DailyForecastDto> dailyForecastDtoList;
+	private AirQualityDto airQualityDto;
 
 	public boolean isSuccessful() {
 		return isSuccessful;
 	}
 
-	public void setSuccessful(boolean successful) {
+	public WeatherDataObj setSuccessful(boolean successful) {
 		isSuccessful = successful;
+		return this;
 	}
 
 	public String getRefreshDateTime() {
 		return refreshDateTime;
 	}
 
-	public void setRefreshDateTime(String refreshDateTime) {
+	public WeatherDataObj setRefreshDateTime(String refreshDateTime) {
 		this.refreshDateTime = refreshDateTime;
+		return this;
 	}
 
-	public CurrentConditionsObj getCurrentConditionsObj() {
-		return currentConditionsObj;
+	public CurrentConditionsDto getCurrentConditionsDto() {
+		return currentConditionsDto;
 	}
 
-	public void setCurrentConditionsObj(CurrentConditionsObj currentConditionsObj) {
-		this.currentConditionsObj = currentConditionsObj;
+	public WeatherDataObj setCurrentConditionsDto(CurrentConditionsDto currentConditionsDto) {
+		this.currentConditionsDto = currentConditionsDto;
+		return this;
 	}
 
-	public List<HourlyForecastObj> getHourlyForecastObjList() {
-		return hourlyForecastObjList;
+	public List<HourlyForecastDto> getHourlyForecastDtoList() {
+		return hourlyForecastDtoList;
 	}
 
-	public void setHourlyForecastObjList(List<HourlyForecastObj> hourlyForecastObjList) {
-		this.hourlyForecastObjList = hourlyForecastObjList;
+	public WeatherDataObj setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
+		this.hourlyForecastDtoList = hourlyForecastDtoList;
+		return this;
 	}
 
-	public List<DailyForecastObj> getDailyForecastObjList() {
-		return dailyForecastObjList;
+	public List<DailyForecastDto> getDailyForecastDtoList() {
+		return dailyForecastDtoList;
 	}
 
-	public void setDailyForecastObjList(List<DailyForecastObj> dailyForecastObjList) {
-		this.dailyForecastObjList = dailyForecastObjList;
+	public WeatherDataObj setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
+		this.dailyForecastDtoList = dailyForecastDtoList;
+		return this;
 	}
 
-	public AirQualityObj getAirQualityObj() {
-		return airQualityObj;
+	public AirQualityDto getAirQualityDto() {
+		return airQualityDto;
 	}
 
-	public void setAirQualityObj(AirQualityObj airQualityObj) {
-		this.airQualityObj = airQualityObj;
+	public WeatherDataObj setAirQualityDto(AirQualityDto airQualityDto) {
+		this.airQualityDto = airQualityDto;
+		return this;
 	}
 }

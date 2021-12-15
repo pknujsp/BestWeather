@@ -8,8 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.lifedawn.bestweather.weathers.detailfragment.adapters.DetailDailyForecastViewPagerAdapter;
-import com.lifedawn.bestweather.weathers.detailfragment.adapters.DetailHourlyForecastViewPagerAdapter;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 

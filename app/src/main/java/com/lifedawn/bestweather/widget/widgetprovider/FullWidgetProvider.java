@@ -15,19 +15,20 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
-import com.lifedawn.bestweather.forremoteviews.SimpleWeatherDataProcessor;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.models.AirQualityDto;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.FullWidgetCreator;
-import com.lifedawn.bestweather.widget.model.AirQualityObj;
-import com.lifedawn.bestweather.widget.model.CurrentConditionsObj;
-import com.lifedawn.bestweather.widget.model.DailyForecastObj;
-import com.lifedawn.bestweather.widget.model.HourlyForecastObj;
 import com.lifedawn.bestweather.widget.model.WeatherDataObj;
 
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -48,7 +49,7 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 		super.onDeleted(context, appWidgetIds);
 		WidgetHelper widgetHelper = new WidgetHelper(context);
 		for (int appWidgetId : appWidgetIds) {
-			widgetHelper.cancelAutoRefresh(appWidgetId, CurrentWidgetProvider.class);
+			widgetHelper.cancelAutoRefresh(appWidgetId, FullWidgetProvider.class);
 		}
 	}
 
@@ -70,8 +71,10 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 					WidgetHelper widgetHelper = new WidgetHelper(context);
 					for (WidgetDto widgetDto : list) {
 						if (widgetDto.getUpdateIntervalMillis() > 0) {
-							widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId(),
-									FullWidgetProvider.class);
+							if (!widgetHelper.repeating(widgetDto.getAppWidgetId(), FullWidgetProvider.class)) {
+								widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId(),
+										FullWidgetProvider.class);
+							}
 						}
 					}
 				}
@@ -172,40 +175,49 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, WeatherSourceType requestWeatherSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleJsonDownloader multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
+		ZoneOffset zoneOffset = null;
 		FullWidgetCreator widgetCreator = new FullWidgetCreator(context, null, appWidgetId);
 		widgetCreator.setWidgetDto(widgetDto);
 		widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getLocalDateTime().toString());
 		widgetCreator.setHeaderViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime());
 
-		final CurrentConditionsObj currentConditionsObj = SimpleWeatherDataProcessor.getCurrentConditionsObj(context, requestWeatherSourceType,
-				multipleJsonDownloader);
-		if (currentConditionsObj.isSuccessful()) {
-			widgetCreator.setCurrentConditionsViews(remoteViews, currentConditionsObj);
-			zoneId = ZoneId.of(currentConditionsObj.getTimeZoneId());
+		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleJsonDownloader,
+				requestWeatherSourceType);
+		if (currentConditionsDto != null) {
+			widgetCreator.setCurrentConditionsViews(remoteViews, currentConditionsDto);
+			zoneId = currentConditionsDto.getCurrentTime().getZone();
+			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			widgetDto.setTimeZoneId(zoneId.getId());
 
 			widgetCreator.setClockTimeZone(remoteViews);
 		}
 
-		final List<HourlyForecastObj> hourlyForecastObjList = SimpleWeatherDataProcessor.getHourlyForecasts(context,
-				requestWeatherSourceType, multipleJsonDownloader);
-		if (!hourlyForecastObjList.isEmpty()) {
-			widgetCreator.setHourlyForecastViews(remoteViews, hourlyForecastObjList);
+		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleJsonDownloader,
+				requestWeatherSourceType);
+		if (!hourlyForecastDtoList.isEmpty()) {
+			widgetCreator.setHourlyForecastViews(remoteViews, hourlyForecastDtoList);
 		}
 
-		final List<DailyForecastObj> dailyForecastObjList = SimpleWeatherDataProcessor.getDailyForecasts(context,
-				requestWeatherSourceType, multipleJsonDownloader);
-		if (!dailyForecastObjList.isEmpty()) {
-			widgetCreator.setDailyForecastViews(remoteViews, dailyForecastObjList);
+		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleJsonDownloader,
+				requestWeatherSourceType);
+		if (!dailyForecastDtoList.isEmpty()) {
+			widgetCreator.setDailyForecastViews(remoteViews, dailyForecastDtoList);
 		}
 
-		final AirQualityObj airQualityObj = SimpleWeatherDataProcessor.getAirQualityObj(context, multipleJsonDownloader);
-		if (airQualityObj.isSuccessful()) {
-			widgetCreator.setAirQualityViews(remoteViews, airQualityObj);
+		AirQualityDto airQualityDto = null;
+		if (zoneOffset != null) {
+			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleJsonDownloader,
+					requestWeatherSourceType, zoneOffset);
+			if (airQualityDto != null) {
+				widgetCreator.setAirQualityViews(remoteViews, airQualityDto);
+			} else {
+				widgetCreator.setAirQualityViews(remoteViews, context.getString(R.string.noData));
+			}
+		} else {
+			widgetCreator.setAirQualityViews(remoteViews, context.getString(R.string.noData));
 		}
-
-		final boolean successful = currentConditionsObj.isSuccessful() && !hourlyForecastObjList.isEmpty()
-				&& !dailyForecastObjList.isEmpty();
+		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty()
+				&& !dailyForecastDtoList.isEmpty();
 
 		WeatherDataObj weatherDataObj = new WeatherDataObj();
 		weatherDataObj.setSuccessful(successful);

@@ -8,7 +8,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -20,7 +19,7 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCal
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.hourlyforecast.OwmDetailHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DateView;
@@ -67,7 +66,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			@Override
 			public void onClick(View v) {
 				OwmDetailHourlyForecastFragment detailHourlyForecastFragment = new OwmDetailHourlyForecastFragment();
-				detailHourlyForecastFragment.setHourlyList(oneCallResponse.getHourly());
+				detailHourlyForecastFragment.setOneCallResponse(oneCallResponse);
 
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
@@ -127,7 +126,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		boolean haveSnowVolumes = false;
 
 		List<HourlyForecastDto> hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(),
-				items, windUnit, tempUnit, visibilityUnit, zoneId);
+				oneCallResponse, windUnit, tempUnit, visibilityUnit);
 
 		for (HourlyForecastDto item : hourlyForecastDtoList) {
 			dateList.add(item.getHours());

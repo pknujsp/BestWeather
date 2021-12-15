@@ -10,17 +10,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailHourlyForecastFragment;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AccuDetailHourlyForecastFragment extends BaseDetailHourlyForecastFragment {
@@ -48,7 +43,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailHourlyForecastFr
 			@Override
 			public void run() {
 				hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(), hourlyItemList, windUnit,
-						tempUnit, visibilityUnit, zoneId);
+						tempUnit, visibilityUnit);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

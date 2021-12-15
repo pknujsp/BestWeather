@@ -21,7 +21,7 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCal
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.dailyforecast.OwmDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
@@ -69,7 +69,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			@Override
 			public void onClick(View view) {
 				OwmDetailDailyForecastFragment detailDailyForecastFragment = new OwmDetailDailyForecastFragment();
-				detailDailyForecastFragment.setDailyList(oneCallResponse.getDaily());
+				detailDailyForecastFragment.setOneCallResponse(oneCallResponse);
 
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
@@ -134,8 +134,8 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final String mm = "mm";
 		boolean haveSnowVolumes = false;
 
-		List<DailyForecastDto> dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), items,
-				windUnit, tempUnit, zoneId);
+		List<DailyForecastDto> dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), oneCallResponse,
+				windUnit, tempUnit);
 
 		for (DailyForecastDto item : dailyForecastDtoList) {
 			dateList.add(item.getDate().format(dateTimeFormatter));

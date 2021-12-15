@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.weathers.detailfragment.dto;
+package com.lifedawn.bestweather.weathers.models;
 
 import java.time.ZonedDateTime;
 

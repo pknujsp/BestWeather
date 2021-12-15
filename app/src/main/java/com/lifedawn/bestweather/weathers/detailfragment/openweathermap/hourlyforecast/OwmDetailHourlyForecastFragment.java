@@ -10,21 +10,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailHourlyForecastFragment;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class OwmDetailHourlyForecastFragment extends BaseDetailHourlyForecastFragment {
-	private List<OneCallResponse.Hourly> hourlyList;
+	private OneCallResponse oneCallResponse;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -37,8 +32,8 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailHourlyForecastFra
 		binding.toolbar.fragmentTitle.setText(R.string.detail_hourly_forecast);
 	}
 
-	public OwmDetailHourlyForecastFragment setHourlyList(List<OneCallResponse.Hourly> hourlyList) {
-		this.hourlyList = hourlyList;
+	public OwmDetailHourlyForecastFragment setOneCallResponse(OneCallResponse oneCallResponse) {
+		this.oneCallResponse = oneCallResponse;
 		return this;
 	}
 
@@ -218,8 +213,8 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailHourlyForecastFra
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(), hourlyList,
-						windUnit, tempUnit, visibilityUnit, zoneId);
+				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(), oneCallResponse,
+						windUnit, tempUnit, visibilityUnit);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

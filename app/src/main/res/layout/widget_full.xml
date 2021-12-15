@@ -24,7 +24,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/watch"
+                android:id="@+id/clockLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -36,6 +36,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:includeFontPadding="false"
                     android:singleLine="true"
                     android:text="10.1 Mon"
                     android:textColor="@color/widgetTextColor"
@@ -43,10 +44,11 @@
 
 
                 <android.widget.TextClock
-                    android:id="@+id/time"
+                    android:id="@+id/timeClock"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:includeFontPadding="false"
                     android:singleLine="true"
                     android:text="11:30"
                     android:textColor="@color/widgetTextColor"
@@ -63,7 +65,7 @@
 
 
                 <ImageView
-                    android:id="@+id/current_weather_icon"
+                    android:id="@+id/weatherIcon"
                     android:layout_width="38dp"
                     android:layout_height="38dp"
                     android:layout_marginRight="4dp"
@@ -71,7 +73,7 @@
                     android:src="@drawable/day_clear" />
 
                 <TextView
-                    android:id="@+id/current_temperature"
+                    android:id="@+id/temperature"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="20°"

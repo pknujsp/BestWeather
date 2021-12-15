@@ -8,19 +8,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.databinding.HeaderviewDetailHourlyforecastBinding;
 import com.lifedawn.bestweather.databinding.ItemviewDetailDailyForecastBinding;
-import com.lifedawn.bestweather.databinding.ItemviewDetailForecastBinding;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.GridItemDto;
-import com.lifedawn.bestweather.weathers.detailfragment.dto.HourlyForecastDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
