@@ -39,10 +39,6 @@
     <attr name="lineColor" format="color" />
     <attr name="alertDialogStyle" format="reference" />
 
-    <declare-styleable name="AppWidgetAttrs">
-        <attr name="appWidgetBackgroundColor" format="color" />
-        <attr name="appWidgetTextColor" format="color" />
-    </declare-styleable>
 
     <declare-styleable name="CustomSearchView">
         <attr name="hint" format="string" />
@@ -80,5 +76,9 @@
         </attr>
         <attr name="android:text" format="string" />
         <attr name="iconSrc" format="reference" />
+    </declare-styleable>
+    <declare-styleable name="AppWidgetAttrs">
+        <attr name="appWidgetBackgroundColor" format="color" />
+        <attr name="appWidgetTextColor" format="color" />
     </declare-styleable>
 </resources>

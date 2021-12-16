@@ -554,6 +554,7 @@
     <string name="today">오늘</string>
     <string name="detailSunRiseSet">상세 일출, 일몰</string>
     <string name="currentAndForecast">현재및 예보</string>
+    <string name="widgetSimple3">현재/시간별 그래프</string>
 
 
 </resources>

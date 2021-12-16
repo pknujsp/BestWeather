@@ -63,7 +63,7 @@ public class CurrentWidgetCreator extends AbstractWidgetCreator {
 		remoteViews.setTextViewTextSize(R.id.precipitation, TypedValue.COMPLEX_UNIT_PX, precipitationTextSize);
 		remoteViews.setTextViewTextSize(R.id.current_temperature, TypedValue.COMPLEX_UNIT_PX, tempTextSize);
 
-		setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
+		//setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
 
 		setClockTimeZone(remoteViews);
 		return remoteViews;
@@ -85,7 +85,13 @@ public class CurrentWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setClockTimeZone(RemoteViews remoteViews) {
-		ZoneId zoneId = widgetDto.isDisplayLocalClock() ? ZoneId.of(widgetDto.getTimeZoneId()) : ZoneId.systemDefault();
+		ZoneId zoneId;
+		if (widgetDto.getTimeZoneId() == null) {
+			zoneId = ZoneId.systemDefault();
+		} else {
+			zoneId = widgetDto.isDisplayLocalClock() ? ZoneId.of(widgetDto.getTimeZoneId()) : ZoneId.systemDefault();
+		}
+
 		remoteViews.setString(R.id.dateClock, "setTimeZone", zoneId.getId());
 		remoteViews.setString(R.id.timeClock, "setTimeZone", zoneId.getId());
 	}
@@ -112,9 +118,9 @@ public class CurrentWidgetCreator extends AbstractWidgetCreator {
 		remoteViews.setTextViewTextSize(R.id.current_temperature, TypedValue.COMPLEX_UNIT_PX, tempTextSize);
 	}
 
-	public void setAirQualityViews(RemoteViews remoteViews, AirQualityDto airQualityDto) {
+	public void setAirQualityViews(RemoteViews remoteViews, String value) {
 		remoteViews.setTextViewText(R.id.airQuality,
-				context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
+				context.getString(R.string.air_quality) + ": " + value);
 	}
 
 	@Override

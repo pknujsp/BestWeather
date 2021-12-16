@@ -8,7 +8,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
@@ -139,8 +142,8 @@ public abstract class AbstractWidgetCreator {
 
 	protected void setBackgroundAlpha(RemoteViews remoteViews, int backgroundAlpha) {
 		float opacity = widgetDto.getBackgroundAlpha() / 100f;
-		int newBackgroundColor = (int) (opacity * 0xFF) << 24 | AppTheme.getColor(context, R.attr.appWidgetBackgroundColor);
-		remoteViews.setInt(R.id.root_layout, "setBackgroundColor", newBackgroundColor);
+		int newBackgroundColor = (int) (opacity * 0xFF) << 24 | AppTheme.getColor(context, R.color.widgetBackgroundColor);
+		remoteViews.setInt(R.id.content_container, "setBackgroundColor", newBackgroundColor);
 	}
 
 

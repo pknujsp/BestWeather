@@ -91,6 +91,7 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			setCurrentConditionsViews(remoteViews, currentConditionsDto);
+			icon = currentConditionsDto.getWeatherIcon();
 		}
 
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleJsonDownloader,

@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.widget.widgetprovider;
 
 import android.annotation.SuppressLint;
 import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,12 +19,13 @@ import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.WidgetHelper;
-import com.lifedawn.bestweather.widget.creator.CurrentWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.FirstSimpleWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.ThirdSimpleWidgetCreator;
 import com.lifedawn.bestweather.widget.model.WeatherDataObj;
 
 import java.time.ZoneId;
@@ -32,7 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
+public class ThirdSimpleWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	public void onEnabled(Context context) {
 		super.onEnabled(context);
@@ -48,14 +50,13 @@ public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
 		super.onDeleted(context, appWidgetIds);
 		WidgetHelper widgetHelper = new WidgetHelper(context);
 		for (int appWidgetId : appWidgetIds) {
-			widgetHelper.cancelAutoRefresh(appWidgetId, CurrentWidgetProvider.class);
+			widgetHelper.cancelAutoRefresh(appWidgetId, ThirdSimpleWidgetProvider.class);
 		}
 	}
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
-
 	}
 
 	@SuppressLint("UnsafeProtectedBroadcastReceiver")
@@ -71,9 +72,9 @@ public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
 					WidgetHelper widgetHelper = new WidgetHelper(context);
 					for (WidgetDto widgetDto : list) {
 						if (widgetDto.getUpdateIntervalMillis() > 0) {
-							if (!widgetHelper.repeating(widgetDto.getAppWidgetId(), CurrentWidgetProvider.class)) {
+							if (!widgetHelper.repeating(widgetDto.getAppWidgetId(), ThirdSimpleWidgetProvider.class)) {
 								widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId(),
-										CurrentWidgetProvider.class);
+										ThirdSimpleWidgetProvider.class);
 							}
 						}
 					}
@@ -89,7 +90,7 @@ public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
 
 	@Override
 	protected void reDrawWidget(Context context, int appWidgetId) {
-		CurrentWidgetCreator widgetViewCreator = new CurrentWidgetCreator(context, null, appWidgetId);
+		ThirdSimpleWidgetCreator widgetViewCreator = new ThirdSimpleWidgetCreator(context, null, appWidgetId);
 		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto widgetDto) {
@@ -120,21 +121,19 @@ public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
 			}
 		});
 
-
 	}
 
 	@Override
 	protected void init(Context context, Bundle bundle) {
 		final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		CurrentWidgetCreator widgetViewCreator = new CurrentWidgetCreator(context, null, appWidgetId);
+		ThirdSimpleWidgetCreator widgetViewCreator = new ThirdSimpleWidgetCreator(context, null, appWidgetId);
 		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto widgetDto) {
 				final RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
-
 				WidgetHelper widgetHelper = new WidgetHelper(context);
 				if (widgetDto.getUpdateIntervalMillis() > 0) {
-					widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId, CurrentWidgetProvider.class);
+					widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId, FirstSimpleWidgetProvider.class);
 				}
 
 				if (networkStatus.networkAvailable()) {
@@ -161,45 +160,36 @@ public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
 			}
 		});
 
-
 	}
 
+	@Override
+	Set<RequestWeatherDataType> getRequestWeatherDataTypeSet() {
+		Set<RequestWeatherDataType> set = new HashSet<>();
+		set.add(RequestWeatherDataType.currentConditions);
+		set.add(RequestWeatherDataType.hourlyForecast);
+
+		return set;
+	}
 
 	@Override
 	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, WeatherSourceType requestWeatherSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleJsonDownloader multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
-		CurrentWidgetCreator currentWidgetCreator = new CurrentWidgetCreator(context, null, appWidgetId);
-		currentWidgetCreator.setWidgetDto(widgetDto);
+		ThirdSimpleWidgetCreator widgetCreator = new ThirdSimpleWidgetCreator(context, null, appWidgetId);
+		widgetCreator.setWidgetDto(widgetDto);
+		widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getLocalDateTime().toString());
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleJsonDownloader,
 				requestWeatherSourceType);
-		boolean successful = false;
+		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleJsonDownloader,
+				requestWeatherSourceType);
+		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty();
 
-		if (currentConditionsDto != null) {
-			widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getLocalDateTime().toString());
-			currentWidgetCreator.setCurrentConditionsViews(remoteViews, currentConditionsDto);
-			currentWidgetCreator.setHeaderViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime());
+		if (successful) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
-
 			widgetDto.setTimeZoneId(zoneId.getId());
-			currentWidgetCreator.setClockTimeZone(remoteViews);
-
-			successful = true;
-		}
-
-		AirQualityDto airQualityDto = null;
-		if (zoneOffset != null) {
-			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleJsonDownloader,
-					requestWeatherSourceType, zoneOffset);
-			if (airQualityDto != null) {
-				currentWidgetCreator.setAirQualityViews(remoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
-			} else {
-				currentWidgetCreator.setAirQualityViews(remoteViews, context.getString(R.string.noData));
-			}
-		} else {
-			currentWidgetCreator.setAirQualityViews(remoteViews, context.getString(R.string.noData));
+			widgetCreator.setCurrentAndHourlyForecastViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto, hourlyForecastDtoList);
 		}
 
 		WeatherDataObj weatherDataObj = new WeatherDataObj();
@@ -212,20 +202,12 @@ public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
 			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
 			setRefreshPendingIntent(remoteViews, appWidgetId, context);
 		}
-		currentWidgetCreator.updateSettings(widgetDto, null);
+		widgetCreator.updateSettings(widgetDto, null);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 
 	@Override
-	Set<RequestWeatherDataType> getRequestWeatherDataTypeSet() {
-		Set<RequestWeatherDataType> set = new HashSet<>();
-		set.add(RequestWeatherDataType.currentConditions);
-		set.add(RequestWeatherDataType.airQuality);
-		return set;
-	}
-
-	@Override
 	Class<?> getThis() {
-		return CurrentWidgetProvider.class;
+		return ThirdSimpleWidgetCreator.class;
 	}
 }

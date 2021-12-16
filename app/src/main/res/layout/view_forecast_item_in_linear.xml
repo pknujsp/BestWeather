@@ -1,70 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="0dp"
-    android:layout_height="match_parent"
-    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:layout_weight="1"
     android:gravity="center"
-    android:orientation="vertical"
-    android:paddingTop="3dp"
-    android:paddingBottom="3dp"
-    android:weightSum="1.0">
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/daily_date"
+        android:id="@+id/dateTime"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
-        android:layout_weight="0.2"
-        android:textSize="@dimen/dateTextSizeInDailyForecastItem"
-        android:gravity="center"
         android:includeFontPadding="false"
         android:maxLines="1"
-        android:text="Mon"
+        android:text="15"
         android:textAlignment="center"
-        android:textColor="@color/widgetTextColor" />
+        android:textColor="@color/widgetTextColor"
+        android:textSize="@dimen/dateTimeTextSizeInSimpleWidgetForecastItem" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/iconLayout"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="3dp"
-        android:layout_weight="0.6"
-        android:gravity="center"
+        android:layout_weight="1"
         android:orientation="horizontal"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp">
+        android:padding="2dp">
 
         <ImageView
-            android:id="@+id/daily_left_weather_icon"
+            android:id="@+id/leftIcon"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:adjustViewBounds="true"
+            android:gravity="center"
             android:scaleType="centerInside"
             android:src="@drawable/day_clear" />
 
         <ImageView
-            android:id="@+id/daily_right_weather_icon"
+            android:id="@+id/rightIcon"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:adjustViewBounds="true"
+            android:gravity="center"
             android:scaleType="centerInside"
             android:src="@drawable/day_clear" />
-
     </LinearLayout>
 
     <TextView
-        android:id="@+id/daily_temperature"
+        android:id="@+id/temperature"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.2"
+        android:layout_height="wrap_content"
         android:gravity="center"
+        android:includeFontPadding="false"
         android:maxLines="1"
-        android:text="20° / 20°"
-        android:textSize="@dimen/tempTextSizeInDailyForecastItem"
+        android:text="20°"
         android:textAlignment="center"
-        android:textColor="@color/widgetTextColor" />
+        android:textColor="@color/widgetTextColor"
+        android:textSize="@dimen/tempTextSizeInSimpleWidgetForecastItem" />
 
 </LinearLayout>

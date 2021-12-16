@@ -61,7 +61,7 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 		remoteViews.setTextViewTextSize(R.id.dateClock, TypedValue.COMPLEX_UNIT_PX, clockDateTextSize);
 		remoteViews.setTextViewTextSize(R.id.timeClock, TypedValue.COMPLEX_UNIT_PX, clockTimeTextSize);
 
-		setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
+		//setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
 
 		remoteViews.setTextViewTextSize(R.id.address, TypedValue.COMPLEX_UNIT_PX, addressTextSize);
 		remoteViews.setTextViewTextSize(R.id.refresh, TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);

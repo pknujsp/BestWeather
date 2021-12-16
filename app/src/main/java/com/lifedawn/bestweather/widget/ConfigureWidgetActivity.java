@@ -47,8 +47,12 @@ import com.lifedawn.bestweather.widget.creator.CurrentWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.FirstSimpleWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.FullWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.SecSimpleWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.ThirdSimpleWidgetCreator;
 import com.lifedawn.bestweather.widget.widgetprovider.CurrentWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FirstSimpleWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FullWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SecSimpleWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.ThirdSimpleWidgetProvider;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -154,6 +158,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			widgetCreator = new FirstSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
 		} else if (layoutId == R.layout.widget_simple2) {
 			widgetCreator = new SecSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
+		} else if (layoutId == R.layout.widget_simple3) {
+			widgetCreator = new ThirdSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
 		}
 
 		widgetDto = widgetCreator.loadDefaultSettings();
@@ -178,6 +184,12 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 					widgetProviderClass = CurrentWidgetProvider.class;
 				} else if (layoutId == R.layout.widget_full) {
 					widgetProviderClass = FullWidgetProvider.class;
+				} else if (layoutId == R.layout.widget_simple) {
+					widgetProviderClass = FirstSimpleWidgetProvider.class;
+				} else if (layoutId == R.layout.widget_simple2) {
+					widgetProviderClass = SecSimpleWidgetProvider.class;
+				} else if (layoutId == R.layout.widget_simple3) {
+					widgetProviderClass = ThirdSimpleWidgetProvider.class;
 				}
 
 				if (binding.selectedLocationRadio.isChecked()) {

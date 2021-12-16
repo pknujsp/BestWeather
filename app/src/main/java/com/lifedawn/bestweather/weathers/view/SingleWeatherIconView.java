@@ -100,5 +100,13 @@ public class SingleWeatherIconView extends View {
 			this.img = img;
 			this.description = description;
 		}
+
+		public Drawable getImg() {
+			return img;
+		}
+
+		public String getDescription() {
+			return description;
+		}
 	}
 }

@@ -14,19 +14,19 @@ public class RemoteViewProcessor {
 
 	public static void onBeginProcess(RemoteViews remoteViews) {
 		remoteViews.setViewVisibility(R.id.progressbar, View.VISIBLE);
-		remoteViews.setViewVisibility(R.id.content_container, View.GONE);
+		remoteViews.setViewVisibility(R.id.valuesLayout, View.GONE);
 		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
 	}
 
 	public static void onSuccessfulProcess(RemoteViews remoteViews) {
-		remoteViews.setViewVisibility(R.id.content_container, View.VISIBLE);
+		remoteViews.setViewVisibility(R.id.valuesLayout, View.VISIBLE);
 		remoteViews.setViewVisibility(R.id.warning_layout, View.GONE);
 		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
 	}
 
 	public static void onErrorProcess(RemoteViews remoteViews, Context context, ErrorType errorType) {
 		remoteViews.setViewVisibility(R.id.warning_layout, View.VISIBLE);
-		remoteViews.setViewVisibility(R.id.content_container, View.GONE);
+		remoteViews.setViewVisibility(R.id.valuesLayout, View.GONE);
 		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
 
 		switch (errorType) {

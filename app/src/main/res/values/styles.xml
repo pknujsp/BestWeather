@@ -137,7 +137,6 @@
 
     <style name="WidgetBackground">
         <item name="android:background">@drawable/widget_background</item>
-        <item name="android:padding">@dimen/widget_padding</item>
         <item name="android:backgroundTint">@color/widgetBackgroundColor</item>
     </style>
 </resources>

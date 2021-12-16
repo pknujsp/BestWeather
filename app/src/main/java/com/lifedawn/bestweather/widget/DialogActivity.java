@@ -23,9 +23,15 @@ import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.CurrentWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.FirstSimpleWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.FullWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.SecSimpleWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.ThirdSimpleWidgetCreator;
 import com.lifedawn.bestweather.widget.widgetprovider.CurrentWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FirstSimpleWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FullWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SecSimpleWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.ThirdSimpleWidgetProvider;
 
 public class DialogActivity extends Activity {
 	private ActivityDialogBinding binding;
@@ -55,6 +61,15 @@ public class DialogActivity extends Activity {
 		} else if (widgetLayoutId == R.layout.widget_full) {
 			widgetCreator = new FullWidgetCreator(getApplicationContext(), null, appWidgetId);
 			widgetClass = FullWidgetProvider.class;
+		} else if (widgetLayoutId == R.layout.widget_simple) {
+			widgetCreator = new FirstSimpleWidgetCreator(getApplicationContext(), null, appWidgetId);
+			widgetClass = FirstSimpleWidgetProvider.class;
+		} else if (widgetLayoutId == R.layout.widget_simple2) {
+			widgetCreator = new SecSimpleWidgetCreator(getApplicationContext(), null, appWidgetId);
+			widgetClass = SecSimpleWidgetProvider.class;
+		} else if (widgetLayoutId == R.layout.widget_simple3) {
+			widgetCreator = new ThirdSimpleWidgetCreator(getApplicationContext(), null, appWidgetId);
+			widgetClass = ThirdSimpleWidgetProvider.class;
 		}
 
 		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {

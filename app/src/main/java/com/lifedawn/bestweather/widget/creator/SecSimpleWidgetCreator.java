@@ -58,7 +58,7 @@ public class SecSimpleWidgetCreator extends AbstractWidgetCreator {
 		remoteViews.setTextViewTextSize(R.id.temperature, TypedValue.COMPLEX_UNIT_PX, tempTextSize);
 		remoteViews.setTextViewTextSize(R.id.airQuality, TypedValue.COMPLEX_UNIT_PX, airQualityTextSize);
 
-		setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
+		//setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
 
 		setClockTimeZone(remoteViews);
 		return remoteViews;
@@ -79,12 +79,18 @@ public class SecSimpleWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setClockTimeZone(RemoteViews remoteViews) {
-		ZoneId zoneId = widgetDto.isDisplayLocalClock() ? ZoneId.of(widgetDto.getTimeZoneId()) : ZoneId.systemDefault();
+		ZoneId zoneId;
+		if (widgetDto.getTimeZoneId() == null) {
+			zoneId = ZoneId.systemDefault();
+		} else {
+			zoneId = widgetDto.isDisplayLocalClock() ? ZoneId.of(widgetDto.getTimeZoneId()) : ZoneId.systemDefault();
+		}
+
 		remoteViews.setString(R.id.clock, "setTimeZone", zoneId.getId());
 	}
 
 	public void setHeaderViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime) {
-		remoteViews.setTextViewText(R.id.addressName, addressName);
+		remoteViews.setTextViewText(R.id.address, addressName);
 		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
 	}
 

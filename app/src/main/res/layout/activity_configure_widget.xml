@@ -23,7 +23,7 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="250dp"
                 android:clickable="false"
                 android:focusable="false">
 
@@ -40,8 +40,10 @@
                     android:clickable="false"
                     android:focusable="false"
                     android:minHeight="40dp"
-                    android:paddingHorizontal="18dp"
-                    android:paddingVertical="12dp" />
+                    android:paddingLeft="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingRight="16dp"
+                    android:paddingBottom="8dp" />
 
             </FrameLayout>
 
@@ -81,14 +83,16 @@
                         style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/background_transparency" />
+                        android:text="@string/background_transparency"
+                        android:visibility="gone" />
 
                     <SeekBar
                         android:id="@+id/background_transparency_slider"
                         style="@style/WidgetConfigureConfig"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:max="100" />
+                        android:max="100"
+                        android:visibility="gone" />
 
                     <TextView
                         style="@style/SettingsLabel"

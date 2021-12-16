@@ -10,4 +10,5 @@
     <item name="locationTypeTagInFavLocItemViewInSideNav" type="id" />
     <item name="favoriteLocationDtoTagInFavLocItemViewInSideNav" type="id" />
     <item name="begin_column_index" type="id" />
+    <item name="hourAndIconView" type="id" />
 </resources>
