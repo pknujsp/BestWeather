@@ -127,16 +127,20 @@
     <dimen name="precipitationTextSizeInFullWidget">14sp</dimen>
     <!-- -->
 
-    <dimen name="simpleWidgetWidth">316dp</dimen>
-    <dimen name="simpleWidgetHeight">106dp</dimen>
+    <dimen name="simpleWidgetWidth">320dp</dimen>
+    <dimen name="simpleWidgetHeight">110dp</dimen>
 
     <dimen name="headerViewOfDetailForecastItemHeight">140dp</dimen>
     <dimen name="tempTopMargin">2dp</dimen>
-    <dimen name="tempTextSizeInDailyForecastItem">12sp</dimen>
+    <dimen name="tempTextSizeInDailyForecastItem">11sp</dimen>
     <dimen name="dateTextSizeInDailyForecastItem">12sp</dimen>
     <dimen name="hourTextSizeInHourlyForecastItem">12sp</dimen>
-    <dimen name="tempTextSizeInHourlyForecastItem">12sp</dimen>
+    <dimen name="tempTextSizeInHourlyForecastItem">11sp</dimen>
     <dimen name="dateTimeTextSizeInSimpleWidgetForecastItem">12sp</dimen>
     <dimen name="tempTextSizeInSimpleWidgetForecastItem">12sp</dimen>
+    <dimen name="currentLabelTextSizeInCurrentConditionsViewForSimpleWidget">12sp</dimen>
+    <dimen name="tempTextSizeInCurrentConditionsViewForSimpleWidget">24sp</dimen>
+    <dimen name="precipitationTextSizeInCurrentConditionsViewForSimpleWidget">12sp</dimen>
+    <dimen name="airQualityTextSizeInCurrentConditionsViewForSimpleWidget">12sp</dimen>
 
 </resources>

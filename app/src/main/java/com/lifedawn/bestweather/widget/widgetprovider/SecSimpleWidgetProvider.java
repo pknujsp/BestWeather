@@ -183,39 +183,31 @@ public class SecSimpleWidgetProvider extends AbstractAppWidgetProvider {
 		SecSimpleWidgetCreator widgetCreator = new SecSimpleWidgetCreator(context, null, appWidgetId);
 		widgetCreator.setWidgetDto(widgetDto);
 		widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getLocalDateTime().toString());
-		widgetCreator.setHeaderViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime());
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleJsonDownloader,
 				requestWeatherSourceType);
-		if (currentConditionsDto != null) {
-			widgetCreator.setCurrentConditionsViews(remoteViews, currentConditionsDto);
+		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleJsonDownloader,
+				requestWeatherSourceType);
+
+		final boolean successful = currentConditionsDto != null && !dailyForecastDtoList.isEmpty();
+		AirQualityDto airQualityDto = null;
+
+		if (successful) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			widgetDto.setTimeZoneId(zoneId.getId());
 
-			widgetCreator.setClockTimeZone(remoteViews);
-		}
-
-		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleJsonDownloader,
-				requestWeatherSourceType);
-		if (!dailyForecastDtoList.isEmpty()) {
-			widgetCreator.setDailyForecastViews(remoteViews, dailyForecastDtoList);
-		}
-
-
-		AirQualityDto airQualityDto = null;
-		if (zoneOffset != null) {
 			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleJsonDownloader,
 					requestWeatherSourceType, zoneOffset);
-			if (airQualityDto != null) {
-				widgetCreator.setAirQualityViews(remoteViews, airQualityDto);
-			} else {
-				widgetCreator.setAirQualityViews(remoteViews, context.getString(R.string.noData));
+			if (airQualityDto == null) {
+				airQualityDto = new AirQualityDto();
+				airQualityDto.setAqi(-1);
 			}
-		} else {
-			widgetCreator.setAirQualityViews(remoteViews, context.getString(R.string.noData));
+
+			widgetCreator.setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto,
+					currentConditionsDto, dailyForecastDtoList);
 		}
-		final boolean successful = currentConditionsDto != null && !dailyForecastDtoList.isEmpty();
+
 
 		WeatherDataObj weatherDataObj = new WeatherDataObj();
 		weatherDataObj.setSuccessful(successful);

@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.widget.widgetprovider;
 
 import android.annotation.SuppressLint;
 import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,11 +19,9 @@ import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.WidgetHelper;
-import com.lifedawn.bestweather.widget.creator.FirstSimpleWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.ThirdSimpleWidgetCreator;
 import com.lifedawn.bestweather.widget.model.WeatherDataObj;
 
@@ -189,7 +186,7 @@ public class ThirdSimpleWidgetProvider extends AbstractAppWidgetProvider {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			widgetDto.setTimeZoneId(zoneId.getId());
-			widgetCreator.setCurrentAndHourlyForecastViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto, hourlyForecastDtoList);
+			widgetCreator.setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto, hourlyForecastDtoList);
 		}
 
 		WeatherDataObj weatherDataObj = new WeatherDataObj();

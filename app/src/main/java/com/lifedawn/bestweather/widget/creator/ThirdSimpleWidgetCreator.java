@@ -3,15 +3,12 @@ package com.lifedawn.bestweather.widget.creator;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -21,16 +18,10 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
-import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
-import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
-import com.lifedawn.bestweather.weathers.view.TextsView;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,12 +30,13 @@ import java.util.List;
 import static android.view.View.MeasureSpec.EXACTLY;
 
 public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
-	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a hh:mm");
+	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 
 	private int addressTextSize;
 	private int refreshDateTimeTextSize;
 	private int hourTextSize;
 	private int tempTextSize;
+	private final int cellCount = 8;
 
 	public ThirdSimpleWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
@@ -57,7 +49,7 @@ public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
 		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
 
 		if (needTempData) {
-			setTempHourlyForecastViews(remoteViews);
+			setTempDataViews(remoteViews);
 		} else {
 			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent(remoteViews));
 		}
@@ -91,9 +83,8 @@ public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
 		return view;
 	}
 
-	public void setCurrentAndHourlyForecastViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, CurrentConditionsDto currentConditionsDto,
-	                                             List<HourlyForecastDto> hourlyForecastDtoList) {
-		remoteViews.removeAllViews(R.id.hourlyForecastView);
+	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, CurrentConditionsDto currentConditionsDto,
+	                         List<HourlyForecastDto> hourlyForecastDtoList) {
 		final String degree = "°";
 		final String degreeCelsius = "°C";
 		final String degreeFahrenheit = "°F";
@@ -107,7 +98,7 @@ public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
 		weatherIconList.add(ContextCompat.getDrawable(context, currentConditionsDto.getWeatherIcon()));
 		tempList.add(Integer.parseInt(currentConditionsDto.getTemp().replace(degreeCelsius, "").replace(degreeFahrenheit, "")));
 
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < cellCount - 1; i++) {
 			if (hourlyForecastDtoList.get(i).getHours().getHour() == 0) {
 				hourList.add(hourlyForecastDtoList.get(i).getHours().format(hour0Formatter));
 			} else {
@@ -120,8 +111,7 @@ public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
 		drawViews(remoteViews, addressName, lastRefreshDateTime, hourList, weatherIconList, tempList);
 	}
 
-	public void setTempHourlyForecastViews(RemoteViews remoteViews) {
-		remoteViews.removeAllViews(R.id.hourlyForecastView);
+	public void setTempDataViews(RemoteViews remoteViews) {
 		List<String> hourList = new ArrayList<>();
 		List<Drawable> weatherIconList = new ArrayList<>();
 		List<Integer> tempList = new ArrayList<>();
@@ -129,8 +119,6 @@ public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
 		final String hour = "5";
 		final int temp = 20;
 		final Drawable weatherIcon = ContextCompat.getDrawable(context, R.drawable.day_clear);
-
-		final int cellCount = 8;
 
 		hourList.add(context.getString(R.string.current));
 		weatherIconList.add(weatherIcon);
@@ -143,16 +131,9 @@ public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
 		}
 		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), hourList, weatherIconList,
 				tempList);
-
 	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, List<String> hoursList, List<Drawable> iconList, List<Integer> tempList) {
-		final int width = (int) (context.getResources().getDimension(R.dimen.simpleWidgetWidth)
-				- (context.getResources().getDimension(R.dimen.widget_padding) * 2f));
-		final int height = (int) (context.getResources().getDimension(R.dimen.simpleWidgetHeight)
-				- (context.getResources().getDimension(R.dimen.widget_padding) * 2f));
-		final int cellCount = hoursList.size();
-
 		RelativeLayout rootLayout = new RelativeLayout(context);
 
 		LinearLayout hourAndIconLinearLayout = new LinearLayout(context);
@@ -199,26 +180,25 @@ public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
 		rootLayout.addView(hourAndIconLinearLayout, hourAndIconRowLayoutParams);
 		rootLayout.addView(detailSingleTemperatureView, tempRowLayoutParams);
 
-		final int widthSpec = View.MeasureSpec.makeMeasureSpec(width, EXACTLY);
-		final int heightSpec = View.MeasureSpec.makeMeasureSpec(height, EXACTLY);
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+
+		final int[] widgetSize = getWidgetExactSizeInPx(appWidgetManager);
+		final float widgetPadding = context.getResources().getDimension(R.dimen.widget_padding);
+
+		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[0] - widgetPadding * 2), EXACTLY);
+		final int heightSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[1] - widgetPadding * 2), EXACTLY);
 
 		rootLayout.measure(widthSpec, heightSpec);
 		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());
 
-		/*
-		Bitmap b = Bitmap.createBitmap(rootLayout.getMeasuredWidth(),
-				rootLayout.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-		Canvas c = new Canvas(b);
-
-		rootLayout.draw(c);
-
-		 */
 		rootLayout.setDrawingCacheEnabled(true);
 		rootLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
 		Bitmap viewBmp = rootLayout.getDrawingCache();
+
 		remoteViews.setImageViewBitmap(R.id.currentWithHourlyForecastView, viewBmp);
 	}
+
 
 	@Override
 	public void setDisplayClock(boolean displayClock) {

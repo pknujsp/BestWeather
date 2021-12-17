@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -158,6 +159,35 @@ public abstract class AbstractWidgetCreator {
 
 		return PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
+
+	protected int getWidgetSizeInDp(AppWidgetManager appWidgetManager, String key) {
+		return appWidgetManager.getAppWidgetOptions(appWidgetId).getInt(key, 0);
+	}
+
+	/**
+	 * @param
+	 * @return {widgetWidthPx, widgetHeightPx} 반환
+	 */
+	protected int[] getWidgetExactSizeInPx(AppWidgetManager appWidgetManager) {
+		int widgetWidth = 0;
+		int widgetHeight = 0;
+
+		int portrait = context.getResources().getConfiguration().orientation;
+		if (portrait == Configuration.ORIENTATION_PORTRAIT) {
+			widgetWidth = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
+			widgetHeight = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT);
+		} else {
+			widgetWidth = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH);
+			widgetHeight = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT);
+		}
+
+		final float density = context.getResources().getDisplayMetrics().density;
+		final float widgetWidthPx = widgetWidth * density;
+		final float widgetHeightPx = widgetHeight * density;
+
+		return new int[]{(int) widgetWidthPx, (int) widgetHeightPx};
+	}
+
 
 	abstract public RemoteViews createRemoteViews(boolean needTempData);
 

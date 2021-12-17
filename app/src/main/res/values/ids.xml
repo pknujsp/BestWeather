@@ -11,4 +11,5 @@
     <item name="favoriteLocationDtoTagInFavLocItemViewInSideNav" type="id" />
     <item name="begin_column_index" type="id" />
     <item name="hourAndIconView" type="id" />
+    <item name="currentConditions" type="id" />
 </resources>

@@ -155,10 +155,19 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		} else if (layoutId == R.layout.widget_full) {
 			widgetCreator = new FullWidgetCreator(getApplicationContext(), this, appWidgetId);
 		} else if (layoutId == R.layout.widget_simple) {
+			binding.displayDatetimeSwitch.setVisibility(View.GONE);
+			binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
+			
 			widgetCreator = new FirstSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
 		} else if (layoutId == R.layout.widget_simple2) {
+			binding.displayDatetimeSwitch.setVisibility(View.GONE);
+			binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
+
 			widgetCreator = new SecSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
 		} else if (layoutId == R.layout.widget_simple3) {
+			binding.displayDatetimeSwitch.setVisibility(View.GONE);
+			binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
+
 			widgetCreator = new ThirdSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
 		}
 

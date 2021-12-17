@@ -27,15 +27,19 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 	private int refreshDateTimeTextSize;
 	private int clockDateTextSize;
 	private int clockTimeTextSize;
-	private int tempTextSize;
+	private int currentTempTextSize;
 	private int aqiTextSize;
 	private int precipitationTextSize;
+	private int hourlyForecastHourTextSize;
+	private int hourlyForecastTempTextSize;
+	private int dailyForecastDateTextSize;
+	private int dailyForecastTempTextSize;
 
 	public FullWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
 		timeClockFormat = "HH:mm";
 		dateClockFormat = "M.d E";
-		refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a hh:mm");
+		refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	}
 
 
@@ -66,7 +70,7 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 		remoteViews.setTextViewTextSize(R.id.address, TypedValue.COMPLEX_UNIT_PX, addressTextSize);
 		remoteViews.setTextViewTextSize(R.id.refresh, TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
 
-		remoteViews.setTextViewTextSize(R.id.temperature, TypedValue.COMPLEX_UNIT_PX, tempTextSize);
+		remoteViews.setTextViewTextSize(R.id.temperature, TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
 		remoteViews.setTextViewTextSize(R.id.precipitation, TypedValue.COMPLEX_UNIT_PX, precipitationTextSize);
 		remoteViews.setTextViewTextSize(R.id.airQuality, TypedValue.COMPLEX_UNIT_PX, aqiTextSize);
 
@@ -82,11 +86,15 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 
 		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInCommonWidgetHeader) + extraSize;
 		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshDateTimeTextSizeInCommonWidgetHeader) + extraSize;
-		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInFullWidget) + extraSize;
+		currentTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInFullWidget) + extraSize;
 		clockDateTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateClockTextSizeInFullWidget) + extraSize;
 		clockTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.timeClockTextSizeInFullWidget) + extraSize;
 		aqiTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInFullWidget) + extraSize;
 		precipitationTextSize = context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInFullWidget) + extraSize;
+		hourlyForecastHourTextSize = context.getResources().getDimensionPixelSize(R.dimen.hourTextSizeInHourlyForecastItem) + extraSize;
+		hourlyForecastTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInHourlyForecastItem) + extraSize;
+		dailyForecastDateTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTextSizeInDailyForecastItem) + extraSize;
+		dailyForecastTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInDailyForecastItem) + extraSize;
 	}
 
 	public void setClockTimeZone(RemoteViews remoteViews) {
@@ -151,6 +159,9 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 			childRemoteViews.setTextViewText(R.id.hourly_temperature, hourlyForecastDtoList.get(i).getTemp());
 			childRemoteViews.setImageViewResource(R.id.hourly_weather_icon, hourlyForecastDtoList.get(i).getWeatherIcon());
 
+			childRemoteViews.setTextViewTextSize(R.id.hourly_clock, TypedValue.COMPLEX_UNIT_PX, hourlyForecastHourTextSize);
+			childRemoteViews.setTextViewTextSize(R.id.hourly_temperature, TypedValue.COMPLEX_UNIT_PX, hourlyForecastTempTextSize);
+
 			if (i >= 6) {
 				remoteViews.addView(R.id.hourly_forecast_row_2, childRemoteViews);
 			} else {
@@ -180,6 +191,9 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 				childRemoteViews.setImageViewResource(R.id.daily_left_weather_icon, dailyForecastDtoList.get(day).getAmValues().getWeatherIcon());
 				childRemoteViews.setImageViewResource(R.id.daily_right_weather_icon, dailyForecastDtoList.get(day).getPmValues().getWeatherIcon());
 			}
+
+			childRemoteViews.setTextViewTextSize(R.id.daily_date, TypedValue.COMPLEX_UNIT_PX, dailyForecastDateTextSize);
+			childRemoteViews.setTextViewTextSize(R.id.daily_temperature, TypedValue.COMPLEX_UNIT_PX, dailyForecastTempTextSize);
 
 			remoteViews.addView(R.id.daily_forecast_row, childRemoteViews);
 		}

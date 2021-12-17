@@ -32,8 +32,8 @@ public class CurrentWidgetCreator extends AbstractWidgetCreator {
 	public CurrentWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
 		timeClockFormat = "HH:mm";
-		dateClockFormat = "M.d EEE";
-		refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a hh:mm");
+		dateClockFormat = "M.d E";
+		refreshDateTimeFormatter = DateTimeFormatter.ofPattern("a h:mm");
 	}
 
 	@Override
@@ -103,7 +103,9 @@ public class CurrentWidgetCreator extends AbstractWidgetCreator {
 
 
 	public void setCurrentConditionsViews(RemoteViews remoteViews, CurrentConditionsDto currentConditionsDto) {
-		remoteViews.setTextViewText(R.id.current_temperature, currentConditionsDto.getTemp());
+		final String celsius = "C";
+		final String fahrenheit = "F";
+		remoteViews.setTextViewText(R.id.current_temperature, currentConditionsDto.getTemp().replace(celsius, "").replace(fahrenheit, ""));
 		remoteViews.setImageViewResource(R.id.current_weather_icon, currentConditionsDto.getWeatherIcon());
 
 		String precipitation = "";
