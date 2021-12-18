@@ -57,8 +57,8 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="11dp"
-            android:layout_height="11dp"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
             android:layout_marginRight="1dp"
             android:scaleType="centerInside"
             android:src="@drawable/pop" />

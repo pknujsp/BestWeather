@@ -18,8 +18,15 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
@@ -220,6 +227,30 @@ public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
 	@Override
 	public void setDisplayClock(boolean displayClock) {
 		widgetDto.setDisplayClock(displayClock);
+	}
+
+	@Override
+	public void setDataViewsOfSavedData() {
+		WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+
+		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
+			weatherSourceType = WeatherSourceType.KMA;
+		}
+
+		RemoteViews remoteViews = createRemoteViews(false);
+		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
+
+		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
+		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.parseTextToCurrentConditionsDto(context, jsonObject,
+				weatherSourceType, widgetDto.getLatitude(), widgetDto.getLongitude());
+		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,
+				weatherSourceType, widgetDto.getLatitude(), widgetDto.getLongitude());
+
+		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto,
+				hourlyForecastDtoList, null);
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		appWidgetManager.updateAppWidget(appWidgetId,
+				remoteViews);
 	}
 
 }

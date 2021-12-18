@@ -5,10 +5,14 @@ import android.util.ArrayMap;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
 
 import java.time.LocalDate;
@@ -93,8 +97,8 @@ public class AqicnResponseProcessor {
 		return AQI_GRADE_DESCRIPTIONS[5];
 	}
 
-	public static GeolocalizedFeedResponse getAirQualityObjFromJson(Response<JsonElement> response) {
-		return new Gson().fromJson(response.body().toString(), GeolocalizedFeedResponse.class);
+	public static GeolocalizedFeedResponse getAirQualityObjFromJson(String response) {
+		return new Gson().fromJson(response, GeolocalizedFeedResponse.class);
 	}
 
 	public static List<AirQualityForecastObj> getAirQualityForecastObjList(GeolocalizedFeedResponse geolocalizedFeedResponse, ZoneId timeZone) {
@@ -354,5 +358,17 @@ public class AqicnResponseProcessor {
 
 		airQualityDto.setDailyForecastList(dailyForecastList);
 		return airQualityDto;
+	}
+
+	public static AirQualityDto parseTextToAirQualityDto(Context context, JsonObject jsonObject) {
+		if (jsonObject.get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name()) != null) {
+			GeolocalizedFeedResponse geolocalizedFeedResponse =
+					getAirQualityObjFromJson(jsonObject.get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name()).getAsString());
+			AirQualityDto airQualityDto = makeAirQualityDto(context, geolocalizedFeedResponse,
+					ZoneOffset.of(jsonObject.get("zoneOffset").getAsString()));
+			return airQualityDto;
+		}
+
+		return null;
 	}
 }

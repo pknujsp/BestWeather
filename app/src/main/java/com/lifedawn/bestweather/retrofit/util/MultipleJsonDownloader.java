@@ -12,7 +12,6 @@ import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,11 +21,12 @@ import retrofit2.Response;
 
 public abstract class MultipleJsonDownloader {
 	private static final String tag = "MultipleJsonDownloader";
+	private final ZonedDateTime requestDateTime = ZonedDateTime.now();
 	private volatile int requestCount;
 	private volatile int responseCount;
+
 	private AlertDialog loadingDialog;
 	private Map<String, String> valueMap = new HashMap<>();
-	private ZonedDateTime localDateTime = ZonedDateTime.now();
 	private Map<RetrofitClient.ServiceType, Call<?>> callMap = new HashMap<>();
 
 	protected Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ArrayMap<>();
@@ -46,8 +46,8 @@ public abstract class MultipleJsonDownloader {
 		this.requestCount = requestCount;
 	}
 
-	public ZonedDateTime getLocalDateTime() {
-		return localDateTime;
+	public ZonedDateTime getRequestDateTime() {
+		return requestDateTime;
 	}
 
 	public void setRequestCount(int requestCount) {
@@ -104,11 +104,11 @@ public abstract class MultipleJsonDownloader {
 	}
 
 	public void processResult(WeatherSourceType weatherSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
-	                          Response<?> response) {
+	                          Response<?> response, Object responseObj, String responseText) {
 		if (!responseMap.containsKey(weatherSourceType)) {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
 		}
-		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, response));
+		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, response, responseObj, responseText));
 		Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 
 		if (requestCount == ++responseCount) {
@@ -141,7 +141,8 @@ public abstract class MultipleJsonDownloader {
 
 		private Response<?> response;
 		private Throwable t;
-		private String responseStr;
+		private String responseText;
+		private Object responseObj;
 
 		public ResponseResult(RequestParameter requestParameter, Throwable t) {
 			this.t = t;
@@ -149,10 +150,12 @@ public abstract class MultipleJsonDownloader {
 			this.requestParameter = requestParameter;
 		}
 
-		public ResponseResult(RequestParameter requestParameter, Response<?> response) {
+		public ResponseResult(RequestParameter requestParameter, Response<?> response, Object responseObj, String responseText) {
 			this.response = response;
 			successful = true;
+			this.responseObj = responseObj;
 			this.requestParameter = requestParameter;
+			this.responseText = responseText;
 		}
 
 		public Response<?> getResponse() {
@@ -179,13 +182,12 @@ public abstract class MultipleJsonDownloader {
 			return successful;
 		}
 
-		public String getResponseStr() {
-			return responseStr;
+		public String getResponseText() {
+			return responseText;
 		}
 
-		public ResponseResult setResponseStr(String responseStr) {
-			this.responseStr = responseStr;
-			return this;
+		public Object getResponseObj() {
+			return responseObj;
 		}
 	}
 }

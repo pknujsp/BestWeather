@@ -61,8 +61,8 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 		fullWidgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
-				if (result.getBitmap() != null) {
-					fullWidgetCreator.drawBitmap(fullWidgetCreator.createRemoteViews(false), result.getBitmap());
+				if (result.getResponseText() != null) {
+					fullWidgetCreator.setDataViewsOfSavedData();
 				}
 			}
 
@@ -175,7 +175,7 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 		ZoneOffset zoneOffset = null;
 		FullWidgetCreator widgetCreator = new FullWidgetCreator(context, null, appWidgetId);
 		widgetCreator.setWidgetDto(widgetDto);
-		widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getLocalDateTime().toString());
+		widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getRequestDateTime().toString());
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleJsonDownloader,
 				requestWeatherSourceType);
@@ -209,6 +209,9 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 							widgetDto.setBitmap(bitmap);
 						}
 					});
+			widgetCreator.makeResponseTextToJson(multipleJsonDownloader, requestWeatherDataTypeSet, requestWeatherSourceType, widgetDto, zoneOffset);
+
+
 		}
 
 		widgetDto.setLoadSuccessful(successful);

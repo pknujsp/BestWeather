@@ -4,34 +4,30 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
-import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
-import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 
 import static android.view.View.MeasureSpec.EXACTLY;
 
@@ -134,7 +130,8 @@ public class CurrentWidgetCreator extends AbstractWidgetCreator {
 			precipitation = context.getString(R.string.not_precipitation);
 		}
 		((TextView) view.findViewById(R.id.precipitation)).setText(precipitation);
-		((TextView) view.findViewById(R.id.humidity)).setText(currentConditionsDto.getHumidity());
+		String humidity = context.getString(R.string.humidity) + ": " + currentConditionsDto.getHumidity();
+		((TextView) view.findViewById(R.id.humidity)).setText(humidity);
 		((TextView) view.findViewById(R.id.windDirection)).setText(currentConditionsDto.getWindDirection());
 		((TextView) view.findViewById(R.id.windSpeed)).setText(currentConditionsDto.getWindSpeed());
 		((TextView) view.findViewById(R.id.windStrength)).setText(currentConditionsDto.getWindStrength());
@@ -157,7 +154,7 @@ public class CurrentWidgetCreator extends AbstractWidgetCreator {
 		tempCurrentConditions.setTemp("10°").setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(120)
 				.setWindDirection(WindDirectionConverter.windDirection(context, String.valueOf(tempCurrentConditions.getWindDirectionDegree())))
 				.setWindSpeed(ValueUnits.convertWindSpeed("2.6", ValueUnits.mPerSec) + "m/s")
-				.setWindStrength(WeatherResponseProcessor.getWindSpeedDescription("2.6"));
+				.setSimpleWindStrength(WeatherResponseProcessor.getWindSpeedDescription("2.6"));
 
 		AirQualityDto tempAirQualityDto = new AirQualityDto();
 		tempAirQualityDto.setAqi(10);
@@ -217,6 +214,26 @@ public class CurrentWidgetCreator extends AbstractWidgetCreator {
 		remoteViews.setImageViewBitmap(R.id.valuesView, viewBmp);
 	}
 
+
+	@Override
+	public void setDataViewsOfSavedData() {
+		WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+
+		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
+			weatherSourceType = WeatherSourceType.KMA;
+		}
+
+		RemoteViews remoteViews = createRemoteViews(false);
+		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
+		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
+		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.parseTextToCurrentConditionsDto(context, jsonObject,
+				weatherSourceType, widgetDto.getLatitude(), widgetDto.getLongitude());
+
+		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto, currentConditionsDto, null);
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		appWidgetManager.updateAppWidget(appWidgetId,
+				remoteViews);
+	}
 
 	@Override
 	public void setDisplayClock(boolean displayClock) {

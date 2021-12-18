@@ -124,16 +124,13 @@ public class FiveDaysOfDailyForecastsResponse {
 
 	public static class DailyForecasts {
 		@Expose
-		@SerializedName("DateTime")
+		@SerializedName("Date")
 		private String dateTime;
 
 		@Expose
 		@SerializedName("EpochDate")
 		private String epochDate;
 
-		@Expose
-		@SerializedName("EndEpochDate")
-		private String endEpochDate;
 
 		@Expose
 		@SerializedName("Temperature")
@@ -171,13 +168,6 @@ public class FiveDaysOfDailyForecastsResponse {
 			this.epochDate = epochDate;
 		}
 
-		public String getEndEpochDate() {
-			return endEpochDate;
-		}
-
-		public void setEndEpochDate(String endEpochDate) {
-			this.endEpochDate = endEpochDate;
-		}
 
 		public Temperature getTemperature() {
 			return temperature;

@@ -67,6 +67,17 @@ public class WidgetDto {
 	@ColumnInfo(name = "bitmap")
 	private Bitmap bitmap;
 
+	@ColumnInfo(name = "responseText")
+	private String responseText;
+
+	public String getResponseText() {
+		return responseText;
+	}
+
+	public void setResponseText(String responseText) {
+		this.responseText = responseText;
+	}
+
 	public Bitmap getBitmap() {
 		return bitmap;
 	}

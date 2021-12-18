@@ -12,6 +12,7 @@ public class CurrentConditionsDto {
 	private String windDirection;
 	private int windDirectionDegree;
 	private String windSpeed;
+	private String simpleWindStrength;
 	private String windStrength;
 	private String windGust;
 	private String pressure;
@@ -62,6 +63,14 @@ public class CurrentConditionsDto {
 	public CurrentConditionsDto setWeatherIcon(int weatherIcon) {
 		this.weatherIcon = weatherIcon;
 		return this;
+	}
+
+	public String getWindStrength() {
+		return windStrength;
+	}
+
+	public void setWindStrength(String windStrength) {
+		this.windStrength = windStrength;
 	}
 
 	public String getWeatherDescription() {
@@ -118,12 +127,12 @@ public class CurrentConditionsDto {
 		return this;
 	}
 
-	public String getWindStrength() {
-		return windStrength;
+	public String getSimpleWindStrength() {
+		return simpleWindStrength;
 	}
 
-	public CurrentConditionsDto setWindStrength(String windStrength) {
-		this.windStrength = windStrength;
+	public CurrentConditionsDto setSimpleWindStrength(String simpleWindStrength) {
+		this.simpleWindStrength = simpleWindStrength;
 		return this;
 	}
 

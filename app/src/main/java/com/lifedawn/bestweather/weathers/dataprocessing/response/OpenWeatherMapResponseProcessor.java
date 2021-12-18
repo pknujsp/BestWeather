@@ -18,7 +18,6 @@ import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -272,7 +271,8 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 			currentConditionsDto.setWindGust(ValueUnits.convertWindSpeed(item.getWindGust(), windUnit) + ValueUnits.convertToStr(context,
 					windUnit));
 		}
-		currentConditionsDto.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWind_speed()));
+		currentConditionsDto.setSimpleWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWind_speed()));
+		currentConditionsDto.setWindStrength(WeatherResponseProcessor.getWindSpeedDescription(item.getWind_speed()));
 		currentConditionsDto.setPressure(item.getPressure() + "hpa");
 		currentConditionsDto.setUvIndex(item.getUvi());
 		currentConditionsDto.setVisibility(ValueUnits.convertVisibility(item.getVisibility(),

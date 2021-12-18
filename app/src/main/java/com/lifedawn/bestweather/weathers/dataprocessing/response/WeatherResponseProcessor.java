@@ -6,7 +6,10 @@ import android.util.ArrayMap;
 
 import androidx.preference.PreferenceManager;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
@@ -29,7 +32,10 @@ import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
+import com.tickaroo.tikxml.TikXml;
 
+import java.io.IOException;
+import java.lang.reflect.GenericArrayType;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -39,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okio.Buffer;
 import retrofit2.Response;
 
 public class WeatherResponseProcessor {
@@ -108,10 +115,57 @@ public class WeatherResponseProcessor {
 		AirQualityDto airQualityDto = null;
 
 		if (aqiCnResponseResult.getResponse() != null) {
-			GeolocalizedFeedResponse airQualityResponse = AqicnResponseProcessor.getAirQualityObjFromJson((Response<JsonElement>) aqiCnResponseResult.getResponse());
-			airQualityDto = AqicnResponseProcessor.makeAirQualityDto(context, airQualityResponse, zoneOffset);
+			airQualityDto = AqicnResponseProcessor.makeAirQualityDto(context, (GeolocalizedFeedResponse) aqiCnResponseResult.getResponseObj(), zoneOffset);
 		}
 		return airQualityDto;
+	}
+
+	public static CurrentConditionsDto parseTextToCurrentConditionsDto(Context context, JsonObject jsonObject,
+	                                                                   WeatherSourceType weatherSourceType, Double latitude,
+	                                                                   Double longitude) {
+		CurrentConditionsDto currentConditionsDto = null;
+
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		ValueUnits windUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
+				ValueUnits.mPerSec.name()));
+		ValueUnits tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
+				ValueUnits.celsius.name()));
+		ValueUnits visibilityUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_visibility),
+				ValueUnits.km.name()));
+
+		if (weatherSourceType == WeatherSourceType.KMA) {
+			if (jsonObject.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST.name()) != null) {
+				try {
+					TikXml tikXml = new TikXml.Builder().exceptionOnUnreadXml(false).build();
+					VilageFcstResponse vilageFcstResponse =
+							tikXml.read(new Buffer().writeUtf8(jsonObject.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST.name()).getAsString()),
+									VilageFcstResponse.class);
+					FinalCurrentConditions finalCurrentConditions =
+							KmaResponseProcessor.getFinalCurrentConditions(vilageFcstResponse);
+
+					currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDto(context, finalCurrentConditions, windUnit, tempUnit,
+							latitude, longitude);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		} else if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+			JsonElement jsonElement = jsonObject.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS.name());
+
+			CurrentConditionsResponse currentConditionsResponse =
+					AccuWeatherResponseProcessor.getCurrentConditionsObjFromJson(jsonElement);
+
+			currentConditionsDto = AccuWeatherResponseProcessor.makeCurrentConditionsDto(context,
+					currentConditionsResponse.getItems().get(0), windUnit, tempUnit, visibilityUnit);
+		} else if (weatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
+			OneCallResponse oneCallResponse =
+					OpenWeatherMapResponseProcessor.getOneCallObjFromJson(jsonObject.get(RetrofitClient.ServiceType.OWM_ONE_CALL.name()).getAsString());
+
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDto(context, oneCallResponse,
+					windUnit, tempUnit, visibilityUnit);
+		}
+		return currentConditionsDto;
 	}
 
 	public static CurrentConditionsDto getCurrentConditionsDto(Context context, MultipleJsonDownloader multipleJsonDownloader,
@@ -132,7 +186,7 @@ public class WeatherResponseProcessor {
 
 			if (ultraSrtResponseResult.isSuccessful()) {
 				FinalCurrentConditions finalCurrentConditions =
-						KmaResponseProcessor.getFinalCurrentConditions((VilageFcstResponse) ultraSrtResponseResult.getResponse().body());
+						KmaResponseProcessor.getFinalCurrentConditions((VilageFcstResponse) ultraSrtResponseResult.getResponseObj());
 				UltraSrtNcstParameter ultraSrtNcstParameter = (UltraSrtNcstParameter) ultraSrtResponseResult.getRequestParameter();
 
 				currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDto(context, finalCurrentConditions, windUnit, tempUnit,
@@ -144,7 +198,7 @@ public class WeatherResponseProcessor {
 
 			if (currentConditionsResponseResult.isSuccessful()) {
 				CurrentConditionsResponse currentConditionsResponse =
-						AccuWeatherResponseProcessor.getCurrentConditionsObjFromJson((JsonElement) currentConditionsResponseResult.getResponse().body());
+						AccuWeatherResponseProcessor.getCurrentConditionsObjFromJson((JsonElement) currentConditionsResponseResult.getResponseObj());
 
 				currentConditionsDto = AccuWeatherResponseProcessor.makeCurrentConditionsDto(context,
 						currentConditionsResponse.getItems().get(0), windUnit, tempUnit, visibilityUnit);
@@ -155,13 +209,66 @@ public class WeatherResponseProcessor {
 
 			if (owmResponseResult.isSuccessful()) {
 				OneCallResponse oneCallResponse =
-						OpenWeatherMapResponseProcessor.getOneCallObjFromJson(owmResponseResult.getResponse().body().toString());
+						OpenWeatherMapResponseProcessor.getOneCallObjFromJson((String) owmResponseResult.getResponseObj());
 
 				currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDto(context, oneCallResponse,
 						windUnit, tempUnit, visibilityUnit);
 			}
 		}
 		return currentConditionsDto;
+	}
+
+	public static List<HourlyForecastDto> parseTextToHourlyForecastDtoList(Context context, JsonObject jsonObject,
+	                                                                       WeatherSourceType weatherSourceType, Double latitude,
+	                                                                       Double longitude) {
+		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
+
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		ValueUnits windUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
+				ValueUnits.mPerSec.name()));
+		ValueUnits tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
+				ValueUnits.celsius.name()));
+		ValueUnits visibilityUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_visibility),
+				ValueUnits.km.name()));
+
+		if (weatherSourceType == WeatherSourceType.KMA) {
+			if (jsonObject.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name()) != null &&
+					jsonObject.get(RetrofitClient.ServiceType.VILAGE_FCST.name()) != null) {
+				TikXml tikXml = new TikXml.Builder().exceptionOnUnreadXml(false).build();
+				try {
+					VilageFcstResponse ultraSrtFcstResponse =
+							tikXml.read(new Buffer().writeUtf8(jsonObject.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name()).getAsString()),
+									VilageFcstResponse.class);
+					VilageFcstResponse vilageFcstResponse =
+							tikXml.read(new Buffer().writeUtf8(jsonObject.get(RetrofitClient.ServiceType.VILAGE_FCST.name()).getAsString()),
+									VilageFcstResponse.class);
+					List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(ultraSrtFcstResponse,
+							vilageFcstResponse);
+					hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoList(context, finalHourlyForecastList,
+							latitude, longitude, windUnit, tempUnit);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} else if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+			if (jsonObject.get(RetrofitClient.ServiceType.ACCU_12_HOURLY.name()) != null) {
+				TwelveHoursOfHourlyForecastsResponse hourlyForecastsResponse = AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
+						jsonObject.get(RetrofitClient.ServiceType.ACCU_12_HOURLY.name()));
+
+				hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(context, hourlyForecastsResponse.getItems()
+						, windUnit, tempUnit, visibilityUnit);
+			}
+
+		} else if (weatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
+			if (jsonObject.get(RetrofitClient.ServiceType.OWM_ONE_CALL.name()) != null) {
+				OneCallResponse oneCallResponse =
+						OpenWeatherMapResponseProcessor.getOneCallObjFromJson(jsonObject.get(RetrofitClient.ServiceType.OWM_ONE_CALL.name()).getAsString());
+
+				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(context, oneCallResponse,
+						windUnit, tempUnit, visibilityUnit);
+			}
+		}
+		return hourlyForecastDtoList;
 	}
 
 	public static List<HourlyForecastDto> getHourlyForecastDtoList(Context context, MultipleJsonDownloader multipleJsonDownloader,
@@ -185,9 +292,9 @@ public class WeatherResponseProcessor {
 
 			if (ultraSrtFcstResponseResult.isSuccessful() && vilageFcstResponseResult.isSuccessful()) {
 				VilageFcstResponse ultraSrtFcstRoot =
-						(VilageFcstResponse) ultraSrtFcstResponseResult.getResponse().body();
+						(VilageFcstResponse) ultraSrtFcstResponseResult.getResponseObj();
 				VilageFcstResponse vilageFcstRoot =
-						(VilageFcstResponse) vilageFcstResponseResult.getResponse().body();
+						(VilageFcstResponse) vilageFcstResponseResult.getResponseObj();
 
 				VilageFcstParameter vilageFcstParameter = (VilageFcstParameter) vilageFcstResponseResult.getRequestParameter();
 
@@ -201,8 +308,8 @@ public class WeatherResponseProcessor {
 					RetrofitClient.ServiceType.ACCU_12_HOURLY);
 
 			if (hourlyForecastResponseResult.isSuccessful()) {
-				TwelveHoursOfHourlyForecastsResponse hourlyForecastsResponse = AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
-						(JsonElement) hourlyForecastResponseResult.getResponse().body());
+				TwelveHoursOfHourlyForecastsResponse hourlyForecastsResponse =
+						(TwelveHoursOfHourlyForecastsResponse) hourlyForecastResponseResult.getResponseObj();
 
 				hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(context, hourlyForecastsResponse.getItems()
 						, windUnit, tempUnit, visibilityUnit);
@@ -211,8 +318,8 @@ public class WeatherResponseProcessor {
 			MultipleJsonDownloader.ResponseResult responseResult = responseMap.get(WeatherSourceType.OPEN_WEATHER_MAP).get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
 			if (responseResult.isSuccessful()) {
-				OneCallResponse oneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
-						responseResult.getResponse().body().toString());
+				OneCallResponse oneCallResponse =
+						(OneCallResponse) responseResult.getResponseObj();
 
 				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(context, oneCallResponse,
 						windUnit, tempUnit, visibilityUnit);
@@ -221,6 +328,71 @@ public class WeatherResponseProcessor {
 
 		return hourlyForecastDtoList;
 	}
+
+
+	public static List<DailyForecastDto> parseTextToDailyForecastDtoList(Context context, JsonObject jsonObject,
+	                                                                     WeatherSourceType weatherSourceType) {
+		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
+
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		ValueUnits windUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
+				ValueUnits.mPerSec.name()));
+		ValueUnits tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
+				ValueUnits.celsius.name()));
+
+		if (weatherSourceType == WeatherSourceType.KMA) {
+			if (jsonObject.get(RetrofitClient.ServiceType.VILAGE_FCST.name()) != null &&
+					jsonObject.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name()) != null &&
+					jsonObject.get(RetrofitClient.ServiceType.MID_TA_FCST.name()) != null &&
+					jsonObject.get(RetrofitClient.ServiceType.MID_LAND_FCST.name()) != null &&
+					jsonObject.get("tmFc") != null) {
+				TikXml tikXml = new TikXml.Builder().exceptionOnUnreadXml(false).build();
+				try {
+					VilageFcstResponse ultraSrtFcstResponse =
+							tikXml.read(new Buffer().writeUtf8(jsonObject.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name()).getAsString()),
+									VilageFcstResponse.class);
+					VilageFcstResponse vilageFcstResponse =
+							tikXml.read(new Buffer().writeUtf8(jsonObject.get(RetrofitClient.ServiceType.VILAGE_FCST.name()).getAsString()),
+									VilageFcstResponse.class);
+					MidLandFcstResponse midLandFcstResponse =
+							tikXml.read(new Buffer().writeUtf8(jsonObject.get(RetrofitClient.ServiceType.MID_LAND_FCST.name()).getAsString()),
+									MidLandFcstResponse.class);
+					MidTaResponse midTaFcstResponse =
+							tikXml.read(new Buffer().writeUtf8(jsonObject.get(RetrofitClient.ServiceType.MID_TA_FCST.name()).getAsString()),
+									MidTaResponse.class);
+
+					List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(ultraSrtFcstResponse,
+							vilageFcstResponse);
+					List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastList(midLandFcstResponse, midTaFcstResponse,
+							jsonObject.get("tmFc").getAsLong());
+
+					dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoList(context,
+							KmaResponseProcessor.getDailyForecastList(finalDailyForecastList, finalHourlyForecastList), tempUnit);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} else if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+			if (jsonObject.get(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY.name()) != null) {
+				FiveDaysOfDailyForecastsResponse hourlyForecastsResponse = AccuWeatherResponseProcessor.getDailyForecastObjFromJson(
+						jsonObject.get(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY.name()).getAsString());
+
+				dailyForecastDtoList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(context, hourlyForecastsResponse.getDailyForecasts()
+						, windUnit, tempUnit);
+			}
+
+		} else if (weatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
+			if (jsonObject.get(RetrofitClient.ServiceType.OWM_ONE_CALL.name()) != null) {
+				OneCallResponse oneCallResponse =
+						OpenWeatherMapResponseProcessor.getOneCallObjFromJson(jsonObject.get(RetrofitClient.ServiceType.OWM_ONE_CALL.name()).getAsString());
+
+				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(context, oneCallResponse,
+						windUnit, tempUnit);
+			}
+		}
+		return dailyForecastDtoList;
+	}
+
 
 	public static List<DailyForecastDto> getDailyForecastDtoList(Context context, MultipleJsonDownloader multipleJsonDownloader,
 	                                                             WeatherSourceType weatherSourceType) {
@@ -243,10 +415,10 @@ public class WeatherResponseProcessor {
 			if (midLandFcstResponseResult.isSuccessful() && midTaFcstResponseResult.isSuccessful() &&
 					vilageFcstResponseResult.isSuccessful() && ultraSrtFcstResponseResult.isSuccessful()) {
 				MidLandFcstResponse midLandFcstRoot =
-						(MidLandFcstResponse) midLandFcstResponseResult.getResponse().body();
-				MidTaResponse midTaRoot = (MidTaResponse) midTaFcstResponseResult.getResponse().body();
-				VilageFcstResponse vilageFcstRoot = (VilageFcstResponse) vilageFcstResponseResult.getResponse().body();
-				VilageFcstResponse ultraSrtFcstRoot = (VilageFcstResponse) ultraSrtFcstResponseResult.getResponse().body();
+						(MidLandFcstResponse) midLandFcstResponseResult.getResponseObj();
+				MidTaResponse midTaRoot = (MidTaResponse) midTaFcstResponseResult.getResponseObj();
+				VilageFcstResponse vilageFcstRoot = (VilageFcstResponse) vilageFcstResponseResult.getResponseObj();
+				VilageFcstResponse ultraSrtFcstRoot = (VilageFcstResponse) ultraSrtFcstResponseResult.getResponseObj();
 
 				List<FinalHourlyForecast> finalHourlyForecasts = KmaResponseProcessor.getFinalHourlyForecastList(ultraSrtFcstRoot,
 						vilageFcstRoot);
@@ -261,8 +433,8 @@ public class WeatherResponseProcessor {
 					RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY);
 
 			if (dailyForecastResponseResult.isSuccessful()) {
-				FiveDaysOfDailyForecastsResponse dailyForecastResponse = AccuWeatherResponseProcessor.getDailyForecastObjFromJson(
-						dailyForecastResponseResult.getResponse().body().toString());
+				FiveDaysOfDailyForecastsResponse dailyForecastResponse =
+						(FiveDaysOfDailyForecastsResponse) dailyForecastResponseResult.getResponseObj();
 
 				dailyForecastDtoList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(context, dailyForecastResponse.getDailyForecasts()
 						, windUnit, tempUnit);
@@ -271,8 +443,8 @@ public class WeatherResponseProcessor {
 			MultipleJsonDownloader.ResponseResult responseResult = responseMap.get(WeatherSourceType.OPEN_WEATHER_MAP).get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
 			if (responseResult.isSuccessful()) {
-				OneCallResponse oneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
-						responseResult.getResponse().body().toString());
+				OneCallResponse oneCallResponse =
+						(OneCallResponse) responseResult.getResponseObj();
 
 				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(context, oneCallResponse,
 						windUnit, tempUnit);

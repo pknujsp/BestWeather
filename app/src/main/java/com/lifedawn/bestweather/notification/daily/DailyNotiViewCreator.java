@@ -84,7 +84,7 @@ public class DailyNotiViewCreator extends AbstractNotiViewCreator {
 	protected void setResultViews(Context context, RemoteViews remoteViews, WeatherSourceType requestWeatherSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleJsonDownloader multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
-		setHeaderViews(remoteViews, notificationDataObj.getAddressName(), multipleJsonDownloader.getLocalDateTime().toString());
+		setHeaderViews(remoteViews, notificationDataObj.getAddressName(), multipleJsonDownloader.getRequestDateTime().toString());
 		int icon = R.drawable.temp_icon;
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleJsonDownloader,

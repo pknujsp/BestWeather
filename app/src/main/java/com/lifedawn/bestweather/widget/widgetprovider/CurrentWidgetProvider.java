@@ -19,7 +19,6 @@ import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
@@ -155,7 +154,7 @@ public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
 		boolean successful = currentConditionsDto != null;
 
 		if (successful) {
-			widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getLocalDateTime().toString());
+			widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getRequestDateTime().toString());
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 
@@ -173,9 +172,11 @@ public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
 					currentConditionsDto, new OnDrawBitmapCallback() {
 						@Override
 						public void onCreatedBitmap(Bitmap bitmap) {
-							widgetDto.setBitmap(bitmap);
+							//widgetDto.setBitmap(bitmap);
 						}
 					});
+
+			widgetCreator.makeResponseTextToJson(multipleJsonDownloader, requestWeatherDataTypeSet, requestWeatherSourceType, widgetDto, zoneOffset);
 		}
 
 		widgetDto.setLoadSuccessful(successful);

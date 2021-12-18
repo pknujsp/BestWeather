@@ -17,34 +17,22 @@ import retrofit2.http.QueryMap;
 public interface Querys {
 	// kma
 	@GET("getUltraSrtNcst")
-	Call<JsonElement> getUltraSrtNcst(@QueryMap(encoded = true) Map<String, String> queryMap);
-
-	@GET("getUltraSrtFcst")
-	Call<JsonElement> getUltraSrtFcst(@QueryMap(encoded = true) Map<String, String> queryMap);
-
-	@GET("getVilageFcst")
-	Call<JsonElement> getVilageFcst(@QueryMap(encoded = true) Map<String, String> queryMap);
-
-	@GET("getMidLandFcst")
-	Call<JsonElement> getMidLandFcst(@QueryMap(encoded = true) Map<String, String> queryMap);
-
-	@GET("getMidTa")
-	Call<JsonElement> getMidTa(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<String> getUltraSrtNcstByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	@GET("getUltraSrtNcst")
-	Call<VilageFcstResponse> getUltraSrtNcstByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<String> getUltraSrtNcstByText(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	@GET("getUltraSrtFcst")
-	Call<VilageFcstResponse> getUltraSrtFcstByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<String> getUltraSrtFcstByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	@GET("getVilageFcst")
-	Call<VilageFcstResponse> getVilageFcstByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<String> getVilageFcstByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	@GET("getMidLandFcst")
-	Call<MidLandFcstResponse> getMidLandFcstByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<String> getMidLandFcstByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	@GET("getMidTa")
-	Call<MidTaResponse> getMidTaByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<String> getMidTaByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	//accu weather
 	/* http://dataservice.accuweather.com/locations/v1/cities/geoposition/

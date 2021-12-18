@@ -155,7 +155,7 @@ public class FirstSimpleWidgetProvider extends AbstractAppWidgetProvider {
 		ZoneOffset zoneOffset = null;
 		FirstSimpleWidgetCreator widgetCreator = new FirstSimpleWidgetCreator(context, null, appWidgetId);
 		widgetCreator.setWidgetDto(widgetDto);
-		widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getLocalDateTime().toString());
+		widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getRequestDateTime().toString());
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleJsonDownloader,
 				requestWeatherSourceType);
@@ -185,6 +185,8 @@ public class FirstSimpleWidgetProvider extends AbstractAppWidgetProvider {
 							widgetDto.setBitmap(bitmap);
 						}
 					});
+			widgetCreator.makeResponseTextToJson(multipleJsonDownloader, requestWeatherDataTypeSet, requestWeatherSourceType, widgetDto, zoneOffset);
+
 		}
 
 		widgetDto.setLoadSuccessful(successful);

@@ -494,10 +494,10 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			if (midLandFcstResponse.isSuccessful() && midTaFcstResponse.isSuccessful() &&
 					vilageFcstResponse.isSuccessful() && ultraSrtFcstResponse.isSuccessful()) {
 				MidLandFcstResponse midLandFcstRoot =
-						(MidLandFcstResponse) midLandFcstResponse.getResponse().body();
-				MidTaResponse midTaRoot = (MidTaResponse) midTaFcstResponse.getResponse().body();
-				VilageFcstResponse vilageFcstRoot = (VilageFcstResponse) vilageFcstResponse.getResponse().body();
-				VilageFcstResponse ultraSrtFcstRoot = (VilageFcstResponse) ultraSrtFcstResponse.getResponse().body();
+						(MidLandFcstResponse) midLandFcstResponse.getResponseObj();
+				MidTaResponse midTaRoot = (MidTaResponse) midTaFcstResponse.getResponseObj();
+				VilageFcstResponse vilageFcstRoot = (VilageFcstResponse) vilageFcstResponse.getResponseObj();
+				VilageFcstResponse ultraSrtFcstRoot = (VilageFcstResponse) ultraSrtFcstResponse.getResponseObj();
 
 				List<FinalHourlyForecast> finalHourlyForecasts = KmaResponseProcessor.getFinalHourlyForecastList(ultraSrtFcstRoot,
 						vilageFcstRoot);
@@ -524,8 +524,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 					RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY);
 
 			if (accuDailyForecastResponse.isSuccessful()) {
-				dailyForecastResponse.accuDailyForecastsResponse = AccuWeatherResponseProcessor.getDailyForecastObjFromJson(
-						arrayMap.get(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY).getResponse().body().toString());
+				dailyForecastResponse.accuDailyForecastsResponse =
+						(FiveDaysOfDailyForecastsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY).getResponseObj();
 			} else {
 				dailyForecastResponse.accuThrowable = accuDailyForecastResponse.getT();
 			}
@@ -536,8 +536,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			MultipleJsonDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
 			if (responseResult.isSuccessful()) {
-				dailyForecastResponse.owmOneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
-						responseResult.getResponse().body().toString());
+				dailyForecastResponse.owmOneCallResponse =
+						(OneCallResponse) responseResult.getResponseObj();
 			} else {
 				dailyForecastResponse.owmThrowable = responseResult.getT();
 			}

@@ -362,7 +362,8 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeedForAccu(item.getWind().getSpeed().getMetric().getValue(), windUnit) + ValueUnits.convertToStr(context, windUnit));
 		currentConditionsDto.setWindGust(ValueUnits.convertWindSpeedForAccu(item.getWindGust().getSpeed().getMetric().getValue(),
 				windUnit) + ValueUnits.convertToStr(context, windUnit));
-		currentConditionsDto.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()));
+		currentConditionsDto.setSimpleWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()));
+		currentConditionsDto.setWindStrength(WeatherResponseProcessor.getWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()));
 		currentConditionsDto.setPressure(item.getPressure().getMetric().getValue() + "hpa");
 		currentConditionsDto.setUvIndex(item.getuVIndex());
 		currentConditionsDto.setVisibility(ValueUnits.convertVisibilityForAccu(item.getVisibility().getMetric().getValue(),

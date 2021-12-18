@@ -192,7 +192,7 @@ public class WeatherForAlarmFragment extends Fragment {
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 
 		if (aqicnResponse.isSuccessful()) {
-			GeolocalizedFeedResponse airQualityResponse = AqicnResponseProcessor.getAirQualityObjFromJson((Response<JsonElement>) aqicnResponse.getResponse());
+			GeolocalizedFeedResponse airQualityResponse = (GeolocalizedFeedResponse) aqicnResponse.getResponseObj();
 
 			if (airQualityResponse != null) {
 				if (airQualityResponse.getStatus().equals("ok")) {
@@ -241,10 +241,10 @@ public class WeatherForAlarmFragment extends Fragment {
 				MultipleJsonDownloader.ResponseResult vilageFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST);
 
 				FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(
-						(VilageFcstResponse) ultraSrtNcstResponseResult.getResponse().body());
+						(VilageFcstResponse) ultraSrtNcstResponseResult.getResponseObj());
 				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
-						(VilageFcstResponse) ultraSrtFcstResponseResult.getResponse().body(),
-						(VilageFcstResponse) vilageFcstResponseResult.getResponse().body());
+						(VilageFcstResponse) ultraSrtFcstResponseResult.getResponseObj(),
+						(VilageFcstResponse) vilageFcstResponseResult.getResponseObj());
 
 				zoneId = KmaResponseProcessor.getZoneId();
 
@@ -269,8 +269,8 @@ public class WeatherForAlarmFragment extends Fragment {
 				MultipleJsonDownloader.ResponseResult currentConditionsResponseResult =
 						arrayMap.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS);
 
-				CurrentConditionsResponse currentConditionsResponse = AccuWeatherResponseProcessor.getCurrentConditionsObjFromJson(
-						(JsonElement) currentConditionsResponseResult.getResponse().body());
+				CurrentConditionsResponse currentConditionsResponse =
+						(CurrentConditionsResponse) currentConditionsResponseResult.getResponseObj();
 
 				zoneId = ZonedDateTime.parse(currentConditionsResponse.getItems().get(0).getLocalObservationDateTime()).getZone();
 
@@ -292,8 +292,8 @@ public class WeatherForAlarmFragment extends Fragment {
 				break;
 			case OPEN_WEATHER_MAP:
 				MultipleJsonDownloader.ResponseResult owmResponseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
-				OneCallResponse oneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
-						owmResponseResult.getResponse().body().toString());
+				OneCallResponse oneCallResponse =
+						(OneCallResponse) owmResponseResult.getResponseObj();
 				zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
 
 				OneCallResponse.Current current = oneCallResponse.getCurrent();
@@ -353,8 +353,8 @@ public class WeatherForAlarmFragment extends Fragment {
 				MultipleJsonDownloader.ResponseResult vilageFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST);
 
 				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
-						(VilageFcstResponse) ultraSrtFcstResponseResult.getResponse().body(),
-						(VilageFcstResponse) vilageFcstResponseResult.getResponse().body());
+						(VilageFcstResponse) ultraSrtFcstResponseResult.getResponseObj(),
+						(VilageFcstResponse) vilageFcstResponseResult.getResponseObj());
 
 				KmaSimpleHourlyForecastFragment kmaSimpleHourlyForecastFragment = new KmaSimpleHourlyForecastFragment();
 				kmaSimpleHourlyForecastFragment.setFinalHourlyForecastList(finalHourlyForecastList);
@@ -367,8 +367,8 @@ public class WeatherForAlarmFragment extends Fragment {
 				MultipleJsonDownloader.ResponseResult hourlyForecastResponseResult =
 						arrayMap.get(RetrofitClient.ServiceType.ACCU_12_HOURLY);
 
-				TwelveHoursOfHourlyForecastsResponse twelveHoursOfHourlyForecastsResponse = AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
-						(JsonElement) hourlyForecastResponseResult.getResponse().body());
+				TwelveHoursOfHourlyForecastsResponse twelveHoursOfHourlyForecastsResponse =
+						(TwelveHoursOfHourlyForecastsResponse) hourlyForecastResponseResult.getResponseObj();
 
 				AccuSimpleHourlyForecastFragment accuSimpleHourlyForecastFragment = new AccuSimpleHourlyForecastFragment();
 				accuSimpleHourlyForecastFragment.setTwelveHoursOfHourlyForecastsResponse(twelveHoursOfHourlyForecastsResponse);
@@ -380,8 +380,8 @@ public class WeatherForAlarmFragment extends Fragment {
 				break;
 			case OPEN_WEATHER_MAP:
 				MultipleJsonDownloader.ResponseResult owmResponseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
-				OneCallResponse oneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
-						owmResponseResult.getResponse().body().toString());
+				OneCallResponse oneCallResponse =
+						(OneCallResponse) owmResponseResult.getResponseObj();
 
 				OwmSimpleHourlyForecastFragment owmSimpleHourlyForecastFragment = new OwmSimpleHourlyForecastFragment();
 				owmSimpleHourlyForecastFragment.setOneCallResponse(oneCallResponse);

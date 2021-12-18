@@ -12,8 +12,10 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.CurrentWeatherParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.DailyForecastParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 
 import java.util.Set;
 
@@ -22,49 +24,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class OpenWeatherMapProcessing {
-	/**
-	 * current weather
-	 */
-	public static Call<JsonElement> getCurrentWeather(CurrentWeatherParameter currentWeatherParameter,
-	                                                  JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_CURRENT_WEATHER);
-
-		Call<JsonElement> call = querys.getCurrentWeather(currentWeatherParameter.getMap());
-		call.enqueue(new Callback<JsonElement>() {
-			@Override
-			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.onResponseResult(response);
-			}
-
-			@Override
-			public void onFailure(Call<JsonElement> call, Throwable t) {
-				callback.onResponseResult(t);
-			}
-		});
-		return call;
-	}
-
-	/**
-	 * daily forecast
-	 */
-	public static Call<JsonElement> getDailyForecast(DailyForecastParameter dailyForecastParameter,
-	                                                 JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
-
-		Call<JsonElement> call = querys.getDailyForecast(dailyForecastParameter.getMap());
-		call.enqueue(new Callback<JsonElement>() {
-			@Override
-			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.onResponseResult(response);
-			}
-
-			@Override
-			public void onFailure(Call<JsonElement> call, Throwable t) {
-				callback.onResponseResult(t);
-			}
-		});
-		return call;
-	}
 
 	/**
 	 * one call
@@ -77,7 +36,9 @@ public class OpenWeatherMapProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.onResponseResult(response);
+				OneCallResponse oneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
+						response.body().toString());
+				callback.onResponseResult(response, oneCallResponse, response.body().toString());
 				Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
 			}
 
@@ -102,10 +63,10 @@ public class OpenWeatherMapProcessing {
 
 			Call<JsonElement> oneCallCall = getOneCall(oneCallParameter, new JsonDownloader() {
 				@Override
-				public void onResponseResult(Response<?> response) {
+				public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 					Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
 					multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
-							RetrofitClient.ServiceType.OWM_ONE_CALL, response);
+							RetrofitClient.ServiceType.OWM_ONE_CALL, response, responseObj, responseText);
 				}
 
 				@Override
@@ -121,17 +82,16 @@ public class OpenWeatherMapProcessing {
 	}
 
 	public static void requestWeatherData(Context context, Double latitude, Double longitude,
-	                                      RequestOwm requestOwm,
-	                                      MultipleJsonDownloader multipleJsonDownloader) {
+	                                      RequestOwm requestOwm, MultipleJsonDownloader multipleJsonDownloader) {
 		OneCallParameter oneCallParameter = new OneCallParameter();
 		Set<OneCallParameter.OneCallApis> excludeOneCallApis = requestOwm.getExcludeApis();
 		oneCallParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString()).setOneCallApis(excludeOneCallApis);
 
 		Call<JsonElement> oneCallCall = getOneCall(oneCallParameter, new JsonDownloader() {
 			@Override
-			public void onResponseResult(Response<?> response) {
+			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 				multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
-						RetrofitClient.ServiceType.OWM_ONE_CALL, response);
+						RetrofitClient.ServiceType.OWM_ONE_CALL, response, responseObj, responseText);
 			}
 
 			@Override

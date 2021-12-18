@@ -3,20 +3,14 @@ package com.lifedawn.bestweather.weathers.dataprocessing.response;
 import android.content.Context;
 import android.content.res.TypedArray;
 
-import com.google.gson.Gson;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstItem;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
-import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaItem;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
-import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaRoot;
-import com.lifedawn.bestweather.retrofit.responses.kma.json.ultrasrtfcstresponse.UltraSrtFcstRoot;
-import com.lifedawn.bestweather.retrofit.responses.kma.json.ultrasrtncstresponse.UltraSrtNcstRoot;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstItem;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
-import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstresponse.VilageFcstRoot;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
@@ -27,6 +21,7 @@ import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
+import com.tickaroo.tikxml.TikXml;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -41,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import okio.Buffer;
 import retrofit2.Response;
 
 public class KmaResponseProcessor extends WeatherResponseProcessor {
@@ -476,67 +472,89 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		return finalDailyForecasts;
 	}
 
-	public static boolean successfulVilageResponse(Response<VilageFcstResponse> response) {
+	public static VilageFcstResponse successfulVilageResponse(Response<String> response) {
 		if (response == null) {
-			return false;
+			return null;
 		}
 
 		if (response.body() == null) {
-			return false;
+			return null;
 		} else {
-			if (response.body().getKmaHeader() == null) {
-				return false;
-			}
-			final String successfulCode = "00";
+			try {
+				TikXml tikXml = new TikXml.Builder().exceptionOnUnreadXml(false).build();
+				VilageFcstResponse vilageFcstResponse = tikXml.read(new Buffer().writeUtf8(response.body()), VilageFcstResponse.class);
+				if (vilageFcstResponse.getKmaHeader() == null) {
+					return null;
+				}
 
-			if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
-				return true;
-			} else {
-				return false;
+				if (vilageFcstResponse.getKmaHeader().getResultCode().equals("00")) {
+					return vilageFcstResponse;
+				} else {
+					return null;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
 			}
+
+
 		}
 
 	}
 
-	public static boolean successfulMidLandFcstResponse(Response<MidLandFcstResponse> response) {
+	public static MidLandFcstResponse successfulMidLandFcstResponse(Response<String> response) {
 		if (response == null) {
-			return false;
+			return null;
 		}
 		if (response.body() == null) {
-			return false;
+			return null;
 		} else {
-			if (response.body().getKmaHeader() == null) {
-				return false;
+			try {
+				TikXml tikXml = new TikXml.Builder().exceptionOnUnreadXml(false).build();
+				MidLandFcstResponse midLandFcstResponse = tikXml.read(new Buffer().writeUtf8(response.body()), MidLandFcstResponse.class);
+				if (midLandFcstResponse.getKmaHeader() == null) {
+					return null;
+				}
+
+				if (midLandFcstResponse.getKmaHeader().getResultCode().equals("00")) {
+					return midLandFcstResponse;
+				} else {
+					return null;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
 			}
 
-			final String successfulCode = "00";
 
-			if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
-				return true;
-			} else {
-				return false;
-			}
 		}
 
 	}
 
-	public static boolean successfulMidTaFcstResponse(Response<MidTaResponse> response) {
+	public static MidTaResponse successfulMidTaFcstResponse(Response<String> response) {
 		if (response == null) {
-			return false;
+			return null;
 		}
 		if (response.body() == null) {
-			return false;
+			return null;
 		} else {
-			if (response.body().getKmaHeader() == null) {
-				return false;
-			}
-			final String successfulCode = "00";
+			try {
+				TikXml tikXml = new TikXml.Builder().exceptionOnUnreadXml(false).build();
+				MidTaResponse midTaResponse = tikXml.read(new Buffer().writeUtf8(response.body()), MidTaResponse.class);
+				if (midTaResponse.getKmaHeader() == null) {
+					return null;
+				}
 
-			if (response.body().getKmaHeader().getResultCode().equals(successfulCode)) {
-				return true;
-			} else {
-				return false;
+				if (midTaResponse.getKmaHeader().getResultCode().equals("00")) {
+					return midTaResponse;
+				} else {
+					return null;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
 			}
+
 		}
 
 	}
@@ -701,7 +719,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(item.getWindSpeed(), windUnit) + ValueUnits.convertToStr(context,
 				windUnit));
 
-		currentConditionsDto.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWindSpeed()));
+		currentConditionsDto.setSimpleWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWindSpeed()));
+		currentConditionsDto.setWindStrength(WeatherResponseProcessor.getWindSpeedDescription(item.getWindSpeed()));
 		currentConditionsDto.setPrecipitationType(item.getPrecipitationType());
 
 		if (!item.getPrecipitation1Hour().equals("0")) {
@@ -709,26 +728,6 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		}
 
 		return currentConditionsDto;
-	}
-
-	public static UltraSrtNcstRoot getUltraSrtNcstObjFromJson(String response) {
-		return new Gson().fromJson(response, UltraSrtNcstRoot.class);
-	}
-
-	public static UltraSrtFcstRoot getUltraSrtFcstObjFromJson(String response) {
-		return new Gson().fromJson(response, UltraSrtFcstRoot.class);
-	}
-
-	public static VilageFcstRoot getVilageFcstObjFromJson(String response) {
-		return new Gson().fromJson(response, VilageFcstRoot.class);
-	}
-
-	public static MidLandFcstRoot getMidLandObjFromJson(String response) {
-		return new Gson().fromJson(response, MidLandFcstRoot.class);
-	}
-
-	public static MidTaRoot getMidTaObjFromJson(String response) {
-		return new Gson().fromJson(response, MidTaRoot.class);
 	}
 
 	public static ZoneId getZoneId() {

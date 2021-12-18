@@ -466,9 +466,9 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			if (ultraSrtFcstResponse.isSuccessful() && vilageFcstResponse.isSuccessful()) {
 
 				VilageFcstResponse ultraSrtFcstRoot =
-						(VilageFcstResponse) ultraSrtFcstResponse.getResponse().body();
+						(VilageFcstResponse) ultraSrtFcstResponse.getResponseObj();
 				VilageFcstResponse vilageFcstRoot =
-						(VilageFcstResponse) vilageFcstResponse.getResponse().body();
+						(VilageFcstResponse) vilageFcstResponse.getResponseObj();
 
 				hourlyForecastResponse.kmaSuccessful = true;
 				hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(ultraSrtFcstRoot,
@@ -490,8 +490,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			if (accuHourlyForecastResponse.isSuccessful()) {
 				hourlyForecastResponse.accuSuccessful = true;
-				hourlyForecastResponse.accuHourlyForecastsResponse = AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
-						(JsonElement) accuHourlyForecastResponse.getResponse().body());
+				hourlyForecastResponse.accuHourlyForecastsResponse =
+						(TwelveHoursOfHourlyForecastsResponse) accuHourlyForecastResponse.getResponseObj();
 			} else {
 				hourlyForecastResponse.accuThrowable = accuHourlyForecastResponse.getT();
 			}
@@ -503,8 +503,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.owmSuccessful = true;
-				hourlyForecastResponse.owmOneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
-						responseResult.getResponse().body().toString());
+				hourlyForecastResponse.owmOneCallResponse =
+						(OneCallResponse) responseResult.getResponseObj();
 			} else {
 				hourlyForecastResponse.owmThrowable = responseResult.getT();
 			}

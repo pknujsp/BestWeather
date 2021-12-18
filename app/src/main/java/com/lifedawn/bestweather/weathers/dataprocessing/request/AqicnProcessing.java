@@ -7,8 +7,10 @@ import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.aqicn.AqicnParameter;
+import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,7 +25,9 @@ public class AqicnProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.onResponseResult(response);
+				GeolocalizedFeedResponse airQualityResponse =
+						AqicnResponseProcessor.getAirQualityObjFromJson(response.body().toString());
+				callback.onResponseResult(response, airQualityResponse, response.body().toString());
 				Log.e(RetrofitClient.LOG_TAG, "aqicn geolocalizedfeed 성공");
 			}
 
@@ -42,9 +46,9 @@ public class AqicnProcessing {
 
 		Call<JsonElement> localizedFeedCall = getLocalizedFeed(aqicnParameter, new JsonDownloader() {
 			@Override
-			public void onResponseResult(Response<?> response) {
+			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 				multipleJsonDownloader.processResult(WeatherSourceType.AQICN, aqicnParameter,
-						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, response);
+						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, response, responseObj, responseText);
 			}
 
 			@Override

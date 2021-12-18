@@ -60,7 +60,7 @@ public class RetrofitClient {
 			case MID_TA_FCST:
 				Retrofit midFcstInstance = new Retrofit.Builder().client(client)
 						.baseUrl(MID_FCST_INFO_SERVICE_URL)
-						.addConverterFactory(TikXmlConverterFactory.create(new TikXml.Builder().exceptionOnUnreadXml(false).build()))
+						.addConverterFactory(ScalarsConverterFactory.create())
 						.build();
 				return midFcstInstance.create(Querys.class);
 
@@ -68,7 +68,7 @@ public class RetrofitClient {
 			case ULTRA_SRT_FCST:
 			case VILAGE_FCST:
 				Retrofit vilageFcstInstance = new Retrofit.Builder().client(client).baseUrl(VILAGE_FCST_INFO_SERVICE_URL)
-						.addConverterFactory(TikXmlConverterFactory.create(new TikXml.Builder().exceptionOnUnreadXml(false).build()))
+						.addConverterFactory(ScalarsConverterFactory.create())
 						.build();
 				return vilageFcstInstance.create(Querys.class);
 

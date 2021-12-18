@@ -44,8 +44,7 @@
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
 
-<!--    <color name="widgetBackgroundColor">#B4EFE9E9</color> -->
-    <color name="widgetBackgroundColor">#A98907B1</color>
+   <color name="widgetBackgroundColor">#B4E1DADA</color>
     <color name="textColorInNotification">#151515</color>
 
     <color name="defaultTextColorInDrawableWithText">#FFFFFF</color>

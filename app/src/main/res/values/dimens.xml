@@ -142,7 +142,7 @@
     <dimen name="airQualityTextSizeInCurrentConditionsViewForSimpleWidget">12sp</dimen>
     <dimen name="popTextSizeInSimpleWidgetForecastItem">10sp</dimen>
     <dimen name="currentWidgetWidth">250dp</dimen>
-    <dimen name="currentWidgetHeight">40dp</dimen>
+    <dimen name="currentWidgetHeight">80dp</dimen>
     <dimen name="fullWidgetWidth">250dp</dimen>
     <dimen name="fullWidgetHeight">180dp</dimen>
     <dimen name="windTextSizeInCurrentWidget">14sp</dimen>

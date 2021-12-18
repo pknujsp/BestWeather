@@ -24,7 +24,7 @@ public class MetNorwayProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				callback.onResponseResult(response);
+				callback.onResponseResult(response, null, null);
 			}
 
 			@Override
@@ -40,9 +40,9 @@ public class MetNorwayProcessing {
 		locationForecastParameter.setLatitude(latitude).setLongitude(longitude);
 		Call<JsonElement> locationForecastCall = getLocationForecast(locationForecastParameter, new JsonDownloader() {
 			@Override
-			public void onResponseResult(Response<?> response) {
+			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 				multipleJsonDownloader.processResult(WeatherSourceType.MET_NORWAY, locationForecastParameter,
-						RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST, response);
+						RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST, response, null, response.body().toString());
 			}
 
 			@Override

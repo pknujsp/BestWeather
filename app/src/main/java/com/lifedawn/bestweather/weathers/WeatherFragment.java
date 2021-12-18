@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -56,7 +55,6 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeat
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
@@ -71,6 +69,8 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.flickr.FlickrGetPhotosFromGalleryParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
@@ -109,7 +109,6 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -363,7 +362,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void run() {
 				ZonedDateTime lastRefreshDateTime =
-						ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleJsonDownloader.getLocalDateTime().toString());
+						ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleJsonDownloader.getRequestDateTime().toString());
 				lastRefreshDateTime = lastRefreshDateTime.withZoneSameInstant(zoneId);
 
 				Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
@@ -997,8 +996,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 
 		GeolocalizedFeedResponse airQualityResponse = null;
-		if (aqicnResponse.getResponse() != null) {
-			airQualityResponse = AqicnResponseProcessor.getAirQualityObjFromJson((Response<JsonElement>) aqicnResponse.getResponse());
+		if (aqicnResponse.isSuccessful()) {
+			airQualityResponse = (GeolocalizedFeedResponse) aqicnResponse.getResponseObj();
 		}
 
 		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult> arrayMap = responseMap.get(
@@ -1015,13 +1014,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		switch (requestWeatherSourceType) {
 			case KMA:
 				FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(
-						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponse().body());
+						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponseObj());
 				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
-						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponse().body(),
-						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST).getResponse().body());
+						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponseObj(),
+						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST).getResponseObj());
 				List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastList(
-						(MidLandFcstResponse) arrayMap.get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponse().body(),
-						(MidTaResponse) arrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST).getResponse().body(),
+						(MidLandFcstResponse) arrayMap.get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponseObj(),
+						(MidTaResponse) arrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST).getResponseObj(),
 						Long.parseLong(multipleJsonDownloader.get("tmFc")));
 				finalDailyForecastList = KmaResponseProcessor.getDailyForecastList(finalDailyForecastList, finalHourlyForecastList);
 
@@ -1053,17 +1052,15 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				AccuSimpleDailyForecastFragment accuSimpleDailyForecastFragment = new AccuSimpleDailyForecastFragment();
 				AccuDetailCurrentConditionsFragment accuDetailCurrentConditionsFragment = new AccuDetailCurrentConditionsFragment();
 
-				CurrentConditionsResponse currentConditionsResponse = AccuWeatherResponseProcessor.getCurrentConditionsObjFromJson(
-						(JsonElement) arrayMap.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponse().body());
+				CurrentConditionsResponse currentConditionsResponse =
+						(CurrentConditionsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponseObj();
 
 				accuSimpleCurrentConditionsFragment.setCurrentConditionsResponse(currentConditionsResponse).setAirQualityResponse(
 						airQualityResponse);
 				accuSimpleHourlyForecastFragment.setTwelveHoursOfHourlyForecastsResponse(
-						AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
-								(JsonElement) arrayMap.get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponse().body()));
+						(TwelveHoursOfHourlyForecastsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponseObj());
 				accuSimpleDailyForecastFragment.setFiveDaysOfDailyForecastsResponse(
-						AccuWeatherResponseProcessor.getDailyForecastObjFromJson(
-								arrayMap.get(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY).getResponse().body().toString()));
+						(FiveDaysOfDailyForecastsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY).getResponseObj());
 				accuDetailCurrentConditionsFragment.setCurrentConditionsResponse(currentConditionsResponse);
 
 				simpleCurrentConditionsFragment = accuSimpleCurrentConditionsFragment;
@@ -1080,8 +1077,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				OwmSimpleDailyForecastFragment owmSimpleDailyForecastFragment = new OwmSimpleDailyForecastFragment();
 				OwmDetailCurrentConditionsFragment owmDetailCurrentConditionsFragment = new OwmDetailCurrentConditionsFragment();
 
-				OneCallResponse oneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
-						arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponse().body().toString());
+				OneCallResponse oneCallResponse =
+						(OneCallResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponseObj();
 
 				owmSimpleCurrentConditionsFragment.setOneCallResponse(oneCallResponse).setAirQualityResponse(airQualityResponse);
 				owmSimpleHourlyForecastFragment.setOneCallResponse(oneCallResponse);
@@ -1134,7 +1131,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				@Override
 				public void run() {
 					createWeatherDataSourcePicker(countryCode);
-					ZonedDateTime dateTime = multipleJsonDownloader.getLocalDateTime();
+					ZonedDateTime dateTime = multipleJsonDownloader.getRequestDateTime();
 					DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
 							clockUnit == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
 									getString(R.string.datetime_pattern_clock24), Locale.getDefault());

@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.weathers.dataprocessing.request;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.Querys;
@@ -24,14 +23,11 @@ import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,8 +40,8 @@ public final class KmaProcessing {
 	/**
 	 * 초단기 실황
 	 */
-	public static Call<VilageFcstResponse> getUltraSrtNcstData(UltraSrtNcstParameter parameter, ZonedDateTime dateTime,
-	                                                           JsonDownloader callback) {
+	public static Call<String> getUltraSrtNcstData(UltraSrtNcstParameter parameter, ZonedDateTime dateTime,
+	                                               JsonDownloader callback) {
 		//basetime설정
 		if (dateTime.getMinute() < 40) {
 			dateTime = dateTime.minusHours(1);
@@ -58,24 +54,22 @@ public final class KmaProcessing {
 		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "00");
 
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
-		Call<VilageFcstResponse> call = querys.getUltraSrtNcstByXml(parameter.getMap());
-		call.enqueue(new Callback<VilageFcstResponse>() {
+		Call<String> call = querys.getUltraSrtNcstByXml(parameter.getMap());
+		call.enqueue(new Callback<String>() {
 			@Override
-			public void onResponse(Call<VilageFcstResponse> call, Response<VilageFcstResponse> response) {
-				if (KmaResponseProcessor.successfulVilageResponse(response)) {
-					callback.onResponseResult(response);
+			public void onResponse(Call<String> call, Response<String> response) {
+				VilageFcstResponse vilageFcstResponse = KmaResponseProcessor.successfulVilageResponse(response);
+				if (vilageFcstResponse != null) {
+					callback.onResponseResult(response, vilageFcstResponse, response.body());
 					Log.e(RetrofitClient.LOG_TAG, "kma ultra srt ncst 성공");
-
 				} else {
 					callback.onResponseResult(new Exception());
 					Log.e(RetrofitClient.LOG_TAG, "kma ultra srt ncst 실패");
-
 				}
-
 			}
 
 			@Override
-			public void onFailure(Call<VilageFcstResponse> call, Throwable t) {
+			public void onFailure(Call<String> call, Throwable t) {
 				callback.onResponseResult(t);
 				Log.e(RetrofitClient.LOG_TAG, "kma ultra srt ncst 실패");
 			}
@@ -87,8 +81,8 @@ public final class KmaProcessing {
 	/**
 	 * 초단기예보
 	 */
-	public static Call<VilageFcstResponse> getUltraSrtFcstData(UltraSrtFcstParameter parameter, ZonedDateTime dateTime,
-	                                                           JsonDownloader callback) {
+	public static Call<String> getUltraSrtFcstData(UltraSrtFcstParameter parameter, ZonedDateTime dateTime,
+	                                               JsonDownloader callback) {
 		//basetime설정
 		if (dateTime.getMinute() < 45) {
 			dateTime = dateTime.minusHours(1);
@@ -100,12 +94,13 @@ public final class KmaProcessing {
 		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "30");
 
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
-		Call<VilageFcstResponse> xmlCall = Objects.requireNonNull(querys).getUltraSrtFcstByXml(parameter.getMap());
-		xmlCall.enqueue(new Callback<VilageFcstResponse>() {
+		Call<String> xmlCall = Objects.requireNonNull(querys).getUltraSrtFcstByXml(parameter.getMap());
+		xmlCall.enqueue(new Callback<String>() {
 			@Override
-			public void onResponse(Call<VilageFcstResponse> call, Response<VilageFcstResponse> response) {
-				if (KmaResponseProcessor.successfulVilageResponse(response)) {
-					callback.onResponseResult(response);
+			public void onResponse(Call<String> call, Response<String> response) {
+				VilageFcstResponse vilageFcstResponse = KmaResponseProcessor.successfulVilageResponse(response);
+				if (vilageFcstResponse != null) {
+					callback.onResponseResult(response, vilageFcstResponse, response.body());
 					Log.e(RetrofitClient.LOG_TAG, "kma ultra srt fcst 성공");
 
 				} else {
@@ -116,7 +111,7 @@ public final class KmaProcessing {
 			}
 
 			@Override
-			public void onFailure(Call<VilageFcstResponse> call, Throwable t) {
+			public void onFailure(Call<String> call, Throwable t) {
 				callback.onResponseResult(t);
 				Log.e(RetrofitClient.LOG_TAG, "kma ultra srt fcst 실패");
 			}
@@ -131,8 +126,8 @@ public final class KmaProcessing {
 	 * - Base_time : 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300 (1일 8회)
 	 * - API 제공 시간(~이후) : 02:10, 05:10, 08:10, 11:10, 14:10, 17:10, 20:10, 23:10
 	 */
-	public static Call<VilageFcstResponse> getVilageFcstData(VilageFcstParameter parameter, ZonedDateTime dateTime,
-	                                                         JsonDownloader callback) {
+	public static Call<String> getVilageFcstData(VilageFcstParameter parameter, ZonedDateTime dateTime,
+	                                             JsonDownloader callback) {
 		//basetime설정
 		final int currentHour = dateTime.getHour();
 		final int currentMinute = dateTime.getMinute();
@@ -159,23 +154,22 @@ public final class KmaProcessing {
 		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "00");
 
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.VILAGE_FCST);
-		Call<VilageFcstResponse> call = Objects.requireNonNull(querys).getVilageFcstByXml(parameter.getMap());
-		call.enqueue(new Callback<VilageFcstResponse>() {
+		Call<String> call = Objects.requireNonNull(querys).getVilageFcstByXml(parameter.getMap());
+		call.enqueue(new Callback<String>() {
 			@Override
-			public void onResponse(Call<VilageFcstResponse> call, Response<VilageFcstResponse> response) {
-				if (KmaResponseProcessor.successfulVilageResponse(response)) {
-					callback.onResponseResult(response);
+			public void onResponse(Call<String> call, Response<String> response) {
+				VilageFcstResponse vilageFcstResponse = KmaResponseProcessor.successfulVilageResponse(response);
+				if (vilageFcstResponse != null) {
+					callback.onResponseResult(response, vilageFcstResponse, response.body());
 					Log.e(RetrofitClient.LOG_TAG, "kma vilage fcst 성공");
-
 				} else {
 					callback.onResponseResult(new Exception());
 					Log.e(RetrofitClient.LOG_TAG, "kma vilage fcst 실패");
-
 				}
 			}
 
 			@Override
-			public void onFailure(Call<VilageFcstResponse> call, Throwable t) {
+			public void onFailure(Call<String> call, Throwable t) {
 				callback.onResponseResult(t);
 				Log.e(RetrofitClient.LOG_TAG, "kma vilage fcst 실패");
 			}
@@ -189,14 +183,15 @@ public final class KmaProcessing {
 	 *
 	 * @param parameter
 	 */
-	public static Call<MidLandFcstResponse> getMidLandFcstData(MidLandParameter parameter, JsonDownloader callback) {
+	public static Call<String> getMidLandFcstData(MidLandParameter parameter, JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.MID_LAND_FCST);
-		Call<MidLandFcstResponse> call = Objects.requireNonNull(querys).getMidLandFcstByXml(parameter.getMap());
-		call.enqueue(new Callback<MidLandFcstResponse>() {
+		Call<String> call = Objects.requireNonNull(querys).getMidLandFcstByXml(parameter.getMap());
+		call.enqueue(new Callback<String>() {
 			@Override
-			public void onResponse(Call<MidLandFcstResponse> call, Response<MidLandFcstResponse> response) {
-				if (KmaResponseProcessor.successfulMidLandFcstResponse(response)) {
-					callback.onResponseResult(response);
+			public void onResponse(Call<String> call, Response<String> response) {
+				MidLandFcstResponse midLandFcstResponse = KmaResponseProcessor.successfulMidLandFcstResponse(response);
+				if (midLandFcstResponse != null) {
+					callback.onResponseResult(response, midLandFcstResponse, response.body());
 					Log.e(RetrofitClient.LOG_TAG, "kma mid land 성공");
 
 				} else {
@@ -207,7 +202,7 @@ public final class KmaProcessing {
 			}
 
 			@Override
-			public void onFailure(Call<MidLandFcstResponse> call, Throwable t) {
+			public void onFailure(Call<String> call, Throwable t) {
 				callback.onResponseResult(t);
 				Log.e(RetrofitClient.LOG_TAG, "kma mid land 실패");
 			}
@@ -220,14 +215,15 @@ public final class KmaProcessing {
 	 *
 	 * @param parameter
 	 */
-	public static Call<MidTaResponse> getMidTaData(MidTaParameter parameter, JsonDownloader callback) {
+	public static Call<String> getMidTaData(MidTaParameter parameter, JsonDownloader callback) {
 		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.MID_TA_FCST);
-		Call<MidTaResponse> call = Objects.requireNonNull(querys).getMidTaByXml(parameter.getMap());
-		call.enqueue(new Callback<MidTaResponse>() {
+		Call<String> call = Objects.requireNonNull(querys).getMidTaByXml(parameter.getMap());
+		call.enqueue(new Callback<String>() {
 			@Override
-			public void onResponse(Call<MidTaResponse> call, Response<MidTaResponse> response) {
-				if (KmaResponseProcessor.successfulMidTaFcstResponse(response)) {
-					callback.onResponseResult(response);
+			public void onResponse(Call<String> call, Response<String> response) {
+				MidTaResponse midTaResponse = KmaResponseProcessor.successfulMidTaFcstResponse(response);
+				if (midTaResponse != null) {
+					callback.onResponseResult(response, midTaResponse, response.body());
 					Log.e(RetrofitClient.LOG_TAG, "kma mid ta 성공");
 				} else {
 					callback.onResponseResult(new Exception());
@@ -236,7 +232,7 @@ public final class KmaProcessing {
 			}
 
 			@Override
-			public void onFailure(Call<MidTaResponse> call, Throwable t) {
+			public void onFailure(Call<String> call, Throwable t) {
 				callback.onResponseResult(t);
 				Log.e(RetrofitClient.LOG_TAG, "kma mid ta 실패");
 			}
@@ -298,13 +294,13 @@ public final class KmaProcessing {
 							ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY())
 									.setLatitude(latitude).setLongitude(longitude);
 
-							Call<VilageFcstResponse> ultraSrtNcstCall = getUltraSrtNcstData(ultraSrtNcstParameter,
+							Call<String> ultraSrtNcstCall = getUltraSrtNcstData(ultraSrtNcstParameter,
 									ZonedDateTime.of(koreaLocalDateTime.toLocalDateTime(), koreaLocalDateTime.getZone()),
 									new JsonDownloader() {
 										@Override
-										public void onResponseResult(Response<?> response) {
+										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 											multipleJsonDownloader.processResult(WeatherSourceType.KMA, ultraSrtNcstParameter,
-													RetrofitClient.ServiceType.ULTRA_SRT_NCST, response);
+													RetrofitClient.ServiceType.ULTRA_SRT_NCST, response, responseObj, responseText);
 										}
 
 										@Override
@@ -321,13 +317,13 @@ public final class KmaProcessing {
 							ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY()).setLatitude(latitude).setLongitude(longitude);
 
 
-							Call<VilageFcstResponse> ultraSrtFcstCall = getUltraSrtFcstData(ultraSrtFcstParameter,
+							Call<String> ultraSrtFcstCall = getUltraSrtFcstData(ultraSrtFcstParameter,
 									ZonedDateTime.of(koreaLocalDateTime.toLocalDateTime(), koreaLocalDateTime.getZone()),
 									new JsonDownloader() {
 										@Override
-										public void onResponseResult(Response<?> response) {
+										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 											multipleJsonDownloader.processResult(WeatherSourceType.KMA, ultraSrtFcstParameter,
-													RetrofitClient.ServiceType.ULTRA_SRT_FCST, response);
+													RetrofitClient.ServiceType.ULTRA_SRT_FCST, response, responseObj, responseText);
 										}
 
 										@Override
@@ -344,13 +340,13 @@ public final class KmaProcessing {
 							vilageFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY())
 									.setLatitude(latitude).setLongitude(longitude);
 
-							Call<VilageFcstResponse> vilageFcstCall = getVilageFcstData(vilageFcstParameter,
+							Call<String> vilageFcstCall = getVilageFcstData(vilageFcstParameter,
 									ZonedDateTime.of(koreaLocalDateTime.toLocalDateTime(), koreaLocalDateTime.getZone()),
 									new JsonDownloader() {
 										@Override
-										public void onResponseResult(Response<?> response) {
+										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 											multipleJsonDownloader.processResult(WeatherSourceType.KMA, vilageFcstParameter,
-													RetrofitClient.ServiceType.VILAGE_FCST, response);
+													RetrofitClient.ServiceType.VILAGE_FCST, response, responseObj, responseText);
 										}
 
 										@Override
@@ -366,11 +362,11 @@ public final class KmaProcessing {
 							midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode()).setTmFc(tmFc)
 									.setLatitude(latitude).setLongitude(longitude);
 
-							Call<MidLandFcstResponse> midLandFcstCall = getMidLandFcstData(midLandParameter, new JsonDownloader() {
+							Call<String> midLandFcstCall = getMidLandFcstData(midLandParameter, new JsonDownloader() {
 								@Override
-								public void onResponseResult(Response<?> response) {
+								public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 									multipleJsonDownloader.processResult(WeatherSourceType.KMA, midLandParameter,
-											RetrofitClient.ServiceType.MID_LAND_FCST, response);
+											RetrofitClient.ServiceType.MID_LAND_FCST, response, responseObj, responseText);
 								}
 
 								@Override
@@ -388,11 +384,11 @@ public final class KmaProcessing {
 							midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode()).setTmFc(tmFc)
 									.setLatitude(latitude).setLongitude(longitude);
 
-							Call<MidTaResponse> midTaFcstCall = getMidTaData(midTaParameter, new JsonDownloader() {
+							Call<String> midTaFcstCall = getMidTaData(midTaParameter, new JsonDownloader() {
 								@Override
-								public void onResponseResult(Response<?> response) {
+								public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 									multipleJsonDownloader.processResult(WeatherSourceType.KMA, midTaParameter,
-											RetrofitClient.ServiceType.MID_TA_FCST, response);
+											RetrofitClient.ServiceType.MID_TA_FCST, response, responseObj, responseText);
 								}
 
 								@Override
