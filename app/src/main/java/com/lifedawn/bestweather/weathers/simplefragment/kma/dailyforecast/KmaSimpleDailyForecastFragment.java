@@ -142,7 +142,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 						dailyForecastDto.getAmValues().getPop() + "/" + dailyForecastDto.getPmValues().getPop());
 				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
 						dailyForecastDto.getAmValues().getWeatherIcon()),
-						ContextCompat.getDrawable(context, dailyForecastDto.getAmValues().getWeatherIcon()),
+						ContextCompat.getDrawable(context, dailyForecastDto.getPmValues().getWeatherIcon()),
 						dailyForecastDto.getAmValues().getWeatherDescription(),
 						dailyForecastDto.getPmValues().getWeatherDescription()));
 			}

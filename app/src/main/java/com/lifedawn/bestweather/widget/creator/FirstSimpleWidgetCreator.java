@@ -141,7 +141,7 @@ public class FirstSimpleWidgetCreator extends AbstractWidgetCreator {
 	public void setTempDataViews(RemoteViews remoteViews) {
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 		final String temp = "10°";
-		final String pop = "10%";
+		final String pop = "20%";
 		final int weatherIcon = R.drawable.day_clear;
 		ZonedDateTime now = ZonedDateTime.now();
 

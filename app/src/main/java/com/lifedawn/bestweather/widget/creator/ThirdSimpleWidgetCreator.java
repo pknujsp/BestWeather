@@ -113,6 +113,7 @@ public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 
 		final String temp = "20°";
+		final String pop = "10%";
 		final int weatherIcon = R.drawable.day_clear;
 
 		HourlyForecastDto current = new HourlyForecastDto();
@@ -124,7 +125,8 @@ public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
 
 		for (int i = 0; i < cellCount - 1; i++) {
 			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
-			hourlyForecastDto.setWeatherIcon(weatherIcon).setTemp(temp).setHours(now);
+			hourlyForecastDto.setWeatherIcon(weatherIcon).setTemp(temp).setHours(now)
+					.setPop(pop);
 			hourlyForecastDtoList.add(hourlyForecastDto);
 
 			now = now.plusHours(1);
@@ -240,7 +242,6 @@ public class ThirdSimpleWidgetCreator extends AbstractWidgetCreator {
 		RemoteViews remoteViews = createRemoteViews(false);
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
-		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
 		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.parseTextToCurrentConditionsDto(context, jsonObject,
 				weatherSourceType, widgetDto.getLatitude(), widgetDto.getLongitude());
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,

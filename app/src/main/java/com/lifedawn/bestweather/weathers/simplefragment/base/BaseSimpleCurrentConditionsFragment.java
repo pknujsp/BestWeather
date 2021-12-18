@@ -108,7 +108,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	}
 
 	public void setAqiValuesToViews() {
-		String airQuality = AqicnResponseProcessor.getAirQuality(getContext(), airQualityResponse);
+		String airQuality = AqicnResponseProcessor.getGradeDescription((int) Double.parseDouble(airQualityResponse.getData().getAqi()));
 		binding.airQuality.setText(airQuality);
 	}
 

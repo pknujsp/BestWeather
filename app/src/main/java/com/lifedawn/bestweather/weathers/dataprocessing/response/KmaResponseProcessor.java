@@ -340,13 +340,16 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	public static List<FinalDailyForecast> getFinalDailyForecastList(MidLandFcstResponse midLandFcstResponse, MidTaResponse midTaFcstResponse, Long tmFc) {
 		//중기예보 데이터 생성 3~10일후
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddhhmm");
+
+		//tmfc : 202112180600
+		final String tmFcStr = tmFc.toString();
+		int year = Integer.parseInt(tmFcStr.substring(0, 4));
+		int month = Integer.parseInt(tmFcStr.substring(4, 6));
+		int dayOfMonth = Integer.parseInt(tmFcStr.substring(6, 8));
+		int hour = Integer.parseInt(tmFcStr.substring(8, 10));
+		int minute = Integer.parseInt(tmFcStr.substring(10, 12));
 		ZonedDateTime now = ZonedDateTime.now(KmaResponseProcessor.getZoneId());
-
-		try {
-			now = ZonedDateTime.parse(tmFc.toString(), dateTimeFormatter);
-		} catch (Exception e) {
-
-		}
+		now = now.withYear(year).withMonth(month).withDayOfMonth(dayOfMonth).withHour(hour).withMinute(minute);
 
 		//3일 후로 이동
 		now = now.plusDays(3).withHour(0).withMinute(0).withSecond(0).withNano(0);
@@ -594,7 +597,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		for (FinalHourlyForecast finalHourlyForecast : hourlyForecastList) {
 			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
 
-			if (finalHourlyForecast.getRainPrecipitation1Hour().equals(lessThan1mm) ||
+			if (
 					finalHourlyForecast.getRainPrecipitation1Hour().equals(noRain)) {
 				hasRain = false;
 				rainVolume = zeroRainVolume;

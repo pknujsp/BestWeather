@@ -250,8 +250,6 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		String pop = null;
 		Context context = getContext();
 
-		final String tempUnitStr = "°";
-		final String percent = "%";
 		final String cm = "cm";
 		final String mm = "mm";
 
@@ -326,8 +324,6 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 						}
 					}
 					snowVolumeList.add(item.e.getSingleValues().getSnowVolume().replace(mm, ""));
-
-					probabilityOfPrecipitationList.add(item.e.getSingleValues().getPop());
 					rainVolumeList.add(item.e.getSingleValues().getRainVolume().replace(mm, ""));
 
 					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(getContext(), item.e.getSingleValues().getWeatherIcon()),

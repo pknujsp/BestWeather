@@ -144,13 +144,15 @@ public class SecSimpleWidgetCreator extends AbstractWidgetCreator {
 
 	public void setTempDataViews(RemoteViews remoteViews) {
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
-		final String pop = "10%";
+		final String pop = "20%";
+		final String minTemp = "8";
+		final String maxTemp = "17";
 		ZonedDateTime now = ZonedDateTime.now();
 
 		for (int i = 0; i < cellCount; i++) {
 			DailyForecastDto dailyForecastDto = new DailyForecastDto();
 			dailyForecastDto.setDate(now).setAmValues(new DailyForecastDto.Values()).setPmValues(new DailyForecastDto.Values())
-					.setMinTemp("20").setMaxTemp("22");
+					.setMinTemp(minTemp).setMaxTemp(maxTemp);
 			dailyForecastDto.getAmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop);
 			dailyForecastDto.getPmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop);
 
@@ -159,7 +161,7 @@ public class SecSimpleWidgetCreator extends AbstractWidgetCreator {
 		}
 
 		CurrentConditionsDto tempCurrentConditions = new CurrentConditionsDto();
-		tempCurrentConditions.setTemp("20°");
+		tempCurrentConditions.setTemp("15°");
 		tempCurrentConditions.setWeatherIcon(R.drawable.day_clear);
 
 		AirQualityDto tempAirQualityDto = new AirQualityDto();
