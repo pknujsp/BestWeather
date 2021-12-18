@@ -55,6 +55,16 @@
         </activity>
 
         <receiver
+            android:name=".widget.widgetprovider.AbstractAppWidgetProvider"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+        </receiver>
+
+        <receiver
             android:name=".widget.widgetprovider.CurrentWidgetProvider"
             android:enabled="true"
             android:label="@string/widgetCurrent">
@@ -107,7 +117,8 @@
                 android:resource="@xml/widget_simple2_info" />
         </receiver>
 
-        <receiver android:name=".widget.widgetprovider.ThirdSimpleWidgetProvider"
+        <receiver
+            android:name=".widget.widgetprovider.ThirdSimpleWidgetProvider"
             android:label="@string/widgetSimple3">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

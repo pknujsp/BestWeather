@@ -122,6 +122,8 @@ public abstract class AbstractNotiViewCreator {
 		}
 	}
 
+
+
 	public void loadWeatherData(Context context, RemoteViews remoteViews) {
 		RemoteViewProcessor.onBeginProcess(remoteViews);
 		makeNotification(remoteViews, R.drawable.temp_icon);

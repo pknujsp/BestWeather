@@ -24,12 +24,12 @@ import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
-import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
+import com.lifedawn.bestweather.widget.WidgetHelper;
 
 import java.util.List;
 import java.util.Set;
@@ -42,8 +42,18 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	protected AppWidgetManager appWidgetManager;
 	protected NetworkStatus networkStatus;
 
-
 	abstract Class<?> getThis();
+
+	@Override
+	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
+		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
+		if (widgetRepository == null) {
+			widgetRepository = new WidgetRepository(context);
+		}
+		if (appWidgetManager == null) {
+			appWidgetManager = AppWidgetManager.getInstance(context);
+		}
+	}
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -120,7 +130,6 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 				@Override
 				public void onResultSuccessful(WidgetDto result) {
 					loadWeatherData(context, remoteViews, appWidgetId, result);
-
 				}
 
 				@Override
@@ -136,6 +145,25 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 			loadCurrentLocation(context, remoteViews, appWidgetId);
+		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+			//위젯 자동 업데이트 재 등록
+			widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
+				@Override
+				public void onResultSuccessful(List<WidgetDto> list) {
+					WidgetHelper widgetHelper = new WidgetHelper(context);
+					for (WidgetDto widgetDto : list) {
+						if (widgetDto.getUpdateIntervalMillis() > 0) {
+							widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId()
+							);
+						}
+					}
+				}
+
+				@Override
+				public void onResultNoData() {
+
+				}
+			});
 		}
 	}
 

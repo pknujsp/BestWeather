@@ -157,7 +157,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		} else if (layoutId == R.layout.widget_simple) {
 			binding.displayDatetimeSwitch.setVisibility(View.GONE);
 			binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
-			
+
 			widgetCreator = new FirstSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
 		} else if (layoutId == R.layout.widget_simple2) {
 			binding.displayDatetimeSwitch.setVisibility(View.GONE);

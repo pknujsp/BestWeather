@@ -5,6 +5,7 @@ import android.content.Context;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 
 import com.lifedawn.bestweather.room.dao.AlarmDao;
 import com.lifedawn.bestweather.room.dao.FavoriteAddressDao;
@@ -16,6 +17,7 @@ import com.lifedawn.bestweather.room.dto.KmaAreaCodeDto;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 
 @Database(entities = {KmaAreaCodeDto.class, FavoriteAddressDto.class, AlarmDto.class, WidgetDto.class}, version = 1, exportSchema = false)
+@TypeConverters(RoomTypeConverter.class)
 public abstract class AppDb extends RoomDatabase {
 	private static volatile AppDb instance = null;
 

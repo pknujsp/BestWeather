@@ -109,10 +109,10 @@ public abstract class MultipleJsonDownloader {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
 		}
 		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, response));
-		Log.e(tag, "requestCount : " + requestCount + ", responseCount : " + responseCount);
+		Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 
 		if (requestCount == ++responseCount) {
-			Log.e(tag, "requestCount : " + requestCount + ", responseCount : " + responseCount);
+			Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 			onResult();
 		}
 	}
@@ -123,10 +123,10 @@ public abstract class MultipleJsonDownloader {
 		}
 
 		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, t));
-		Log.e(tag, "requestCount : " + requestCount + ", responseCount : " + responseCount);
+		Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 
 		if (requestCount == ++responseCount) {
-			Log.e(tag, "requestCount : " + requestCount + ", responseCount : " + responseCount);
+			Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 			onResult();
 		}
 	}
@@ -136,13 +136,12 @@ public abstract class MultipleJsonDownloader {
 	}
 
 	public static class ResponseResult {
-		private RequestParameter requestParameter;
+		private final RequestParameter requestParameter;
+		private final boolean successful;
+
 		private Response<?> response;
 		private Throwable t;
-		private boolean successful;
-
-		public ResponseResult() {
-		}
+		private String responseStr;
 
 		public ResponseResult(RequestParameter requestParameter, Throwable t) {
 			this.t = t;
@@ -178,6 +177,15 @@ public abstract class MultipleJsonDownloader {
 
 		public boolean isSuccessful() {
 			return successful;
+		}
+
+		public String getResponseStr() {
+			return responseStr;
+		}
+
+		public ResponseResult setResponseStr(String responseStr) {
+			this.responseStr = responseStr;
+			return this;
 		}
 	}
 }

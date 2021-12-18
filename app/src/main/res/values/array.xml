@@ -594,31 +594,5 @@
         <item>21600000</item>
     </string-array>
 
-    <integer-array name="IdsHeaderInWidget">
-        <item>@id/address</item>
-        <item>@id/refresh</item>
-    </integer-array>
-
-    <integer-array name="IdsWatchInWidget">
-        <item>@id/date</item>
-        <item>@id/time</item>
-    </integer-array>
-
-    <integer-array name="IdsCurrentConditionsInWidget">
-        <item>@id/current_temperature</item>
-        <item>@id/current_realfeel_temperature</item>
-        <item>@id/current_airquality</item>
-        <item>@id/current_precipitation</item>
-    </integer-array>
-
-    <integer-array name="IdsHourlyForecastInWidget">
-        <item>@id/hourly_temperature</item>
-        <item>@id/hourly_clock</item>
-    </integer-array>
-
-    <integer-array name="IdsDailyForecastInWidget">
-        <item>@id/daily_date</item>
-        <item>@id/daily_temperature</item>
-    </integer-array>
 
 </resources>

@@ -98,9 +98,7 @@
     <!-- -->
 
     <!-- current widget -->
-    <dimen name="dateClockTextSizeInCurrentWidget">13sp</dimen>
-    <dimen name="timeClockTextSizeInCurrentWidget">26sp</dimen>
-    <dimen name="tempTextSizeInCurrentWidget">28sp</dimen>
+    <dimen name="tempTextSizeInCurrentWidget">32sp</dimen>
     <dimen name="airQualityTextSizeInCurrentWidget">14sp</dimen>
     <dimen name="precipitationTextSizeInCurrentWidget">14sp</dimen>
     <!-- -->
@@ -142,5 +140,16 @@
     <dimen name="tempTextSizeInCurrentConditionsViewForSimpleWidget">24sp</dimen>
     <dimen name="precipitationTextSizeInCurrentConditionsViewForSimpleWidget">12sp</dimen>
     <dimen name="airQualityTextSizeInCurrentConditionsViewForSimpleWidget">12sp</dimen>
+    <dimen name="popTextSizeInSimpleWidgetForecastItem">10sp</dimen>
+    <dimen name="currentWidgetWidth">250dp</dimen>
+    <dimen name="currentWidgetHeight">40dp</dimen>
+    <dimen name="fullWidgetWidth">250dp</dimen>
+    <dimen name="fullWidgetHeight">180dp</dimen>
+    <dimen name="windTextSizeInCurrentWidget">14sp</dimen>
+    <dimen name="humidityTextSizeInCurrentWidget">14sp</dimen>
+    <dimen name="windSpeedTextSizeInCurrentWidget">13sp</dimen>
+    <dimen name="windStrengthTextSizeInCurrentWidget">14sp</dimen>
+    <dimen name="windDirectionTextSizeInCurrentWidget">13sp</dimen>
+    <dimen name="forecastItemViewInLinearPadding">3dp</dimen>
 
 </resources>

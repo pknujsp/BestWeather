@@ -2,9 +2,19 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
+import android.widget.TextView;
+
+import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
@@ -12,21 +22,21 @@ import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
+import static android.view.View.MeasureSpec.EXACTLY;
+
 public class FullWidgetCreator extends AbstractWidgetCreator {
-	private final DateTimeFormatter refreshDateTimeFormatter;
-	private final String timeClockFormat;
-	private final String dateClockFormat;
+	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 
 	private int addressTextSize;
 	private int refreshDateTimeTextSize;
-	private int clockDateTextSize;
-	private int clockTimeTextSize;
 	private int currentTempTextSize;
 	private int aqiTextSize;
 	private int precipitationTextSize;
@@ -35,11 +45,11 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 	private int dailyForecastDateTextSize;
 	private int dailyForecastTempTextSize;
 
+	private final int hourlyForecastCount = 12;
+	private final int dailyForecastCount = 4;
+
 	public FullWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
-		timeClockFormat = "HH:mm";
-		dateClockFormat = "M.d E";
-		refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	}
 
 
@@ -50,31 +60,13 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
 
 		if (needTempData) {
-			setTempHourlyForecastViews(remoteViews);
-			setTempDailyForecastViews(remoteViews);
+			setTempDataViews(remoteViews);
 		} else {
 			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent(remoteViews));
 		}
 
-		remoteViews.setViewVisibility(R.id.clockLayout, widgetDto.isDisplayClock() ? View.VISIBLE : View.GONE);
-		remoteViews.setCharSequence(R.id.dateClock, "setFormat24Hour", dateClockFormat);
-		remoteViews.setCharSequence(R.id.dateClock, "setFormat12Hour", dateClockFormat);
-		remoteViews.setCharSequence(R.id.timeClock, "setFormat24Hour", timeClockFormat);
-		remoteViews.setCharSequence(R.id.timeClock, "setFormat12Hour", timeClockFormat);
-
-		remoteViews.setTextViewTextSize(R.id.dateClock, TypedValue.COMPLEX_UNIT_PX, clockDateTextSize);
-		remoteViews.setTextViewTextSize(R.id.timeClock, TypedValue.COMPLEX_UNIT_PX, clockTimeTextSize);
-
 		//setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
-
-		remoteViews.setTextViewTextSize(R.id.address, TypedValue.COMPLEX_UNIT_PX, addressTextSize);
-		remoteViews.setTextViewTextSize(R.id.refresh, TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
-
-		remoteViews.setTextViewTextSize(R.id.temperature, TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
-		remoteViews.setTextViewTextSize(R.id.precipitation, TypedValue.COMPLEX_UNIT_PX, precipitationTextSize);
-		remoteViews.setTextViewTextSize(R.id.airQuality, TypedValue.COMPLEX_UNIT_PX, aqiTextSize);
-
-		setClockTimeZone(remoteViews);
+		//setClockTimeZone(remoteViews);
 		return remoteViews;
 	}
 
@@ -87,8 +79,6 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInCommonWidgetHeader) + extraSize;
 		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshDateTimeTextSizeInCommonWidgetHeader) + extraSize;
 		currentTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInFullWidget) + extraSize;
-		clockDateTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateClockTextSizeInFullWidget) + extraSize;
-		clockTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.timeClockTextSizeInFullWidget) + extraSize;
 		aqiTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInFullWidget) + extraSize;
 		precipitationTextSize = context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInFullWidget) + extraSize;
 		hourlyForecastHourTextSize = context.getResources().getDimensionPixelSize(R.dimen.hourTextSizeInHourlyForecastItem) + extraSize;
@@ -105,29 +95,27 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 			zoneId = widgetDto.isDisplayLocalClock() ? ZoneId.of(widgetDto.getTimeZoneId()) : ZoneId.systemDefault();
 		}
 
-		remoteViews.setString(R.id.dateClock, "setTimeZone", zoneId.getId());
-		remoteViews.setString(R.id.timeClock, "setTimeZone", zoneId.getId());
+		//remoteViews.setString(R.id.dateClock, "setTimeZone", zoneId.getId());
+		//remoteViews.setString(R.id.timeClock, "setTimeZone", zoneId.getId());
 	}
 
-	public void setAirQualityViews(RemoteViews remoteViews, AirQualityDto airQualityDto) {
-		remoteViews.setTextViewText(R.id.airQuality,
-				context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
+	public View makeHeaderViews(LayoutInflater layoutInflater, String addressName, String lastRefreshDateTime) {
+		View view = layoutInflater.inflate(R.layout.header_view_in_widget, null, false);
+		((TextView) view.findViewById(R.id.address)).setText(addressName);
+		((TextView) view.findViewById(R.id.refresh)).setText(ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
+
+		((TextView) view.findViewById(R.id.address)).setTextSize(TypedValue.COMPLEX_UNIT_PX, addressTextSize);
+		((TextView) view.findViewById(R.id.refresh)).setTextSize(TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
+
+		return view;
 	}
 
-	public void setAirQualityViews(RemoteViews remoteViews, String value) {
-		remoteViews.setTextViewText(R.id.airQuality,
-				context.getString(R.string.air_quality) + ": " + value);
-	}
+	public void makeCurrentConditionsViews(View view, CurrentConditionsDto currentConditionsDto,
+	                                       AirQualityDto airQualityDto) {
+		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp());
 
-
-	public void setHeaderViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime) {
-		remoteViews.setTextViewText(R.id.address, addressName);
-		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-	}
-
-
-	public void setCurrentConditionsViews(RemoteViews remoteViews, CurrentConditionsDto currentConditionsDto) {
-		remoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
+		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+		((TextView) view.findViewById(R.id.airQuality)).setText(airQuality);
 
 		String precipitation = "";
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
@@ -135,19 +123,27 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 		} else {
 			precipitation = context.getString(R.string.not_precipitation);
 		}
-		remoteViews.setTextViewText(R.id.precipitation, precipitation);
-		remoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
+		((TextView) view.findViewById(R.id.precipitation)).setText(precipitation);
+
+		((TextView) view.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
+		((TextView) view.findViewById(R.id.airQuality)).setTextSize(TypedValue.COMPLEX_UNIT_PX, aqiTextSize);
+		((TextView) view.findViewById(R.id.precipitation)).setTextSize(TypedValue.COMPLEX_UNIT_PX, precipitationTextSize);
 	}
 
-	public void setHourlyForecastViews(RemoteViews remoteViews, List<HourlyForecastDto> hourlyForecastDtoList) {
-		remoteViews.removeAllViews(R.id.hourly_forecast_row_1);
-		remoteViews.removeAllViews(R.id.hourly_forecast_row_2);
-
+	public void setHourlyForecastViews(View view, LayoutInflater layoutInflater, List<HourlyForecastDto> hourlyForecastDtoList) {
 		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E 0");
 		String hours = "";
 
-		for (int i = 0; i < 12; i++) {
-			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_linear);
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+		layoutParams.weight = 1;
+		layoutParams.gravity = Gravity.CENTER;
+
+		final int padding = (int) context.getResources().getDimension(R.dimen.forecastItemViewInLinearPadding);
+
+		for (int i = 0; i < hourlyForecastCount; i++) {
+			View itemView = layoutInflater.inflate(R.layout.view_hourly_forecast_item_in_linear, null, false);
+			itemView.setLayoutParams(layoutParams);
+			itemView.setPadding(0, padding, 0, padding);
 
 			if (hourlyForecastDtoList.get(i).getHours().getHour() == 0) {
 				hours = hourlyForecastDtoList.get(i).getHours().format(hour0Formatter);
@@ -155,78 +151,149 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 				hours = String.valueOf(hourlyForecastDtoList.get(i).getHours().getHour());
 			}
 
-			childRemoteViews.setTextViewText(R.id.hourly_clock, hours);
-			childRemoteViews.setTextViewText(R.id.hourly_temperature, hourlyForecastDtoList.get(i).getTemp());
-			childRemoteViews.setImageViewResource(R.id.hourly_weather_icon, hourlyForecastDtoList.get(i).getWeatherIcon());
+			((TextView) itemView.findViewById(R.id.hour)).setText(hours);
+			((TextView) itemView.findViewById(R.id.temperature)).setText(hourlyForecastDtoList.get(i).getTemp());
+			((ImageView) itemView.findViewById(R.id.weatherIcon)).setImageResource(hourlyForecastDtoList.get(i).getWeatherIcon());
 
-			childRemoteViews.setTextViewTextSize(R.id.hourly_clock, TypedValue.COMPLEX_UNIT_PX, hourlyForecastHourTextSize);
-			childRemoteViews.setTextViewTextSize(R.id.hourly_temperature, TypedValue.COMPLEX_UNIT_PX, hourlyForecastTempTextSize);
+			((TextView) itemView.findViewById(R.id.hour)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourlyForecastHourTextSize);
+			((TextView) itemView.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourlyForecastTempTextSize);
 
-			if (i >= 6) {
-				remoteViews.addView(R.id.hourly_forecast_row_2, childRemoteViews);
+			if (i >= hourlyForecastCount / 2) {
+				((ViewGroup) view.findViewById(R.id.hourly_forecast_row_2)).addView(itemView);
 			} else {
-				remoteViews.addView(R.id.hourly_forecast_row_1, childRemoteViews);
+				((ViewGroup) view.findViewById(R.id.hourly_forecast_row_1)).addView(itemView);
 			}
 		}
 
 	}
 
-	public void setDailyForecastViews(RemoteViews remoteViews, List<DailyForecastDto> dailyForecastDtoList) {
-		remoteViews.removeAllViews(R.id.daily_forecast_row);
+	public void setDailyForecastViews(View view, LayoutInflater layoutInflater, List<DailyForecastDto> dailyForecastDtoList) {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("E");
+		String temp = "";
 
-		for (int day = 0; day < 4; day++) {
-			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_daily_forecast_item_in_linear);
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+		layoutParams.weight = 1;
+		layoutParams.gravity = Gravity.CENTER;
 
-			childRemoteViews.setTextViewText(R.id.daily_date, dailyForecastDtoList.get(day).getDate().format(dateFormatter));
-			childRemoteViews.setTextViewText(R.id.daily_temperature, dailyForecastDtoList.get(day).getMinTemp() + " / " + dailyForecastDtoList.get(day).getMaxTemp());
+		final int padding = (int) context.getResources().getDimension(R.dimen.forecastItemViewInLinearPadding);
 
-			childRemoteViews.setViewVisibility(R.id.daily_left_weather_icon, View.VISIBLE);
-			childRemoteViews.setViewVisibility(R.id.daily_right_weather_icon, View.VISIBLE);
+		for (int day = 0; day < dailyForecastCount; day++) {
+			View itemView = layoutInflater.inflate(R.layout.view_daily_forecast_item_in_linear, null, false);
+			itemView.setLayoutParams(layoutParams);
+			itemView.setPadding(0, padding, 0, padding);
+
+			((TextView) itemView.findViewById(R.id.date)).setText(dailyForecastDtoList.get(day).getDate().format(dateFormatter));
+			temp = dailyForecastDtoList.get(day).getMinTemp() + "/" + dailyForecastDtoList.get(day).getMaxTemp();
+			((TextView) itemView.findViewById(R.id.temperature)).setText(temp);
 
 			if (dailyForecastDtoList.get(day).isSingle()) {
-				childRemoteViews.setImageViewResource(R.id.daily_left_weather_icon, dailyForecastDtoList.get(day).getSingleValues().getWeatherIcon());
-				childRemoteViews.setViewVisibility(R.id.daily_right_weather_icon, View.GONE);
+				((ImageView) itemView.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(day).getSingleValues().getWeatherIcon());
+				itemView.findViewById(R.id.rightIcon).setVisibility(View.GONE);
 			} else {
-				childRemoteViews.setImageViewResource(R.id.daily_left_weather_icon, dailyForecastDtoList.get(day).getAmValues().getWeatherIcon());
-				childRemoteViews.setImageViewResource(R.id.daily_right_weather_icon, dailyForecastDtoList.get(day).getPmValues().getWeatherIcon());
+				((ImageView) itemView.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(day).getAmValues().getWeatherIcon());
+				((ImageView) itemView.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(day).getPmValues().getWeatherIcon());
 			}
 
-			childRemoteViews.setTextViewTextSize(R.id.daily_date, TypedValue.COMPLEX_UNIT_PX, dailyForecastDateTextSize);
-			childRemoteViews.setTextViewTextSize(R.id.daily_temperature, TypedValue.COMPLEX_UNIT_PX, dailyForecastTempTextSize);
+			((TextView) itemView.findViewById(R.id.date)).setTextSize(TypedValue.COMPLEX_UNIT_PX, dailyForecastDateTextSize);
+			((TextView) itemView.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, dailyForecastTempTextSize);
 
-			remoteViews.addView(R.id.daily_forecast_row, childRemoteViews);
+			((ViewGroup) view.findViewById(R.id.daily_forecast_row)).addView(itemView);
 		}
 	}
 
-	public void setTempHourlyForecastViews(RemoteViews remoteViews) {
-		remoteViews.removeAllViews(R.id.hourly_forecast_row_1);
-		remoteViews.removeAllViews(R.id.hourly_forecast_row_2);
-
-		for (int i = 0; i < 12; i++) {
-			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_linear);
-
-			if (i >= 6) {
-				remoteViews.addView(R.id.hourly_forecast_row_2, childRemoteViews);
-			} else {
-				remoteViews.addView(R.id.hourly_forecast_row_1, childRemoteViews);
-			}
-		}
+	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto,
+	                         List<HourlyForecastDto> hourlyForecastDtoList, List<DailyForecastDto> dailyForecastDtoList,
+	                         OnDrawBitmapCallback onDrawBitmapCallback) {
+		drawViews(remoteViews, addressName, lastRefreshDateTime, airQualityDto, currentConditionsDto, hourlyForecastDtoList,
+				dailyForecastDtoList, onDrawBitmapCallback);
 	}
 
-	public void setTempDailyForecastViews(RemoteViews remoteViews) {
-		remoteViews.removeAllViews(R.id.daily_forecast_row);
+	public void setTempDataViews(RemoteViews remoteViews) {
+		List<HourlyForecastDto> tempHourlyForecastDtoList = new ArrayList<>();
+		List<DailyForecastDto> tempDailyForecastDtoList = new ArrayList<>();
+		CurrentConditionsDto tempCurrentConditionsDto = new CurrentConditionsDto();
+		AirQualityDto tempAirQualityDto = new AirQualityDto();
 
-		for (int day = 0; day < 4; day++) {
-			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_daily_forecast_item_in_linear);
+		tempCurrentConditionsDto.setWeatherIcon(R.drawable.day_clear).setTemp("20°");
+		tempAirQualityDto.setAqi(10);
 
-			childRemoteViews.setViewVisibility(R.id.daily_left_weather_icon, View.VISIBLE);
-			childRemoteViews.setViewVisibility(R.id.daily_right_weather_icon, View.VISIBLE);
+		final String pop = "10%";
+		ZonedDateTime now = ZonedDateTime.now();
 
-			remoteViews.addView(R.id.daily_forecast_row, childRemoteViews);
+		for (int i = 0; i < dailyForecastCount; i++) {
+			DailyForecastDto dailyForecastDto = new DailyForecastDto();
+			dailyForecastDto.setDate(now).setAmValues(new DailyForecastDto.Values()).setPmValues(new DailyForecastDto.Values())
+					.setMinTemp("20°").setMaxTemp("22°");
+			dailyForecastDto.getAmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop);
+			dailyForecastDto.getPmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop);
+
+			tempDailyForecastDtoList.add(dailyForecastDto);
+			now = now.plusDays(1);
 		}
+
+		now = ZonedDateTime.now();
+
+		for (int i = 0; i < hourlyForecastCount; i++) {
+			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
+			hourlyForecastDto.setWeatherIcon(R.drawable.day_clear).setTemp("20°").setHours(now);
+			tempHourlyForecastDtoList.add(hourlyForecastDto);
+
+			now = now.plusHours(1);
+		}
+
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), tempAirQualityDto,
+				tempCurrentConditionsDto, tempHourlyForecastDtoList, tempDailyForecastDtoList, null);
 	}
 
+
+	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto,
+	                       List<HourlyForecastDto> hourlyForecastDtoList, List<DailyForecastDto> dailyForecastDtoList,
+	                       @Nullable OnDrawBitmapCallback onDrawBitmapCallback) {
+		LayoutInflater layoutInflater = LayoutInflater.from(context);
+
+		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
+		headerView.setId(R.id.header);
+
+		final View valuesView = layoutInflater.inflate(R.layout.view_widget_full_values, null, false);
+
+		makeCurrentConditionsViews(valuesView, currentConditionsDto, airQualityDto);
+		setHourlyForecastViews(valuesView, layoutInflater, hourlyForecastDtoList);
+		setDailyForecastViews(valuesView, layoutInflater, dailyForecastDtoList);
+
+		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		RelativeLayout.LayoutParams valuesViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.MATCH_PARENT);
+
+		headerViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+		valuesViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		valuesViewLayoutParams.addRule(RelativeLayout.BELOW, R.id.header);
+
+		RelativeLayout rootLayout = new RelativeLayout(context);
+
+		rootLayout.addView(headerView, headerViewLayoutParams);
+		rootLayout.addView(valuesView, valuesViewLayoutParams);
+
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+
+		final int[] widgetSize = getWidgetExactSizeInPx(appWidgetManager);
+		final float widgetPadding = context.getResources().getDimension(R.dimen.widget_padding);
+
+		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[0] - widgetPadding * 2), EXACTLY);
+		final int heightSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[1] - widgetPadding * 2), EXACTLY);
+
+		rootLayout.measure(widthSpec, heightSpec);
+		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());
+
+		rootLayout.setDrawingCacheEnabled(true);
+		rootLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+		Bitmap viewBmp = rootLayout.getDrawingCache();
+		if (onDrawBitmapCallback != null) {
+			onDrawBitmapCallback.onCreatedBitmap(viewBmp);
+		}
+		remoteViews.setImageViewBitmap(R.id.valuesView, viewBmp);
+	}
 
 	@Override
 	public void setDisplayClock(boolean displayClock) {

@@ -9,8 +9,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.notification.NotificationReceiver;
-import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.widget.widgetprovider.AbstractAppWidgetProvider;
 
 public class WidgetHelper {
 	private Context context;
@@ -22,14 +21,14 @@ public class WidgetHelper {
 	}
 
 
-	public void onSelectedAutoRefreshInterval(long val, int appWidgetId, Class<?> widgetReceiverClass) {
-		cancelAutoRefresh(appWidgetId, widgetReceiverClass);
+	public void onSelectedAutoRefreshInterval(long val, int appWidgetId) {
+		cancelAutoRefresh(appWidgetId);
 
 		if (val == 0) {
 			return;
 		}
 
-		Intent refreshIntent = new Intent(context, widgetReceiverClass);
+		Intent refreshIntent = new Intent(context, AbstractAppWidgetProvider.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 		Bundle bundle = new Bundle();
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
@@ -42,8 +41,8 @@ public class WidgetHelper {
 				val, pendingIntent);
 	}
 
-	public void cancelAutoRefresh(int appWidgetId, Class<?> widgetReceiverClass) {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, widgetReceiverClass),
+	public void cancelAutoRefresh(int appWidgetId) {
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, AbstractAppWidgetProvider.class),
 				PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
@@ -52,7 +51,7 @@ public class WidgetHelper {
 	}
 
 	public boolean repeating(int appWidgetId, Class<?> widgetReceiverClass) {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, widgetReceiverClass),
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, AbstractAppWidgetProvider.class),
 				PendingIntent.FLAG_NO_CREATE);
 		return pendingIntent != null;
 	}

@@ -197,14 +197,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="@string/display_datetime" />
+                        android:text="@string/display_datetime"
+                        android:visibility="gone" />
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/display_local_datetime_switch"
                         style="@style/SettingsLabel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/display_local_datetime" />
+
+                        android:text="@string/display_local_datetime"
+                        android:visibility="gone" />
 
                     <Button
                         android:id="@+id/check"

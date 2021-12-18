@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 
@@ -23,9 +24,9 @@ import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.FullWidgetCreator;
-import com.lifedawn.bestweather.widget.model.WeatherDataObj;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -49,8 +50,27 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 		super.onDeleted(context, appWidgetIds);
 		WidgetHelper widgetHelper = new WidgetHelper(context);
 		for (int appWidgetId : appWidgetIds) {
-			widgetHelper.cancelAutoRefresh(appWidgetId, FullWidgetProvider.class);
+			widgetHelper.cancelAutoRefresh(appWidgetId);
 		}
+	}
+
+	@Override
+	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
+		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
+		FullWidgetCreator fullWidgetCreator = new FullWidgetCreator(context, null, appWidgetId);
+		fullWidgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
+			@Override
+			public void onResultSuccessful(WidgetDto result) {
+				if (result.getBitmap() != null) {
+					fullWidgetCreator.drawBitmap(fullWidgetCreator.createRemoteViews(false), result.getBitmap());
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
 	}
 
 	@Override
@@ -62,29 +82,6 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
-		String action = intent.getAction();
-		if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
-			//위젯 자동 업데이트 재 등록
-			widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
-				@Override
-				public void onResultSuccessful(List<WidgetDto> list) {
-					WidgetHelper widgetHelper = new WidgetHelper(context);
-					for (WidgetDto widgetDto : list) {
-						if (widgetDto.getUpdateIntervalMillis() > 0) {
-							if (!widgetHelper.repeating(widgetDto.getAppWidgetId(), FullWidgetProvider.class)) {
-								widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId(),
-										FullWidgetProvider.class);
-							}
-						}
-					}
-				}
-
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
-		}
 	}
 
 	@Override
@@ -132,7 +129,7 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 				final RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
 				WidgetHelper widgetHelper = new WidgetHelper(context);
 				if (widgetDto.getUpdateIntervalMillis() > 0) {
-					widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId, FullWidgetProvider.class);
+					widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId);
 				}
 
 				if (networkStatus.networkAvailable()) {
@@ -179,55 +176,52 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 		FullWidgetCreator widgetCreator = new FullWidgetCreator(context, null, appWidgetId);
 		widgetCreator.setWidgetDto(widgetDto);
 		widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getLocalDateTime().toString());
-		widgetCreator.setHeaderViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime());
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleJsonDownloader,
 				requestWeatherSourceType);
-		if (currentConditionsDto != null) {
-			widgetCreator.setCurrentConditionsViews(remoteViews, currentConditionsDto);
+		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleJsonDownloader,
+				requestWeatherSourceType);
+		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleJsonDownloader,
+				requestWeatherSourceType);
+		AirQualityDto airQualityDto = null;
+
+		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty()
+				&& !dailyForecastDtoList.isEmpty();
+
+		if (successful) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			widgetDto.setTimeZoneId(zoneId.getId());
 
 			widgetCreator.setClockTimeZone(remoteViews);
-		}
 
-		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleJsonDownloader,
-				requestWeatherSourceType);
-		if (!hourlyForecastDtoList.isEmpty()) {
-			widgetCreator.setHourlyForecastViews(remoteViews, hourlyForecastDtoList);
-		}
-
-		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleJsonDownloader,
-				requestWeatherSourceType);
-		if (!dailyForecastDtoList.isEmpty()) {
-			widgetCreator.setDailyForecastViews(remoteViews, dailyForecastDtoList);
-		}
-
-		AirQualityDto airQualityDto = null;
-		if (zoneOffset != null) {
 			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleJsonDownloader,
 					requestWeatherSourceType, zoneOffset);
 			if (airQualityDto != null) {
-				widgetCreator.setAirQualityViews(remoteViews, airQualityDto);
-			} else {
-				widgetCreator.setAirQualityViews(remoteViews, context.getString(R.string.noData));
+				airQualityDto = new AirQualityDto();
+				airQualityDto.setAqi(10);
 			}
-		} else {
-			widgetCreator.setAirQualityViews(remoteViews, context.getString(R.string.noData));
-		}
-		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty()
-				&& !dailyForecastDtoList.isEmpty();
 
-		WeatherDataObj weatherDataObj = new WeatherDataObj();
-		weatherDataObj.setSuccessful(successful);
+			widgetCreator.setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto,
+					currentConditionsDto, hourlyForecastDtoList, dailyForecastDtoList, new OnDrawBitmapCallback() {
+						@Override
+						public void onCreatedBitmap(Bitmap bitmap) {
+							widgetDto.setBitmap(bitmap);
+						}
+					});
+		}
+
 		widgetDto.setLoadSuccessful(successful);
 
 		if (successful) {
 			RemoteViewProcessor.onSuccessfulProcess(remoteViews);
 		} else {
-			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-			setRefreshPendingIntent(remoteViews, appWidgetId, context);
+			if (widgetDto.getBitmap() == null) {
+				RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+				setRefreshPendingIntent(remoteViews, appWidgetId, context);
+			} else {
+				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());
+			}
 		}
 		widgetCreator.updateSettings(widgetDto, null);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);

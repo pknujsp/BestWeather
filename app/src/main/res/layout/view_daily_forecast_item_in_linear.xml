@@ -7,12 +7,12 @@
     android:layout_weight="1"
     android:gravity="center"
     android:orientation="vertical"
-    android:paddingTop="3dp"
-    android:paddingBottom="3dp"
+    android:paddingTop="@dimen/forecastItemViewInLinearPadding"
+    android:paddingBottom="@dimen/forecastItemViewInLinearPadding"
     android:weightSum="1.0">
 
     <TextView
-        android:id="@+id/daily_date"
+        android:id="@+id/date"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="2dp"
@@ -35,7 +35,7 @@
         android:paddingBottom="2dp">
 
         <ImageView
-            android:id="@+id/daily_left_weather_icon"
+            android:id="@+id/leftIcon"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -44,7 +44,7 @@
             android:src="@drawable/day_clear" />
 
         <ImageView
-            android:id="@+id/daily_right_weather_icon"
+            android:id="@+id/rightIcon"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -55,7 +55,7 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/daily_temperature"
+        android:id="@+id/temperature"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.22"

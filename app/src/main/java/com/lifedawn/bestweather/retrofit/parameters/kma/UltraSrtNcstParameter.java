@@ -10,7 +10,7 @@ public class UltraSrtNcstParameter extends RequestParameter {
 	private String serviceKey = RetrofitClient.VILAGE_FCST_INFO_SERVICE_SERVICE_KEY;
 	private final String numOfRows = "300";
 	private final String pageNo = "1";
-	private String dataType = RetrofitClient.DATATYPE;
+	private String dataType = RetrofitClient.XML_DATATYPE;
 	private String baseDate;
 	private String baseTime;
 	private String nx;

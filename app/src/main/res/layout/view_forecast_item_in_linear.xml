@@ -48,6 +48,32 @@
             android:src="@drawable/day_clear" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/popLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="11dp"
+            android:layout_height="11dp"
+            android:layout_marginRight="1dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/pop" />
+
+        <TextView
+            android:id="@+id/pop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="20%"
+            android:textColor="@color/widgetTextColor"
+            android:textSize="@dimen/popTextSizeInSimpleWidgetForecastItem" />
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/temperature"
         android:layout_width="match_parent"

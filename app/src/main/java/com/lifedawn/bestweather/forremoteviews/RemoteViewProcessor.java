@@ -34,7 +34,6 @@ public class RemoteViewProcessor {
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.request_to_make_gps_on));
 				remoteViews.setTextViewText(R.id.warning_process_btn, context.getString(R.string.enable_gps));
 				remoteViews.setViewVisibility(R.id.warning_process_btn, View.VISIBLE);
-
 				break;
 			case FAILED_LOAD_WEATHER_DATA:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.update_failed));

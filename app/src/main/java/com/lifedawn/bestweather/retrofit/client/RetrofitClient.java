@@ -41,7 +41,7 @@ public class RetrofitClient {
 	public static final String FLICKR_KEY = "2c887b8d73b8334ddb3b0809c387de1b";
 	public static final String FLICKR_SECRET = "0112b42bf9b07200";
 
-	public static final String DATATYPE = "XML";
+	public static final String XML_DATATYPE = "XML";
 	public static final String LOG_TAG = "Retrofit Response";
 
 

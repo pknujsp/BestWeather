@@ -14,6 +14,7 @@
         style="@style/WidgetBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:gravity="center"
         android:orientation="vertical">
 
         <LinearLayout
@@ -23,7 +24,7 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/currentWithHourlyForecastView"
+                android:id="@+id/valuesView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:ignore="ContentDescription" />

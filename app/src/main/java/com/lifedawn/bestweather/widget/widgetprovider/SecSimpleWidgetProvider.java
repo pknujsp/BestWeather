@@ -2,9 +2,9 @@ package com.lifedawn.bestweather.widget.widgetprovider;
 
 import android.annotation.SuppressLint;
 import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 
@@ -23,13 +23,9 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponse
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.WidgetHelper;
-import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.FirstSimpleWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.FullWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.SecSimpleWidgetCreator;
-import com.lifedawn.bestweather.widget.model.WeatherDataObj;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -54,7 +50,7 @@ public class SecSimpleWidgetProvider extends AbstractAppWidgetProvider {
 		super.onDeleted(context, appWidgetIds);
 		WidgetHelper widgetHelper = new WidgetHelper(context);
 		for (int appWidgetId : appWidgetIds) {
-			widgetHelper.cancelAutoRefresh(appWidgetId, SecSimpleWidgetProvider.class);
+			widgetHelper.cancelAutoRefresh(appWidgetId);
 		}
 	}
 
@@ -67,29 +63,6 @@ public class SecSimpleWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
-		String action = intent.getAction();
-		if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
-			//위젯 자동 업데이트 재 등록
-			widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
-				@Override
-				public void onResultSuccessful(List<WidgetDto> list) {
-					WidgetHelper widgetHelper = new WidgetHelper(context);
-					for (WidgetDto widgetDto : list) {
-						if (widgetDto.getUpdateIntervalMillis() > 0) {
-							if (!widgetHelper.repeating(widgetDto.getAppWidgetId(), SecSimpleWidgetProvider.class)) {
-								widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId(),
-										SecSimpleWidgetProvider.class);
-							}
-						}
-					}
-				}
-
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
-		}
 	}
 
 	@Override
@@ -137,7 +110,7 @@ public class SecSimpleWidgetProvider extends AbstractAppWidgetProvider {
 				final RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
 				WidgetHelper widgetHelper = new WidgetHelper(context);
 				if (widgetDto.getUpdateIntervalMillis() > 0) {
-					widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId, SecSimpleWidgetCreator.class);
+					widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId);
 				}
 
 				if (networkStatus.networkAvailable()) {
@@ -205,19 +178,26 @@ public class SecSimpleWidgetProvider extends AbstractAppWidgetProvider {
 			}
 
 			widgetCreator.setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto,
-					currentConditionsDto, dailyForecastDtoList);
+					currentConditionsDto, dailyForecastDtoList, new OnDrawBitmapCallback() {
+						@Override
+						public void onCreatedBitmap(Bitmap bitmap) {
+							widgetDto.setBitmap(bitmap);
+						}
+					});
 		}
 
 
-		WeatherDataObj weatherDataObj = new WeatherDataObj();
-		weatherDataObj.setSuccessful(successful);
 		widgetDto.setLoadSuccessful(successful);
 
 		if (successful) {
 			RemoteViewProcessor.onSuccessfulProcess(remoteViews);
 		} else {
-			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-			setRefreshPendingIntent(remoteViews, appWidgetId, context);
+			if (widgetDto.getBitmap() == null) {
+				RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+				setRefreshPendingIntent(remoteViews, appWidgetId, context);
+			} else {
+				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());
+			}
 		}
 		widgetCreator.updateSettings(widgetDto, null);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);

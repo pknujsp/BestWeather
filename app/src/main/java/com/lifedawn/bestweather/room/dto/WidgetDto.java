@@ -1,6 +1,8 @@
 package com.lifedawn.bestweather.room.dto;
 
 
+import android.graphics.Bitmap;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -61,6 +63,17 @@ public class WidgetDto {
 
 	@ColumnInfo(name = "loadSuccessful")
 	private boolean loadSuccessful;
+
+	@ColumnInfo(name = "bitmap")
+	private Bitmap bitmap;
+
+	public Bitmap getBitmap() {
+		return bitmap;
+	}
+
+	public void setBitmap(Bitmap bitmap) {
+		this.bitmap = bitmap;
+	}
 
 	public long getId() {
 		return id;

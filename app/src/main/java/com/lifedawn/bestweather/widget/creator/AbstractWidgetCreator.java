@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.View;
@@ -188,6 +189,10 @@ public abstract class AbstractWidgetCreator {
 		return new int[]{(int) widgetWidthPx, (int) widgetHeightPx};
 	}
 
+
+	public void drawBitmap(RemoteViews remoteViews, Bitmap bitmap) {
+		remoteViews.setImageViewBitmap(R.id.valuesView, bitmap);
+	}
 
 	abstract public RemoteViews createRemoteViews(boolean needTempData);
 

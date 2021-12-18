@@ -224,12 +224,12 @@ public class DailyNotiViewCreator extends AbstractNotiViewCreator {
 				hours = String.valueOf(hourlyForecastDtoList.get(i).getHours().getHour());
 			}
 
-			childRemoteViews.setTextViewText(R.id.hourly_clock, hours);
-			childRemoteViews.setTextViewText(R.id.hourly_temperature, hourlyForecastDtoList.get(i).getTemp());
-			childRemoteViews.setImageViewResource(R.id.hourly_weather_icon, hourlyForecastDtoList.get(i).getWeatherIcon());
+			childRemoteViews.setTextViewText(R.id.hour, hours);
+			childRemoteViews.setTextViewText(R.id.temperature, hourlyForecastDtoList.get(i).getTemp());
+			childRemoteViews.setImageViewResource(R.id.weatherIcon, hourlyForecastDtoList.get(i).getWeatherIcon());
 
-			childRemoteViews.setTextColor(R.id.hourly_clock, textColor);
-			childRemoteViews.setTextColor(R.id.hourly_temperature, textColor);
+			childRemoteViews.setTextColor(R.id.hour, textColor);
+			childRemoteViews.setTextColor(R.id.temperature, textColor);
 
 			if (i > 7) {
 				remoteViews.addView(R.id.hourlyForecast2, childRemoteViews);
@@ -246,8 +246,8 @@ public class DailyNotiViewCreator extends AbstractNotiViewCreator {
 		for (int i = 0; i < 16; i++) {
 			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_linear);
 
-			childRemoteViews.setTextColor(R.id.hourly_clock, textColor);
-			childRemoteViews.setTextColor(R.id.hourly_temperature, textColor);
+			childRemoteViews.setTextColor(R.id.hour, textColor);
+			childRemoteViews.setTextColor(R.id.temperature, textColor);
 
 			if (i > 7) {
 				remoteViews.addView(R.id.hourlyForecast2, childRemoteViews);
