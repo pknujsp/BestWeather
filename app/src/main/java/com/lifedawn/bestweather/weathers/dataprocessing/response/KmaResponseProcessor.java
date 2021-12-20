@@ -3,6 +3,8 @@ package com.lifedawn.bestweather.weathers.dataprocessing.response;
 import android.content.Context;
 import android.content.res.TypedArray;
 
+import androidx.annotation.Nullable;
+
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstItem;
@@ -15,7 +17,8 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.F
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
@@ -246,9 +249,13 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		return finalCurrentConditions;
 	}
 
-	public static List<FinalHourlyForecast> getFinalHourlyForecastList(VilageFcstResponse ultraSrtFcstResponse, VilageFcstResponse vilageFcstResponse) {
+	public static List<FinalHourlyForecast> getFinalHourlyForecastList(VilageFcstResponse ultraSrtFcstResponse,
+	                                                                   @Nullable VilageFcstResponse vilageFcstResponse) {
 		List<VilageFcstItem> ultraSrtFcstItemList = ultraSrtFcstResponse.getBody().getItems().getItem();
-		List<VilageFcstItem> vilageItemList = vilageFcstResponse.getBody().getItems().getItem();
+		List<VilageFcstItem> vilageItemList = null;
+		if (vilageFcstResponse != null) {
+			vilageItemList = vilageFcstResponse.getBody().getItems().getItem();
+		}
 		Map<Long, List<VilageFcstItem>> hourDataListMap = new HashMap<>();
 
 		long newDateTime = 0L;
@@ -266,21 +273,24 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 		final long lastDateTimeLongOfUltraSrtFcst = lastDateTime;
 
-		for (VilageFcstItem item : vilageItemList) {
-			newDateTime = Long.parseLong(item.getFcstDate() + item.getFcstTime());
+		if (vilageFcstResponse != null) {
+			for (VilageFcstItem item : vilageItemList) {
+				newDateTime = Long.parseLong(item.getFcstDate() + item.getFcstTime());
 
-			if (newDateTime > lastDateTimeLongOfUltraSrtFcst) {
-				if (newDateTime > lastDateTime) {
-					hourDataListMap.put(newDateTime, new ArrayList<>());
-					lastDateTime = newDateTime;
+				if (newDateTime > lastDateTimeLongOfUltraSrtFcst) {
+					if (newDateTime > lastDateTime) {
+						hourDataListMap.put(newDateTime, new ArrayList<>());
+						lastDateTime = newDateTime;
+					}
+					hourDataListMap.get(newDateTime).add(item);
 				}
-				hourDataListMap.get(newDateTime).add(item);
 			}
 		}
 
 		List<FinalHourlyForecast> finalHourlyForecastList = new ArrayList<>();
 		ZonedDateTime now = ZonedDateTime.now(KmaResponseProcessor.getZoneId()).withMinute(0).withSecond(0).withNano(0);
 		String fcstDate = null;
+
 
 		for (Map.Entry<Long, List<VilageFcstItem>> entry : hourDataListMap.entrySet()) {
 			FinalHourlyForecast finalHourlyForecast = new FinalHourlyForecast();
@@ -632,8 +642,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 					.setWeatherDescription(KmaResponseProcessor.getWeatherDescription(finalHourlyForecast.getPrecipitationType(),
 							finalHourlyForecast.getSky()))
 					.setWindDirectionVal(Integer.parseInt(finalHourlyForecast.getWindDirection()))
-					.setWindDirection(WindDirectionConverter.windDirection(context, finalHourlyForecast.getWindDirection()))
-					.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(finalHourlyForecast.getWindSpeed()))
+					.setWindDirection(WindUtil.windDirection(context, finalHourlyForecast.getWindDirection()))
+					.setWindStrength(WindUtil.getSimpleWindSpeedDescription(finalHourlyForecast.getWindSpeed()))
 					.setWindSpeed(ValueUnits.convertWindSpeed(finalHourlyForecast.getWindSpeed(), windUnit) + ValueUnits.convertToStr(context, windUnit))
 					.setHumidity(finalHourlyForecast.getHumidity() + percent);
 
@@ -692,7 +702,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 	public static CurrentConditionsDto makeCurrentConditionsDto(Context context,
 	                                                            FinalCurrentConditions item,
-	                                                            ValueUnits windUnit, ValueUnits tempUnit, Double latitude,
+	                                                            FinalHourlyForecast finalHourlyForecast, ValueUnits windUnit, ValueUnits tempUnit, Double latitude,
 	                                                            Double longitude) {
 		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
 		final String percent = "%";
@@ -712,19 +722,29 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		ZonedDateTime currentTime = ZonedDateTime.of(localDateTime, koreaZoneId);
 
 		currentConditionsDto.setCurrentTime(currentTime);
-		currentConditionsDto.setWeatherDescription(KmaResponseProcessor.getWeatherPtyIconDescription(item.getPrecipitationType()));
-		currentConditionsDto.setWeatherIcon(KmaResponseProcessor.getWeatherPtyIconImg(item.getPrecipitationType(),
+		currentConditionsDto.setWeatherDescription(KmaResponseProcessor.getWeatherDescription(item.getPrecipitationType(),
+				finalHourlyForecast.getSky()));
+		currentConditionsDto.setWeatherIcon(KmaResponseProcessor.getWeatherSkyAndPtyIconImg(item.getPrecipitationType(),
+				finalHourlyForecast.getSky(),
 				SunRiseSetUtil.isNight(calendar, sunRise, sunSet)));
 		currentConditionsDto.setTemp(ValueUnits.convertTemperature(item.getTemperature(), tempUnit) + tempUnitStr);
+
+		double feelsLikeTemp =
+				WeatherUtil.calcFeelsLikeTemperature(ValueUnits.convertTemperature(item.getTemperature(), ValueUnits.celsius),
+						ValueUnits.convertWindSpeed(item.getWindSpeed(), ValueUnits.kmPerHour),
+						Double.parseDouble(item.getHumidity()));
+
+		currentConditionsDto.setFeelsLikeTemp(ValueUnits.convertTemperature(String.valueOf((int) feelsLikeTemp), tempUnit) + tempUnitStr);
+
 		currentConditionsDto.setHumidity(item.getHumidity() + percent);
 		currentConditionsDto.setWindDirectionDegree(Integer.parseInt(item.getWindDirection()));
-		currentConditionsDto.setWindDirection(WindDirectionConverter.windDirection(context, item.getWindDirection()));
+		currentConditionsDto.setWindDirection(WindUtil.windDirection(context, item.getWindDirection()));
 		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(item.getWindSpeed(), windUnit) + ValueUnits.convertToStr(context,
 				windUnit));
 
-		currentConditionsDto.setSimpleWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWindSpeed()));
-		currentConditionsDto.setWindStrength(WeatherResponseProcessor.getWindSpeedDescription(item.getWindSpeed()));
-		currentConditionsDto.setPrecipitationType(item.getPrecipitationType());
+		currentConditionsDto.setSimpleWindStrength(WindUtil.getSimpleWindSpeedDescription(item.getWindSpeed()));
+		currentConditionsDto.setWindStrength(WindUtil.getWindSpeedDescription(item.getWindSpeed()));
+		currentConditionsDto.setPrecipitationType(getWeatherPtyIconDescription(item.getPrecipitationType()));
 
 		if (!item.getPrecipitation1Hour().equals("0")) {
 			currentConditionsDto.setPrecipitationVolume(item.getPrecipitation1Hour() + "mm");

@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers.simplefragment.accuweather.hourlyforecast;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,6 +25,7 @@ import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.FragmentType;
+import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.TextsView;
@@ -101,7 +103,6 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		Context context = getContext();
 
 		final int weatherRowHeight = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
-		final int defaultTextRowHeight = (int) context.getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
 		List<TwelveHoursOfHourlyForecastsResponse.Item> items = twelveHoursOfHourlyForecastsResponse.getItems();
 
@@ -124,7 +125,7 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		List<ZonedDateTime> dateTimeList = new ArrayList<>();
 		List<String> hourList = new ArrayList<>();
-		List<String> tempList = new ArrayList<>();
+		List<Integer> tempList = new ArrayList<>();
 		List<String> popList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
@@ -133,6 +134,8 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 
 		final String mm = "mm";
 		final String cm = "cm";
+		final String degree = "°";
+
 
 		List<HourlyForecastDto> hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(), items,
 				windUnit, tempUnit, visibilityUnit);
@@ -142,7 +145,8 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 			hourList.add(String.valueOf(item.getHours().getHour()));
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 					ContextCompat.getDrawable(context, item.getWeatherIcon()), item.getWeatherDescription()));
-			tempList.add(item.getTemp());
+			tempList.add(Integer.parseInt(item.getTemp().replace(degree, "")));
+
 			popList.add(item.getPop());
 			rainVolumeList.add(item.getRainVolume().replace(mm, ""));
 
@@ -162,7 +166,9 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		snowVolumeRow.setValueList(snowVolumeList);
 
 		TextsView clockRow = new TextsView(context, viewWidth, columnWidth, hourList);
-		TextsView tempRow = new TextsView(context, viewWidth, columnWidth, tempList);
+		DetailSingleTemperatureView tempRow = new DetailSingleTemperatureView(context, tempList);
+		tempRow.setLineColor(Color.WHITE);
+		tempRow.setCircleColor(Color.WHITE);
 
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -175,9 +181,9 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 			clockRow.setValueTextSize(textSizeMap.get(WeatherDataType.time));
 		}
 		if (textSizeMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setValueTextSize(textSizeMap.get(WeatherDataType.temp));
+			tempRow.setTempTextSizeSp(textSizeMap.get(WeatherDataType.temp));
 		} else {
-			tempRow.setValueTextSize(17);
+			tempRow.setTempTextSizeSp(16);
 		}
 		if (textSizeMap.containsKey(WeatherDataType.pop)) {
 			popRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
@@ -197,7 +203,9 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 			clockRow.setValueTextColor(textColorMap.get(WeatherDataType.time));
 		}
 		if (textColorMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setValueTextColor(textColorMap.get(WeatherDataType.temp));
+			tempRow.setTextColor(textColorMap.get(WeatherDataType.temp));
+		} else {
+			tempRow.setTextColor(Color.WHITE);
 		}
 		if (textColorMap.containsKey(WeatherDataType.pop)) {
 			popRow.setTextColor(textColorMap.get(WeatherDataType.pop));
@@ -217,9 +225,10 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		if (haveSnow) {
 			binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
 		}
-		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
+		final int tempRowHeight = (int) context.getResources().getDimension(R.dimen.singleTemperatureRowHeightInCOMMON);
+
+		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+				tempRowHeight);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
 	}

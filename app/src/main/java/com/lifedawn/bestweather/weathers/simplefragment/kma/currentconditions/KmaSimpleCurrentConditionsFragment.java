@@ -1,12 +1,9 @@
 package com.lifedawn.bestweather.weathers.simplefragment.kma.currentconditions;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,23 +12,18 @@ import android.view.ViewGroup;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
-import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
-import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Calendar;
-import java.util.TimeZone;
-
 public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
-	private FinalCurrentConditions finalCurrentConditions;
+	private FinalCurrentConditions todayFinalCurrentConditions;
+	private FinalCurrentConditions yesterdayFinalCurrentConditions;
 	private FinalHourlyForecast finalHourlyForecast;
-
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -50,8 +42,8 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 		setValuesToViews();
 	}
 
-	public KmaSimpleCurrentConditionsFragment setFinalCurrentConditions(FinalCurrentConditions finalCurrentConditions) {
-		this.finalCurrentConditions = finalCurrentConditions;
+	public KmaSimpleCurrentConditionsFragment setTodayFinalCurrentConditions(FinalCurrentConditions todayFinalCurrentConditions) {
+		this.todayFinalCurrentConditions = todayFinalCurrentConditions;
 		return this;
 	}
 
@@ -60,33 +52,58 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 		return this;
 	}
 
+	public void setYesterdayFinalCurrentConditions(FinalCurrentConditions yesterdayFinalCurrentConditions) {
+		this.yesterdayFinalCurrentConditions = yesterdayFinalCurrentConditions;
+	}
+
 	@Override
 	public void setValuesToViews() {
 		super.setValuesToViews();
 
-		// precipitation type 값 종류 : Rain, Snow, Ice, Null(Not), or Mixed
-		String precipitation = KmaResponseProcessor.getWeatherPtyIconDescription(finalCurrentConditions.getPrecipitationType());
+		CurrentConditionsDto currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDto(getContext(), todayFinalCurrentConditions,
+				finalHourlyForecast, windUnit, tempUnit, latitude, longitude);
 
-		if (Double.parseDouble(finalCurrentConditions.getPrecipitation1Hour()) > 0.0) {
-			precipitation += ", " + finalCurrentConditions.getPrecipitation1Hour() + "mm";
+		String precipitation = null;
+		if (currentConditionsDto.isHasPrecipitationVolume()) {
+			precipitation = currentConditionsDto.getPrecipitationType() + ": " + currentConditionsDto.getPrecipitationVolume();
+		} else {
+			precipitation = currentConditionsDto.getPrecipitationType();
 		}
-
 		binding.precipitation.setText(precipitation);
 
-		SunriseSunsetCalculator calculator = new SunriseSunsetCalculator(new Location(latitude, longitude),
-				TimeZone.getTimeZone(zoneId.getId()));
+		binding.weatherIcon.setImageResource(currentConditionsDto.getWeatherIcon());
+		binding.sky.setText(currentConditionsDto.getWeatherDescription());
 
-		Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(KmaResponseProcessor.getZoneId().getId()));
-		Calendar sunRise = calculator.getOfficialSunriseCalendarForDate(calendar);
-		Calendar sunSet = calculator.getOfficialSunsetCalendarForDate(calendar);
+		final String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
+		final String currentTemp = currentConditionsDto.getTemp().replace(tempUnitStr, "");
+		binding.temperature.setText(currentTemp);
+		binding.wind.setText(currentConditionsDto.getWindStrength());
 
-		binding.weatherIcon.setImageDrawable(
-				ContextCompat.getDrawable(getContext(), KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecast.getSky(),
-						SunRiseSetUtil.isNight(calendar, sunRise, sunSet))));
-		binding.sky.setText(KmaResponseProcessor.getWeatherSkyIconDescription(finalHourlyForecast.getSky()));
-		String temp = ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(),
-				tempUnit) + ValueUnits.convertToStr(getContext(), tempUnit);
-		binding.temperature.setText(temp);
-		binding.wind.setText(WeatherResponseProcessor.getWindSpeedDescription(finalCurrentConditions.getWindSpeed()));
+		double feelsLikeTemp =
+				WeatherUtil.calcFeelsLikeTemperature(ValueUnits.convertTemperature(currentTemp, ValueUnits.celsius),
+						ValueUnits.convertWindSpeed(todayFinalCurrentConditions.getWindSpeed(), ValueUnits.kmPerHour),
+						Double.parseDouble(todayFinalCurrentConditions.getHumidity()));
+		String feelsLikeTempStr = String.valueOf((int) feelsLikeTemp);
+
+		binding.feelsLikeTemp.setText(feelsLikeTempStr);
+		binding.tempUnit.setText(tempUnitStr);
+		binding.feelsLikeTempUnit.setText(tempUnitStr);
+
+		int yesterdayTemp = ValueUnits.convertTemperature(yesterdayFinalCurrentConditions.getTemperature(), tempUnit);
+		int todayTemp = Integer.parseInt(currentTemp);
+
+
+		if (yesterdayTemp == todayTemp) {
+			binding.tempDescription.setText(R.string.TheTemperatureIsTheSameAsYesterday);
+		} else {
+			String text = getString(R.string.thanYesterday);
+
+			if (todayTemp > yesterdayTemp) {
+				text += " " + (todayTemp - yesterdayTemp) + "° " + getString(R.string.higherTemperature);
+			} else {
+				text += " " + (yesterdayTemp - todayTemp) + "° " + getString(R.string.lowerTemperature);
+			}
+			binding.tempDescription.setText(text);
+		}
 	}
 }

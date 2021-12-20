@@ -17,6 +17,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProc
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.UvIndexProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 
 import java.util.Locale;
 
@@ -31,7 +32,7 @@ public class InitApp extends Application {
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
 		initPreferences();
-		WeatherResponseProcessor.init(context);
+		WindUtil.init(context);
 		AccuWeatherResponseProcessor.init(context);
 		AqicnResponseProcessor.init(context);
 		KmaResponseProcessor.init(context);

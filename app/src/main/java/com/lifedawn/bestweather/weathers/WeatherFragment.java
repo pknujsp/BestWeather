@@ -81,7 +81,6 @@ import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
@@ -120,7 +119,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.TimeZone;
+import java.util.SimpleTimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -365,7 +364,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleJsonDownloader.getRequestDateTime().toString());
 				lastRefreshDateTime = lastRefreshDateTime.withZoneSameInstant(zoneId);
 
-				Calendar currentCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.getId()));
+				SimpleTimeZone timeZone = new SimpleTimeZone(lastRefreshDateTime.getOffset().getTotalSeconds() * 1000, "");
+				Calendar currentCalendar = Calendar.getInstance(timeZone);
 				currentCalendar.set(lastRefreshDateTime.getYear(), lastRefreshDateTime.getMonthValue() - 1,
 						lastRefreshDateTime.getDayOfMonth(), lastRefreshDateTime.getHour(), lastRefreshDateTime.getMinute(),
 						lastRefreshDateTime.getSecond());
@@ -963,7 +963,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_NCST).addRequestServiceType(
 						RetrofitClient.ServiceType.ULTRA_SRT_FCST).addRequestServiceType(
 						RetrofitClient.ServiceType.VILAGE_FCST).addRequestServiceType(
-						RetrofitClient.ServiceType.MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.MID_TA_FCST);
+						RetrofitClient.ServiceType.MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.MID_TA_FCST)
+						.addRequestServiceType(RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST);
 				newRequestWeatherSources.put(WeatherSourceType.KMA, requestKma);
 				break;
 			case OPEN_WEATHER_MAP:
@@ -1015,13 +1016,18 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			case KMA:
 				FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(
 						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponseObj());
+				FinalCurrentConditions yesterDayFinalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(
+						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST).getResponseObj());
+
 				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
 						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponseObj(),
 						(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST).getResponseObj());
+
 				List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastList(
 						(MidLandFcstResponse) arrayMap.get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponseObj(),
 						(MidTaResponse) arrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST).getResponseObj(),
 						Long.parseLong(multipleJsonDownloader.get("tmFc")));
+
 				finalDailyForecastList = KmaResponseProcessor.getDailyForecastList(finalDailyForecastList, finalHourlyForecastList);
 
 				KmaSimpleCurrentConditionsFragment kmaSimpleCurrentConditionsFragment = new KmaSimpleCurrentConditionsFragment();
@@ -1029,11 +1035,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				KmaSimpleDailyForecastFragment kmaSimpleDailyForecastFragment = new KmaSimpleDailyForecastFragment();
 				KmaDetailCurrentConditionsFragment kmaDetailCurrentConditionsFragment = new KmaDetailCurrentConditionsFragment();
 
-				kmaSimpleCurrentConditionsFragment.setFinalCurrentConditions(finalCurrentConditions).setFinalHourlyForecast(
+				kmaSimpleCurrentConditionsFragment.setTodayFinalCurrentConditions(finalCurrentConditions).setFinalHourlyForecast(
 						finalHourlyForecastList.get(0)).setAirQualityResponse(airQualityResponse);
+				kmaSimpleCurrentConditionsFragment.setYesterdayFinalCurrentConditions(yesterDayFinalCurrentConditions);
+				kmaSimpleCurrentConditionsFragment.setFinalHourlyForecast(finalHourlyForecastList.get(0));
 				kmaSimpleHourlyForecastFragment.setFinalHourlyForecastList(finalHourlyForecastList);
 				kmaSimpleDailyForecastFragment.setFinalDailyForecastList(finalDailyForecastList);
 				kmaDetailCurrentConditionsFragment.setFinalCurrentConditions(finalCurrentConditions);
+				kmaDetailCurrentConditionsFragment.setFinalHourlyForecast(finalHourlyForecastList.get(0));
 
 				simpleCurrentConditionsFragment = kmaSimpleCurrentConditionsFragment;
 				simpleHourlyForecastFragment = kmaSimpleHourlyForecastFragment;

@@ -63,6 +63,7 @@
                         android:paddingVertical="16dp"
                         android:text="@string/alarm"
                         android:textColor="@color/black"
+                        android:visibility="gone"
                         android:textSize="15sp" />
                 </LinearLayout>
 

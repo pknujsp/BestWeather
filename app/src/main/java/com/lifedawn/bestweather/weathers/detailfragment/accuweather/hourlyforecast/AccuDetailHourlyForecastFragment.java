@@ -149,7 +149,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailHourlyForecastFr
 					precipitationIntensityList.add(hourly.getPrecipitationIntensity());
 					windDirectionList.add(Integer.parseInt(hourly.getWind().getDirection().getDegrees()));
 					windSpeedList.add(ValueUnits.convertWindSpeedForAccu(hourly.getWind().getSpeed().getValue(), windUnit).toString());
-					windStrengthList.add(WeatherResponseProcessor.getSimpleWindSpeedDescription(hourly.getWind().getSpeed().getValue()));
+					windStrengthList.add(WindUtil.getSimpleWindSpeedDescription(hourly.getWind().getSpeed().getValue()));
 					windGustList.add(
 							hourly.getWindGust() == null ? "-" : ValueUnits.convertWindSpeedForAccu(hourly.getWindGust().getSpeed().getValue(),
 									windUnit).toString());

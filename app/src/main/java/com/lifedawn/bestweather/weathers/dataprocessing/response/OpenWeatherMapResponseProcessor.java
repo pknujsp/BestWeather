@@ -12,7 +12,7 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.dailyforecast.
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast.HourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
@@ -155,10 +155,10 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 					.setSnowVolume(snowVolume)
 					.setWeatherDescription(OpenWeatherMapResponseProcessor.getWeatherIconDescription(hourly.getWeather().get(0).getId()))
 					.setFeelsLikeTemp(ValueUnits.convertTemperature(hourly.getFeelsLike(), tempUnit) + tempDegree)
-					.setWindDirection(WindDirectionConverter.windDirection(context, hourly.getWind_deg()))
+					.setWindDirection(WindUtil.windDirection(context, hourly.getWind_deg()))
 					.setWindDirectionVal(Integer.parseInt(hourly.getWind_deg()))
 					.setWindSpeed(ValueUnits.convertWindSpeed(hourly.getWind_speed(), windUnit) + windUnitStr)
-					.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(hourly.getWind_speed()))
+					.setWindStrength(WindUtil.getSimpleWindSpeedDescription(hourly.getWind_speed()))
 					.setWindGust(ValueUnits.convertWindSpeed(hourly.getWindGust(), windUnit) + windUnitStr)
 					.setPressure(hourly.getPressure() + pressureUnit)
 					.setHumidity(hourly.getHumidity() + percent)
@@ -227,10 +227,10 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 					.setSnowVolume(snowVolume)
 					.setWeatherIcon(OpenWeatherMapResponseProcessor.getWeatherIconImg(daily.getWeather().get(0).getId(), false))
 					.setWeatherDescription(OpenWeatherMapResponseProcessor.getWeatherIconDescription(daily.getWeather().get(0).getId()))
-					.setWindDirection(WindDirectionConverter.windDirection(context, daily.getWindDeg()))
+					.setWindDirection(WindUtil.windDirection(context, daily.getWindDeg()))
 					.setWindDirectionVal(Integer.parseInt(daily.getWindDeg()))
 					.setWindSpeed(ValueUnits.convertWindSpeed(daily.getWindSpeed(), windUnit) + wind)
-					.setWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getWindSpeed()))
+					.setWindStrength(WindUtil.getSimpleWindSpeedDescription(daily.getWindSpeed()))
 					.setWindGust(ValueUnits.convertWindSpeed(daily.getWindGust(), windUnit) + wind)
 					.setPressure(daily.getPressure() + hpa)
 					.setHumidity(daily.getHumidity() + percent)
@@ -265,14 +265,14 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		currentConditionsDto.setHumidity(item.getHumidity() + percent);
 		currentConditionsDto.setDewPoint(ValueUnits.convertTemperature(item.getDewPoint(), tempUnit) + tempUnitStr);
 		currentConditionsDto.setWindDirectionDegree(Integer.parseInt(item.getWind_deg()));
-		currentConditionsDto.setWindDirection(WindDirectionConverter.windDirection(context, item.getWind_deg()));
+		currentConditionsDto.setWindDirection(WindUtil.windDirection(context, item.getWind_deg()));
 		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(item.getWind_speed(), windUnit) + ValueUnits.convertToStr(context, windUnit));
 		if (item.getWindGust() != null) {
 			currentConditionsDto.setWindGust(ValueUnits.convertWindSpeed(item.getWindGust(), windUnit) + ValueUnits.convertToStr(context,
 					windUnit));
 		}
-		currentConditionsDto.setSimpleWindStrength(WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWind_speed()));
-		currentConditionsDto.setWindStrength(WeatherResponseProcessor.getWindSpeedDescription(item.getWind_speed()));
+		currentConditionsDto.setSimpleWindStrength(WindUtil.getSimpleWindSpeedDescription(item.getWind_speed()));
+		currentConditionsDto.setWindStrength(WindUtil.getWindSpeedDescription(item.getWind_speed()));
 		currentConditionsDto.setPressure(item.getPressure() + "hpa");
 		currentConditionsDto.setUvIndex(item.getUvi());
 		currentConditionsDto.setVisibility(ValueUnits.convertVisibility(item.getVisibility(),

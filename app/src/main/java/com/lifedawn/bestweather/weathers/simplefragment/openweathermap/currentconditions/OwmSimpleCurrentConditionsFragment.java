@@ -15,6 +15,9 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
 
 import org.jetbrains.annotations.NotNull;
@@ -46,31 +49,38 @@ public class OwmSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 	@Override
 	public void setValuesToViews() {
 		super.setValuesToViews();
-		OneCallResponse.Current current = oneCallResponse.getCurrent();
-		if (current.getRain() != null || current.getSnow() != null) {
-			String precipitation = null;
-			String precipitationUnit = "mm";
+		CurrentConditionsDto currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDto(getContext(), oneCallResponse
+				, windUnit, tempUnit, visibilityUnit);
 
-			if (current.getRain() != null && current.getSnow() != null) {
+		if (currentConditionsDto.isHasPrecipitationVolume()) {
+			String precipitation = null;
+
+			if (currentConditionsDto.isHasRainVolume() && currentConditionsDto.isHasSnowVolume()) {
 				precipitation = getString(
-						R.string.owm_icon_616_rain_and_snow) + ", " + current.getRain().getPrecipitation1Hour() + precipitationUnit + ", " + current.getSnow().getPrecipitation1Hour() + precipitationUnit;
-			} else if (current.getRain() != null) {
-				precipitation = getString(R.string.rain) + ", " + current.getRain().getPrecipitation1Hour() + precipitationUnit;
+						R.string.owm_icon_616_rain_and_snow) + ": " + getString(R.string.rain) + " - " + currentConditionsDto.getRainVolume() +
+						", " + getString(R.string.snow) + " - " + currentConditionsDto.getSnowVolume();
+			} else if (currentConditionsDto.isHasRainVolume()) {
+				precipitation = getString(R.string.rain) + ": " + currentConditionsDto.getRainVolume();
 			} else {
-				precipitation = getString(R.string.snow) + ", " + current.getSnow().getPrecipitation1Hour() + precipitationUnit;
+				precipitation = getString(R.string.snow) + ": " + currentConditionsDto.getSnowVolume();
 			}
 			binding.precipitation.setText(precipitation);
 		} else {
 			binding.precipitation.setText(R.string.not_precipitation);
 		}
 
-		binding.wind.setText(WeatherResponseProcessor.getWindSpeedDescription(current.getWind_speed()));
+		binding.wind.setText(currentConditionsDto.getWindStrength());
 
-		binding.weatherIcon.setImageDrawable(ContextCompat.getDrawable(getContext(),
-				OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId(), current.getWeather().get(0).getIcon().contains("n"))));
-		binding.sky.setText(OpenWeatherMapResponseProcessor.getWeatherIconDescription(current.getWeather().get(0).getId()));
-		String temp = ValueUnits.convertTemperature(current.getTemp(), tempUnit).toString() + ValueUnits.convertToStr(getContext(),
-				tempUnit);
+		binding.weatherIcon.setImageResource(currentConditionsDto.getWeatherIcon());
+		binding.sky.setText(currentConditionsDto.getWeatherDescription());
+
+		final String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
+		final String temp = currentConditionsDto.getTemp().replace(tempUnitStr, "");
 		binding.temperature.setText(temp);
+		binding.wind.setText(currentConditionsDto.getWindStrength());
+
+		binding.feelsLikeTemp.setText(currentConditionsDto.getFeelsLikeTemp().replace(tempUnitStr, ""));
+		binding.tempUnit.setText(tempUnitStr);
+		binding.feelsLikeTempUnit.setText(tempUnitStr);
 	}
 }

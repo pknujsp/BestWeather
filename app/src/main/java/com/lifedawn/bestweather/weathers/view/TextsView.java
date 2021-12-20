@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.TypedValue;
@@ -41,6 +42,7 @@ public class TextsView extends View {
 	public void setValueTextSize(int textSizeSp) {
 		valueTextPaint.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics()));
 	}
+
 
 	public void setValueTextColor(int textColor) {
 		valueTextPaint.setColor(textColor);

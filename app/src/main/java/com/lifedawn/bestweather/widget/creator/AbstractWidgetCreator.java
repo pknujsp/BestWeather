@@ -206,6 +206,8 @@ public abstract class AbstractWidgetCreator {
 					String text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponseText();
 					jsonObject.addProperty(RetrofitClient.ServiceType.ULTRA_SRT_NCST.name(), text);
 
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponseText();
+					jsonObject.addProperty(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name(), text);
 				} else if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
 					String text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponseText();
 					jsonObject.addProperty(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS.name(), text);

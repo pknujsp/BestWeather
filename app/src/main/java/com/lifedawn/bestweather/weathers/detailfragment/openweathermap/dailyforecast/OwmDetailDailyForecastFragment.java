@@ -108,7 +108,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailDailyForecastFragm
 					snowVolumeList.add(daily.getSnow() == null ? "-" : daily.getSnow());
 					windDirectionList.add(Integer.parseInt(daily.getWindDeg()));
 					windSpeedList.add(ValueUnits.convertWindSpeed(daily.getWindSpeed(), windUnit).toString());
-					windStrengthList.add(WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getWindSpeed()));
+					windStrengthList.add(WindUtil.getSimpleWindSpeedDescription(daily.getWindSpeed()));
 					windGustList.add(daily.getWindGust() == null ? "-" : daily.getWindGust());
 					pressureList.add(daily.getPressure());
 					humidityList.add(daily.getHumidity());

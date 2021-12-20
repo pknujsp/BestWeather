@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers.simplefragment.openweathermap.hourlyforecast;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,6 +25,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.hourlyfor
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.FragmentType;
+import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.TextsView;
@@ -118,12 +120,14 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		List<SingleWeatherIconView.WeatherIconObj> iconObjList = new ArrayList<>();
 		List<ZonedDateTime> dateList = new ArrayList<>();
 		List<String> hourList = new ArrayList<>();
-		List<String> tempList = new ArrayList<>();
+		List<Integer> tempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
 
 		boolean haveSnowVolumes = false;
+
+		final String degree = "°";
 
 		List<HourlyForecastDto> hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(),
 				oneCallResponse, windUnit, tempUnit, visibilityUnit);
@@ -132,7 +136,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			dateList.add(item.getHours());
 			hourList.add(String.valueOf(item.getHours().getHour()));
 			iconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context, item.getWeatherIcon()), item.getWeatherDescription()));
-			tempList.add(item.getTemp());
+			tempList.add(Integer.parseInt(item.getTemp().replace(degree, "")));
 			probabilityOfPrecipitationList.add(item.getPop());
 			rainVolumeList.add(item.getRainVolume().replace("mm", ""));
 
@@ -151,7 +155,9 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		snowVolumeRow.setValueList(snowVolumeList);
 
 		TextsView hourRow = new TextsView(context, VIEW_WIDTH, COLUMN_WIDTH, hourList);
-		TextsView tempRow = new TextsView(context, VIEW_WIDTH, COLUMN_WIDTH, tempList);
+		DetailSingleTemperatureView tempRow = new DetailSingleTemperatureView(context, tempList);
+		tempRow.setLineColor(Color.WHITE);
+		tempRow.setCircleColor(Color.WHITE);
 
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -163,9 +169,9 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			hourRow.setValueTextSize(textSizeMap.get(WeatherDataType.time));
 		}
 		if (textSizeMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setValueTextSize(textSizeMap.get(WeatherDataType.temp));
+			tempRow.setTempTextSizeSp(textSizeMap.get(WeatherDataType.temp));
 		} else {
-			tempRow.setValueTextSize(17);
+			tempRow.setTempTextSizeSp(16);
 		}
 		if (textSizeMap.containsKey(WeatherDataType.pop)) {
 			popRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
@@ -184,7 +190,9 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			hourRow.setValueTextColor(textColorMap.get(WeatherDataType.time));
 		}
 		if (textColorMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setValueTextColor(textColorMap.get(WeatherDataType.temp));
+			tempRow.setTextColor(textColorMap.get(WeatherDataType.temp));
+		} else {
+			tempRow.setTextColor(Color.WHITE);
 		}
 		if (textColorMap.containsKey(WeatherDataType.pop)) {
 			popRow.setTextColor(textColorMap.get(WeatherDataType.pop));
@@ -205,11 +213,11 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
 		}
 
-		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
-		binding.forecastView.addView(tempRow, tempRowLayoutParams);
+		final int tempRowHeight = (int) context.getResources().getDimension(R.dimen.singleTemperatureRowHeightInCOMMON);
 
+		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+				tempRowHeight);
+		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 	}
 
 }

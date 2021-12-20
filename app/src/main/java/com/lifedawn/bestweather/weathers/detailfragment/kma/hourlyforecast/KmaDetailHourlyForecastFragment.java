@@ -163,7 +163,7 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailHourlyForecastFra
 					//풍속
 					windSpeedList.add(ValueUnits.convertWindSpeed(finalHourlyForecast.getWindSpeed(), windUnit).toString());
 					//바람세기
-					windStrengthList.add(WeatherResponseProcessor.getSimpleWindSpeedDescription(finalHourlyForecast.getWindSpeed()));
+					windStrengthList.add(WindUtil.getSimpleWindSpeedDescription(finalHourlyForecast.getWindSpeed()));
 					//습도
 					humidityList.add(finalHourlyForecast.getHumidity());
 				}

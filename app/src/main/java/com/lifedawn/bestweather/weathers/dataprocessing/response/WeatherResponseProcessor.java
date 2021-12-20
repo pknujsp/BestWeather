@@ -6,10 +6,8 @@ import android.util.ArrayMap;
 
 import androidx.preference.PreferenceManager;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
@@ -35,65 +33,18 @@ import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.tickaroo.tikxml.TikXml;
 
 import java.io.IOException;
-import java.lang.reflect.GenericArrayType;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import okio.Buffer;
-import retrofit2.Response;
 
 public class WeatherResponseProcessor {
-	private static Map<String, String> windStrengthDescriptionMap = new HashMap<>();
-	private static Map<String, String> windStrengthDescriptionSimpleMap = new HashMap<>();
 
-	public static void init(Context context) {
-		windStrengthDescriptionMap.clear();
-		windStrengthDescriptionSimpleMap.clear();
-
-		windStrengthDescriptionMap.put("1", context.getString(R.string.wind_strength_1));
-		windStrengthDescriptionMap.put("2", context.getString(R.string.wind_strength_2));
-		windStrengthDescriptionMap.put("3", context.getString(R.string.wind_strength_3));
-		windStrengthDescriptionMap.put("4", context.getString(R.string.wind_strength_4));
-
-		windStrengthDescriptionSimpleMap.put("1", context.getString(R.string.wind_strength_1_simple));
-		windStrengthDescriptionSimpleMap.put("2", context.getString(R.string.wind_strength_2_simple));
-		windStrengthDescriptionSimpleMap.put("3", context.getString(R.string.wind_strength_3_simple));
-		windStrengthDescriptionSimpleMap.put("4", context.getString(R.string.wind_strength_4_simple));
-	}
-
-	public static String getWindSpeedDescription(String windSpeed) {
-		double speed = Double.parseDouble(windSpeed);
-
-		if (speed >= 14) {
-			return windStrengthDescriptionMap.get("4");
-		} else if (speed >= 9) {
-			return windStrengthDescriptionMap.get("3");
-		} else if (speed >= 4) {
-			return windStrengthDescriptionMap.get("2");
-		} else {
-			return windStrengthDescriptionMap.get("1");
-		}
-	}
-
-	public static String getSimpleWindSpeedDescription(String windSpeed) {
-		double speed = Double.parseDouble(windSpeed);
-
-		if (speed >= 14) {
-			return windStrengthDescriptionSimpleMap.get("4");
-		} else if (speed >= 9) {
-			return windStrengthDescriptionSimpleMap.get("3");
-		} else if (speed >= 4) {
-			return windStrengthDescriptionSimpleMap.get("2");
-		} else {
-			return windStrengthDescriptionSimpleMap.get("1");
-		}
-	}
 
 	public static ZonedDateTime convertDateTimeOfDailyForecast(long millis, ZoneId zoneId) {
 		return ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), zoneId).withHour(0).withMinute(0).withSecond(0).withNano(0);
@@ -134,17 +85,25 @@ public class WeatherResponseProcessor {
 				ValueUnits.km.name()));
 
 		if (weatherSourceType == WeatherSourceType.KMA) {
-			if (jsonObject.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST.name()) != null) {
+			if (jsonObject.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST.name()) != null &&
+					jsonObject.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name()) != null) {
 				try {
 					TikXml tikXml = new TikXml.Builder().exceptionOnUnreadXml(false).build();
-					VilageFcstResponse vilageFcstResponse =
+					VilageFcstResponse ultraSrtNcstResponse =
 							tikXml.read(new Buffer().writeUtf8(jsonObject.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST.name()).getAsString()),
 									VilageFcstResponse.class);
-					FinalCurrentConditions finalCurrentConditions =
-							KmaResponseProcessor.getFinalCurrentConditions(vilageFcstResponse);
+					VilageFcstResponse ultraSrtFcstResponse =
+							tikXml.read(new Buffer().writeUtf8(jsonObject.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name()).getAsString()),
+									VilageFcstResponse.class);
 
-					currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDto(context, finalCurrentConditions, windUnit, tempUnit,
-							latitude, longitude);
+					FinalCurrentConditions finalCurrentConditions =
+							KmaResponseProcessor.getFinalCurrentConditions(ultraSrtNcstResponse);
+					List<FinalHourlyForecast> finalHourlyForecastList =
+							KmaResponseProcessor.getFinalHourlyForecastList(ultraSrtFcstResponse, null);
+
+					currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDto(context, finalCurrentConditions,
+							finalHourlyForecastList.get(0), windUnit,
+							tempUnit, latitude, longitude);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -181,16 +140,21 @@ public class WeatherResponseProcessor {
 				ValueUnits.km.name()));
 
 		if (weatherSourceType == WeatherSourceType.KMA) {
-			MultipleJsonDownloader.ResponseResult ultraSrtResponseResult =
+			MultipleJsonDownloader.ResponseResult ultraSrtNcstResponseResult =
 					multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
+			MultipleJsonDownloader.ResponseResult ultraSrtFcstResponseResult =
+					multipleJsonDownloader.getResponseMap().get(WeatherSourceType.KMA).get(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
 
-			if (ultraSrtResponseResult.isSuccessful()) {
+			if (ultraSrtNcstResponseResult.isSuccessful()) {
 				FinalCurrentConditions finalCurrentConditions =
-						KmaResponseProcessor.getFinalCurrentConditions((VilageFcstResponse) ultraSrtResponseResult.getResponseObj());
-				UltraSrtNcstParameter ultraSrtNcstParameter = (UltraSrtNcstParameter) ultraSrtResponseResult.getRequestParameter();
+						KmaResponseProcessor.getFinalCurrentConditions((VilageFcstResponse) ultraSrtNcstResponseResult.getResponseObj());
+				List<FinalHourlyForecast> finalHourlyForecastList =
+						KmaResponseProcessor.getFinalHourlyForecastList((VilageFcstResponse) ultraSrtFcstResponseResult.getResponseObj(), null);
+				UltraSrtNcstParameter ultraSrtNcstParameter = (UltraSrtNcstParameter) ultraSrtNcstResponseResult.getRequestParameter();
 
-				currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDto(context, finalCurrentConditions, windUnit, tempUnit,
-						ultraSrtNcstParameter.getLatitude(), ultraSrtNcstParameter.getLongitude());
+				currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDto(context, finalCurrentConditions,
+						finalHourlyForecastList.get(0), windUnit,
+						tempUnit, ultraSrtNcstParameter.getLatitude(), ultraSrtNcstParameter.getLongitude());
 			}
 		} else if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
 			MultipleJsonDownloader.ResponseResult currentConditionsResponseResult = multipleJsonDownloader.getResponseMap().get(WeatherSourceType.ACCU_WEATHER)

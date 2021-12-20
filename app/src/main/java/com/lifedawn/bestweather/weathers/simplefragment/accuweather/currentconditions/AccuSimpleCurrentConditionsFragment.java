@@ -15,6 +15,8 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
 
 import org.jetbrains.annotations.NotNull;
@@ -50,27 +52,28 @@ public class AccuSimpleCurrentConditionsFragment extends BaseSimpleCurrentCondit
 	public void setValuesToViews() {
 		super.setValuesToViews();
 
-		List<CurrentConditionsResponse.Item> items = currentConditionsResponse.getItems();
-		CurrentConditionsResponse.Item item = items.get(0);
-		String precipitation = null;
-		if (item.getHasPrecipitation().equals("true")) {
-			// precipitation type 값 종류 : Rain, Snow, Ice, Null(Not), or Mixed
-			String precipitationUnit = "mm";
+		CurrentConditionsDto currentConditionsDto = AccuWeatherResponseProcessor.makeCurrentConditionsDto(getContext(), currentConditionsResponse.getItems().get(0), windUnit,
+				tempUnit, visibilityUnit);
 
-			precipitation = AccuWeatherResponseProcessor.getPty(
-					item.getPrecipitationType()) + ", " + item.getPrecip1hr().getMetric().getValue() + precipitationUnit;
+		String precipitation = null;
+		if (currentConditionsDto.isHasPrecipitationVolume()) {
+			precipitation = currentConditionsDto.getPrecipitationType() + ": " + currentConditionsDto.getPrecipitationVolume();
 		} else {
-			precipitation = getString(R.string.not_precipitation);
+			precipitation = currentConditionsDto.getPrecipitationType();
 		}
 		binding.precipitation.setText(precipitation);
 
-		binding.weatherIcon.setImageDrawable(
-				ContextCompat.getDrawable(getContext(), AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon())));
-		binding.sky.setText(AccuWeatherResponseProcessor.getWeatherIconDescription(item.getWeatherIcon()));
-		String temp = ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(), tempUnit) + ValueUnits.convertToStr(
-				getContext(), tempUnit);
-		binding.temperature.setText(temp);
-		binding.wind.setText(WeatherResponseProcessor.getWindSpeedDescription(ValueUnits.convertWindSpeedForAccu(item.getWind().getSpeed().getMetric().getValue(), windUnit).toString()));
+		binding.weatherIcon.setImageResource(currentConditionsDto.getWeatherIcon());
+		binding.wind.setText(currentConditionsDto.getWindStrength());
+		binding.sky.setText(currentConditionsDto.getWeatherDescription());
 
+		final String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
+		final String temp = currentConditionsDto.getTemp().replace(tempUnitStr, "");
+		binding.temperature.setText(temp);
+		binding.wind.setText(currentConditionsDto.getWindStrength());
+
+		binding.feelsLikeTemp.setText(currentConditionsDto.getFeelsLikeTemp().replace(tempUnitStr, ""));
+		binding.tempUnit.setText(tempUnitStr);
+		binding.feelsLikeTempUnit.setText(tempUnitStr);
 	}
 }

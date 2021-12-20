@@ -132,8 +132,8 @@ public class AccuDetailDailyForecastFragment extends BaseDetailDailyForecastFrag
 							ValueUnits.convertWindSpeedForAccu(daily.getDay().getWind().getSpeed().getValue(), windUnit).toString(),
 							ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), windUnit).toString()));
 					windStrengthList.add(getDayNightValueStr(
-							WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getDay().getWind().getSpeed().getValue()),
-							WeatherResponseProcessor.getSimpleWindSpeedDescription(daily.getNight().getWind().getSpeed().getValue())));
+							WindUtil.getSimpleWindSpeedDescription(daily.getDay().getWind().getSpeed().getValue()),
+							WindUtil.getSimpleWindSpeedDescription(daily.getNight().getWind().getSpeed().getValue())));
 					windGustList.add(getDayNightValueStr(
 							ValueUnits.convertWindSpeedForAccu(daily.getDay().getWindGust().getSpeed().getValue(), windUnit).toString(),
 							ValueUnits.convertWindSpeedForAccu(daily.getNight().getWindGust().getSpeed().getValue(), windUnit).toString()));

@@ -79,6 +79,45 @@ public final class KmaProcessing {
 	}
 
 	/**
+	 * 1일전(정확히는 23시간 58분전) 초단기 실황
+	 */
+	public static Call<String> getYesterdayUltraSrtNcstData(UltraSrtNcstParameter parameter, ZonedDateTime dateTime,
+	                                                        JsonDownloader callback) {
+		DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
+		DateTimeFormatter HH = DateTimeFormatter.ofPattern("HHmm");
+
+		dateTime = dateTime.minusHours(23).minusMinutes(58);
+
+		parameter.setBaseDate(dateTime.format(yyyyMMdd));
+		parameter.setBaseTime(dateTime.format(HH));
+
+		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
+		Call<String> call = querys.getUltraSrtNcstByXml(parameter.getMap());
+		call.enqueue(new Callback<String>() {
+			@Override
+			public void onResponse(Call<String> call, Response<String> response) {
+				VilageFcstResponse vilageFcstResponse = KmaResponseProcessor.successfulVilageResponse(response);
+				if (vilageFcstResponse != null) {
+					callback.onResponseResult(response, vilageFcstResponse, response.body());
+					Log.e(RetrofitClient.LOG_TAG, "yesterday kma ultra srt ncst 성공");
+				} else {
+					callback.onResponseResult(new Exception());
+					Log.e(RetrofitClient.LOG_TAG, "yesterday kma ultra srt ncst 실패");
+				}
+			}
+
+			@Override
+			public void onFailure(Call<String> call, Throwable t) {
+				callback.onResponseResult(t);
+				Log.e(RetrofitClient.LOG_TAG, "yesterday kma ultra srt ncst 실패");
+			}
+		});
+
+		return call;
+	}
+
+
+	/**
 	 * 초단기예보
 	 */
 	public static Call<String> getUltraSrtFcstData(UltraSrtFcstParameter parameter, ZonedDateTime dateTime,
@@ -312,6 +351,31 @@ public final class KmaProcessing {
 							multipleJsonDownloader.getCallMap().put(RetrofitClient.ServiceType.ULTRA_SRT_NCST, ultraSrtNcstCall);
 
 						}
+
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST)) {
+							final UltraSrtNcstParameter ultraSrtNcstParameter = new UltraSrtNcstParameter();
+							ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY())
+									.setLatitude(latitude).setLongitude(longitude);
+
+							Call<String> yesterdayUltraSrtNcstCall = getYesterdayUltraSrtNcstData(ultraSrtNcstParameter,
+									ZonedDateTime.of(koreaLocalDateTime.toLocalDateTime(), koreaLocalDateTime.getZone()),
+									new JsonDownloader() {
+										@Override
+										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
+											multipleJsonDownloader.processResult(WeatherSourceType.KMA, ultraSrtNcstParameter,
+													RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST, response, responseObj, responseText);
+										}
+
+										@Override
+										public void onResponseResult(Throwable t) {
+											multipleJsonDownloader.processResult(WeatherSourceType.KMA, ultraSrtNcstParameter,
+													RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST, t);
+										}
+									});
+							multipleJsonDownloader.getCallMap().put(RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST, yesterdayUltraSrtNcstCall);
+
+						}
+
 						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_FCST)) {
 							UltraSrtFcstParameter ultraSrtFcstParameter = new UltraSrtFcstParameter();
 							ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY()).setLatitude(latitude).setLongitude(longitude);

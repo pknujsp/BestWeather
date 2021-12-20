@@ -9,11 +9,10 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.ValuesUnit;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
 
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +59,7 @@ public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 		addGridItem(R.string.humidity, current.getHumidity() + percent, R.drawable.humidity, null);
 		addGridItem(R.string.dew_point, ValueUnits.convertTemperature(current.getDewPoint(), tempUnit) + tempUnitStr, R.drawable.dewpoint,
 				null);
-		View windDirectionView = addGridItem(R.string.wind_direction, WindDirectionConverter.windDirection(getContext(), current.getWind_deg()),
+		View windDirectionView = addGridItem(R.string.wind_direction, WindUtil.windDirection(getContext(), current.getWind_deg()),
 				R.drawable.arrow,null);
 		((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(Integer.parseInt(current.getWind_deg()) + 180);
 		addGridItem(R.string.wind_speed,
@@ -69,7 +68,7 @@ public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 				current.getWindGust() == null ? notData :
 						ValueUnits.convertWindSpeed(current.getWindGust(), windUnit) + windUnitStr,
 				R.drawable.windgust, null);
-		addGridItem(R.string.wind_strength, WeatherResponseProcessor.getSimpleWindSpeedDescription(current.getWind_speed()),
+		addGridItem(R.string.wind_strength, WindUtil.getSimpleWindSpeedDescription(current.getWind_speed()),
 				R.drawable.windstrength, null);
 		addGridItem(R.string.pressure, current.getPressure() + hpa, R.drawable.pressure, null);
 		addGridItem(R.string.uv_index, current.getUvi(), R.drawable.uv, null);

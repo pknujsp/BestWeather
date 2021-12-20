@@ -85,6 +85,14 @@ public class DetailSingleTemperatureView extends View {
 		tempPaint.setColor(textColor);
 	}
 
+	public void setLineColor(int color) {
+		linePaint.setColor(color);
+	}
+
+	public void setCircleColor(int color) {
+		circlePaint.setColor(color);
+	}
+
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		String test = "20";

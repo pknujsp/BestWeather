@@ -45,7 +45,7 @@
     <string name="pref_title_unit_temp">기온</string>
 
     <string name="pref_key_unit_visibility">pref_key_unit_visibility</string>
-    <string name="pref_title_unit_visibility">시정거리</string>
+    <string name="pref_title_unit_visibility">가시거리</string>
 
     <string name="pref_key_unit_wind">pref_key_unit_wind</string>
     <string name="pref_title_unit_wind">풍속</string>
@@ -315,7 +315,7 @@
     <string name="wind_gust">돌풍</string>
     <string name="wind_strength">바람세기</string>
     <string name="uv_index">자외선</string>
-    <string name="visibility">시정거리</string>
+    <string name="visibility">가시거리</string>
     <string name="cloud_cover">운량</string>
     <string name="precipitation_type">강수형태</string>
     <string name="pressure">기압</string>
@@ -555,6 +555,10 @@
     <string name="detailSunRiseSet">상세 일출, 일몰</string>
     <string name="currentAndForecast">현재및 예보</string>
     <string name="widgetSimple3">현재/시간별 그래프</string>
+    <string name="TheTemperatureIsTheSameAsYesterday">어제 이 시각과 기온이 같습니다</string>
+    <string name="thanYesterday">어제 이 시각 대비</string>
+    <string name="higherTemperature">높습니다</string>
+    <string name="lowerTemperature">낮습니다</string>
 
 
 </resources>

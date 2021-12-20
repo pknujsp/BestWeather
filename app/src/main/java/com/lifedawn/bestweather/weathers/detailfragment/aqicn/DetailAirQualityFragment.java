@@ -66,6 +66,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -345,10 +346,12 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 		List<String> dateList = new ArrayList<>();
 
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE");
+
 		for (int i = 0; i < airQualityForecastObjList.size(); i++) {
 			AirQualityForecastObj airQualityForecastObj = airQualityForecastObjList.get(i);
 			dateList.add(airQualityForecastObj.date == null ? getString(R.string.current) :
-					airQualityForecastObj.date.format(dateFormatter));
+					airQualityForecastObj.date.format(dateTimeFormatter));
 
 			int pm10 = airQualityForecastObj.pm10 == null ? 0 : airQualityForecastObj.pm10;
 			int pm25 = airQualityForecastObj.pm25 == null ? 0 : airQualityForecastObj.pm25;

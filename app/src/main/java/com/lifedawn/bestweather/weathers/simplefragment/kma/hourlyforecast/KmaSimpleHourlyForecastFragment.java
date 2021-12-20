@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.weathers.simplefragment.kma.hourlyforecast;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.kma.hourlyforecast.KmaDe
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.FragmentType;
+import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.TextsView;
@@ -122,7 +124,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		List<String> hourList = new ArrayList<>();
-		List<String> tempList = new ArrayList<>();
+		List<Integer> tempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
@@ -130,6 +132,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 
 		final String mm = "mm";
 		final String cm = "cm";
+		final String degree = "°";
 
 		boolean haveSnow = false;
 		List<HourlyForecastDto> hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoList(getContext(),
@@ -140,7 +143,8 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			hourList.add(String.valueOf(item.getHours().getHour()));
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 					ContextCompat.getDrawable(context, item.getWeatherIcon()), item.getWeatherDescription()));
-			tempList.add(item.getTemp());
+			tempList.add(Integer.parseInt(item.getTemp().replace(degree, "")));
+
 
 			probabilityOfPrecipitationList.add(item.getPop());
 			rainVolumeList.add(item.getRainVolume().replace(mm, ""));
@@ -160,7 +164,9 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		weatherIconRow.setWeatherImgs(weatherIconObjList);
 
 		TextsView hourRow = new TextsView(context, viewWidth, columnWidth, hourList);
-		TextsView tempRow = new TextsView(context, viewWidth, columnWidth, tempList);
+		DetailSingleTemperatureView tempRow = new DetailSingleTemperatureView(context, tempList);
+		tempRow.setLineColor(Color.WHITE);
+		tempRow.setCircleColor(Color.WHITE);
 
 		if (textSizeMap.containsKey(WeatherDataType.date)) {
 			dateRow.setTextSize(textSizeMap.get(WeatherDataType.date));
@@ -169,9 +175,9 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			hourRow.setValueTextSize(textSizeMap.get(WeatherDataType.time));
 		}
 		if (textSizeMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setValueTextSize(textSizeMap.get(WeatherDataType.temp));
+			tempRow.setTempTextSizeSp(textSizeMap.get(WeatherDataType.temp));
 		} else {
-			tempRow.setValueTextSize(17);
+			tempRow.setTempTextSizeSp(16);
 		}
 		if (textSizeMap.containsKey(WeatherDataType.pop)) {
 			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
@@ -190,7 +196,9 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			hourRow.setValueTextColor(textColorMap.get(WeatherDataType.time));
 		}
 		if (textColorMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setValueTextColor(textColorMap.get(WeatherDataType.temp));
+			tempRow.setTextColor(textColorMap.get(WeatherDataType.temp));
+		} else {
+			tempRow.setTextColor(Color.WHITE);
 		}
 		if (textColorMap.containsKey(WeatherDataType.pop)) {
 			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherDataType.pop));
@@ -214,9 +222,10 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
 		}
 
-		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
+		final int tempRowHeight = (int) context.getResources().getDimension(R.dimen.singleTemperatureRowHeightInCOMMON);
+
+		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+				tempRowHeight);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
 	}

@@ -64,18 +64,83 @@
 
             </LinearLayout>
 
-
-            <TextView
-                android:id="@+id/temperature"
-                style="@style/text_shadow"
+            <LinearLayout
+                android:id="@+id/tempLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/weatherIconLayout"
                 android:layout_alignParentLeft="true"
-                android:fontFamily="sans-serif-thin"
-                android:includeFontPadding="false"
-                android:text="20"
-                android:textSize="71sp" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/temperature"
+                    style="@style/text_shadow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-thin"
+                    android:includeFontPadding="false"
+                    android:text="-20"
+                    android:textSize="80sp" />
+
+                <TextView
+                    android:id="@+id/tempUnit"
+                    style="@style/text_shadow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-thin"
+                    android:includeFontPadding="false"
+                    android:text="°C"
+                    android:textSize="40sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tempDescriptionLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tempLayout"
+                android:layout_alignParentLeft="true"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/text_shadow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:fontFamily="sans-serif-thin"
+                    android:text="@string/real_feel_temperature_simple"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/feelsLikeTemp"
+                    style="@style/text_shadow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-thin"
+                    android:includeFontPadding="false"
+                    android:text="-20"
+                    android:textSize="28sp" />
+
+                <TextView
+                    android:id="@+id/feelsLikeTempUnit"
+                    style="@style/text_shadow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-thin"
+                    android:includeFontPadding="false"
+                    android:text="°C"
+                    android:textSize="22sp" />
+
+                <TextView
+                    android:id="@+id/tempDescription"
+                    style="@style/text_shadow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="12dp"
+                    android:fontFamily="sans-serif-thin"
+                    android:text="tempDescription"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
 
             <LinearLayout
                 android:id="@+id/flickrLayout"
@@ -106,7 +171,7 @@
                 android:id="@+id/airQualityLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@id/temperature"
+                android:layout_alignBottom="@id/tempLayout"
                 android:layout_alignParentRight="true"
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp"

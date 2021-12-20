@@ -20,7 +20,7 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
@@ -151,10 +151,10 @@ public class CurrentWidgetCreator extends AbstractWidgetCreator {
 	public void setTempDataViews(RemoteViews remoteViews) {
 		CurrentConditionsDto tempCurrentConditions = new CurrentConditionsDto();
 		tempCurrentConditions.setTemp("10°").setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(120)
-				.setWindDirection(WindDirectionConverter.windDirection(context, String.valueOf(tempCurrentConditions.getWindDirectionDegree())))
+				.setWindDirection(WindUtil.windDirection(context, String.valueOf(tempCurrentConditions.getWindDirectionDegree())))
 				.setWindSpeed(ValueUnits.convertWindSpeed("2.6", ValueUnits.mPerSec) + "m/s")
 				.setHumidity("45%")
-				.setWindStrength(WeatherResponseProcessor.getWindSpeedDescription("2.6"));
+				.setWindStrength(WindUtil.getWindSpeedDescription("2.6"));
 
 		AirQualityDto tempAirQualityDto = new AirQualityDto();
 		tempAirQualityDto.setAqi(10);

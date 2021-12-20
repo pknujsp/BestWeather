@@ -72,6 +72,7 @@ public class WeatherRequestUtil {
 
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
 				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
 			}
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
 				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST).addRequestServiceType(RetrofitClient.ServiceType.VILAGE_FCST);

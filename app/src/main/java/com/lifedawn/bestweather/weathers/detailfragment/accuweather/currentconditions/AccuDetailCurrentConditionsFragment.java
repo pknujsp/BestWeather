@@ -11,9 +11,8 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindDirectionConverter;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
 
 import org.jetbrains.annotations.NotNull;
@@ -59,7 +58,7 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 		addGridItem(R.string.dew_point, ValueUnits.convertTemperature(item.getDewPoint().getMetric().getValue(), tempUnit) + tempUnitStr,
 				R.drawable.dewpoint,
 				null);
-		View windDirectionView = addGridItem(R.string.wind_direction, WindDirectionConverter.windDirection(getContext(), item.getWind().getDirection().getDegrees()),
+		View windDirectionView = addGridItem(R.string.wind_direction, WindUtil.windDirection(getContext(), item.getWind().getDirection().getDegrees()),
 				R.drawable.arrow, null);
 		((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(Integer.parseInt(item.getWind().getDirection().getDegrees()) + 180);
 
@@ -70,7 +69,7 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 				ValueUnits.convertWindSpeedForAccu(item.getWindGust().getSpeed().getMetric().getValue(), windUnit) + ValueUnits.convertToStr(getContext(), windUnit),
 				R.drawable.windgust, null);
 		addGridItem(R.string.wind_strength,
-				WeatherResponseProcessor.getSimpleWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()),
+				WindUtil.getSimpleWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()),
 				R.drawable.windstrength, null);
 		addGridItem(R.string.pressure, item.getPressure().getMetric().getValue() + ValueUnits.convertToStr(getContext(), ValueUnits.hpa),
 				R.drawable.pressure, null);
