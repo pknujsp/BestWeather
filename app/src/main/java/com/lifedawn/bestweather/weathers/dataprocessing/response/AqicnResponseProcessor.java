@@ -234,27 +234,13 @@ public class AqicnResponseProcessor {
 		airQualityDto.setCurrent(current);
 		GeolocalizedFeedResponse.Data.IAqi iAqi = data.getIaqi();
 
-		if (iAqi.getPm10() != null) {
-			current.setPm10((int) Double.parseDouble(iAqi.getPm10().getValue()));
-		}
-		if (iAqi.getPm25() != null) {
-			current.setPm25((int) Double.parseDouble(iAqi.getPm25().getValue()));
-		}
-		if (iAqi.getDew() != null) {
-			current.setDew((int) Double.parseDouble(iAqi.getDew().getValue()));
-		}
-		if (iAqi.getCo() != null) {
-			current.setCo((int) Double.parseDouble(iAqi.getCo().getValue()));
-		}
-		if (iAqi.getSo2() != null) {
-			current.setSo2((int) Double.parseDouble(iAqi.getSo2().getValue()));
-		}
-		if (iAqi.getNo2() != null) {
-			current.setNo2((int) Double.parseDouble(iAqi.getNo2().getValue()));
-		}
-		if (iAqi.getO3() != null) {
-			current.setO3((int) Double.parseDouble(iAqi.getO3().getValue()));
-		}
+		current.setPm10(iAqi.getPm10() != null ? (int) Double.parseDouble(iAqi.getPm10().getValue()) : -1);
+		current.setPm25(iAqi.getPm25() != null ? (int) Double.parseDouble(iAqi.getPm25().getValue()) : -1);
+		current.setDew(iAqi.getDew() != null ? (int) Double.parseDouble(iAqi.getDew().getValue()) : -1);
+		current.setCo(iAqi.getCo() != null ? (int) Double.parseDouble(iAqi.getCo().getValue()) : -1);
+		current.setSo2(iAqi.getSo2() != null ? (int) Double.parseDouble(iAqi.getSo2().getValue()) : -1);
+		current.setNo2(iAqi.getNo2() != null ? (int) Double.parseDouble(iAqi.getNo2().getValue()) : -1);
+		current.setO3(iAqi.getO3() != null ? (int) Double.parseDouble(iAqi.getO3().getValue()) : -1);
 
 		//---------- dailyforecast-----------------------------------------------------------------------
 		ArrayMap<String, AirQualityDto.DailyForecast> forecastArrMap = new ArrayMap<>();

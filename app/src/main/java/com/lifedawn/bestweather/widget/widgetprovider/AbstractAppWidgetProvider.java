@@ -31,6 +31,7 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -256,12 +257,14 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			}
 
 			ExecutorService executorService = Executors.newSingleThreadExecutor();
-			WeatherSourceType finalWeatherSourceType = weatherSourceType;
+			Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
+			weatherSourceTypeSet.add(weatherSourceType);
+
 			WeatherRequestUtil.loadWeatherData(context, executorService, widgetDto.getCountryCode(), widgetDto.getLatitude(),
 					widgetDto.getLongitude(), requestWeatherDataTypeSet, new MultipleJsonDownloader() {
 						@Override
 						public void onResult() {
-							setResultViews(context, appWidgetId, remoteViews, widgetDto, finalWeatherSourceType, this, requestWeatherDataTypeSet);
+							setResultViews(context, appWidgetId, remoteViews, widgetDto, weatherSourceTypeSet, this, requestWeatherDataTypeSet);
 						}
 
 						@Override
@@ -285,6 +288,6 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	abstract Set<RequestWeatherDataType> getRequestWeatherDataTypeSet();
 
 	abstract protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews,
-	                                       WidgetDto widgetDto, WeatherSourceType requestWeatherSourceType, @Nullable MultipleJsonDownloader multipleJsonDownloader,
+	                                       WidgetDto widgetDto, Set<WeatherSourceType> requestWeatherSourceTypeSet, @Nullable MultipleJsonDownloader multipleJsonDownloader,
 	                                       Set<RequestWeatherDataType> requestWeatherDataTypeSet);
 }

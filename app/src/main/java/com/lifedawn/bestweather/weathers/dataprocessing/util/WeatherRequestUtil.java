@@ -117,10 +117,13 @@ public class WeatherRequestUtil {
 			requestOwm.setExcludeApis(excludeSet);
 			requestOwm.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
 		}
-		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
+		if (weatherSourceType == WeatherSourceType.AQICN) {
 			RequestAqicn requestAqicn = new RequestAqicn();
-			requestAqicn.addRequestServiceType(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 			requestWeatherSources.put(WeatherSourceType.AQICN, requestAqicn);
+
+			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
+				requestAqicn.addRequestServiceType(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
+			}
 		}
 	}
 

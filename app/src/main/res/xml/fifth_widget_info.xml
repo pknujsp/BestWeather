@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="com.lifedawn.bestweather.widget.ConfigureWidgetActivity"
+    android:initialLayout="@layout/view_widget"
+    android:minWidth="@dimen/fifthWidgetWidth"
+    android:minHeight="@dimen/fifthWidgetHeight"
+    android:minResizeWidth="@dimen/fifthWidgetWidth"
+    android:minResizeHeight="@dimen/fifthWidgetHeight"
+    android:previewImage="@drawable/example_appwidget_preview"
+    android:resizeMode="vertical|horizontal"
+
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen" />

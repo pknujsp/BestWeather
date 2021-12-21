@@ -39,6 +39,7 @@ public class TextsView extends View {
 		valueTextPaint.setColor(Color.WHITE);
 	}
 
+
 	public void setValueTextSize(int textSizeSp) {
 		valueTextPaint.setTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp, getResources().getDisplayMetrics()));
 	}

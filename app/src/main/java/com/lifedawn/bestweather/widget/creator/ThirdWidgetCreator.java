@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Weather;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
@@ -35,9 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.view.View.MeasureSpec.EXACTLY;
-
-public class FullWidgetCreator extends AbstractWidgetCreator {
+public class ThirdWidgetCreator extends AbstractWidgetCreator {
 	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 
 	private int addressTextSize;
@@ -53,7 +49,7 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 	private final int hourlyForecastCount = 12;
 	private final int dailyForecastCount = 4;
 
-	public FullWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
+	public ThirdWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
 	}
 
@@ -259,7 +255,7 @@ public class FullWidgetCreator extends AbstractWidgetCreator {
 		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
 		headerView.setId(R.id.header);
 
-		final View valuesView = layoutInflater.inflate(R.layout.view_widget_full_values, null, false);
+		final View valuesView = layoutInflater.inflate(R.layout.view_third_widget, null, false);
 
 		makeCurrentConditionsViews(valuesView, currentConditionsDto, airQualityDto);
 		setHourlyForecastViews(valuesView, layoutInflater, hourlyForecastDtoList);

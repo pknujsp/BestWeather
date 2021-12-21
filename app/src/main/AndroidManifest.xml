@@ -65,9 +65,9 @@
         </receiver>
 
         <receiver
-            android:name=".widget.widgetprovider.CurrentWidgetProvider"
+            android:name=".widget.widgetprovider.FirstWidgetProvider"
             android:enabled="true"
-            android:label="@string/widgetCurrent">
+            android:label="@string/firstWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -75,51 +75,13 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_current_info" />
-        </receiver>
-        <receiver
-            android:name=".widget.widgetprovider.FullWidgetProvider"
-            android:enabled="true"
-            android:label="@string/widgetFull">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_full_info" />
-        </receiver>
-        <receiver
-            android:name=".widget.widgetprovider.FirstSimpleWidgetProvider"
-            android:enabled="true"
-            android:label="@string/widgetSimple1">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_simple1_info" />
-        </receiver>
-        <receiver
-            android:name=".widget.widgetprovider.SecSimpleWidgetProvider"
-            android:enabled="true"
-            android:label="@string/widgetSimple2">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_simple2_info" />
+                android:resource="@xml/first_widget_info" />
         </receiver>
 
         <receiver
-            android:name=".widget.widgetprovider.ThirdSimpleWidgetProvider"
-            android:label="@string/widgetSimple3">
+            android:name=".widget.widgetprovider.ThirdWidgetProvider"
+            android:enabled="true"
+            android:label="@string/thirdWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -127,7 +89,139 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_simple3_info" />
+                android:resource="@xml/third_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.widgetprovider.SecondWidgetProvider"
+            android:enabled="true"
+            android:label="@string/secondWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/second_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.widgetprovider.FourthWidgetProvider"
+            android:enabled="true"
+            android:label="@string/fourthWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/fourth_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.widgetprovider.FifthWidgetProvider"
+            android:label="@string/fifthWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/fifth_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.widgetprovider.FifthWidgetProvider"
+            android:label="@string/fifthWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/fifth_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.widgetprovider.SixthWidgetProvider"
+            android:label="@string/sixthWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/sixth_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.widgetprovider.SeventhWidgetProvider"
+            android:label="@string/seventhWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/seventh_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.widgetprovider.EighthWidgetProvider"
+            android:label="@string/eighthWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/eighth_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.widgetprovider.NinthWidgetProvider"
+            android:label="@string/ninthWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/ninth_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.widgetprovider.TenthWidgetProvider"
+            android:label="@string/tenthWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/tenth_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.widgetprovider.EleventhWidgetProvider"
+            android:label="@string/eleventhWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/eleventh_widget_info" />
         </receiver>
 
         <receiver

@@ -42,7 +42,7 @@ public class AirQualityDto {
 
 		public Current setCo(Integer co) {
 			this.co = co;
-			hasCo = true;
+			hasCo = co != -1;
 			return this;
 		}
 
@@ -61,7 +61,7 @@ public class AirQualityDto {
 
 		public Current setDew(Integer dew) {
 			this.dew = dew;
-			hasDew = true;
+			hasDew = dew != -1;
 			return this;
 		}
 
@@ -80,7 +80,7 @@ public class AirQualityDto {
 
 		public Current setNo2(Integer no2) {
 			this.no2 = no2;
-			hasNo2 = true;
+			hasNo2 = no2 != -1;
 			return this;
 		}
 
@@ -99,7 +99,7 @@ public class AirQualityDto {
 
 		public Current setO3(Integer o3) {
 			this.o3 = o3;
-			hasO3 = true;
+			hasO3 = o3 != -1;
 			return this;
 		}
 
@@ -118,7 +118,7 @@ public class AirQualityDto {
 
 		public Current setPm10(Integer pm10) {
 			this.pm10 = pm10;
-			hasPm10 = true;
+			hasPm10 = pm10 != -1;
 			return this;
 		}
 
@@ -137,7 +137,7 @@ public class AirQualityDto {
 
 		public Current setPm25(Integer pm25) {
 			this.pm25 = pm25;
-			hasPm25 = true;
+			hasPm25 = pm25 != -1;
 			return this;
 		}
 
@@ -156,7 +156,7 @@ public class AirQualityDto {
 
 		public Current setSo2(Integer so2) {
 			this.so2 = so2;
-			hasSo2 = true;
+			hasSo2 = so2 != -1;
 			return this;
 		}
 

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
+        android:text="@string/measuring_station_name"
+        android:id="@+id/measuring_station_name"
+        android:textColor="@color/widgetTextColor"
+        android:textSize="@dimen/stationNameTextSizeInSixthWidget" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/weatherIcon"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginRight="4dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/day_clear" />
+
+        <TextView
+            android:id="@+id/temperature"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-thin"
+            android:text="5°"
+            android:textColor="@color/widgetTextColor"
+            android:textSize="@dimen/tempTextSizeInSixthWidget" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/precipitation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/not_precipitation"
+                android:textColor="@color/widgetTextColor"
+                android:textSize="@dimen/precipitationtTextSizeInSixthWidget" />
+
+            <TextView
+                android:id="@+id/airQuality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/air_quality"
+                android:textColor="@color/widgetTextColor"
+                android:textSize="@dimen/airQualityTextSizeInSixthWidget" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <androidx.gridlayout.widget.GridLayout
+        android:id="@+id/airQualityGrid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:columnCount="3"
+        app:orientation="horizontal"
+        app:useDefaultMargins="true" />
+
+</LinearLayout>

@@ -20,13 +20,11 @@ import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.WidgetHelper;
-import com.lifedawn.bestweather.widget.creator.FirstSimpleWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.SecSimpleWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.FifthWidgetCreator;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -34,8 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-public class FirstSimpleWidgetProvider extends AbstractAppWidgetProvider {
+public class EleventhWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	public void onEnabled(Context context) {
 		super.onEnabled(context);
@@ -58,7 +55,7 @@ public class FirstSimpleWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
 		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
-		FirstSimpleWidgetCreator widgetCreator = new FirstSimpleWidgetCreator(context, null, appWidgetId);
+		FifthWidgetCreator widgetCreator = new FifthWidgetCreator(context, null, appWidgetId);
 		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
@@ -87,7 +84,7 @@ public class FirstSimpleWidgetProvider extends AbstractAppWidgetProvider {
 
 	@Override
 	protected void reDrawWidget(Context context, int appWidgetId) {
-		FirstSimpleWidgetCreator widgetViewCreator = new FirstSimpleWidgetCreator(context, null, appWidgetId);
+		FifthWidgetCreator widgetViewCreator = new FifthWidgetCreator(context, null, appWidgetId);
 		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto widgetDto) {
@@ -123,7 +120,7 @@ public class FirstSimpleWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	protected void init(Context context, Bundle bundle) {
 		final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		FirstSimpleWidgetCreator widgetViewCreator = new FirstSimpleWidgetCreator(context, null, appWidgetId);
+		FifthWidgetCreator widgetViewCreator = new FifthWidgetCreator(context, null, appWidgetId);
 		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto widgetDto) {
@@ -164,49 +161,36 @@ public class FirstSimpleWidgetProvider extends AbstractAppWidgetProvider {
 		Set<RequestWeatherDataType> set = new HashSet<>();
 		set.add(RequestWeatherDataType.currentConditions);
 		set.add(RequestWeatherDataType.hourlyForecast);
-		set.add(RequestWeatherDataType.airQuality);
 
 		return set;
 	}
 
 	@Override
-	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, WeatherSourceType requestWeatherSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleJsonDownloader multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherSourceType> requestWeatherSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleJsonDownloader multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
-		FirstSimpleWidgetCreator widgetCreator = new FirstSimpleWidgetCreator(context, null, appWidgetId);
+		FifthWidgetCreator widgetCreator = new FifthWidgetCreator(context, null, appWidgetId);
 		widgetCreator.setWidgetDto(widgetDto);
 		widgetDto.setLastRefreshDateTime(multipleJsonDownloader.getRequestDateTime().toString());
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleJsonDownloader,
-				requestWeatherSourceType);
+				requestWeatherSourceTypeSet);
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleJsonDownloader,
-				requestWeatherSourceType);
-
+				requestWeatherSourceTypeSet);
 		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty();
 
 		if (successful) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			widgetDto.setTimeZoneId(zoneId.getId());
-
-			AirQualityDto airQualityDto = null;
-
-			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleJsonDownloader,
-					requestWeatherSourceType, zoneOffset);
-			if (airQualityDto == null) {
-				airQualityDto = new AirQualityDto();
-				airQualityDto.setAqi(-1);
-			}
-
-			widgetCreator.setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto,
-					currentConditionsDto, hourlyForecastDtoList, new OnDrawBitmapCallback() {
+			widgetCreator.setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto,
+					hourlyForecastDtoList, new OnDrawBitmapCallback() {
 						@Override
 						public void onCreatedBitmap(Bitmap bitmap) {
 							widgetDto.setBitmap(bitmap);
 						}
 					});
-			widgetCreator.makeResponseTextToJson(multipleJsonDownloader, requestWeatherDataTypeSet, requestWeatherSourceType, widgetDto, zoneOffset);
-
+			widgetCreator.makeResponseTextToJson(multipleJsonDownloader, requestWeatherDataTypeSet, requestWeatherSourceTypeSet, widgetDto, zoneOffset);
 		}
 
 		widgetDto.setLoadSuccessful(successful);
@@ -227,6 +211,6 @@ public class FirstSimpleWidgetProvider extends AbstractAppWidgetProvider {
 
 	@Override
 	Class<?> getThis() {
-		return FirstSimpleWidgetProvider.class;
+		return FifthWidgetCreator.class;
 	}
 }

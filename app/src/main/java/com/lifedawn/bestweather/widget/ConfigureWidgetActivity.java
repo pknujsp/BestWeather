@@ -43,16 +43,16 @@ import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.CurrentWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.FirstSimpleWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.FullWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.SecSimpleWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.ThirdSimpleWidgetCreator;
-import com.lifedawn.bestweather.widget.widgetprovider.CurrentWidgetProvider;
-import com.lifedawn.bestweather.widget.widgetprovider.FirstSimpleWidgetProvider;
-import com.lifedawn.bestweather.widget.widgetprovider.FullWidgetProvider;
-import com.lifedawn.bestweather.widget.widgetprovider.SecSimpleWidgetProvider;
-import com.lifedawn.bestweather.widget.widgetprovider.ThirdSimpleWidgetProvider;
+import com.lifedawn.bestweather.widget.creator.FirstWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.SecondWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.ThirdWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.FourthWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.FifthWidgetCreator;
+import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SecondWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.ThirdWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FourthWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FifthWidgetProvider;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -150,25 +150,11 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
 
-		if (layoutId == R.layout.widget_current) {
-			widgetCreator = new CurrentWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (layoutId == R.layout.widget_full) {
-			widgetCreator = new FullWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (layoutId == R.layout.widget_simple) {
-			binding.displayDatetimeSwitch.setVisibility(View.GONE);
-			binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
+		binding.displayDatetimeSwitch.setVisibility(View.GONE);
+		binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
 
-			widgetCreator = new FirstSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (layoutId == R.layout.widget_simple2) {
-			binding.displayDatetimeSwitch.setVisibility(View.GONE);
-			binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
-
-			widgetCreator = new SecSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (layoutId == R.layout.widget_simple3) {
-			binding.displayDatetimeSwitch.setVisibility(View.GONE);
-			binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
-
-			widgetCreator = new ThirdSimpleWidgetCreator(getApplicationContext(), this, appWidgetId);
+		if (layoutId == R.layout.view_widget) {
+			widgetCreator = new FirstWidgetCreator(getApplicationContext(), this, appWidgetId);
 		}
 
 		widgetDto = widgetCreator.loadDefaultSettings();
@@ -189,18 +175,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			@Override
 			public void onClick(View v) {
 				Class<?> widgetProviderClass = null;
-				if (layoutId == R.layout.widget_current) {
-					widgetProviderClass = CurrentWidgetProvider.class;
-				} else if (layoutId == R.layout.widget_full) {
-					widgetProviderClass = FullWidgetProvider.class;
-				} else if (layoutId == R.layout.widget_simple) {
-					widgetProviderClass = FirstSimpleWidgetProvider.class;
-				} else if (layoutId == R.layout.widget_simple2) {
-					widgetProviderClass = SecSimpleWidgetProvider.class;
-				} else if (layoutId == R.layout.widget_simple3) {
-					widgetProviderClass = ThirdSimpleWidgetProvider.class;
+				if (layoutId == R.layout.view_widget) {
+					widgetProviderClass = FirstWidgetProvider.class;
 				}
-
 				if (binding.selectedLocationRadio.isChecked()) {
 					widgetDto.setAddressName(newSelectedAddressDto.getAddress());
 					widgetDto.setCountryCode(newSelectedAddressDto.getCountryCode());

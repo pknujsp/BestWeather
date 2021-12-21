@@ -22,16 +22,16 @@ import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.CurrentWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.FirstSimpleWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.FullWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.SecSimpleWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.ThirdSimpleWidgetCreator;
-import com.lifedawn.bestweather.widget.widgetprovider.CurrentWidgetProvider;
-import com.lifedawn.bestweather.widget.widgetprovider.FirstSimpleWidgetProvider;
-import com.lifedawn.bestweather.widget.widgetprovider.FullWidgetProvider;
-import com.lifedawn.bestweather.widget.widgetprovider.SecSimpleWidgetProvider;
-import com.lifedawn.bestweather.widget.widgetprovider.ThirdSimpleWidgetProvider;
+import com.lifedawn.bestweather.widget.creator.FirstWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.SecondWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.ThirdWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.FourthWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.FifthWidgetCreator;
+import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SecondWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.ThirdWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FourthWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FifthWidgetProvider;
 
 public class DialogActivity extends Activity {
 	private ActivityDialogBinding binding;
@@ -55,21 +55,21 @@ public class DialogActivity extends Activity {
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		int widgetLayoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
 
-		if (widgetLayoutId == R.layout.widget_current) {
-			widgetCreator = new CurrentWidgetCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = CurrentWidgetProvider.class;
-		} else if (widgetLayoutId == R.layout.widget_full) {
-			widgetCreator = new FullWidgetCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = FullWidgetProvider.class;
-		} else if (widgetLayoutId == R.layout.widget_simple) {
-			widgetCreator = new FirstSimpleWidgetCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = FirstSimpleWidgetProvider.class;
-		} else if (widgetLayoutId == R.layout.widget_simple2) {
-			widgetCreator = new SecSimpleWidgetCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = SecSimpleWidgetProvider.class;
-		} else if (widgetLayoutId == R.layout.widget_simple3) {
-			widgetCreator = new ThirdSimpleWidgetCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = ThirdSimpleWidgetProvider.class;
+		if (widgetLayoutId == R.layout.view_widget) {
+			widgetCreator = new FirstWidgetCreator(getApplicationContext(), null, appWidgetId);
+			widgetClass = FirstWidgetProvider.class;
+		} else if (widgetLayoutId == R.layout.third_widget) {
+			widgetCreator = new ThirdWidgetCreator(getApplicationContext(), null, appWidgetId);
+			widgetClass = ThirdWidgetProvider.class;
+		} else if (widgetLayoutId == R.layout.second_widget) {
+			widgetCreator = new SecondWidgetCreator(getApplicationContext(), null, appWidgetId);
+			widgetClass = SecondWidgetProvider.class;
+		} else if (widgetLayoutId == R.layout.fourth_widget) {
+			widgetCreator = new FourthWidgetCreator(getApplicationContext(), null, appWidgetId);
+			widgetClass = FourthWidgetProvider.class;
+		} else if (widgetLayoutId == R.layout.fifth_widget) {
+			widgetCreator = new FifthWidgetCreator(getApplicationContext(), null, appWidgetId);
+			widgetClass = FifthWidgetProvider.class;
 		}
 
 		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {

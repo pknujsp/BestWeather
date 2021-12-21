@@ -23,10 +23,17 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <FrameLayout
+                android:id="@+id/noBitmapValuesView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
             <ImageView
                 android:id="@+id/valuesView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 tools:ignore="ContentDescription" />
 
         </LinearLayout>
@@ -46,7 +53,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="gone" />
-
     </LinearLayout>
 
 

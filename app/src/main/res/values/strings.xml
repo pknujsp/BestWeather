@@ -460,10 +460,10 @@
 
     <!-- widget -->
     <string name="widget_current_label">현재</string>
-    <string name="widgetCurrent">현재</string>
-    <string name="widgetFull">현재/시간별/일별 종합</string>
-    <string name="widgetSimple1">현재/시간별 간단히</string>
-    <string name="widgetSimple2">현재/일별 간단히</string>
+    <string name="firstWidgetLabel">현재</string>
+    <string name="thirdWidgetLabel">현재/시간별/일별 종합</string>
+    <string name="secondWidgetLabel">현재/시간별 간단히</string>
+    <string name="fourthWidgetLabel">현재/일별 간단히</string>
 
 
     <string name="real_feel_temperature_simple">체감</string>
@@ -554,11 +554,17 @@
     <string name="today">오늘</string>
     <string name="detailSunRiseSet">상세 일출, 일몰</string>
     <string name="currentAndForecast">현재및 예보</string>
-    <string name="widgetSimple3">현재/시간별 그래프</string>
+    <string name="fifthWidgetLabel">현재/시간별 그래프</string>
     <string name="TheTemperatureIsTheSameAsYesterday">어제 이 시각과 기온이 같습니다</string>
     <string name="thanYesterday">어제 이 시각 대비</string>
     <string name="higherTemperature">높습니다</string>
     <string name="lowerTemperature">낮습니다</string>
+    <string name="sixthWidgetLabel">현재+세부 대기질</string>
+    <string name="seventhWidgetLabel">현재 대기질+대기예보</string>
+    <string name="eighthWidgetLabel">종합2</string>
+    <string name="ninthWidgetLabel">긴 시간별 예보</string>
+    <string name="tenthWidgetLabel">긴 일별 예보</string>
+    <string name="eleventhWidgetLabel">시간별 예보 비교</string>
 
 
 </resources>

@@ -2,8 +2,6 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,7 +14,6 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -28,7 +25,6 @@ import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
-import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureViewForRemoteViews;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
@@ -38,27 +34,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.view.View.MeasureSpec.EXACTLY;
-
-public class SecSimpleWidgetCreator extends AbstractWidgetCreator {
-	private final DateTimeFormatter refreshDateTimeFormatter;
+public class TenthWidgetCreator extends AbstractWidgetCreator {
+	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 
 	private int addressTextSize;
 	private int refreshDateTimeTextSize;
 	private int dateTextSize;
 	private int tempTextSize;
 	private int popTextSize;
-	private int currentPrecipitationTextSize;
-	private int currentAirQualityTextSize;
-	private int currentLabelTextSize;
-	private int currentTempTextSize;
-	private int currentAirQualityLabelTextSize;
+	private int rainVolumeTextSize;
+	private int snowVolumeTextSize;
 
-	private final int cellCount = 5;
-
-	public SecSimpleWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
+	public TenthWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
-		refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	}
 
 	@Override
@@ -89,39 +77,8 @@ public class SecSimpleWidgetCreator extends AbstractWidgetCreator {
 		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInSimpleWidgetForecastItem) + extraSize;
 		popTextSize = context.getResources().getDimensionPixelSize(R.dimen.popTextSizeInSimpleWidgetForecastItem) + extraSize;
 		dateTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTimeTextSizeInSimpleWidgetForecastItem) + extraSize;
-		currentPrecipitationTextSize = context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
-		currentAirQualityTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
-		currentAirQualityLabelTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
-		currentLabelTextSize = context.getResources().getDimensionPixelSize(R.dimen.currentLabelTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
-		currentTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
-	}
-
-
-	public View makeCurrentConditionsViews(LayoutInflater layoutInflater, CurrentConditionsDto currentConditionsDto,
-	                                       AirQualityDto airQualityDto) {
-		final String celsius = "C";
-		final String fahrenheit = "F";
-
-		View view = layoutInflater.inflate(R.layout.view_current_conditions_for_simple_widget, null, false);
-		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp().replace(celsius, "").replace(fahrenheit, ""));
-		((ImageView) view.findViewById(R.id.weatherIcon)).setImageResource(currentConditionsDto.getWeatherIcon());
-
-		String precipitation = "";
-		if (currentConditionsDto.isHasPrecipitationVolume()) {
-			precipitation += context.getString(R.string.precipitation) + ": " + currentConditionsDto.getPrecipitationVolume();
-		} else {
-			precipitation = context.getString(R.string.not_precipitation);
-		}
-		((TextView) view.findViewById(R.id.precipitation)).setText(precipitation);
-		((TextView) view.findViewById(R.id.airQuality)).setText(AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
-
-		((TextView) view.findViewById(R.id.currentLabel)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentLabelTextSize);
-		((TextView) view.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
-		((TextView) view.findViewById(R.id.precipitation)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentPrecipitationTextSize);
-		((TextView) view.findViewById(R.id.airQuality)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentAirQualityTextSize);
-		((TextView) view.findViewById(R.id.airQualityLabel)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentAirQualityLabelTextSize);
-
-		return view;
+		rainVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.rainVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
+		snowVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.snowVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
 	}
 
 
@@ -136,50 +93,24 @@ public class SecSimpleWidgetCreator extends AbstractWidgetCreator {
 		return view;
 	}
 
-	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto,
+	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                         List<DailyForecastDto> dailyForecastDtoList, OnDrawBitmapCallback onDrawBitmapCallback) {
 
-		drawViews(remoteViews, addressName, lastRefreshDateTime, airQualityDto, currentConditionsDto, dailyForecastDtoList, onDrawBitmapCallback);
+		drawViews(remoteViews, addressName, lastRefreshDateTime, dailyForecastDtoList, onDrawBitmapCallback);
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
-		final String pop = "20%";
-		final String minTemp = "8";
-		final String maxTemp = "17";
-		ZonedDateTime now = ZonedDateTime.now();
-
-		for (int i = 0; i < cellCount; i++) {
-			DailyForecastDto dailyForecastDto = new DailyForecastDto();
-			dailyForecastDto.setDate(now).setAmValues(new DailyForecastDto.Values()).setPmValues(new DailyForecastDto.Values())
-					.setMinTemp(minTemp).setMaxTemp(maxTemp);
-			dailyForecastDto.getAmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop);
-			dailyForecastDto.getPmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop);
-
-			dailyForecastDtoList.add(dailyForecastDto);
-			now = now.plusDays(1);
-		}
-
-		CurrentConditionsDto tempCurrentConditions = new CurrentConditionsDto();
-		tempCurrentConditions.setTemp("15°");
-		tempCurrentConditions.setWeatherIcon(R.drawable.day_clear);
-
-		AirQualityDto tempAirQualityDto = new AirQualityDto();
-		tempAirQualityDto.setAqi(10);
-
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), tempAirQualityDto, tempCurrentConditions,
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
 				dailyForecastDtoList, null);
 	}
 
-	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto,
+	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                       List<DailyForecastDto> dailyForecastDtoList, @Nullable OnDrawBitmapCallback onDrawBitmapCallback) {
 		LayoutInflater layoutInflater = LayoutInflater.from(context);
 
 		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
 		headerView.setId(R.id.header);
-
-		View currentConditionsView = makeCurrentConditionsViews(layoutInflater, currentConditionsDto, airQualityDto);
-		currentConditionsView.setId(R.id.currentConditions);
 
 		LinearLayout hourAndIconLinearLayout = new LinearLayout(context);
 		hourAndIconLinearLayout.setId(R.id.hourAndIconView);
@@ -190,10 +121,10 @@ public class SecSimpleWidgetCreator extends AbstractWidgetCreator {
 
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEE");
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d\nE");
 		String pop = null;
 
-		for (int cell = 0; cell < cellCount; cell++) {
+		for (int cell = 0; cell < dailyForecastDtoList.size(); cell++) {
 			View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
 			//hour, weatherIcon
 			((TextView) view.findViewById(R.id.dateTime)).setText(dailyForecastDtoList.get(cell).getDate().format(dateFormatter));
@@ -223,16 +154,12 @@ public class SecSimpleWidgetCreator extends AbstractWidgetCreator {
 
 		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		RelativeLayout.LayoutParams currentConditionsViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-				ViewGroup.LayoutParams.MATCH_PARENT);
 		RelativeLayout.LayoutParams hourAndIconRowLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		RelativeLayout.LayoutParams tempRowLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.MATCH_PARENT);
 
 		headerViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-		currentConditionsViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		currentConditionsViewLayoutParams.addRule(RelativeLayout.BELOW, R.id.header);
 		hourAndIconRowLayoutParams.addRule(RelativeLayout.BELOW, R.id.header);
 		hourAndIconRowLayoutParams.addRule(RelativeLayout.RIGHT_OF, R.id.currentConditions);
 		tempRowLayoutParams.addRule(RelativeLayout.BELOW, R.id.hourAndIconView);
@@ -246,13 +173,12 @@ public class SecSimpleWidgetCreator extends AbstractWidgetCreator {
 		RelativeLayout rootLayout = new RelativeLayout(context);
 
 		rootLayout.addView(headerView, headerViewLayoutParams);
-		rootLayout.addView(currentConditionsView, currentConditionsViewLayoutParams);
 		rootLayout.addView(hourAndIconLinearLayout, hourAndIconRowLayoutParams);
 		rootLayout.addView(detailSingleTemperatureView, tempRowLayoutParams);
 
-		drawBitmap(rootLayout,onDrawBitmapCallback,remoteViews);
-
+		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews);
 	}
+
 
 	@Override
 	public void setDisplayClock(boolean displayClock) {
@@ -270,14 +196,10 @@ public class SecSimpleWidgetCreator extends AbstractWidgetCreator {
 		RemoteViews remoteViews = createRemoteViews(false);
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
-		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
-		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.parseTextToCurrentConditionsDto(context, jsonObject,
-				weatherSourceType, widgetDto.getLatitude(), widgetDto.getLongitude());
-
 		List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.parseTextToDailyForecastDtoList(context, jsonObject,
 				weatherSourceType);
 
-		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto, currentConditionsDto,
+		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 				dailyForecastDtoList, null);
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		appWidgetManager.updateAppWidget(appWidgetId,

@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,9 +28,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static android.view.View.MeasureSpec.EXACTLY;
-
-public class CurrentWidgetCreator extends AbstractWidgetCreator {
+public class FirstWidgetCreator extends AbstractWidgetCreator {
 	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("E a h:mm");
 
 	private int addressTextSize;
@@ -45,7 +42,7 @@ public class CurrentWidgetCreator extends AbstractWidgetCreator {
 	private int windStrengthTextSize;
 
 
-	public CurrentWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
+	public FirstWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
 	}
 
@@ -116,7 +113,7 @@ public class CurrentWidgetCreator extends AbstractWidgetCreator {
 
 	public View makeCurrentConditionsViews(LayoutInflater layoutInflater, CurrentConditionsDto currentConditionsDto,
 	                                       AirQualityDto airQualityDto) {
-		View view = layoutInflater.inflate(R.layout.view_widget_current_values, null, false);
+		View view = layoutInflater.inflate(R.layout.view_first_widget, null, false);
 
 		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp());
 

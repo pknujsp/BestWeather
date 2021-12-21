@@ -129,9 +129,38 @@
     <dimen name="airQualityTextSizeInFullWidget">14sp</dimen>
     <dimen name="precipitationTextSizeInFullWidget">14sp</dimen>
     <!-- -->
+    <dimen name="firstWidgetWidth">250dp</dimen>
+    <dimen name="firstWidgetHeight">80dp</dimen>
 
-    <dimen name="simpleWidgetWidth">320dp</dimen>
-    <dimen name="simpleWidgetHeight">110dp</dimen>
+    <dimen name="secondWidgetWidth">320dp</dimen>
+    <dimen name="secondWidgetHeight">110dp</dimen>
+
+    <dimen name="thirdWidgetWidth">250dp</dimen>
+    <dimen name="thirdWidgetHeight">180dp</dimen>
+
+    <dimen name="fourthWidgetWidth">320dp</dimen>
+    <dimen name="fourthWidgetHeight">110dp</dimen>
+
+    <dimen name="fifthWidgetWidth">320dp</dimen>
+    <dimen name="fifthWidgetHeight">110dp</dimen>
+
+    <dimen name="sixthWidgetWidth">250dp</dimen>
+    <dimen name="sixthWidgetHeight">180dp</dimen>
+
+    <dimen name="seventhWidgetWidth">250dp</dimen>
+    <dimen name="seventhWidgetHeight">180dp</dimen>
+
+    <dimen name="eighthWidgetWidth">320dp</dimen>
+    <dimen name="eighthWidgetHeight">110dp</dimen>
+
+    <dimen name="ninthWidgetWidth">320dp</dimen>
+    <dimen name="ninthWidgetHeight">110dp</dimen>
+
+    <dimen name="tenthWidgetWidth">320dp</dimen>
+    <dimen name="tenthWidgetHeight">110dp</dimen>
+
+    <dimen name="eleventhWidgetWidth">320dp</dimen>
+    <dimen name="eleventhWidgetHeight">180dp</dimen>
 
     <dimen name="headerViewOfDetailForecastItemHeight">140dp</dimen>
     <dimen name="tempTopMargin">2dp</dimen>
@@ -146,11 +175,30 @@
     <dimen name="precipitationTextSizeInCurrentConditionsViewForSimpleWidget">12sp</dimen>
     <dimen name="airQualityTextSizeInCurrentConditionsViewForSimpleWidget">12sp</dimen>
     <dimen name="popTextSizeInSimpleWidgetForecastItem">10sp</dimen>
-    <dimen name="currentWidgetWidth">250dp</dimen>
-    <dimen name="currentWidgetHeight">80dp</dimen>
-    <dimen name="fullWidgetWidth">250dp</dimen>
-    <dimen name="fullWidgetHeight">180dp</dimen>
 
     <dimen name="forecastItemViewInLinearPadding">3dp</dimen>
+    <dimen name="stationNameTextSizeInSixthWidget">14sp</dimen>
+    <dimen name="tempTextSizeInSixthWidget">30sp</dimen>
+    <dimen name="precipitationtTextSizeInSixthWidget">13sp</dimen>
+    <dimen name="airQualityTextSizeInSixthWidget">13sp</dimen>
+    <dimen name="stationNameTextSizeInSeventhWidget">14sp</dimen>
+    <dimen name="airQualityTextSizeInSeventhWidget">13sp</dimen>
+    <dimen name="dateClockTextSizeInEighthWidget">18sp</dimen>
+    <dimen name="timeClockTextSizeInEighthWidget">32sp</dimen>
+    <dimen name="tempTextSizeInEighthWidget">32sp</dimen>
+    <dimen name="precipitationTextSizeInEighthWidget">14sp</dimen>
+    <dimen name="airQualityTextSizeInEighthWidget">14sp</dimen>
+    <dimen name="labelTextSizeInAirQualityItem">13sp</dimen>
+    <dimen name="gradeValueTextSizeInAirQualityItem">19sp</dimen>
+    <dimen name="gradeDescriptionTextSizeInAirQualityItem">16sp</dimen>
+    <dimen name="labelTextSizeInSimpleAirQualityItem">13sp</dimen>
+    <dimen name="gradeValueTextSizeInSimpleAirQualityItem">15sp</dimen>
+    <dimen name="gradeDescriptionTextSizeInSimpleAirQualityItem">16sp</dimen>
+    <dimen name="dateTextSizeInLinearDailyAqiForecastItem">14sp</dimen>
+    <dimen name="particleNameTextSizeInLinearDailyAqiForecastItem">15sp</dimen>
+    <dimen name="rainVolumeTextSizeInSimpleWidgetForecastItem">10sp</dimen>
+    <dimen name="snowVolumeTextSizeInSimpleWidgetForecastItem">10sp</dimen>
+    <dimen name="weatherSourceNameTextSizeInWidget">11sp</dimen>
+    <dimen name="weatherSourceNameTextSizeInSourceView">12sp</dimen>
 
 </resources>

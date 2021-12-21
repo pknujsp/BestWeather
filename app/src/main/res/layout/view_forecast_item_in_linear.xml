@@ -74,6 +74,59 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/rainVolumeLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginRight="1dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/raindrop" />
+
+        <TextView
+            android:id="@+id/rainVolume"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="0.0"
+            android:textColor="@color/widgetTextColor"
+            android:textSize="@dimen/rainVolumeTextSizeInSimpleWidgetForecastItem" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/snowLayoutLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_marginRight="1dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/snowparticle" />
+
+        <TextView
+            android:id="@+id/snowVolume"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:text="0.0"
+            android:textColor="@color/widgetTextColor"
+            android:textSize="@dimen/snowVolumeTextSizeInSimpleWidgetForecastItem" />
+
+    </LinearLayout>
+
+
     <TextView
         android:id="@+id/temperature"
         android:layout_width="match_parent"

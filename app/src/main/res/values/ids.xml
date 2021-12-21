@@ -12,4 +12,5 @@
     <item name="begin_column_index" type="id" />
     <item name="hourAndIconView" type="id" />
     <item name="currentConditions" type="id" />
+    <item name="hoursRow" type="id" />
 </resources>
