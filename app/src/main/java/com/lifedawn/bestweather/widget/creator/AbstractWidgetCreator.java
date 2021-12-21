@@ -9,6 +9,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.ArrayMap;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -28,10 +30,13 @@ import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.widget.DialogActivity;
+import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 
 import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Set;
+
+import static android.view.View.MeasureSpec.EXACTLY;
 
 public abstract class AbstractWidgetCreator {
 	protected final int appWidgetId;
@@ -263,6 +268,30 @@ public abstract class AbstractWidgetCreator {
 
 	public void drawBitmap(RemoteViews remoteViews, Bitmap bitmap) {
 		remoteViews.setImageViewBitmap(R.id.valuesView, bitmap);
+	}
+
+	protected Bitmap drawBitmap(ViewGroup rootLayout, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, RemoteViews remoteViews) {
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+
+		final int[] widgetSize = getWidgetExactSizeInPx(appWidgetManager);
+		final float widgetPadding = context.getResources().getDimension(R.dimen.widget_padding);
+
+		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[0] - widgetPadding * 2), EXACTLY);
+		final int heightSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[1] - widgetPadding * 2), EXACTLY);
+
+		rootLayout.measure(widthSpec, heightSpec);
+		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());
+
+		rootLayout.setDrawingCacheEnabled(true);
+		rootLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+		Bitmap viewBmp = rootLayout.getDrawingCache();
+		if (onDrawBitmapCallback != null) {
+			onDrawBitmapCallback.onCreatedBitmap(viewBmp);
+		}
+		remoteViews.setImageViewBitmap(R.id.valuesView, viewBmp);
+
+		return viewBmp;
 	}
 
 	abstract public RemoteViews createRemoteViews(boolean needTempData);

@@ -210,8 +210,6 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 						}
 					});
 			widgetCreator.makeResponseTextToJson(multipleJsonDownloader, requestWeatherDataTypeSet, requestWeatherSourceType, widgetDto, zoneOffset);
-
-
 		}
 
 		widgetDto.setLoadSuccessful(successful);
@@ -223,6 +221,7 @@ public class FullWidgetProvider extends AbstractAppWidgetProvider {
 				RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
 				setRefreshPendingIntent(remoteViews, appWidgetId, context);
 			} else {
+				RemoteViewProcessor.onSuccessfulProcess(remoteViews);
 				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());
 			}
 		}

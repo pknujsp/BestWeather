@@ -44,6 +44,7 @@ public class RetrofitClient {
 	public static final String XML_DATATYPE = "XML";
 	public static final String LOG_TAG = "Retrofit Response";
 
+	private static final OkHttpClient client = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS).build();
 
 	public enum ServiceType {
 		YESTERDAY_ULTRA_SRT_NCST, ULTRA_SRT_NCST, ULTRA_SRT_FCST, MID_LAND_FCST, MID_TA_FCST, VILAGE_FCST, ACCU_GEOPOSITION_SEARCH,
@@ -54,7 +55,6 @@ public class RetrofitClient {
 
 
 	public static synchronized Querys getApiService(ServiceType serviceType) {
-		OkHttpClient client = new OkHttpClient.Builder().connectTimeout(4, TimeUnit.SECONDS).build();
 
 		switch (serviceType) {
 			case MID_LAND_FCST:

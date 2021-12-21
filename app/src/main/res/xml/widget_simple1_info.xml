@@ -7,6 +7,7 @@
     android:minResizeWidth="@dimen/simpleWidgetWidth"
     android:minResizeHeight="@dimen/simpleWidgetHeight"
     android:previewImage="@drawable/example_appwidget_preview"
-    android:resizeMode="none"
+    android:resizeMode="vertical|horizontal"
+
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen"/>

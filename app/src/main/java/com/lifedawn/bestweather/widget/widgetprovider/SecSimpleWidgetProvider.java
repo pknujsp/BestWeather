@@ -26,6 +26,7 @@ import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.SecSimpleWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.ThirdSimpleWidgetCreator;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -53,6 +54,26 @@ public class SecSimpleWidgetProvider extends AbstractAppWidgetProvider {
 			widgetHelper.cancelAutoRefresh(appWidgetId);
 		}
 	}
+
+	@Override
+	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
+		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
+		SecSimpleWidgetCreator widgetCreator = new SecSimpleWidgetCreator(context, null, appWidgetId);
+		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
+			@Override
+			public void onResultSuccessful(WidgetDto result) {
+				if (result.getResponseText() != null) {
+					widgetCreator.setDataViewsOfSavedData();
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
+	}
+
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {

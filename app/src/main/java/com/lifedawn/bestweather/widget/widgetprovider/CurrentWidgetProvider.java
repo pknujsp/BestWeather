@@ -25,6 +25,7 @@ import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.CurrentWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.SecSimpleWidgetCreator;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -55,6 +56,25 @@ public class CurrentWidgetProvider extends AbstractAppWidgetProvider {
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
 
+	}
+
+	@Override
+	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
+		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
+		CurrentWidgetCreator widgetCreator = new CurrentWidgetCreator(context, null, appWidgetId);
+		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
+			@Override
+			public void onResultSuccessful(WidgetDto result) {
+				if (result.getResponseText() != null) {
+					widgetCreator.setDataViewsOfSavedData();
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
 	}
 
 	@SuppressLint("UnsafeProtectedBroadcastReceiver")

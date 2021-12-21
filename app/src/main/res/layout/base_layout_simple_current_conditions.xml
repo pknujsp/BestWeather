@@ -106,7 +106,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="8dp"
-                    android:fontFamily="sans-serif-thin"
                     android:text="@string/real_feel_temperature_simple"
                     android:textSize="20sp" />
 
@@ -128,7 +127,7 @@
                     android:fontFamily="sans-serif-thin"
                     android:includeFontPadding="false"
                     android:text="°C"
-                    android:textSize="22sp" />
+                    android:textSize="20sp" />
 
                 <TextView
                     android:id="@+id/tempDescription"
@@ -136,7 +135,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
-                    android:fontFamily="sans-serif-thin"
                     android:text="tempDescription"
                     android:textSize="15sp" />
             </LinearLayout>

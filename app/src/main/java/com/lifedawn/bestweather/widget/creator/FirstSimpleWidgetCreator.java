@@ -235,25 +235,8 @@ public class FirstSimpleWidgetCreator extends AbstractWidgetCreator {
 		rootLayout.addView(hourAndIconLinearLayout, hourAndIconRowLayoutParams);
 		rootLayout.addView(detailSingleTemperatureView, tempRowLayoutParams);
 
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		drawBitmap(rootLayout,onDrawBitmapCallback,remoteViews);
 
-		final int[] widgetSize = getWidgetExactSizeInPx(appWidgetManager);
-		final float widgetPadding = context.getResources().getDimension(R.dimen.widget_padding);
-
-		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[0] - widgetPadding * 2), EXACTLY);
-		final int heightSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[1] - widgetPadding * 2), EXACTLY);
-
-		rootLayout.measure(widthSpec, heightSpec);
-		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());
-
-		rootLayout.setDrawingCacheEnabled(true);
-		rootLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-
-		Bitmap viewBmp = rootLayout.getDrawingCache();
-		if (onDrawBitmapCallback != null) {
-			onDrawBitmapCallback.onCreatedBitmap(viewBmp);
-		}
-		remoteViews.setImageViewBitmap(R.id.valuesView, viewBmp);
 	}
 
 
