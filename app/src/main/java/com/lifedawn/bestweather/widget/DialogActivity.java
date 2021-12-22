@@ -58,20 +58,7 @@ public class DialogActivity extends Activity {
 		if (widgetLayoutId == R.layout.view_widget) {
 			widgetCreator = new FirstWidgetCreator(getApplicationContext(), null, appWidgetId);
 			widgetClass = FirstWidgetProvider.class;
-		} else if (widgetLayoutId == R.layout.third_widget) {
-			widgetCreator = new ThirdWidgetCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = ThirdWidgetProvider.class;
-		} else if (widgetLayoutId == R.layout.second_widget) {
-			widgetCreator = new SecondWidgetCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = SecondWidgetProvider.class;
-		} else if (widgetLayoutId == R.layout.fourth_widget) {
-			widgetCreator = new FourthWidgetCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = FourthWidgetProvider.class;
-		} else if (widgetLayoutId == R.layout.fifth_widget) {
-			widgetCreator = new FifthWidgetCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = FifthWidgetProvider.class;
 		}
-
 		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
