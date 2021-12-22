@@ -24,7 +24,7 @@ import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
-import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
@@ -34,7 +34,6 @@ import com.lifedawn.bestweather.widget.WidgetHelper;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
@@ -250,18 +249,26 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 			final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
-			WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+			final Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
 
-			if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
-				weatherSourceType = WeatherSourceType.KMA;
+			final String[] weatherSourceTypeNames = widgetDto.getWeatherSourceType().split(",");
+			for (String name : weatherSourceTypeNames) {
+				weatherSourceTypeSet.add(WeatherSourceType.valueOf(name));
 			}
 
-			ExecutorService executorService = Executors.newSingleThreadExecutor();
-			Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
-			weatherSourceTypeSet.add(weatherSourceType);
+			if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
+				if (getThis() != EleventhWidgetProvider.class) {
+					weatherSourceTypeSet.clear();
+				}
+				weatherSourceTypeSet.add(WeatherSourceType.KMA);
+			}
 
-			WeatherRequestUtil.loadWeatherData(context, executorService, widgetDto.getCountryCode(), widgetDto.getLatitude(),
-					widgetDto.getLongitude(), requestWeatherDataTypeSet, new MultipleJsonDownloader() {
+			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
+				weatherSourceTypeSet.add(WeatherSourceType.AQICN);
+			}
+
+			WeatherRequestUtil.loadWeatherData(context, Executors.newSingleThreadExecutor(), widgetDto.getCountryCode(), widgetDto.getLatitude(),
+					widgetDto.getLongitude(), requestWeatherDataTypeSet, new MultipleRestApiDownloader() {
 						@Override
 						public void onResult() {
 							setResultViews(context, appWidgetId, remoteViews, widgetDto, weatherSourceTypeSet, this, requestWeatherDataTypeSet);
@@ -271,7 +278,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 						public void onCanceled() {
 
 						}
-					}, weatherSourceType);
+					}, weatherSourceTypeSet);
 
 		} else {
 			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK);
@@ -288,6 +295,6 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	abstract Set<RequestWeatherDataType> getRequestWeatherDataTypeSet();
 
 	abstract protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews,
-	                                       WidgetDto widgetDto, Set<WeatherSourceType> requestWeatherSourceTypeSet, @Nullable MultipleJsonDownloader multipleJsonDownloader,
+	                                       WidgetDto widgetDto, Set<WeatherSourceType> requestWeatherSourceTypeSet, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                                       Set<RequestWeatherDataType> requestWeatherDataTypeSet);
 }

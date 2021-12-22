@@ -12,6 +12,7 @@ public class AirQualityDto {
 	private String aqiCnUrl;
 	private ZonedDateTime time;
 	private Current current;
+	private Time timeInfo;
 	private List<DailyForecast> dailyForecastList;
 
 	public static class Current {
@@ -301,6 +302,46 @@ public class AirQualityDto {
 		}
 	}
 
+	public static class Time {
+		private String v;
+		private String s;
+		private String tz;
+		private String iso;
+
+		public String getV() {
+			return v;
+		}
+
+		public void setV(String v) {
+			this.v = v;
+		}
+
+		public String getS() {
+			return s;
+		}
+
+		public void setS(String s) {
+			this.s = s;
+		}
+
+		public String getTz() {
+			return tz;
+		}
+
+		public void setTz(String tz) {
+			this.tz = tz;
+		}
+
+		public String getIso() {
+			return iso;
+		}
+
+		public void setIso(String iso) {
+			this.iso = iso;
+		}
+	}
+
+
 	public Integer getAqi() {
 		return aqi;
 	}
@@ -380,5 +421,13 @@ public class AirQualityDto {
 	public AirQualityDto setAqiCnUrl(String aqiCnUrl) {
 		this.aqiCnUrl = aqiCnUrl;
 		return this;
+	}
+
+	public Time getTimeInfo() {
+		return timeInfo;
+	}
+
+	public void setTimeInfo(Time timeInfo) {
+		this.timeInfo = timeInfo;
 	}
 }

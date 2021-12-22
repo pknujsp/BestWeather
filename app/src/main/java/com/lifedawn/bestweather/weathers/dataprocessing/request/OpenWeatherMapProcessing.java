@@ -9,12 +9,10 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.parameters.openweathermap.CurrentWeatherParameter;
-import com.lifedawn.bestweather.retrofit.parameters.openweathermap.DailyForecastParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
-import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 
 import java.util.Set;
@@ -53,7 +51,7 @@ public class OpenWeatherMapProcessing {
 	}
 
 	public static void getOwmForecasts(String latitude, String longitude, boolean useOneCall,
-	                                   MultipleJsonDownloader multipleJsonDownloader) {
+	                                   MultipleRestApiDownloader multipleRestApiDownloader) {
 		if (useOneCall) {
 			OneCallParameter oneCallParameter = new OneCallParameter();
 			Set<OneCallParameter.OneCallApis> excludeOneCallApis = new ArraySet<>();
@@ -65,14 +63,14 @@ public class OpenWeatherMapProcessing {
 				@Override
 				public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 					Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
-					multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
+					multipleRestApiDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
 							RetrofitClient.ServiceType.OWM_ONE_CALL, response, responseObj, responseText);
 				}
 
 				@Override
 				public void onResponseResult(Throwable t) {
 					Log.e(RetrofitClient.LOG_TAG, "own one call 실패");
-					multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
+					multipleRestApiDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
 							RetrofitClient.ServiceType.OWM_ONE_CALL, t);
 				}
 
@@ -82,7 +80,7 @@ public class OpenWeatherMapProcessing {
 	}
 
 	public static void requestWeatherData(Context context, Double latitude, Double longitude,
-	                                      RequestOwm requestOwm, MultipleJsonDownloader multipleJsonDownloader) {
+	                                      RequestOwm requestOwm, MultipleRestApiDownloader multipleRestApiDownloader) {
 		OneCallParameter oneCallParameter = new OneCallParameter();
 		Set<OneCallParameter.OneCallApis> excludeOneCallApis = requestOwm.getExcludeApis();
 		oneCallParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString()).setOneCallApis(excludeOneCallApis);
@@ -90,18 +88,18 @@ public class OpenWeatherMapProcessing {
 		Call<JsonElement> oneCallCall = getOneCall(oneCallParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-				multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
+				multipleRestApiDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
 						RetrofitClient.ServiceType.OWM_ONE_CALL, response, responseObj, responseText);
 			}
 
 			@Override
 			public void onResponseResult(Throwable t) {
-				multipleJsonDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
+				multipleRestApiDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
 						RetrofitClient.ServiceType.OWM_ONE_CALL, t);
 			}
 
 		});
-		multipleJsonDownloader.getCallMap().put(RetrofitClient.ServiceType.OWM_ONE_CALL, oneCallCall);
+		multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.OWM_ONE_CALL, oneCallCall);
 
 	}
 }

@@ -17,17 +17,17 @@ import androidx.preference.PreferenceManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.Gps;
-import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 import com.lifedawn.bestweather.notification.model.NotificationDataObj;
-import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -134,11 +134,17 @@ public abstract class AbstractNotiViewCreator {
 			weatherDataSourceType = WeatherSourceType.KMA;
 		}
 
+		final Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
+		weatherSourceTypeSet.add(weatherDataSourceType);
+		if(requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)){
+			weatherSourceTypeSet.add(WeatherSourceType.AQICN);
+		}
+
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		WeatherSourceType finalWeatherDataSourceType = weatherDataSourceType;
 		WeatherRequestUtil.loadWeatherData(context, executorService, notificationDataObj.getCountryCode(),
 				notificationDataObj.getLatitude(), notificationDataObj.getLongitude(), requestWeatherDataTypeSet,
-				new MultipleJsonDownloader() {
+				new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {
 						setResultViews(context, remoteViews, finalWeatherDataSourceType, this, requestWeatherDataTypeSet);
@@ -148,7 +154,7 @@ public abstract class AbstractNotiViewCreator {
 					public void onCanceled() {
 
 					}
-				}, weatherDataSourceType);
+				}, weatherSourceTypeSet);
 
 
 	}
@@ -169,7 +175,7 @@ public abstract class AbstractNotiViewCreator {
 	abstract protected Set<RequestWeatherDataType> getRequestWeatherDataTypeSet();
 
 	abstract protected void setResultViews(Context context, RemoteViews remoteViews,
-	                                       WeatherSourceType requestWeatherSourceType, @Nullable MultipleJsonDownloader multipleJsonDownloader,
+	                                       WeatherSourceType requestWeatherSourceType, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                                       Set<RequestWeatherDataType> requestWeatherDataTypeSet);
 
 	abstract protected void makeNotification(RemoteViews remoteViews, int icon);

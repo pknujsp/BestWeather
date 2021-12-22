@@ -256,14 +256,24 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 		RemoteViews remoteViews = createRemoteViews(false);
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
-		/*
-		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,
-				weatherSourceType, widgetDto.getLatitude(), widgetDto.getLongitude());
+		ArrayMap<WeatherSourceType, List<HourlyForecastDto>> weatherSourceTypeListArrayMap = new ArrayMap<>();
 
+		final String[] weatherSourceTypeNames = widgetDto.getWeatherSourceType().split(",");
+		final WeatherSourceType[] weatherSourceTypes = new WeatherSourceType[weatherSourceTypeNames.length];
+
+		int i = 0;
+		for (String name : weatherSourceTypeNames) {
+			weatherSourceTypes[i++] = WeatherSourceType.valueOf(name);
+		}
+
+		for (WeatherSourceType weatherSourceType : weatherSourceTypes) {
+			weatherSourceTypeListArrayMap.put(weatherSourceType,
+					WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject, weatherSourceType, widgetDto.getLatitude(),
+							widgetDto.getLongitude()));
+		}
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
-				hourlyForecastDtoList, null);
+				weatherSourceTypeListArrayMap, null);
 
-		 */
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		appWidgetManager.updateAppWidget(appWidgetId,
 				remoteViews);

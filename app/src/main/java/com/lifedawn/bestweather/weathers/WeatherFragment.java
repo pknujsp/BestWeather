@@ -78,7 +78,7 @@ import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
-import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
@@ -152,7 +152,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private String addressName;
 	private SharedPreferences sharedPreferences;
 
-	private MultipleJsonDownloader multipleJsonDownloader;
+	private MultipleRestApiDownloader multipleRestApiDownloader;
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
 
 
@@ -338,8 +338,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	@Override
 	public void onDestroy() {
-		if (multipleJsonDownloader != null) {
-			multipleJsonDownloader.cancel();
+		if (multipleRestApiDownloader != null) {
+			multipleRestApiDownloader.cancel();
 		}
 		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		super.onDestroy();
@@ -353,7 +353,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void run() {
 				ZonedDateTime lastRefreshDateTime =
-						ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleJsonDownloader.getRequestDateTime().toString());
+						ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader.getRequestDateTime().toString());
 				lastRefreshDateTime = lastRefreshDateTime.withZoneSameInstant(zoneId);
 
 				SimpleTimeZone timeZone = new SimpleTimeZone(lastRefreshDateTime.getOffset().getTotalSeconds() * 1000, "");
@@ -669,7 +669,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
 		weatherSourceTypeSet.add(mainWeatherSourceType);
 		weatherSourceTypeSet.add(WeatherSourceType.AQICN);
-		setWeatherFragments(weatherSourceTypeSet, FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleJsonDownloader,
+		setWeatherFragments(weatherSourceTypeSet, FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader,
 				latitude, longitude, null);
 	}
 
@@ -693,10 +693,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		setRequestWeatherSourceWithSourceTypes(weatherSourceTypeSet, requestWeatherSources);
 		final ResponseResultObj responseResultObj = new ResponseResultObj(weatherSourceTypeSet, requestWeatherSources, mainWeatherSourceType);
 
-		multipleJsonDownloader = new MultipleJsonDownloader() {
+		multipleRestApiDownloader = new MultipleRestApiDownloader() {
 			@Override
 			public void onResult() {
-				responseResultObj.multipleJsonDownloader = this;
+				responseResultObj.multipleRestApiDownloader = this;
 				processOnResult(responseResultObj);
 			}
 
@@ -705,12 +705,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			}
 		};
-		multipleJsonDownloader.setLoadingDialog(loadingDialog);
+		multipleRestApiDownloader.setLoadingDialog(loadingDialog);
 
 		EXECUTOR_SERVICE.execute(new Runnable() {
 			@Override
 			public void run() {
-				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleJsonDownloader);
+				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleRestApiDownloader);
 			}
 		});
 	}
@@ -728,10 +728,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		setRequestWeatherSourceWithSourceTypes(newWeatherSourceTypeSet, requestWeatherSources);
 
 		final ResponseResultObj responseResultObj = new ResponseResultObj(newWeatherSourceTypeSet, requestWeatherSources, newWeatherSourceType);
-		multipleJsonDownloader = new MultipleJsonDownloader() {
+		multipleRestApiDownloader = new MultipleRestApiDownloader() {
 			@Override
 			public void onResult() {
-				responseResultObj.multipleJsonDownloader = this;
+				responseResultObj.multipleRestApiDownloader = this;
 				processOnResult(responseResultObj);
 			}
 
@@ -740,32 +740,32 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			}
 		};
-		multipleJsonDownloader.setLoadingDialog(loadingDialog);
+		multipleRestApiDownloader.setLoadingDialog(loadingDialog);
 		EXECUTOR_SERVICE.execute(new Runnable() {
 			@Override
 			public void run() {
-				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleJsonDownloader);
+				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleRestApiDownloader);
 			}
 		});
 	}
 
 	private void processOnResult(ResponseResultObj responseResultObj) {
-		Set<Map.Entry<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult>>> entrySet = responseResultObj.multipleJsonDownloader.getResponseMap().entrySet();
+		Set<Map.Entry<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>>> entrySet = responseResultObj.multipleRestApiDownloader.getResponseMap().entrySet();
 		//메인 날씨 제공사의 데이터가 정상이면 메인 날씨 제공사의 프래그먼트들을 설정하고 값을 표시한다.
 		//메인 날씨 제공사의 응답이 불량이면 재 시도, 취소 중 택1 다이얼로그 표시
-		for (Map.Entry<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult>> entry : entrySet) {
+		for (Map.Entry<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> entry : entrySet) {
 			final WeatherSourceType weatherSourceType = entry.getKey();
 
 			if (weatherSourceType == WeatherSourceType.AQICN) {
 				continue;
 			}
 
-			for (MultipleJsonDownloader.ResponseResult responseResult : entry.getValue().values()) {
+			for (MultipleRestApiDownloader.ResponseResult responseResult : entry.getValue().values()) {
 				if (!responseResult.isSuccessful()) {
 
 					if (getActivity() != null) {
 						//다시시도, 취소 중 택1
-						responseResultObj.multipleJsonDownloader.getLoadingDialog().dismiss();
+						responseResultObj.multipleRestApiDownloader.getLoadingDialog().dismiss();
 						Set<WeatherSourceType> otherTypes = getOtherWeatherSourceTypes(weatherSourceType,
 								mainWeatherSourceType);
 
@@ -798,7 +798,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							public void onClick(DialogInterface dialog, int which) {
 								if (which == 1) {
 									//다시 시도
-									responseResultObj.multipleJsonDownloader.setLoadingDialog(
+									responseResultObj.multipleRestApiDownloader.setLoadingDialog(
 											reRefreshBySameWeatherSource(responseResultObj));
 								} else if (which == 0) {
 									//취소
@@ -806,10 +806,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 										getActivity().finish();
 									}
 								} else if (which >= 2) {
-									responseResultObj.weatherSourceTypeSet.remove(weatherSourceType);
-									responseResultObj.weatherSourceTypeSet.add(weatherSourceTypeArr[which - 2]);
-									responseResultObj.multipleJsonDownloader.setLoadingDialog(
-											reRefreshByAnotherWeatherSource(mainWeatherSourceType, responseResultObj));
+									//다른 제공사로 요청
+									responseResultObj.mainWeatherSourceType = weatherSourceTypeArr[which - 2];
+									responseResultObj.weatherSourceTypeSet.clear();
+									responseResultObj.weatherSourceTypeSet.add(responseResultObj.mainWeatherSourceType);
+									responseResultObj.weatherSourceTypeSet.add(WeatherSourceType.AQICN);
+									responseResultObj.multipleRestApiDownloader.setLoadingDialog(
+											reRefreshByAnotherWeatherSource(responseResultObj));
 								}
 								dialog.dismiss();
 							}
@@ -829,12 +832,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		}
 		//응답 성공 하면
-		final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.multipleJsonDownloader,
+		final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.multipleRestApiDownloader,
 				responseResultObj.weatherSourceTypeSet, responseResultObj.mainWeatherSourceType);
 
 		FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
-		setWeatherFragments(responseResultObj.weatherSourceTypeSet, responseResultObj.multipleJsonDownloader, latitude, longitude,
-				responseResultObj.multipleJsonDownloader.getLoadingDialog());
+		setWeatherFragments(responseResultObj.weatherSourceTypeSet, responseResultObj.multipleRestApiDownloader, latitude, longitude,
+				responseResultObj.multipleRestApiDownloader.getLoadingDialog());
 	}
 
 	/**
@@ -909,17 +912,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private AlertDialog reRefreshBySameWeatherSource(ResponseResultObj responseResultObj) {
 		final AlertDialog loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
-		WeatherSourceType requestWeatherSource = null;
-		Set<WeatherSourceType> weatherSourceTypeSet = responseResultObj.weatherSourceTypeSet;
-
-		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
-			requestWeatherSource = WeatherSourceType.KMA;
-		} else if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
-			requestWeatherSource = WeatherSourceType.ACCU_WEATHER;
-		} else if (weatherSourceTypeSet.contains(WeatherSourceType.OPEN_WEATHER_MAP)) {
-			requestWeatherSource = WeatherSourceType.OPEN_WEATHER_MAP;
-		}
-		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult> result = responseResultObj.multipleJsonDownloader.getResponseMap().get(
+		final WeatherSourceType requestWeatherSource = responseResultObj.mainWeatherSourceType;
+		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> result = responseResultObj.multipleRestApiDownloader.getResponseMap().get(
 				requestWeatherSource);
 
 		ArrayMap<WeatherSourceType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
@@ -939,14 +933,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void run() {
 				MainProcessing.reRequestWeatherDataBySameWeatherSourceIfFailed(getContext(), latitude, longitude, newRequestWeatherSources,
-						responseResultObj.multipleJsonDownloader);
+						responseResultObj.multipleRestApiDownloader);
 			}
 		});
 
 		return loadingDialog;
 	}
 
-	private AlertDialog reRefreshByAnotherWeatherSource(WeatherSourceType lastWeatherSourceType, ResponseResultObj responseResultObj) {
+	private AlertDialog reRefreshByAnotherWeatherSource(ResponseResultObj responseResultObj) {
 		final AlertDialog loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		ArrayMap<WeatherSourceType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
@@ -956,8 +950,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		EXECUTOR_SERVICE.execute(new Runnable() {
 			@Override
 			public void run() {
-				MainProcessing.reRequestWeatherDataByAnotherWeatherSourceIfFailed(getContext(), latitude, longitude, lastWeatherSourceType,
-						newRequestWeatherSources, responseResultObj.multipleJsonDownloader);
+				MainProcessing.reRequestWeatherDataByAnotherWeatherSourceIfFailed(getContext(), latitude, longitude,
+						responseResultObj.requestWeatherSources, responseResultObj.multipleRestApiDownloader);
 			}
 		});
 
@@ -1003,10 +997,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 
-	private void setWeatherFragments(Set<WeatherSourceType> weatherSourceTypeSet, MultipleJsonDownloader multipleJsonDownloader,
+	private void setWeatherFragments(Set<WeatherSourceType> weatherSourceTypeSet, MultipleRestApiDownloader multipleRestApiDownloader,
 	                                 Double latitude, Double longitude, @Nullable AlertDialog loadingDialog) {
-		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult>> responseMap = multipleJsonDownloader.getResponseMap();
-		ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult> arrayMap = null;
+		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
+		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap = null;
 
 		Fragment simpleCurrentConditionsFragment = null;
 		Fragment simpleHourlyForecastFragment = null;
@@ -1018,7 +1012,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		ZoneId zoneId = null;
 
 		if (weatherSourceTypeSet.contains(WeatherSourceType.AQICN)) {
-			MultipleJsonDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherSourceType.AQICN).get(
+			MultipleRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherSourceType.AQICN).get(
 					RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 			if (aqicnResponse.isSuccessful()) {
 				airQualityResponse = (GeolocalizedFeedResponse) aqicnResponse.getResponseObj();
@@ -1041,7 +1035,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastList(
 					(MidLandFcstResponse) arrayMap.get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponseObj(),
 					(MidTaResponse) arrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST).getResponseObj(),
-					Long.parseLong(multipleJsonDownloader.get("tmFc")));
+					Long.parseLong(multipleRestApiDownloader.get("tmFc")));
 
 			finalDailyForecastList = KmaResponseProcessor.getDailyForecastList(finalDailyForecastList, finalHourlyForecastList);
 
@@ -1162,7 +1156,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				@Override
 				public void run() {
 					createWeatherDataSourcePicker(countryCode);
-					ZonedDateTime dateTime = multipleJsonDownloader.getRequestDateTime();
+					ZonedDateTime dateTime = multipleRestApiDownloader.getRequestDateTime();
 					DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
 							clockUnit == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
 									getString(R.string.datetime_pattern_clock24), Locale.getDefault());
@@ -1257,7 +1251,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private static class ResponseResultObj implements Serializable {
-		MultipleJsonDownloader multipleJsonDownloader;
+		MultipleRestApiDownloader multipleRestApiDownloader;
 		Set<WeatherSourceType> weatherSourceTypeSet;
 		WeatherSourceType mainWeatherSourceType;
 		ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources;
@@ -1271,12 +1265,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private static class WeatherResponseObj implements Serializable {
-		final MultipleJsonDownloader multipleJsonDownloader;
+		final MultipleRestApiDownloader multipleRestApiDownloader;
 		final Set<WeatherSourceType> requestWeatherSourceTypeSet;
 		final WeatherSourceType requestMainWeatherSourceType;
 
-		public WeatherResponseObj(MultipleJsonDownloader multipleJsonDownloader, Set<WeatherSourceType> requestWeatherSourceTypeSet, WeatherSourceType requestMainWeatherSourceType) {
-			this.multipleJsonDownloader = multipleJsonDownloader;
+		public WeatherResponseObj(MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherSourceType> requestWeatherSourceTypeSet, WeatherSourceType requestMainWeatherSourceType) {
+			this.multipleRestApiDownloader = multipleRestApiDownloader;
 			this.requestWeatherSourceTypeSet = requestWeatherSourceTypeSet;
 			this.requestMainWeatherSourceType = requestMainWeatherSourceType;
 		}

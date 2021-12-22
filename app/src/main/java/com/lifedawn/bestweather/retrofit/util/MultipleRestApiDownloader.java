@@ -19,7 +19,7 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Response;
 
-public abstract class MultipleJsonDownloader {
+public abstract class MultipleRestApiDownloader {
 	private static final String tag = "MultipleJsonDownloader";
 	private final ZonedDateTime requestDateTime = ZonedDateTime.now();
 	private volatile int requestCount;
@@ -31,7 +31,7 @@ public abstract class MultipleJsonDownloader {
 
 	protected Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ArrayMap<>();
 
-	public MultipleJsonDownloader() {
+	public MultipleRestApiDownloader() {
 	}
 
 	public Map<RetrofitClient.ServiceType, Call<?>> getCallMap() {
@@ -42,7 +42,7 @@ public abstract class MultipleJsonDownloader {
 		return responseMap;
 	}
 
-	public MultipleJsonDownloader(int requestCount) {
+	public MultipleRestApiDownloader(int requestCount) {
 		this.requestCount = requestCount;
 	}
 
@@ -105,19 +105,22 @@ public abstract class MultipleJsonDownloader {
 
 	public void processResult(WeatherSourceType weatherSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
 	                          Response<?> response, Object responseObj, String responseText) {
+		responseCount++;
+
 		if (!responseMap.containsKey(weatherSourceType)) {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
 		}
 		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, response, responseObj, responseText));
 		Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 
-		if (requestCount == ++responseCount) {
-			Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
+		if (requestCount == responseCount) {
 			onResult();
 		}
 	}
 
 	public void processResult(WeatherSourceType weatherSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType, Throwable t) {
+		responseCount++;
+
 		if (!responseMap.containsKey(weatherSourceType)) {
 			responseMap.put(weatherSourceType, new ArrayMap<>());
 		}
@@ -125,8 +128,7 @@ public abstract class MultipleJsonDownloader {
 		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, t));
 		Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 
-		if (requestCount == ++responseCount) {
-			Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
+		if (requestCount == responseCount) {
 			onResult();
 		}
 	}

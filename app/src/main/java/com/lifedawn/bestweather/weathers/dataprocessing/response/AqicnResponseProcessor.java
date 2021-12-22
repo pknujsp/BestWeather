@@ -10,13 +10,11 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
-import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
-import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -205,7 +203,7 @@ public class AqicnResponseProcessor {
 		return LocalDate.parse(day, dateTimeFormatter);
 	}
 
-	public static boolean successfulResponse(MultipleJsonDownloader.ResponseResult result) {
+	public static boolean successfulResponse(MultipleRestApiDownloader.ResponseResult result) {
 		if (result.getResponse() != null) {
 			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();
 
@@ -221,9 +219,21 @@ public class AqicnResponseProcessor {
 
 	public static AirQualityDto makeAirQualityDto(Context context, GeolocalizedFeedResponse geolocalizedFeedResponse, ZoneOffset zoneOffset) {
 		GeolocalizedFeedResponse.Data data = geolocalizedFeedResponse.getData();
+
+		if (zoneOffset == null) {
+			zoneOffset = ZoneOffset.of(data.getTime().getTz());
+		}
+		//-----------------time----
+		AirQualityDto.Time time = new AirQualityDto.Time();
+		time.setS(data.getTime().getS());
+		time.setTz(data.getTime().getTz());
+		time.setV(data.getTime().getV());
+		time.setIso(data.getTime().getIso());
+
 		AirQualityDto airQualityDto = new AirQualityDto();
 		airQualityDto.setAqi((int) Double.parseDouble(data.getAqi()));
 		airQualityDto.setIdx(Integer.parseInt(data.getIdx()));
+		airQualityDto.setTimeInfo(time);
 
 		airQualityDto.setCityName(data.getCity().getName());
 		airQualityDto.setAqiCnUrl(data.getCity().getUrl());
@@ -244,6 +254,7 @@ public class AqicnResponseProcessor {
 
 		//---------- dailyforecast-----------------------------------------------------------------------
 		ArrayMap<String, AirQualityDto.DailyForecast> forecastArrMap = new ArrayMap<>();
+
 		final ZonedDateTime todayDate = ZonedDateTime.now(zoneOffset);
 		ZonedDateTime date = ZonedDateTime.of(todayDate.toLocalDateTime(), zoneOffset);
 		LocalDate localDate = null;
@@ -347,9 +358,10 @@ public class AqicnResponseProcessor {
 	}
 
 	public static AirQualityDto parseTextToAirQualityDto(Context context, JsonObject jsonObject) {
-		if (jsonObject.get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name()) != null) {
+		if (jsonObject.get(WeatherSourceType.AQICN.name()) != null) {
+			JsonObject aqiCnObject = jsonObject.getAsJsonObject(WeatherSourceType.AQICN.name());
 			GeolocalizedFeedResponse geolocalizedFeedResponse =
-					getAirQualityObjFromJson(jsonObject.get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name()).getAsString());
+					getAirQualityObjFromJson(aqiCnObject.get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name()).getAsString());
 			AirQualityDto airQualityDto = makeAirQualityDto(context, geolocalizedFeedResponse,
 					ZoneOffset.of(jsonObject.get("zoneOffset").getAsString()));
 			return airQualityDto;

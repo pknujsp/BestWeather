@@ -16,7 +16,6 @@ import android.widget.RemoteViews;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
@@ -25,7 +24,7 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
@@ -192,7 +191,7 @@ public abstract class AbstractWidgetCreator {
 		return new int[]{(int) widgetWidthPx, (int) widgetHeightPx};
 	}
 
-	public void makeResponseTextToJson(MultipleJsonDownloader multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet,
+	public void makeResponseTextToJson(MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet,
 	                                   Set<WeatherSourceType> weatherSourceTypeSet, WidgetDto widgetDto, ZoneOffset zoneOffset) {
 		//json형태로 저장
 		/*
@@ -210,15 +209,15 @@ public abstract class AbstractWidgetCreator {
 		}
 
 		 */
-		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult>> arrayMap =
-				multipleJsonDownloader.getResponseMap();
+		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> arrayMap =
+				multipleRestApiDownloader.getResponseMap();
 
 		final JsonObject rootJsonObject = new JsonObject();
 		String text = null;
 
 		//owm이면 onecall이므로 한번만 수행
 		for (WeatherSourceType weatherSourceType : weatherSourceTypeSet) {
-			ArrayMap<RetrofitClient.ServiceType, MultipleJsonDownloader.ResponseResult> requestWeatherSourceArr =
+			ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> requestWeatherSourceArr =
 					arrayMap.get(weatherSourceType);
 
 			if (weatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
@@ -261,8 +260,8 @@ public abstract class AbstractWidgetCreator {
 						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.VILAGE_FCST).getResponseText();
 						kmaJsonObject.addProperty(RetrofitClient.ServiceType.VILAGE_FCST.name(), text);
 					}
-					long tmFc = Long.parseLong(multipleJsonDownloader.get("tmFc"));
-					rootJsonObject.addProperty("tmFc", tmFc);
+					long tmFc = Long.parseLong(multipleRestApiDownloader.get("tmFc"));
+					kmaJsonObject.addProperty("tmFc", tmFc);
 				}
 				rootJsonObject.add(weatherSourceType.name(), kmaJsonObject);
 

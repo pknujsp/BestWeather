@@ -21,7 +21,7 @@ import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
 import com.lifedawn.bestweather.notification.model.DailyNotiDataObj;
-import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
@@ -81,13 +81,13 @@ public class DailyNotiViewCreator extends AbstractNotiViewCreator {
 	}
 
 	@Override
-	protected void setResultViews(Context context, RemoteViews remoteViews, WeatherSourceType requestWeatherSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleJsonDownloader multipleJsonDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	protected void setResultViews(Context context, RemoteViews remoteViews, WeatherSourceType requestWeatherSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
-		setHeaderViews(remoteViews, notificationDataObj.getAddressName(), multipleJsonDownloader.getRequestDateTime().toString());
+		setHeaderViews(remoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		int icon = R.drawable.temp_icon;
 
-		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleJsonDownloader,
+		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
 				requestWeatherSourceType);
 		if (currentConditionsDto != null) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
@@ -96,7 +96,7 @@ public class DailyNotiViewCreator extends AbstractNotiViewCreator {
 			icon = currentConditionsDto.getWeatherIcon();
 		}
 
-		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleJsonDownloader,
+		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
 				requestWeatherSourceType);
 		if (!hourlyForecastDtoList.isEmpty()) {
 			setHourlyForecastViews(remoteViews, hourlyForecastDtoList);
@@ -105,8 +105,8 @@ public class DailyNotiViewCreator extends AbstractNotiViewCreator {
 
 		AirQualityDto airQualityDto = null;
 		if (zoneOffset != null) {
-			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleJsonDownloader,
-					requestWeatherSourceType, zoneOffset);
+			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
+					zoneOffset);
 			if (airQualityDto != null) {
 				setAirQualityViews(remoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 			} else {

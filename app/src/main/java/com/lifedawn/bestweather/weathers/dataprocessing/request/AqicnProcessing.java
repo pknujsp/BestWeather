@@ -9,7 +9,7 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.aqicn.AqicnParameter;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
-import com.lifedawn.bestweather.retrofit.util.MultipleJsonDownloader;
+import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 
 import retrofit2.Call;
@@ -40,25 +40,25 @@ public class AqicnProcessing {
 		return call;
 	}
 
-	public static void getAirQuality(Double latitude, Double longitude, MultipleJsonDownloader multipleJsonDownloader) {
+	public static void getAirQuality(Double latitude, Double longitude, MultipleRestApiDownloader multipleRestApiDownloader) {
 		AqicnParameter aqicnParameter = new AqicnParameter();
 		aqicnParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString());
 
 		Call<JsonElement> localizedFeedCall = getLocalizedFeed(aqicnParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-				multipleJsonDownloader.processResult(WeatherSourceType.AQICN, aqicnParameter,
+				multipleRestApiDownloader.processResult(WeatherSourceType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, response, responseObj, responseText);
 			}
 
 			@Override
 			public void onResponseResult(Throwable t) {
-				multipleJsonDownloader.processResult(WeatherSourceType.AQICN, aqicnParameter,
+				multipleRestApiDownloader.processResult(WeatherSourceType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, t);
 			}
 
 		});
-		multipleJsonDownloader.getCallMap().put(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, localizedFeedCall);
+		multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, localizedFeedCall);
 
 	}
 }

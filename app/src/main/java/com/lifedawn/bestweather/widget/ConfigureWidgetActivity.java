@@ -14,6 +14,8 @@ import android.Manifest;
 import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -43,13 +45,25 @@ import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.EighthWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.EleventhWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.FirstWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.NinthWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.SecondWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.SeventhWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.SixthWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.TenthWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.ThirdWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.FourthWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.FifthWidgetCreator;
+import com.lifedawn.bestweather.widget.widgetprovider.EighthWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.EleventhWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.NinthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.SecondWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SeventhWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SixthWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.TenthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.ThirdWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FourthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FifthWidgetProvider;
@@ -148,14 +162,45 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		}
 
 		appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
-		layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
+		final AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId);
+		layoutId = appWidgetProviderInfo.initialLayout;
+		ComponentName componentName = appWidgetProviderInfo.provider;
+		final String providerClassName = componentName.getClassName();
+
+		if (providerClassName.equals(FirstWidgetProvider.class.getName())) {
+			widgetCreator = new FirstWidgetCreator(getApplicationContext(), this, appWidgetId);
+		} else if (providerClassName.equals(SecondWidgetProvider.class.getName())) {
+			widgetCreator = new SecondWidgetCreator(getApplicationContext(), this, appWidgetId);
+		} else if (providerClassName.equals(ThirdWidgetProvider.class.getName())) {
+			widgetCreator = new ThirdWidgetCreator(getApplicationContext(), this, appWidgetId);
+
+		} else if (providerClassName.equals(FourthWidgetProvider.class.getName())) {
+			widgetCreator = new FourthWidgetCreator(getApplicationContext(), this, appWidgetId);
+
+		} else if (providerClassName.equals(FifthWidgetProvider.class.getName())) {
+			widgetCreator = new FifthWidgetCreator(getApplicationContext(), this, appWidgetId);
+
+		} else if (providerClassName.equals(SixthWidgetProvider.class.getName())) {
+			widgetCreator = new SixthWidgetCreator(getApplicationContext(), this, appWidgetId);
+
+		} else if (providerClassName.equals(SeventhWidgetProvider.class.getName())) {
+			widgetCreator = new SeventhWidgetCreator(getApplicationContext(), this, appWidgetId);
+
+		} else if (providerClassName.equals(EighthWidgetProvider.class.getName())) {
+			widgetCreator = new EighthWidgetCreator(getApplicationContext(), this, appWidgetId);
+
+		} else if (providerClassName.equals(NinthWidgetProvider.class.getName())) {
+			widgetCreator = new NinthWidgetCreator(getApplicationContext(), this, appWidgetId);
+
+		} else if (providerClassName.equals(TenthWidgetProvider.class.getName())) {
+			widgetCreator = new TenthWidgetCreator(getApplicationContext(), this, appWidgetId);
+		} else if (providerClassName.equals(EleventhWidgetProvider.class.getName())) {
+			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), this, appWidgetId);
+		}
 
 		binding.displayDatetimeSwitch.setVisibility(View.GONE);
 		binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
 
-		if (layoutId == R.layout.view_widget) {
-			widgetCreator = new FirstWidgetCreator(getApplicationContext(), this, appWidgetId);
-		}
 
 		widgetDto = widgetCreator.loadDefaultSettings();
 		updatePreview();
@@ -175,9 +220,12 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			@Override
 			public void onClick(View v) {
 				Class<?> widgetProviderClass = null;
-				if (layoutId == R.layout.view_widget) {
-					widgetProviderClass = FirstWidgetProvider.class;
+				try {
+					widgetProviderClass = Class.forName(providerClassName);
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
 				}
+
 				if (binding.selectedLocationRadio.isChecked()) {
 					widgetDto.setAddressName(newSelectedAddressDto.getAddress());
 					widgetDto.setCountryCode(newSelectedAddressDto.getCountryCode());
