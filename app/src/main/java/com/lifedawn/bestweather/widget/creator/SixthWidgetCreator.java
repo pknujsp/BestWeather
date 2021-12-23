@@ -102,21 +102,15 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		CurrentConditionsDto current = new CurrentConditionsDto();
-		current.setWeatherIcon(R.drawable.day_clear)
-				.setTemp("20°");
-
-		AirQualityDto tempAirQualityDto = new AirQualityDto();
-		tempAirQualityDto.setAqi(13);
-
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), current, tempAirQualityDto, null);
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
+				WeatherResponseProcessor.getTempCurrentConditionsDto(context),
+				WeatherResponseProcessor.getTempAirQualityDto(), null);
 	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                       CurrentConditionsDto currentConditionsDto, AirQualityDto airQualityDto, @Nullable OnDrawBitmapCallback onDrawBitmapCallback) {
 		RelativeLayout rootLayout = new RelativeLayout(context);
-
-		LayoutInflater layoutInflater = LayoutInflater.from(context);
+		final LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
 		headerView.setId(R.id.header);
@@ -203,8 +197,7 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 
 	private void addAirQualityGridItem(LayoutInflater layoutInflater, GridLayout gridLayout, String label, String gradeValue,
 	                                   String gradeDescription, int textColor, int iconId) {
-		View view = layoutInflater.inflate(R.layout.air_quality_item, null, false);
-
+		RelativeLayout view = (RelativeLayout) layoutInflater.inflate(R.layout.air_quality_item, null);
 		((ImageView) view.findViewById(R.id.label_icon)).setImageResource(iconId);
 
 		TextView labelTextView = view.findViewById(R.id.label);
@@ -230,7 +223,7 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherSourceType = WeatherSourceType.KMA;

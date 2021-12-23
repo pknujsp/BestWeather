@@ -146,17 +146,8 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		CurrentConditionsDto tempCurrentConditions = new CurrentConditionsDto();
-		tempCurrentConditions.setTemp("10°").setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(120)
-				.setWindDirection(WindUtil.windDirection(context, String.valueOf(tempCurrentConditions.getWindDirectionDegree())))
-				.setWindSpeed(ValueUnits.convertWindSpeed("2.6", ValueUnits.mPerSec) + "m/s")
-				.setHumidity("45%")
-				.setWindStrength(WindUtil.getWindSpeedDescription("2.6"));
-
-		AirQualityDto tempAirQualityDto = new AirQualityDto();
-		tempAirQualityDto.setAqi(10);
-
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), tempAirQualityDto, tempCurrentConditions,
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
+				WeatherResponseProcessor.getTempAirQualityDto(), WeatherResponseProcessor.getTempCurrentConditionsDto(context),
 				null);
 	}
 
@@ -190,14 +181,14 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 		rootLayout.addView(headerView, headerViewLayoutParams);
 		rootLayout.addView(currentConditionsView, currentConditionsViewLayoutParams);
 
-		drawBitmap(rootLayout,onDrawBitmapCallback,remoteViews);
+		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews);
 
 	}
 
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherSourceType = WeatherSourceType.KMA;

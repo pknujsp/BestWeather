@@ -6,8 +6,12 @@ import android.util.ArrayMap;
 
 import androidx.preference.PreferenceManager;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
@@ -26,11 +30,15 @@ import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.tickaroo.tikxml.TikXml;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -223,8 +231,11 @@ public class WeatherResponseProcessor {
 			}
 		} else if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
 			if (weatherSourceElement.get(RetrofitClient.ServiceType.ACCU_12_HOURLY.name()) != null) {
+				final String jsonText = weatherSourceElement.get(RetrofitClient.ServiceType.ACCU_12_HOURLY.name()).getAsString();
+				JsonArray accuJsonArr = (JsonArray) JsonParser.parseString(jsonText);
+
 				TwelveHoursOfHourlyForecastsResponse hourlyForecastsResponse = AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
-						weatherSourceElement.get(RetrofitClient.ServiceType.ACCU_12_HOURLY.name()));
+						accuJsonArr);
 
 				hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(context, hourlyForecastsResponse.getItems()
 						, windUnit, tempUnit, visibilityUnit);
@@ -425,6 +436,110 @@ public class WeatherResponseProcessor {
 		}
 
 		return dailyForecastDtoList;
+	}
+
+	public static CurrentConditionsDto getTempCurrentConditionsDto(Context context) {
+		CurrentConditionsDto tempCurrentConditions = new CurrentConditionsDto();
+		tempCurrentConditions.setTemp("-100°").setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(120)
+				.setWindDirection(WindUtil.windDirection(context, String.valueOf(tempCurrentConditions.getWindDirectionDegree())))
+				.setWindSpeed(ValueUnits.convertWindSpeed("2.6", ValueUnits.mPerSec) + ValueUnits.convertToStr(context, ValueUnits.mPerSec))
+				.setHumidity("45%")
+				.setWindStrength(WindUtil.getWindSpeedDescription("2.6"));
+
+		return tempCurrentConditions;
+	}
+
+	public static List<HourlyForecastDto> getTempHourlyForecastDtoList(Context context, int count) {
+		final String tempDegree = "10°";
+		final String percent = "%";
+
+		final String zeroSnowVolume = "0.0mm";
+		final String zeroRainVolume = "0.0mm";
+		final String zeroPrecipitationVolume = "0.0mm";
+
+		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
+
+		ZonedDateTime zonedDateTime = ZonedDateTime.now();
+
+		for (int i = 0; i < count; i++) {
+			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
+
+			hourlyForecastDto.setHours(zonedDateTime)
+					.setWeatherIcon(R.drawable.day_clear)
+					.setTemp(tempDegree)
+					.setPop(10 + percent)
+					.setPrecipitationVolume(zeroPrecipitationVolume)
+					.setHasRain(false)
+					.setHasSnow(false)
+					.setRainVolume(zeroRainVolume)
+					.setSnowVolume(zeroSnowVolume)
+					.setFeelsLikeTemp(tempDegree);
+
+			hourlyForecastDtoList.add(hourlyForecastDto);
+			zonedDateTime = zonedDateTime.plusHours(1);
+		}
+		return hourlyForecastDtoList;
+	}
+
+	public static List<DailyForecastDto> getTempDailyForecastDtoList(Context context, int count) {
+		final String minTemp = "-10°";
+		final String maxTemp = "10°";
+		final String percent = "%";
+
+		final String zeroSnowVolume = "0.0mm";
+		final String zeroRainVolume = "0.0mm";
+		final String zeroPrecipitationVolume = "0.0mm";
+		final String pop = "10%";
+
+		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
+
+		ZonedDateTime zonedDateTime = ZonedDateTime.now();
+
+		for (int i = 0; i < count; i++) {
+			DailyForecastDto dailyForecastDto = new DailyForecastDto();
+
+			dailyForecastDto.setAmValues(new DailyForecastDto.Values()).setPmValues(new DailyForecastDto.Values())
+					.setMinTemp(minTemp).setMaxTemp(maxTemp).setDate(zonedDateTime).getAmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop)
+					.setRainVolume(zeroRainVolume).setSnowVolume(zeroSnowVolume);
+			dailyForecastDto.getPmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop)
+					.setRainVolume(zeroRainVolume).setSnowVolume(zeroSnowVolume);
+
+			dailyForecastDtoList.add(dailyForecastDto);
+			zonedDateTime = zonedDateTime.plusDays(1);
+		}
+		return dailyForecastDtoList;
+	}
+
+	public static AirQualityDto getTempAirQualityDto() {
+		AirQualityDto airQualityDto = new AirQualityDto();
+		airQualityDto.setAqi(160).setCityName("stationName");
+
+		AirQualityDto.Current current = new AirQualityDto.Current();
+		airQualityDto.setCurrent(current);
+		current.setO3(10);
+		current.setNo2(20);
+		current.setCo(30);
+		current.setSo2(40);
+		current.setPm25(100);
+		current.setPm10(200);
+		current.setDew(70);
+
+		ZonedDateTime zonedDateTime = ZonedDateTime.now();
+		List<AirQualityDto.DailyForecast> dailyForecastList = new ArrayList<>();
+		airQualityDto.setDailyForecastList(dailyForecastList);
+
+		AirQualityDto.DailyForecast.Val val = new AirQualityDto.DailyForecast.Val();
+		val.setMin(10).setMax(20).setAvg(15);
+
+		for (int i = 0; i < 6; i++) {
+			AirQualityDto.DailyForecast dailyForecast = new AirQualityDto.DailyForecast();
+			dailyForecast.setDate(zonedDateTime).setUvi(val).setO3(val).setPm25(val).setPm10(val);
+
+			dailyForecastList.add(dailyForecast);
+			zonedDateTime = zonedDateTime.plusDays(1);
+		}
+
+		return airQualityDto;
 	}
 
 	public static WeatherSourceType getMainWeatherSourceType(Set<WeatherSourceType> requestWeatherSourceTypeSet) {

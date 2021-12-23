@@ -19,6 +19,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -259,7 +260,9 @@ public class AqicnResponseProcessor {
 		ZonedDateTime date = ZonedDateTime.of(todayDate.toLocalDateTime(), zoneOffset);
 		LocalDate localDate = null;
 
-		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm10Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm10();
+		GeolocalizedFeedResponse.Data.Forecast forecast = data.getForecast();
+
+		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm10Forecast = forecast.getDaily().getPm10();
 		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm10Forecast) {
 			localDate = getDate(valueMap.getDay());
 			date = date.withYear(localDate.getYear()).withMonth(localDate.getMonthValue()).withDayOfMonth(localDate.getDayOfMonth());
@@ -280,7 +283,7 @@ public class AqicnResponseProcessor {
 			forecastArrMap.get(valueMap.getDay()).setPm10(pm10);
 		}
 
-		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm25Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm25();
+		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm25Forecast = forecast.getDaily().getPm25();
 		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm25Forecast) {
 			localDate = getDate(valueMap.getDay());
 			date = date.withYear(localDate.getYear()).withMonth(localDate.getMonthValue()).withDayOfMonth(localDate.getDayOfMonth());
@@ -301,7 +304,7 @@ public class AqicnResponseProcessor {
 			forecastArrMap.get(valueMap.getDay()).setPm25(pm25);
 		}
 
-		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> o3Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getO3();
+		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> o3Forecast = forecast.getDaily().getO3();
 		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : o3Forecast) {
 			localDate = getDate(valueMap.getDay());
 			date = date.withYear(localDate.getYear()).withMonth(localDate.getMonthValue()).withDayOfMonth(localDate.getDayOfMonth());
@@ -345,7 +348,13 @@ public class AqicnResponseProcessor {
 		}
 
 		AirQualityDto.DailyForecast[] forecastObjArr = new AirQualityDto.DailyForecast[1];
-		List<AirQualityDto.DailyForecast> dailyForecastList = Arrays.asList(forecastArrMap.values().toArray(forecastObjArr));
+		forecastObjArr = forecastArrMap.values().toArray(forecastObjArr);
+
+		List<AirQualityDto.DailyForecast> dailyForecastList = new ArrayList<>();
+		for (AirQualityDto.DailyForecast dailyForecast : forecastObjArr) {
+			dailyForecastList.add(dailyForecast);
+		}
+
 		Collections.sort(dailyForecastList, new Comparator<AirQualityDto.DailyForecast>() {
 			@Override
 			public int compare(AirQualityDto.DailyForecast forecastObj, AirQualityDto.DailyForecast t1) {

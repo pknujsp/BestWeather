@@ -31,9 +31,11 @@ import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class EleventhWidgetCreator extends AbstractWidgetCreator {
 	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
@@ -43,6 +45,8 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 	private int hourTextSize;
 	private int tempTextSize;
 	private int popTextSize;
+	private int rainVolumeTextSize;
+	private int snowVolumeTextSize;
 	private int weatherSourceNameTextSize;
 
 	private final int cellCount = 9;
@@ -79,6 +83,8 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 		hourTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTimeTextSizeInSimpleWidgetForecastItem) + extraSize;
 		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInSimpleWidgetForecastItem) + extraSize;
 		popTextSize = context.getResources().getDimensionPixelSize(R.dimen.popTextSizeInSimpleWidgetForecastItem) + extraSize;
+		rainVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.rainVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
+		snowVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.snowVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
 		weatherSourceNameTextSize = context.getResources().getDimensionPixelSize(R.dimen.weatherSourceNameTextSizeInWidget) + extraSize;
 	}
 
@@ -101,14 +107,20 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), null, null);
+		ArrayMap<WeatherSourceType, List<HourlyForecastDto>> hourlyForecastDtoListMap = new ArrayMap<>();
+		hourlyForecastDtoListMap.put(WeatherSourceType.ACCU_WEATHER, WeatherResponseProcessor.getTempHourlyForecastDtoList(context,
+				cellCount));
+		hourlyForecastDtoListMap.put(WeatherSourceType.OPEN_WEATHER_MAP, WeatherResponseProcessor.getTempHourlyForecastDtoList(context,
+				cellCount));
+
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
+				hourlyForecastDtoListMap,
+				null);
 	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                       ArrayMap<WeatherSourceType, List<HourlyForecastDto>> hourlyForecastDtoListMap, @Nullable OnDrawBitmapCallback onDrawBitmapCallback) {
 		RelativeLayout rootLayout = new RelativeLayout(context);
-
-
 		LayoutInflater layoutInflater = LayoutInflater.from(context);
 
 		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
@@ -117,7 +129,6 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E 0");
 
 		//첫번째로 일치하는 시각을 찾는다. 첫 시각이 kma가 12시, owm이 13시 이면 13시를 첫 시작으로 하여 화면을 표시
-
 		Set<WeatherSourceType> weatherSourceTypeSet = hourlyForecastDtoListMap.keySet();
 		ZonedDateTime firstDateTime = null;
 
@@ -129,6 +140,14 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 				firstDateTime = ZonedDateTime.of(hourlyForecastDtoList.get(0).getHours().toLocalDateTime(),
 						hourlyForecastDtoList.get(0).getHours().getZone());
 			}
+		}
+
+		final long firstHours = TimeUnit.SECONDS.toHours(firstDateTime.toEpochSecond());
+		long hours = 0;
+		Map<WeatherSourceType, Integer> firstBeginIdxMap = new HashMap<>();
+		for (WeatherSourceType weatherSourceType : hourlyForecastDtoListMap.keySet()) {
+			hours = TimeUnit.SECONDS.toHours(hourlyForecastDtoListMap.get(weatherSourceType).get(0).getHours().toEpochSecond());
+			firstBeginIdxMap.put(weatherSourceType, (int) (firstHours - hours));
 		}
 
 		//시각을 먼저 표시
@@ -162,6 +181,9 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 		final LinearLayout.LayoutParams forecastRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0);
 		forecastRowLayoutParams.weight = 1;
 
+		final String mm = "mm";
+		final String cm = "cm";
+
 		for (WeatherSourceType weatherSourceType : weatherSourceTypeSet) {
 			List<HourlyForecastDto> hourlyForecastDtoList = hourlyForecastDtoListMap.get(weatherSourceType);
 
@@ -176,14 +198,43 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 			layoutParams.gravity = Gravity.CENTER;
 			layoutParams.weight = 1;
 
-			for (int cell = 0; cell < cellCount; cell++) {
+			boolean haveRain = false;
+			boolean haveSnow = false;
+
+			int count = cellCount + firstBeginIdxMap.get(weatherSourceType);
+
+			for (int cell = firstBeginIdxMap.get(weatherSourceType); cell < count; cell++) {
+				if (hourlyForecastDtoList.get(cell).isHasRain()) {
+					if (!haveRain) {
+						haveRain = true;
+					}
+				}
+				if (hourlyForecastDtoList.get(cell).isHasSnow()) {
+					if (!haveSnow) {
+						haveSnow = true;
+					}
+				}
+			}
+
+			for (int cell = firstBeginIdxMap.get(weatherSourceType); cell < count; cell++) {
 				View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
 				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(hourlyForecastDtoList.get(cell).getWeatherIcon());
 
-				if (cell != 0) {
+				if (!hourlyForecastDtoList.get(cell).getPop().equals("-")) {
 					((TextView) view.findViewById(R.id.pop)).setText(hourlyForecastDtoList.get(cell).getPop());
 				} else {
 					view.findViewById(R.id.popLayout).setVisibility(View.INVISIBLE);
+				}
+
+				if (haveRain) {
+					((TextView) view.findViewById(R.id.rainVolume)).setText(hourlyForecastDtoList.get(cell).getRainVolume().replace(mm,
+							"").replace(cm, ""));
+					((TextView) view.findViewById(R.id.rainVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, rainVolumeTextSize);
+				}
+				if (hourlyForecastDtoList.get(cell).isHasSnow()) {
+					((TextView) view.findViewById(R.id.snowVolume)).setText(hourlyForecastDtoList.get(cell).getSnowVolume().replace(mm,
+							"").replace(cm, ""));
+					((TextView) view.findViewById(R.id.snowVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, snowVolumeTextSize);
 				}
 
 				((TextView) view.findViewById(R.id.pop)).setTextSize(TypedValue.COMPLEX_UNIT_PX, popTextSize);
@@ -192,8 +243,8 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 
 				view.findViewById(R.id.dateTime).setVisibility(View.GONE);
 				view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
-				view.findViewById(R.id.rainVolumeLayout).setVisibility(View.GONE);
-				view.findViewById(R.id.snowVolumeLayout).setVisibility(View.GONE);
+				view.findViewById(R.id.rainVolumeLayout).setVisibility(haveRain ? View.VISIBLE : View.GONE);
+				view.findViewById(R.id.snowVolumeLayout).setVisibility(haveSnow ? View.VISIBLE : View.GONE);
 
 				hourlyForecastListView.addView(view, layoutParams);
 			}
@@ -212,7 +263,7 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 				icon = R.drawable.owmicon;
 			}
 
-			View weatherSourceView = layoutInflater.inflate(R.layout.weather_data_source_view, null, false);
+			View weatherSourceView = layoutInflater.inflate(R.layout.weather_data_source_view, null);
 			((TextView) weatherSourceView.findViewById(R.id.source)).setTextSize(TypedValue.COMPLEX_UNIT_PX, weatherSourceNameTextSize);
 			((TextView) weatherSourceView.findViewById(R.id.source)).setText(weatherSource);
 			((ImageView) weatherSourceView.findViewById(R.id.icon)).setImageResource(icon);
@@ -257,16 +308,9 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		ArrayMap<WeatherSourceType, List<HourlyForecastDto>> weatherSourceTypeListArrayMap = new ArrayMap<>();
+		Set<WeatherSourceType> weatherSourceTypeSet = widgetDto.getWeatherSourceTypeSet();
 
-		final String[] weatherSourceTypeNames = widgetDto.getWeatherSourceType().split(",");
-		final WeatherSourceType[] weatherSourceTypes = new WeatherSourceType[weatherSourceTypeNames.length];
-
-		int i = 0;
-		for (String name : weatherSourceTypeNames) {
-			weatherSourceTypes[i++] = WeatherSourceType.valueOf(name);
-		}
-
-		for (WeatherSourceType weatherSourceType : weatherSourceTypes) {
+		for (WeatherSourceType weatherSourceType : weatherSourceTypeSet) {
 			weatherSourceTypeListArrayMap.put(weatherSourceType,
 					WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject, weatherSourceType, widgetDto.getLatitude(),
 							widgetDto.getLongitude()));

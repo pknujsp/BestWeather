@@ -110,28 +110,9 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
-
-		final String temp = "20°";
-		final String pop = "10%";
-		final int weatherIcon = R.drawable.day_clear;
-
-		HourlyForecastDto current = new HourlyForecastDto();
-		current.setHours(null).setWeatherIcon(weatherIcon)
-				.setTemp(temp);
-
-		hourlyForecastDtoList.add(current);
-		ZonedDateTime now = ZonedDateTime.now();
-
-		for (int i = 0; i < cellCount - 1; i++) {
-			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
-			hourlyForecastDto.setWeatherIcon(weatherIcon).setTemp(temp).setHours(now)
-					.setPop(pop);
-			hourlyForecastDtoList.add(hourlyForecastDto);
-
-			now = now.plusHours(1);
-		}
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), hourlyForecastDtoList, null);
+		List<HourlyForecastDto> tempHourlyForecastDtoList = WeatherResponseProcessor.getTempHourlyForecastDtoList(context, cellCount );
+		tempHourlyForecastDtoList.get(0).setHours(null);
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), tempHourlyForecastDtoList, null);
 	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
@@ -215,7 +196,7 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+		WeatherSourceType weatherSourceType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherSourceType = WeatherSourceType.KMA;

@@ -53,7 +53,7 @@ public class SeventhWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
 		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
-		FifthWidgetCreator widgetCreator = new FifthWidgetCreator(context, null, appWidgetId);
+		SeventhWidgetCreator widgetCreator = new SeventhWidgetCreator(context, null, appWidgetId);
 		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
@@ -82,7 +82,7 @@ public class SeventhWidgetProvider extends AbstractAppWidgetProvider {
 
 	@Override
 	protected void reDrawWidget(Context context, int appWidgetId) {
-		FifthWidgetCreator widgetViewCreator = new FifthWidgetCreator(context, null, appWidgetId);
+		SeventhWidgetCreator widgetViewCreator = new SeventhWidgetCreator(context, null, appWidgetId);
 		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto widgetDto) {
@@ -118,7 +118,7 @@ public class SeventhWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	protected void init(Context context, Bundle bundle) {
 		final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		FifthWidgetCreator widgetViewCreator = new FifthWidgetCreator(context, null, appWidgetId);
+		SeventhWidgetCreator widgetViewCreator = new SeventhWidgetCreator(context, null, appWidgetId);
 		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto widgetDto) {

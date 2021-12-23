@@ -607,8 +607,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		for (FinalHourlyForecast finalHourlyForecast : hourlyForecastList) {
 			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
 
-			if (
-					finalHourlyForecast.getRainPrecipitation1Hour().equals(noRain)) {
+			if (finalHourlyForecast.getRainPrecipitation1Hour().equals(noRain)) {
 				hasRain = false;
 				rainVolume = zeroRainVolume;
 			} else {

@@ -143,32 +143,9 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
-		final String pop = "20%";
-		final String minTemp = "8";
-		final String maxTemp = "17";
-		ZonedDateTime now = ZonedDateTime.now();
-
-		for (int i = 0; i < cellCount; i++) {
-			DailyForecastDto dailyForecastDto = new DailyForecastDto();
-			dailyForecastDto.setDate(now).setAmValues(new DailyForecastDto.Values()).setPmValues(new DailyForecastDto.Values())
-					.setMinTemp(minTemp).setMaxTemp(maxTemp);
-			dailyForecastDto.getAmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop);
-			dailyForecastDto.getPmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop);
-
-			dailyForecastDtoList.add(dailyForecastDto);
-			now = now.plusDays(1);
-		}
-
-		CurrentConditionsDto tempCurrentConditions = new CurrentConditionsDto();
-		tempCurrentConditions.setTemp("15°");
-		tempCurrentConditions.setWeatherIcon(R.drawable.day_clear);
-
-		AirQualityDto tempAirQualityDto = new AirQualityDto();
-		tempAirQualityDto.setAqi(10);
-
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), tempAirQualityDto, tempCurrentConditions,
-				dailyForecastDtoList, null);
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), WeatherResponseProcessor.getTempAirQualityDto(),
+				WeatherResponseProcessor.getTempCurrentConditionsDto(context),
+				WeatherResponseProcessor.getTempDailyForecastDtoList(context, cellCount), null);
 	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto,
@@ -250,7 +227,7 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 		rootLayout.addView(hourAndIconLinearLayout, hourAndIconRowLayoutParams);
 		rootLayout.addView(detailSingleTemperatureView, tempRowLayoutParams);
 
-		drawBitmap(rootLayout,onDrawBitmapCallback,remoteViews);
+		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews);
 
 	}
 
@@ -261,7 +238,7 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherSourceType = WeatherSourceType.KMA;

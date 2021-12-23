@@ -84,6 +84,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	private AbstractWidgetCreator widgetCreator;
 	private AppWidgetManager appWidgetManager;
 	private boolean selectedFavoriteLocation;
+	private boolean useMultipleWeatherDataSource = false;
 
 	private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
 		@Override
@@ -149,6 +150,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		super.onCreate(savedInstanceState);
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_configure_widget);
 
+		binding.multipleWeatherDataSourceLayout.setVisibility(View.GONE);
+
 		getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
 		setBackgroundImg();
@@ -185,7 +188,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 		} else if (providerClassName.equals(SeventhWidgetProvider.class.getName())) {
 			widgetCreator = new SeventhWidgetCreator(getApplicationContext(), this, appWidgetId);
-
+			binding.weatherDataSourceLayout.setVisibility(View.GONE);
 		} else if (providerClassName.equals(EighthWidgetProvider.class.getName())) {
 			widgetCreator = new EighthWidgetCreator(getApplicationContext(), this, appWidgetId);
 
@@ -196,11 +199,13 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			widgetCreator = new TenthWidgetCreator(getApplicationContext(), this, appWidgetId);
 		} else if (providerClassName.equals(EleventhWidgetProvider.class.getName())) {
 			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), this, appWidgetId);
+			binding.multipleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
+			binding.weatherDataSourceLayout.setVisibility(View.GONE);
+			useMultipleWeatherDataSource = true;
 		}
 
 		binding.displayDatetimeSwitch.setVisibility(View.GONE);
 		binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
-
 
 		widgetDto = widgetCreator.loadDefaultSettings();
 		updatePreview();
@@ -219,6 +224,19 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		binding.check.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if (useMultipleWeatherDataSource) {
+					if (!binding.accuWeatherChk.isChecked() && !binding.owmChk.isChecked() && !binding.kmaChk.isChecked()) {
+						Toast.makeText(ConfigureWidgetActivity.this, R.string.notSelectedDefaultWeatherSource, Toast.LENGTH_SHORT).show();
+						return;
+					}
+				} else {
+					if (!binding.accuWeatherRadio.isChecked() && !binding.owmRadio.isChecked()) {
+						Toast.makeText(ConfigureWidgetActivity.this, R.string.notSelectedDefaultWeatherSource, Toast.LENGTH_SHORT).show();
+						return;
+					}
+				}
+
+
 				Class<?> widgetProviderClass = null;
 				try {
 					widgetProviderClass = Class.forName(providerClassName);
@@ -232,7 +250,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 					widgetDto.setLatitude(Double.parseDouble(newSelectedAddressDto.getLatitude()));
 					widgetDto.setLongitude(Double.parseDouble(newSelectedAddressDto.getLongitude()));
 				}
-				Class<?> finalWidgetProviderClass = widgetProviderClass;
+				final Class<?> finalWidgetProviderClass = widgetProviderClass;
 
 				widgetCreator.saveSettings(widgetDto, new DbQueryCallback<WidgetDto>() {
 					@Override
@@ -369,29 +387,84 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			binding.kmaTopPrioritySwitch.setVisibility(View.VISIBLE);
 		} else {
 			binding.kmaTopPrioritySwitch.setVisibility(View.GONE);
+			binding.kmaChk.setVisibility(View.GONE);
 		}
 
 		//기본 날씨 제공사 확인
+		WeatherSourceType weatherSourceType = null;
+
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_accu_weather), true)) {
-			binding.accuWeatherRadio.setChecked(true);
+			weatherSourceType = WeatherSourceType.ACCU_WEATHER;
 		} else {
-			binding.owmRadio.setChecked(true);
+			weatherSourceType = WeatherSourceType.OPEN_WEATHER_MAP;
 		}
 
-		binding.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				widgetDto.setWeatherSourceType(checkedId == 0 ? WeatherSourceType.ACCU_WEATHER.name()
-						: WeatherSourceType.OPEN_WEATHER_MAP.name());
-			}
-		});
+		if (!useMultipleWeatherDataSource) {
+			binding.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(RadioGroup group, int checkedId) {
+					WeatherSourceType newType = checkedId == 0 ? WeatherSourceType.ACCU_WEATHER
+							: WeatherSourceType.OPEN_WEATHER_MAP;
+					WeatherSourceType previousType = checkedId == 1 ? WeatherSourceType.ACCU_WEATHER
+							: WeatherSourceType.OPEN_WEATHER_MAP;
 
-		binding.kmaTopPrioritySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				widgetDto.setTopPriorityKma(isChecked);
+					widgetDto.removeWeatherSourceType(previousType);
+					widgetDto.addWeatherSourceType(newType);
+				}
+			});
+
+			binding.kmaTopPrioritySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					widgetDto.setTopPriorityKma(isChecked);
+				}
+			});
+
+			if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+				binding.accuWeatherRadio.setChecked(true);
+			} else {
+				binding.owmRadio.setChecked(true);
 			}
-		});
+
+		} else {
+			binding.accuWeatherChk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					if (isChecked) {
+						widgetDto.addWeatherSourceType(WeatherSourceType.ACCU_WEATHER);
+					} else {
+						widgetDto.removeWeatherSourceType(WeatherSourceType.ACCU_WEATHER);
+					}
+				}
+			});
+			binding.owmChk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					if (isChecked) {
+						widgetDto.addWeatherSourceType(WeatherSourceType.OPEN_WEATHER_MAP);
+					} else {
+						widgetDto.removeWeatherSourceType(WeatherSourceType.OPEN_WEATHER_MAP);
+					}
+				}
+			});
+			binding.kmaChk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					if (isChecked) {
+						widgetDto.addWeatherSourceType(WeatherSourceType.KMA);
+					} else {
+						widgetDto.removeWeatherSourceType(WeatherSourceType.KMA);
+					}
+				}
+			});
+
+			if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+				binding.accuWeatherChk.setChecked(true);
+			} else {
+				binding.owmChk.setChecked(true);
+			}
+
+		}
 
 	}
 

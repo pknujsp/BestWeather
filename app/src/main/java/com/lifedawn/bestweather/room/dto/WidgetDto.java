@@ -7,6 +7,11 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity(tableName = "widget_table")
 public class WidgetDto {
 	@PrimaryKey(autoGenerate = true)
@@ -28,8 +33,8 @@ public class WidgetDto {
 	@ColumnInfo(name = "locationType")
 	private String locationType;
 
-	@ColumnInfo(name = "weatherSourceType")
-	private String weatherSourceType;
+	@ColumnInfo(name = "weatherSourceTypes")
+	private Set<WeatherSourceType> weatherSourceTypeSet;
 
 	@ColumnInfo(name = "topPriorityKma")
 	private boolean topPriorityKma;
@@ -134,13 +139,6 @@ public class WidgetDto {
 		this.locationType = locationType;
 	}
 
-	public String getWeatherSourceType() {
-		return weatherSourceType;
-	}
-
-	public void setWeatherSourceType(String weatherSourceType) {
-		this.weatherSourceType = weatherSourceType;
-	}
 
 	public boolean isTopPriorityKma() {
 		return topPriorityKma;
@@ -230,4 +228,22 @@ public class WidgetDto {
 		this.loadSuccessful = loadSuccessful;
 	}
 
+	public void addWeatherSourceType(WeatherSourceType newType) {
+		if (weatherSourceTypeSet == null) {
+			weatherSourceTypeSet = new HashSet<>();
+		}
+		weatherSourceTypeSet.add(newType);
+	}
+
+	public void removeWeatherSourceType(WeatherSourceType removeType) {
+		weatherSourceTypeSet.remove(removeType);
+	}
+
+	public void setWeatherSourceTypeSet(Set<WeatherSourceType> weatherSourceTypeSet) {
+		this.weatherSourceTypeSet = weatherSourceTypeSet;
+	}
+
+	public Set<WeatherSourceType> getWeatherSourceTypeSet() {
+		return weatherSourceTypeSet;
+	}
 }

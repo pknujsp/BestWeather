@@ -210,40 +210,10 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		List<HourlyForecastDto> tempHourlyForecastDtoList = new ArrayList<>();
-		List<DailyForecastDto> tempDailyForecastDtoList = new ArrayList<>();
-		CurrentConditionsDto tempCurrentConditionsDto = new CurrentConditionsDto();
-		AirQualityDto tempAirQualityDto = new AirQualityDto();
-
-		tempCurrentConditionsDto.setWeatherIcon(R.drawable.day_clear).setTemp("20°");
-		tempAirQualityDto.setAqi(10);
-
-		final String pop = "10%";
-		ZonedDateTime now = ZonedDateTime.now();
-
-		for (int i = 0; i < dailyForecastCount; i++) {
-			DailyForecastDto dailyForecastDto = new DailyForecastDto();
-			dailyForecastDto.setDate(now).setAmValues(new DailyForecastDto.Values()).setPmValues(new DailyForecastDto.Values())
-					.setMinTemp("20°").setMaxTemp("22°");
-			dailyForecastDto.getAmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop);
-			dailyForecastDto.getPmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop);
-
-			tempDailyForecastDtoList.add(dailyForecastDto);
-			now = now.plusDays(1);
-		}
-
-		now = ZonedDateTime.now();
-
-		for (int i = 0; i < hourlyForecastCount; i++) {
-			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
-			hourlyForecastDto.setWeatherIcon(R.drawable.day_clear).setTemp("20°").setHours(now);
-			tempHourlyForecastDtoList.add(hourlyForecastDto);
-
-			now = now.plusHours(1);
-		}
-
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), tempAirQualityDto,
-				tempCurrentConditionsDto, tempHourlyForecastDtoList, tempDailyForecastDtoList, null);
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), WeatherResponseProcessor.getTempAirQualityDto(),
+				WeatherResponseProcessor.getTempCurrentConditionsDto(context),
+				WeatherResponseProcessor.getTempHourlyForecastDtoList(context, hourlyForecastCount),
+				WeatherResponseProcessor.getTempDailyForecastDtoList(context, dailyForecastCount), null);
 	}
 
 
@@ -275,7 +245,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		rootLayout.addView(headerView, headerViewLayoutParams);
 		rootLayout.addView(valuesView, valuesViewLayoutParams);
 
-		drawBitmap(rootLayout,onDrawBitmapCallback,remoteViews);
+		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews);
 
 	}
 
@@ -286,7 +256,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherSourceType = WeatherSourceType.KMA;

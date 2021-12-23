@@ -100,9 +100,8 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
 		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
-				dailyForecastDtoList, null);
+				WeatherResponseProcessor.getTempDailyForecastDtoList(context, 7), null);
 	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
@@ -115,37 +114,30 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 		LinearLayout hourAndIconLinearLayout = new LinearLayout(context);
 		hourAndIconLinearLayout.setId(R.id.hourAndIconView);
 		hourAndIconLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
-		LinearLayout.LayoutParams hourAndIconCellLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-		hourAndIconCellLayoutParams.gravity = Gravity.CENTER;
+		LinearLayout.LayoutParams hourAndIconCellLayoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
 		hourAndIconCellLayoutParams.weight = 1;
 
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d\nE");
-		String pop = null;
 
 		for (int cell = 0; cell < dailyForecastDtoList.size(); cell++) {
 			View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
-			//hour, weatherIcon
 			((TextView) view.findViewById(R.id.dateTime)).setText(dailyForecastDtoList.get(cell).getDate().format(dateFormatter));
-
 			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, dateTextSize);
-			((TextView) view.findViewById(R.id.pop)).setTextSize(TypedValue.COMPLEX_UNIT_PX, popTextSize);
 
 			if (dailyForecastDtoList.get(cell).isSingle()) {
 				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getSingleValues().getWeatherIcon());
-				pop = dailyForecastDtoList.get(cell).getSingleValues().getPop();
-
 				view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
 			} else {
 				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getAmValues().getWeatherIcon());
 				((ImageView) view.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(cell).getPmValues().getWeatherIcon());
-				pop = dailyForecastDtoList.get(cell).getAmValues().getPop() + "/" +
-						dailyForecastDtoList.get(cell).getPmValues().getPop();
 			}
-			((TextView) view.findViewById(R.id.pop)).setText(pop);
 
 			view.findViewById(R.id.temperature).setVisibility(View.GONE);
+			view.findViewById(R.id.popLayout).setVisibility(View.GONE);
+			view.findViewById(R.id.rainVolumeLayout).setVisibility(View.GONE);
+			view.findViewById(R.id.snowVolumeLayout).setVisibility(View.GONE);
 
 			minTempList.add(Integer.parseInt(dailyForecastDtoList.get(cell).getMinTemp().replace(tempDegree, "")));
 			maxTempList.add(Integer.parseInt(dailyForecastDtoList.get(cell).getMaxTemp().replace(tempDegree, "")));
@@ -187,7 +179,7 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherSourceType = WeatherSourceType.KMA;

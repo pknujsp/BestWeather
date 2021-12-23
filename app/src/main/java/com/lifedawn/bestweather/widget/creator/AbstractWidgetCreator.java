@@ -78,8 +78,9 @@ public abstract class AbstractWidgetCreator {
 		widgetDto.setDisplayClock(true);
 		widgetDto.setDisplayLocalClock(false);
 		widgetDto.setLocationType(LocationType.CurrentLocation.name());
-		widgetDto.setWeatherSourceType(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.pref_key_accu_weather), false)
-				? WeatherSourceType.ACCU_WEATHER.name() : WeatherSourceType.OPEN_WEATHER_MAP.name());
+		widgetDto.addWeatherSourceType(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.pref_key_accu_weather),
+				false)
+				? WeatherSourceType.ACCU_WEATHER : WeatherSourceType.OPEN_WEATHER_MAP);
 		widgetDto.setTextSizeAmount(0);
 		widgetDto.setTopPriorityKma(false);
 		widgetDto.setUpdateIntervalMillis(0);
@@ -312,6 +313,33 @@ public abstract class AbstractWidgetCreator {
 
 		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[0] - widgetPadding * 2), EXACTLY);
 		final int heightSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[1] - widgetPadding * 2), EXACTLY);
+
+		rootLayout.measure(widthSpec, heightSpec);
+		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());
+
+		rootLayout.setDrawingCacheEnabled(true);
+		rootLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+		Bitmap viewBmp = rootLayout.getDrawingCache();
+		if (onDrawBitmapCallback != null) {
+			onDrawBitmapCallback.onCreatedBitmap(viewBmp);
+		}
+		remoteViews.setImageViewBitmap(R.id.valuesView, viewBmp);
+
+		return viewBmp;
+	}
+
+	protected Bitmap drawBitmap(ViewGroup rootLayout, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, RemoteViews remoteViews,
+	                            int minusHeight) {
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+
+		final int[] widgetSize = getWidgetExactSizeInPx(appWidgetManager);
+		final float widgetPadding = context.getResources().getDimension(R.dimen.widget_padding);
+
+		int height = (int) (minusHeight > 0 ? widgetSize[1] - widgetPadding - minusHeight : widgetSize[1] - widgetPadding * 2);
+
+		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[0] - widgetPadding * 2), EXACTLY);
+		final int heightSpec = View.MeasureSpec.makeMeasureSpec(height, EXACTLY);
 
 		rootLayout.measure(widthSpec, heightSpec);
 		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());

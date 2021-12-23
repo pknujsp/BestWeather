@@ -13,7 +13,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
         android:includeFontPadding="false"
-        android:maxLines="1"
         android:text="15"
         android:textAlignment="center"
         android:textColor="@color/widgetTextColor"
@@ -101,7 +100,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/snowLayoutLayout"
+        android:id="@+id/snowVolumeLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"

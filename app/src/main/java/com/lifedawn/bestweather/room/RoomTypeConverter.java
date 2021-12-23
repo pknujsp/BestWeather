@@ -5,7 +5,11 @@ import android.graphics.BitmapFactory;
 
 import androidx.room.TypeConverter;
 
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+
 import java.io.ByteArrayOutputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RoomTypeConverter {
 
@@ -25,5 +29,33 @@ public class RoomTypeConverter {
 			return null;
 		}
 		return BitmapFactory.decodeByteArray(byteArr, 0, byteArr.length);
+	}
+
+	@TypeConverter
+	public String toString(Set<WeatherSourceType> weatherSourceTypeSet) {
+		if (weatherSourceTypeSet == null) {
+			return null;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		int i = 0;
+
+		for (WeatherSourceType type : weatherSourceTypeSet) {
+			stringBuilder.append(type.name());
+			if (++i < weatherSourceTypeSet.size()) {
+				stringBuilder.append(",");
+			}
+		}
+
+		return stringBuilder.toString();
+	}
+
+	@TypeConverter
+	public Set<WeatherSourceType> toSet(String value) {
+		String[] types = value.split(",");
+		Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
+		for (String type : types) {
+			weatherSourceTypeSet.add(WeatherSourceType.valueOf(type));
+		}
+		return weatherSourceTypeSet;
 	}
 }

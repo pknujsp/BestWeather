@@ -3,13 +3,11 @@ package com.lifedawn.bestweather.widget.creator;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
@@ -23,6 +21,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponsePr
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
@@ -40,14 +39,18 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 	private int refreshDateTimeTextSize;
 	private int dateClockTextSize;
 	private int timeClockTextSize;
-	private int hourTextSize;
-	private int tempTextSize;
+	private int forecastDateTimeTextSize;
+	private int forecastTempTextSize;
+	private int currentWindDirectionTextSize;
+	private int currentWindSpeedTextSize;
 	private int currentTempTextSize;
-	private int precipitationTextSize;
-	private int airQualityTextSize;
-	private int popTextSize;
+	private int currentPrecipitationTextSize;
+	private int currentAirQualityTextSize;
+	private int currentFeelsLikeTempTextSize;
+	private int forecastPopTextSize;
 
 	private final int hourlyForecastCount = 5;
+	private final int dailyForecastCount = 3;
 
 	public EighthWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
@@ -79,40 +82,46 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInCommonWidgetHeader) + extraSize;
 		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshDateTimeTextSizeInCommonWidgetHeader) + extraSize;
 
-		hourTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTimeTextSizeInSimpleWidgetForecastItem) + extraSize;
-		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInSimpleWidgetForecastItem) + extraSize;
-		popTextSize = context.getResources().getDimensionPixelSize(R.dimen.popTextSizeInSimpleWidgetForecastItem) + extraSize;
+		forecastDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTimeTextSizeInSimpleWidgetForecastItem) + extraSize;
+		forecastTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInSimpleWidgetForecastItem) + extraSize;
+		forecastPopTextSize = context.getResources().getDimensionPixelSize(R.dimen.popTextSizeInSimpleWidgetForecastItem) + extraSize;
 
 		dateClockTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateClockTextSizeInEighthWidget) + extraSize;
 		timeClockTextSize = context.getResources().getDimensionPixelSize(R.dimen.timeClockTextSizeInEighthWidget) + extraSize;
 
 		currentTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInEighthWidget) + extraSize;
-		precipitationTextSize = context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInEighthWidget) + extraSize;
-		airQualityTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInEighthWidget) + extraSize;
+		currentFeelsLikeTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.feelsLikeTempTextSizeInEighthWidget) + extraSize;
+		currentPrecipitationTextSize = context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInEighthWidget) + extraSize;
+		currentAirQualityTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInEighthWidget) + extraSize;
+		currentWindDirectionTextSize = context.getResources().getDimensionPixelSize(R.dimen.windDirectionTextSizeInEighthWidget) + extraSize;
+		currentWindSpeedTextSize = context.getResources().getDimensionPixelSize(R.dimen.windSpeedTextSizeInEighthWidget) + extraSize;
 	}
 
 
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, CurrentConditionsDto currentConditionsDto,
-	                         List<HourlyForecastDto> hourlyForecastDtoList, AirQualityDto airQualityDto, OnDrawBitmapCallback onDrawBitmapCallback) {
-		drawViews(remoteViews, addressName, lastRefreshDateTime, currentConditionsDto, hourlyForecastDtoList, airQualityDto, onDrawBitmapCallback);
+	                         List<HourlyForecastDto> hourlyForecastDtoList, List<DailyForecastDto> dailyForecastDtoList, AirQualityDto airQualityDto, OnDrawBitmapCallback onDrawBitmapCallback) {
+		drawViews(remoteViews, addressName, lastRefreshDateTime, currentConditionsDto, hourlyForecastDtoList, dailyForecastDtoList, airQualityDto,
+				onDrawBitmapCallback);
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), null, null, null, null);
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
+				WeatherResponseProcessor.getTempCurrentConditionsDto(context),
+				WeatherResponseProcessor.getTempHourlyForecastDtoList(context, hourlyForecastCount),
+				WeatherResponseProcessor.getTempDailyForecastDtoList(context, dailyForecastCount)
+				, WeatherResponseProcessor.getTempAirQualityDto(), null);
 	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, CurrentConditionsDto currentConditionsDto,
-	                       List<HourlyForecastDto> hourlyForecastDtoList, AirQualityDto airQualityDto,
+	                       List<HourlyForecastDto> hourlyForecastDtoList, List<DailyForecastDto> dailyForecastDtoList, AirQualityDto airQualityDto,
 	                       @Nullable OnDrawBitmapCallback onDrawBitmapCallback) {
-		LayoutInflater layoutInflater = LayoutInflater.from(context);
+		final RemoteViews valuesRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_eighth_widget_values);
 
-		final RemoteViews clockRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_eighth_widget_clock);
+		valuesRemoteViews.setTextViewText(R.id.address, addressName);
+		valuesRemoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
 
-		clockRemoteViews.setTextViewText(R.id.address, addressName);
-		clockRemoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-
-		clockRemoteViews.setTextViewTextSize(R.id.address, TypedValue.COMPLEX_UNIT_PX, addressTextSize);
-		clockRemoteViews.setTextViewTextSize(R.id.refresh, TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
+		valuesRemoteViews.setTextViewTextSize(R.id.address, TypedValue.COMPLEX_UNIT_PX, addressTextSize);
+		valuesRemoteViews.setTextViewTextSize(R.id.refresh, TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
 
 		ZoneId zoneId;
 		if (widgetDto.getTimeZoneId() == null) {
@@ -121,21 +130,16 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 			zoneId = widgetDto.isDisplayLocalClock() ? ZoneId.of(widgetDto.getTimeZoneId()) : ZoneId.systemDefault();
 		}
 
-		remoteViews.setString(R.id.timeClock, "setTimeZone", zoneId.getId());
-		remoteViews.setString(R.id.dateClock, "setTimeZone", zoneId.getId());
-		remoteViews.setTextViewTextSize(R.id.timeClock, TypedValue.COMPLEX_UNIT_PX, timeClockTextSize);
-		remoteViews.setTextViewTextSize(R.id.dateClock, TypedValue.COMPLEX_UNIT_PX, dateClockTextSize);
+		valuesRemoteViews.setString(R.id.timeClock, "setTimeZone", zoneId.getId());
+		valuesRemoteViews.setString(R.id.dateClock, "setTimeZone", zoneId.getId());
+		valuesRemoteViews.setTextViewTextSize(R.id.timeClock, TypedValue.COMPLEX_UNIT_PX, timeClockTextSize);
+		valuesRemoteViews.setTextViewTextSize(R.id.dateClock, TypedValue.COMPLEX_UNIT_PX, dateClockTextSize);
 
-		remoteViews.addView(R.id.noBitmapValuesView, clockRemoteViews);
-		remoteViews.setViewVisibility(R.id.noBitmapValuesView, View.VISIBLE);
-
-		final ViewGroup eighthValuesView = (ViewGroup) layoutInflater.inflate(R.layout.view_eighth_widget_values, null, false);
-
-		((TextView) eighthValuesView.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, tempTextSize);
-		((TextView) eighthValuesView.findViewById(R.id.precipitation)).setTextSize(TypedValue.COMPLEX_UNIT_PX, precipitationTextSize);
-		((TextView) eighthValuesView.findViewById(R.id.airQuality)).setTextSize(TypedValue.COMPLEX_UNIT_PX, airQualityTextSize);
-
-		((TextView) eighthValuesView.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp());
+		//현재 날씨------------------------------------------------------
+		valuesRemoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
+		String feelsLikeTemp = context.getString(R.string.feelsLike) + ": " + currentConditionsDto.getFeelsLikeTemp();
+		valuesRemoteViews.setTextViewText(R.id.feelsLikeTemp, feelsLikeTemp);
+		valuesRemoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
 
 		String precipitation = "";
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
@@ -143,69 +147,77 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		} else {
 			precipitation = context.getString(R.string.not_precipitation);
 		}
+		valuesRemoteViews.setTextViewText(R.id.precipitation, precipitation);
+		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+		valuesRemoteViews.setTextViewText(R.id.airQuality, airQuality);
+		valuesRemoteViews.setTextViewText(R.id.windDirection,
+				context.getString(R.string.wind_direction) + ": " + currentConditionsDto.getWindDirection());
+		String windSpeed = currentConditionsDto.getWindSpeed() + ", " + currentConditionsDto.getWindStrength();
+		valuesRemoteViews.setTextViewText(R.id.windSpeed, windSpeed);
 
-		((TextView) eighthValuesView.findViewById(R.id.precipitation)).setText(precipitation);
-		String simpleAirQuality = context.getString(R.string.air_quality) + ": " +
-				AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
-		((TextView) eighthValuesView.findViewById(R.id.airQuality)).setText(simpleAirQuality);
+		valuesRemoteViews.setTextViewTextSize(R.id.temperature, TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
+		valuesRemoteViews.setTextViewTextSize(R.id.feelsLikeTemp, TypedValue.COMPLEX_UNIT_PX, currentFeelsLikeTempTextSize);
+		valuesRemoteViews.setTextViewTextSize(R.id.precipitation, TypedValue.COMPLEX_UNIT_PX, currentPrecipitationTextSize);
+		valuesRemoteViews.setTextViewTextSize(R.id.windDirection, TypedValue.COMPLEX_UNIT_PX, currentWindDirectionTextSize);
+		valuesRemoteViews.setTextViewTextSize(R.id.windSpeed, TypedValue.COMPLEX_UNIT_PX, currentWindSpeedTextSize);
+		valuesRemoteViews.setTextViewTextSize(R.id.airQuality, TypedValue.COMPLEX_UNIT_PX, currentAirQualityTextSize);
 
-		final LinearLayout hourlyForecastLayout = eighthValuesView.findViewById(R.id.hourlyForecast);
-
-		LinearLayout hourlyForecastHourAndIconLinearLayout = new LinearLayout(context);
-		hourlyForecastHourAndIconLinearLayout.setId(R.id.hourAndIconView);
-		hourlyForecastHourAndIconLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
-		LinearLayout.LayoutParams hourAndIconCellLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-		hourAndIconCellLayoutParams.gravity = Gravity.CENTER;
-		hourAndIconCellLayoutParams.weight = 1;
-
-		List<Integer> tempList = new ArrayList<>();
-		final String degree = "°";
-		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E 0");
+		//시간별 예보-------------------------------------------------------------------------------------
+		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E\n0");
 
 		for (int cell = 0; cell < hourlyForecastCount; cell++) {
-			View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
+			RemoteViews hourlyRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_forecast_item_in_linear);
 
-			if (cell == 0) {
-				((TextView) view.findViewById(R.id.dateTime)).setText(context.getString(R.string.current));
+			if (hourlyForecastDtoList.get(cell).getHours().getHour() == 0) {
+				hourlyRemoteViews.setTextViewText(R.id.dateTime, hourlyForecastDtoList.get(cell).getHours().format(hour0Formatter));
 			} else {
-				//hour, weatherIcon, pop
-				if (hourlyForecastDtoList.get(cell).getHours().getHour() == 0) {
-					((TextView) view.findViewById(R.id.dateTime)).setText(hourlyForecastDtoList.get(cell).getHours().format(hour0Formatter));
-				} else {
-					((TextView) view.findViewById(R.id.dateTime)).setText(String.valueOf(hourlyForecastDtoList.get(cell).getHours().getHour()));
-				}
+				hourlyRemoteViews.setTextViewText(R.id.dateTime, String.valueOf(hourlyForecastDtoList.get(cell).getHours().getHour()));
 			}
-			((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(hourlyForecastDtoList.get(cell).getWeatherIcon());
-			tempList.add(Integer.parseInt(hourlyForecastDtoList.get(cell).getTemp().replace(degree, "")));
+			hourlyRemoteViews.setImageViewResource(R.id.leftIcon, hourlyForecastDtoList.get(cell).getWeatherIcon());
+			hourlyRemoteViews.setTextViewText(R.id.temperature, hourlyForecastDtoList.get(cell).getTemp());
+			hourlyRemoteViews.setTextViewText(R.id.pop, hourlyForecastDtoList.get(cell).getPop());
 
-			if (cell != 0) {
-				((TextView) view.findViewById(R.id.pop)).setText(hourlyForecastDtoList.get(cell).getPop());
-			} else {
-				view.findViewById(R.id.popLayout).setVisibility(View.INVISIBLE);
-			}
+			hourlyRemoteViews.setViewVisibility(R.id.rainVolumeLayout, View.GONE);
+			hourlyRemoteViews.setViewVisibility(R.id.snowVolumeLayout, View.GONE);
+			hourlyRemoteViews.setViewVisibility(R.id.rightIcon, View.GONE);
 
-			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourTextSize);
-			((TextView) view.findViewById(R.id.pop)).setTextSize(TypedValue.COMPLEX_UNIT_PX, popTextSize);
-
-			view.findViewById(R.id.temperature).setVisibility(View.GONE);
-			view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
-
-			hourlyForecastHourAndIconLinearLayout.addView(view, hourAndIconCellLayoutParams);
+			valuesRemoteViews.addView(R.id.hourlyForecast, hourlyRemoteViews);
 		}
 
-		DetailSingleTemperatureView detailSingleTemperatureView = new DetailSingleTemperatureView(context, tempList);
-		detailSingleTemperatureView.setTempTextSizePx(tempTextSize);
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("E");
 
-		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0);
-		tempRowLayoutParams.weight = 1;
+		//----------------daily---------------------------------------------------------------
+		for (int cell = 0; cell < dailyForecastCount; cell++) {
+			RemoteViews dailyRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_forecast_item_in_linear);
 
-		hourlyForecastLayout.addView(hourlyForecastHourAndIconLinearLayout,
-				new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-		hourlyForecastLayout.addView(detailSingleTemperatureView, tempRowLayoutParams);
+			dailyRemoteViews.setTextViewText(R.id.dateTime, dailyForecastDtoList.get(cell).getDate().format(dateFormatter));
 
-		drawBitmap(eighthValuesView, onDrawBitmapCallback, remoteViews);
+			if (dailyForecastDtoList.get(cell).isSingle()) {
+				dailyRemoteViews.setImageViewResource(R.id.leftIcon, dailyForecastDtoList.get(cell).getSingleValues().getWeatherIcon());
+				dailyRemoteViews.setViewVisibility(R.id.rightIcon, View.GONE);
+
+				dailyRemoteViews.setTextViewText(R.id.pop, dailyForecastDtoList.get(cell).getSingleValues().getPop());
+			} else {
+				dailyRemoteViews.setImageViewResource(R.id.leftIcon, dailyForecastDtoList.get(cell).getAmValues().getWeatherIcon());
+				dailyRemoteViews.setImageViewResource(R.id.rightIcon, dailyForecastDtoList.get(cell).getPmValues().getWeatherIcon());
+				dailyRemoteViews.setTextViewText(R.id.pop, dailyForecastDtoList.get(cell).getAmValues().getPop() + "/" +
+						dailyForecastDtoList.get(cell).getPmValues().getPop());
+			}
+
+			dailyRemoteViews.setTextViewText(R.id.temperature,
+					dailyForecastDtoList.get(cell).getMinTemp() + "/" + dailyForecastDtoList.get(cell).getMaxTemp());
+
+			dailyRemoteViews.setViewVisibility(R.id.rainVolumeLayout, View.GONE);
+			dailyRemoteViews.setViewVisibility(R.id.snowVolumeLayout, View.GONE);
+
+			valuesRemoteViews.addView(R.id.dailyForecast, dailyRemoteViews);
+		}
+
+		remoteViews.removeAllViews(R.id.noBitmapValuesView);
+		remoteViews.addView(R.id.noBitmapValuesView, valuesRemoteViews);
+		remoteViews.setViewVisibility(R.id.noBitmapValuesView, View.VISIBLE);
+		remoteViews.setViewVisibility(R.id.valuesView, View.GONE);
 	}
-
 
 	@Override
 	public void setDisplayClock(boolean displayClock) {
@@ -214,7 +226,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+		WeatherSourceType weatherSourceType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherSourceType = WeatherSourceType.KMA;
@@ -227,10 +239,13 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 				weatherSourceType, widgetDto.getLatitude(), widgetDto.getLongitude());
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,
 				weatherSourceType, widgetDto.getLatitude(), widgetDto.getLongitude());
+		List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.parseTextToDailyForecastDtoList(context, jsonObject,
+				weatherSourceType);
 		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto,
-				hourlyForecastDtoList, airQualityDto, null);
+				hourlyForecastDtoList, dailyForecastDtoList, airQualityDto, null);
+
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		appWidgetManager.updateAppWidget(appWidgetId,
 				remoteViews);

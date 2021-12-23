@@ -9,16 +9,16 @@
         android:id="@+id/icon"
         android:layout_width="12dp"
         android:layout_height="12dp"
-        android:layout_marginRight="6dp"
+        android:layout_marginRight="5dp"
         android:scaleType="centerInside"
-        android:src="@drawable/owm" />
+        android:src="@drawable/owmicon" />
 
     <TextView
         android:id="@+id/source"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="source"
-        android:textColor="?attr/textColor"
+        android:textColor="@color/black"
         android:textSize="@dimen/weatherSourceNameTextSizeInSourceView" />
 
 </LinearLayout>

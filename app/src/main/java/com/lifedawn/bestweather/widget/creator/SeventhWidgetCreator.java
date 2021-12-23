@@ -110,8 +110,8 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		AirQualityDto tempAirQualityDto = new AirQualityDto();
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), tempAirQualityDto, null);
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), WeatherResponseProcessor.getTempAirQualityDto(),
+				null);
 	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
@@ -127,6 +127,9 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		String stationName = context.getString(R.string.measuring_station_name) + ": " + airQualityDto.getCityName();
 		((TextView) seventhView.findViewById(R.id.measuring_station_name)).setText(stationName);
 		((TextView) seventhView.findViewById(R.id.measuring_station_name)).setTextSize(TypedValue.COMPLEX_UNIT_PX, stationNameTextSize);
+
+		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+		((TextView) seventhView.findViewById(R.id.airQuality)).setText(airQuality);
 
 		((TextView) seventhView.findViewById(R.id.airQuality)).setTextSize(TypedValue.COMPLEX_UNIT_PX, simpleAirQualityTextSize);
 
@@ -186,7 +189,16 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 
 		forecastLayout.addView(forecastItemView, forecastItemLayoutParams);
 
-		for (AirQualityDto.DailyForecast item : airQualityDto.getDailyForecastList()) {
+		AirQualityDto.DailyForecast current = new AirQualityDto.DailyForecast();
+		current.setDate(null).setPm10(new AirQualityDto.DailyForecast.Val().setAvg(airQualityDto.getCurrent().getPm10()))
+				.setPm25(new AirQualityDto.DailyForecast.Val().setAvg(airQualityDto.getCurrent().getPm25()))
+				.setO3(new AirQualityDto.DailyForecast.Val().setAvg(airQualityDto.getCurrent().getO3()));
+
+		List<AirQualityDto.DailyForecast> dailyForecastList = new ArrayList<>();
+		dailyForecastList.add(current);
+		dailyForecastList.addAll(airQualityDto.getDailyForecastList());
+
+		for (AirQualityDto.DailyForecast item : dailyForecastList) {
 			forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 			forecastItemView.setPadding(0, 0, 0, 0);
 
@@ -200,19 +212,22 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 			pm25TextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, forecastParticleNameTextSize);
 			o3TextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, forecastParticleNameTextSize);
 
-			dateTextView.setText(item.getDate().format(forecastDateFormatter));
+			dateTextView.setText(item.getDate() == null ? context.getString(R.string.current) : item.getDate().format(forecastDateFormatter));
 			if (item.isHasPm10()) {
 				pm10TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getPm10().getAvg()));
+				pm10TextView.setTextColor(AqicnResponseProcessor.getGradeColorId(item.getPm10().getAvg()));
 			} else {
 				pm10TextView.setText(noData);
 			}
 			if (item.isHasPm25()) {
 				pm25TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getPm25().getAvg()));
+				pm25TextView.setTextColor(AqicnResponseProcessor.getGradeColorId(item.getPm25().getAvg()));
 			} else {
 				pm25TextView.setText(noData);
 			}
 			if (item.isHasO3()) {
 				o3TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getO3().getAvg()));
+				o3TextView.setTextColor(AqicnResponseProcessor.getGradeColorId(item.getO3().getAvg()));
 			} else {
 				o3TextView.setText(noData);
 			}

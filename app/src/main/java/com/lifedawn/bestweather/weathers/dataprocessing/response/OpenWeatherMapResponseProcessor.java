@@ -247,7 +247,6 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	public static CurrentConditionsDto makeCurrentConditionsDto(Context context,
 	                                                            OneCallResponse oneCallResponse,
 	                                                            ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
-
 		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
 		final String percent = "%";
 		final ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);

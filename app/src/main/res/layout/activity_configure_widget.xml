@@ -80,117 +80,179 @@
                         android:valueFrom="-5"
                         android:valueTo="5" />
 
-                    <TextView
-                        style="@style/SettingsLabel"
+                    <LinearLayout
+                        android:id="@+id/backgroundAlphaLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/background_transparency"
-                        android:visibility="gone" />
+                        android:orientation="vertical">
 
-                    <SeekBar
-                        android:id="@+id/background_transparency_slider"
-                        style="@style/WidgetConfigureConfig"
+                        <TextView
+                            style="@style/SettingsLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/background_transparency"
+                            android:visibility="gone" />
+
+                        <SeekBar
+                            android:id="@+id/background_transparency_slider"
+                            style="@style/WidgetConfigureConfig"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:max="100"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/locationLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:max="100"
-                        android:visibility="gone" />
+                        android:orientation="vertical">
 
-                    <TextView
-                        style="@style/SettingsLabel"
+                        <TextView
+                            style="@style/SettingsLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/location" />
+
+                        <RadioGroup
+                            android:id="@+id/location_radio_group"
+                            style="@style/WidgetConfigureConfig"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <RadioButton
+                                android:id="@+id/current_location_radio"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="false"
+                                android:text="@string/current_location" />
+
+                            <RadioButton
+                                android:id="@+id/selected_location_radio"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/selected_location" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="right"
+                                android:orientation="horizontal">
+
+                                <Button
+                                    android:id="@+id/change_address_btn"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/change_address"
+                                    android:visibility="visible" />
+
+                                <TextView
+                                    android:id="@+id/selectedAddressName"
+                                    style="@style/SettingsValue"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="16dp"
+                                    android:text="selectedAddressName" />
+
+
+                            </LinearLayout>
+
+                        </RadioGroup>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/weatherDataSourceLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/location" />
+                        android:orientation="vertical">
 
-                    <RadioGroup
-                        android:id="@+id/location_radio_group"
-                        style="@style/WidgetConfigureConfig"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        <TextView
+                            style="@style/SettingsLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/pref_title_weather_data_sources" />
 
-                        <RadioButton
-                            android:id="@+id/current_location_radio"
-                            android:layout_width="wrap_content"
+                        <RadioGroup
+                            android:id="@+id/weather_data_source_radio_group"
+                            style="@style/WidgetConfigureConfig"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <RadioButton
+                                android:id="@+id/accu_weather_radio"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/accu_weather" />
+
+                            <RadioButton
+                                android:id="@+id/owm_radio"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/owm" />
+
+                        </RadioGroup>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/kma_top_priority_switch"
+                            style="@style/SettingsLabel"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:checked="false"
-                            android:text="@string/current_location" />
+                            android:text="@string/pref_title_kma_top_priority" />
+                    </LinearLayout>
 
-                        <RadioButton
-                            android:id="@+id/selected_location_radio"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/selected_location" />
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="right"
-                            android:orientation="horizontal">
-
-                            <Button
-                                android:id="@+id/change_address_btn"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/change_address"
-                                android:visibility="visible" />
-
-                            <TextView
-                                android:id="@+id/selectedAddressName"
-                                style="@style/SettingsValue"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="16dp"
-                                android:text="selectedAddressName" />
-
-
-                        </LinearLayout>
-
-                    </RadioGroup>
-
-                    <TextView
-                        style="@style/SettingsLabel"
+                    <LinearLayout
+                        android:id="@+id/multipleWeatherDataSourceLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/pref_title_weather_data_sources" />
+                        android:orientation="vertical">
 
-                    <RadioGroup
-                        android:id="@+id/weather_data_source_radio_group"
-                        style="@style/WidgetConfigureConfig"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        <TextView
+                            style="@style/SettingsLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/pref_title_weather_data_sources" />
 
-                        <RadioButton
-                            android:id="@+id/accu_weather_radio"
+
+                        <CheckBox
+                            android:id="@+id/accu_weather_chk"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/accu_weather" />
 
-                        <RadioButton
-                            android:id="@+id/owm_radio"
+                        <CheckBox
+                            android:id="@+id/owm_chk"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/owm" />
 
-                    </RadioGroup>
+                        <CheckBox
+                            android:id="@+id/kma_chk"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/kma" />
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/kma_top_priority_switch"
-                        style="@style/SettingsLabel"
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/refreshIntervalLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:checked="false"
-                        android:text="@string/pref_title_kma_top_priority" />
+                        android:orientation="vertical">
 
-                    <TextView
-                        style="@style/SettingsLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/auto_refresh_interval" />
+                        <TextView
+                            style="@style/SettingsLabel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/auto_refresh_interval" />
 
-                    <Spinner
-                        android:id="@+id/auto_refresh_interval_spinner"
-                        style="@style/WidgetConfigureConfig"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        <Spinner
+                            android:id="@+id/auto_refresh_interval_spinner"
+                            style="@style/WidgetConfigureConfig"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/display_datetime_switch"

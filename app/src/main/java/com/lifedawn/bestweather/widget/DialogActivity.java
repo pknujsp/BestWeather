@@ -6,6 +6,8 @@ import androidx.databinding.DataBindingUtil;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
@@ -22,13 +24,25 @@ import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.EighthWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.EleventhWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.FirstWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.NinthWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.SecondWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.SeventhWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.SixthWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.TenthWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.ThirdWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.FourthWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.FifthWidgetCreator;
+import com.lifedawn.bestweather.widget.widgetprovider.EighthWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.EleventhWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.NinthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.SecondWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SeventhWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SixthWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.TenthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.ThirdWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FourthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FifthWidgetProvider;
@@ -53,12 +67,47 @@ public class DialogActivity extends Activity {
 		remoteViews = bundle.getParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name());
 
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
-		int widgetLayoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
+		final AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId);
+		ComponentName componentName = appWidgetProviderInfo.provider;
+		final String providerClassName = componentName.getClassName();
 
-		if (widgetLayoutId == R.layout.view_widget) {
+		if (providerClassName.equals(FirstWidgetProvider.class.getName())) {
 			widgetCreator = new FirstWidgetCreator(getApplicationContext(), null, appWidgetId);
-			widgetClass = FirstWidgetProvider.class;
+		} else if (providerClassName.equals(SecondWidgetProvider.class.getName())) {
+			widgetCreator = new SecondWidgetCreator(getApplicationContext(), null, appWidgetId);
+		} else if (providerClassName.equals(ThirdWidgetProvider.class.getName())) {
+			widgetCreator = new ThirdWidgetCreator(getApplicationContext(), null, appWidgetId);
+
+		} else if (providerClassName.equals(FourthWidgetProvider.class.getName())) {
+			widgetCreator = new FourthWidgetCreator(getApplicationContext(), null, appWidgetId);
+
+		} else if (providerClassName.equals(FifthWidgetProvider.class.getName())) {
+			widgetCreator = new FifthWidgetCreator(getApplicationContext(), null, appWidgetId);
+
+		} else if (providerClassName.equals(SixthWidgetProvider.class.getName())) {
+			widgetCreator = new SixthWidgetCreator(getApplicationContext(), null, appWidgetId);
+
+		} else if (providerClassName.equals(SeventhWidgetProvider.class.getName())) {
+			widgetCreator = new SeventhWidgetCreator(getApplicationContext(), null, appWidgetId);
+
+		} else if (providerClassName.equals(EighthWidgetProvider.class.getName())) {
+			widgetCreator = new EighthWidgetCreator(getApplicationContext(), null, appWidgetId);
+
+		} else if (providerClassName.equals(NinthWidgetProvider.class.getName())) {
+			widgetCreator = new NinthWidgetCreator(getApplicationContext(), null, appWidgetId);
+
+		} else if (providerClassName.equals(TenthWidgetProvider.class.getName())) {
+			widgetCreator = new TenthWidgetCreator(getApplicationContext(), null, appWidgetId);
+		} else if (providerClassName.equals(EleventhWidgetProvider.class.getName())) {
+			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), null, appWidgetId);
 		}
+
+		try {
+			widgetClass = Class.forName(providerClassName);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
 		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {

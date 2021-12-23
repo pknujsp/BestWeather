@@ -139,29 +139,9 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
-		final String temp = "10°";
-		final String pop = "20%";
-		final int weatherIcon = R.drawable.day_clear;
-		ZonedDateTime now = ZonedDateTime.now();
-
-		for (int i = 0; i < cellCount; i++) {
-			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
-			hourlyForecastDto.setWeatherIcon(weatherIcon).setTemp(temp).setHours(now).setPop(pop);
-			hourlyForecastDtoList.add(hourlyForecastDto);
-
-			now = now.plusHours(1);
-		}
-
-		CurrentConditionsDto tempCurrentConditions = new CurrentConditionsDto();
-		tempCurrentConditions.setTemp(temp);
-		tempCurrentConditions.setWeatherIcon(weatherIcon);
-
-		AirQualityDto tempAirQualityDto = new AirQualityDto();
-		tempAirQualityDto.setAqi(10);
-
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), tempAirQualityDto, tempCurrentConditions,
-				hourlyForecastDtoList, null);
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), WeatherResponseProcessor.getTempAirQualityDto(),
+				WeatherResponseProcessor.getTempCurrentConditionsDto(context),
+				WeatherResponseProcessor.getTempHourlyForecastDtoList(context, cellCount), null);
 	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto,
@@ -235,7 +215,7 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		rootLayout.addView(hourAndIconLinearLayout, hourAndIconRowLayoutParams);
 		rootLayout.addView(detailSingleTemperatureView, tempRowLayoutParams);
 
-		drawBitmap(rootLayout,onDrawBitmapCallback,remoteViews);
+		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews);
 
 	}
 
@@ -247,7 +227,7 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherSourceType = WeatherSourceType.KMA;

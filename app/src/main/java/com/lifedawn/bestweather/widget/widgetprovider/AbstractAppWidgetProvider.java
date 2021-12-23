@@ -249,18 +249,12 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 			final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
-			final Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
-
-			final String[] weatherSourceTypeNames = widgetDto.getWeatherSourceType().split(",");
-			for (String name : weatherSourceTypeNames) {
-				weatherSourceTypeSet.add(WeatherSourceType.valueOf(name));
-			}
+			final Set<WeatherSourceType> weatherSourceTypeSet = widgetDto.getWeatherSourceTypeSet();
 
 			if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
-				if (getThis() != EleventhWidgetProvider.class) {
-					weatherSourceTypeSet.clear();
+				if (weatherSourceTypeSet.size() == 1) {
+					weatherSourceTypeSet.add(WeatherSourceType.KMA);
 				}
-				weatherSourceTypeSet.add(WeatherSourceType.KMA);
 			}
 
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {

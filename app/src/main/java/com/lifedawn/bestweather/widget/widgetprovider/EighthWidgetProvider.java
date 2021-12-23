@@ -22,11 +22,11 @@ import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.EighthWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.FifthWidgetCreator;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -57,7 +57,7 @@ public class EighthWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
 		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
-		FifthWidgetCreator widgetCreator = new FifthWidgetCreator(context, null, appWidgetId);
+		EighthWidgetCreator widgetCreator = new EighthWidgetCreator(context, null, appWidgetId);
 		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
@@ -86,7 +86,7 @@ public class EighthWidgetProvider extends AbstractAppWidgetProvider {
 
 	@Override
 	protected void reDrawWidget(Context context, int appWidgetId) {
-		FifthWidgetCreator widgetViewCreator = new FifthWidgetCreator(context, null, appWidgetId);
+		EighthWidgetCreator widgetViewCreator = new EighthWidgetCreator(context, null, appWidgetId);
 		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto widgetDto) {
@@ -122,7 +122,7 @@ public class EighthWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	protected void init(Context context, Bundle bundle) {
 		final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		FifthWidgetCreator widgetViewCreator = new FifthWidgetCreator(context, null, appWidgetId);
+		EighthWidgetCreator widgetViewCreator = new EighthWidgetCreator(context, null, appWidgetId);
 		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto widgetDto) {
@@ -163,6 +163,7 @@ public class EighthWidgetProvider extends AbstractAppWidgetProvider {
 		Set<RequestWeatherDataType> set = new HashSet<>();
 		set.add(RequestWeatherDataType.currentConditions);
 		set.add(RequestWeatherDataType.hourlyForecast);
+		set.add(RequestWeatherDataType.dailyForecast);
 		set.add(RequestWeatherDataType.airQuality);
 
 		return set;
@@ -182,8 +183,10 @@ public class EighthWidgetProvider extends AbstractAppWidgetProvider {
 				mainWeatherSourceType);
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
 				mainWeatherSourceType);
+		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleRestApiDownloader,
+				mainWeatherSourceType);
 		AirQualityDto airQualityDto = null;
-		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty();
+		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty() && !dailyForecastDtoList.isEmpty();
 
 		if (successful) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
@@ -198,7 +201,7 @@ public class EighthWidgetProvider extends AbstractAppWidgetProvider {
 			}
 
 			widgetCreator.setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto,
-					hourlyForecastDtoList, airQualityDto, new OnDrawBitmapCallback() {
+					hourlyForecastDtoList, dailyForecastDtoList, airQualityDto, new OnDrawBitmapCallback() {
 						@Override
 						public void onCreatedBitmap(Bitmap bitmap) {
 							widgetDto.setBitmap(bitmap);

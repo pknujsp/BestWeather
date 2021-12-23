@@ -97,8 +97,9 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), hourlyForecastDtoList, null);
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
+				WeatherResponseProcessor.getTempHourlyForecastDtoList(context, 24),
+				null);
 	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
@@ -126,7 +127,7 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 		boolean haveSnowVolume = false;
 		boolean haveRainVolume = false;
 		int cell = 0;
-		for (; cell < hourlyForecastDtoList.size(); cell = cell + 3) {
+		for (; cell < hourlyForecastDtoList.size(); cell = cell + hourGap) {
 			if (hourlyForecastDtoList.get(cell).isHasSnow()) {
 				haveSnowVolume = true;
 			}
@@ -138,34 +139,16 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 		final String mm = "mm";
 		final String cm = "cm";
 
-		for (cell = 0; cell < hourlyForecastDtoList.size(); cell = cell + 3) {
+		for (cell = 0; cell < hourlyForecastDtoList.size(); cell = cell + hourGap) {
 			View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
 
-			if (cell == 0) {
-				((TextView) view.findViewById(R.id.dateTime)).setText(context.getString(R.string.current));
+			if (hourlyForecastDtoList.get(cell).getHours().getHour() == 0) {
+				((TextView) view.findViewById(R.id.dateTime)).setText(hourlyForecastDtoList.get(cell).getHours().format(hour0Formatter));
 			} else {
-				//hour, weatherIcon, pop
-				if (hourlyForecastDtoList.get(cell).getHours().getHour() == 0) {
-					((TextView) view.findViewById(R.id.dateTime)).setText(hourlyForecastDtoList.get(cell).getHours().format(hour0Formatter));
-				} else {
-					((TextView) view.findViewById(R.id.dateTime)).setText(hourlyForecastDtoList.get(cell).getHours().format(hourFormatter));
-				}
+				((TextView) view.findViewById(R.id.dateTime)).setText(hourlyForecastDtoList.get(cell).getHours().format(hourFormatter));
 			}
+
 			((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(hourlyForecastDtoList.get(cell).getWeatherIcon());
-
-			if (cell != 0) {
-				((TextView) view.findViewById(R.id.pop)).setText(hourlyForecastDtoList.get(cell).getPop());
-			} else {
-				view.findViewById(R.id.popLayout).setVisibility(View.INVISIBLE);
-			}
-
-			if (haveRainVolume) {
-				((TextView) view.findViewById(R.id.rainVolume)).setText(hourlyForecastDtoList.get(cell).getRainVolume().replace(mm, "").replace(cm, ""));
-			}
-			if (haveSnowVolume) {
-				((TextView) view.findViewById(R.id.snowVolume)).setText(hourlyForecastDtoList.get(cell).getSnowVolume().replace(mm, "").replace(cm,
-						""));
-			}
 
 			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourTextSize);
 			((TextView) view.findViewById(R.id.pop)).setTextSize(TypedValue.COMPLEX_UNIT_PX, popTextSize);
@@ -173,15 +156,14 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 			view.findViewById(R.id.temperature).setVisibility(View.GONE);
 			view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
 
+			view.findViewById(R.id.popLayout).setVisibility(View.GONE);
 			view.findViewById(R.id.rainVolumeLayout).setVisibility(haveRainVolume ? View.VISIBLE : View.GONE);
 			view.findViewById(R.id.snowVolumeLayout).setVisibility(haveSnowVolume ? View.VISIBLE : View.GONE);
+			tempList.add(Integer.parseInt(hourlyForecastDtoList.get(cell).getTemp().replace(degree, "")));
 
 			hourAndIconLinearLayout.addView(view, hourAndIconCellLayoutParams);
 		}
 
-		for (int i = 0; i <= cell; i++) {
-			tempList.add(Integer.parseInt(hourlyForecastDtoList.get(i).getTemp().replace(degree, "")));
-		}
 
 		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -213,7 +195,7 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType = WeatherSourceType.valueOf(widgetDto.getWeatherSourceType());
+		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherSourceType = WeatherSourceType.KMA;

@@ -14,7 +14,7 @@
         android:layout_weight="1"
         android:text="date"
         android:textAlignment="center"
-        android:textColor="?attr/textColorInWeatherCard"
+        android:textColor="@color/black"
         android:textSize="@dimen/dateTextSizeInLinearDailyAqiForecastItem" />
 
     <TextView
@@ -24,7 +24,7 @@
         android:layout_weight="1"
         android:text="value"
         android:textAlignment="center"
-        android:textColor="?attr/textColorInWeatherCard"
+        android:textColor="@color/black"
         android:textSize="@dimen/particleNameTextSizeInLinearDailyAqiForecastItem" />
 
     <TextView
@@ -34,7 +34,7 @@
         android:layout_weight="1"
         android:text="value"
         android:textAlignment="center"
-        android:textColor="?attr/textColorInWeatherCard"
+        android:textColor="@color/black"
         android:textSize="@dimen/particleNameTextSizeInLinearDailyAqiForecastItem" />
 
 
@@ -45,7 +45,7 @@
         android:layout_weight="1"
         android:text="value"
         android:textAlignment="center"
-        android:textColor="?attr/textColorInWeatherCard"
+        android:textColor="@color/black"
         android:textSize="@dimen/particleNameTextSizeInLinearDailyAqiForecastItem" />
 
 </LinearLayout>
