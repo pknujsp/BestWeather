@@ -145,10 +145,12 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 				adapter.addItem(new GridItemDto(context.getString(R.string.snow_volume), hourlyForecastDto.getSnowVolume(),
 						ContextCompat.getDrawable(context, R.drawable.snowparticle)));
 			}
-			adapter.addItem(new GridItemDto(context.getString(R.string.wind_direction), hourlyForecastDto.getWindDirection(),
+			adapter.addItem(new GridItemDto(context.getString(R.string.wind_direction), hourlyForecastDto.getWindDirection() == null ?
+					context.getString(R.string.noData) : hourlyForecastDto.getWindDirection(),
 					ContextCompat.getDrawable(context, R.drawable.arrow), hourlyForecastDto.getWindDirectionVal()));
 
-			adapter.addItem(new GridItemDto(context.getString(R.string.wind_speed), hourlyForecastDto.getWindSpeed(),
+			adapter.addItem(new GridItemDto(context.getString(R.string.wind_speed), hourlyForecastDto.getWindSpeed() == null ?
+					context.getString(R.string.noData) : hourlyForecastDto.getWindSpeed(),
 					ContextCompat.getDrawable(context, R.drawable.windspeed)));
 
 			if (hourlyForecastDto.getWindGust() != null) {
@@ -159,7 +161,8 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 				adapter.addItem(new GridItemDto(context.getString(R.string.pressure), hourlyForecastDto.getPressure(),
 						ContextCompat.getDrawable(context, R.drawable.pressure)));
 			}
-			adapter.addItem(new GridItemDto(context.getString(R.string.wind_strength), hourlyForecastDto.getWindStrength(),
+			adapter.addItem(new GridItemDto(context.getString(R.string.wind_strength), hourlyForecastDto.getWindStrength() == null ?
+					context.getString(R.string.noData) : hourlyForecastDto.getWindStrength(),
 					ContextCompat.getDrawable(context, R.drawable.windstrength)));
 			adapter.addItem(new GridItemDto(context.getString(R.string.humidity), hourlyForecastDto.getHumidity(),
 					ContextCompat.getDrawable(context, R.drawable.humidity)));

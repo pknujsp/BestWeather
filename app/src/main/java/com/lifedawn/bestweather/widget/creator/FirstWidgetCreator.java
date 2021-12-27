@@ -15,11 +15,9 @@ import androidx.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
@@ -191,7 +189,7 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
-			weatherSourceType = WeatherSourceType.KMA;
+			weatherSourceType = WeatherSourceType.KMA_WEB;
 		}
 
 		RemoteViews remoteViews = createRemoteViews(false);

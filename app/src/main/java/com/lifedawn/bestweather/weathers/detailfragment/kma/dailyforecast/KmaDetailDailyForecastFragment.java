@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailDailyForecastFragment;
@@ -20,6 +21,7 @@ import java.util.List;
 
 public class KmaDetailDailyForecastFragment extends BaseDetailDailyForecastFragment {
 	private List<FinalDailyForecast> finalDailyForecastList;
+	private List<KmaDailyForecast> kmaDailyForecasts;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -32,6 +34,11 @@ public class KmaDetailDailyForecastFragment extends BaseDetailDailyForecastFragm
 		binding.toolbar.fragmentTitle.setText(R.string.detail_daily_forecast);
 	}
 
+	public KmaDetailDailyForecastFragment setKmaDailyForecasts(List<KmaDailyForecast> kmaDailyForecasts) {
+		this.kmaDailyForecasts = kmaDailyForecasts;
+		return this;
+	}
+
 	public KmaDetailDailyForecastFragment setFinalDailyForecastList(List<FinalDailyForecast> finalDailyForecastList) {
 		this.finalDailyForecastList = finalDailyForecastList;
 		return this;
@@ -42,7 +49,9 @@ public class KmaDetailDailyForecastFragment extends BaseDetailDailyForecastFragm
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoList(getContext(), finalDailyForecastList, tempUnit);
+				dailyForecastDtoList =
+						finalDailyForecastList != null ? KmaResponseProcessor.makeDailyForecastDtoListOfXML(finalDailyForecastList,
+								tempUnit) : KmaResponseProcessor.makeDailyForecastDtoListOfWEB(kmaDailyForecasts, tempUnit);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

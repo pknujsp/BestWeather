@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaDailyForecast;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
@@ -39,12 +40,18 @@ import java.util.Locale;
 
 public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	private List<FinalDailyForecast> finalDailyForecastList;
+	private List<KmaDailyForecast> kmaDailyForecasts;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		needCompare = true;
 
+	}
+
+	public KmaSimpleDailyForecastFragment setKmaDailyForecasts(List<KmaDailyForecast> kmaDailyForecasts) {
+		this.kmaDailyForecasts = kmaDailyForecasts;
+		return this;
 	}
 
 	@Override
@@ -74,6 +81,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			public void onClick(View view) {
 				KmaDetailDailyForecastFragment detailDailyForecastFragment = new KmaDetailDailyForecastFragment();
 				detailDailyForecastFragment.setFinalDailyForecastList(finalDailyForecastList);
+				detailDailyForecastFragment.setKmaDailyForecasts(kmaDailyForecasts);
 
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
@@ -103,10 +111,19 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		// 날짜, 최저/최고 기온 ,낮과 밤의 날씨상태, 강수확률
 		Context context = getContext();
 
+		List<DailyForecastDto> dailyForecastDtoList = null;
+		if (finalDailyForecastList != null) {
+			dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfXML(finalDailyForecastList,
+					tempUnit);
+		} else {
+			dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfWEB(kmaDailyForecasts,
+					tempUnit);
+		}
+
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
 
-		final int COLUMN_COUNT = finalDailyForecastList.size();
+		final int COLUMN_COUNT = dailyForecastDtoList.size();
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyAccuKma);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 
@@ -125,8 +142,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<Integer> maxTempList = new ArrayList<>();
 		List<String> probabilityOfPrecipitationList = new ArrayList<>();
 
-		List<DailyForecastDto> dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoList(getContext(), finalDailyForecastList,
-				tempUnit);
+
 
 		for (DailyForecastDto dailyForecastDto : dailyForecastDtoList) {
 			dateList.add(dailyForecastDto.getDate().format(dateTimeFormatter));

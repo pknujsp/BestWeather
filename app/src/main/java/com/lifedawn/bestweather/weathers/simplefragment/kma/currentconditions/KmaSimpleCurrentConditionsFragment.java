@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaCurrentConditions;
+import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
@@ -24,6 +26,8 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 	private FinalCurrentConditions todayFinalCurrentConditions;
 	private FinalCurrentConditions yesterdayFinalCurrentConditions;
 	private FinalHourlyForecast finalHourlyForecast;
+	private KmaCurrentConditions kmaCurrentConditions;
+	private KmaHourlyForecast kmaHourlyForecast;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,16 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		setValuesToViews();
+	}
+
+	public KmaSimpleCurrentConditionsFragment setKmaHourlyForecast(KmaHourlyForecast kmaHourlyForecast) {
+		this.kmaHourlyForecast = kmaHourlyForecast;
+		return this;
+	}
+
+	public KmaSimpleCurrentConditionsFragment setKmaCurrentConditions(KmaCurrentConditions kmaCurrentConditions) {
+		this.kmaCurrentConditions = kmaCurrentConditions;
+		return this;
 	}
 
 	public KmaSimpleCurrentConditionsFragment setTodayFinalCurrentConditions(FinalCurrentConditions todayFinalCurrentConditions) {
@@ -60,14 +74,18 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 	public void setValuesToViews() {
 		super.setValuesToViews();
 
-		CurrentConditionsDto currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDto(getContext(), todayFinalCurrentConditions,
-				finalHourlyForecast, windUnit, tempUnit, latitude, longitude);
-
-		String precipitation = null;
-		if (currentConditionsDto.isHasPrecipitationVolume()) {
-			precipitation = currentConditionsDto.getPrecipitationType() + ": " + currentConditionsDto.getPrecipitationVolume();
+		CurrentConditionsDto currentConditionsDto = null;
+		if (todayFinalCurrentConditions != null) {
+			currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDtoOfXML(getContext(), todayFinalCurrentConditions,
+					finalHourlyForecast, windUnit, tempUnit, latitude, longitude);
 		} else {
-			precipitation = currentConditionsDto.getPrecipitationType();
+			currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDtoOfWEB(getContext(), kmaCurrentConditions, kmaHourlyForecast
+					, windUnit, tempUnit, latitude, longitude);
+		}
+
+		String precipitation = currentConditionsDto.getPrecipitationType();
+		if (currentConditionsDto.isHasPrecipitationVolume() && !currentConditionsDto.getPrecipitationVolume().equals("0.0mm")) {
+			precipitation += ": " + currentConditionsDto.getPrecipitationVolume();
 		}
 		binding.precipitation.setText(precipitation);
 
@@ -77,33 +95,30 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 		final String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
 		final String currentTemp = currentConditionsDto.getTemp().replace(tempUnitStr, "");
 		binding.temperature.setText(currentTemp);
-		binding.wind.setText(currentConditionsDto.getWindStrength());
 
-		double feelsLikeTemp =
-				WeatherUtil.calcFeelsLikeTemperature(ValueUnits.convertTemperature(currentTemp, ValueUnits.celsius),
-						ValueUnits.convertWindSpeed(todayFinalCurrentConditions.getWindSpeed(), ValueUnits.kmPerHour),
-						Double.parseDouble(todayFinalCurrentConditions.getHumidity()));
-		String feelsLikeTempStr = String.valueOf((int) feelsLikeTemp);
+		binding.wind.setText(currentConditionsDto.getWindStrength() != null ? currentConditionsDto.getWindStrength() :
+				getString(R.string.noWindData));
 
-		binding.feelsLikeTemp.setText(feelsLikeTempStr);
+		binding.feelsLikeTemp.setText(currentConditionsDto.getFeelsLikeTemp().replace(tempUnitStr, ""));
 		binding.tempUnit.setText(tempUnitStr);
 		binding.feelsLikeTempUnit.setText(tempUnitStr);
 
-		int yesterdayTemp = ValueUnits.convertTemperature(yesterdayFinalCurrentConditions.getTemperature(), tempUnit);
-		int todayTemp = Integer.parseInt(currentTemp);
+		if (yesterdayFinalCurrentConditions != null) {
+			int yesterdayTemp = ValueUnits.convertTemperature(yesterdayFinalCurrentConditions.getTemperature(), tempUnit);
+			int todayTemp = Integer.parseInt(currentTemp);
 
-
-		if (yesterdayTemp == todayTemp) {
-			binding.tempDescription.setText(R.string.TheTemperatureIsTheSameAsYesterday);
-		} else {
-			String text = getString(R.string.thanYesterday);
-
-			if (todayTemp > yesterdayTemp) {
-				text += " " + (todayTemp - yesterdayTemp) + "° " + getString(R.string.higherTemperature);
+			if (yesterdayTemp == todayTemp) {
+				binding.tempDescription.setText(R.string.TheTemperatureIsTheSameAsYesterday);
 			} else {
-				text += " " + (yesterdayTemp - todayTemp) + "° " + getString(R.string.lowerTemperature);
+				String text = getString(R.string.thanYesterday);
+
+				if (todayTemp > yesterdayTemp) {
+					text += " " + (todayTemp - yesterdayTemp) + "° " + getString(R.string.higherTemperature);
+				} else {
+					text += " " + (yesterdayTemp - todayTemp) + "° " + getString(R.string.lowerTemperature);
+				}
+				binding.tempDescription.setText(text);
 			}
-			binding.tempDescription.setText(text);
 		}
 	}
 }

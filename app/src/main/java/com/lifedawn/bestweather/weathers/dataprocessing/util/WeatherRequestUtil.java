@@ -45,7 +45,7 @@ public class WeatherRequestUtil {
 
 	public static void initWeatherSourceUniqueValues(WeatherSourceType weatherSourceType, boolean aqi, Context context) {
 		switch (weatherSourceType) {
-			case KMA:
+			case KMA_WEB:
 				KmaResponseProcessor.init(context);
 				break;
 			case ACCU_WEATHER:
@@ -63,9 +63,9 @@ public class WeatherRequestUtil {
 	public static void setRequestWeatherSourceWithSourceType(Set<WeatherSourceType> weatherSourceTypeSet,
 	                                                         ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
 	                                                         Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
-		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
+		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA_API)) {
 			RequestKma requestKma = new RequestKma();
-			requestWeatherSources.put(WeatherSourceType.KMA, requestKma);
+			requestWeatherSources.put(WeatherSourceType.KMA_API, requestKma);
 
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
 				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
@@ -78,7 +78,18 @@ public class WeatherRequestUtil {
 				requestKma.addRequestServiceType(RetrofitClient.ServiceType.MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.MID_TA_FCST)
 						.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST).addRequestServiceType(RetrofitClient.ServiceType.VILAGE_FCST);
 			}
+		} else if (weatherSourceTypeSet.contains(WeatherSourceType.KMA_WEB)) {
+			RequestKma requestKma = new RequestKma();
+			requestWeatherSources.put(WeatherSourceType.KMA_WEB, requestKma);
+
+			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS);
+			}
+			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast) || requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_FORECASTS);
+			}
 		}
+
 		if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
 			RequestAccu requestAccu = new RequestAccu();
 			requestWeatherSources.put(WeatherSourceType.ACCU_WEATHER, requestAccu);
@@ -137,7 +148,7 @@ public class WeatherRequestUtil {
 		if (countryCode.equals("KR")) {
 			boolean kmaIsTopPriority = sharedPreferences.getBoolean(context.getString(R.string.pref_key_kma_top_priority), true);
 			if (kmaIsTopPriority) {
-				mainWeatherSourceType = WeatherSourceType.KMA;
+				mainWeatherSourceType = WeatherSourceType.KMA_WEB;
 			}
 		}
 

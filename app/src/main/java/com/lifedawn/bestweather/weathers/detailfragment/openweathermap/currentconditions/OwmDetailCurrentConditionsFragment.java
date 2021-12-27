@@ -11,7 +11,6 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
 
@@ -59,7 +58,7 @@ public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 		addGridItem(R.string.humidity, current.getHumidity() + percent, R.drawable.humidity, null);
 		addGridItem(R.string.dew_point, ValueUnits.convertTemperature(current.getDewPoint(), tempUnit) + tempUnitStr, R.drawable.dewpoint,
 				null);
-		View windDirectionView = addGridItem(R.string.wind_direction, WindUtil.windDirection(getContext(), current.getWind_deg()),
+		View windDirectionView = addGridItem(R.string.wind_direction, WindUtil.parseWindDirectionDegreeAsStr(getContext(), current.getWind_deg()),
 				R.drawable.arrow,null);
 		((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(Integer.parseInt(current.getWind_deg()) + 180);
 		addGridItem(R.string.wind_speed,

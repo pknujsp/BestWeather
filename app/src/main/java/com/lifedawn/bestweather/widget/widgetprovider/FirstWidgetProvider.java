@@ -168,8 +168,6 @@ public class FirstWidgetProvider extends AbstractAppWidgetProvider {
 		widgetCreator.setWidgetDto(widgetDto);
 
 		final WeatherSourceType weatherSourceType = WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherSourceTypeSet);
-
-
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
 				weatherSourceType);
 		AirQualityDto airQualityDto = null;

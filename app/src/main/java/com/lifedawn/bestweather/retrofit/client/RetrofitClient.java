@@ -18,6 +18,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class RetrofitClient {
 	//kma
+	public static final String KMA_CURRENT_CONDITIONS_AND_HOURLY_AND_DAILY_FORECAST_URL = "https://www.weather.go.kr/w/wnuri-fct2021/main/";
 	public static final String MID_FCST_INFO_SERVICE_URL = "http://apis.data.go.kr/1360000/MidFcstInfoService/";
 	public static final String VILAGE_FCST_INFO_SERVICE_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/";
 	//accu weather
@@ -50,13 +51,19 @@ public class RetrofitClient {
 		YESTERDAY_ULTRA_SRT_NCST, ULTRA_SRT_NCST, ULTRA_SRT_FCST, MID_LAND_FCST, MID_TA_FCST, VILAGE_FCST, ACCU_GEOPOSITION_SEARCH,
 		ACCU_CURRENT_CONDITIONS,
 		ACCU_5_DAYS_OF_DAILY, ACCU_12_HOURLY, MET_NORWAY_LOCATION_FORECAST, AQICN_GEOLOCALIZED_FEED, OWM_CURRENT_WEATHER,
-		OWM_HOURLY_FORECAST, OWM_DAILY_FORECAST, OWM_ONE_CALL, FLICKR
+		OWM_HOURLY_FORECAST, OWM_DAILY_FORECAST, OWM_ONE_CALL, FLICKR, KMA_CURRENT_CONDITIONS, KMA_FORECASTS
 	}
 
 
 	public static synchronized Querys getApiService(ServiceType serviceType) {
 
 		switch (serviceType) {
+			case KMA_CURRENT_CONDITIONS:
+			case KMA_FORECASTS:
+				Retrofit kmaHtmlInstance = new Retrofit.Builder().client(client).addConverterFactory(ScalarsConverterFactory.create())
+						.baseUrl(KMA_CURRENT_CONDITIONS_AND_HOURLY_AND_DAILY_FORECAST_URL).build();
+				return kmaHtmlInstance.create(Querys.class);
+
 			case MID_LAND_FCST:
 			case MID_TA_FCST:
 				Retrofit midFcstInstance = new Retrofit.Builder().client(client)

@@ -2,8 +2,6 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -16,7 +14,6 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -27,18 +24,13 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponse
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
-import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureViewForRemoteViews;
-import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.view.View.MeasureSpec.EXACTLY;
 
 public class FourthWidgetCreator extends AbstractWidgetCreator {
 	private final DateTimeFormatter refreshDateTimeFormatter;
@@ -241,7 +233,7 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
-			weatherSourceType = WeatherSourceType.KMA;
+			weatherSourceType = WeatherSourceType.KMA_WEB;
 		}
 
 		RemoteViews remoteViews = createRemoteViews(false);

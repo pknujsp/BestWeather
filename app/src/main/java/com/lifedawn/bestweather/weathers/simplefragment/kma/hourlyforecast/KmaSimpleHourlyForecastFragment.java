@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
@@ -40,6 +41,7 @@ import java.util.List;
 
 public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 	private List<FinalHourlyForecast> finalHourlyForecastList;
+	private List<KmaHourlyForecast> kmaHourlyForecasts;
 
 
 	@Override
@@ -74,6 +76,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			public void onClick(View v) {
 				KmaDetailHourlyForecastFragment detailHourlyForecastFragment = new KmaDetailHourlyForecastFragment();
 				detailHourlyForecastFragment.setFinalHourlyForecastList(finalHourlyForecastList);
+				detailHourlyForecastFragment.setKmaHourlyForecasts(kmaHourlyForecasts);
 
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
@@ -99,15 +102,29 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 	}
 
 
+	public KmaSimpleHourlyForecastFragment setKmaHourlyForecasts(List<KmaHourlyForecast> kmaHourlyForecasts) {
+		this.kmaHourlyForecasts = kmaHourlyForecasts;
+		return this;
+	}
+
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public void setValuesToViews() {
 		//kma hourly forecast simple : 날짜, 시각, 날씨, 기온, 강수확률, 강수량
 		Context context = getContext();
 
+		List<HourlyForecastDto> hourlyForecastDtoList = null;
+		if (finalHourlyForecastList != null) {
+			hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoListOfXML(getContext(),
+					finalHourlyForecastList, latitude, longitude, windUnit, tempUnit);
+		} else {
+			hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoListOfWEB(getContext(), kmaHourlyForecasts, latitude,
+					longitude, windUnit, tempUnit);
+		}
+
 		final int weatherRowHeight = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 
-		final int columnCount = finalHourlyForecastList.size();
+		final int columnCount = hourlyForecastDtoList.size();
 		final int columnWidth = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCHourly);
 		final int viewWidth = columnCount * columnWidth;
 
@@ -135,8 +152,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		final String degree = "°";
 
 		boolean haveSnow = false;
-		List<HourlyForecastDto> hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoList(getContext(),
-				finalHourlyForecastList, latitude, longitude, windUnit, tempUnit);
+
 
 		for (HourlyForecastDto item : hourlyForecastDtoList) {
 			dateTimeList.add(item.getHours());
@@ -144,7 +160,6 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 					ContextCompat.getDrawable(context, item.getWeatherIcon()), item.getWeatherDescription()));
 			tempList.add(Integer.parseInt(item.getTemp().replace(degree, "")));
-
 
 			probabilityOfPrecipitationList.add(item.getPop());
 			rainVolumeList.add(item.getRainVolume().replace(mm, ""));

@@ -3,12 +3,10 @@ package com.lifedawn.bestweather.widget.creator;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
@@ -24,8 +22,6 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponsePr
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
-import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
-import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 
 import java.time.ZonedDateTime;
@@ -226,7 +222,7 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
-			weatherSourceType = WeatherSourceType.KMA;
+			weatherSourceType = WeatherSourceType.KMA_WEB;
 		}
 
 		RemoteViews remoteViews = createRemoteViews(false);

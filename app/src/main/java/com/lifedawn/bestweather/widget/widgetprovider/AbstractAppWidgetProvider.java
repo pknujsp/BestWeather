@@ -31,7 +31,6 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -253,7 +252,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 
 			if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 				if (weatherSourceTypeSet.size() == 1) {
-					weatherSourceTypeSet.add(WeatherSourceType.KMA);
+					weatherSourceTypeSet.add(WeatherSourceType.KMA_WEB);
 				}
 			}
 

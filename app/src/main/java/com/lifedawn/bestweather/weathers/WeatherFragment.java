@@ -74,6 +74,9 @@ import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyfo
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaCurrentConditions;
+import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaDailyForecast;
+import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
@@ -88,6 +91,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapR
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.parser.KmaWebParser;
 import com.lifedawn.bestweather.weathers.detailfragment.accuweather.currentconditions.AccuDetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.kma.currentconditions.KmaDetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.currentconditions.OwmDetailCurrentConditionsFragment;
@@ -112,12 +116,16 @@ import java.io.Serializable;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.SimpleTimeZone;
@@ -396,7 +404,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 				String weather = null;
 				switch (weatherSourceType) {
-					case KMA:
+					case KMA_WEB:
+						String pty = KmaResponseProcessor.convertPtyTextToCode(val);
+						String sky = KmaResponseProcessor.convertSkyTextToCode(val);
+						weather = pty == null ? KmaResponseProcessor.getSkyFlickrGalleryName(
+								sky) : KmaResponseProcessor.getPtyFlickrGalleryName(pty);
+						break;
+					case KMA_API:
 						String code = val.substring(0, 1);
 						weather = val.contains("_sky") ? KmaResponseProcessor.getSkyFlickrGalleryName(
 								code) : KmaResponseProcessor.getPtyFlickrGalleryName(code);
@@ -656,7 +670,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		if (countryCode.equals("KR")) {
 			boolean kmaIsTopPriority = sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), true);
 			if (kmaIsTopPriority) {
-				mainWeatherSourceType = WeatherSourceType.KMA;
+				mainWeatherSourceType = WeatherSourceType.KMA_WEB;
 			}
 		}
 
@@ -776,8 +790,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						final WeatherSourceType[] weatherSourceTypeArr = new WeatherSourceType[otherTypes.size()];
 						int arrIndex = 2;
 
-						if (otherTypes.contains(WeatherSourceType.KMA)) {
-							weatherSourceTypeArr[arrIndex - 2] = WeatherSourceType.KMA;
+						if (otherTypes.contains(WeatherSourceType.KMA_WEB)) {
+							weatherSourceTypeArr[arrIndex - 2] = WeatherSourceType.KMA_WEB;
 							failedDialogItems[arrIndex++] = getString(R.string.kma) + ", " + getString(
 									R.string.rerequest_another_weather_datasource);
 						}
@@ -862,7 +876,17 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	                                                          WeatherSourceType lastWeatherSourceType) {
 		Set<WeatherSourceType> others = new HashSet<>();
 
-		if (requestWeatherSourceType == WeatherSourceType.KMA) {
+		if (requestWeatherSourceType == WeatherSourceType.KMA_WEB) {
+
+			if (lastWeatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
+				others.add(WeatherSourceType.ACCU_WEATHER);
+			} else if (lastWeatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+				others.add(WeatherSourceType.OPEN_WEATHER_MAP);
+			} else {
+				others.add(WeatherSourceType.OPEN_WEATHER_MAP);
+				others.add(WeatherSourceType.ACCU_WEATHER);
+			}
+		} else if (requestWeatherSourceType == WeatherSourceType.KMA_API) {
 
 			if (lastWeatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
 				others.add(WeatherSourceType.ACCU_WEATHER);
@@ -877,13 +901,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			if (lastWeatherSourceType == WeatherSourceType.ACCU_WEATHER) {
 				if (countryCode.equals("KR")) {
 					others.add(WeatherSourceType.OPEN_WEATHER_MAP);
-					others.add(WeatherSourceType.KMA);
+					others.add(WeatherSourceType.KMA_WEB);
 				} else {
 					others.add(WeatherSourceType.OPEN_WEATHER_MAP);
 				}
 			} else if (lastWeatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
 				if (countryCode.equals("KR")) {
-					others.add(WeatherSourceType.KMA);
+					others.add(WeatherSourceType.KMA_WEB);
 				}
 			} else {
 				others.add(WeatherSourceType.OPEN_WEATHER_MAP);
@@ -893,13 +917,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			if (lastWeatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
 				if (countryCode.equals("KR")) {
 					others.add(WeatherSourceType.ACCU_WEATHER);
-					others.add(WeatherSourceType.KMA);
+					others.add(WeatherSourceType.KMA_WEB);
 				} else {
 					others.add(WeatherSourceType.ACCU_WEATHER);
 				}
 			} else if (lastWeatherSourceType == WeatherSourceType.ACCU_WEATHER) {
 				if (countryCode.equals("KR")) {
-					others.add(WeatherSourceType.KMA);
+					others.add(WeatherSourceType.KMA_WEB);
 				}
 			} else {
 				others.add(WeatherSourceType.ACCU_WEATHER);
@@ -961,14 +985,20 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private void setRequestWeatherSourceWithSourceTypes(Set<WeatherSourceType> weatherSourceTypeSet,
 	                                                    ArrayMap<WeatherSourceType, RequestWeatherSource> newRequestWeatherSources) {
 
-		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
+		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA_WEB)) {
 			RequestKma requestKma = new RequestKma();
 			requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_NCST).addRequestServiceType(
 					RetrofitClient.ServiceType.ULTRA_SRT_FCST).addRequestServiceType(
 					RetrofitClient.ServiceType.VILAGE_FCST).addRequestServiceType(
 					RetrofitClient.ServiceType.MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.MID_TA_FCST)
 					.addRequestServiceType(RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST);
-			newRequestWeatherSources.put(WeatherSourceType.KMA, requestKma);
+			newRequestWeatherSources.put(WeatherSourceType.KMA_WEB, requestKma);
+		}
+		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA_WEB)) {
+			RequestKma requestKma = new RequestKma();
+			requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS).addRequestServiceType(
+					RetrofitClient.ServiceType.KMA_FORECASTS);
+			newRequestWeatherSources.put(WeatherSourceType.KMA_WEB, requestKma);
 		}
 		if (weatherSourceTypeSet.contains(WeatherSourceType.OPEN_WEATHER_MAP)) {
 			RequestOwm requestOwm = new RequestOwm();
@@ -1017,27 +1047,26 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			if (aqicnResponse.isSuccessful()) {
 				airQualityResponse = (GeolocalizedFeedResponse) aqicnResponse.getResponseObj();
 			}
-
 		}
 
-		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA)) {
-			arrayMap = responseMap.get(WeatherSourceType.KMA);
+		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA_API)) {
+			arrayMap = responseMap.get(WeatherSourceType.KMA_API);
 
-			FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(
+			FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditionsByXML(
 					(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponseObj());
-			FinalCurrentConditions yesterDayFinalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(
+			FinalCurrentConditions yesterDayFinalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditionsByXML(
 					(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST).getResponseObj());
 
-			List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
+			List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastListByXML(
 					(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponseObj(),
 					(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST).getResponseObj());
 
-			List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastList(
+			List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastListByXML(
 					(MidLandFcstResponse) arrayMap.get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponseObj(),
 					(MidTaResponse) arrayMap.get(RetrofitClient.ServiceType.MID_TA_FCST).getResponseObj(),
 					Long.parseLong(multipleRestApiDownloader.get("tmFc")));
 
-			finalDailyForecastList = KmaResponseProcessor.getDailyForecastList(finalDailyForecastList, finalHourlyForecastList);
+			finalDailyForecastList = KmaResponseProcessor.getDailyForecastListByXML(finalDailyForecastList, finalHourlyForecastList);
 
 			KmaSimpleCurrentConditionsFragment kmaSimpleCurrentConditionsFragment = new KmaSimpleCurrentConditionsFragment();
 			KmaSimpleHourlyForecastFragment kmaSimpleHourlyForecastFragment = new KmaSimpleHourlyForecastFragment();
@@ -1063,7 +1092,39 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			currentConditionsWeatherVal = pty.equals("0") ? sky + "_sky" : pty + "_pty";
 			zoneId = KmaResponseProcessor.getZoneId();
-			mainWeatherSourceType = WeatherSourceType.KMA;
+			mainWeatherSourceType = WeatherSourceType.KMA_API;
+
+		} else if (weatherSourceTypeSet.contains(WeatherSourceType.KMA_WEB)) {
+			arrayMap = responseMap.get(WeatherSourceType.KMA_WEB);
+
+			KmaCurrentConditions kmaCurrentConditions = (KmaCurrentConditions) arrayMap.get(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS).getResponseObj();
+			Object[] forecasts = (Object[]) arrayMap.get(RetrofitClient.ServiceType.KMA_FORECASTS).getResponseObj();
+
+			ArrayList<KmaHourlyForecast> kmaHourlyForecasts = (ArrayList<KmaHourlyForecast>) forecasts[0];
+			ArrayList<KmaDailyForecast> kmaDailyForecasts = (ArrayList<KmaDailyForecast>) forecasts[1];
+
+			KmaSimpleCurrentConditionsFragment kmaSimpleCurrentConditionsFragment = new KmaSimpleCurrentConditionsFragment();
+			KmaSimpleHourlyForecastFragment kmaSimpleHourlyForecastFragment = new KmaSimpleHourlyForecastFragment();
+			KmaSimpleDailyForecastFragment kmaSimpleDailyForecastFragment = new KmaSimpleDailyForecastFragment();
+			KmaDetailCurrentConditionsFragment kmaDetailCurrentConditionsFragment = new KmaDetailCurrentConditionsFragment();
+
+			kmaSimpleCurrentConditionsFragment.setKmaCurrentConditions(kmaCurrentConditions).setKmaHourlyForecast(kmaHourlyForecasts.get(0))
+					.setAirQualityResponse(airQualityResponse);
+			//kmaSimpleCurrentConditionsFragment.setYesterdayFinalCurrentConditions(yesterDayFinalCurrentConditions);
+			kmaSimpleHourlyForecastFragment.setKmaHourlyForecasts(kmaHourlyForecasts);
+			kmaSimpleDailyForecastFragment.setKmaDailyForecasts(kmaDailyForecasts);
+			kmaDetailCurrentConditionsFragment.setKmaCurrentConditions(kmaCurrentConditions).setKmaHourlyForecast(kmaHourlyForecasts.get(0));
+
+			simpleCurrentConditionsFragment = kmaSimpleCurrentConditionsFragment;
+			simpleHourlyForecastFragment = kmaSimpleHourlyForecastFragment;
+			simpleDailyForecastFragment = kmaSimpleDailyForecastFragment;
+			detailCurrentConditionsFragment = kmaDetailCurrentConditionsFragment;
+
+			String pty = kmaCurrentConditions.getPty();
+
+			currentConditionsWeatherVal = pty.isEmpty() ? kmaHourlyForecasts.get(0).getWeatherDescription() : pty;
+			zoneId = KmaResponseProcessor.getZoneId();
+			mainWeatherSourceType = WeatherSourceType.KMA_WEB;
 
 		} else if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
 			arrayMap = responseMap.get(WeatherSourceType.ACCU_WEATHER);
@@ -1186,7 +1247,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private void createWeatherDataSourcePicker(String countryCode) {
 		switch (mainWeatherSourceType) {
-			case KMA:
+			case KMA_WEB:
 				binding.datasource.setText(R.string.kma);
 				break;
 			case ACCU_WEATHER:
@@ -1208,7 +1269,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					items[1] = getString(R.string.accu_weather);
 					items[2] = getString(R.string.owm);
 
-					checkedItemIdx = (mainWeatherSourceType == WeatherSourceType.KMA) ? 0 : (mainWeatherSourceType == WeatherSourceType.ACCU_WEATHER) ? 1 : 2;
+					checkedItemIdx = (mainWeatherSourceType == WeatherSourceType.KMA_WEB) ? 0 : (mainWeatherSourceType == WeatherSourceType.ACCU_WEATHER) ? 1 : 2;
 				} else {
 					items[0] = getString(R.string.accu_weather);
 					items[1] = getString(R.string.owm);
@@ -1235,7 +1296,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 										newWeatherSourceType = accu ? WeatherSourceType.ACCU_WEATHER : WeatherSourceType.OPEN_WEATHER_MAP;
 									} else {
-										newWeatherSourceType = WeatherSourceType.KMA;
+										newWeatherSourceType = WeatherSourceType.KMA_WEB;
 									}
 									requestNewDataWithAnotherWeatherSource(newWeatherSourceType, lastWeatherSourceType);
 								}

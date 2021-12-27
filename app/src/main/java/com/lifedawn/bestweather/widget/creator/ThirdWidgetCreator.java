@@ -30,7 +30,6 @@ import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ThirdWidgetCreator extends AbstractWidgetCreator {
@@ -259,7 +258,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
-			weatherSourceType = WeatherSourceType.KMA;
+			weatherSourceType = WeatherSourceType.KMA_WEB;
 		}
 
 		RemoteViews remoteViews = createRemoteViews(false);

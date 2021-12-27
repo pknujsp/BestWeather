@@ -155,7 +155,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 					.setSnowVolume(snowVolume)
 					.setWeatherDescription(OpenWeatherMapResponseProcessor.getWeatherIconDescription(hourly.getWeather().get(0).getId()))
 					.setFeelsLikeTemp(ValueUnits.convertTemperature(hourly.getFeelsLike(), tempUnit) + tempDegree)
-					.setWindDirection(WindUtil.windDirection(context, hourly.getWind_deg()))
+					.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, hourly.getWind_deg()))
 					.setWindDirectionVal(Integer.parseInt(hourly.getWind_deg()))
 					.setWindSpeed(ValueUnits.convertWindSpeed(hourly.getWind_speed(), windUnit) + windUnitStr)
 					.setWindStrength(WindUtil.getSimpleWindSpeedDescription(hourly.getWind_speed()))
@@ -227,7 +227,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 					.setSnowVolume(snowVolume)
 					.setWeatherIcon(OpenWeatherMapResponseProcessor.getWeatherIconImg(daily.getWeather().get(0).getId(), false))
 					.setWeatherDescription(OpenWeatherMapResponseProcessor.getWeatherIconDescription(daily.getWeather().get(0).getId()))
-					.setWindDirection(WindUtil.windDirection(context, daily.getWindDeg()))
+					.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, daily.getWindDeg()))
 					.setWindDirectionVal(Integer.parseInt(daily.getWindDeg()))
 					.setWindSpeed(ValueUnits.convertWindSpeed(daily.getWindSpeed(), windUnit) + wind)
 					.setWindStrength(WindUtil.getSimpleWindSpeedDescription(daily.getWindSpeed()))
@@ -264,7 +264,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		currentConditionsDto.setHumidity(item.getHumidity() + percent);
 		currentConditionsDto.setDewPoint(ValueUnits.convertTemperature(item.getDewPoint(), tempUnit) + tempUnitStr);
 		currentConditionsDto.setWindDirectionDegree(Integer.parseInt(item.getWind_deg()));
-		currentConditionsDto.setWindDirection(WindUtil.windDirection(context, item.getWind_deg()));
+		currentConditionsDto.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, item.getWind_deg()));
 		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(item.getWind_speed(), windUnit) + ValueUnits.convertToStr(context, windUnit));
 		if (item.getWindGust() != null) {
 			currentConditionsDto.setWindGust(ValueUnits.convertWindSpeed(item.getWindGust(), windUnit) + ValueUnits.convertToStr(context,

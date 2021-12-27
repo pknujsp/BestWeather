@@ -36,8 +36,9 @@ public class MainProcessing {
 		if (requestWeatherSources.containsKey(WeatherSourceType.ACCU_WEATHER)) {
 			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherSourceType.ACCU_WEATHER), multipleRestApiDownloader);
 		}
-		if (requestWeatherSources.containsKey(WeatherSourceType.KMA)) {
-			KmaProcessing.requestWeatherData(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherSourceType.KMA), multipleRestApiDownloader);
+		if (requestWeatherSources.containsKey(WeatherSourceType.KMA_WEB)) {
+			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherSourceType.KMA_WEB),
+					multipleRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherSourceType.OPEN_WEATHER_MAP)) {
 			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,
@@ -74,8 +75,8 @@ public class MainProcessing {
 		if (requestWeatherSources.containsKey(WeatherSourceType.ACCU_WEATHER)) {
 			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherSourceType.ACCU_WEATHER), multipleRestApiDownloader);
 		}
-		if (requestWeatherSources.containsKey(WeatherSourceType.KMA)) {
-			KmaProcessing.requestWeatherData(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherSourceType.KMA), multipleRestApiDownloader);
+		if (requestWeatherSources.containsKey(WeatherSourceType.KMA_WEB)) {
+			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherSourceType.KMA_WEB), multipleRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherSourceType.OPEN_WEATHER_MAP)) {
 			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,
@@ -101,8 +102,8 @@ public class MainProcessing {
 		if (requestWeatherSources.containsKey(WeatherSourceType.ACCU_WEATHER)) {
 			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherSourceType.ACCU_WEATHER), multipleRestApiDownloader);
 		}
-		if (requestWeatherSources.containsKey(WeatherSourceType.KMA)) {
-			KmaProcessing.requestWeatherData(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherSourceType.KMA), multipleRestApiDownloader);
+		if (requestWeatherSources.containsKey(WeatherSourceType.KMA_WEB)) {
+			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherSourceType.KMA_WEB), multipleRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherSourceType.OPEN_WEATHER_MAP)) {
 			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,

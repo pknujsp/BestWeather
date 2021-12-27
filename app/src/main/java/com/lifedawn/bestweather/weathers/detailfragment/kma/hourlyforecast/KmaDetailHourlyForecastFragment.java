@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailHourlyForecastFragment;
@@ -20,6 +21,12 @@ import java.util.List;
 
 public class KmaDetailHourlyForecastFragment extends BaseDetailHourlyForecastFragment {
 	private List<FinalHourlyForecast> finalHourlyForecastList;
+	private List<KmaHourlyForecast> kmaHourlyForecasts;
+
+	public KmaDetailHourlyForecastFragment setKmaHourlyForecasts(List<KmaHourlyForecast> kmaHourlyForecasts) {
+		this.kmaHourlyForecasts = kmaHourlyForecasts;
+		return this;
+	}
 
 	public void setFinalHourlyForecastList(List<FinalHourlyForecast> finalHourlyForecastList) {
 		this.finalHourlyForecastList = finalHourlyForecastList;
@@ -41,8 +48,10 @@ public class KmaDetailHourlyForecastFragment extends BaseDetailHourlyForecastFra
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoList(getContext(), finalHourlyForecastList, latitude,
-						longitude, windUnit, tempUnit);
+				hourlyForecastDtoList = finalHourlyForecastList != null ? KmaResponseProcessor.makeHourlyForecastDtoListOfXML(getContext(),
+						finalHourlyForecastList, latitude, longitude, windUnit, tempUnit) :
+						KmaResponseProcessor.makeHourlyForecastDtoListOfWEB(getContext(),
+								kmaHourlyForecasts, latitude, longitude, windUnit, tempUnit);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

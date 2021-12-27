@@ -198,7 +198,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 					.setPrecipitationType(AccuWeatherResponseProcessor.getPty(hourly.getPrecipitationType()))
 					.setPrecipitationTypeIcon(AccuWeatherResponseProcessor.getPtyIcon(hourly.getPrecipitationType()))
 					.setWindDirectionVal(Integer.parseInt(hourly.getWind().getDirection().getDegrees()))
-					.setWindDirection(WindUtil.windDirection(context, hourly.getWind().getDirection().getDegrees()))
+					.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, hourly.getWind().getDirection().getDegrees()))
 					.setWindSpeed(ValueUnits.convertWindSpeedForAccu(hourly.getWind().getSpeed().getValue(), windUnit) + windUnitStr)
 					.setWindGust(ValueUnits.convertWindSpeedForAccu(hourly.getWindGust().getSpeed().getValue(), windUnit) + windUnitStr)
 					.setWindStrength(ValueUnits.convertWindSpeedForAccu(hourly.getWind().getSpeed().getValue(), ValueUnits.mPerSec).toString())
@@ -286,7 +286,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 			am.setRainVolume(rainVolume);
 			am.setHasSnowVolume(hasSnow);
 			am.setSnowVolume(snowVolume);
-			am.setWindDirection(WindUtil.windDirection(context, daily.getDay().getWind().getDirection().getDegrees()));
+			am.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, daily.getDay().getWind().getDirection().getDegrees()));
 			am.setWindDirectionVal(Integer.parseInt(daily.getDay().getWind().getDirection().getDegrees()));
 			am.setWindSpeed(ValueUnits.convertWindSpeedForAccu(daily.getDay().getWind().getSpeed().getValue(), windUnit) + windUnitStr);
 			am.setWindStrength(WindUtil.getSimpleWindSpeedDescription(ValueUnits.convertWindSpeedForAccu(daily.getDay().getWind().getSpeed().getValue(), ValueUnits.mPerSec).toString()));
@@ -328,7 +328,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 			pm.setRainVolume(rainVolume);
 			pm.setHasSnowVolume(hasSnow);
 			pm.setSnowVolume(snowVolume);
-			pm.setWindDirection(WindUtil.windDirection(context, daily.getNight().getWind().getDirection().getDegrees()));
+			pm.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, daily.getNight().getWind().getDirection().getDegrees()));
 			pm.setWindDirectionVal(Integer.parseInt(daily.getNight().getWind().getDirection().getDegrees()));
 			pm.setWindSpeed(ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), windUnit) + windUnitStr);
 			pm.setWindStrength(WindUtil.getSimpleWindSpeedDescription(ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), ValueUnits.mPerSec).toString()));
@@ -358,7 +358,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		currentConditionsDto.setHumidity(item.getRelativeHumidity() + percent);
 		currentConditionsDto.setDewPoint(ValueUnits.convertTemperature(item.getDewPoint().getMetric().getValue(), tempUnit) + tempUnitStr);
 		currentConditionsDto.setWindDirectionDegree(Integer.parseInt(item.getWind().getDirection().getDegrees()));
-		currentConditionsDto.setWindDirection(WindUtil.windDirection(context, item.getWind().getDirection().getDegrees()));
+		currentConditionsDto.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, item.getWind().getDirection().getDegrees()));
 		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeedForAccu(item.getWind().getSpeed().getMetric().getValue(), windUnit) + ValueUnits.convertToStr(context, windUnit));
 		currentConditionsDto.setWindGust(ValueUnits.convertWindSpeedForAccu(item.getWindGust().getSpeed().getMetric().getValue(),
 				windUnit) + ValueUnits.convertToStr(context, windUnit));

@@ -451,9 +451,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					if (isChecked) {
-						widgetDto.addWeatherSourceType(WeatherSourceType.KMA);
+						widgetDto.addWeatherSourceType(WeatherSourceType.KMA_WEB);
 					} else {
-						widgetDto.removeWeatherSourceType(WeatherSourceType.KMA);
+						widgetDto.removeWeatherSourceType(WeatherSourceType.KMA_WEB);
 					}
 				}
 			});

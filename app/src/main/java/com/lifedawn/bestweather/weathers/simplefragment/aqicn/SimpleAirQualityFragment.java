@@ -210,7 +210,9 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 		List<AirQualityForecastObj> forecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(geolocalizedFeedResponse,
 				zoneId);
+		final int textColor = AppTheme.getColor(getContext(), R.attr.textColorInWeatherCard);
 		for (AirQualityForecastObj forecastObj : forecastObjList) {
+
 			View forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 			((TextView) forecastItemView.findViewById(R.id.date)).setText(forecastObj.date.format(dateTimeFormatter));
 
@@ -228,6 +230,12 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 					forecastObj.o3 == null ? notData : AqicnResponseProcessor.getGradeDescription(forecastObj.o3));
 			((TextView) forecastItemView.findViewById(R.id.o3)).setTextColor(forecastObj.o3 == null ? ContextCompat.getColor(context,
 					R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.o3));
+
+			((TextView) forecastItemView.findViewById(R.id.date)).setTextColor(textColor);
+			((TextView) forecastItemView.findViewById(R.id.pm10)).setTextColor(textColor);
+			((TextView) forecastItemView.findViewById(R.id.pm25)).setTextColor(textColor);
+			((TextView) forecastItemView.findViewById(R.id.o3)).setTextColor(textColor);
+
 
 			binding.forecast.addView(forecastItemView);
 		}

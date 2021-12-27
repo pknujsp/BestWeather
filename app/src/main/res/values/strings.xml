@@ -253,7 +253,7 @@
     <string name="owm_icon_781_tornado">토네이도</string>
 
     <string name="owm_icon_800_clear">맑음</string>
-    <string name="owm_icon_801_few_clouds">구름 조금</string>
+    <string name="owm_icon_801_few_clouds">구름조금</string>
     <string name="owm_icon_802_scattered_clouds">흩어진 구름</string>
     <string name="owm_icon_803_broken_clouds">부서진 구름</string>
     <string name="owm_icon_804_overcast_clouds">흐림</string>
@@ -265,7 +265,7 @@
 
     <string name="kma_pty_0_not">강수없음</string>
     <string name="kma_pty_1_rain">비</string>
-    <string name="kma_pty_2_rain_and_snow">비/눈</string>
+    <string name="kma_pty_2_rain_and_snow">진눈깨비</string>
     <string name="kma_pty_3_snow">눈</string>
     <string name="kma_pty_4_showers">소나기</string>
     <string name="kma_pty_5_raindrop">빗방울</string>
@@ -567,6 +567,7 @@
     <string name="eleventhWidgetLabel">시간별 예보 비교</string>
     <string name="feelsLike">체감</string>
     <string name="notSelectedDefaultWeatherSource">기본 날씨 제공사가 선택되지 않았습니다</string>
+    <string name="noWindData">바람 정보 없음</string>
 
 
 </resources>

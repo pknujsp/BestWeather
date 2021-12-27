@@ -439,6 +439,17 @@
         <item>7</item>
     </string-array>
 
+    <string-array name="KmaPtyIconTextCodes">
+        <item>강수없음</item>
+        <item>비</item>
+        <item>비/눈</item>
+        <item>눈</item>
+        <item>소나기</item>
+        <item>빗방울</item>
+        <item>빗방울눈날림</item>
+        <item>눈날림</item>
+    </string-array>
+
     <string-array name="KmaPtyIconDescriptionsForCode">
         <item>@string/kma_pty_0_not</item>
         <item>@string/kma_pty_1_rain</item>
@@ -516,6 +527,45 @@
         <item>@drawable/sleet</item>
         <item>@drawable/showers</item>
         <item>@drawable/showers</item>
+    </integer-array>
+
+    <string-array name="KmaWeatherDescriptionCodes">
+        <item>맑음</item>
+        <item>구름 많음</item>
+        <item>흐림</item>
+        <item>비</item>
+        <item>비/눈</item>
+        <item>눈</item>
+        <item>소나기</item>
+        <item>빗방울</item>
+        <item>빗방울/눈날림</item>
+        <item>눈날림</item>
+    </string-array>
+
+    <string-array name="KmaWeatherDescriptions">
+        <item>@string/kma_sky_1_clear</item>
+        <item>@string/kma_sky_3_mostly_cloudy</item>
+        <item>@string/kma_mid_overcast</item>
+        <item>@string/kma_pty_1_rain</item>
+        <item>@string/kma_pty_2_rain_and_snow</item>
+        <item>@string/kma_pty_3_snow</item>
+        <item>@string/kma_pty_4_showers</item>
+        <item>@string/kma_pty_5_raindrop</item>
+        <item>@string/kma_pty_6_raindrop_and_snow_blizzard</item>
+        <item>@string/kma_pty_7_snow_blizzard</item>
+    </string-array>
+
+    <integer-array name="KmaWeatherIconForDescriptionCode">
+        <item>@drawable/day_clear</item>
+        <item>@drawable/day_mostly_cloudy</item>
+        <item>@drawable/overcast</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/snow</item>
+        <item>@drawable/showers</item>
+        <item>@drawable/rain</item>
+        <item>@drawable/sleet</item>
+        <item>@drawable/snow</item>
     </integer-array>
 
     <integer-array name="AqiGrades">

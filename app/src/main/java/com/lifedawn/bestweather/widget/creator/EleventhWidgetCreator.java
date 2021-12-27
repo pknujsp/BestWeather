@@ -22,15 +22,11 @@ import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
-import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
-import com.lifedawn.bestweather.weathers.view.TextsView;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -252,7 +248,7 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 
 			String weatherSource = null;
 			int icon = 0;
-			if (weatherSourceType == WeatherSourceType.KMA) {
+			if (weatherSourceType == WeatherSourceType.KMA_WEB) {
 				weatherSource = context.getString(R.string.kma);
 				icon = R.drawable.kmaicon;
 			} else if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {

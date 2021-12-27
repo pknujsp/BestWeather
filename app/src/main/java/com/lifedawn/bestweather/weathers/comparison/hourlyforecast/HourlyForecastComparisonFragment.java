@@ -25,7 +25,9 @@ import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
+import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast.HourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.comparison.base.BaseForecastComparisonFragment;
@@ -33,7 +35,6 @@ import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.FragmentType;
@@ -80,7 +81,6 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 	private void setValuesToViews(HourlyForecastResponse hourlyForecastResponse) {
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
-		final int defaultValueRowHeight = (int) getResources().getDimension(R.dimen.defaultValueRowHeightInSC);
 
 		final List<WeatherSourceType> weatherSourceTypeList = new ArrayList<>();
 
@@ -89,23 +89,21 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		List<ForecastObj<HourlyForecastDto>> owmFinalHourlyForecasts = null;
 
 		if (hourlyForecastResponse.kmaSuccessful) {
-			List<HourlyForecastDto> hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoList(getContext(),
-					hourlyForecastResponse.kmaHourlyForecastList, latitude, longitude, windUnit, tempUnit);
+			List<HourlyForecastDto> hourlyForecastDtoList = hourlyForecastResponse.kmaHourlyForecastList;
 
 			kmaFinalHourlyForecasts = new ArrayList<>();
 			for (HourlyForecastDto finalHourlyForecast : hourlyForecastDtoList) {
 				kmaFinalHourlyForecasts.add(new ForecastObj<>(finalHourlyForecast.getHours(), finalHourlyForecast));
 			}
 
-			weatherSourceTypeList.add(WeatherSourceType.KMA);
+			weatherSourceTypeList.add(WeatherSourceType.KMA_WEB);
 			binding.kma.setVisibility(View.VISIBLE);
 		} else {
 			binding.kma.setVisibility(View.GONE);
 		}
 
 		if (hourlyForecastResponse.accuSuccessful) {
-			List<HourlyForecastDto> hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(),
-					hourlyForecastResponse.accuHourlyForecastsResponse.getItems(), windUnit, tempUnit, visibilityUnit);
+			List<HourlyForecastDto> hourlyForecastDtoList = hourlyForecastResponse.accuHourlyForecastList;
 			accuFinalHourlyForecasts = new ArrayList<>();
 			for (HourlyForecastDto finalHourlyForecast : hourlyForecastDtoList) {
 				accuFinalHourlyForecasts.add(new ForecastObj<>(finalHourlyForecast.getHours(), finalHourlyForecast));
@@ -118,8 +116,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		}
 
 		if (hourlyForecastResponse.owmSuccessful) {
-			List<HourlyForecastDto> hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(),
-					hourlyForecastResponse.owmOneCallResponse, windUnit, tempUnit, visibilityUnit);
+			List<HourlyForecastDto> hourlyForecastDtoList = hourlyForecastResponse.owmHourlyForecastList;
 			owmFinalHourlyForecasts = new ArrayList<>();
 
 			for (HourlyForecastDto finalHourlyForecast : hourlyForecastDtoList) {
@@ -193,7 +190,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			int specificRowWidth = 0;
 			int beginColumnIndex = 0;
 
-			if (weatherSourceTypeList.get(i) == WeatherSourceType.KMA) {
+			if (weatherSourceTypeList.get(i) == WeatherSourceType.KMA_WEB) {
 				specificRowWidth = kmaFinalHourlyForecasts.size() * columnWidth;
 
 				for (int idx = 0; idx < dateTimeList.size(); idx++) {
@@ -260,7 +257,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			List<String> snowVolumeList = new ArrayList<>();
 			boolean haveSnow = false;
 
-			if (weatherSourceTypeList.get(i) == WeatherSourceType.KMA) {
+			if (weatherSourceTypeList.get(i) == WeatherSourceType.KMA_WEB) {
 
 				for (ForecastObj<HourlyForecastDto> item : kmaFinalHourlyForecasts) {
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
@@ -355,7 +352,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			String sourceName;
 			int logoId;
 			switch (weatherSourceTypeList.get(i)) {
-				case KMA:
+				case KMA_WEB:
 					view = binding.kma;
 					sourceName = getString(R.string.kma);
 					logoId = R.drawable.kmaicon;
@@ -408,10 +405,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 		if (countryCode.equals("KR")) {
 			RequestKma requestKma = new RequestKma();
-			requestKma.addRequestServiceType(RetrofitClient.ServiceType.VILAGE_FCST).addRequestServiceType(
-					RetrofitClient.ServiceType.ULTRA_SRT_FCST);
-
-			request.put(WeatherSourceType.KMA, requestKma);
+			requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_FORECASTS);
+			request.put(WeatherSourceType.KMA_WEB, requestKma);
 		}
 
 		AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
@@ -455,9 +450,9 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap;
 		HourlyForecastResponse hourlyForecastResponse = new HourlyForecastResponse();
 
-		//kma
-		if (responseMap.containsKey(WeatherSourceType.KMA)) {
-			arrayMap = responseMap.get(WeatherSourceType.KMA);
+		//kma api
+		if (responseMap.containsKey(WeatherSourceType.KMA_API)) {
+			arrayMap = responseMap.get(WeatherSourceType.KMA_API);
 			MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponse = Objects.requireNonNull(arrayMap).get(
 					RetrofitClient.ServiceType.ULTRA_SRT_FCST);
 			MultipleRestApiDownloader.ResponseResult vilageFcstResponse = arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST);
@@ -470,16 +465,34 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 						(VilageFcstResponse) vilageFcstResponse.getResponseObj();
 
 				hourlyForecastResponse.kmaSuccessful = true;
-				hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(ultraSrtFcstRoot,
-						vilageFcstRoot);
+				hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.makeHourlyForecastDtoListOfXML(getContext(), KmaResponseProcessor.getFinalHourlyForecastListByXML(ultraSrtFcstRoot,
+						vilageFcstRoot), latitude, longitude, windUnit, tempUnit);
 			} else {
 				if (!ultraSrtFcstResponse.isSuccessful()) {
 					hourlyForecastResponse.kmaThrowable = ultraSrtFcstResponse.getT();
-				} else if (!vilageFcstResponse.isSuccessful()) {
+				} else {
 					hourlyForecastResponse.kmaThrowable = vilageFcstResponse.getT();
 				}
 			}
 		}
+
+		//kma web
+		if (responseMap.containsKey(WeatherSourceType.KMA_WEB)) {
+			arrayMap = responseMap.get(WeatherSourceType.KMA_WEB);
+			MultipleRestApiDownloader.ResponseResult forecastsResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_FORECASTS);
+
+			if (forecastsResponseResult.isSuccessful()) {
+				Object[] objects = (Object[]) forecastsResponseResult.getResponseObj();
+				List<KmaHourlyForecast> kmaHourlyForecasts = (List<KmaHourlyForecast>) objects[0];
+
+				hourlyForecastResponse.kmaSuccessful = true;
+				hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.makeHourlyForecastDtoListOfWEB(getContext(),
+						kmaHourlyForecasts, latitude, longitude, windUnit, tempUnit);
+			} else {
+				hourlyForecastResponse.kmaThrowable = forecastsResponseResult.getT();
+			}
+		}
+
 
 		//accu
 		if (responseMap.containsKey(WeatherSourceType.ACCU_WEATHER)) {
@@ -488,9 +501,12 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					RetrofitClient.ServiceType.ACCU_12_HOURLY);
 
 			if (accuHourlyForecastResponse.isSuccessful()) {
-				hourlyForecastResponse.accuSuccessful = true;
-				hourlyForecastResponse.accuHourlyForecastsResponse =
+				TwelveHoursOfHourlyForecastsResponse hourlyForecastsResponse =
 						(TwelveHoursOfHourlyForecastsResponse) accuHourlyForecastResponse.getResponseObj();
+
+				hourlyForecastResponse.accuSuccessful = true;
+				hourlyForecastResponse.accuHourlyForecastList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(),
+						hourlyForecastsResponse.getItems(), windUnit, tempUnit, visibilityUnit);
 			} else {
 				hourlyForecastResponse.accuThrowable = accuHourlyForecastResponse.getT();
 			}
@@ -502,8 +518,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.owmSuccessful = true;
-				hourlyForecastResponse.owmOneCallResponse =
-						(OneCallResponse) responseResult.getResponseObj();
+				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(),
+						(OneCallResponse) responseResult.getResponseObj(), windUnit, tempUnit, visibilityUnit);
 			} else {
 				hourlyForecastResponse.owmThrowable = responseResult.getT();
 			}
@@ -522,10 +538,10 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		}
 	}
 
-	static class HourlyForecastResponse {
-		List<FinalHourlyForecast> kmaHourlyForecastList;
-		TwelveHoursOfHourlyForecastsResponse accuHourlyForecastsResponse;
-		OneCallResponse owmOneCallResponse;
+	private static class HourlyForecastResponse {
+		List<HourlyForecastDto> kmaHourlyForecastList;
+		List<HourlyForecastDto> accuHourlyForecastList;
+		List<HourlyForecastDto> owmHourlyForecastList;
 
 		boolean kmaSuccessful;
 		boolean accuSuccessful;

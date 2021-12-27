@@ -54,7 +54,7 @@ public class WindUtil {
 		}
 	}
 
-	public static String windDirection(Context context, String degree) {
+	public static String parseWindDirectionDegreeAsStr(Context context, String degree) {
 		final int convertedToSixteen = (int) ((Integer.parseInt(degree) + 22.5 * 0.5) / 22.5);
 		switch (convertedToSixteen) {
 			case 1:
@@ -104,6 +104,110 @@ public class WindUtil {
 
 			default:
 				return context.getString(R.string.wind_direction_N);
+		}
+	}
+
+	public static String parseWindDirectionStrAsStr(Context context, String degree) {
+		switch (degree) {
+			case "북북동":
+				return context.getString(R.string.wind_direction_NNE);
+
+			case "북동":
+				return context.getString(R.string.wind_direction_NE);
+
+			case "동북동":
+				return context.getString(R.string.wind_direction_ENE);
+
+			case "동":
+				return context.getString(R.string.wind_direction_E);
+
+			case "동남동":
+				return context.getString(R.string.wind_direction_ESE);
+
+			case "남동":
+				return context.getString(R.string.wind_direction_SE);
+
+			case "남남동":
+				return context.getString(R.string.wind_direction_SSE);
+
+			case "남":
+				return context.getString(R.string.wind_direction_S);
+
+			case "남남서":
+				return context.getString(R.string.wind_direction_SSW);
+
+			case "남서":
+				return context.getString(R.string.wind_direction_SW);
+
+			case "서남서":
+				return context.getString(R.string.wind_direction_WSW);
+
+			case "서":
+				return context.getString(R.string.wind_direction_W);
+
+			case "서북서":
+				return context.getString(R.string.wind_direction_WNW);
+
+			case "북서":
+				return context.getString(R.string.wind_direction_NW);
+
+			case "북북서":
+				return context.getString(R.string.wind_direction_NNW);
+
+			default:
+				return context.getString(R.string.wind_direction_N);
+		}
+	}
+
+	public static int parseWindDirectionStrAsInt(String degree) {
+		switch (degree) {
+			case "북북동":
+				return 25;
+
+			case "북동":
+				return 45;
+
+			case "동북동":
+				return 67;
+
+			case "동":
+				return 90;
+
+			case "동남동":
+				return 112;
+
+			case "남동":
+				return 135;
+
+			case "남남동":
+				return 157;
+
+			case "남":
+				return 180;
+
+			case "남남서":
+				return 202;
+
+			case "남서":
+				return 225;
+
+			case "서남서":
+				return 247;
+
+			case "서":
+				return 270;
+
+			case "서북서":
+				return 292;
+
+			case "북서":
+				return 315;
+
+			case "북북서":
+				return 337;
+
+			default:
+				return 0;
 		}
 	}
 }

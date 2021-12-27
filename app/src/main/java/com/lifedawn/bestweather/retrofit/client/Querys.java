@@ -15,7 +15,7 @@ import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 
 public interface Querys {
-	// kma
+	// kma api xml--------------------------------------------
 	@GET("getUltraSrtNcst")
 	Call<String> getUltraSrtNcstByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
 
@@ -33,6 +33,13 @@ public interface Querys {
 
 	@GET("getMidTa")
 	Call<String> getMidTaByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
+
+	// kma html -----------------------------------------------
+	@GET("current-weather.do")
+	Call<String> getKmaCurrentConditions(@QueryMap(encoded = true) Map<String, String> queryMap);
+
+	@GET("digital-forecast.do")
+	Call<String> getKmaHourlyAndDailyForecast(@QueryMap(encoded = true) Map<String, String> queryMap);
 
 	//accu weather
 	/* http://dataservice.accuweather.com/locations/v1/cities/geoposition/

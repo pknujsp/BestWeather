@@ -125,7 +125,7 @@ public class WeatherForAlarmFragment extends Fragment {
 		boolean successful = false;
 
 		switch (requestWeatherSourceType) {
-			case KMA:
+			case KMA_WEB:
 				MultipleRestApiDownloader.ResponseResult ultraSrtNcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
 				MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
 				MultipleRestApiDownloader.ResponseResult vilageFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST);
@@ -232,14 +232,14 @@ public class WeatherForAlarmFragment extends Fragment {
 		}
 
 		switch (weatherSourceType) {
-			case KMA:
+			case KMA_WEB:
 				MultipleRestApiDownloader.ResponseResult ultraSrtNcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
 				MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
 				MultipleRestApiDownloader.ResponseResult vilageFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST);
 
-				FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditions(
+				FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditionsByXML(
 						(VilageFcstResponse) ultraSrtNcstResponseResult.getResponseObj());
-				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
+				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastListByXML(
 						(VilageFcstResponse) ultraSrtFcstResponseResult.getResponseObj(),
 						(VilageFcstResponse) vilageFcstResponseResult.getResponseObj());
 
@@ -345,11 +345,11 @@ public class WeatherForAlarmFragment extends Fragment {
 		BaseSimpleForecastFragment hourlyForecastFragment = null;
 
 		switch (weatherSourceType) {
-			case KMA:
+			case KMA_WEB:
 				MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
 				MultipleRestApiDownloader.ResponseResult vilageFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST);
 
-				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastList(
+				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastListByXML(
 						(VilageFcstResponse) ultraSrtFcstResponseResult.getResponseObj(),
 						(VilageFcstResponse) vilageFcstResponseResult.getResponseObj());
 

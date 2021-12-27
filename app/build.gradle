@@ -74,6 +74,7 @@ dependencies {
 
     annotationProcessor 'com.tickaroo.tikxml:processor:0.8.13'
     implementation 'com.tickaroo.tikxml:retrofit-converter:0.8.13'
+    implementation 'org.jsoup:jsoup:1.14.3'
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }
