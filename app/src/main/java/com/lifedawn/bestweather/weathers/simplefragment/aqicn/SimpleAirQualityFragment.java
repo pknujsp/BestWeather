@@ -200,17 +200,22 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 		LayoutInflater layoutInflater = LayoutInflater.from(getContext());
 
-		View labelView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
-		((TextView) labelView.findViewById(R.id.date)).setText(null);
-		((TextView) labelView.findViewById(R.id.pm10)).setText(getString(R.string.pm10_str));
-		((TextView) labelView.findViewById(R.id.pm25)).setText(getString(R.string.pm25_str));
-		((TextView) labelView.findViewById(R.id.o3)).setText(getString(R.string.o3_str));
-		binding.forecast.addView(labelView);
-
-
 		List<AirQualityForecastObj> forecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(geolocalizedFeedResponse,
 				zoneId);
 		final int textColor = AppTheme.getColor(getContext(), R.attr.textColorInWeatherCard);
+
+		View labelView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
+		((TextView) labelView.findViewById(R.id.date)).setVisibility(View.INVISIBLE);
+		((TextView) labelView.findViewById(R.id.pm10)).setText(getString(R.string.pm10_str));
+		((TextView) labelView.findViewById(R.id.pm25)).setText(getString(R.string.pm25_str));
+		((TextView) labelView.findViewById(R.id.o3)).setText(getString(R.string.o3_str));
+
+		((TextView) labelView.findViewById(R.id.date)).setTextColor(textColor);
+		((TextView) labelView.findViewById(R.id.pm10)).setTextColor(textColor);
+		((TextView) labelView.findViewById(R.id.pm25)).setTextColor(textColor);
+		((TextView) labelView.findViewById(R.id.o3)).setTextColor(textColor);
+		binding.forecast.addView(labelView);
+
 		for (AirQualityForecastObj forecastObj : forecastObjList) {
 
 			View forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);

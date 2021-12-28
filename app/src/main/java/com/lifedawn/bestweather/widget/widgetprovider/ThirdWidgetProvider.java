@@ -179,7 +179,6 @@ public class ThirdWidgetProvider extends AbstractAppWidgetProvider {
 
 		final WeatherSourceType weatherSourceType = WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherSourceTypeSet);
 
-
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
 				weatherSourceType);
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
@@ -200,7 +199,7 @@ public class ThirdWidgetProvider extends AbstractAppWidgetProvider {
 
 			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
 					zoneOffset);
-			if (airQualityDto != null) {
+			if (airQualityDto == null) {
 				airQualityDto = new AirQualityDto();
 				airQualityDto.setAqi(-1);
 			}

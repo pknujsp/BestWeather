@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 
 import androidx.room.TypeConverter;
 
+import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 
 import java.io.ByteArrayOutputStream;
@@ -57,5 +58,41 @@ public class RoomTypeConverter {
 			weatherSourceTypeSet.add(WeatherSourceType.valueOf(type));
 		}
 		return weatherSourceTypeSet;
+	}
+
+	@TypeConverter
+	public String toString(WeatherSourceType weatherSourceType) {
+		if (weatherSourceType != null) {
+			return weatherSourceType.name();
+		} else {
+			return null;
+		}
+	}
+
+	@TypeConverter
+	public WeatherSourceType toWeatherSourceType(String weatherSourceType) {
+		if (weatherSourceType != null) {
+			return WeatherSourceType.valueOf(weatherSourceType);
+		} else {
+			return null;
+		}
+	}
+
+	@TypeConverter
+	public String toString(LocationType locationType) {
+		if (locationType != null) {
+			return locationType.name();
+		} else {
+			return null;
+		}
+	}
+
+	@TypeConverter
+	public LocationType toLocationType(String locationType) {
+		if (locationType != null) {
+			return LocationType.valueOf(locationType);
+		} else {
+			return null;
+		}
 	}
 }

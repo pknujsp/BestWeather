@@ -36,6 +36,23 @@ public class KmaWebParser {
 		//4.8℃ 최저-최고-
 		String temp = spans.get(3).textNodes().get(0).text().replace(" ", "");
 
+		//1일전 기온
+		String yesterdayTemp = wrap1.select("li.w-txt").text().replace(" ", "");
+		if (yesterdayTemp.contains("℃")) {
+			String t = yesterdayTemp.replace("어제보다", "").replace("높아요", "")
+					.replace("낮아요", "").replace("℃", "");
+			Double currentTempVal = Double.parseDouble(temp);
+			Double yesterdayTempVal = Double.parseDouble(t);
+			if (yesterdayTemp.contains("높아요")) {
+				yesterdayTempVal = currentTempVal - yesterdayTempVal;
+			} else if (yesterdayTemp.contains("낮아요")) {
+				yesterdayTempVal = currentTempVal + yesterdayTempVal;
+			}
+			yesterdayTemp = yesterdayTempVal.toString();
+		} else {
+			yesterdayTemp = temp;
+		}
+
 		//체감(4.8℃)
 		String chill = spans.select(".chill").text();
 		chill = chill.substring(3, chill.length() - 2).replace(" ", "");
@@ -55,13 +72,13 @@ public class KmaWebParser {
 
 		String precipitationVolume = spans2.get(2).text().replace(" ", "");
 		if (precipitationVolume.contains("-")) {
-			precipitationVolume = "0.0";
+			precipitationVolume = "0.0mm";
 		}
 
 		KmaCurrentConditions kmaCurrentConditions = new KmaCurrentConditions();
 		kmaCurrentConditions.setTemp(temp).setFeelsLikeTemp(chill).setHumidity(humidity).setPty(pty)
 				.setWindDirection(windDirection).setWindSpeed(windSpeed).setPrecipitationVolume(precipitationVolume)
-				.setBaseDateTime(baseDateTime);
+				.setBaseDateTime(baseDateTime).setYesterdayTemp(yesterdayTemp);
 		return kmaCurrentConditions;
 	}
 

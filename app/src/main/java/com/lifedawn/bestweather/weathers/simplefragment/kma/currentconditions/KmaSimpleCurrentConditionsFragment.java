@@ -103,22 +103,22 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 		binding.tempUnit.setText(tempUnitStr);
 		binding.feelsLikeTempUnit.setText(tempUnitStr);
 
-		if (yesterdayFinalCurrentConditions != null) {
-			int yesterdayTemp = ValueUnits.convertTemperature(yesterdayFinalCurrentConditions.getTemperature(), tempUnit);
-			int todayTemp = Integer.parseInt(currentTemp);
 
-			if (yesterdayTemp == todayTemp) {
-				binding.tempDescription.setText(R.string.TheTemperatureIsTheSameAsYesterday);
+		int yesterdayTemp = ValueUnits.convertTemperature(yesterdayFinalCurrentConditions == null ? kmaCurrentConditions.getYesterdayTemp()
+				: yesterdayFinalCurrentConditions.getTemperature(), tempUnit);
+		int todayTemp = Integer.parseInt(currentTemp);
+
+		if (yesterdayTemp == todayTemp) {
+			binding.tempDescription.setText(R.string.TheTemperatureIsTheSameAsYesterday);
+		} else {
+			String text = getString(R.string.thanYesterday);
+
+			if (todayTemp > yesterdayTemp) {
+				text += " " + (todayTemp - yesterdayTemp) + "° " + getString(R.string.higherTemperature);
 			} else {
-				String text = getString(R.string.thanYesterday);
-
-				if (todayTemp > yesterdayTemp) {
-					text += " " + (todayTemp - yesterdayTemp) + "° " + getString(R.string.higherTemperature);
-				} else {
-					text += " " + (yesterdayTemp - todayTemp) + "° " + getString(R.string.lowerTemperature);
-				}
-				binding.tempDescription.setText(text);
+				text += " " + (yesterdayTemp - todayTemp) + "° " + getString(R.string.lowerTemperature);
 			}
+			binding.tempDescription.setText(text);
 		}
 	}
 }

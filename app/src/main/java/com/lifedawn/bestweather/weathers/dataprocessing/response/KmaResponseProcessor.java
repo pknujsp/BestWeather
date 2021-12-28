@@ -1064,8 +1064,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		}
 		currentConditionsDto.setPrecipitationType(getWeatherPtyIconDescription(currentPtyCode));
 
-		if (!kmaCurrentConditions.getPrecipitationVolume().equals("-")) {
-			currentConditionsDto.setPrecipitationVolume(kmaCurrentConditions.getPrecipitationVolume() + "mm");
+		if (!kmaCurrentConditions.getPrecipitationVolume().contains("-") && !kmaCurrentConditions.getPrecipitationVolume().contains("0.0")) {
+			currentConditionsDto.setPrecipitationVolume(kmaCurrentConditions.getPrecipitationVolume());
 		}
 
 		return currentConditionsDto;

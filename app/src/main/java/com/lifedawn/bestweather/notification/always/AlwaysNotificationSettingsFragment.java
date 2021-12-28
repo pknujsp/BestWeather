@@ -62,9 +62,7 @@ public class AlwaysNotificationSettingsFragment extends BaseNotificationSettings
 		super.onViewCreated(view, savedInstanceState);
 		binding.toolbar.fragmentTitle.setText(R.string.always_notification);
 		binding.notificationSwitch.setText(R.string.use_always_notification);
-		binding.commons.alarmClock.setVisibility(View.GONE);
-		binding.commons.alarmClockLabel.setVisibility(View.GONE);
-
+		binding.commons.multipleWeatherDataSourceLayout.setVisibility(View.GONE);
 		binding.notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

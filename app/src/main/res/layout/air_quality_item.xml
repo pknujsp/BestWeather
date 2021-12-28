@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/label_icon"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="6dp"
@@ -41,7 +41,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/value_int"
-        style="@style/text_shadow_black"
         android:layout_alignLeft="@id/label"
         android:text="@string/aqi_1_good"
         android:textColor="@color/black"

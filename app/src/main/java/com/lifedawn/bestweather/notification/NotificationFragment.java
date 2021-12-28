@@ -16,7 +16,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.AlarmListFragment;
 import com.lifedawn.bestweather.databinding.FragmentNotificationBinding;
 import com.lifedawn.bestweather.notification.always.AlwaysNotificationSettingsFragment;
-import com.lifedawn.bestweather.notification.daily.DailyNotificationSettingsFragment;
+import com.lifedawn.bestweather.notification.daily.fragment.DailyNotificationSettingsFragment;
 
 import org.jetbrains.annotations.NotNull;
 

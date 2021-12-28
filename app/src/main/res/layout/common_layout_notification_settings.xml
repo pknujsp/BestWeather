@@ -57,40 +57,79 @@
 
         </RadioGroup>
 
-
-        <TextView
-            style="@style/SettingsLabel"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/pref_title_weather_data_sources" />
+            android:id="@+id/singleWeatherDataSourceLayout"
+            android:orientation="vertical">
 
-        <RadioGroup
-            android:id="@+id/weather_data_source_radio_group"
-            style="@style/WidgetConfigureConfig"
+            <TextView
+                style="@style/SettingsLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pref_title_weather_data_sources" />
+
+            <RadioGroup
+                android:id="@+id/weather_data_source_radio_group"
+                style="@style/WidgetConfigureConfig"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:id="@+id/accu_weather_radio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/accu_weather" />
+
+                <RadioButton
+                    android:id="@+id/owm_radio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owm" />
+
+            </RadioGroup>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/kma_top_priority_switch"
+                style="@style/SettingsLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="@string/pref_title_kma_top_priority" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/multipleWeatherDataSourceLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <RadioButton
-                android:id="@+id/accu_weather_radio"
+            <TextView
+                style="@style/SettingsLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pref_title_weather_data_sources" />
+
+
+            <CheckBox
+                android:id="@+id/accu_weather_chk"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/accu_weather" />
 
-            <RadioButton
-                android:id="@+id/owm_radio"
+            <CheckBox
+                android:id="@+id/owm_chk"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/owm" />
 
-        </RadioGroup>
+            <CheckBox
+                android:id="@+id/kma_chk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/kma" />
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/kma_top_priority_switch"
-            style="@style/SettingsLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checked="false"
-            android:text="@string/pref_title_kma_top_priority" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/autoRefreshIntervalLabel"
@@ -104,24 +143,6 @@
             style="@style/WidgetConfigureConfig"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/alarmClockLabel"
-            style="@style/SettingsLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/alarmClock" />
-
-        <TextView
-            android:id="@+id/alarmClock"
-            style="@style/SettingsLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:text="08:00"
-            android:textColor="@color/blue" />
 
     </LinearLayout>
 </layout>

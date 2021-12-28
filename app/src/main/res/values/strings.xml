@@ -568,6 +568,9 @@
     <string name="feelsLike">체감</string>
     <string name="notSelectedDefaultWeatherSource">기본 날씨 제공사가 선택되지 않았습니다</string>
     <string name="noWindData">바람 정보 없음</string>
+    <string name="registeredDailyNotification">일일 알림 등록되었습니다</string>
+    <string name="save">저장</string>
+    <string name="currentAirQuality">현재 대기질</string>
 
 
 </resources>

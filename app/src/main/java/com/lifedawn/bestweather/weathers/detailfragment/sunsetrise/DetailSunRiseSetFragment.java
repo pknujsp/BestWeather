@@ -106,10 +106,10 @@ public class DetailSunRiseSetFragment extends Fragment {
 		binding.chart.getAxisRight().setValueFormatter(new TimeFormatter());
 
 		XAxis xAxis = binding.chart.getXAxis();
-		xAxis.setPosition(XAxis.XAxisPosition.BOTH_SIDED);
+		xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 		xAxis.setDrawGridLines(false);
 		xAxis.setDrawAxisLine(false);
-		xAxis.setTextSize(12f);
+		xAxis.setTextSize(13f);
 		xAxis.setCenterAxisLabels(false);
 		xAxis.setLabelCount(12);
 		xAxis.setGranularity(1f);
@@ -169,7 +169,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 					BarDataSet barDataSet = new BarDataSet(sunRiseSetTimeDataList, "sunRiseSet");
 					barDataSet.setDrawIcons(false);
 					barDataSet.setValueFormatter(new TimeFormatter());
-					barDataSet.setValueTextSize(12f);
+					barDataSet.setValueTextSize(13f);
 					barDataSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
 
 					barDataSet.setColors(barColors);

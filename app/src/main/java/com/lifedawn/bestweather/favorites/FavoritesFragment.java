@@ -39,6 +39,7 @@ import com.lifedawn.bestweather.databinding.ViewSearchBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
 import com.lifedawn.bestweather.notification.BaseNotificationSettingsFragment;
+import com.lifedawn.bestweather.notification.daily.fragment.DailyNotificationSettingsFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
@@ -90,7 +91,8 @@ public class FavoritesFragment extends Fragment {
 					checkHaveLocations();
 				} else if (requestFragment.equals(ConfigureWidgetActivity.class.getName()) ||
 						requestFragment.equals(BaseNotificationSettingsFragment.class.getName()) ||
-						requestFragment.equals(AlarmSettingsFragment.class.getName())) {
+						requestFragment.equals(AlarmSettingsFragment.class.getName()) ||
+						requestFragment.equals(DailyNotificationSettingsFragment.class.getName())) {
 					if (!clickedItem) {
 						Bundle bundle = new Bundle();
 						bundle.putSerializable(BundleKey.SelectedAddressDto.name(), null);
@@ -374,7 +376,8 @@ public class FavoritesFragment extends Fragment {
 	private void onClickedItem(FavoriteAddressDto favoriteAddressDto) {
 		if (requestFragment.equals(ConfigureWidgetActivity.class.getName()) ||
 				requestFragment.equals(BaseNotificationSettingsFragment.class.getName()) ||
-				requestFragment.equals(AlarmSettingsFragment.class.getName())) {
+				requestFragment.equals(AlarmSettingsFragment.class.getName()) ||
+				requestFragment.equals(DailyNotificationSettingsFragment.class.getName())) {
 			Bundle bundle = new Bundle();
 			bundle.putSerializable(BundleKey.SelectedAddressDto.name(), favoriteAddressDto);
 			onResultFragmentListener.onResultFragment(bundle);

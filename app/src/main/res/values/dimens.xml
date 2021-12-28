@@ -144,10 +144,10 @@
     <dimen name="fifthWidgetWidth">320dp</dimen>
     <dimen name="fifthWidgetHeight">110dp</dimen>
 
-    <dimen name="sixthWidgetWidth">250dp</dimen>
+    <dimen name="sixthWidgetWidth">320dp</dimen>
     <dimen name="sixthWidgetHeight">180dp</dimen>
 
-    <dimen name="seventhWidgetWidth">250dp</dimen>
+    <dimen name="seventhWidgetWidth">320dp</dimen>
     <dimen name="seventhWidgetHeight">180dp</dimen>
 
     <dimen name="eighthWidgetWidth">320dp</dimen>
@@ -203,5 +203,6 @@
     <dimen name="windDirectionTextSizeInEighthWidget">13sp</dimen>
     <dimen name="feelsLikeTempTextSizeInEighthWidget">16sp</dimen>
     <dimen name="windSpeedTextSizeInEighthWidget">13sp</dimen>
+    <dimen name="notificationPadding">8dp</dimen>
 
 </resources>

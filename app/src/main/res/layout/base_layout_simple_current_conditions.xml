@@ -80,7 +80,7 @@
                     android:fontFamily="sans-serif-thin"
                     android:includeFontPadding="false"
                     android:text="-20"
-                    android:textSize="80sp" />
+                    android:textSize="86sp" />
 
                 <TextView
                     android:id="@+id/tempUnit"

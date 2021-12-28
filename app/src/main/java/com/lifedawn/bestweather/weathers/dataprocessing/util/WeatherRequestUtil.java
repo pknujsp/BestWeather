@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.util.ArrayMap;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
@@ -135,7 +136,7 @@ public class WeatherRequestUtil {
 		}
 	}
 
-	public static WeatherSourceType getMainWeatherSourceType(Context context, @NonNull String countryCode) {
+	public static WeatherSourceType getMainWeatherSourceType(Context context, @Nullable String countryCode) {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		WeatherSourceType mainWeatherSourceType = null;
 
@@ -145,10 +146,12 @@ public class WeatherRequestUtil {
 			mainWeatherSourceType = WeatherSourceType.OPEN_WEATHER_MAP;
 		}
 
-		if (countryCode.equals("KR")) {
-			boolean kmaIsTopPriority = sharedPreferences.getBoolean(context.getString(R.string.pref_key_kma_top_priority), true);
-			if (kmaIsTopPriority) {
-				mainWeatherSourceType = WeatherSourceType.KMA_WEB;
+		if (countryCode != null) {
+			if (countryCode.equals("KR")) {
+				boolean kmaIsTopPriority = sharedPreferences.getBoolean(context.getString(R.string.pref_key_kma_top_priority), true);
+				if (kmaIsTopPriority) {
+					mainWeatherSourceType = WeatherSourceType.KMA_WEB;
+				}
 			}
 		}
 

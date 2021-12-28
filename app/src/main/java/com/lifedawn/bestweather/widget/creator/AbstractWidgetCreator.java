@@ -270,8 +270,8 @@ public abstract class AbstractWidgetCreator {
 				JsonObject kmaJsonObject = new JsonObject();
 
 				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_FORECASTS).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_FORECASTS.name(), text);
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS).getResponseText();
+					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS.name(), text);
 				}
 				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast) || requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
 					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_FORECASTS).getResponseText();

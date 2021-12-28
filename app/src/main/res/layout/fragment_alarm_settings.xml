@@ -14,8 +14,7 @@
 
             <include
                 android:id="@+id/toolbar"
-                layout="@layout/toolbar"
-      />
+                layout="@layout/toolbar" />
 
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/root_scroll_View"
@@ -176,8 +175,8 @@
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/alarmVibartor"
-                        android:layout_width="match_parent"
                         style="@style/Switch"
+                        android:layout_width="match_parent"
                         android:layout_marginBottom="12dp"
                         android:text="@string/alarmVibration" />
 

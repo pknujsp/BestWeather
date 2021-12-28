@@ -9,7 +9,7 @@
         android:id="@+id/measuring_station_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp"
+        android:layout_marginBottom="4dp"
         android:text="@string/measuring_station_name"
         android:textColor="@color/widgetTextColor"
         android:textSize="@dimen/stationNameTextSizeInSixthWidget" />

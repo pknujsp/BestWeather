@@ -41,6 +41,7 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 	private int snowVolumeTextSize;
 
 	private final int hourGap = 3;
+	private final int maxHoursCount = 13;
 
 	public NinthWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
@@ -125,20 +126,29 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 		//강우, 강설 여부 확인
 		boolean haveSnowVolume = false;
 		boolean haveRainVolume = false;
+		int count = 1;
 		int cell = 0;
 		for (; cell < hourlyForecastDtoList.size(); cell = cell + hourGap) {
+			if (count > maxHoursCount) {
+				break;
+			}
 			if (hourlyForecastDtoList.get(cell).isHasSnow()) {
 				haveSnowVolume = true;
 			}
 			if (hourlyForecastDtoList.get(cell).isHasRain()) {
 				haveRainVolume = true;
 			}
+			count++;
 		}
 
 		final String mm = "mm";
 		final String cm = "cm";
+		count = 1;
 
 		for (cell = 0; cell < hourlyForecastDtoList.size(); cell = cell + hourGap) {
+			if (count++ > maxHoursCount) {
+				break;
+			}
 			View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
 
 			if (hourlyForecastDtoList.get(cell).getHours().getHour() == 0) {
@@ -194,7 +204,7 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
+		WeatherSourceType weatherSourceType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherSourceType = WeatherSourceType.KMA_WEB;

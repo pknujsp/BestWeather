@@ -13,4 +13,5 @@
     <item name="hourAndIconView" type="id" />
     <item name="currentConditions" type="id" />
     <item name="hoursRow" type="id" />
+    <item name="datesRow" type="id" />
 </resources>

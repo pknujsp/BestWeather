@@ -46,7 +46,7 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 	private int currentTempTextSize;
 	private int currentAirQualityLabelTextSize;
 
-	private final int cellCount = 6;
+	private final int cellCount = 7;
 
 	public SecondWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);

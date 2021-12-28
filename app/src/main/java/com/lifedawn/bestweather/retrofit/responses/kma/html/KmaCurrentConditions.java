@@ -4,6 +4,7 @@ public class KmaCurrentConditions
 {
     private String baseDateTime;
     private String temp;
+    private String yesterdayTemp;
     private String feelsLikeTemp;
     private String humidity;
     private String windDirection;
@@ -17,6 +18,15 @@ public class KmaCurrentConditions
 
     public KmaCurrentConditions setPty(String pty) {
         this.pty = pty;
+        return this;
+    }
+
+    public String getYesterdayTemp() {
+        return yesterdayTemp;
+    }
+
+    public KmaCurrentConditions setYesterdayTemp(String yesterdayTemp) {
+        this.yesterdayTemp = yesterdayTemp;
         return this;
     }
 

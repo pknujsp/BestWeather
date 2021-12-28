@@ -6,9 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.core.app.AlarmManagerCompat;
+
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.notification.NotificationReceiver;
-import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.alarm.AlarmReceiver;
+import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 
 import java.time.LocalTime;
 import java.util.Calendar;
@@ -22,34 +25,41 @@ public class DailyNotiHelper {
 		alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 	}
 
-	public PendingIntent getRefreshPendingIntent() {
-		Intent refreshIntent = new Intent(context, NotificationReceiver.class);
+	public PendingIntent getRefreshPendingIntent(int id) {
+		Intent refreshIntent = new Intent(context, DailyPushNotificationReceiver.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 		Bundle bundle = new Bundle();
-		bundle.putString(NotificationType.class.getName(), NotificationType.Daily.name());
+		bundle.putInt(BundleKey.dtoId.name(), id);
 
 		refreshIntent.putExtras(bundle);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 20, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id + 6000, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
 	}
 
-	public void setAlarm(String alarmClock) {
-		LocalTime localTime = LocalTime.parse(alarmClock);
+	public void enablePushNotification(DailyPushNotificationDto dailyPushNotificationDto) {
+		LocalTime localTime = LocalTime.parse(dailyPushNotificationDto.getAlarmClock());
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.HOUR_OF_DAY, localTime.getHour());
 		calendar.set(Calendar.MINUTE, localTime.getMinute());
 		calendar.set(Calendar.SECOND, 0);
 
-		alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-				AlarmManager.INTERVAL_DAY, getRefreshPendingIntent());
+		AlarmManagerCompat.setExactAndAllowWhileIdle(alarmManager, AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), getRefreshPendingIntent(dailyPushNotificationDto.getId()));
 	}
 
-	public void cancelAlarm() {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 20, new Intent(context, NotificationReceiver.class), 0);
+	public void disablePushNotification(int id) {
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id + 6000, new Intent(context, DailyPushNotificationReceiver.class), 0);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();
+		}
+	}
+
+	public void modifyPushNotification(DailyPushNotificationDto dailyPushNotificationDto) {
+		disablePushNotification(dailyPushNotificationDto.getId());
+
+		if (dailyPushNotificationDto.isEnabled()) {
+			enablePushNotification(dailyPushNotificationDto);
 		}
 	}
 

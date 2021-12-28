@@ -252,6 +252,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 
 			if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 				if (weatherSourceTypeSet.size() == 1) {
+					weatherSourceTypeSet.clear();
 					weatherSourceTypeSet.add(WeatherSourceType.KMA_WEB);
 				}
 			}
