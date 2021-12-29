@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.notification.daily.fragment;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -10,8 +11,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
+import android.widget.RemoteViews;
+import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -24,6 +29,14 @@ import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentDailyPushNotificationSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.notification.daily.DailyNotiHelper;
+import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
+import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
+import com.lifedawn.bestweather.notification.daily.viewcreator.FifthDailyNotificationViewCreator;
+import com.lifedawn.bestweather.notification.daily.viewcreator.FirstDailyNotificationViewCreator;
+import com.lifedawn.bestweather.notification.daily.viewcreator.FourthDailyNotificationViewCreator;
+import com.lifedawn.bestweather.notification.daily.viewcreator.SecondDailyNotificationViewCreator;
+import com.lifedawn.bestweather.notification.daily.viewcreator.ThirdDailyNotificationViewCreator;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.Weather;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -34,12 +47,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
 
 public class DailyNotificationSettingsFragment extends Fragment {
-	private final DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a hh:mm");
+	private final DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a h:mm");
 
 	private FragmentDailyPushNotificationSettingsBinding binding;
 	private DailyNotiHelper dailyNotiHelper;
@@ -80,6 +94,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			newNotificationDto.setEnabled(true);
 			newNotificationDto.setAlarmClock(LocalTime.of(8, 0).toString());
 			newNotificationDto.addWeatherSourceType(mainWeatherSourceType);
+			newNotificationDto.setNotificationType(DailyPushNotificationType.First);
 
 			editingNotificationDto = newNotificationDto;
 		} else {
@@ -101,10 +116,10 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		binding.toolbar.fragmentTitle.setText(R.string.daily_notification);
 
-		binding.commons.multipleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
+		binding.commons.multipleWeatherDataSourceLayout.setVisibility(View.GONE);
 		binding.commons.autoRefreshIntervalSpinner.setVisibility(View.GONE);
 		binding.commons.autoRefreshIntervalLabel.setVisibility(View.GONE);
-		binding.commons.singleWeatherDataSourceLayout.setVisibility(View.GONE);
+		binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -154,11 +169,6 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 
-				if (!binding.commons.accuWeatherChk.isChecked() && !binding.commons.owmChk.isChecked()
-						&& !binding.commons.kmaChk.isChecked()) {
-					Toast.makeText(getContext(), R.string.notSelectedDefaultWeatherSource, Toast.LENGTH_SHORT).show();
-					return;
-				}
 
 				if (newNotificationSession) {
 					repository.add(newNotificationDto, new DbQueryCallback<DailyPushNotificationDto>() {
@@ -204,6 +214,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 
 		initLocation();
 		initWeatherDataSource();
+		initNotificationTypeSpinner();
 	}
 
 	@Override
@@ -222,52 +233,113 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			}
 
 		}
+		binding.notificationTypesSpinner.setSelection(editingNotificationDto.getNotificationType().getIndex());
+
 		LocalTime localTime = LocalTime.parse(editingNotificationDto.getAlarmClock());
 		binding.hours.setText(localTime.format(hoursFormatter));
 
 		Set<WeatherSourceType> weatherSourceTypeSet = editingNotificationDto.getWeatherSourceTypeSet();
 		if (weatherSourceTypeSet.contains(WeatherSourceType.OPEN_WEATHER_MAP)) {
-			binding.commons.owmChk.setChecked(true);
-		}
-		if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
-			binding.commons.accuWeatherChk.setChecked(true);
-		}
-		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA_WEB)) {
-			binding.commons.kmaChk.setChecked(true);
+			binding.commons.owmRadio.setChecked(true);
+		} else if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
+			binding.commons.accuWeatherRadio.setChecked(true);
+		} else {
+			if (mainWeatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+				binding.commons.accuWeatherRadio.setChecked(true);
+			} else {
+				binding.commons.owmRadio.setChecked(true);
+			}
 		}
 
 		initializing = false;
 	}
 
-	protected void initWeatherDataSource() {
-		binding.commons.accuWeatherChk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+	private void initNotificationTypeSpinner() {
+		final String[] notificationTypes = getResources().getStringArray(R.array.DailyPushNotificationType);
+
+		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, notificationTypes);
+		binding.notificationTypesSpinner.setAdapter(spinnerAdapter);
+
+		binding.notificationTypesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (isChecked) {
-					editingNotificationDto.addWeatherSourceType(WeatherSourceType.ACCU_WEATHER);
-				} else {
-					editingNotificationDto.removeWeatherSourceType(WeatherSourceType.ACCU_WEATHER);
-				}
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				onSelectedNotificationType(position);
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
 			}
 		});
-		binding.commons.owmChk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+	}
+
+	private void onSelectedNotificationType(int position) {
+		DailyPushNotificationType dailyPushNotificationType = DailyPushNotificationType.valueOf(position);
+		Context context = getActivity().getApplicationContext();
+		AbstractDailyNotiViewCreator viewCreator = null;
+
+		switch (dailyPushNotificationType) {
+			case First:
+				//시간별 예보
+				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
+				viewCreator = new FirstDailyNotificationViewCreator(context);
+				break;
+			case Second:
+				//현재날씨
+				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
+				viewCreator = new SecondDailyNotificationViewCreator(context);
+				break;
+			case Third:
+				//일별 예보
+				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
+				viewCreator = new ThirdDailyNotificationViewCreator(context);
+				break;
+			case Fourth:
+				//현재 대기질
+				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.GONE);
+				viewCreator = new FourthDailyNotificationViewCreator(context);
+				break;
+			default:
+				//대기질 예보
+				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.GONE);
+				viewCreator = new FifthDailyNotificationViewCreator(context);
+				break;
+		}
+
+		RemoteViews remoteViews = viewCreator.createRemoteViews(true);
+		View previewWidgetView = remoteViews.apply(context, binding.previewLayout);
+		binding.previewLayout.addView(previewWidgetView);
+
+		editingNotificationDto.setNotificationType(dailyPushNotificationType);
+		if (editingNotificationDto.getNotificationType() == DailyPushNotificationType.Fourth
+				|| editingNotificationDto.getNotificationType() == DailyPushNotificationType.Fifth) {
+			Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
+			weatherSourceTypeSet.add(WeatherSourceType.AQICN);
+			editingNotificationDto.setWeatherSourceTypeSet(weatherSourceTypeSet);
+		} else if (editingNotificationDto.getNotificationType() == DailyPushNotificationType.Second) {
+			editingNotificationDto.addWeatherSourceType(WeatherSourceType.AQICN);
+		} else {
+			editingNotificationDto.removeWeatherSourceType(WeatherSourceType.AQICN);
+		}
+	}
+
+
+	private void initWeatherDataSource() {
+		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (isChecked) {
-					editingNotificationDto.addWeatherSourceType(WeatherSourceType.OPEN_WEATHER_MAP);
-				} else {
-					editingNotificationDto.removeWeatherSourceType(WeatherSourceType.OPEN_WEATHER_MAP);
-				}
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				WeatherSourceType checked = checkedId == R.id.accu_weather_radio ? WeatherSourceType.ACCU_WEATHER
+						: WeatherSourceType.OPEN_WEATHER_MAP;
+				WeatherSourceType unChecked = checkedId == R.id.accu_weather_radio ? WeatherSourceType.OPEN_WEATHER_MAP
+						: WeatherSourceType.ACCU_WEATHER;
+				editingNotificationDto.addWeatherSourceType(checked);
+				editingNotificationDto.removeWeatherSourceType(unChecked);
 			}
 		});
-		binding.commons.kmaChk.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+		binding.commons.kmaTopPrioritySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (isChecked) {
-					editingNotificationDto.addWeatherSourceType(WeatherSourceType.KMA_WEB);
-				} else {
-					editingNotificationDto.removeWeatherSourceType(WeatherSourceType.KMA_WEB);
-				}
+				editingNotificationDto.setTopPriorityKma(isChecked);
 			}
 		});
 
@@ -280,6 +352,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 				if (checkedId == binding.commons.currentLocationRadio.getId() && binding.commons.currentLocationRadio.isChecked()) {
 					binding.commons.changeAddressBtn.setVisibility(View.GONE);
 					binding.commons.selectedAddressName.setVisibility(View.GONE);
+					editingNotificationDto.setLocationType(LocationType.CurrentLocation);
 
 				} else if (checkedId == binding.commons.selectedLocationRadio.getId() && binding.commons.selectedLocationRadio.isChecked()) {
 					binding.commons.changeAddressBtn.setVisibility(View.VISIBLE);
@@ -325,6 +398,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 					editingNotificationDto.setLatitude(Double.parseDouble(addressDto.getLatitude()));
 					editingNotificationDto.setLongitude(Double.parseDouble(addressDto.getLongitude()));
 					editingNotificationDto.setCountryCode(addressDto.getCountryCode());
+					editingNotificationDto.setLocationType(LocationType.SelectedAddress);
 				}
 			}
 		});

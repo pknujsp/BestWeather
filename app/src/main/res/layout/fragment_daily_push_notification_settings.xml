@@ -76,6 +76,19 @@
                                     android:textColor="@color/blue"
                                     android:textSize="50sp" />
 
+                                <TextView
+                                    android:id="@+id/notificationTypesLabel"
+                                    style="@style/SettingsLabel"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/notificationType" />
+
+                                <Spinner
+                                    android:id="@+id/notificationTypesSpinner"
+                                    style="@style/WidgetConfigureConfig"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content" />
+
                                 <include
                                     android:id="@+id/commons"
                                     layout="@layout/common_layout_notification_settings" />

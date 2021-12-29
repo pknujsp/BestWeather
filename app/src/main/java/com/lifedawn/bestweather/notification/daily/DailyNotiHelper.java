@@ -25,14 +25,15 @@ public class DailyNotiHelper {
 		alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 	}
 
-	public PendingIntent getRefreshPendingIntent(int id) {
+	public PendingIntent getRefreshPendingIntent(DailyPushNotificationDto dailyPushNotificationDto) {
 		Intent refreshIntent = new Intent(context, DailyPushNotificationReceiver.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 		Bundle bundle = new Bundle();
-		bundle.putInt(BundleKey.dtoId.name(), id);
+		bundle.putInt(BundleKey.dtoId.name(), dailyPushNotificationDto.getId());
+		bundle.putString("DailyPushNotificationType", dailyPushNotificationDto.getNotificationType().name());
 
 		refreshIntent.putExtras(bundle);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id + 6000, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, dailyPushNotificationDto.getId() + 6000, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
 	}
 
@@ -44,7 +45,7 @@ public class DailyNotiHelper {
 		calendar.set(Calendar.MINUTE, localTime.getMinute());
 		calendar.set(Calendar.SECOND, 0);
 
-		AlarmManagerCompat.setExactAndAllowWhileIdle(alarmManager, AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), getRefreshPendingIntent(dailyPushNotificationDto.getId()));
+		AlarmManagerCompat.setExactAndAllowWhileIdle(alarmManager, AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), getRefreshPendingIntent(dailyPushNotificationDto));
 	}
 
 	public void disablePushNotification(int id) {

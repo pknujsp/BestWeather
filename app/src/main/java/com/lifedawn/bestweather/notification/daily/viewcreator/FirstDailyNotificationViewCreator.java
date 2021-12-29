@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
+import android.widget.WrapperListAdapter;
 
 import androidx.annotation.Nullable;
 
@@ -60,11 +61,8 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                       ArrayMap<WeatherSourceType, List<HourlyForecastDto>> hourlyForecastDtoListMap) {
-		RelativeLayout rootLayout = new RelativeLayout(context);
+		LinearLayout rootLayout = new LinearLayout(context);
 		LayoutInflater layoutInflater = LayoutInflater.from(context);
-
-		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
-		headerView.setId(R.id.header);
 
 		//첫번째로 일치하는 시각을 찾는다. 첫 시각이 kma가 14, owm이 15 이면 15를 첫 시작으로 하여 화면을 표시
 		Set<WeatherSourceType> weatherSourceTypeSet = hourlyForecastDtoListMap.keySet();
@@ -119,8 +117,7 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		final LinearLayout forecastTable = new LinearLayout(context);
 		forecastTable.setOrientation(LinearLayout.VERTICAL);
 
-		final LinearLayout.LayoutParams forecastRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0);
-		forecastRowLayoutParams.weight = 1;
+		final LinearLayout.LayoutParams forecastRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
 		for (WeatherSourceType weatherSourceType : weatherSourceTypeSet) {
 			List<HourlyForecastDto> hourlyForecastDtoList = hourlyForecastDtoListMap.get(weatherSourceType);
@@ -137,7 +134,6 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			layoutParams.weight = 1;
 
 			int count = cellCount + firstBeginIdxMap.get(weatherSourceType);
-			String pop = null;
 
 			for (int cell = firstBeginIdxMap.get(weatherSourceType); cell < count; cell++) {
 				View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
@@ -171,26 +167,23 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			((TextView) weatherSourceView.findViewById(R.id.source)).setText(weatherSource);
 			((ImageView) weatherSourceView.findViewById(R.id.icon)).setImageResource(icon);
 
-			LinearLayout.LayoutParams listViewLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0);
-			listViewLayoutParams.weight = 1;
+			LinearLayout.LayoutParams listViewLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 
-			row.addView(weatherSourceView);
+			row.addView(weatherSourceView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 			row.addView(hourlyForecastListView, listViewLayoutParams);
 
 			forecastTable.addView(row);
 		}
 
-		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+		LinearLayout.LayoutParams headerViewLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		RelativeLayout.LayoutParams hoursRowLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+		LinearLayout.LayoutParams hoursRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
-		RelativeLayout.LayoutParams forecastViewsLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+		LinearLayout.LayoutParams forecastViewsLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 
-		headerViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-		hoursRowLayoutParams.addRule(RelativeLayout.BELOW, R.id.header);
-		forecastViewsLayoutParams.addRule(RelativeLayout.BELOW, R.id.datesRow);
-		forecastViewsLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
+		headerView.setId(R.id.header);
 
 		rootLayout.addView(headerView, headerViewLayoutParams);
 		rootLayout.addView(hoursRow, hoursRowLayoutParams);

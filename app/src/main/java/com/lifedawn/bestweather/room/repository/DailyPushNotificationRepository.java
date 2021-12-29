@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 
+import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.room.AppDb;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dao.DailyPushNotificationDao;
@@ -73,12 +74,15 @@ public class DailyPushNotificationRepository {
 		});
 	}
 
-	public void update(DailyPushNotificationDto dailyPushNotificationDto, DbQueryCallback<DailyPushNotificationDto> callback) {
+	public void update(DailyPushNotificationDto dailyPushNotificationDto, @Nullable DbQueryCallback<DailyPushNotificationDto> callback) {
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				int id = (int) dailyPushNotificationDao.update(dailyPushNotificationDto);
-				callback.processResult(dailyPushNotificationDao.get(id));
+				dailyPushNotificationDao.update(dailyPushNotificationDto);
+				if (callback != null) {
+					DailyPushNotificationDto updated = dailyPushNotificationDao.get(dailyPushNotificationDto.getId());
+					callback.onResultSuccessful(updated);
+				}
 			}
 		});
 	}

@@ -17,6 +17,7 @@ import com.lifedawn.bestweather.alarm.AlarmListFragment;
 import com.lifedawn.bestweather.databinding.FragmentNotificationBinding;
 import com.lifedawn.bestweather.notification.always.AlwaysNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.daily.fragment.DailyNotificationSettingsFragment;
+import com.lifedawn.bestweather.notification.daily.fragment.DailyPushNotificationListFragment;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -68,11 +69,11 @@ public class NotificationFragment extends Fragment {
 		binding.daily.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				DailyNotificationSettingsFragment dailyNotificationSettingsFragment = new DailyNotificationSettingsFragment();
-				String tag = DailyNotificationSettingsFragment.class.getName();
+				DailyPushNotificationListFragment listFragment = new DailyPushNotificationListFragment();
+				String tag = DailyPushNotificationListFragment.class.getName();
 
 				getParentFragmentManager().beginTransaction().hide(NotificationFragment.this).add(R.id.fragment_container,
-						dailyNotificationSettingsFragment, tag)
+						listFragment, tag)
 						.addToBackStack(tag).commit();
 			}
 		});

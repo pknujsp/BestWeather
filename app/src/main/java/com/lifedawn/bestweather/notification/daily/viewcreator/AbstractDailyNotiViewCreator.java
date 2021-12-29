@@ -4,9 +4,13 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.Rect;
+import android.text.StaticLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
@@ -18,6 +22,7 @@ import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 
@@ -44,13 +49,10 @@ public abstract class AbstractDailyNotiViewCreator {
 	}
 
 	protected Bitmap drawBitmap(ViewGroup rootLayout, RemoteViews remoteViews) {
-		final float padding = context.getResources().getDimension(R.dimen.notificationPadding);
+		final int padding = (int) context.getResources().getDimension(R.dimen.notificationPadding);
 
-		final int width = context.getResources().getDisplayMetrics().widthPixels;
-		final int height = (int) (width - padding * 2);
-
-		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (width - padding * 2), EXACTLY);
-		final int heightSpec = View.MeasureSpec.makeMeasureSpec(height, EXACTLY);
+		final int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+		final int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
 
 		rootLayout.measure(widthSpec, heightSpec);
 		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());
@@ -66,7 +68,7 @@ public abstract class AbstractDailyNotiViewCreator {
 	abstract public void setTempDataViews(RemoteViews remoteViews);
 
 	public RemoteViews createRemoteViews(boolean needTempData) {
-		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_widget);
+		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_notification);
 
 		if (needTempData) {
 			setTempDataViews(remoteViews);
@@ -79,8 +81,9 @@ public abstract class AbstractDailyNotiViewCreator {
 		NotificationHelper notificationHelper = new NotificationHelper(context);
 		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Daily);
 		notificationObj.getNotificationBuilder().setSmallIcon(R.drawable.day_clear);
-		notificationObj.getNotificationBuilder().setStyle(new NotificationCompat.BigTextStyle());
+		notificationObj.getNotificationBuilder().setContentTitle(context.getString(R.string.app_name));
 		notificationObj.getNotificationBuilder().setPriority(NotificationCompat.PRIORITY_DEFAULT);
+		notificationObj.getNotificationBuilder().setStyle(new NotificationCompat.BigTextStyle());
 
 		notificationObj.getNotificationBuilder().setCustomContentView(remoteViews);
 		notificationObj.getNotificationBuilder().setCustomBigContentView(remoteViews);
@@ -96,4 +99,5 @@ public abstract class AbstractDailyNotiViewCreator {
 	public abstract void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherSourceType> weatherSourceTypeSet,
 	                                    @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                                    Set<RequestWeatherDataType> requestWeatherDataTypeSet);
+
 }

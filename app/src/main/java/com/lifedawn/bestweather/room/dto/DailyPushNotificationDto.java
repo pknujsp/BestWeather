@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey;
 
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -19,6 +20,9 @@ public class DailyPushNotificationDto implements Serializable {
 
 	@ColumnInfo(name = "locationType")
 	private LocationType locationType;
+
+	@ColumnInfo(name = "notificationType")
+	private DailyPushNotificationType notificationType;
 
 	@ColumnInfo(name = "weatherSourceTypeSet")
 	private Set<WeatherSourceType> weatherSourceTypeSet;
@@ -133,6 +137,14 @@ public class DailyPushNotificationDto implements Serializable {
 
 	public void setAlarmClock(String alarmClock) {
 		this.alarmClock = alarmClock;
+	}
+
+	public DailyPushNotificationType getNotificationType() {
+		return notificationType;
+	}
+
+	public void setNotificationType(DailyPushNotificationType notificationType) {
+		this.notificationType = notificationType;
 	}
 
 	public void addWeatherSourceType(WeatherSourceType newType) {

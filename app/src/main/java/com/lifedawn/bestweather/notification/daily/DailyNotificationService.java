@@ -41,7 +41,6 @@ import java.util.concurrent.Executors;
 
 public class DailyNotificationService extends Service {
 	private DailyPushNotificationRepository repository;
-	private DailyPushNotificationDto dailyPushNotificationDto;
 	private AbstractDailyNotiViewCreator viewCreator = null;
 
 	public DailyNotificationService() {
@@ -63,7 +62,6 @@ public class DailyNotificationService extends Service {
 		repository.get(notificationDtoId, new DbQueryCallback<DailyPushNotificationDto>() {
 			@Override
 			public void onResultSuccessful(DailyPushNotificationDto dto) {
-				dailyPushNotificationDto = dto;
 				switch (type) {
 					case First:
 						viewCreator = new FirstDailyNotificationViewCreator(getApplicationContext());
@@ -87,7 +85,6 @@ public class DailyNotificationService extends Service {
 				} else {
 					loadWeatherData(remoteViews, dto);
 				}
-
 
 			}
 
@@ -150,10 +147,6 @@ public class DailyNotificationService extends Service {
 	public void loadWeatherData(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto) {
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = viewCreator.getRequestWeatherDataTypeSet();
 		final Set<WeatherSourceType> weatherSourceTypeSet = dailyPushNotificationDto.getWeatherSourceTypeSet();
-
-		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
-			weatherSourceTypeSet.add(WeatherSourceType.AQICN);
-		}
 
 		WeatherRequestUtil.loadWeatherData(getApplicationContext(), Executors.newSingleThreadExecutor(), dailyPushNotificationDto.getCountryCode(),
 				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), requestWeatherDataTypeSet, new MultipleRestApiDownloader() {

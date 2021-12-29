@@ -644,5 +644,11 @@
         <item>21600000</item>
     </string-array>
 
-
+    <string-array name="DailyPushNotificationType">
+        <item>@string/FirstDailyPushNotification</item>
+        <item>@string/SecondDailyPushNotification</item>
+        <item>@string/ThirdDailyPushNotification</item>
+        <item>@string/FourthDailyPushNotification</item>
+        <item>@string/FifthDailyPushNotification</item>
+    </string-array>
 </resources>

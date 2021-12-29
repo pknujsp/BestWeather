@@ -571,6 +571,13 @@
     <string name="registeredDailyNotification">일일 알림 등록되었습니다</string>
     <string name="save">저장</string>
     <string name="currentAirQuality">현재 대기질</string>
+    <string name="notificationType">알림 유형</string>
+    <string name="FirstDailyPushNotification">시간별 예보</string>
+    <string name="SecondDailyPushNotification">현재 날씨</string>
+    <string name="ThirdDailyPushNotification">일별 예보</string>
+    <string name="FourthDailyPushNotification">현재 대기질</string>
+    <string name="FifthDailyPushNotification">대기질 예보</string>
+    <string name="remove">삭제</string>
 
 
 </resources>

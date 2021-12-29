@@ -1,15 +1,19 @@
 package com.lifedawn.bestweather.notification.daily.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -21,9 +25,11 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.OnCheckedSwitchInListListener;
 import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
+import com.lifedawn.bestweather.commons.interfaces.OnClickedPopupMenuItemListener;
 import com.lifedawn.bestweather.databinding.FragmentDailyPushNotificationListBinding;
 import com.lifedawn.bestweather.databinding.ViewDailyPushNotificationItemBinding;
 import com.lifedawn.bestweather.notification.daily.DailyNotiHelper;
+import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
@@ -39,7 +45,7 @@ import java.util.List;
 public class DailyPushNotificationListFragment extends Fragment {
 	private FragmentDailyPushNotificationListBinding binding;
 	private NotificationListAdapter adapter;
-	private DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a hh:mm");
+	private DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a h:mm");
 	private DailyPushNotificationRepository repository;
 	private DailyNotiHelper dailyNotiHelper;
 
@@ -82,8 +88,7 @@ public class DailyPushNotificationListFragment extends Fragment {
 				settingsFragment.setArguments(bundle);
 
 				getParentFragmentManager().beginTransaction().hide(DailyPushNotificationListFragment.this).add(R.id.fragment_container,
-						settingsFragment, tag)
-						.addToBackStack(tag).commit();
+						settingsFragment, tag).addToBackStack(tag).commit();
 			}
 		}, new OnCheckedSwitchInListListener<DailyPushNotificationDto>() {
 			@Override
@@ -105,6 +110,26 @@ public class DailyPushNotificationListFragment extends Fragment {
 					String text =
 							LocalTime.parse(dailyPushNotificationDto.getAlarmClock()).format(hoursFormatter) + ", " + getString(R.string.registeredDailyNotification);
 					Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+				}
+			}
+		}, new OnClickedPopupMenuItemListener<DailyPushNotificationDto>() {
+			@Override
+			public void onClickedItem(DailyPushNotificationDto e, int position) {
+				switch (position) {
+					case 0:
+						dailyNotiHelper.disablePushNotification(e.getId());
+						repository.delete(e, new DbQueryCallback<Boolean>() {
+							@Override
+							public void onResultSuccessful(Boolean result) {
+								loadList();
+							}
+
+							@Override
+							public void onResultNoData() {
+
+							}
+						});
+						break;
 				}
 			}
 		});
@@ -162,13 +187,16 @@ public class DailyPushNotificationListFragment extends Fragment {
 		private Context context;
 		private OnClickedListViewItemListener<DailyPushNotificationDto> onClickedItemListener;
 		private OnCheckedSwitchInListListener<DailyPushNotificationDto> onCheckedSwitchInListListener;
+		private OnClickedPopupMenuItemListener<DailyPushNotificationDto> onClickedPopupMenuItemListener;
 		private final DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a hh:mm");
 
 		public NotificationListAdapter(Context context, OnClickedListViewItemListener<DailyPushNotificationDto> onClickedItemListener,
-		                               OnCheckedSwitchInListListener<DailyPushNotificationDto> onCheckedSwitchInListListener) {
+		                               OnCheckedSwitchInListListener<DailyPushNotificationDto> onCheckedSwitchInListListener,
+		                               OnClickedPopupMenuItemListener<DailyPushNotificationDto> onClickedPopupMenuItemListener) {
 			this.onClickedItemListener = onClickedItemListener;
 			this.context = context;
 			this.onCheckedSwitchInListListener = onCheckedSwitchInListListener;
+			this.onClickedPopupMenuItemListener = onClickedPopupMenuItemListener;
 		}
 
 		public void setNotificationList(List<DailyPushNotificationDto> notificationList) {
@@ -204,9 +232,11 @@ public class DailyPushNotificationListFragment extends Fragment {
 				DailyPushNotificationDto dto = notificationList.get(getAdapterPosition());
 				binding.hours.setText(LocalTime.parse(dto.getAlarmClock()).format(hoursFormatter));
 				binding.notiSwitch.setChecked(dto.isEnabled());
+				binding.notificationType.setText(DailyPushNotificationType.getNotificationName(dto.getNotificationType(), context));
 
-				binding.location.setVisibility(dto.getLocationType() == LocationType.SelectedAddress ? View.VISIBLE : View.GONE);
-				binding.location.setText(dto.getAddressName());
+				String addressName = dto.getLocationType() == LocationType.SelectedAddress ? dto.getAddressName() :
+						context.getString(R.string.current_location);
+				binding.location.setText(addressName);
 
 				binding.getRoot().setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -220,7 +250,30 @@ public class DailyPushNotificationListFragment extends Fragment {
 						onCheckedSwitchInListListener.onCheckedSwitch(notificationList.get(getAdapterPosition()), isChecked);
 					}
 				});
+				binding.control.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						PopupMenu popupMenu = new PopupMenu(context, binding.control, Gravity.BOTTOM);
+
+						popupMenu.getMenuInflater().inflate(R.menu.menu_of_daily_notification_item, popupMenu.getMenu());
+						popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+							@SuppressLint("NonConstantResourceId")
+							@Override
+							public boolean onMenuItemClick(MenuItem menuItem) {
+								switch (menuItem.getItemId()) {
+									default:
+										onClickedPopupMenuItemListener.onClickedItem(dto, 0);
+								}
+								return true;
+							}
+						});
+
+						popupMenu.show();
+					}
+				});
+
 			}
+
 		}
 	}
 }

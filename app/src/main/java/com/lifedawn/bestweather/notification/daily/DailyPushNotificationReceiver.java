@@ -10,7 +10,12 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.AlarmActivity;
 import com.lifedawn.bestweather.alarm.alarmnotifications.AlarmService;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.AlarmDto;
+import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
+import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
+
+import java.util.List;
 
 public class DailyPushNotificationReceiver extends BroadcastReceiver {
 
@@ -34,7 +39,23 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 				context.startService(dailyNotificationService);
 			}
 		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+			DailyPushNotificationRepository repository = new DailyPushNotificationRepository(context);
+			repository.getAll(new DbQueryCallback<List<DailyPushNotificationDto>>() {
+				@Override
+				public void onResultSuccessful(List<DailyPushNotificationDto> result) {
+					DailyNotiHelper notiHelper = new DailyNotiHelper(context);
+					for (DailyPushNotificationDto notificationDto : result) {
+						if (notificationDto.isEnabled()) {
+							notiHelper.enablePushNotification(notificationDto);
+						}
+					}
+				}
 
+				@Override
+				public void onResultNoData() {
+
+				}
+			});
 		}
 
 	}

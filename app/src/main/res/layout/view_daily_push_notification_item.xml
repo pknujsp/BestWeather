@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout
+        style="@style/ListItemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
         android:clickable="true"
         android:paddingLeft="16dp"
         android:paddingTop="8dp"
@@ -21,7 +21,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@id/alarmSwitch"
+                android:layout_toLeftOf="@id/notiSwitch"
                 android:orientation="vertical">
 
                 <TextView
@@ -48,11 +48,27 @@
             </LinearLayout>
 
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/notiSwitch"
-                style="@style/Switch"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_centerVertical="true" />
+                android:layout_centerVertical="true"
+                android:gravity="center"
+                android:orientation="vertical">
+
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/notiSwitch"
+                    style="@style/Switch" />
+
+                <ImageButton
+                    android:id="@+id/control"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:src="@drawable/more_horizontal" />
+
+            </LinearLayout>
 
         </RelativeLayout>
 

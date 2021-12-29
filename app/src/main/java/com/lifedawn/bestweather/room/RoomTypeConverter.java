@@ -7,6 +7,7 @@ import androidx.room.TypeConverter;
 
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
@@ -91,6 +92,24 @@ public class RoomTypeConverter {
 	public LocationType toLocationType(String locationType) {
 		if (locationType != null) {
 			return LocationType.valueOf(locationType);
+		} else {
+			return null;
+		}
+	}
+
+	@TypeConverter
+	public String toString(DailyPushNotificationType dailyPushNotificationType) {
+		if (dailyPushNotificationType == null) {
+			return null;
+		} else {
+			return dailyPushNotificationType.name();
+		}
+	}
+
+	@TypeConverter
+	public DailyPushNotificationType toDailyPushNotificationType(String dailyPushNotificationType) {
+		if (dailyPushNotificationType != null) {
+			return DailyPushNotificationType.valueOf(dailyPushNotificationType);
 		} else {
 			return null;
 		}
