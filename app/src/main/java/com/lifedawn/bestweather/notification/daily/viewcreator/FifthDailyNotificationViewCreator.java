@@ -39,48 +39,43 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		drawViews(remoteViews, addressName, lastRefreshDateTime, airQualityDto);
 	}
 
+	@Override
+	public RemoteViews createRemoteViews(boolean needTempData) {
+		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_notification);
+
+		if (needTempData) {
+			setTempDataViews(remoteViews);
+		}
+
+		return remoteViews;
+	}
+
 	public void setTempDataViews(RemoteViews remoteViews) {
 		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), WeatherResponseProcessor.getTempAirQualityDto());
 	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                       AirQualityDto airQualityDto) {
-		RelativeLayout rootLayout = new RelativeLayout(context);
-		LayoutInflater layoutInflater = LayoutInflater.from(context);
+		RemoteViews valuesRemoteViews = new RemoteViews(context.getPackageName(), R.layout.fifth_daily_noti_view);
 
-		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
-		headerView.setId(R.id.header);
+		valuesRemoteViews.setTextViewText(R.id.address, addressName);
+		valuesRemoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
 
-		ViewGroup seventhView = (ViewGroup) layoutInflater.inflate(R.layout.view_seventh_widget, null, false);
+		final String noData = "-";
+		valuesRemoteViews.setTextViewText(R.id.measuring_station_name,
+				context.getString(R.string.measuring_station_name) + ": " + (airQualityDto.getCityName() == null ?
+						noData : airQualityDto.getCityName()));
+		valuesRemoteViews.setTextViewText(R.id.airQuality,
+				context.getString(R.string.currentAirQuality) + "\n" + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 
-		String stationName = context.getString(R.string.measuring_station_name) + ": " + airQualityDto.getCityName();
-		((TextView) seventhView.findViewById(R.id.measuring_station_name)).setText(stationName);
+		RemoteViews forecastHeader = new RemoteViews(context.getPackageName(), R.layout.air_quality_simple_forecast_item);
 
-		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
-		((TextView) seventhView.findViewById(R.id.airQuality)).setText(airQuality);
+		forecastHeader.setViewVisibility(R.id.date, View.INVISIBLE);
+		forecastHeader.setTextViewText(R.id.pm10, context.getString(R.string.pm10_str));
+		forecastHeader.setTextViewText(R.id.pm25, context.getString(R.string.pm25_str));
+		forecastHeader.setTextViewText(R.id.o3, context.getString(R.string.o3_str));
 
-		LinearLayout forecastLayout = seventhView.findViewById(R.id.airQualityForecast);
-		final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, context.getResources().getDisplayMetrics());
-		final String noData = context.getString(R.string.noData);
-
-		LinearLayout.LayoutParams forecastItemLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		forecastItemLayoutParams.bottomMargin = margin;
-
-		View forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
-		forecastItemView.setPadding(0, 0, 0, 0);
-
-		TextView dateTextView = forecastItemView.findViewById(R.id.date);
-		TextView pm10TextView = forecastItemView.findViewById(R.id.pm10);
-		TextView pm25TextView = forecastItemView.findViewById(R.id.pm25);
-		TextView o3TextView = forecastItemView.findViewById(R.id.o3);
-
-		dateTextView.setVisibility(View.INVISIBLE);
-		pm10TextView.setText(context.getString(R.string.pm10_str));
-		pm25TextView.setText(context.getString(R.string.pm25_str));
-		o3TextView.setText(context.getString(R.string.o3_str));
-
-		forecastLayout.addView(forecastItemView, forecastItemLayoutParams);
+		valuesRemoteViews.addView(R.id.airQualityForecast, forecastHeader);
 
 		AirQualityDto.DailyForecast current = new AirQualityDto.DailyForecast();
 		current.setDate(null).setPm10(new AirQualityDto.DailyForecast.Val().setAvg(airQualityDto.getCurrent().getPm10()))
@@ -94,50 +89,32 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		DateTimeFormatter forecastDateFormatter = DateTimeFormatter.ofPattern("M.d E");
 
 		for (AirQualityDto.DailyForecast item : dailyForecastList) {
-			forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
-			forecastItemView.setPadding(0, 0, 0, 0);
+			RemoteViews forecast = new RemoteViews(context.getPackageName(), R.layout.air_quality_simple_forecast_item);
 
-			dateTextView = forecastItemView.findViewById(R.id.date);
-			pm10TextView = forecastItemView.findViewById(R.id.pm10);
-			pm25TextView = forecastItemView.findViewById(R.id.pm25);
-			o3TextView = forecastItemView.findViewById(R.id.o3);
-
-			dateTextView.setText(item.getDate() == null ? context.getString(R.string.current) : item.getDate().format(forecastDateFormatter));
+			forecast.setTextViewText(R.id.date, item.getDate() == null ? context.getString(R.string.current) :
+					item.getDate().format(forecastDateFormatter));
 			if (item.isHasPm10()) {
-				pm10TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getPm10().getAvg()));
-				pm10TextView.setTextColor(AqicnResponseProcessor.getGradeColorId(item.getPm10().getAvg()));
+				forecast.setTextViewText(R.id.pm10, AqicnResponseProcessor.getGradeDescription(item.getPm10().getAvg()));
 			} else {
-				pm10TextView.setText(noData);
-			}
-			if (item.isHasPm25()) {
-				pm25TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getPm25().getAvg()));
-				pm25TextView.setTextColor(AqicnResponseProcessor.getGradeColorId(item.getPm25().getAvg()));
-			} else {
-				pm25TextView.setText(noData);
-			}
-			if (item.isHasO3()) {
-				o3TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getO3().getAvg()));
-				o3TextView.setTextColor(AqicnResponseProcessor.getGradeColorId(item.getO3().getAvg()));
-			} else {
-				o3TextView.setText(noData);
+				forecast.setTextViewText(R.id.pm10, noData);
 			}
 
-			forecastLayout.addView(forecastItemView, forecastItemLayoutParams);
+			if (item.isHasPm25()) {
+				forecast.setTextViewText(R.id.pm25, AqicnResponseProcessor.getGradeDescription(item.getPm25().getAvg()));
+			} else {
+				forecast.setTextViewText(R.id.pm25, noData);
+			}
+
+			if (item.isHasO3()) {
+				forecast.setTextViewText(R.id.o3, AqicnResponseProcessor.getGradeDescription(item.getO3().getAvg()));
+			} else {
+				forecast.setTextViewText(R.id.o3, noData);
+			}
+
+			valuesRemoteViews.addView(R.id.airQualityForecast, forecast);
 		}
 
-		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		RelativeLayout.LayoutParams seventhWidgetViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.MATCH_PARENT);
-
-		headerViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-		seventhWidgetViewLayoutParams.addRule(RelativeLayout.BELOW, R.id.header);
-		seventhWidgetViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-
-		rootLayout.addView(headerView, headerViewLayoutParams);
-		rootLayout.addView(seventhView, seventhWidgetViewLayoutParams);
-
-		drawBitmap(rootLayout, remoteViews);
+		remoteViews.addView(R.id.valuesView, valuesRemoteViews);
 	}
 
 

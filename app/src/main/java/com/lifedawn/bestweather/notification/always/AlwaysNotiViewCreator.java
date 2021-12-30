@@ -197,6 +197,7 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 		notificationObj.getNotificationBuilder().setStyle(new NotificationCompat.BigTextStyle());
 		notificationObj.getNotificationBuilder().setPriority(NotificationCompat.PRIORITY_LOW);
 		notificationObj.getNotificationBuilder().setVibrate(new long[]{0L});
+		notificationObj.getNotificationBuilder().setAutoCancel(false);
 
 		notificationObj.getNotificationBuilder().setCustomContentView(remoteViews);
 		notificationObj.getNotificationBuilder().setCustomBigContentView(remoteViews);

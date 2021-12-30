@@ -1,7 +1,9 @@
 package com.lifedawn.bestweather.main;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -32,6 +34,7 @@ import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
 import com.lifedawn.bestweather.intro.IntroTransactionFragment;
+import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
@@ -39,6 +42,8 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProc
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.UvIndexProcessor;
+import com.lifedawn.bestweather.widget.widgetprovider.AbstractAppWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
 
 import java.util.Locale;
 
@@ -104,6 +109,24 @@ public class MainActivity extends AppCompatActivity {
 		} else {
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commit();
+
+			//위젯 다시 그리기
+			Intent redrawIntent = new Intent(getApplicationContext(), FirstWidgetProvider.class);
+			redrawIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REDRAW));
+			PendingIntent redrawWidgetPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, redrawIntent, 0);
+			try {
+				redrawWidgetPendingIntent.send();
+			} catch (PendingIntent.CanceledException e) {
+				e.printStackTrace();
+			}
+
+			//ongoing notification 확인
+			boolean ongoingNotification = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+					.getBoolean(NotificationType.Always.getPreferenceName(), false);
+
+			if (ongoingNotification) {
+
+			}
 		}
 
 	}

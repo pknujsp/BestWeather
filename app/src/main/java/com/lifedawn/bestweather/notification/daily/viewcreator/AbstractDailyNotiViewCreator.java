@@ -2,7 +2,9 @@ package com.lifedawn.bestweather.notification.daily.viewcreator;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -20,6 +22,7 @@ import androidx.core.app.NotificationCompat;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
@@ -40,42 +43,9 @@ public abstract class AbstractDailyNotiViewCreator {
 		this.context = context;
 	}
 
-	protected View makeHeaderViews(LayoutInflater layoutInflater, String addressName, String lastRefreshDateTime) {
-		View view = layoutInflater.inflate(R.layout.header_view_in_widget, null, false);
-		((TextView) view.findViewById(R.id.address)).setText(addressName);
-		((TextView) view.findViewById(R.id.refresh)).setText(ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-
-		return view;
-	}
-
-	protected Bitmap drawBitmap(ViewGroup rootLayout, RemoteViews remoteViews) {
-		final int padding = (int) context.getResources().getDimension(R.dimen.notificationPadding);
-
-		final int widthSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-		final int heightSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-
-		rootLayout.measure(widthSpec, heightSpec);
-		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());
-
-		rootLayout.setDrawingCacheEnabled(true);
-		rootLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-
-		Bitmap viewBmp = rootLayout.getDrawingCache();
-		remoteViews.setImageViewBitmap(R.id.valuesView, viewBmp);
-		return viewBmp;
-	}
-
 	abstract public void setTempDataViews(RemoteViews remoteViews);
 
-	public RemoteViews createRemoteViews(boolean needTempData) {
-		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_notification);
-
-		if (needTempData) {
-			setTempDataViews(remoteViews);
-		}
-
-		return remoteViews;
-	}
+	abstract public RemoteViews createRemoteViews(boolean needTempData);
 
 	public void makeNotification(RemoteViews remoteViews, int notificationDtoId) {
 		NotificationHelper notificationHelper = new NotificationHelper(context);
@@ -84,9 +54,14 @@ public abstract class AbstractDailyNotiViewCreator {
 		notificationObj.getNotificationBuilder().setContentTitle(context.getString(R.string.app_name));
 		notificationObj.getNotificationBuilder().setPriority(NotificationCompat.PRIORITY_DEFAULT);
 		notificationObj.getNotificationBuilder().setStyle(new NotificationCompat.BigTextStyle());
+		notificationObj.getNotificationBuilder().setAutoCancel(true);
 
 		notificationObj.getNotificationBuilder().setCustomContentView(remoteViews);
 		notificationObj.getNotificationBuilder().setCustomBigContentView(remoteViews);
+
+		Intent intent = new Intent(context, MainActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		remoteViews.setOnClickPendingIntent(R.id.root_layout, PendingIntent.getActivity(context, 0, intent, 0));
 
 		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
 		Notification notification = notificationObj.getNotificationBuilder().build();

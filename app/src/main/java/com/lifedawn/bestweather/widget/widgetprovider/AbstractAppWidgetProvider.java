@@ -66,10 +66,8 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 		if (networkStatus == null) {
 			networkStatus = NetworkStatus.getInstance(context);
 		}
-		ComponentName componentName = new ComponentName(context, getThis());
 
-		int[] allWidgetIds = appWidgetManager.getAppWidgetIds(componentName);
-		for (int widgetId : allWidgetIds) {
+		for (int widgetId : appWidgetIds) {
 			reDrawWidget(context, widgetId);
 		}
 	}
@@ -155,6 +153,20 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 							widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId()
 							);
 						}
+					}
+				}
+
+				@Override
+				public void onResultNoData() {
+
+				}
+			});
+		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW))) {
+			widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
+				@Override
+				public void onResultSuccessful(List<WidgetDto> list) {
+					for (WidgetDto widgetDto : list) {
+						reDrawWidget(context, widgetDto.getAppWidgetId());
 					}
 				}
 

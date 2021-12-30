@@ -168,7 +168,16 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		binding.check.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
+				if (editingNotificationDto.getNotificationType() == DailyPushNotificationType.Fourth
+						|| editingNotificationDto.getNotificationType() == DailyPushNotificationType.Fifth) {
+					Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
+					weatherSourceTypeSet.add(WeatherSourceType.AQICN);
+					editingNotificationDto.setWeatherSourceTypeSet(weatherSourceTypeSet);
+				} else if (editingNotificationDto.getNotificationType() == DailyPushNotificationType.Second) {
+					editingNotificationDto.addWeatherSourceType(WeatherSourceType.AQICN);
+				} else {
+					editingNotificationDto.removeWeatherSourceType(WeatherSourceType.AQICN);
+				}
 
 				if (newNotificationSession) {
 					repository.add(newNotificationDto, new DbQueryCallback<DailyPushNotificationDto>() {
@@ -275,6 +284,8 @@ public class DailyNotificationSettingsFragment extends Fragment {
 
 	private void onSelectedNotificationType(int position) {
 		DailyPushNotificationType dailyPushNotificationType = DailyPushNotificationType.valueOf(position);
+		editingNotificationDto.setNotificationType(dailyPushNotificationType);
+
 		Context context = getActivity().getApplicationContext();
 		AbstractDailyNotiViewCreator viewCreator = null;
 
@@ -308,19 +319,8 @@ public class DailyNotificationSettingsFragment extends Fragment {
 
 		RemoteViews remoteViews = viewCreator.createRemoteViews(true);
 		View previewWidgetView = remoteViews.apply(context, binding.previewLayout);
+		binding.previewLayout.removeAllViews();
 		binding.previewLayout.addView(previewWidgetView);
-
-		editingNotificationDto.setNotificationType(dailyPushNotificationType);
-		if (editingNotificationDto.getNotificationType() == DailyPushNotificationType.Fourth
-				|| editingNotificationDto.getNotificationType() == DailyPushNotificationType.Fifth) {
-			Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
-			weatherSourceTypeSet.add(WeatherSourceType.AQICN);
-			editingNotificationDto.setWeatherSourceTypeSet(weatherSourceTypeSet);
-		} else if (editingNotificationDto.getNotificationType() == DailyPushNotificationType.Second) {
-			editingNotificationDto.addWeatherSourceType(WeatherSourceType.AQICN);
-		} else {
-			editingNotificationDto.removeWeatherSourceType(WeatherSourceType.AQICN);
-		}
 	}
 
 

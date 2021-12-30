@@ -24,6 +24,7 @@
 
         <activity
             android:name=".alarm.AlarmActivity"
+            android:exported="false"
             android:showForAllUsers="true"
             android:showOnLockScreen="true"
             android:showWhenLocked="true"
@@ -32,6 +33,7 @@
 
         <activity
             android:name=".widget.ConfigureWidgetActivity"
+            android:exported="false"
             android:theme="@style/AppTheme.White">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
@@ -41,11 +43,13 @@
         <activity
             android:name=".widget.DialogActivity"
             android:excludeFromRecents="true"
+            android:exported="false"
             android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <activity
             android:name=".main.MainActivity"
+            android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"
@@ -59,7 +63,8 @@
 
         <receiver
             android:name=".widget.widgetprovider.AbstractAppWidgetProvider"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -69,6 +74,7 @@
         <receiver
             android:name=".widget.widgetprovider.FirstWidgetProvider"
             android:enabled="true"
+            android:exported="true"
             android:label="@string/firstWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -83,6 +89,7 @@
         <receiver
             android:name=".widget.widgetprovider.SecondWidgetProvider"
             android:enabled="true"
+            android:exported="true"
             android:label="@string/secondWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -97,6 +104,7 @@
         <receiver
             android:name=".widget.widgetprovider.ThirdWidgetProvider"
             android:enabled="true"
+            android:exported="true"
             android:label="@string/thirdWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -111,6 +119,7 @@
         <receiver
             android:name=".widget.widgetprovider.FourthWidgetProvider"
             android:enabled="true"
+            android:exported="true"
             android:label="@string/fourthWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -124,6 +133,7 @@
 
         <receiver
             android:name=".widget.widgetprovider.FifthWidgetProvider"
+            android:exported="true"
             android:label="@string/fifthWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -137,6 +147,7 @@
 
         <receiver
             android:name=".widget.widgetprovider.SixthWidgetProvider"
+            android:exported="true"
             android:label="@string/sixthWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -150,6 +161,7 @@
 
         <receiver
             android:name=".widget.widgetprovider.SeventhWidgetProvider"
+            android:exported="true"
             android:label="@string/seventhWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -163,6 +175,7 @@
 
         <receiver
             android:name=".widget.widgetprovider.EighthWidgetProvider"
+            android:exported="true"
             android:label="@string/eighthWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -176,6 +189,7 @@
 
         <receiver
             android:name=".widget.widgetprovider.NinthWidgetProvider"
+            android:exported="true"
             android:label="@string/ninthWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -189,6 +203,7 @@
 
         <receiver
             android:name=".widget.widgetprovider.TenthWidgetProvider"
+            android:exported="true"
             android:label="@string/tenthWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -202,6 +217,7 @@
 
         <receiver
             android:name=".widget.widgetprovider.EleventhWidgetProvider"
+            android:exported="true"
             android:label="@string/eleventhWidgetLabel">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -243,12 +259,12 @@
         <service
             android:name=".notification.daily.DailyNotificationService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="true" />
 
         <service
             android:name=".alarm.alarmnotifications.AlarmService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="true" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

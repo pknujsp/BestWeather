@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
@@ -24,45 +25,28 @@ import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
 public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCreator {
 	private final int cellCount = 6;
 
+	@Override
+	public RemoteViews createRemoteViews(boolean needTempData) {
+		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_notification);
+
+		if (needTempData) {
+			setTempDataViews(remoteViews);
+		}
+
+		return remoteViews;
+	}
+
 	public SecondDailyNotificationViewCreator(Context context) {
 		super(context);
 	}
 
-	public View makeCurrentConditionsViews(LayoutInflater layoutInflater, CurrentConditionsDto currentConditionsDto,
-	                                       AirQualityDto airQualityDto) {
-		final String celsius = "C";
-		final String fahrenheit = "F";
-
-		View view = layoutInflater.inflate(R.layout.view_current_conditions_daily_notification, null, false);
-		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp().replace(celsius, "").replace(fahrenheit, ""));
-		((ImageView) view.findViewById(R.id.weatherIcon)).setImageResource(currentConditionsDto.getWeatherIcon());
-
-		String precipitation = "";
-		if (currentConditionsDto.isHasPrecipitationVolume()) {
-			precipitation += context.getString(R.string.precipitation) + ": " + currentConditionsDto.getPrecipitationVolume();
-		} else {
-			precipitation = context.getString(R.string.not_precipitation);
-		}
-		((TextView) view.findViewById(R.id.precipitation)).setText(precipitation);
-		((TextView) view.findViewById(R.id.airQuality)).setText(new String(context.getString(R.string.air_quality) + ": " +
-				AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi())));
-
-		if (currentConditionsDto.getWindDirection() != null) {
-			String wind =
-					context.getString(R.string.wind) + ": " + currentConditionsDto.getWindDirection() + ", " + currentConditionsDto.getWindSpeed() + ", "
-							+ currentConditionsDto.getSimpleWindStrength();
-			((TextView) view.findViewById(R.id.wind)).setText(wind);
-			((ImageView) view.findViewById(R.id.windDirectionArrow)).setRotation(currentConditionsDto.getWindDirectionDegree() + 180);
-		}
-
-		return view;
-	}
 
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto) {
 		drawViews(remoteViews, addressName, lastRefreshDateTime, airQualityDto, currentConditionsDto);
@@ -74,30 +58,38 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 				WeatherResponseProcessor.getTempCurrentConditionsDto(context));
 	}
 
-	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto) {
-		LayoutInflater layoutInflater = LayoutInflater.from(context);
+	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto,
+	                       CurrentConditionsDto currentConditionsDto) {
+		RemoteViews valuesRemoveViews = new RemoteViews(context.getPackageName(), R.layout.second_daily_noti_view);
 
-		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
-		headerView.setId(R.id.header);
+		String precipitation = "";
+		if (currentConditionsDto.isHasPrecipitationVolume()) {
+			precipitation += context.getString(R.string.precipitation) + ": " + currentConditionsDto.getPrecipitationVolume();
+		} else {
+			precipitation = context.getString(R.string.not_precipitation);
+		}
+		valuesRemoveViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
+		valuesRemoveViews.setTextViewText(R.id.humidity, currentConditionsDto.getHumidity());
+		valuesRemoveViews.setTextViewText(R.id.precipitation, precipitation);
+		valuesRemoveViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
 
-		View currentConditionsView = makeCurrentConditionsViews(layoutInflater, currentConditionsDto, airQualityDto);
-		currentConditionsView.setId(R.id.currentConditions);
+		if (currentConditionsDto.getWindDirection() != null) {
+			valuesRemoveViews.setTextViewText(R.id.windDirection, currentConditionsDto.getWindDirection());
+			valuesRemoveViews.setTextViewText(R.id.windSpeed, currentConditionsDto.getWindSpeed());
+			valuesRemoveViews.setTextViewText(R.id.windStrength, currentConditionsDto.getWindStrength());
+		} else {
+			valuesRemoveViews.setViewVisibility(R.id.windDirection, View.GONE);
+			valuesRemoveViews.setViewVisibility(R.id.windSpeed, View.GONE);
+			valuesRemoveViews.setTextViewText(R.id.windStrength, context.getString(R.string.noWindData));
+		}
 
-		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		RelativeLayout.LayoutParams currentConditionsViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
+		valuesRemoveViews.setTextViewText(R.id.airQuality, context.getString(R.string.air_quality) + ": " +
+				AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 
-		headerViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-		currentConditionsViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		currentConditionsViewLayoutParams.addRule(RelativeLayout.BELOW, R.id.header);
+		valuesRemoveViews.setTextViewText(R.id.address, addressName);
+		valuesRemoveViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
 
-		RelativeLayout rootLayout = new RelativeLayout(context);
-
-		rootLayout.addView(headerView, headerViewLayoutParams);
-		rootLayout.addView(currentConditionsView, currentConditionsViewLayoutParams);
-
-		drawBitmap(rootLayout, remoteViews);
+		remoteViews.addView(R.id.valuesView, valuesRemoveViews);
 	}
 
 	@Override

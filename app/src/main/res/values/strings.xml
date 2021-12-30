@@ -567,7 +567,7 @@
     <string name="eleventhWidgetLabel">시간별 예보 비교</string>
     <string name="feelsLike">체감</string>
     <string name="notSelectedDefaultWeatherSource">기본 날씨 제공사가 선택되지 않았습니다</string>
-    <string name="noWindData">바람 정보 없음</string>
+    <string name="noWindData">바람 정보없음</string>
     <string name="registeredDailyNotification">일일 알림 등록되었습니다</string>
     <string name="save">저장</string>
     <string name="currentAirQuality">현재 대기질</string>
@@ -578,6 +578,7 @@
     <string name="FourthDailyPushNotification">현재 대기질</string>
     <string name="FifthDailyPushNotification">대기질 예보</string>
     <string name="remove">삭제</string>
+    <string name="com_lifedawn_bestweather_action_REDRAW">com_lifedawn_bestweather_action_REDRAW</string>
 
 
 </resources>
