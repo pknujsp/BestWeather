@@ -56,6 +56,10 @@ public abstract class AbstractWidgetCreator {
 		return this;
 	}
 
+	public Context getContext() {
+		return context;
+	}
+
 	public AbstractWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		this.context = context;
 		this.widgetUpdateCallback = widgetUpdateCallback;

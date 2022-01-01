@@ -407,7 +407,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					case KMA_WEB:
 						String pty = KmaResponseProcessor.convertPtyTextToCode(val);
 						String sky = KmaResponseProcessor.convertSkyTextToCode(val);
-						weather = pty == null ? KmaResponseProcessor.getSkyFlickrGalleryName(
+						weather = (pty == null) ? KmaResponseProcessor.getSkyFlickrGalleryName(
 								sky) : KmaResponseProcessor.getPtyFlickrGalleryName(pty);
 						break;
 					case KMA_API:
@@ -435,7 +435,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							public void run() {
 								if (getChildFragmentManager().findFragmentByTag(getString(R.string.tag_simple_current_conditions_fragment)) != null) {
 									Glide.with(WeatherFragment.this).load(BACKGROUND_IMG_MAP.get(galleryName).getImg()).transition(
-											DrawableTransitionOptions.withCrossFade(500)).into(binding.currentConditionsImg);
+											DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
 									BaseSimpleCurrentConditionsFragment currentConditionsFragment =
 											(BaseSimpleCurrentConditionsFragment) getChildFragmentManager().findFragmentByTag(getString(R.string.tag_simple_current_conditions_fragment));
 									currentConditionsFragment.setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
@@ -443,7 +443,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							}
 						});
 					}
-
 
 				} else {
 					FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
@@ -479,12 +478,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 										@Override
 										public void onResourceReady(@NonNull @NotNull Drawable resource,
 										                            @Nullable @org.jetbrains.annotations.Nullable Transition<? super Drawable> transition) {
-											if (getActivity() == null) {
-												return;
-											} else {
+											if (getActivity() != null) {
 												BACKGROUND_IMG_MAP.get(galleryName).setImg(resource);
 												Glide.with(WeatherFragment.this).load(resource).transition(
-														DrawableTransitionOptions.withCrossFade(500)).into(binding.currentConditionsImg);
+														DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
 
 												getActivity().runOnUiThread(new Runnable() {
 													@Override

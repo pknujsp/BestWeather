@@ -14,8 +14,9 @@ import com.lifedawn.bestweather.widget.widgetprovider.AbstractAppWidgetProvider;
 public class WidgetHelper {
 	private Context context;
 	private AlarmManager alarmManager;
+	private Class<?> widgetProviderClass;
 
-	public WidgetHelper(Context context) {
+	public WidgetHelper(Context context, Class<?> widgetProviderClass) {
 		this.context = context;
 		this.alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 	}
@@ -42,18 +43,12 @@ public class WidgetHelper {
 	}
 
 	public void cancelAutoRefresh(int appWidgetId) {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, AbstractAppWidgetProvider.class),
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, widgetProviderClass),
 				PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();
 		}
-	}
-
-	public boolean repeating(int appWidgetId, Class<?> widgetReceiverClass) {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, AbstractAppWidgetProvider.class),
-				PendingIntent.FLAG_NO_CREATE);
-		return pendingIntent != null;
 	}
 
 }

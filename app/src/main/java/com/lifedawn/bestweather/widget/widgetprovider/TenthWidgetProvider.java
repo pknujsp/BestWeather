@@ -23,7 +23,6 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponse
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.WidgetHelper;
-import com.lifedawn.bestweather.widget.creator.FifthWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.TenthWidgetCreator;
 
 import java.time.ZoneId;
@@ -46,10 +45,6 @@ public class TenthWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
 		super.onDeleted(context, appWidgetIds);
-		WidgetHelper widgetHelper = new WidgetHelper(context);
-		for (int appWidgetId : appWidgetIds) {
-			widgetHelper.cancelAutoRefresh(appWidgetId);
-		}
 	}
 
 	@Override
@@ -85,35 +80,8 @@ public class TenthWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	protected void reDrawWidget(Context context, int appWidgetId) {
 		TenthWidgetCreator widgetViewCreator = new TenthWidgetCreator(context, null, appWidgetId);
-		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto widgetDto) {
-				if (widgetDto == null) {
-					return;
-				}
+		reDrawWidget(widgetViewCreator);
 
-				MainThreadWorker.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
-
-						if (widgetDto.isLoadSuccessful()) {
-							loadCurrentLocation(context, remoteViews, appWidgetId);
-						} else {
-							remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetViewCreator.getOnClickedPendingIntent(remoteViews));
-							RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-							appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-						}
-
-					}
-				});
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
 
 	}
 
@@ -125,7 +93,7 @@ public class TenthWidgetProvider extends AbstractAppWidgetProvider {
 			@Override
 			public void onResultSuccessful(WidgetDto widgetDto) {
 				final RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
-				WidgetHelper widgetHelper = new WidgetHelper(context);
+				WidgetHelper widgetHelper = new WidgetHelper(context, getClass());
 				if (widgetDto.getUpdateIntervalMillis() > 0) {
 					widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId);
 				}

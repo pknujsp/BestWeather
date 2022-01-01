@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.widget.widgetprovider;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
@@ -19,6 +18,7 @@ import androidx.annotation.Nullable;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.Gps;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
@@ -30,6 +30,8 @@ import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.WidgetHelper;
+import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.ThirdWidgetCreator;
 
 import java.util.List;
 import java.util.Set;
@@ -46,9 +48,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
 		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
-		if (widgetRepository == null) {
-			widgetRepository = new WidgetRepository(context);
-		}
+
 		if (appWidgetManager == null) {
 			appWidgetManager = AppWidgetManager.getInstance(context);
 		}
@@ -57,14 +57,8 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		Log.e(tag, "onUpdate");
-		if (widgetRepository == null) {
-			widgetRepository = new WidgetRepository(context);
-		}
 		if (appWidgetManager == null) {
 			appWidgetManager = AppWidgetManager.getInstance(context);
-		}
-		if (networkStatus == null) {
-			networkStatus = NetworkStatus.getInstance(context);
 		}
 
 		for (int widgetId : appWidgetIds) {
@@ -87,15 +81,16 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
 		super.onDeleted(context, appWidgetIds);
-		if (widgetRepository == null) {
-			widgetRepository = new WidgetRepository(context);
+
+		WidgetHelper widgetHelper = new WidgetHelper(context, getClass());
+		for (int appWidgetId : appWidgetIds) {
+			widgetHelper.cancelAutoRefresh(appWidgetId);
 		}
-		if (appWidgetManager == null) {
-			appWidgetManager = AppWidgetManager.getInstance(context);
-		}
+
 		for (int appWidgetId : appWidgetIds) {
 			widgetRepository.delete(appWidgetId, null);
 		}
+
 		Log.e(tag, "onDeleted");
 	}
 
@@ -113,15 +108,15 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			networkStatus = NetworkStatus.getInstance(context);
 		}
 
+		Bundle bundle = intent.getExtras();
 		String action = intent.getAction();
 		Log.e(tag, action);
 
 		if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_INIT))) {
 			init(context, intent.getExtras());
 		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			Bundle bundle = intent.getExtras();
-			int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-			RemoteViews remoteViews = bundle.getParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name());
+			final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+			final RemoteViews remoteViews = bundle.getParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name());
 
 			widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
 				@Override
@@ -135,9 +130,8 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 				}
 			});
 		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH_CURRENT_LOCATION))) {
-			Bundle bundle = intent.getExtras();
-			int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-			RemoteViews remoteViews = bundle.getParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name());
+			final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+			final RemoteViews remoteViews = bundle.getParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name());
 			RemoteViewProcessor.onBeginProcess(remoteViews);
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
@@ -147,7 +141,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
 				@Override
 				public void onResultSuccessful(List<WidgetDto> list) {
-					WidgetHelper widgetHelper = new WidgetHelper(context);
+					WidgetHelper widgetHelper = new WidgetHelper(context, getClass());
 					for (WidgetDto widgetDto : list) {
 						if (widgetDto.getUpdateIntervalMillis() > 0) {
 							widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId()
@@ -179,7 +173,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	}
 
 	public final void setRefreshPendingIntent(RemoteViews remoteViews, int appWidgetId, Context context) {
-		Intent refreshIntent = new Intent(context, getThis());
+		Intent refreshIntent = new Intent(context, getClass());
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
 		Bundle bundle = new Bundle();
@@ -291,6 +285,33 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			setRefreshPendingIntent(remoteViews, appWidgetId, context);
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 		}
+
+	}
+
+	protected void reDrawWidget(AbstractWidgetCreator widgetViewCreator) {
+		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
+			@Override
+			public void onResultSuccessful(WidgetDto widgetDto) {
+				if (widgetDto == null) {
+					return;
+				}
+
+				RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
+
+				if (widgetDto.isLoadSuccessful()) {
+					widgetViewCreator.setDataViewsOfSavedData();
+				} else {
+					remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetViewCreator.getOnClickedPendingIntent(remoteViews));
+					RemoteViewProcessor.onErrorProcess(remoteViews, widgetViewCreator.getContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+					appWidgetManager.updateAppWidget(widgetViewCreator.getAppWidgetId(), remoteViews);
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
 
 	}
 

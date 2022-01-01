@@ -56,11 +56,10 @@ public final class KmaProcessing {
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
-				final Document currentConditionsDocument = Jsoup.parse(response.body());
-				KmaCurrentConditions kmaCurrentConditions = KmaWebParser.parseCurrentConditions(currentConditionsDocument,
-						ZonedDateTime.now(ZoneId.of("+09:00")).toString());
-
 				if (response.body() != null) {
+					final Document currentConditionsDocument = Jsoup.parse(response.body());
+					KmaCurrentConditions kmaCurrentConditions = KmaWebParser.parseCurrentConditions(currentConditionsDocument,
+							ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toString());
 					callback.onResponseResult(response, kmaCurrentConditions, response.body());
 					Log.e(RetrofitClient.LOG_TAG, "kma current conditions 성공");
 				} else {
@@ -88,13 +87,13 @@ public final class KmaProcessing {
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
-				final Document forecastsDocument = Jsoup.parse(response.body());
-				List<KmaHourlyForecast> kmaHourlyForecasts = KmaWebParser.parseHourlyForecasts(forecastsDocument);
-				List<KmaDailyForecast> kmaDailyForecasts = KmaWebParser.parseDailyForecasts(forecastsDocument);
-				KmaWebParser.makeExtendedDailyForecasts(kmaHourlyForecasts, kmaDailyForecasts);
-				Object[] lists = new Object[]{kmaHourlyForecasts, kmaDailyForecasts};
-
 				if (response.body() != null) {
+					final Document forecastsDocument = Jsoup.parse(response.body());
+					List<KmaHourlyForecast> kmaHourlyForecasts = KmaWebParser.parseHourlyForecasts(forecastsDocument);
+					List<KmaDailyForecast> kmaDailyForecasts = KmaWebParser.parseDailyForecasts(forecastsDocument);
+					KmaWebParser.makeExtendedDailyForecasts(kmaHourlyForecasts, kmaDailyForecasts);
+					Object[] lists = new Object[]{kmaHourlyForecasts, kmaDailyForecasts};
+
 					callback.onResponseResult(response, lists, response.body());
 					Log.e(RetrofitClient.LOG_TAG, "kma forecasts 성공");
 				} else {

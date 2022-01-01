@@ -110,23 +110,6 @@ public class MainActivity extends AppCompatActivity {
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commit();
 
-			//위젯 다시 그리기
-			Intent redrawIntent = new Intent(getApplicationContext(), FirstWidgetProvider.class);
-			redrawIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REDRAW));
-			PendingIntent redrawWidgetPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, redrawIntent, 0);
-			try {
-				redrawWidgetPendingIntent.send();
-			} catch (PendingIntent.CanceledException e) {
-				e.printStackTrace();
-			}
-
-			//ongoing notification 확인
-			boolean ongoingNotification = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-					.getBoolean(NotificationType.Always.getPreferenceName(), false);
-
-			if (ongoingNotification) {
-
-			}
 		}
 
 	}
