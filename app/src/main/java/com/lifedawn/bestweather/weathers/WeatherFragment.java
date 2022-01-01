@@ -1,7 +1,6 @@
 package com.lifedawn.bestweather.weathers;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -40,12 +38,14 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.classes.Gps;
+import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
@@ -91,7 +91,6 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapR
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.parser.KmaWebParser;
 import com.lifedawn.bestweather.weathers.detailfragment.accuweather.currentconditions.AccuDetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.kma.currentconditions.KmaDetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.currentconditions.OwmDetailCurrentConditionsFragment;
@@ -117,15 +116,12 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.SimpleTimeZone;
@@ -149,9 +145,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private WeatherViewModel weatherViewModel;
 	private OnResultFragmentListener onResultFragmentListener;
 	private View.OnClickListener menuOnClickListener;
-	private Gps gps;
+	private FusedLocation fusedLocation;
 	private NetworkStatus networkStatus;
-	private Gps.LocationCallback locationCallbackInMainFragment;
+	private FusedLocation.MyLocationCallback locationCallbackInMainFragment;
 
 	private WeatherSourceType mainWeatherSourceType;
 	private Double latitude;
@@ -162,6 +158,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private MultipleRestApiDownloader multipleRestApiDownloader;
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
+	private LocationLifeCycleObserver locationLifeCycleObserver;
+	private AlertDialog dialog;
 
 
 	public WeatherFragment setMenuOnClickListener(View.OnClickListener menuOnClickListener) {
@@ -193,12 +191,15 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		networkStatus = NetworkStatus.getInstance(getContext());
-		gps = new Gps(getContext(), requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
+		fusedLocation = FusedLocation.getInstance(getContext());
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		weatherViewModel.setiLoadImgOfCurrentConditions(this);
 		locationCallbackInMainFragment = weatherViewModel.getLocationCallback();
+
+		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
+		getLifecycle().addObserver(locationLifeCycleObserver);
 	}
 
 	@Override
@@ -240,7 +241,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
-					gps.runGps(requireActivity(), locationCallback);
+					dialog = ProgressDialog.show(requireActivity(),getString(R.string.msg_finding_current_location),null);
+					fusedLocation.startLocationUpdates(myLocationCallback);
 				}
 			}
 		});
@@ -292,7 +294,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		binding.mainToolbar.gps.setVisibility(locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
 		binding.mainToolbar.find.setVisibility(locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
 
-		Bundle bundle = new Bundle();
+		final Bundle bundle = new Bundle();
 		bundle.putSerializable(BundleKey.SelectedAddressDto.name(), favoriteAddressDto);
 		bundle.putSerializable(BundleKey.IGps.name(), (IGps) this);
 		bundle.putString(BundleKey.LocationType.name(), locationType.name());
@@ -522,80 +524,65 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	}
 
-
-	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(
-			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-				@Override
-				public void onActivityResult(ActivityResult result) {
-					//gps 사용확인 화면에서 나온뒤 현재 위치 다시 파악
-					LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-					boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-					if (isGpsEnabled) {
-						binding.mainToolbar.gps.callOnClick();
-					} else {
-						locationCallback.onFailed(Gps.LocationCallback.Fail.DISABLED_GPS);
-					}
-				}
-			});
-
-	private final ActivityResultLauncher<Intent> moveToAppDetailSettingsLauncher = registerForActivityResult(
-			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-				@Override
-				public void onActivityResult(ActivityResult result) {
-					if (ContextCompat.checkSelfPermission(getContext(),
-							Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-						sharedPreferences.edit().putBoolean(
-								getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false).apply();
-						binding.mainToolbar.gps.callOnClick();
-					} else {
-						locationCallback.onFailed(Gps.LocationCallback.Fail.REJECT_PERMISSION);
-					}
-
-				}
-			});
-
-	private final ActivityResultLauncher<String> requestLocationPermissionLauncher = registerForActivityResult(
-			new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
-				@Override
-				public void onActivityResult(Boolean isGranted) {
-					//gps사용 권한
-					//허가남 : 현재 위치 다시 파악
-					//거부됨 : 작업 취소
-					//계속 거부 체크됨 : 작업 취소
-					if (isGranted) {
-						sharedPreferences.edit().putBoolean(
-								getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false).apply();
-						binding.mainToolbar.gps.callOnClick();
-					} else {
-						if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-							sharedPreferences.edit().putBoolean(
-									getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), true).apply();
-						}
-						locationCallback.onFailed(Gps.LocationCallback.Fail.REJECT_PERMISSION);
-					}
-				}
-			});
-
-	private final Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
+	private final FusedLocation.MyLocationCallback myLocationCallback = new FusedLocation.MyLocationCallback() {
 		@Override
-		public void onSuccessful(Location location) {
+		public void onSuccessful(LocationResult locationResult) {
 			//현재 위치 파악 성공
 			//현재 위/경도 좌표를 최근 현재위치의 위/경도로 등록
 			//날씨 데이터 요청
+			dialog.dismiss();
+			final Location location = locationResult.getLocations().get(0);
+
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString(getString(R.string.pref_key_last_current_location_latitude), String.valueOf(location.getLatitude())).putString(
 					getString(R.string.pref_key_last_current_location_longitude), String.valueOf(location.getLongitude())).commit();
 
 			onChangedCurrentLocation(location);
-			locationCallbackInMainFragment.onSuccessful(location);
+			locationCallbackInMainFragment.onSuccessful(locationResult);
 		}
 
 		@Override
 		public void onFailed(Fail fail) {
+			dialog.dismiss();
 			locationCallbackInMainFragment.onFailed(fail);
+
+			if (fail == Fail.DISABLED_GPS) {
+				fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
+					@Override
+					public void onActivityResult(ActivityResult result) {
+						if (fusedLocation.isOnGps()) {
+							binding.mainToolbar.gps.callOnClick();
+						}
+					}
+				});
+			} else if (fail == Fail.REJECT_PERMISSION) {
+				fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
+					@Override
+					public void onActivityResult(ActivityResult result) {
+						if (ContextCompat.checkSelfPermission(getContext(),
+								Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+							binding.mainToolbar.gps.callOnClick();
+						}
+					}
+				}, new ActivityResultCallback<Map<String, Boolean>>() {
+					@Override
+					public void onActivityResult(Map<String, Boolean> result) {
+						//gps사용 권한
+						//허가남 : 현재 위치 다시 파악
+						//거부됨 : 작업 취소
+						//계속 거부 체크됨 : 작업 취소
+						if (!result.containsValue(false)) {
+							binding.mainToolbar.gps.callOnClick();
+						} else {
+
+						}
+					}
+				});
+
+			}
 		}
 	};
+
 
 	@Override
 	public void requestCurrentLocation() {
@@ -621,20 +608,16 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 								mainWeatherSourceType = getMainWeatherSourceType("");
 								countryCode = "";
 								addressName = getString(R.string.unknown_address);
-
-								String addressStr = getString(R.string.current_location) + " : " + addressName;
-								binding.addressName.setText(addressStr);
-								weatherViewModel.setCurrentLocationAddressName(addressName);
 							} else {
 								Address address = addressList.get(0);
 								addressName = address.getAddressLine(0);
 								mainWeatherSourceType = getMainWeatherSourceType(address.getCountryCode());
 								countryCode = address.getCountryCode();
-
-								String addressStr = getString(R.string.current_location) + " : " + addressName;
-								binding.addressName.setText(addressStr);
-								weatherViewModel.setCurrentLocationAddressName(addressName);
 							}
+
+							String addressStr = getString(R.string.current_location) + " : " + addressName;
+							binding.addressName.setText(addressStr);
+							weatherViewModel.setCurrentLocationAddressName(addressName);
 
 
 							if (refresh) {

@@ -14,9 +14,10 @@ import android.widget.RemoteViews;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
+import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
@@ -70,9 +71,11 @@ public abstract class AbstractNotiViewCreator {
 	abstract public void initNotification();
 
 	public void loadCurrentLocation(Context context, RemoteViews remoteViews) {
-		Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
+
+		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
-			public void onSuccessful(Location location) {
+			public void onSuccessful(LocationResult locationResult) {
+				final Location location = locationResult.getLocations().get(0);
 				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
 					public void onGeocodingResult(List<Address> addressList) {
@@ -116,12 +119,8 @@ public abstract class AbstractNotiViewCreator {
 			}
 		};
 
-		Gps gps = new Gps(context, null, null, null);
-		if (gps.checkPermissionAndGpsEnabled(context, locationCallback)) {
-			gps.runGps(context, locationCallback);
-		}
+		FusedLocation.getInstance(context).startLocationUpdates(locationCallback);
 	}
-
 
 
 	public void loadWeatherData(Context context, RemoteViews remoteViews) {
@@ -136,7 +135,7 @@ public abstract class AbstractNotiViewCreator {
 
 		final Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
 		weatherSourceTypeSet.add(weatherDataSourceType);
-		if(requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)){
+		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
 			weatherSourceTypeSet.add(WeatherSourceType.AQICN);
 		}
 

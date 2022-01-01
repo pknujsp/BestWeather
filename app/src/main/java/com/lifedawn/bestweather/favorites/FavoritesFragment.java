@@ -354,7 +354,7 @@ public class FavoritesFragment extends Fragment {
 
 			// 다시 묻지 않음을 선택했는지 확인
 			final boolean neverAskAgain = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(
-					getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false);
+					getString(R.string.pref_key_never_ask_again_permission_for_access_location), false);
 
 			if (neverAskAgain) {
 				Intent intent = new Intent();

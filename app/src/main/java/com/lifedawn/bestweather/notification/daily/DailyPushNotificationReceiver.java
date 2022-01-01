@@ -7,27 +7,14 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.RemoteViews;
 
-import androidx.annotation.NonNull;
-import androidx.work.Data;
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.ListenableWorker;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.Operation;
-import androidx.work.OutOfQuotaPolicy;
-import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
-
-import com.google.common.util.concurrent.ListenableFuture;
+import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.alarm.AlarmActivity;
-import com.lifedawn.bestweather.alarm.alarmnotifications.AlarmService;
+import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
@@ -41,12 +28,9 @@ import com.lifedawn.bestweather.notification.daily.viewcreator.SecondDailyNotifi
 import com.lifedawn.bestweather.notification.daily.viewcreator.ThirdDailyNotificationViewCreator;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.room.dto.AlarmDto;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Set;
@@ -99,9 +83,10 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 
 	public void loadCurrentLocation(Context context, ExecutorService executorService, RemoteViews remoteViews,
 	                                DailyPushNotificationDto dailyPushNotificationDto) {
-		Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
+		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
-			public void onSuccessful(Location location) {
+			public void onSuccessful(LocationResult locationResult) {
+				final Location location = locationResult.getLocations().get(0);
 				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
 					public void onGeocodingResult(List<Address> addressList) {
@@ -138,10 +123,7 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 			}
 		};
 
-		Gps gps = new Gps(context, null, null, null);
-		if (gps.checkPermissionAndGpsEnabled(context, locationCallback)) {
-			gps.runGps(context, locationCallback);
-		}
+		FusedLocation.getInstance(context).startLocationUpdates(locationCallback);
 	}
 
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,

@@ -1,12 +1,7 @@
 package com.lifedawn.bestweather.notification;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,22 +15,12 @@ import android.widget.RemoteViews;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.Gps;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
@@ -52,7 +37,6 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 	protected FragmentBaseNotificationSettingsBinding binding;
 	protected boolean isKr;
 	protected FavoriteAddressDto newSelectedAddressDto;
-	protected Gps gps;
 	protected NotificationType notificationType;
 	protected long[] intervalsLong;
 	protected NotificationHelper notificationHelper;
@@ -74,7 +58,6 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		notificationHelper = new NotificationHelper(getActivity().getApplicationContext());
-		gps = new Gps(getContext(), requestOnGpsLauncher, requestLocationPermissionLauncher, moveToAppDetailSettingsLauncher);
 
 		Locale locale = null;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -241,73 +224,6 @@ public abstract class BaseNotificationSettingsFragment extends Fragment implemen
 
 	abstract public void onSelectedCurrentLocation();
 
-	private final ActivityResultLauncher<Intent> requestOnGpsLauncher = registerForActivityResult(
-			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-				@Override
-				public void onActivityResult(ActivityResult result) {
-					//gps 사용확인 화면에서 나온뒤 현재 위치 다시 파악
-					LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-					boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-					if (isGpsEnabled) {
-					} else {
-						locationCallback.onFailed(Gps.LocationCallback.Fail.DISABLED_GPS);
-					}
-				}
-			});
-
-	private final ActivityResultLauncher<Intent> moveToAppDetailSettingsLauncher = registerForActivityResult(
-			new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
-				@Override
-				public void onActivityResult(ActivityResult result) {
-					if (ContextCompat.checkSelfPermission(getContext(),
-							Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-						PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(
-								getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false).apply();
-
-					} else {
-						locationCallback.onFailed(Gps.LocationCallback.Fail.REJECT_PERMISSION);
-					}
-
-				}
-			});
-
-	private final ActivityResultLauncher<String> requestLocationPermissionLauncher = registerForActivityResult(
-			new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
-				@Override
-				public void onActivityResult(Boolean isGranted) {
-					//gps사용 권한
-					//허가남 : 현재 위치 다시 파악
-					//거부됨 : 작업 취소
-					//계속 거부 체크됨 : 작업 취소
-					if (isGranted) {
-						PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(
-								getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false).apply();
-					} else {
-						if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-								Manifest.permission.ACCESS_FINE_LOCATION)) {
-							PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(
-									getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), true).apply();
-						}
-						locationCallback.onFailed(Gps.LocationCallback.Fail.REJECT_PERMISSION);
-					}
-				}
-			});
-
-	private final Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
-		@Override
-		public void onSuccessful(Location location) {
-		}
-
-		@Override
-		public void onFailed(Fail fail) {
-			if (fail == Fail.DISABLED_GPS) {
-				Toast.makeText(getContext(), R.string.request_to_make_gps_on, Toast.LENGTH_SHORT).show();
-			} else if (fail == Fail.REJECT_PERMISSION) {
-				Toast.makeText(getContext(), R.string.message_needs_location_permission, Toast.LENGTH_SHORT).show();
-			}
-		}
-	};
 
 	@Override
 	public void updateNotification(RemoteViews remoteViews) {

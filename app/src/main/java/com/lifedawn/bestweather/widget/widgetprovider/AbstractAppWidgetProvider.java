@@ -15,10 +15,10 @@ import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.classes.Gps;
-import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
@@ -31,7 +31,6 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.ThirdWidgetCreator;
 
 import java.util.List;
 import java.util.Set;
@@ -188,9 +187,11 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 
 	public void loadCurrentLocation(Context context, RemoteViews remoteViews, int appWidgetId) {
 		Log.e(tag, "loadCurrentLocation");
-		Gps.LocationCallback locationCallback = new Gps.LocationCallback() {
+
+		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
-			public void onSuccessful(Location location) {
+			public void onSuccessful(LocationResult locationResult) {
+				final Location location = locationResult.getLocations().get(0);
 				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
 					public void onGeocodingResult(List<Address> addressList) {
@@ -198,16 +199,15 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 						widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
 							@Override
 							public void onResultSuccessful(WidgetDto result) {
-								WidgetDto widgetDto = result;
 								Address address = addressList.get(0);
 
-								widgetDto.setAddressName(address.getAddressLine(0));
-								widgetDto.setCountryCode(address.getCountryCode());
-								widgetDto.setLatitude(address.getLatitude());
-								widgetDto.setLongitude(address.getLongitude());
+								result.setAddressName(address.getAddressLine(0));
+								result.setCountryCode(address.getCountryCode());
+								result.setLatitude(address.getLatitude());
+								result.setLongitude(address.getLongitude());
 
-								widgetRepository.update(widgetDto, null);
-								loadWeatherData(context, remoteViews, appWidgetId, widgetDto);
+								widgetRepository.update(result, null);
+								loadWeatherData(context, remoteViews, appWidgetId, result);
 							}
 
 							@Override
@@ -241,10 +241,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			}
 		};
 
-		Gps gps = new Gps(context, null, null, null);
-		if (gps.checkPermissionAndGpsEnabled(context, locationCallback)) {
-			gps.runGps(context, locationCallback);
-		}
+		FusedLocation.getInstance(context).startLocationUpdates(locationCallback);
 	}
 
 

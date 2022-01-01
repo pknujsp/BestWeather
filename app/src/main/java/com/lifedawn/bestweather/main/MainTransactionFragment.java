@@ -3,8 +3,6 @@ package com.lifedawn.bestweather.main;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.location.Location;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -24,9 +22,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.CloseWindow;
-import com.lifedawn.bestweather.commons.classes.Gps;
+import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
@@ -75,6 +74,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 				closeWindow.clicked(getActivity());
 			}
 		}
+
 	};
 
 	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
@@ -127,6 +127,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 				}
 			}
 		}
+
 	};
 
 	private void setCurrentLocationState(boolean newState) {
@@ -159,22 +160,24 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			}
 		});
 
-		weatherViewModel.setLocationCallback(new Gps.LocationCallback() {
+		weatherViewModel.setLocationCallback(new FusedLocation.MyLocationCallback() {
 			@Override
-			public void onSuccessful(Location location) {
+			public void onSuccessful(LocationResult locationResult) {
 
 			}
 
 			@Override
 			public void onFailed(Fail fail) {
-				//기존의 현재 위치 값이 없으면 즐겨찾기로 이동
-				double latitude = Double.parseDouble(
-						sharedPreferences.getString(getString(R.string.pref_key_last_current_location_latitude), "0.0"));
-				double longitude = Double.parseDouble(
-						sharedPreferences.getString(getString(R.string.pref_key_last_current_location_longitude), "0.0"));
+				if (fail == Fail.FAILED_FIND_LOCATION) {
+					//기존의 현재 위치 값이 없으면 즐겨찾기로 이동
+					double latitude = Double.parseDouble(
+							sharedPreferences.getString(getString(R.string.pref_key_last_current_location_latitude), "0.0"));
+					double longitude = Double.parseDouble(
+							sharedPreferences.getString(getString(R.string.pref_key_last_current_location_longitude), "0.0"));
 
-				if (latitude == 0.0 || longitude == 0.0) {
-					binding.sideNavMenu.favorites.callOnClick();
+					if (latitude == 0.0 || longitude == 0.0) {
+						binding.sideNavMenu.favorites.callOnClick();
+					}
 				}
 			}
 		});
@@ -225,8 +228,13 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		});
 
 		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), newWeatherFragment,
-				WeatherFragment.class.getName()).commit();
+				WeatherFragment.class.getName()).commitNow();
+		initializing = false;
+	}
 
+	@Override
+	public void onStart() {
+		super.onStart();
 		createFavoriteLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
@@ -238,7 +246,8 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 				if (lastSelectedLocationType == LocationType.CurrentLocation) {
 					if (usingCurrentLocation) {
-						binding.sideNavMenu.currentLocationLayout.callOnClick();
+						WeatherFragment weatherFragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName());
+						weatherFragment.load(LocationType.CurrentLocation, null);
 					} else {
 						if (favoriteAddressDtoList.size() > 0) {
 							binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
@@ -264,9 +273,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 			}
 		});
-		initializing = false;
 	}
-
 
 	private void createFavoriteLocationsList(DbQueryCallback<List<FavoriteAddressDto>> callback) {
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {

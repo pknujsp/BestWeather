@@ -205,7 +205,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		final int textColor = AppTheme.getColor(getContext(), R.attr.textColorInWeatherCard);
 
 		View labelView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
-		((TextView) labelView.findViewById(R.id.date)).setVisibility(View.INVISIBLE);
+		labelView.findViewById(R.id.date).setVisibility(View.INVISIBLE);
 		((TextView) labelView.findViewById(R.id.pm10)).setText(getString(R.string.pm10_str));
 		((TextView) labelView.findViewById(R.id.pm25)).setText(getString(R.string.pm25_str));
 		((TextView) labelView.findViewById(R.id.o3)).setText(getString(R.string.o3_str));
@@ -237,10 +237,6 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 					R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.o3));
 
 			((TextView) forecastItemView.findViewById(R.id.date)).setTextColor(textColor);
-			((TextView) forecastItemView.findViewById(R.id.pm10)).setTextColor(textColor);
-			((TextView) forecastItemView.findViewById(R.id.pm25)).setTextColor(textColor);
-			((TextView) forecastItemView.findViewById(R.id.o3)).setTextColor(textColor);
-
 
 			binding.forecast.addView(forecastItemView);
 		}

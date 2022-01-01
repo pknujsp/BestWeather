@@ -85,7 +85,7 @@
 
     <string name="pref_key_show_intro">pref_key_show_intro</string>
 
-    <string name="pref_key_never_ask_again_permission_for_access_fine_location">pref_key_never_ask_again_permission_for_access_fine_location</string>
+    <string name="pref_key_never_ask_again_permission_for_access_location">pref_key_never_ask_again_permission_for_access_location</string>
 
     <string name="pref_key_forecast_view_type">pref_key_forecast_view_type</string>
     <string name="pref_title_forecast_view_type">예보 데이터 목록의 표시 유형</string>
@@ -579,6 +579,7 @@
     <string name="FifthDailyPushNotification">대기질 예보</string>
     <string name="remove">삭제</string>
     <string name="com_lifedawn_bestweather_action_REDRAW">com_lifedawn_bestweather_action_REDRAW</string>
+    <string name="startOnCurrentLocation">현재위치로 시작</string>
 
 
 </resources>

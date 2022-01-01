@@ -15,13 +15,12 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponsePr
 import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.UvIndexProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 
 import java.util.Locale;
 
-public class InitApp extends Application {
+public class MyApplication extends Application {
 	private SharedPreferences sharedPreferences;
 
 	@Override
@@ -53,7 +52,7 @@ public class InitApp extends Application {
 				editor.putString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name());
 				editor.putString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name());
 				editor.putBoolean(getString(R.string.pref_key_use_current_location), true);
-				editor.putBoolean(getString(R.string.pref_key_never_ask_again_permission_for_access_fine_location), false);
+				editor.putBoolean(getString(R.string.pref_key_never_ask_again_permission_for_access_location), false);
 				editor.putBoolean(getString(R.string.pref_key_show_intro), true);
 
 				Locale locale;
@@ -71,4 +70,5 @@ public class InitApp extends Application {
 
 		}
 	}
+
 }
