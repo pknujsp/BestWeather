@@ -32,6 +32,7 @@ import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -52,9 +53,14 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 				@Override
 				public void run() {
 					final Integer id = arguments.getInt(BundleKey.dtoId.name());
+					final LocalTime localTime = LocalTime.parse(arguments.getString("time"));
 					final DailyPushNotificationType dailyPushNotificationType = DailyPushNotificationType.valueOf(arguments.getString(
 							"DailyPushNotificationType"));
-					workNotification(context, executorService, id, dailyPushNotificationType);
+					if (localTime.isBefore(LocalTime.now())) {
+						executorService.shutdown();
+					} else {
+						workNotification(context, executorService, id, dailyPushNotificationType);
+					}
 				}
 			});
 

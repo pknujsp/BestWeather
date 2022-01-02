@@ -48,6 +48,7 @@
                         android:clickable="true"
                         android:drawableRight="@drawable/expand_more"
                         android:drawableTint="@color/purple_500"
+                        android:fontFamily="sans-serif-thin"
                         android:text="@string/loading"
                         android:textAlignment="center"
                         android:textSize="16sp" />
@@ -62,9 +63,10 @@
                         android:layout_marginLeft="16dp"
                         android:layout_marginRight="16dp"
                         android:layout_marginBottom="4dp"
+                        android:fontFamily="sans-serif-condensed-light"
                         android:text="@string/loading"
                         android:textAlignment="center"
-                        android:textSize="20sp" />
+                        android:textSize="22sp" />
 
                     <TextView
                         android:id="@+id/updated_datetime"
@@ -76,6 +78,7 @@
                         android:layout_marginBottom="150dp"
                         android:drawableLeft="@drawable/refresh"
                         android:drawableTint="@color/white"
+                        android:fontFamily="sans-serif-condensed"
                         android:gravity="center_vertical"
                         android:text="@string/loading"
                         android:textAlignment="textEnd"

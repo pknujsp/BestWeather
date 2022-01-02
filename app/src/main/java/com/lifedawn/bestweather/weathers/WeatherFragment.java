@@ -161,7 +161,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 	private AlertDialog dialog;
 
-
 	public WeatherFragment setMenuOnClickListener(View.OnClickListener menuOnClickListener) {
 		this.menuOnClickListener = menuOnClickListener;
 		return this;
@@ -241,7 +240,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
-					dialog = ProgressDialog.show(requireActivity(),getString(R.string.msg_finding_current_location),null);
+					dialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
 					fusedLocation.startLocationUpdates(myLocationCallback);
 				}
 			}
@@ -530,13 +529,23 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			//현재 위치 파악 성공
 			//현재 위/경도 좌표를 최근 현재위치의 위/경도로 등록
 			//날씨 데이터 요청
-			dialog.dismiss();
-			final Location location = locationResult.getLocations().get(0);
+			int bestIndex = 0;
+			float accuracy = Float.MIN_VALUE;
+			List<Location> locations = locationResult.getLocations();
+
+			for (int i = 0; i < locations.size(); i++) {
+				if (locations.get(i).getAccuracy() > accuracy) {
+					accuracy = locations.get(i).getAccuracy();
+					bestIndex = i;
+				}
+			}
+			final Location location = locations.get(bestIndex);
 
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString(getString(R.string.pref_key_last_current_location_latitude), String.valueOf(location.getLatitude())).putString(
 					getString(R.string.pref_key_last_current_location_longitude), String.valueOf(location.getLongitude())).commit();
 
+			dialog.dismiss();
 			onChangedCurrentLocation(location);
 			locationCallbackInMainFragment.onSuccessful(locationResult);
 		}

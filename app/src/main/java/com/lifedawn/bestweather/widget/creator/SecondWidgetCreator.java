@@ -40,6 +40,8 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 	private int hourTextSize;
 	private int tempTextSize;
 	private int popTextSize;
+	private int rainVolumeTextSize;
+	private int snowVolumeTextSize;
 	private int currentPrecipitationTextSize;
 	private int currentAirQualityTextSize;
 	private int currentLabelTextSize;
@@ -80,6 +82,8 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInSimpleWidgetForecastItem) + extraSize;
 		hourTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTimeTextSizeInSimpleWidgetForecastItem) + extraSize;
 		popTextSize = context.getResources().getDimensionPixelSize(R.dimen.popTextSizeInSimpleWidgetForecastItem) + extraSize;
+		rainVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.rainVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
+		snowVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.snowVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
 		currentPrecipitationTextSize = context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
 		currentAirQualityTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
 		currentAirQualityLabelTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
@@ -155,6 +159,20 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		hourAndIconCellLayoutParams.gravity = Gravity.CENTER;
 		hourAndIconCellLayoutParams.weight = 1;
 
+		final String mm = "mm";
+		final String cm = "cm";
+		boolean haveRain = false;
+		boolean haveSnow = false;
+
+		for (int cell = 0; cell < cellCount; cell++) {
+			if (hourlyForecastDtoList.get(cell).isHasRain()) {
+				haveRain = true;
+			}
+			if (hourlyForecastDtoList.get(cell).isHasSnow()) {
+				haveSnow = true;
+			}
+		}
+
 		List<Integer> tempList = new ArrayList<>();
 		final String degree = "°";
 		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E 0");
@@ -171,6 +189,30 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 			tempList.add(Integer.parseInt(hourlyForecastDtoList.get(cell).getTemp().replace(degree, "")));
 
 			((TextView) view.findViewById(R.id.pop)).setText(hourlyForecastDtoList.get(cell).getPop());
+
+			if (haveRain) {
+				if (hourlyForecastDtoList.get(cell).isHasRain()) {
+					((TextView) view.findViewById(R.id.rainVolume)).setText(hourlyForecastDtoList.get(cell).getRainVolume().replace(mm
+							, "").replace(cm, ""));
+					((TextView) view.findViewById(R.id.rainVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, rainVolumeTextSize);
+				} else {
+					view.findViewById(R.id.rainVolumeLayout).setVisibility(View.INVISIBLE);
+				}
+			} else {
+				view.findViewById(R.id.rainVolumeLayout).setVisibility(View.GONE);
+			}
+
+			if (haveSnow) {
+				if (hourlyForecastDtoList.get(cell).isHasSnow()) {
+					((TextView) view.findViewById(R.id.snowVolume)).setText(hourlyForecastDtoList.get(cell).getSnowVolume().replace(mm
+							, "").replace(cm, ""));
+					((TextView) view.findViewById(R.id.snowVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, snowVolumeTextSize);
+				} else {
+					view.findViewById(R.id.snowVolumeLayout).setVisibility(View.INVISIBLE);
+				}
+			} else {
+				view.findViewById(R.id.snowVolumeLayout).setVisibility(View.GONE);
+			}
 
 			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourTextSize);
 			((TextView) view.findViewById(R.id.pop)).setTextSize(TypedValue.COMPLEX_UNIT_PX, popTextSize);
@@ -210,7 +252,6 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		rootLayout.addView(detailSingleTemperatureView, tempRowLayoutParams);
 
 		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews);
-
 	}
 
 

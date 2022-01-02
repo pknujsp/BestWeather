@@ -25,6 +25,7 @@ import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 
+import java.lang.reflect.TypeVariable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -38,6 +39,8 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 	private int hourTextSize;
 	private int tempTextSize;
 	private int popTextSize;
+	private int rainVolumeTextSize;
+	private int snowVolumeTextSize;
 
 	private final int cellCount = 9;
 
@@ -73,7 +76,8 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 		hourTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTimeTextSizeInSimpleWidgetForecastItem) + extraSize;
 		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInSimpleWidgetForecastItem) + extraSize;
 		popTextSize = context.getResources().getDimensionPixelSize(R.dimen.popTextSizeInSimpleWidgetForecastItem) + extraSize;
-
+		rainVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.rainVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
+		snowVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.snowVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
 	}
 
 
@@ -102,7 +106,7 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	public void setTempDataViews(RemoteViews remoteViews) {
-		List<HourlyForecastDto> tempHourlyForecastDtoList = WeatherResponseProcessor.getTempHourlyForecastDtoList(context, cellCount );
+		List<HourlyForecastDto> tempHourlyForecastDtoList = WeatherResponseProcessor.getTempHourlyForecastDtoList(context, cellCount);
 		tempHourlyForecastDtoList.get(0).setHours(null);
 		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), tempHourlyForecastDtoList, null);
 	}
@@ -125,7 +129,22 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 
 		List<Integer> tempList = new ArrayList<>();
 		final String degree = "°";
+		final String mm = "mm";
+		final String cm = "cm";
+
 		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E 0");
+
+		boolean haveRain = false;
+		boolean haveSnow = false;
+
+		for (int cell = 0; cell < cellCount; cell++) {
+			if (hourlyForecastDtoList.get(cell).isHasRain()) {
+				haveRain = true;
+			}
+			if (hourlyForecastDtoList.get(cell).isHasSnow()) {
+				haveSnow = true;
+			}
+		}
 
 		for (int cell = 0; cell < cellCount; cell++) {
 			View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
@@ -147,6 +166,30 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 				((TextView) view.findViewById(R.id.pop)).setText(hourlyForecastDtoList.get(cell).getPop());
 			} else {
 				view.findViewById(R.id.popLayout).setVisibility(View.INVISIBLE);
+			}
+
+			if (haveRain) {
+				if (hourlyForecastDtoList.get(cell).isHasRain()) {
+					((TextView) view.findViewById(R.id.rainVolume)).setText(hourlyForecastDtoList.get(cell).getRainVolume().replace(mm
+							, "").replace(cm, ""));
+					((TextView) view.findViewById(R.id.rainVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, rainVolumeTextSize);
+				} else {
+					view.findViewById(R.id.rainVolumeLayout).setVisibility(View.INVISIBLE);
+				}
+			} else {
+				view.findViewById(R.id.rainVolumeLayout).setVisibility(View.GONE);
+			}
+
+			if (haveSnow) {
+				if (hourlyForecastDtoList.get(cell).isHasSnow()) {
+					((TextView) view.findViewById(R.id.snowVolume)).setText(hourlyForecastDtoList.get(cell).getSnowVolume().replace(mm
+							, "").replace(cm, ""));
+					((TextView) view.findViewById(R.id.snowVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, snowVolumeTextSize);
+				} else {
+					view.findViewById(R.id.snowVolumeLayout).setVisibility(View.INVISIBLE);
+				}
+			} else {
+				view.findViewById(R.id.snowVolumeLayout).setVisibility(View.GONE);
 			}
 
 			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourTextSize);

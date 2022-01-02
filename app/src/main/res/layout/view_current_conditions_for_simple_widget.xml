@@ -40,6 +40,7 @@
             android:includeFontPadding="false"
             android:maxLines="1"
             android:text="20°"
+            android:fontFamily="sans-serif-thin"
             android:textAlignment="center"
             android:textColor="@color/widgetTextColor"
             android:textSize="@dimen/tempTextSizeInCurrentConditionsViewForSimpleWidget" />

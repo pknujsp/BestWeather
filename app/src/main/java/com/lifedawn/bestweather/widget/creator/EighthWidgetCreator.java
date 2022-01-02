@@ -156,7 +156,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		valuesRemoteViews.setTextViewTextSize(R.id.airQuality, TypedValue.COMPLEX_UNIT_PX, currentAirQualityTextSize);
 
 		//시간별 예보-------------------------------------------------------------------------------------
-		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E\n0");
+		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E 0");
 
 		for (int cell = 0; cell < hourlyForecastCount; cell++) {
 			RemoteViews hourlyRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_forecast_item_in_linear);

@@ -39,7 +39,6 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 	private int windSpeedTextSize;
 	private int windStrengthTextSize;
 
-
 	public FirstWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
 	}
@@ -186,7 +185,7 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
+		WeatherSourceType weatherSourceType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherSourceType = WeatherSourceType.KMA_WEB;

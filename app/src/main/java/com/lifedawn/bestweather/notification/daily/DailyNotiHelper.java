@@ -30,6 +30,7 @@ public class DailyNotiHelper {
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 		Bundle bundle = new Bundle();
 		bundle.putInt(BundleKey.dtoId.name(), dailyPushNotificationDto.getId());
+		bundle.putString("time", dailyPushNotificationDto.getAlarmClock());
 		bundle.putString("DailyPushNotificationType", dailyPushNotificationDto.getNotificationType().name());
 
 		refreshIntent.putExtras(bundle);

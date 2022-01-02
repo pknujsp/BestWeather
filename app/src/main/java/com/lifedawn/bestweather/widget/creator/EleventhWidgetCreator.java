@@ -223,14 +223,26 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 				}
 
 				if (haveRain) {
-					((TextView) view.findViewById(R.id.rainVolume)).setText(hourlyForecastDtoList.get(cell).getRainVolume().replace(mm,
-							"").replace(cm, ""));
-					((TextView) view.findViewById(R.id.rainVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, rainVolumeTextSize);
+					if (hourlyForecastDtoList.get(cell).isHasRain()) {
+						((TextView) view.findViewById(R.id.rainVolume)).setText(hourlyForecastDtoList.get(cell).getRainVolume().replace(mm,
+								"").replace(cm, ""));
+						((TextView) view.findViewById(R.id.rainVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, rainVolumeTextSize);
+					} else {
+						view.findViewById(R.id.rainVolumeLayout).setVisibility(View.INVISIBLE);
+					}
+				} else {
+					view.findViewById(R.id.rainVolumeLayout).setVisibility(View.GONE);
 				}
-				if (hourlyForecastDtoList.get(cell).isHasSnow()) {
-					((TextView) view.findViewById(R.id.snowVolume)).setText(hourlyForecastDtoList.get(cell).getSnowVolume().replace(mm,
-							"").replace(cm, ""));
-					((TextView) view.findViewById(R.id.snowVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, snowVolumeTextSize);
+				if (haveSnow) {
+					if (hourlyForecastDtoList.get(cell).isHasSnow()) {
+						((TextView) view.findViewById(R.id.snowVolume)).setText(hourlyForecastDtoList.get(cell).getSnowVolume().replace(mm,
+								"").replace(cm, ""));
+						((TextView) view.findViewById(R.id.snowVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, snowVolumeTextSize);
+					} else {
+						view.findViewById(R.id.snowVolumeLayout).setVisibility(View.INVISIBLE);
+					}
+				} else {
+					view.findViewById(R.id.snowVolumeLayout).setVisibility(View.GONE);
 				}
 
 				((TextView) view.findViewById(R.id.pop)).setTextSize(TypedValue.COMPLEX_UNIT_PX, popTextSize);
@@ -239,8 +251,6 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 
 				view.findViewById(R.id.dateTime).setVisibility(View.GONE);
 				view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
-				view.findViewById(R.id.rainVolumeLayout).setVisibility(haveRain ? View.VISIBLE : View.GONE);
-				view.findViewById(R.id.snowVolumeLayout).setVisibility(haveSnow ? View.VISIBLE : View.GONE);
 
 				hourlyForecastListView.addView(view, layoutParams);
 			}

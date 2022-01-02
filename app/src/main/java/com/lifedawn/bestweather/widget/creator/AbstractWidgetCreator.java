@@ -276,12 +276,15 @@ public abstract class AbstractWidgetCreator {
 				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
 					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS).getResponseText();
 					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS.name(), text);
-				}
-				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast) || requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
 					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_FORECASTS).getResponseText();
 					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_FORECASTS.name(), text);
 				}
-
+				if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_FORECASTS.name())) {
+					if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast) || requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
+						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_FORECASTS).getResponseText();
+						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_FORECASTS.name(), text);
+					}
+				}
 				rootJsonObject.add(weatherSourceType.name(), kmaJsonObject);
 
 			} else if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {

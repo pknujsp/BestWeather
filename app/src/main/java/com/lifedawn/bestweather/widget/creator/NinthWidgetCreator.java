@@ -141,8 +141,6 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 			count++;
 		}
 
-		final String mm = "mm";
-		final String cm = "cm";
 		count = 1;
 
 		for (cell = 0; cell < hourlyForecastDtoList.size(); cell = cell + hourGap) {
@@ -160,14 +158,13 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 			((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(hourlyForecastDtoList.get(cell).getWeatherIcon());
 
 			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourTextSize);
-			((TextView) view.findViewById(R.id.pop)).setTextSize(TypedValue.COMPLEX_UNIT_PX, popTextSize);
 
 			view.findViewById(R.id.temperature).setVisibility(View.GONE);
 			view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
 
 			view.findViewById(R.id.popLayout).setVisibility(View.GONE);
-			view.findViewById(R.id.rainVolumeLayout).setVisibility(haveRainVolume ? View.VISIBLE : View.GONE);
-			view.findViewById(R.id.snowVolumeLayout).setVisibility(haveSnowVolume ? View.VISIBLE : View.GONE);
+			view.findViewById(R.id.rainVolumeLayout).setVisibility(View.GONE);
+			view.findViewById(R.id.snowVolumeLayout).setVisibility(View.GONE);
 			tempList.add(Integer.parseInt(hourlyForecastDtoList.get(cell).getTemp().replace(degree, "")));
 
 			hourAndIconLinearLayout.addView(view, hourAndIconCellLayoutParams);

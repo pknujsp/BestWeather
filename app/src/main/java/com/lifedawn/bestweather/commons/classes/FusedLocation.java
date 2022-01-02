@@ -90,7 +90,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				accessFineLocation == PackageManager.PERMISSION_GRANTED) {
 			LocationRequest locationRequest = LocationRequest.create();
 			locationRequest.setInterval(300);
-			locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+			locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 			fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
 				@Override

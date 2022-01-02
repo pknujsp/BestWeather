@@ -85,6 +85,7 @@ public class WeatherRequestUtil {
 
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
 				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS);
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_FORECASTS);
 			}
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast) || requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
 				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_FORECASTS);

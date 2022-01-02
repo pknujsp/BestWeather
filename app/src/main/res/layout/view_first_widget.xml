@@ -28,6 +28,7 @@
             android:layout_marginRight="12dp"
             android:includeFontPadding="false"
             android:text="20°"
+            android:fontFamily="sans-serif-thin"
             android:textColor="@color/widgetTextColor"
             android:textSize="@dimen/tempTextSizeInCurrentWidget" />
 
