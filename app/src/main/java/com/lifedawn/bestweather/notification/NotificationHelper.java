@@ -15,18 +15,25 @@ import com.lifedawn.bestweather.main.MainActivity;
 
 public class NotificationHelper {
 	private Context context;
+	NotificationManager notificationManager;
 
 	public NotificationHelper(Context context) {
 		this.context = context;
+		this.notificationManager = context.getSystemService(NotificationManager.class);
 	}
 
 	private void createNotificationChannel(NotificationObj notificationObj) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			NotificationChannel channel = new NotificationChannel(notificationObj.channelId, notificationObj.channelName,
-					NotificationManager.IMPORTANCE_DEFAULT);
+					NotificationManager.IMPORTANCE_LOW);
 			channel.setDescription(notificationObj.channelDescription);
 
-			NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+			if (notificationObj.getNotificationType() == NotificationType.Always) {
+				channel.setVibrationPattern(new long[]{0L});
+				channel.enableLights(false);
+				channel.enableVibration(true);
+			}
+
 			notificationManager.createNotificationChannel(channel);
 		}
 	}
@@ -51,7 +58,6 @@ public class NotificationHelper {
 	}
 
 	public void cancelNotification(int notificationId) {
-		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
 		StatusBarNotification[] activeNotifications = notificationManager.getActiveNotifications();
 
 		for (StatusBarNotification activeNotification : activeNotifications) {
@@ -65,17 +71,14 @@ public class NotificationHelper {
 
 	private NotificationObj getNotificationObj(NotificationType notificationType) {
 		if (notificationType == NotificationType.Always) {
-			return new NotificationObj(NotificationType.Always.getNotificationId(),
-					NotificationType.Always.getChannelId(), context.getString(R.string.notificationAlwaysChannelName),
-					context.getString(R.string.notificationAlwaysChannelDescription));
+			return new NotificationObj(context.getString(R.string.notificationAlwaysChannelName),
+					context.getString(R.string.notificationAlwaysChannelDescription), notificationType);
 		} else if (notificationType == NotificationType.Daily) {
-			return new NotificationObj(NotificationType.Daily.getNotificationId(),
-					NotificationType.Daily.getChannelId(), context.getString(R.string.notificationDailyChannelName),
-					context.getString(R.string.notificationDailyChannelDescription));
+			return new NotificationObj(context.getString(R.string.notificationDailyChannelName),
+					context.getString(R.string.notificationDailyChannelDescription), notificationType);
 		} else {
-			return new NotificationObj(NotificationType.Alarm.getNotificationId(),
-					NotificationType.Alarm.getChannelId(), context.getString(R.string.notificationAlarmChannelName),
-					context.getString(R.string.notificationAlarmChannelDescription));
+			return new NotificationObj(context.getString(R.string.notificationAlarmChannelName),
+					context.getString(R.string.notificationAlarmChannelDescription), notificationType);
 		}
 	}
 
@@ -85,12 +88,14 @@ public class NotificationHelper {
 		final String channelId;
 		final String channelName;
 		final String channelDescription;
+		final NotificationType notificationType;
 
-		public NotificationObj(int notificationId, String channelId, String channelName, String channelDescription) {
-			this.notificationId = notificationId;
-			this.channelId = channelId;
+		public NotificationObj(String channelName, String channelDescription, NotificationType notificationType) {
+			this.notificationId = notificationType.getNotificationId();
+			this.channelId = notificationType.getChannelId();
 			this.channelName = channelName;
 			this.channelDescription = channelDescription;
+			this.notificationType = notificationType;
 		}
 
 		public NotificationCompat.Builder getNotificationBuilder() {
@@ -115,6 +120,10 @@ public class NotificationHelper {
 
 		public String getChannelDescription() {
 			return channelDescription;
+		}
+
+		public NotificationType getNotificationType() {
+			return notificationType;
 		}
 	}
 }

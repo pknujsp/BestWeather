@@ -129,6 +129,7 @@ public abstract class AbstractNotiViewCreator {
 
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
 		WeatherSourceType weatherDataSourceType = notificationDataObj.getWeatherSourceType();
+
 		if (notificationDataObj.isTopPriorityKma() && notificationDataObj.getCountryCode().equals("KR")) {
 			weatherDataSourceType = WeatherSourceType.KMA_WEB;
 		}

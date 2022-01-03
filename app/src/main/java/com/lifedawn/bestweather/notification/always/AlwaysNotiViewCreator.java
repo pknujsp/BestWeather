@@ -4,11 +4,13 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
@@ -38,7 +40,7 @@ import java.util.List;
 import java.util.Set;
 
 public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
-
+	private final int hourlyForecastCount = 8;
 
 	public AlwaysNotiViewCreator(Context context, NotificationUpdateCallback notificationUpdateCallback) {
 		super(context, NotificationType.Always, notificationUpdateCallback);
@@ -49,9 +51,9 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_always_notification);
 
 		if (temp) {
-			setTempHourlyForecastViews(remoteViews);
+			setHourlyForecastViews(remoteViews, WeatherResponseProcessor.getTempHourlyForecastDtoList(context, hourlyForecastCount));
 		} else {
-			remoteViews.setOnClickPendingIntent(R.id.refresh, getRefreshPendingIntent());
+			remoteViews.setOnClickPendingIntent(R.id.refreshLayout, getRefreshPendingIntent());
 		}
 
 		return remoteViews;
@@ -155,8 +157,23 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E 0");
 		String hours = null;
 
-		for (int i = 0; i < 7; i++) {
-			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_linear);
+		boolean haveRain = false;
+		boolean haveSnow = false;
+
+		for (int i = 0; i < hourlyForecastCount; i++) {
+			if (hourlyForecastDtoList.get(i).isHasRain()) {
+				haveRain = true;
+			}
+			if (hourlyForecastDtoList.get(i).isHasSnow()) {
+				haveSnow = true;
+			}
+		}
+
+		final String mm = "mm";
+		final String cm = "cm";
+
+		for (int i = 0; i < hourlyForecastCount; i++) {
+			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_forecast_item_in_linear);
 
 			if (hourlyForecastDtoList.get(i).getHours().getHour() == 0) {
 				hours = hourlyForecastDtoList.get(i).getHours().format(hour0Formatter);
@@ -164,47 +181,61 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 				hours = String.valueOf(hourlyForecastDtoList.get(i).getHours().getHour());
 			}
 
-			childRemoteViews.setTextViewText(R.id.hour, hours);
+			if (haveRain) {
+				if (hourlyForecastDtoList.get(i).isHasRain()) {
+					childRemoteViews.setTextViewText(R.id.rainVolume, hourlyForecastDtoList.get(i).getRainVolume()
+							.replace(mm, "").replace(cm, ""));
+					childRemoteViews.setTextColor(R.id.rainVolume, textColor);
+				} else {
+					childRemoteViews.setViewVisibility(R.id.rainVolumeLayout, View.INVISIBLE);
+				}
+			} else {
+				childRemoteViews.setViewVisibility(R.id.rainVolumeLayout, View.GONE);
+			}
+
+			if (haveSnow) {
+				if (hourlyForecastDtoList.get(i).isHasRain()) {
+					childRemoteViews.setTextViewText(R.id.snowVolume, hourlyForecastDtoList.get(i).getSnowVolume()
+							.replace(mm, "").replace(cm, ""));
+					childRemoteViews.setTextColor(R.id.snowVolume, textColor);
+				} else {
+					childRemoteViews.setViewVisibility(R.id.snowVolumeLayout, View.INVISIBLE);
+				}
+			} else {
+				childRemoteViews.setViewVisibility(R.id.snowVolumeLayout, View.GONE);
+			}
+
+			childRemoteViews.setTextViewText(R.id.dateTime, hours);
+			childRemoteViews.setTextViewText(R.id.pop, hourlyForecastDtoList.get(i).getPop());
 			childRemoteViews.setTextViewText(R.id.temperature, hourlyForecastDtoList.get(i).getTemp());
-			childRemoteViews.setImageViewResource(R.id.weatherIcon, hourlyForecastDtoList.get(i).getWeatherIcon());
+			childRemoteViews.setImageViewResource(R.id.leftIcon, hourlyForecastDtoList.get(i).getWeatherIcon());
+			childRemoteViews.setViewVisibility(R.id.rightIcon, View.GONE);
 
-			childRemoteViews.setTextColor(R.id.hour, textColor);
+			childRemoteViews.setTextColor(R.id.dateTime, textColor);
 			childRemoteViews.setTextColor(R.id.temperature, textColor);
-
-			remoteViews.addView(R.id.hourlyForecast, childRemoteViews);
-		}
-	}
-
-	public void setTempHourlyForecastViews(RemoteViews remoteViews) {
-		remoteViews.removeAllViews(R.id.hourlyForecast);
-		final int textColor = ContextCompat.getColor(context, R.color.textColorInNotification);
-
-		for (int i = 0; i < 7; i++) {
-			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_hourly_forecast_item_in_linear);
-
-			childRemoteViews.setTextColor(R.id.hour, textColor);
-			childRemoteViews.setTextColor(R.id.temperature, textColor);
+			childRemoteViews.setTextColor(R.id.pop, textColor);
 
 			remoteViews.addView(R.id.hourlyForecast, childRemoteViews);
 		}
 	}
 
 	public void makeNotification(RemoteViews remoteViews, int icon) {
-		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(notificationType);
-		notificationObj.getNotificationBuilder().setOngoing(true);
-		notificationObj.getNotificationBuilder().setSmallIcon(icon);
-		notificationObj.getNotificationBuilder().setShowWhen(false);
-		notificationObj.getNotificationBuilder().setStyle(new NotificationCompat.BigTextStyle());
-		notificationObj.getNotificationBuilder().setPriority(NotificationCompat.PRIORITY_LOW);
-		notificationObj.getNotificationBuilder().setVibrate(new long[]{0L});
-		notificationObj.getNotificationBuilder().setAutoCancel(false);
+		boolean enabled =
+				PreferenceManager.getDefaultSharedPreferences(context).getBoolean(notificationType.getPreferenceName(), false);
+		if (enabled) {
+			NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(notificationType);
+			NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
 
-		notificationObj.getNotificationBuilder().setCustomContentView(remoteViews);
-		notificationObj.getNotificationBuilder().setCustomBigContentView(remoteViews);
+			builder.setOngoing(true).setSmallIcon(icon).setShowWhen(false).setStyle(new NotificationCompat.BigTextStyle()).setPriority(NotificationCompat.PRIORITY_LOW)
+					.setVibrate(new long[]{0L}).setDefaults(NotificationCompat.DEFAULT_LIGHTS |
+					NotificationCompat.DEFAULT_SOUND).setAutoCancel(false).setCustomContentView(remoteViews).setCustomBigContentView(remoteViews);
 
-		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-		Notification notification = notificationObj.getNotificationBuilder().build();
-		notificationManager.notify(notificationObj.getNotificationId(), notification);
+			NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+			Notification notification = builder.build();
+			notificationManager.notify(notificationType.getNotificationId(), notification);
+		} else {
+			notificationHelper.cancelNotification(notificationType.getNotificationId());
+		}
 	}
 
 	/*

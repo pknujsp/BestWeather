@@ -36,7 +36,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="description"
-            style="@style/text_shadow_black"
             android:textColor="@color/black"
             android:textSize="@dimen/gradeDescriptionTextSizeInSimpleAirQualityItem" />
 

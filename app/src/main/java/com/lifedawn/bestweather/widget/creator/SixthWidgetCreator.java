@@ -145,35 +145,28 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 
 		List<String> gradeValueList = new ArrayList<>();
 		List<String> gradeDescriptionList = new ArrayList<>();
-		List<Integer> gradeTextColorList = new ArrayList<>();
 
 		gradeValueList.add(airQualityDto.getCurrent().getPm10().toString());
 		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getPm10()));
-		gradeTextColorList.add(AqicnResponseProcessor.getGradeColorId(airQualityDto.getCurrent().getPm10()));
 
 		gradeValueList.add(airQualityDto.getCurrent().getPm25().toString());
 		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getPm25()));
-		gradeTextColorList.add(AqicnResponseProcessor.getGradeColorId(airQualityDto.getCurrent().getPm25()));
 
 		gradeValueList.add(airQualityDto.getCurrent().getO3().toString());
 		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getO3()));
-		gradeTextColorList.add(AqicnResponseProcessor.getGradeColorId(airQualityDto.getCurrent().getO3()));
 
 		gradeValueList.add(airQualityDto.getCurrent().getCo().toString());
 		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getCo()));
-		gradeTextColorList.add(AqicnResponseProcessor.getGradeColorId(airQualityDto.getCurrent().getCo()));
 
 		gradeValueList.add(airQualityDto.getCurrent().getSo2().toString());
 		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getSo2()));
-		gradeTextColorList.add(AqicnResponseProcessor.getGradeColorId(airQualityDto.getCurrent().getSo2()));
 
 		gradeValueList.add(airQualityDto.getCurrent().getNo2().toString());
 		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getNo2()));
-		gradeTextColorList.add(AqicnResponseProcessor.getGradeColorId(airQualityDto.getCurrent().getNo2()));
 
 		for (int i = 0; i < 6; i++) {
 			addAirQualityGridItem(layoutInflater, airQualityGridLayout, particleNames[i], gradeValueList.get(i), gradeDescriptionList.get(i),
-					gradeTextColorList.get(i), iconIds[i]);
+					iconIds[i]);
 		}
 
 		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -192,7 +185,7 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	private void addAirQualityGridItem(LayoutInflater layoutInflater, GridLayout gridLayout, String label, String gradeValue,
-	                                   String gradeDescription, int textColor, int iconId) {
+	                                   String gradeDescription, int iconId) {
 		RelativeLayout view = (RelativeLayout) layoutInflater.inflate(R.layout.air_quality_item, null);
 		((ImageView) view.findViewById(R.id.label_icon)).setImageResource(iconId);
 
@@ -203,7 +196,6 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 		labelTextView.setText(label);
 		gradeValueTextView.setText(gradeValue);
 		gradeDescriptionTextView.setText(gradeDescription);
-		gradeDescriptionTextView.setTextColor(textColor);
 
 		labelTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, particleNameTextSize);
 		gradeValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, gradeValueTextSize);

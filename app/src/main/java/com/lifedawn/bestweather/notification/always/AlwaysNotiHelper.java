@@ -20,27 +20,26 @@ public class AlwaysNotiHelper {
 		alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 	}
 
-	public void onSelectedAutoRefreshInterval(long val) {
+	public void onSelectedAutoRefreshInterval(long millis) {
 		cancelAutoRefresh();
 
-		if (val == 0) {
-			return;
+		if (millis != 0) {
+			Intent refreshIntent = new Intent(context, NotificationReceiver.class);
+			refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+			Bundle bundle = new Bundle();
+			bundle.putString(NotificationType.class.getName(), NotificationType.Always.name());
+
+			refreshIntent.putExtras(bundle);
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 123, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+			alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
+					millis, pendingIntent);
 		}
 
-		Intent refreshIntent = new Intent(context, NotificationReceiver.class);
-		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-		Bundle bundle = new Bundle();
-		bundle.putString(NotificationType.class.getName(), NotificationType.Always.name());
-
-		refreshIntent.putExtras(bundle);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 11, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
-				val, pendingIntent);
 	}
 
 	public void cancelAutoRefresh() {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 11, new Intent(context, NotificationReceiver.class), 0);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 123, new Intent(context, NotificationReceiver.class), 0);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();

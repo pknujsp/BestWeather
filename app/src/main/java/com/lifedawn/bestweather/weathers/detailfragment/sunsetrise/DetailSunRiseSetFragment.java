@@ -8,7 +8,11 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,6 +23,8 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.listener.ChartTouchListener;
+import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.model.GradientColor;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
@@ -85,6 +91,15 @@ public class DetailSunRiseSetFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				getParentFragmentManager().popBackStackImmediate();
+			}
+		});
+
+		binding.chart.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				Log.d("touchEvent", event.getAction() + " : systemCurrent - " + System.currentTimeMillis() +
+						", downTime - " + event.getDownTime() + ", eventTime - " + event.getEventTime());
+				return false;
 			}
 		});
 
@@ -187,6 +202,56 @@ public class DetailSunRiseSetFragment extends Fragment {
 
 						if (sunRiseSetObjList.size() > 0) {
 							binding.chart.zoom(0f, 8f, 0f, 0f);
+
+							final float x = binding.chart.getLeft() + binding.chart.getWidth() / 2f;
+							final float y = binding.chart.getTop() + binding.chart.getHeight() / 2f;
+							/*
+							4384
+							4457
+							4531
+							4594
+							*/
+
+							Handler handler = new Handler();
+
+							final long firstDownTime = SystemClock.uptimeMillis();
+							final long firstEventTime = firstDownTime;
+
+							binding.chart.dispatchTouchEvent(MotionEvent.obtain(firstDownTime,
+									firstEventTime,
+									MotionEvent.ACTION_DOWN, x, y, 0));
+
+							handler.postDelayed(new Runnable() {
+								@Override
+								public void run() {
+									binding.chart.dispatchTouchEvent(MotionEvent.obtain(firstDownTime,
+											SystemClock.uptimeMillis(),
+											MotionEvent.ACTION_UP, x, y, 0));
+
+									handler.postDelayed(new Runnable() {
+										@Override
+										public void run() {
+											final long secDownTime = SystemClock.uptimeMillis();
+											final long secEventTime = secDownTime;
+
+											binding.chart.dispatchTouchEvent(MotionEvent.obtain(secDownTime,
+													secEventTime,
+													MotionEvent.ACTION_DOWN, x, y, 0));
+
+											handler.postDelayed(new Runnable() {
+												@Override
+												public void run() {
+													binding.chart.dispatchTouchEvent(MotionEvent.obtain(secDownTime,
+															SystemClock.uptimeMillis(),
+															MotionEvent.ACTION_UP, x, y, 0));
+												}
+											}, 20);
+										}
+									}, 40);
+								}
+							}, 20);
+
+
 						}
 					}
 				});

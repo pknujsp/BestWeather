@@ -7,19 +7,61 @@
     android:padding="8dp">
 
     <LinearLayout
-        android:id="@+id/content_container"
+        android:id="@+id/valuesLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <include
-            android:id="@+id/header"
-            layout="@layout/view_header_in_notification" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-condensed"
+                android:maxLines="1"
+                android:minLines="1"
+                android:text="@string/address_name"
+                android:textColor="@color/textColorInNotification"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:id="@+id/refreshLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/refresh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:gravity="center_vertical"
+                    android:text="@string/updated_time"
+                    android:textColor="@color/textColorInNotification"
+                    android:textSize="12sp" />
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/refresh" />
+
+            </LinearLayout>
+        </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/currentConditionsLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
 
 
             <ImageView
@@ -40,12 +82,13 @@
                 android:layout_alignBottom="@id/weatherIcon"
                 android:layout_marginRight="16dp"
                 android:layout_toRightOf="@id/weatherIcon"
+                android:fontFamily="sans-serif-thin"
                 android:gravity="center_vertical"
+                android:includeFontPadding="false"
                 android:maxLines="1"
                 android:text="20°"
                 android:textColor="@color/textColorInNotification"
-                android:textScaleX="0.95"
-                android:textSize="20sp" />
+                android:textSize="24sp" />
 
 
             <TextView

@@ -3,31 +3,23 @@ package com.lifedawn.bestweather.widget.creator;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.gridlayout.widget.GridLayout;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
-import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
-import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
-import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
-import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 
 import java.time.ZonedDateTime;
@@ -142,23 +134,19 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 
 		List<String> gradeValueList = new ArrayList<>();
 		List<String> gradeDescriptionList = new ArrayList<>();
-		List<Integer> gradeTextColorList = new ArrayList<>();
 
 		gradeValueList.add(airQualityDto.getCurrent().getCo().toString());
 		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getCo()));
-		gradeTextColorList.add(AqicnResponseProcessor.getGradeColorId(airQualityDto.getCurrent().getCo()));
 
 		gradeValueList.add(airQualityDto.getCurrent().getSo2().toString());
 		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getSo2()));
-		gradeTextColorList.add(AqicnResponseProcessor.getGradeColorId(airQualityDto.getCurrent().getSo2()));
 
 		gradeValueList.add(airQualityDto.getCurrent().getNo2().toString());
 		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getNo2()));
-		gradeTextColorList.add(AqicnResponseProcessor.getGradeColorId(airQualityDto.getCurrent().getNo2()));
 
 		for (int i = 0; i < 3; i++) {
-			addAirQualityGridItem(layoutInflater, gridLayout, particleNames[i], gradeValueList.get(i), gradeDescriptionList.get(i),
-					gradeTextColorList.get(i), iconIds[i]);
+			addAirQualityGridItem(layoutInflater, gridLayout, particleNames[i], gradeValueList.get(i), gradeDescriptionList.get(i)
+			);
 		}
 
 		LinearLayout forecastLayout = seventhView.findViewById(R.id.airQualityForecast);
@@ -215,19 +203,16 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 			dateTextView.setText(item.getDate() == null ? context.getString(R.string.current) : item.getDate().format(forecastDateFormatter));
 			if (item.isHasPm10()) {
 				pm10TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getPm10().getAvg()));
-				pm10TextView.setTextColor(AqicnResponseProcessor.getGradeColorId(item.getPm10().getAvg()));
 			} else {
 				pm10TextView.setText(noData);
 			}
 			if (item.isHasPm25()) {
 				pm25TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getPm25().getAvg()));
-				pm25TextView.setTextColor(AqicnResponseProcessor.getGradeColorId(item.getPm25().getAvg()));
 			} else {
 				pm25TextView.setText(noData);
 			}
 			if (item.isHasO3()) {
 				o3TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getO3().getAvg()));
-				o3TextView.setTextColor(AqicnResponseProcessor.getGradeColorId(item.getO3().getAvg()));
 			} else {
 				o3TextView.setText(noData);
 			}
@@ -251,7 +236,7 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	private void addAirQualityGridItem(LayoutInflater layoutInflater, GridLayout gridLayout, String label, String gradeValue,
-	                                   String gradeDescription, int textColor, int iconId) {
+	                                   String gradeDescription) {
 		View view = layoutInflater.inflate(R.layout.view_simple_air_quality_item, null, false);
 
 		TextView labelTextView = view.findViewById(R.id.label);
@@ -261,7 +246,6 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		labelTextView.setText(label);
 		gradeValueTextView.setText(gradeValue);
 		gradeDescriptionTextView.setText(gradeDescription);
-		gradeDescriptionTextView.setTextColor(textColor);
 
 		labelTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, currentParticleNameTextSize);
 		gradeValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, currentGradeValueTextSize);

@@ -110,7 +110,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		private Context context;
 		private OnClickedListViewItemListener<Integer> onClickedForecastItem;
 		private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
-		private DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("HH");
+		private DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("H");
 
 		public HourlyForecastListAdapter(Context context, @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
 			this.context = context;

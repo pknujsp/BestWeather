@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.Layout;
 import android.text.StaticLayout;
@@ -49,6 +50,7 @@ public class IconTextView extends View {
 		valueTextPaint.setTextAlign(Paint.Align.CENTER);
 		valueTextPaint.setTextSize(context.getResources().getDimension(R.dimen.iconValueTextSizeInSCD));
 		valueTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
+		valueTextPaint.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
 
 		icon = ContextCompat.getDrawable(context, iconId);
 		icon.setTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.blue)));

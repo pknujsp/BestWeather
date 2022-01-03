@@ -861,7 +861,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 					.setWeatherIcon(KmaResponseProcessor.getWeatherIconImgWeb(finalHourlyForecast.getWeatherDescription(),
 							isNight))
 					.setWeatherDescription(KmaResponseProcessor.getWeatherDescriptionWeb(finalHourlyForecast.getWeatherDescription()))
-					.setHumidity(finalHourlyForecast.getHumidity() + percent).setPop(!finalHourlyForecast.getPop().contains("%") ?
+					.setHumidity(finalHourlyForecast.getHumidity()).setPop(!finalHourlyForecast.getPop().contains("%") ?
 					"-" : finalHourlyForecast.getPop());
 
 			if (finalHourlyForecast.getWindDirection() != null) {
