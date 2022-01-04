@@ -31,4 +31,9 @@
             </group>
         </group>
     </group>
+    <path
+        android:pathData="M12.671653 40.98843l7.339087 -7.472412 -4.935099 -0.02687V7.9387681H10.496592V33.463825l-4.935099 -0.02687z"
+        android:fillType="evenOdd"
+        android:fillColor="#000000"
+        android:strokeLineCap="round" />
 </vector>

@@ -4,6 +4,8 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -41,6 +43,7 @@ import java.util.Set;
 
 public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 	private final int hourlyForecastCount = 8;
+	private Handler handler;
 
 	public AlwaysNotiViewCreator(Context context, NotificationUpdateCallback notificationUpdateCallback) {
 		super(context, NotificationType.Always, notificationUpdateCallback);
@@ -59,10 +62,13 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 		return remoteViews;
 	}
 
-	public void initNotification() {
+
+	@Override
+	public void initNotification(Handler handler) {
+		this.handler = handler;
 		RemoteViews remoteViews = createRemoteViews(false);
 		RemoteViewProcessor.onBeginProcess(remoteViews);
-		makeNotification(remoteViews, R.drawable.refresh);
+		makeNotification(remoteViews, R.drawable.refresh, false);
 
 		if (notificationDataObj.getLocationType() == LocationType.CurrentLocation) {
 			loadCurrentLocation(context, remoteViews);
@@ -123,7 +129,7 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 			remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, getRefreshPendingIntent());
 		}
 
-		makeNotification(remoteViews, icon);
+		makeNotification(remoteViews, icon, true);
 	}
 
 	public void setHeaderViews(RemoteViews remoteViews, String addressName, String dateTime) {
@@ -219,7 +225,7 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 		}
 	}
 
-	public void makeNotification(RemoteViews remoteViews, int icon) {
+	public void makeNotification(RemoteViews remoteViews, int icon, boolean isFinished) {
 		boolean enabled =
 				PreferenceManager.getDefaultSharedPreferences(context).getBoolean(notificationType.getPreferenceName(), false);
 		if (enabled) {
@@ -235,6 +241,12 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 			notificationManager.notify(notificationType.getNotificationId(), notification);
 		} else {
 			notificationHelper.cancelNotification(notificationType.getNotificationId());
+		}
+
+		if (isFinished && handler != null) {
+			Message message = handler.obtainMessage();
+			message.obj = "finished";
+			handler.sendMessage(message);
 		}
 	}
 

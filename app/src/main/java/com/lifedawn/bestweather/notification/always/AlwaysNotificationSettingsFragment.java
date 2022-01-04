@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.notification.always;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,6 +9,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,8 +37,6 @@ import com.lifedawn.bestweather.notification.model.AlwaysNotiDataObj;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Locale;
 
 
 public class AlwaysNotificationSettingsFragment extends Fragment implements NotificationUpdateCallback {
@@ -115,7 +114,12 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 
 					if (isChecked) {
 						alwaysNotiViewCreator.savePreferences();
-						alwaysNotiViewCreator.initNotification();
+						alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
+							@Override
+							public boolean handleMessage(@NonNull Message msg) {
+								return false;
+							}
+						}));
 						onSelectedAutoRefreshInterval(alwaysNotiDataObj.getUpdateIntervalMillis());
 					} else {
 						notificationHelper.cancelNotification(notificationType.getNotificationId());
@@ -287,7 +291,12 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 					.setLatitude(Float.parseFloat(favoriteAddressDto.getLatitude())).setLongitude(Float.parseFloat(favoriteAddressDto.getLongitude()));
 			alwaysNotiDataObj.setLocationType(LocationType.SelectedAddress);
 			alwaysNotiViewCreator.savePreferences();
-			alwaysNotiViewCreator.initNotification();
+			alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
+				@Override
+				public boolean handleMessage(@NonNull Message msg) {
+					return false;
+				}
+			}));
 		}
 	}
 
@@ -296,7 +305,12 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 			alwaysNotiDataObj.setLocationType(LocationType.CurrentLocation);
 			alwaysNotiViewCreator.savePreferences();
 
-			alwaysNotiViewCreator.initNotification();
+			alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
+				@Override
+				public boolean handleMessage(@NonNull Message msg) {
+					return false;
+				}
+			}));
 		}
 	}
 
@@ -311,7 +325,12 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 			alwaysNotiDataObj.setTopPriorityKma(checked);
 			alwaysNotiViewCreator.savePreferences();
 
-			alwaysNotiViewCreator.initNotification();
+			alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
+				@Override
+				public boolean handleMessage(@NonNull Message msg) {
+					return false;
+				}
+			}));
 		}
 	}
 
@@ -320,7 +339,12 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 			alwaysNotiDataObj.setWeatherSourceType(weatherSourceType);
 			alwaysNotiViewCreator.savePreferences();
 
-			alwaysNotiViewCreator.initNotification();
+			alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
+				@Override
+				public boolean handleMessage(@NonNull Message msg) {
+					return false;
+				}
+			}));
 		}
 	}
 

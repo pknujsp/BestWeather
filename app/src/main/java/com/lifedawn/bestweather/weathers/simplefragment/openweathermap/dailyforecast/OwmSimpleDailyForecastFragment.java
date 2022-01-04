@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
@@ -132,7 +133,8 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 		final String degree = "°";
 		final String mm = "mm";
-		boolean haveSnowVolumes = false;
+		boolean haveSnow = false;
+		boolean haveRain = false;
 
 		List<DailyForecastDto> dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), oneCallResponse,
 				windUnit, tempUnit);
@@ -143,8 +145,13 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			maxTempList.add(Integer.parseInt(item.getMaxTemp().replace(degree, "")));
 
 			if (item.getSingleValues().isHasSnowVolume()) {
-				if (!haveSnowVolumes) {
-					haveSnowVolumes = true;
+				if (!haveSnow) {
+					haveSnow = true;
+				}
+			}
+			if (item.getSingleValues().isHasRainVolume()) {
+				if (!haveRain) {
+					haveRain = true;
 				}
 			}
 			snowVolumeList.add(item.getSingleValues().getSnowVolume().replace(mm, ""));
@@ -209,7 +216,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
 		binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
 		binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
-		if (haveSnowVolumes) {
+		if (haveSnow) {
 			binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
 		}
 
@@ -217,6 +224,9 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
+
+		createValueUnitsDescription(WeatherSourceType.OPEN_WEATHER_MAP, haveRain, haveSnow);
+
 	}
 
 }

@@ -249,6 +249,11 @@
         </receiver>
 
         <service
+            android:name=".notification.AlwaysNotiJobService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
             android:name=".alarm.alarmnotifications.AlarmService"
             android:enabled="true"
             android:exported="true" />

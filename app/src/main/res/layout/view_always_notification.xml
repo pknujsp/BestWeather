@@ -61,7 +61,8 @@
             android:id="@+id/currentConditionsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="6dp">
 
 
             <ImageView
@@ -88,7 +89,7 @@
                 android:maxLines="1"
                 android:text="20°"
                 android:textColor="@color/textColorInNotification"
-                android:textSize="24sp" />
+                android:textSize="26sp" />
 
 
             <TextView
@@ -99,11 +100,13 @@
                 android:layout_alignBottom="@id/weatherIcon"
                 android:layout_marginRight="16dp"
                 android:layout_toRightOf="@id/temp"
-                android:autoSizeTextType="uniform"
+                android:fontFamily="sans-serif-condensed-light"
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:text="@string/good"
-                android:textColor="@color/textColorInNotification" />
+
+                android:textColor="@color/textColorInNotification"
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/precipitation"
@@ -113,12 +116,14 @@
                 android:layout_alignBottom="@id/weatherIcon"
                 android:layout_marginRight="16dp"
                 android:layout_toRightOf="@id/airQuality"
-                android:autoSizeTextType="uniform"
+                android:fontFamily="sans-serif-condensed-light"
                 android:gravity="center_vertical"
+
                 android:maxLines="1"
                 android:text="@string/not_precipitation"
+                android:textColor="@color/textColorInNotification"
 
-                android:textColor="@color/textColorInNotification" />
+                android:textSize="13sp" />
 
 
             <TextView
@@ -128,27 +133,26 @@
                 android:layout_alignTop="@id/weatherIcon"
                 android:layout_alignBottom="@id/weatherIcon"
                 android:layout_toRightOf="@id/precipitation"
-                android:autoSizeTextType="uniform"
+                android:fontFamily="sans-serif-condensed-light"
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:text="2.3m/s"
+                android:textColor="@color/textColorInNotification"
 
-                android:textColor="@color/textColorInNotification" />
+                android:textSize="13sp" />
 
 
         </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/hourlyForecast"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal" />
 
         </LinearLayout>

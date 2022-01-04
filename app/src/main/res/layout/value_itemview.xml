@@ -11,17 +11,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
+        android:fontFamily="sans-serif-light"
         android:text="label"
-        android:textColor="#A49FF3"
-        android:textSize="15sp" />
+        android:textColor="@color/black"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/value_background"
+        android:fontFamily="sans-serif-light"
         android:text="value"
         android:textColor="#272727"
-        android:textSize="16sp" />
+        android:textSize="15sp" />
 
 </LinearLayout>

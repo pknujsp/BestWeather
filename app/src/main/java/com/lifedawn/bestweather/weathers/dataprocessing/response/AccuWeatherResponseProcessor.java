@@ -150,6 +150,9 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		boolean hasSnow;
 		boolean hasRain;
 
+		Integer por = 0;
+		Integer pos = 0;
+
 		ZoneId zoneId = ZonedDateTime.parse(hourlyForecastList.get(0).getDateTime()).getZone();
 
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
@@ -180,6 +183,9 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 				totalRiquidVolume = zeroTotalRiquidVolume;
 			}
 
+			por = (int) (Double.parseDouble(hourly.getRainProbability()));
+			pos = (int) (Double.parseDouble(hourly.getSnowProbability()));
+
 			hourlyForecastDto.setHours(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getEpochDateTime()) * 1000L,
 					zoneId))
 					.setTemp(ValueUnits.convertTemperature(hourly.getTemperature().getValue(), tempUnit) + tempDegree)
@@ -193,8 +199,10 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 					.setRainVolume(rainVolume)
 					.setSnowVolume(snowVolume)
 					.setFeelsLikeTemp(ValueUnits.convertTemperature(hourly.getRealFeelTemperature().getValue(), tempUnit) + tempDegree)
-					.setPor((int) (Double.parseDouble(hourly.getRainProbability())) + percent)
-					.setPos((int) (Double.parseDouble(hourly.getSnowProbability())) + percent)
+					.setPor(por + percent)
+					.setPos(pos + percent)
+					.setHasPor(por > 0)
+					.setHasPos(pos > 0)
 					.setPrecipitationType(AccuWeatherResponseProcessor.getPty(hourly.getPrecipitationType()))
 					.setPrecipitationTypeIcon(AccuWeatherResponseProcessor.getPtyIcon(hourly.getPrecipitationType()))
 					.setWindDirectionVal(Integer.parseInt(hourly.getWind().getDirection().getDegrees()))

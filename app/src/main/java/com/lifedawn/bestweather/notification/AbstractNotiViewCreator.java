@@ -8,6 +8,7 @@ import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.widget.RemoteViews;
 
@@ -68,7 +69,7 @@ public abstract class AbstractNotiViewCreator {
 
 	abstract public RemoteViews createRemoteViews(boolean temp);
 
-	abstract public void initNotification();
+	abstract public void initNotification(Handler handler);
 
 	public void loadCurrentLocation(Context context, RemoteViews remoteViews) {
 
@@ -115,7 +116,7 @@ public abstract class AbstractNotiViewCreator {
 				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, PendingIntent.getActivity(context, 30, intent,
 						PendingIntent.FLAG_UPDATE_CURRENT));
 				RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
-				makeNotification(remoteViews, R.drawable.temp_icon);
+				makeNotification(remoteViews, R.drawable.temp_icon, true);
 			}
 		};
 
@@ -125,7 +126,7 @@ public abstract class AbstractNotiViewCreator {
 
 	public void loadWeatherData(Context context, RemoteViews remoteViews) {
 		RemoteViewProcessor.onBeginProcess(remoteViews);
-		makeNotification(remoteViews, R.drawable.temp_icon);
+		makeNotification(remoteViews, R.drawable.temp_icon, false);
 
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
 		WeatherSourceType weatherDataSourceType = notificationDataObj.getWeatherSourceType();
@@ -178,7 +179,7 @@ public abstract class AbstractNotiViewCreator {
 	                                       WeatherSourceType requestWeatherSourceType, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                                       Set<RequestWeatherDataType> requestWeatherDataTypeSet);
 
-	abstract protected void makeNotification(RemoteViews remoteViews, int icon);
+	abstract protected void makeNotification(RemoteViews remoteViews, int icon, boolean isFinished);
 
 	abstract public void loadSavedPreferences();
 

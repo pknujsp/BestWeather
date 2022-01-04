@@ -24,11 +24,15 @@ import com.lifedawn.bestweather.flickr.FlickrImgObj;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
+import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.TimeZone;
 
 public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues {
@@ -45,6 +49,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	protected String countryCode;
 	protected WeatherSourceType mainWeatherSourceType;
 	protected ZoneId zoneId;
+	protected ZoneOffset zoneOffset;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -64,6 +69,8 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(
 				BundleKey.WeatherDataSource.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
+
+		zoneOffset = ZonedDateTime.now(zoneId).getOffset();
 	}
 
 	@Override
@@ -108,7 +115,22 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	}
 
 	public void setAqiValuesToViews() {
-		String airQuality = AqicnResponseProcessor.getGradeDescription((int) Double.parseDouble(airQualityResponse.getData().getAqi()));
+		AirQualityDto airQualityDto = AqicnResponseProcessor.makeAirQualityDto(getContext(), airQualityResponse, zoneOffset);
+		Double distance = 0.0;
+		String airQuality = null;
+
+		if (airQualityDto != null) {
+			distance = LocationDistance.distance(latitude, longitude, airQualityDto.getLatitude(), airQualityDto.getLongitude(),
+					LocationDistance.Unit.KM);
+
+			if (distance > 100) {
+				airQuality = getString(R.string.noData);
+			} else {
+				airQuality = AqicnResponseProcessor.getGradeDescription((int) Double.parseDouble(airQualityResponse.getData().getAqi()));
+			}
+		} else {
+			airQuality = getString(R.string.noData);
+		}
 		binding.airQuality.setText(airQuality);
 	}
 

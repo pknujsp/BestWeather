@@ -1,12 +1,16 @@
 package com.lifedawn.bestweather.weathers.detailfragment.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.gridlayout.widget.GridLayout;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +24,7 @@ import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<DetailHourlyForecastViewPagerAdapter.ViewHolder> {
@@ -36,7 +41,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 		ValueUnits clockUnit =
 				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock),
 						ValueUnits.clock24.name()));
-		hoursFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "a hh:00" : "HH:00");
+		hoursFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "h:00 a" : "H:00");
 	}
 
 	public DetailHourlyForecastViewPagerAdapter setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
@@ -68,126 +73,179 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 		public ViewHolder(@NonNull @NotNull View itemView) {
 			super(itemView);
 			binding = ItemviewDetailForecastBinding.bind(itemView);
-			LayoutInflater layoutInflater = (LayoutInflater) itemView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			headerBinding = HeaderviewDetailHourlyforecastBinding.inflate(layoutInflater, null, false);
 			binding.header.addView(headerBinding.getRoot());
 		}
 
 		public void onBind(HourlyForecastDto hourlyForecastDto) {
-			binding.gridView.setAdapter(null);
+			binding.detailGridLayout.removeAllViews();
+			headerBinding.precipitationGridLayout.removeAllViews();
 
 			//header 화면 구성
 			headerBinding.date.setText(hourlyForecastDto.getHours().format(dateFormatter));
 			headerBinding.hours.setText(hourlyForecastDto.getHours().format(hoursFormatter));
 			headerBinding.weatherIcon.setImageResource(hourlyForecastDto.getWeatherIcon());
 			headerBinding.temp.setText(hourlyForecastDto.getTemp());
-			headerBinding.pop.setText(hourlyForecastDto.getPop());
+			headerBinding.weatherDescription.setText(hourlyForecastDto.getWeatherDescription());
 
-			if (!hourlyForecastDto.isHasSnow()) {
-				headerBinding.snowVolumeLayout.setVisibility(View.GONE);
-			} else {
-				headerBinding.snowVolumeLayout.setVisibility(View.VISIBLE);
-				headerBinding.snowVolume.setText(hourlyForecastDto.getSnowVolume());
-			}
-			if (!hourlyForecastDto.isHasRain()) {
-				headerBinding.rainVolumeLayout.setVisibility(View.GONE);
-			} else {
-				headerBinding.rainVolumeLayout.setVisibility(View.VISIBLE);
-				headerBinding.rainVolume.setText(hourlyForecastDto.getRainVolume());
-			}
-			if (!hourlyForecastDto.isHasPrecipitation()) {
-				headerBinding.precipitationVolumeLayout.setVisibility(View.GONE);
-			} else {
-				headerBinding.precipitationVolumeLayout.setVisibility(View.VISIBLE);
-				headerBinding.precipitationVolume.setText(hourlyForecastDto.getPrecipitationVolume());
-			}
+			addPrecipitationGridItem(layoutInflater, hourlyForecastDto);
 
-			//gridview구성
-			WeatherDataGridViewAdapter adapter = new WeatherDataGridViewAdapter(context);
+			//gridviewLayout
 			//공통 - 날씨, 기온, 강수량, 강수확률, 풍향, 풍속, 바람세기, 습도
-
-			adapter.addItem(new GridItemDto(context.getString(R.string.weather), hourlyForecastDto.getWeatherDescription(),
-					ContextCompat.getDrawable(context, hourlyForecastDto.getWeatherIcon())));
-			adapter.addItem(new GridItemDto(context.getString(R.string.temperature), hourlyForecastDto.getTemp(),
-					ContextCompat.getDrawable(context, R.drawable.temperature)));
+			List<GridItemDto> gridItemDtos = new ArrayList<>();
 
 			if (hourlyForecastDto.getFeelsLikeTemp() != null) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.real_feel_temperature), hourlyForecastDto.getFeelsLikeTemp(),
-						ContextCompat.getDrawable(context, R.drawable.realfeeltemperature)));
+				gridItemDtos.add(new GridItemDto(context.getString(R.string.real_feel_temperature), hourlyForecastDto.getFeelsLikeTemp(),
+						null));
 			}
 			if (hourlyForecastDto.getPrecipitationType() != null) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.precipitation_type), hourlyForecastDto.getPrecipitationType(),
+				gridItemDtos.add(new GridItemDto(context.getString(R.string.precipitation_type), hourlyForecastDto.getPrecipitationType(),
 						ContextCompat.getDrawable(context, hourlyForecastDto.getPrecipitationTypeIcon())));
 			}
 
-			if (hourlyForecastDto.isHasPrecipitation()) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.precipitation_volume), hourlyForecastDto.getPrecipitationVolume(),
-						ContextCompat.getDrawable(context, R.drawable.precipitationvolume)));
-			}
-
-			adapter.addItem(new GridItemDto(context.getString(R.string.probability_of_precipitation), hourlyForecastDto.getPop(),
-					ContextCompat.getDrawable(context, R.drawable.pop)));
-
-			if (hourlyForecastDto.getPor() != null) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.probability_of_rain), hourlyForecastDto.getPor(),
-						ContextCompat.getDrawable(context, R.drawable.por)));
-			}
-			if (hourlyForecastDto.getPos() != null) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.probability_of_snow), hourlyForecastDto.getPos(),
-						ContextCompat.getDrawable(context, R.drawable.pos)));
-			}
-
-			if (hourlyForecastDto.isHasRain()) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.rain_volume), hourlyForecastDto.getRainVolume(),
-						ContextCompat.getDrawable(context, R.drawable.raindrop)));
-			}
-			if (hourlyForecastDto.isHasSnow()) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.snow_volume), hourlyForecastDto.getSnowVolume(),
-						ContextCompat.getDrawable(context, R.drawable.snowparticle)));
-			}
-			adapter.addItem(new GridItemDto(context.getString(R.string.wind_direction), hourlyForecastDto.getWindDirection() == null ?
+			gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_direction), hourlyForecastDto.getWindDirection() == null ?
 					context.getString(R.string.noData) : hourlyForecastDto.getWindDirection(),
 					ContextCompat.getDrawable(context, R.drawable.arrow), hourlyForecastDto.getWindDirectionVal()));
 
-			adapter.addItem(new GridItemDto(context.getString(R.string.wind_speed), hourlyForecastDto.getWindSpeed() == null ?
-					context.getString(R.string.noData) : hourlyForecastDto.getWindSpeed(),
-					ContextCompat.getDrawable(context, R.drawable.windspeed)));
+			gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_speed), hourlyForecastDto.getWindSpeed() == null ?
+					context.getString(R.string.noData) : hourlyForecastDto.getWindSpeed(), null));
+
+			gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_strength), hourlyForecastDto.getWindStrength() == null ?
+					context.getString(R.string.noData) : hourlyForecastDto.getWindStrength(), null));
 
 			if (hourlyForecastDto.getWindGust() != null) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.wind_gust), hourlyForecastDto.getWindGust(),
-						ContextCompat.getDrawable(context, R.drawable.windgust)));
+				gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_gust), hourlyForecastDto.getWindGust(), null));
 			}
 			if (hourlyForecastDto.getPressure() != null) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.pressure), hourlyForecastDto.getPressure(),
-						ContextCompat.getDrawable(context, R.drawable.pressure)));
+				gridItemDtos.add(new GridItemDto(context.getString(R.string.pressure), hourlyForecastDto.getPressure(), null));
 			}
-			adapter.addItem(new GridItemDto(context.getString(R.string.wind_strength), hourlyForecastDto.getWindStrength() == null ?
-					context.getString(R.string.noData) : hourlyForecastDto.getWindStrength(),
-					ContextCompat.getDrawable(context, R.drawable.windstrength)));
-			adapter.addItem(new GridItemDto(context.getString(R.string.humidity), hourlyForecastDto.getHumidity(),
-					ContextCompat.getDrawable(context, R.drawable.humidity)));
 
-			//나머지 - 강우확률, 강설확률, 강우량, 강설량, 돌풍, 기압, 이슬점, 운량, 시정, 자외선, 체감기온
+			gridItemDtos.add(new GridItemDto(context.getString(R.string.humidity), hourlyForecastDto.getHumidity(), null));
 
+			//나머지 - 돌풍, 기압, 이슬점, 운량, 시정, 자외선, 체감기온
 
 			if (hourlyForecastDto.getDewPointTemp() != null) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.dew_point), hourlyForecastDto.getDewPointTemp(),
-						ContextCompat.getDrawable(context, R.drawable.dewpoint)));
+				gridItemDtos.add(new GridItemDto(context.getString(R.string.dew_point), hourlyForecastDto.getDewPointTemp(), null));
 			}
 			if (hourlyForecastDto.getCloudiness() != null) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.cloud_cover), hourlyForecastDto.getCloudiness(),
-						ContextCompat.getDrawable(context, R.drawable.cloudiness)));
+				gridItemDtos.add(new GridItemDto(context.getString(R.string.cloud_cover), hourlyForecastDto.getCloudiness(), null));
 			}
 			if (hourlyForecastDto.getVisibility() != null) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.visibility), hourlyForecastDto.getVisibility(),
-						ContextCompat.getDrawable(context, R.drawable.visibility)));
+				gridItemDtos.add(new GridItemDto(context.getString(R.string.visibility), hourlyForecastDto.getVisibility(), null));
 			}
 			if (hourlyForecastDto.getUvIndex() != null) {
-				adapter.addItem(new GridItemDto(context.getString(R.string.uv_index), hourlyForecastDto.getUvIndex(),
-						ContextCompat.getDrawable(context, R.drawable.uv)));
+				gridItemDtos.add(new GridItemDto(context.getString(R.string.uv_index), hourlyForecastDto.getUvIndex(), null));
+			}
+			addDetailGridItem(layoutInflater, gridItemDtos);
+		}
+
+		private void addDetailGridItem(LayoutInflater layoutInflater, List<GridItemDto> gridItemDtos) {
+			for (GridItemDto gridItem : gridItemDtos) {
+				View convertView = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
+
+				TextView label = convertView.findViewById(R.id.label);
+				TextView value = convertView.findViewById(R.id.value);
+				ImageView icon = convertView.findViewById(R.id.label_icon);
+
+				label.setText(gridItem.label);
+				value.setText(gridItem.value);
+
+				if (gridItem.img != null) {
+					icon.setImageDrawable(gridItem.img);
+					if (gridItem.imgRotate != null) {
+						icon.setRotation(gridItem.imgRotate);
+					}
+				} else {
+					icon.setVisibility(View.GONE);
+				}
+
+				int cellCount = binding.detailGridLayout.getChildCount();
+				int row = cellCount / 4;
+				int column = cellCount % 4;
+
+				GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+
+				layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
+				layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
+
+				binding.detailGridLayout.addView(convertView, layoutParams);
+			}
+		}
+
+		private void addPrecipitationGridItem(LayoutInflater layoutInflater, HourlyForecastDto hourlyForecastDto) {
+			View gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
+			final int blueColor = ContextCompat.getColor(context, R.color.blue);
+			//강수확률
+			((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.probability_of_precipitation));
+			((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPop());
+			((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
+			gridItem.findViewById(R.id.label_icon).setVisibility(View.GONE);
+			headerBinding.precipitationGridLayout.addView(gridItem);
+
+			//강우확률
+			if (hourlyForecastDto.isHasPor()) {
+				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
+
+				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.probability_of_rain));
+				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPor());
+				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
+
+				gridItem.findViewById(R.id.label_icon).setVisibility(View.GONE);
+
+				headerBinding.precipitationGridLayout.addView(gridItem);
 			}
 
-			binding.gridView.setAdapter(adapter);
+			//강설확률
+			if (hourlyForecastDto.isHasPos()) {
+				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
+
+				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.probability_of_snow));
+				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPos());
+				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
+
+				gridItem.findViewById(R.id.label_icon).setVisibility(View.GONE);
+
+				headerBinding.precipitationGridLayout.addView(gridItem);
+			}
+
+			//강수량
+			if (hourlyForecastDto.isHasPrecipitation()) {
+				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
+
+				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.precipitation_volume));
+				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPrecipitationVolume());
+				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
+
+				gridItem.findViewById(R.id.label_icon).setVisibility(View.GONE);
+
+				headerBinding.precipitationGridLayout.addView(gridItem);
+			}
+
+			//강우량
+			if (hourlyForecastDto.isHasRain()) {
+				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
+
+				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.rain_volume));
+				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getRainVolume());
+				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
+
+				gridItem.findViewById(R.id.label_icon).setVisibility(View.GONE);
+
+				headerBinding.precipitationGridLayout.addView(gridItem);
+			}
+
+			//강설량
+			if (hourlyForecastDto.isHasSnow()) {
+				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
+
+				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.snow_volume));
+				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getSnowVolume());
+				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
+
+				gridItem.findViewById(R.id.label_icon).setVisibility(View.GONE);
+
+				headerBinding.precipitationGridLayout.addView(gridItem);
+			}
 		}
 	}
 }

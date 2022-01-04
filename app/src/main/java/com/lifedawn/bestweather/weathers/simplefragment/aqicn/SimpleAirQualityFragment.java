@@ -110,14 +110,12 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void setValuesToViews() {
 		//응답 실패한 경우
-		if (geolocalizedFeedResponse == null) {
+		if (geolocalizedFeedResponse == null || !geolocalizedFeedResponse.getStatus().equals("ok")) {
 			binding.progressResultView.onFailed(getString(R.string.error));
 			return;
 		} else {
 			binding.progressResultView.onSuccessful();
 		}
-
-		Context context = getContext();
 
 		//측정소와의 거리 계산 후 50km이상의 거리에 있으면 표시보류
 		final Double distance = LocationDistance.distance(latitude, longitude,
@@ -125,8 +123,11 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 				Double.parseDouble(geolocalizedFeedResponse.getData().getCity().getGeo().get(1)), LocationDistance.Unit.KM);
 
 		String notData = getString(R.string.noData);
-
-		binding.distanceToMeasuringStation.setText(String.format("%.2f", distance) + getString(R.string.km));
+		String distanceStr = String.format("%.2f", distance) + getString(R.string.km);
+		if (distance > 100) {
+			distanceStr += ", " + getString(R.string.the_measuring_station_is_very_far_away);
+		}
+		binding.distanceToMeasuringStation.setText(distanceStr);
 
 		if (geolocalizedFeedResponse.getData().getCity().getName() != null) {
 			binding.measuringStationName.setText(geolocalizedFeedResponse.getData().getCity().getName());
@@ -223,17 +224,17 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 			((TextView) forecastItemView.findViewById(R.id.pm10)).setText(
 					forecastObj.pm10 == null ? notData : AqicnResponseProcessor.getGradeDescription(forecastObj.pm10));
-			((TextView) forecastItemView.findViewById(R.id.pm10)).setTextColor(forecastObj.pm10 == null ? ContextCompat.getColor(context,
+			((TextView) forecastItemView.findViewById(R.id.pm10)).setTextColor(forecastObj.pm10 == null ? ContextCompat.getColor(getContext(),
 					R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.pm10));
 
 			((TextView) forecastItemView.findViewById(R.id.pm25)).setText(
 					forecastObj.pm25 == null ? notData : AqicnResponseProcessor.getGradeDescription(forecastObj.pm25));
-			((TextView) forecastItemView.findViewById(R.id.pm25)).setTextColor(forecastObj.pm25 == null ? ContextCompat.getColor(context,
+			((TextView) forecastItemView.findViewById(R.id.pm25)).setTextColor(forecastObj.pm25 == null ? ContextCompat.getColor(getContext(),
 					R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.pm25));
 
 			((TextView) forecastItemView.findViewById(R.id.o3)).setText(
 					forecastObj.o3 == null ? notData : AqicnResponseProcessor.getGradeDescription(forecastObj.o3));
-			((TextView) forecastItemView.findViewById(R.id.o3)).setTextColor(forecastObj.o3 == null ? ContextCompat.getColor(context,
+			((TextView) forecastItemView.findViewById(R.id.o3)).setTextColor(forecastObj.o3 == null ? ContextCompat.getColor(getContext(),
 					R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.o3));
 
 			((TextView) forecastItemView.findViewById(R.id.date)).setTextColor(textColor);

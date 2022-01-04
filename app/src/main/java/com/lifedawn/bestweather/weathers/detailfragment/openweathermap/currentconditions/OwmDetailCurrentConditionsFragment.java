@@ -46,41 +46,40 @@ public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 		String mm = ValueUnits.convertToStr(getContext(), ValueUnits.mm);
 		String hpa = ValueUnits.convertToStr(getContext(), ValueUnits.hpa);
 
-		binding.conditionsGrid.requestLayout();
+		binding.conditionsGrid.removeAllViews();
 
 		addGridItem(R.string.weather, OpenWeatherMapResponseProcessor.getWeatherIconDescription(current.getWeather().get(0).getId()),
 				OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId(),
-						current.getWeather().get(0).getIcon().contains("n")),null);
-		addGridItem(R.string.temperature, ValueUnits.convertTemperature(current.getTemp(), tempUnit).toString() + tempUnitStr, R.drawable.temperature,
+						current.getWeather().get(0).getIcon().contains("n")));
+		addGridItem(R.string.temperature, ValueUnits.convertTemperature(current.getTemp(), tempUnit).toString() + tempUnitStr,
 				null);
 		addGridItem(R.string.real_feel_temperature, ValueUnits.convertTemperature(current.getFeelsLike(), tempUnit).toString() + tempUnitStr,
-				R.drawable.realfeeltemperature, null);
-		addGridItem(R.string.humidity, current.getHumidity() + percent, R.drawable.humidity, null);
-		addGridItem(R.string.dew_point, ValueUnits.convertTemperature(current.getDewPoint(), tempUnit) + tempUnitStr, R.drawable.dewpoint,
+				null);
+		addGridItem(R.string.humidity, current.getHumidity() + percent, null);
+		addGridItem(R.string.dew_point, ValueUnits.convertTemperature(current.getDewPoint(), tempUnit) + tempUnitStr,
 				null);
 		View windDirectionView = addGridItem(R.string.wind_direction, WindUtil.parseWindDirectionDegreeAsStr(getContext(), current.getWind_deg()),
-				R.drawable.arrow,null);
+				R.drawable.arrow);
 		((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(Integer.parseInt(current.getWind_deg()) + 180);
 		addGridItem(R.string.wind_speed,
-				ValueUnits.convertWindSpeed(current.getWind_speed(), windUnit) + windUnitStr, R.drawable.windspeed, null);
+				ValueUnits.convertWindSpeed(current.getWind_speed(), windUnit) + windUnitStr, null);
 		addGridItem(R.string.wind_gust,
 				current.getWindGust() == null ? notData :
 						ValueUnits.convertWindSpeed(current.getWindGust(), windUnit) + windUnitStr,
-				R.drawable.windgust, null);
+				null);
 		addGridItem(R.string.wind_strength, WindUtil.getSimpleWindSpeedDescription(current.getWind_speed()),
-				R.drawable.windstrength, null);
-		addGridItem(R.string.pressure, current.getPressure() + hpa, R.drawable.pressure, null);
-		addGridItem(R.string.uv_index, current.getUvi(), R.drawable.uv, null);
+				null);
+		addGridItem(R.string.pressure, current.getPressure() + hpa, null);
+		addGridItem(R.string.uv_index, current.getUvi(), null);
 		addGridItem(R.string.visibility,
 				ValueUnits.convertVisibility(current.getVisibility(), visibilityUnit) + ValueUnits.convertToStr(getContext(), visibilityUnit),
-				R.drawable.visibility,
 				null);
-		addGridItem(R.string.cloud_cover, current.getClouds() + percent, R.drawable.cloudiness, null);
+		addGridItem(R.string.cloud_cover, current.getClouds() + percent, null);
 		addGridItem(R.string.rain_volume, current.getRain() == null ? notData :
 						current.getRain().getPrecipitation1Hour() + mm,
-				R.drawable.rainvolume, null);
+				null);
 		addGridItem(R.string.snow_volume, current.getSnow() == null ? notData :
 						current.getSnow().getPrecipitation1Hour() + mm,
-				R.drawable.snowvolume, null);
+				null);
 	}
 }

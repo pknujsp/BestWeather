@@ -67,44 +67,44 @@ public class KmaDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 					, windUnit, tempUnit, latitude, longitude);
 		}
 
-		binding.conditionsGrid.requestLayout();
+		binding.conditionsGrid.removeAllViews();
 
-		addGridItem(R.string.weather, currentConditionsDto.getWeatherDescription(), currentConditionsDto.getWeatherIcon(), null);
+
+		addGridItem(R.string.weather, currentConditionsDto.getWeatherDescription(), currentConditionsDto.getWeatherIcon());
 
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
-			addGridItem(R.string.precipitation_volume, currentConditionsDto.getPrecipitationVolume(), R.drawable.precipitationvolume, null);
+			addGridItem(R.string.precipitation_volume, currentConditionsDto.getPrecipitationVolume(), null);
 		}
 		addGridItem(R.string.temperature, currentConditionsDto.getTemp(),
-				R.drawable.temperature, null);
+				null);
 
 		addGridItem(R.string.real_feel_temperature, currentConditionsDto.getFeelsLikeTemp(),
-				R.drawable.realfeeltemperature, null);
+				null);
 
-		addGridItem(R.string.humidity, currentConditionsDto.getHumidity(), R.drawable.humidity,
+		addGridItem(R.string.humidity, currentConditionsDto.getHumidity(),
 				null);
 
 		if (currentConditionsDto.getWindDirection() != null) {
 			View windDirectionView = addGridItem(R.string.wind_direction, WindUtil.parseWindDirectionDegreeAsStr(getContext(),
-					String.valueOf(currentConditionsDto.getWindDirectionDegree())), R.drawable.arrow,
-					null);
+					String.valueOf(currentConditionsDto.getWindDirectionDegree())), R.drawable.arrow);
 			((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(currentConditionsDto.getWindDirectionDegree() + 180);
 		} else {
-			addGridItem(R.string.wind_direction, getString(R.string.noData), R.drawable.arrow,
+			addGridItem(R.string.wind_direction, getString(R.string.noData),
 					null);
 		}
 
 		if (currentConditionsDto.getWindSpeed() != null) {
 			addGridItem(R.string.wind_speed,
 					currentConditionsDto.getWindSpeed(),
-					R.drawable.windspeed, null);
+					null);
 			addGridItem(R.string.wind_strength, currentConditionsDto.getSimpleWindStrength(),
-					R.drawable.windstrength, null);
+					null);
 		} else {
 			addGridItem(R.string.wind_speed,
 					getString(R.string.noData),
-					R.drawable.windspeed, null);
-			addGridItem(R.string.wind_strength,getString(R.string.noData),
-					R.drawable.windstrength, null);
+					null);
+			addGridItem(R.string.wind_strength, getString(R.string.noData),
+					null);
 		}
 
 	}

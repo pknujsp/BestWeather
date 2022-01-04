@@ -1,6 +1,8 @@
 package com.lifedawn.bestweather.weathers.detailfragment.base;
 
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +25,6 @@ import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValue
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
-import java.util.TimeZone;
 
 public class BaseDetailCurrentConditionsFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutDetailCurrentConditionsBinding binding;
@@ -73,17 +74,20 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 
 	}
 
-	protected final View addGridItem(int labelDescriptionId, String value, @NonNull Integer labelIconId, Integer valueIconId) {
-		View gridItem = layoutInflater.inflate(R.layout.current_conditions_detail_item, null, false);
+	protected final View addGridItem(int labelDescriptionId, String value, @Nullable Integer labelIconId) {
+		View gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null, false);
 
-		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
 		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
 		((TextView) gridItem.findViewById(R.id.value)).setText(value);
-		if (valueIconId == null) {
-			gridItem.findViewById(R.id.value_img).setVisibility(View.GONE);
+		if (labelIconId == null) {
+			gridItem.findViewById(R.id.label_icon).setVisibility(View.GONE);
 		} else {
-			((ImageView) gridItem.findViewById(R.id.value_img)).setImageResource(valueIconId);
+			((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
+			((ImageView) gridItem.findViewById(R.id.label_icon)).setImageTintList(ColorStateList.valueOf(Color.WHITE));
 		}
+
+		((TextView) gridItem.findViewById(R.id.label)).setTextColor(Color.WHITE);
+		((TextView) gridItem.findViewById(R.id.value)).setTextColor(Color.WHITE);
 
 		int cellCount = binding.conditionsGrid.getChildCount();
 		int row = cellCount / 4;

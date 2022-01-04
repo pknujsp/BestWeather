@@ -43,45 +43,41 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 		String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
 		String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
 
-		binding.conditionsGrid.requestLayout();
+		binding.conditionsGrid.removeAllViews();
 
 		addGridItem(R.string.weather, AccuWeatherResponseProcessor.getWeatherIconDescription(item.getWeatherIcon()),
-				AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon()), null);
+				AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon()));
 		addGridItem(R.string.temperature,
-				ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(), tempUnit) + tempUnitStr,
-				R.drawable.temperature, null);
+				ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(), tempUnit) + tempUnitStr, null);
 		addGridItem(R.string.real_feel_temperature,
-				ValueUnits.convertTemperature(item.getRealFeelTemperature().getMetric().getValue(), tempUnit) + tempUnitStr,
-				R.drawable.realfeeltemperature, null);
-		addGridItem(R.string.humidity, item.getRelativeHumidity() + percent, R.drawable.humidity, null);
-		addGridItem(R.string.dew_point, ValueUnits.convertTemperature(item.getDewPoint().getMetric().getValue(), tempUnit) + tempUnitStr,
-				R.drawable.dewpoint,
-				null);
+				ValueUnits.convertTemperature(item.getRealFeelTemperature().getMetric().getValue(), tempUnit) + tempUnitStr, null);
+		addGridItem(R.string.humidity, item.getRelativeHumidity() + percent, null);
+		addGridItem(R.string.dew_point, ValueUnits.convertTemperature(item.getDewPoint().getMetric().getValue(), tempUnit) + tempUnitStr, null);
 		View windDirectionView = addGridItem(R.string.wind_direction, WindUtil.parseWindDirectionDegreeAsStr(getContext(), item.getWind().getDirection().getDegrees()),
-				R.drawable.arrow, null);
+				R.drawable.arrow);
 		((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(Integer.parseInt(item.getWind().getDirection().getDegrees()) + 180);
 
 		addGridItem(R.string.wind_speed,
 				ValueUnits.convertWindSpeedForAccu(item.getWind().getSpeed().getMetric().getValue(), windUnit) + ValueUnits.convertToStr(getContext(), windUnit),
-				R.drawable.windspeed, null);
+				null);
 		addGridItem(R.string.wind_gust,
 				ValueUnits.convertWindSpeedForAccu(item.getWindGust().getSpeed().getMetric().getValue(), windUnit) + ValueUnits.convertToStr(getContext(), windUnit),
-				R.drawable.windgust, null);
+				null);
 		addGridItem(R.string.wind_strength,
 				WindUtil.getSimpleWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()),
-				R.drawable.windstrength, null);
+				null);
 		addGridItem(R.string.pressure, item.getPressure().getMetric().getValue() + ValueUnits.convertToStr(getContext(), ValueUnits.hpa),
-				R.drawable.pressure, null);
-		addGridItem(R.string.uv_index, item.getuVIndex(), R.drawable.uv, null);
+				null);
+		addGridItem(R.string.uv_index, item.getuVIndex(), null);
 		addGridItem(R.string.visibility,
 				ValueUnits.convertVisibilityForAccu(item.getVisibility().getMetric().getValue(), visibilityUnit) + ValueUnits.convertToStr(getContext(),
 						visibilityUnit),
-				R.drawable.visibility, null);
-		addGridItem(R.string.cloud_cover, item.getCloudCover() + percent, R.drawable.cloudiness, null);
+				null);
+		addGridItem(R.string.cloud_cover, item.getCloudCover() + percent, null);
 		addGridItem(R.string.precipitation_volume, item.getPrecip1hr().getMetric().getValue().equals("0.0") ?
 						getString(R.string.not_available) :
 						item.getPrecip1hr().getMetric().getValue() + ValueUnits.convertToStr(getContext(), ValueUnits.mm),
-				R.drawable.pop, null);
-		addGridItem(R.string.precipitation_type, AccuWeatherResponseProcessor.getPty(item.getPrecipitationType()), R.drawable.temp_icon, null);
+				null);
+		addGridItem(R.string.precipitation_type, AccuWeatherResponseProcessor.getPty(item.getPrecipitationType()), null);
 	}
 }

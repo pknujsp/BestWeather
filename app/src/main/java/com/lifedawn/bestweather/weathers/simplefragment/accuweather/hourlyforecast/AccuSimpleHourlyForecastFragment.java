@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
@@ -131,6 +132,7 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 		List<String> snowVolumeList = new ArrayList<>();
 
 		boolean haveSnow = false;
+		boolean haveRain = false;
 
 		final String mm = "mm";
 		final String cm = "cm";
@@ -149,13 +151,18 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 
 			popList.add(item.getPop());
 			rainVolumeList.add(item.getRainVolume().replace(mm, ""));
+			snowVolumeList.add(item.getSnowVolume().replace(cm, ""));
 
 			if (item.isHasSnow()) {
 				if (!haveSnow) {
 					haveSnow = true;
 				}
 			}
-			snowVolumeList.add(item.getSnowVolume().replace(cm, ""));
+			if (item.isHasRain()) {
+				if (!haveRain) {
+					haveRain = true;
+				}
+			}
 		}
 
 		weatherIconRow.setWeatherImgs(weatherIconObjList);
@@ -231,6 +238,7 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 				tempRowHeight);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
+		createValueUnitsDescription(WeatherSourceType.ACCU_WEATHER, haveRain, haveSnow);
 	}
 
 }

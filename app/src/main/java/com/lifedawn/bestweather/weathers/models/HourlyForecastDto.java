@@ -31,6 +31,26 @@ public class HourlyForecastDto {
 	private boolean hasPrecipitation;
 	private boolean hasRain;
 	private boolean hasSnow;
+	private boolean hasPor;
+	private boolean hasPos;
+
+	public boolean isHasPor() {
+		return hasPor;
+	}
+
+	public HourlyForecastDto setHasPor(boolean hasPor) {
+		this.hasPor = hasPor;
+		return this;
+	}
+
+	public boolean isHasPos() {
+		return hasPos;
+	}
+
+	public HourlyForecastDto setHasPos(boolean hasPos) {
+		this.hasPos = hasPos;
+		return this;
+	}
 
 	public boolean isHasPrecipitation() {
 		return hasPrecipitation;

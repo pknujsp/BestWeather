@@ -3,15 +3,20 @@ package com.lifedawn.bestweather.weathers.simplefragment.base;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -141,5 +146,47 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	@Override
 	public void setValuesToViews() {
 
+	}
+
+	protected void createValueUnitsDescription(WeatherSourceType weatherSourceType, boolean haveRain, boolean haveSnow) {
+		binding.extraView.removeAllViews();
+
+		if (haveRain || haveSnow) {
+			String rainUnit = "mm";
+			String snowUnit = null;
+
+			if (weatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
+				snowUnit = "mm";
+			} else {
+				snowUnit = "cm";
+			}
+
+			StringBuilder stringBuilder = new StringBuilder();
+
+			if (haveRain) {
+				stringBuilder.append(getString(R.string.rain)).append(" : ").append(rainUnit);
+			}
+			if (haveSnow) {
+				if (stringBuilder.length() > 0) {
+					stringBuilder.append(", ");
+				}
+				stringBuilder.append(getString(R.string.snow)).append(" : ").append(snowUnit);
+			}
+
+			TextView textView = new TextView(getContext());
+			FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT);
+			layoutParams.gravity = Gravity.RIGHT;
+			textView.setLayoutParams(layoutParams);
+			textView.setTextColor(Color.GRAY);
+			textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f);
+			textView.setText(stringBuilder.toString());
+			textView.setIncludeFontPadding(false);
+
+			binding.extraView.addView(textView);
+			binding.extraView.setVisibility(View.VISIBLE);
+		}else{
+			binding.extraView.setVisibility(View.GONE);
+		}
 	}
 }

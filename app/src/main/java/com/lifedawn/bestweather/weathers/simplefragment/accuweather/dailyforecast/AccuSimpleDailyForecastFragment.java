@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
@@ -132,6 +133,10 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		final String cm = "cm";
 		final String degree = "°";
 		boolean haveSnow = false;
+		boolean haveRain = false;
+
+		Float rainVolume = 0f;
+		Float snowVolume = 0f;
 
 		List<DailyForecastDto> dailyForecastDtoList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(getContext(), items, windUnit,
 				tempUnit);
@@ -140,6 +145,9 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		int maxTemp;
 
 		for (DailyForecastDto dailyForecasts : dailyForecastDtoList) {
+			rainVolume = 0f;
+			snowVolume = 0f;
+
 			dateList.add(dailyForecasts.getDate().format(dateTimeFormatter));
 			weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
 					ContextCompat.getDrawable(context, dailyForecasts.getAmValues().getWeatherIcon()),
@@ -155,17 +163,27 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 
 			popList.add(
 					dailyForecasts.getAmValues().getPop() + " / " + dailyForecasts.getPmValues().getPop());
+
+			rainVolume = Float.parseFloat(dailyForecasts.getAmValues().getRainVolume().replace(mm, ""))
+					+ Float.parseFloat(dailyForecasts.getPmValues().getRainVolume().replace(mm, ""));
+			snowVolume = Float.parseFloat(dailyForecasts.getAmValues().getSnowVolume().replace(cm, ""))
+					+ Float.parseFloat(dailyForecasts.getPmValues().getSnowVolume().replace(cm, ""));
+
 			rainVolumeList.add(
-					String.format("%.2f", Float.parseFloat(dailyForecasts.getAmValues().getRainVolume().replace(mm, ""))
-							+ Float.parseFloat(dailyForecasts.getPmValues().getRainVolume().replace(mm, ""))));
+					String.format("%.2f", rainVolume));
 			snowVolumeList.add(
-					String.format("%.2f", Float.parseFloat(dailyForecasts.getAmValues().getSnowVolume().replace(cm, ""))
-							+ Float.parseFloat(dailyForecasts.getPmValues().getSnowVolume().replace(cm, ""))));
+					String.format("%.2f", snowVolume));
 
 			if (!haveSnow) {
 				if (dailyForecasts.getAmValues().isHasSnowVolume() ||
 						dailyForecasts.getPmValues().isHasSnowVolume()) {
 					haveSnow = true;
+				}
+			}
+
+			if (!haveRain) {
+				if (rainVolume > 0.0) {
+					haveRain = true;
 				}
 			}
 		}
@@ -233,6 +251,9 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 		tempRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 		tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.iconValueViewMargin);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
+
+		createValueUnitsDescription(WeatherSourceType.ACCU_WEATHER, haveRain, haveSnow);
+
 
 	}
 }

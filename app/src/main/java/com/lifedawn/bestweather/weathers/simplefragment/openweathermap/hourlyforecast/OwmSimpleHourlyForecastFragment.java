@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
@@ -125,7 +126,8 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
 
-		boolean haveSnowVolumes = false;
+		boolean haveSnow = false;
+		boolean haveRain = false;
 
 		final String degree = "°";
 
@@ -141,8 +143,13 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 			rainVolumeList.add(item.getRainVolume().replace("mm", ""));
 
 			if (item.isHasSnow()) {
-				if (!haveSnowVolumes) {
-					haveSnowVolumes = true;
+				if (!haveSnow) {
+					haveSnow = true;
+				}
+			}
+			if (item.isHasRain()) {
+				if (!haveRain) {
+					haveRain = true;
 				}
 			}
 			snowVolumeList.add(item.getSnowVolume().replace("mm", ""));
@@ -209,7 +216,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
 		binding.forecastView.addView(popRow, rowLayoutParams);
 		binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
-		if (haveSnowVolumes) {
+		if (haveSnow) {
 			binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
 		}
 
@@ -218,6 +225,8 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				tempRowHeight);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
+
+		createValueUnitsDescription(WeatherSourceType.OPEN_WEATHER_MAP, haveRain, haveSnow);
 	}
 
 }

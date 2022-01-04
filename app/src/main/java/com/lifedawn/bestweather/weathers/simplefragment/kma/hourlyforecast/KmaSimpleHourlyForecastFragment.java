@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
@@ -142,7 +143,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		List<String> hourList = new ArrayList<>();
 		List<Integer> tempList = new ArrayList<>();
-		List<String> probabilityOfPrecipitationList = new ArrayList<>();
+		List<String> popList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
 		List<ZonedDateTime> dateTimeList = new ArrayList<>();
@@ -152,6 +153,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		final String degree = "°";
 
 		boolean haveSnow = false;
+		boolean haveRain = false;
 
 
 		for (HourlyForecastDto item : hourlyForecastDtoList) {
@@ -161,19 +163,25 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 					ContextCompat.getDrawable(context, item.getWeatherIcon()), item.getWeatherDescription()));
 			tempList.add(Integer.parseInt(item.getTemp().replace(degree, "")));
 
-			probabilityOfPrecipitationList.add(item.getPop());
+			popList.add(item.getPop());
 			rainVolumeList.add(item.getRainVolume().replace(mm, ""));
+			snowVolumeList.add(item.getSnowVolume().replace(cm, ""));
+
 			if (item.isHasSnow()) {
 				if (!haveSnow) {
 					haveSnow = true;
 				}
 			}
-			snowVolumeList.add(item.getSnowVolume().replace(cm, ""));
+			if (item.isHasRain()) {
+				if (!haveRain) {
+					haveRain = true;
+				}
+			}
 		}
 
 
 		dateRow.init(dateTimeList);
-		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
+		probabilityOfPrecipitationRow.setValueList(popList);
 		rainVolumeRow.setValueList(rainVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);
 		weatherIconRow.setWeatherImgs(weatherIconObjList);
@@ -243,6 +251,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				tempRowHeight);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
+		createValueUnitsDescription(WeatherSourceType.KMA_WEB, haveRain, haveSnow);
 	}
 
 }
