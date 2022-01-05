@@ -75,5 +75,7 @@ public class AccuSimpleCurrentConditionsFragment extends BaseSimpleCurrentCondit
 		binding.feelsLikeTemp.setText(currentConditionsDto.getFeelsLikeTemp().replace(tempUnitStr, ""));
 		binding.tempUnit.setText(tempUnitStr);
 		binding.feelsLikeTempUnit.setText(tempUnitStr);
+
+		binding.tempDescription.setVisibility(View.GONE);
 	}
 }

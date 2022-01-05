@@ -169,10 +169,8 @@ public abstract class AbstractWidgetJobService extends JobService {
 		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REDRAW))) {
 			int[] appWidgetIds = bundle.getIntArray("appWidgetIds");
 			for (int id : appWidgetIds) {
-				onReDraw(id);
+				onReDraw(id, params);
 			}
-			jobFinished(params, false);
-
 		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED))) {
 			createWidgetViewCreator(appWidgetId);
 			widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
@@ -334,7 +332,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 		});
 	}
 
-	protected void onReDraw(int appWidgetId) {
+	protected void onReDraw(int appWidgetId, JobParameters params) {
 		createWidgetViewCreator(appWidgetId);
 		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
@@ -343,15 +341,15 @@ public abstract class AbstractWidgetJobService extends JobService {
 					return;
 				}
 
-				RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
-
 				if (widgetDto.isLoadSuccessful()) {
 					widgetViewCreator.setDataViewsOfSavedData();
 				} else {
+					RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
 					remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetViewCreator.getOnClickedPendingIntent(remoteViews));
 					RemoteViewProcessor.onErrorProcess(remoteViews, widgetViewCreator.getContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
 					appWidgetManager.updateAppWidget(widgetViewCreator.getAppWidgetId(), remoteViews);
 				}
+				jobFinished(params, false);
 			}
 
 			@Override

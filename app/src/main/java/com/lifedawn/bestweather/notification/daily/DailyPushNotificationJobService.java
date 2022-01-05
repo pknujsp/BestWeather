@@ -51,7 +51,7 @@ public class DailyPushNotificationJobService extends JobService {
 
 	public DailyPushNotificationJobService() {
 		Configuration.Builder builder = new Configuration.Builder();
-		builder.setJobSchedulerJobIdRange(2000, 2100);
+		builder.setJobSchedulerJobIdRange(0, Integer.MAX_VALUE);
 	}
 
 	@Override
@@ -64,6 +64,7 @@ public class DailyPushNotificationJobService extends JobService {
 			final LocalTime localTime = LocalTime.parse(bundle.getString("time"));
 			final DailyPushNotificationType dailyPushNotificationType = DailyPushNotificationType.valueOf(bundle.getString(
 					"DailyPushNotificationType"));
+
 			if (localTime.isBefore(LocalTime.now())) {
 				jobFinished(params, false);
 			} else {
@@ -121,7 +122,7 @@ public class DailyPushNotificationJobService extends JobService {
 				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
 					public void onGeocodingResult(List<Address> addressList) {
-						Address address = addressList.get(0);
+						final Address address = addressList.get(0);
 
 						dailyPushNotificationDto.setAddressName(address.getAddressLine(0));
 						dailyPushNotificationDto.setCountryCode(address.getCountryCode());

@@ -50,20 +50,26 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		String action = intent.getAction();
+
+		if (intent.getExtras() == null) {
+			return;
+		}
+
 		Bundle arguments = intent.getExtras();
+		final int id = arguments.getInt(BundleKey.dtoId.name());
 
 		PersistableBundle persistableBundle = new PersistableBundle();
 		persistableBundle.putString("DailyPushNotificationType", arguments.getString(
 				"DailyPushNotificationType"));
 		persistableBundle.putString("time", arguments.getString("time"));
-		persistableBundle.putInt(BundleKey.dtoId.name(), arguments.getInt(BundleKey.dtoId.name()));
+		persistableBundle.putInt(BundleKey.dtoId.name(), id);
 		persistableBundle.putString("action", action);
 
 		JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
-		JobInfo jobInfo = new JobInfo.Builder(2001, new ComponentName(context, DailyPushNotificationJobService.class))
+		JobInfo jobInfo = new JobInfo.Builder(10000 + id, new ComponentName(context, DailyPushNotificationJobService.class))
 				.setMinimumLatency(500)
-				.setOverrideDeadline(10000)
+				.setOverrideDeadline(20000)
 				.setExtras(persistableBundle)
 				.build();
 		jobScheduler.schedule(jobInfo);

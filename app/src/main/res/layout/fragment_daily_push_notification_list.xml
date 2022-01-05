@@ -23,11 +23,10 @@
                 android:overScrollMode="never"
                 android:scrollbars="none">
 
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/settings_container"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_height="match_parent">
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/notificationList"
@@ -37,7 +36,12 @@
                         tools:itemCount="7"
                         tools:listitem="@layout/view_daily_push_notification_item" />
 
-                </LinearLayout>
+                    <com.lifedawn.bestweather.commons.views.ProgressResultView
+                        android:id="@+id/progress_result_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
 
             </androidx.core.widget.NestedScrollView>
 

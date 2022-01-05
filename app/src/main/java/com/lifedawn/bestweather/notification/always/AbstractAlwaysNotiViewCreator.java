@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.notification;
+package com.lifedawn.bestweather.notification.always;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -24,6 +24,9 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
+import com.lifedawn.bestweather.notification.NotificationHelper;
+import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
 import com.lifedawn.bestweather.notification.always.AlwaysNotificationReceiver;
 import com.lifedawn.bestweather.notification.model.NotificationDataObj;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
@@ -36,7 +39,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public abstract class AbstractNotiViewCreator {
+public abstract class AbstractAlwaysNotiViewCreator {
 	protected final NotificationUpdateCallback notificationUpdateCallback;
 	protected final ValueUnits windSpeedUnit;
 	protected final DateTimeFormatter dateTimeFormatter;
@@ -46,10 +49,9 @@ public abstract class AbstractNotiViewCreator {
 
 	protected Context context;
 	protected NotificationHelper notificationHelper;
-
 	protected NotificationDataObj notificationDataObj;
 
-	public AbstractNotiViewCreator(Context context, NotificationType notificationType, NotificationUpdateCallback notificationUpdateCallback) {
+	public AbstractAlwaysNotiViewCreator(Context context, NotificationType notificationType, NotificationUpdateCallback notificationUpdateCallback) {
 		this.context = context;
 		this.notificationUpdateCallback = notificationUpdateCallback;
 		this.notificationType = notificationType;

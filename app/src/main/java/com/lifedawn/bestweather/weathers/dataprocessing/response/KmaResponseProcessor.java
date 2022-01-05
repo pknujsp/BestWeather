@@ -802,8 +802,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	                                                                     List<KmaHourlyForecast> hourlyForecastList, double latitude, double longitude,
 	                                                                     ValueUnits windUnit, ValueUnits tempUnit) {
 		final String tempDegree = "°";
-		final String percent = "%";
 		final String windUnisStr = ValueUnits.convertToStr(context, windUnit);
+		final String mPerSec = "m/s";
 
 		final String zeroRainVolume = "0.0mm";
 		final String zeroSnowVolume = "0.0cm";
@@ -827,6 +827,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		String rainVolume;
 		boolean hasRain;
 		boolean hasSnow;
+		String windSpeed = null;
 
 		for (KmaHourlyForecast finalHourlyForecast : hourlyForecastList) {
 			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
@@ -865,10 +866,12 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 					"-" : finalHourlyForecast.getPop());
 
 			if (finalHourlyForecast.getWindDirection() != null) {
+				windSpeed = finalHourlyForecast.getWindSpeed().replace(mPerSec, "");
+
 				hourlyForecastDto.setWindDirectionVal(WindUtil.parseWindDirectionStrAsInt(finalHourlyForecast.getWindDirection()))
 						.setWindDirection(WindUtil.parseWindDirectionStrAsStr(context, finalHourlyForecast.getWindDirection()))
-						.setWindStrength(WindUtil.getSimpleWindSpeedDescription(finalHourlyForecast.getWindSpeed().replace(windUnisStr, "")))
-						.setWindSpeed(ValueUnits.convertWindSpeed(finalHourlyForecast.getWindSpeed().replace(windUnisStr, ""), windUnit)
+						.setWindStrength(WindUtil.getSimpleWindSpeedDescription(windSpeed))
+						.setWindSpeed(ValueUnits.convertWindSpeed(windSpeed, windUnit)
 								+ ValueUnits.convertToStr(context, windUnit));
 			}
 

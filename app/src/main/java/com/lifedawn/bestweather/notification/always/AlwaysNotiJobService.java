@@ -6,7 +6,6 @@ import android.app.job.JobService;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.os.PersistableBundle;
 
@@ -16,8 +15,6 @@ import androidx.work.Configuration;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.notification.always.AlwaysNotiHelper;
-import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
 
 public class AlwaysNotiJobService extends JobService {
 	public AlwaysNotiJobService() {

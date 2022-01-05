@@ -35,6 +35,8 @@
             android:layout_weight="1"
             android:adjustViewBounds="true"
             android:gravity="center"
+            android:minWidth="18dp"
+            android:minHeight="18dp"
             android:scaleType="centerInside"
             android:src="@drawable/day_clear" />
 
@@ -45,6 +47,8 @@
             android:layout_weight="1"
             android:adjustViewBounds="true"
             android:gravity="center"
+            android:minWidth="18dp"
+            android:minHeight="18dp"
             android:scaleType="centerInside"
             android:src="@drawable/day_clear" />
     </LinearLayout>

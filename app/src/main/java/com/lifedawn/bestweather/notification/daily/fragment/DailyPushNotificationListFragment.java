@@ -2,10 +2,12 @@ package com.lifedawn.bestweather.notification.daily.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.RecyclerViewItemDecoration;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
@@ -66,6 +69,7 @@ public class DailyPushNotificationListFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		binding.progressResultView.setContentView(binding.notificationList);
 		binding.toolbar.fragmentTitle.setText(R.string.daily_notification);
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -117,19 +121,44 @@ public class DailyPushNotificationListFragment extends Fragment {
 			public void onClickedItem(DailyPushNotificationDto e, int position) {
 				switch (position) {
 					case 0:
-						dailyNotiHelper.disablePushNotification(e.getId());
-						repository.delete(e, new DbQueryCallback<Boolean>() {
-							@Override
-							public void onResultSuccessful(Boolean result) {
-								loadList();
-							}
+						new MaterialAlertDialogBuilder(requireActivity())
+								.setTitle(R.string.removeNotification)
+								.setMessage(R.string.will_you_delete_the_notification)
+								.setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										dailyNotiHelper.disablePushNotification(e.getId());
+										repository.delete(e, new DbQueryCallback<Boolean>() {
+											@Override
+											public void onResultSuccessful(Boolean result) {
+												loadList();
+											}
 
-							@Override
-							public void onResultNoData() {
+											@Override
+											public void onResultNoData() {
 
+											}
+										});
+										dialog.dismiss();
+									}
+								}).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
 							}
-						});
+						}).create().show();
 						break;
+				}
+			}
+		});
+		adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+			@Override
+			public void onChanged() {
+				super.onChanged();
+				if (adapter.getItemCount() > 0) {
+					binding.progressResultView.onSuccessful();
+				} else {
+					binding.progressResultView.onFailed(getString(R.string.empty_daily_notifications));
 				}
 			}
 		});

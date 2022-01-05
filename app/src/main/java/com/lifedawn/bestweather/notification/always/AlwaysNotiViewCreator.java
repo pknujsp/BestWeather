@@ -21,7 +21,6 @@ import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 
-import com.lifedawn.bestweather.notification.AbstractNotiViewCreator;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
@@ -41,7 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
+public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 	private final int hourlyForecastCount = 8;
 	private Handler handler;
 
@@ -181,12 +180,6 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 		for (int i = 0; i < hourlyForecastCount; i++) {
 			RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_forecast_item_in_linear);
 
-			if (hourlyForecastDtoList.get(i).getHours().getHour() == 0) {
-				hours = hourlyForecastDtoList.get(i).getHours().format(hour0Formatter);
-			} else {
-				hours = String.valueOf(hourlyForecastDtoList.get(i).getHours().getHour());
-			}
-
 			if (haveRain) {
 				if (hourlyForecastDtoList.get(i).isHasRain()) {
 					childRemoteViews.setTextViewText(R.id.rainVolume, hourlyForecastDtoList.get(i).getRainVolume()
@@ -211,6 +204,12 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 				childRemoteViews.setViewVisibility(R.id.snowVolumeLayout, View.GONE);
 			}
 
+			if (hourlyForecastDtoList.get(i).getHours().getHour() == 0) {
+				hours = hourlyForecastDtoList.get(i).getHours().format(hour0Formatter);
+			} else {
+				hours = String.valueOf(hourlyForecastDtoList.get(i).getHours().getHour());
+			}
+
 			childRemoteViews.setTextViewText(R.id.dateTime, hours);
 			childRemoteViews.setTextViewText(R.id.pop, hourlyForecastDtoList.get(i).getPop());
 			childRemoteViews.setTextViewText(R.id.temperature, hourlyForecastDtoList.get(i).getTemp());
@@ -232,8 +231,8 @@ public class AlwaysNotiViewCreator extends AbstractNotiViewCreator {
 			NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(notificationType);
 			NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
 
-			builder.setOngoing(true).setSmallIcon(icon).setShowWhen(false).setStyle(new NotificationCompat.BigTextStyle()).setPriority(NotificationCompat.PRIORITY_LOW)
-					.setVibrate(new long[]{0L}).setDefaults(NotificationCompat.DEFAULT_LIGHTS |
+			builder.setOngoing(true).setSmallIcon(icon).setShowWhen(false)
+					.setPriority(NotificationCompat.PRIORITY_LOW).setVibrate(new long[]{0L}).setDefaults(NotificationCompat.DEFAULT_LIGHTS |
 					NotificationCompat.DEFAULT_SOUND).setAutoCancel(false).setCustomContentView(remoteViews).setCustomBigContentView(remoteViews);
 
 			NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
