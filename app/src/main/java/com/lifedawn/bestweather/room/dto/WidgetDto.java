@@ -7,6 +7,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 
 import java.util.HashSet;
@@ -31,7 +32,7 @@ public class WidgetDto {
 	private boolean displayLocalClock;
 
 	@ColumnInfo(name = "locationType")
-	private String locationType;
+	private LocationType locationType;
 
 	@ColumnInfo(name = "weatherSourceTypes")
 	private Set<WeatherSourceType> weatherSourceTypeSet;
@@ -131,11 +132,11 @@ public class WidgetDto {
 		this.displayLocalClock = displayLocalClock;
 	}
 
-	public String getLocationType() {
+	public LocationType getLocationType() {
 		return locationType;
 	}
 
-	public void setLocationType(String locationType) {
+	public void setLocationType(LocationType locationType) {
 		this.locationType = locationType;
 	}
 

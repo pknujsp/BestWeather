@@ -81,7 +81,7 @@ public abstract class AbstractWidgetCreator {
 		widgetDto.setBackgroundAlpha(100);
 		widgetDto.setDisplayClock(true);
 		widgetDto.setDisplayLocalClock(false);
-		widgetDto.setLocationType(LocationType.CurrentLocation.name());
+		widgetDto.setLocationType(LocationType.CurrentLocation);
 		widgetDto.addWeatherSourceType(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.pref_key_accu_weather),
 				false)
 				? WeatherSourceType.ACCU_WEATHER : WeatherSourceType.OPEN_WEATHER_MAP);

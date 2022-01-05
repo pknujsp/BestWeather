@@ -579,6 +579,7 @@
     <string name="FifthDailyPushNotification">대기질 예보</string>
     <string name="remove">삭제</string>
     <string name="com_lifedawn_bestweather_action_REDRAW">com_lifedawn_bestweather_action_REDRAW</string>
+    <string name="com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED">com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED</string>
     <string name="startOnCurrentLocation">현재위치로 시작</string>
 
 

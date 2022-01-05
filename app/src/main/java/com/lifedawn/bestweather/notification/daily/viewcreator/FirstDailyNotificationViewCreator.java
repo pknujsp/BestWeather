@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.notification.daily.viewcreator;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Message;
 import android.util.ArrayMap;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -145,6 +146,7 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
 		}
 		makeNotification(remoteViews, dailyPushNotificationDto.getId());
+
 	}
 
 	@Override

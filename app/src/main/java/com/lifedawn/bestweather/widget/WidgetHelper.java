@@ -19,6 +19,7 @@ public class WidgetHelper {
 	public WidgetHelper(Context context, Class<?> widgetProviderClass) {
 		this.context = context;
 		this.alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		this.widgetProviderClass = widgetProviderClass;
 	}
 
 
@@ -29,7 +30,7 @@ public class WidgetHelper {
 			return;
 		}
 
-		Intent refreshIntent = new Intent(context, AbstractAppWidgetProvider.class);
+		Intent refreshIntent = new Intent(context, widgetProviderClass);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 		Bundle bundle = new Bundle();
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);

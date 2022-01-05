@@ -77,25 +77,18 @@ public class DialogActivity extends Activity {
 			widgetCreator = new SecondWidgetCreator(getApplicationContext(), null, appWidgetId);
 		} else if (providerClassName.equals(ThirdWidgetProvider.class.getName())) {
 			widgetCreator = new ThirdWidgetCreator(getApplicationContext(), null, appWidgetId);
-
 		} else if (providerClassName.equals(FourthWidgetProvider.class.getName())) {
 			widgetCreator = new FourthWidgetCreator(getApplicationContext(), null, appWidgetId);
-
 		} else if (providerClassName.equals(FifthWidgetProvider.class.getName())) {
 			widgetCreator = new FifthWidgetCreator(getApplicationContext(), null, appWidgetId);
-
 		} else if (providerClassName.equals(SixthWidgetProvider.class.getName())) {
 			widgetCreator = new SixthWidgetCreator(getApplicationContext(), null, appWidgetId);
-
 		} else if (providerClassName.equals(SeventhWidgetProvider.class.getName())) {
 			widgetCreator = new SeventhWidgetCreator(getApplicationContext(), null, appWidgetId);
-
 		} else if (providerClassName.equals(EighthWidgetProvider.class.getName())) {
 			widgetCreator = new EighthWidgetCreator(getApplicationContext(), null, appWidgetId);
-
 		} else if (providerClassName.equals(NinthWidgetProvider.class.getName())) {
 			widgetCreator = new NinthWidgetCreator(getApplicationContext(), null, appWidgetId);
-
 		} else if (providerClassName.equals(TenthWidgetProvider.class.getName())) {
 			widgetCreator = new TenthWidgetCreator(getApplicationContext(), null, appWidgetId);
 		} else if (providerClassName.equals(EleventhWidgetProvider.class.getName())) {
@@ -114,15 +107,9 @@ public class DialogActivity extends Activity {
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						locationType = LocationType.valueOf(result.getLocationType());
+						locationType = result.getLocationType();
 
-						String[] listItems = null;
-						if (locationType == LocationType.CurrentLocation) {
-							listItems = new String[]{getString(R.string.open_app),
-									getString(R.string.cancel), getString(R.string.refresh), getString(R.string.refresh_current_location)};
-						} else {
-							listItems = new String[]{getString(R.string.open_app), getString(R.string.cancel), getString(R.string.refresh)};
-						}
+						String[] listItems = new String[]{getString(R.string.open_app), getString(R.string.cancel), getString(R.string.refresh)};
 
 						new AlertDialog.Builder(new ContextThemeWrapper(DialogActivity.this, R.style.Theme_AppCompat_Light_Dialog))
 								.setTitle(getString(R.string.widget_control))
@@ -142,7 +129,6 @@ public class DialogActivity extends Activity {
 
 											Bundle bundle = new Bundle();
 											bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-											bundle.putParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
 											refreshIntent.putExtras(bundle);
 
 											PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, refreshIntent,
@@ -153,6 +139,7 @@ public class DialogActivity extends Activity {
 												e.printStackTrace();
 											}
 										} else if (which == 3) {
+											/*
 											//현재 위치 업데이트
 											Intent refreshCurrentLocationIntent = new Intent(getApplicationContext(), widgetClass);
 											refreshCurrentLocationIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH_CURRENT_LOCATION));
@@ -168,6 +155,8 @@ public class DialogActivity extends Activity {
 											} catch (PendingIntent.CanceledException e) {
 												e.printStackTrace();
 											}
+
+											 */
 										}
 										dialog.dismiss();
 										finish();

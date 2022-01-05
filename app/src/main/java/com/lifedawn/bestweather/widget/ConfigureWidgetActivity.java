@@ -139,6 +139,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 	private void setBackgroundImg() {
 		if (isReadStoragePermissionGranted()) {
+			checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
 			WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
 			Drawable wallpaperDrawable = wallpaperManager.getDrawable();
 			Glide.with(this).load(wallpaperDrawable).into(binding.wallpaper);
@@ -476,12 +477,12 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 					binding.changeAddressBtn.setVisibility(View.GONE);
 					binding.selectedAddressName.setVisibility(View.GONE);
 
-					widgetDto.setLocationType(LocationType.CurrentLocation.name());
+					widgetDto.setLocationType(LocationType.CurrentLocation);
 				} else if (checkedId == binding.selectedLocationRadio.getId() && binding.selectedLocationRadio.isChecked()) {
 					binding.changeAddressBtn.setVisibility(View.VISIBLE);
 					binding.selectedAddressName.setVisibility(View.VISIBLE);
 
-					widgetDto.setLocationType(LocationType.SelectedAddress.name());
+					widgetDto.setLocationType(LocationType.SelectedAddress);
 
 					if (!selectedFavoriteLocation) {
 						openFavoritesFragment();

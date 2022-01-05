@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Message;
 import android.text.StaticLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +40,7 @@ import static android.view.View.MeasureSpec.EXACTLY;
 public abstract class AbstractDailyNotiViewCreator {
 	protected final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	protected Context context;
+	protected Handler handler;
 
 	public AbstractDailyNotiViewCreator(Context context) {
 		this.context = context;
@@ -46,6 +49,10 @@ public abstract class AbstractDailyNotiViewCreator {
 	abstract public void setTempDataViews(RemoteViews remoteViews);
 
 	abstract public RemoteViews createRemoteViews(boolean needTempData);
+
+	public void setHandler(Handler handler) {
+		this.handler = handler;
+	}
 
 	public void makeNotification(RemoteViews remoteViews, int notificationDtoId) {
 		NotificationHelper notificationHelper = new NotificationHelper(context);
@@ -66,6 +73,12 @@ public abstract class AbstractDailyNotiViewCreator {
 		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
 		Notification notification = notificationObj.getNotificationBuilder().build();
 		notificationManager.notify(notificationObj.getNotificationId() + notificationDtoId, notification);
+
+		if (handler != null) {
+			Message message = handler.obtainMessage();
+			message.obj = "finished";
+			handler.sendMessage(message);
+		}
 	}
 
 

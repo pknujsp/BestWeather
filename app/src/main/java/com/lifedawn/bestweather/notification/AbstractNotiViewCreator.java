@@ -24,6 +24,7 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
+import com.lifedawn.bestweather.notification.always.AlwaysNotificationReceiver;
 import com.lifedawn.bestweather.notification.model.NotificationDataObj;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
@@ -161,7 +162,7 @@ public abstract class AbstractNotiViewCreator {
 	}
 
 	protected PendingIntent getRefreshPendingIntent() {
-		Intent refreshIntent = new Intent(context, NotificationReceiver.class);
+		Intent refreshIntent = new Intent(context, AlwaysNotificationReceiver.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 		Bundle bundle = new Bundle();
 		bundle.putString(NotificationType.class.getName(), notificationType.name());

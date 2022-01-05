@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.SystemClock;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.notification.NotificationReceiver;
 import com.lifedawn.bestweather.notification.NotificationType;
 
 public class AlwaysNotiHelper {
@@ -24,7 +23,7 @@ public class AlwaysNotiHelper {
 		cancelAutoRefresh();
 
 		if (millis != 0) {
-			Intent refreshIntent = new Intent(context, NotificationReceiver.class);
+			Intent refreshIntent = new Intent(context, AlwaysNotificationReceiver.class);
 			refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 			Bundle bundle = new Bundle();
 			bundle.putString(NotificationType.class.getName(), NotificationType.Always.name());
@@ -39,7 +38,7 @@ public class AlwaysNotiHelper {
 	}
 
 	public void cancelAutoRefresh() {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 123, new Intent(context, NotificationReceiver.class), 0);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 123, new Intent(context, AlwaysNotificationReceiver.class), 0);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();

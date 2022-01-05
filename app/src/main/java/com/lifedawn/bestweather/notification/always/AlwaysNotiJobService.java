@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.notification;
+package com.lifedawn.bestweather.notification.always;
 
 
 import android.app.job.JobParameters;
@@ -15,6 +15,7 @@ import androidx.preference.PreferenceManager;
 import androidx.work.Configuration;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.always.AlwaysNotiHelper;
 import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
 

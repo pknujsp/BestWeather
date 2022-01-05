@@ -26,6 +26,8 @@ import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.FourthWidgetCreator;
+import com.lifedawn.bestweather.widget.jobservice.FourthWidgetJobService;
+import com.lifedawn.bestweather.widget.jobservice.ThirdWidgetJobService;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -34,7 +36,6 @@ import java.util.List;
 import java.util.Set;
 
 public class FourthWidgetProvider extends AbstractAppWidgetProvider {
-
 	@Override
 	public void onEnabled(Context context) {
 		super.onEnabled(context);
@@ -48,158 +49,26 @@ public class FourthWidgetProvider extends AbstractAppWidgetProvider {
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
 		super.onDeleted(context, appWidgetIds);
-
 	}
-
-	@Override
-	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
-		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
-		FourthWidgetCreator widgetCreator = new FourthWidgetCreator(context, null, appWidgetId);
-		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto result) {
-				if (result.getResponseText() != null) {
-					widgetCreator.setDataViewsOfSavedData();
-				}
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
-	}
-
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
 	}
 
-	@SuppressLint("UnsafeProtectedBroadcastReceiver")
+	@Override
+	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
+		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
+	}
+
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
 	}
 
-	@Override
-	protected void reDrawWidget(Context context, int appWidgetId) {
-		FourthWidgetCreator widgetViewCreator = new FourthWidgetCreator(context, null, appWidgetId);
-		reDrawWidget(widgetViewCreator);
-
-	}
 
 	@Override
-	protected void init(Context context, Bundle bundle) {
-		final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		FourthWidgetCreator widgetViewCreator = new FourthWidgetCreator(context, null, appWidgetId);
-		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto widgetDto) {
-				final RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
-				WidgetHelper widgetHelper = new WidgetHelper(context,  getClass());
-				if (widgetDto.getUpdateIntervalMillis() > 0) {
-					widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId);
-				}
-
-				if (networkStatus.networkAvailable()) {
-					RemoteViewProcessor.onBeginProcess(remoteViews);
-					appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-
-					final LocationType locationType = LocationType.valueOf(widgetDto.getLocationType());
-
-					if (locationType == LocationType.CurrentLocation) {
-						loadCurrentLocation(context, remoteViews, appWidgetId);
-					} else {
-						loadWeatherData(context, remoteViews, appWidgetId, widgetDto);
-					}
-				} else {
-					RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK);
-					setRefreshPendingIntent(remoteViews, appWidgetId, context);
-					appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-				}
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
-
-	}
-
-	@Override
-	Set<RequestWeatherDataType> getRequestWeatherDataTypeSet() {
-		Set<RequestWeatherDataType> set = new HashSet<>();
-		set.add(RequestWeatherDataType.currentConditions);
-		set.add(RequestWeatherDataType.dailyForecast);
-		set.add(RequestWeatherDataType.airQuality);
-
-		return set;
-	}
-
-	@Override
-	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherSourceType> requestWeatherSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
-		ZoneId zoneId = null;
-		ZoneOffset zoneOffset = null;
-		FourthWidgetCreator widgetCreator = new FourthWidgetCreator(context, null, appWidgetId);
-		widgetCreator.setWidgetDto(widgetDto);
-		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
-
-		final WeatherSourceType weatherSourceType = WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherSourceTypeSet);
-
-
-		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
-				weatherSourceType);
-		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleRestApiDownloader,
-				weatherSourceType);
-
-		final boolean successful = currentConditionsDto != null && !dailyForecastDtoList.isEmpty();
-		AirQualityDto airQualityDto = null;
-
-		if (successful) {
-			zoneId = currentConditionsDto.getCurrentTime().getZone();
-			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
-			widgetDto.setTimeZoneId(zoneId.getId());
-
-			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
-					zoneOffset);
-			if (airQualityDto == null) {
-				airQualityDto = new AirQualityDto();
-				airQualityDto.setAqi(-1);
-			}
-
-			widgetCreator.setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto,
-					currentConditionsDto, dailyForecastDtoList, new OnDrawBitmapCallback() {
-						@Override
-						public void onCreatedBitmap(Bitmap bitmap) {
-							widgetDto.setBitmap(bitmap);
-						}
-					});
-			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, requestWeatherDataTypeSet, requestWeatherSourceTypeSet, widgetDto, zoneOffset);
-
-
-		}
-
-
-		widgetDto.setLoadSuccessful(successful);
-
-		if (successful) {
-			RemoteViewProcessor.onSuccessfulProcess(remoteViews);
-		} else {
-			if (widgetDto.getBitmap() == null) {
-				RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-				setRefreshPendingIntent(remoteViews, appWidgetId, context);
-			} else {
-				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());
-			}
-		}
-		widgetCreator.updateSettings(widgetDto, null);
-		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-	}
-
-	@Override
-	Class<?> getThis() {
-		return FourthWidgetProvider.class;
+	protected Class<?> getJobServiceClass() {
+		return FourthWidgetJobService.class;
 	}
 }

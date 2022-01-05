@@ -1,324 +1,118 @@
 package com.lifedawn.bestweather.widget.widgetprovider;
 
-import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.app.job.JobWorkItem;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.os.Handler;
+import android.os.Message;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 
-import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.FusedLocation;
-import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.classes.NetworkStatus;
-import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
-import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.WidgetHelper;
-import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
+import com.lifedawn.bestweather.widget.jobservice.FirstWidgetJobService;
 
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.Executors;
 
 public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
-	protected static final String tag = "AppWidgetProvider";
-	protected WidgetRepository widgetRepository;
-	protected AppWidgetManager appWidgetManager;
-	protected NetworkStatus networkStatus;
+	protected static final int JOB_ID_ON_APP_WIDGET_OPTIONS_CHANGED = 100000;
+	protected static final int JOB_REFRESH = 200000;
+	protected static final int JOB_ACTION_BOOT_COMPLETED = 300000;
+	protected static final int JOB_REDRAW = 400000;
+	protected static final int JOB_INIT = 500000;
 
-	abstract Class<?> getThis();
+	protected abstract Class<?> getJobServiceClass();
 
 	@Override
 	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
 		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
-
-		if (appWidgetManager == null) {
-			appWidgetManager = AppWidgetManager.getInstance(context);
-		}
+		scheduleJob(context, context.getString(R.string.com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED), JOB_ID_ON_APP_WIDGET_OPTIONS_CHANGED, appWidgetId);
 	}
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		Log.e(tag, "onUpdate");
-		if (appWidgetManager == null) {
-			appWidgetManager = AppWidgetManager.getInstance(context);
-		}
-
-		for (int widgetId : appWidgetIds) {
-			reDrawWidget(context, widgetId);
-		}
+		super.onUpdate(context, appWidgetManager, appWidgetIds);
 	}
 
 	@Override
 	public void onEnabled(Context context) {
 		super.onEnabled(context);
-		Log.e(tag, "onEnabled");
 	}
 
 	@Override
 	public void onDisabled(Context context) {
 		super.onDisabled(context);
-		Log.e(tag, "onDisabled");
 	}
 
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
-		super.onDeleted(context, appWidgetIds);
-
 		WidgetHelper widgetHelper = new WidgetHelper(context, getClass());
+		WidgetRepository widgetRepository = new WidgetRepository(context);
+
 		for (int appWidgetId : appWidgetIds) {
 			widgetHelper.cancelAutoRefresh(appWidgetId);
-		}
-
-		for (int appWidgetId : appWidgetIds) {
 			widgetRepository.delete(appWidgetId, null);
 		}
-
-		Log.e(tag, "onDeleted");
+		super.onDeleted(context, appWidgetIds);
 	}
 
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
-		if (widgetRepository == null) {
-			widgetRepository = new WidgetRepository(context);
-		}
-		if (appWidgetManager == null) {
-			appWidgetManager = AppWidgetManager.getInstance(context);
-		}
-		if (networkStatus == null) {
-			networkStatus = NetworkStatus.getInstance(context);
-		}
-
 		Bundle bundle = intent.getExtras();
-		String action = intent.getAction();
-		Log.e(tag, action);
+		final String action = intent.getAction();
+		int jobBeginId = 0;
 
 		if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_INIT))) {
-			init(context, intent.getExtras());
+			jobBeginId = JOB_INIT;
 		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-			final RemoteViews remoteViews = bundle.getParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name());
-
-			widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
-				@Override
-				public void onResultSuccessful(WidgetDto result) {
-					loadWeatherData(context, remoteViews, appWidgetId, result);
-				}
-
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
-		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH_CURRENT_LOCATION))) {
-			final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-			final RemoteViews remoteViews = bundle.getParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name());
-			RemoteViewProcessor.onBeginProcess(remoteViews);
-			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-
-			loadCurrentLocation(context, remoteViews, appWidgetId);
+			jobBeginId = JOB_REFRESH;
 		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
-			//위젯 자동 업데이트 재 등록
-			widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
-				@Override
-				public void onResultSuccessful(List<WidgetDto> list) {
-					WidgetHelper widgetHelper = new WidgetHelper(context, getClass());
-					for (WidgetDto widgetDto : list) {
-						if (widgetDto.getUpdateIntervalMillis() > 0) {
-							widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId()
-							);
-						}
-					}
-				}
-
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
+			jobBeginId = JOB_ACTION_BOOT_COMPLETED;
 		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW))) {
-			widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
-				@Override
-				public void onResultSuccessful(List<WidgetDto> list) {
-					for (WidgetDto widgetDto : list) {
-						reDrawWidget(context, widgetDto.getAppWidgetId());
-					}
-				}
+			jobBeginId = JOB_REDRAW;
+		}
 
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
+		if (jobBeginId != 0) {
+			final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+			scheduleJob(context, action, jobBeginId, appWidgetId);
 		}
 	}
 
-	public final void setRefreshPendingIntent(RemoteViews remoteViews, int appWidgetId, Context context) {
-		Intent refreshIntent = new Intent(context, getClass());
-		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
-		Bundle bundle = new Bundle();
-		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-		bundle.putParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
-		refreshIntent.putExtras(bundle);
+	protected final void scheduleJob(Context context, String action, int jobIdBegin, int appWidgetId) {
+		PersistableBundle persistableBundle = new PersistableBundle();
+		persistableBundle.putString("action", action);
+		persistableBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId, refreshIntent,
-				PendingIntent.FLAG_CANCEL_CURRENT);
-		remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, pendingIntent);
-	}
+		final int jobId = jobIdBegin + appWidgetId;
 
-	public void loadCurrentLocation(Context context, RemoteViews remoteViews, int appWidgetId) {
-		Log.e(tag, "loadCurrentLocation");
+		JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+		JobInfo jobInfo = new JobInfo.Builder(jobId, new ComponentName(context, getJobServiceClass()))
+				.setMinimumLatency(0).setOverrideDeadline(500).setExtras(persistableBundle).build();
 
-		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
-			@Override
-			public void onSuccessful(LocationResult locationResult) {
-				final Location location = locationResult.getLocations().get(0);
-				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
-					@Override
-					public void onGeocodingResult(List<Address> addressList) {
-						WidgetRepository widgetRepository = new WidgetRepository(context);
-						widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
-							@Override
-							public void onResultSuccessful(WidgetDto result) {
-								Address address = addressList.get(0);
-
-								result.setAddressName(address.getAddressLine(0));
-								result.setCountryCode(address.getCountryCode());
-								result.setLatitude(address.getLatitude());
-								result.setLongitude(address.getLongitude());
-
-								widgetRepository.update(result, null);
-								loadWeatherData(context, remoteViews, appWidgetId, result);
-							}
-
-							@Override
-							public void onResultNoData() {
-
-							}
-						});
-
-
-					}
-				});
+		List<JobInfo> jobInfoList = jobScheduler.getAllPendingJobs();
+		for (JobInfo pendingJonInfo : jobInfoList) {
+			if (pendingJonInfo.getId() == jobId) {
+				jobScheduler.cancel(jobId);
 			}
-
-			@Override
-			public void onFailed(Fail fail) {
-				Intent intent = null;
-				RemoteViewProcessor.ErrorType errorType = null;
-
-				if (fail == Fail.REJECT_PERMISSION) {
-					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_REJECTED;
-					intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-					intent.setData(Uri.fromParts("package", context.getPackageName(), null));
-				} else {
-					errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
-					intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-				}
-
-				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT));
-				RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
-				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-			}
-		};
-
-		FusedLocation.getInstance(context).startLocationUpdates(locationCallback);
-	}
-
-
-	public void loadWeatherData(Context context, RemoteViews remoteViews, int appWidgetId, WidgetDto widgetDto) {
-		if (networkStatus.networkAvailable()) {
-			RemoteViewProcessor.onBeginProcess(remoteViews);
-			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-
-			final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
-			final Set<WeatherSourceType> weatherSourceTypeSet = widgetDto.getWeatherSourceTypeSet();
-
-			if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
-				if (weatherSourceTypeSet.size() == 1) {
-					weatherSourceTypeSet.clear();
-					weatherSourceTypeSet.add(WeatherSourceType.KMA_WEB);
-				}
-			}
-
-			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
-				weatherSourceTypeSet.add(WeatherSourceType.AQICN);
-			}
-
-			WeatherRequestUtil.loadWeatherData(context, Executors.newSingleThreadExecutor(), widgetDto.getCountryCode(), widgetDto.getLatitude(),
-					widgetDto.getLongitude(), requestWeatherDataTypeSet, new MultipleRestApiDownloader() {
-						@Override
-						public void onResult() {
-							setResultViews(context, appWidgetId, remoteViews, widgetDto, weatherSourceTypeSet, this, requestWeatherDataTypeSet);
-						}
-
-						@Override
-						public void onCanceled() {
-
-						}
-					}, weatherSourceTypeSet);
-
-		} else {
-			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK);
-			setRefreshPendingIntent(remoteViews, appWidgetId, context);
-			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 		}
 
+		jobScheduler.schedule(jobInfo);
 	}
 
-	protected void reDrawWidget(AbstractWidgetCreator widgetViewCreator) {
-		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto widgetDto) {
-				if (widgetDto == null) {
-					return;
-				}
-
-				RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
-
-				if (widgetDto.isLoadSuccessful()) {
-					widgetViewCreator.setDataViewsOfSavedData();
-				} else {
-					remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetViewCreator.getOnClickedPendingIntent(remoteViews));
-					RemoteViewProcessor.onErrorProcess(remoteViews, widgetViewCreator.getContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-					appWidgetManager.updateAppWidget(widgetViewCreator.getAppWidgetId(), remoteViews);
-				}
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
-
-	}
-
-	abstract protected void reDrawWidget(Context context, int appWidgetId);
-
-	abstract protected void init(Context context, Bundle bundle);
-
-	abstract Set<RequestWeatherDataType> getRequestWeatherDataTypeSet();
-
-	abstract protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews,
-	                                       WidgetDto widgetDto, Set<WeatherSourceType> requestWeatherSourceTypeSet, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
-	                                       Set<RequestWeatherDataType> requestWeatherDataTypeSet);
 }
