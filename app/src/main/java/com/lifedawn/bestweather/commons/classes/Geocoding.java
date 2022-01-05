@@ -51,7 +51,6 @@ public class Geocoding {
 			@Override
 			public void run() {
 				Geocoder geocoder = new Geocoder(context);
-
 				try {
 					List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 20);
 					callback.onGeocodingResult(addressList);
