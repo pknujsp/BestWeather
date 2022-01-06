@@ -44,7 +44,7 @@ public class AlwaysNotiJobService extends JobService {
 				}
 			}));
 
-		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 			SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 			final boolean enabledAlwaysNotification =

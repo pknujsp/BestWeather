@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.ArrayMap;
+import android.util.ArraySet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
@@ -251,6 +253,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		final String cm = "cm";
 		final String mm = "mm";
 
+		List<WeatherSourceUnitObj> weatherSourceUnitObjList = new ArrayList<>();
+
 		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
 			List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 			List<String> tempList = new ArrayList<>();
@@ -258,6 +262,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			List<String> rainVolumeList = new ArrayList<>();
 			List<String> snowVolumeList = new ArrayList<>();
 			boolean haveSnow = false;
+			boolean haveRain = false;
 
 			if (weatherSourceTypeList.get(i) == WeatherSourceType.KMA_WEB) {
 				for (ForecastObj<DailyForecastDto> item : kmaFinalDailyForecasts) {
@@ -301,6 +306,13 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 							haveSnow = true;
 						}
 					}
+
+					if (!haveRain) {
+						if (item.e.getAmValues().isHasRainVolume() ||
+								item.e.getPmValues().isHasRainVolume()) {
+							haveRain = true;
+						}
+					}
 					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
 							ContextCompat.getDrawable(context, item.e.getAmValues().getWeatherIcon()),
 							ContextCompat.getDrawable(context, item.e.getPmValues().getWeatherIcon()),
@@ -321,14 +333,19 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 							haveSnow = true;
 						}
 					}
+					if (item.e.getSingleValues().isHasRainVolume()) {
+						if (!haveRain) {
+							haveRain = true;
+						}
+					}
 					snowVolumeList.add(item.e.getSingleValues().getSnowVolume().replace(mm, ""));
 					rainVolumeList.add(item.e.getSingleValues().getRainVolume().replace(mm, ""));
 
 					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(getContext(), item.e.getSingleValues().getWeatherIcon()),
 							item.e.getSingleValues().getWeatherDescription()));
 				}
-
 			}
+			weatherSourceUnitObjList.add(new WeatherSourceUnitObj(weatherSourceTypeList.get(i), haveRain, haveSnow));
 
 			weatherIconRows.get(i).setIcons(weatherIconObjList);
 			tempRows.get(i).setValueList(tempList);
@@ -405,6 +422,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			tempRows.get(i).setValueTextColor(Color.BLACK);
 			view.addView(tempRows.get(i), tempRowLayoutParams);
 		}
+
+		createValueUnitsDescription(weatherSourceUnitObjList);
 	}
 
 	private void loadForecasts() {
@@ -453,7 +472,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			}
 		};
 
-		ExecutorService executorService = Executors.newSingleThreadExecutor();
+		ExecutorService executorService = MyApplication.getExecutorService();
+
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {

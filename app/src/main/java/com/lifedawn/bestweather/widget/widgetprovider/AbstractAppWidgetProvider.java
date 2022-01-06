@@ -82,6 +82,8 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			jobBeginId = JOB_ACTION_BOOT_COMPLETED;
 		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW))) {
 			jobBeginId = JOB_REDRAW;
+		} else if (action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
+			jobBeginId = JOB_REDRAW;
 		}
 
 		if (jobBeginId != 0) {
@@ -102,15 +104,16 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 		final int jobId = jobIdBegin + appWidgetId;
 
 		JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-		JobInfo jobInfo = new JobInfo.Builder(jobId, new ComponentName(context, getJobServiceClass()))
-				.setMinimumLatency(0).setOverrideDeadline(500).setExtras(persistableBundle).build();
 
 		List<JobInfo> jobInfoList = jobScheduler.getAllPendingJobs();
 		for (JobInfo pendingJonInfo : jobInfoList) {
 			if (pendingJonInfo.getId() == jobId) {
-				jobScheduler.cancel(jobId);
+				//jobScheduler.cancel(jobId);
 			}
 		}
+
+		JobInfo jobInfo = new JobInfo.Builder(jobId, new ComponentName(context, getJobServiceClass()))
+				.setMinimumLatency(0).setOverrideDeadline(500).setExtras(persistableBundle).build();
 
 		jobScheduler.schedule(jobInfo);
 	}

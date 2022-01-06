@@ -50,6 +50,7 @@ import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.FragmentAirQualityDetailBinding;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
@@ -81,8 +82,6 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	private Double latitude;
 	private Double longitude;
 	private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("E");
-
-	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	private int pm10LineColor;
 	private int pm25LineColor;
@@ -155,7 +154,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void setValuesToViews() {
 		final GeolocalizedFeedResponse.Data.IAqi iAqi = response.getData().getIaqi();
-
+		ExecutorService executorService = MyApplication.getExecutorService();
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {

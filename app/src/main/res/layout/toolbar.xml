@@ -5,6 +5,7 @@
     android:layout_height="@dimen/toolbarHeight"
     android:background="@color/white"
     android:gravity="center_vertical"
+
     android:paddingHorizontal="16dp">
 
     <ImageView
@@ -21,9 +22,9 @@
         android:layout_height="@dimen/btnSizeInToolbar"
         android:layout_marginLeft="18dp"
         android:layout_toRightOf="@id/back_btn"
+        android:fontFamily="sans-serif-light"
         android:gravity="center_vertical"
         android:text="fragmentTitle"
-        android:fontFamily="sans-serif-light"
         android:textColor="?attr/toolbarTextColor" />
 
 </RelativeLayout>

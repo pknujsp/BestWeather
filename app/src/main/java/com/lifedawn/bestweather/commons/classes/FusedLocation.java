@@ -10,8 +10,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.provider.Settings;
+import android.provider.SyncStateContract;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -23,8 +26,12 @@ import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApi;
 import com.google.android.gms.common.api.internal.ConnectionCallbacks;
 import com.google.android.gms.common.api.internal.OnConnectionFailedListener;
+import com.google.android.gms.common.api.internal.RegistrationMethods;
+import com.google.android.gms.common.internal.Constants;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
@@ -32,12 +39,22 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedListener {
 	private static FusedLocation instance;
@@ -80,38 +97,56 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 	public void startLocationUpdates(MyLocationCallback myLocationCallback) {
 		if (!isOnGps()) {
 			myLocationCallback.onFailed(MyLocationCallback.Fail.DISABLED_GPS);
-			return;
-		}
-
-		final int accessFineLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-		final int accessCoarseLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
-
-		if (accessCoarseLocation == PackageManager.PERMISSION_GRANTED &&
-				accessFineLocation == PackageManager.PERMISSION_GRANTED) {
-			LocationRequest locationRequest = LocationRequest.create();
-			locationRequest.setInterval(200);
-			locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-			fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
-				@Override
-				public void onLocationResult(@NonNull @NotNull LocationResult locationResult) {
-					fusedLocationClient.removeLocationUpdates(this);
-					super.onLocationResult(locationResult);
-
-					if (locationResult.getLocations().size() > 0) {
-						myLocationCallback.onSuccessful(locationResult);
-					} else {
-						myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
-					}
-				}
-
-				@Override
-				public void onLocationAvailability(@NonNull @NotNull LocationAvailability locationAvailability) {
-					super.onLocationAvailability(locationAvailability);
-				}
-			}, Looper.getMainLooper());
+		} else if (!isOnNetwork()) {
+			myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
 		} else {
-			myLocationCallback.onFailed(MyLocationCallback.Fail.REJECT_PERMISSION);
+			if (checkPermissions()) {
+				boolean availableGoogleApi = availablePlayServices();
+
+				LocationRequest locationRequest = LocationRequest.create();
+				locationRequest.setInterval(300);
+				locationRequest.setFastestInterval(150);
+				locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+				Timer timer = new Timer();
+
+				LocationCallback locationCallback = new LocationCallback() {
+					@Override
+					public void onLocationResult(@NonNull @NotNull LocationResult locationResult) {
+						timer.cancel();
+						fusedLocationClient.removeLocationUpdates(this);
+
+						if (locationResult != null) {
+							if (locationResult.getLocations().size() > 0) {
+								myLocationCallback.onSuccessful(locationResult);
+							} else {
+								myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
+							}
+						} else {
+							myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
+						}
+					}
+
+					@Override
+					public void onLocationAvailability(@NonNull @NotNull LocationAvailability locationAvailability) {
+						super.onLocationAvailability(locationAvailability);
+					}
+				};
+
+				timer.schedule(new TimerTask() {
+					@Override
+					public void run() {
+						locationCallback.onLocationResult(LocationResult.create(new ArrayList<>()));
+					}
+				}, 3000L);
+
+				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+
+				fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+			} else {
+				myLocationCallback.onFailed(MyLocationCallback.Fail.REJECT_PERMISSION);
+			}
 		}
 	}
 
@@ -162,6 +197,10 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 			locationLifeCycleObserver.launchPermissionLauncher(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
 					Manifest.permission.ACCESS_COARSE_LOCATION}, permissionsResultCallback);
 		}
+	}
+
+	public boolean availablePlayServices() {
+		return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
 	}
 
 	public interface MyLocationCallback {

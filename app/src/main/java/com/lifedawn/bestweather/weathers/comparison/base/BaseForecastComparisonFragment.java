@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers.comparison.base;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,9 +9,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
@@ -19,6 +24,7 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.Weather;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.NotScrolledView;
@@ -26,6 +32,8 @@ import com.lifedawn.bestweather.weathers.view.NotScrolledView;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
+import java.util.List;
+import java.util.Set;
 
 public class BaseForecastComparisonFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutForecastComparisonBinding binding;
@@ -106,4 +114,75 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 
 	}
 
+	protected void createValueUnitsDescription(List<WeatherSourceUnitObj> weatherSourceUnitObjs) {
+		StringBuilder stringBuilder = new StringBuilder();
+
+		for (WeatherSourceUnitObj weatherSourceTypeObj : weatherSourceUnitObjs) {
+			if (weatherSourceTypeObj.haveRain || weatherSourceTypeObj.haveSnow) {
+				String rainUnit = "mm";
+				String snowUnit = null;
+				String weatherSourceTypeName = null;
+
+				switch (weatherSourceTypeObj.weatherSourceType) {
+					case ACCU_WEATHER:
+						weatherSourceTypeName = getString(R.string.accu_weather);
+						snowUnit = "cm";
+						break;
+					case OPEN_WEATHER_MAP:
+						weatherSourceTypeName = getString(R.string.owm);
+						snowUnit = "mm";
+						break;
+					default:
+						weatherSourceTypeName = getString(R.string.kma);
+						snowUnit = "cm";
+				}
+
+				if (stringBuilder.length() > 0) {
+					stringBuilder.append("\n");
+				}
+				stringBuilder.append(weatherSourceTypeName).append(": ");
+
+				if (weatherSourceTypeObj.haveRain) {
+					stringBuilder.append(getString(R.string.rain)).append(" ").append(rainUnit);
+				}
+				if (weatherSourceTypeObj.haveSnow) {
+					if (weatherSourceTypeObj.haveRain) {
+						stringBuilder.append(" ");
+					}
+					stringBuilder.append(getString(R.string.snow)).append(" ").append(snowUnit);
+				}
+			}
+		}
+
+		if (stringBuilder.length() > 0) {
+			TextView textView = new TextView(getContext());
+			FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT);
+			layoutParams.gravity = Gravity.RIGHT;
+			textView.setLayoutParams(layoutParams);
+			textView.setTextColor(Color.GRAY);
+			textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f);
+			textView.setText(stringBuilder.toString());
+			textView.setIncludeFontPadding(false);
+
+			binding.extraView.removeAllViews();
+			binding.extraView.addView(textView);
+			binding.extraView.setVisibility(View.VISIBLE);
+		} else {
+			binding.extraView.setVisibility(View.GONE);
+
+		}
+	}
+
+	protected static class WeatherSourceUnitObj {
+		final WeatherSourceType weatherSourceType;
+		final boolean haveRain;
+		final boolean haveSnow;
+
+		public WeatherSourceUnitObj(WeatherSourceType weatherSourceType, boolean haveRain, boolean haveSnow) {
+			this.weatherSourceType = weatherSourceType;
+			this.haveRain = haveRain;
+			this.haveSnow = haveSnow;
+		}
+	}
 }

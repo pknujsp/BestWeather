@@ -8,12 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PersistableBundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -29,7 +27,6 @@ import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -38,7 +35,6 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.FirstWidgetCreator;
 
 import java.util.List;
 import java.util.Set;
@@ -61,6 +57,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 		PersistableBundle bundle = params.getExtras();
 		final String action = bundle.getString("action");
 		final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+		Log.e("jobService", action);
 
 		widgetRepository = new WidgetRepository(getApplicationContext());
 		appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
@@ -172,21 +169,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 				onReDraw(id, params);
 			}
 		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED))) {
-			createWidgetViewCreator(appWidgetId);
-			widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
-				@Override
-				public void onResultSuccessful(WidgetDto result) {
-					if (result.getResponseText() != null) {
-						widgetViewCreator.setDataViewsOfSavedData();
-					}
-					jobFinished(params, false);
-				}
-
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
+			onReDraw(appWidgetId, params);
 		}
 
 		return true;
@@ -227,7 +210,6 @@ public abstract class AbstractWidgetJobService extends JobService {
 							message.obj = "finished";
 							handler.sendMessage(message);
 						} else {
-
 							WidgetRepository widgetRepository = new WidgetRepository(context);
 							widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
 								@Override
@@ -277,7 +259,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 			}
 		};
 
-		FusedLocation.getInstance(context).startLocationUpdates(locationCallback);
+		FusedLocation.getInstance(getApplicationContext()).startLocationUpdates(locationCallback);
 	}
 
 
@@ -337,15 +319,11 @@ public abstract class AbstractWidgetJobService extends JobService {
 		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto widgetDto) {
-				if (widgetDto == null) {
-					return;
-				}
-
-				if (widgetDto.isLoadSuccessful()) {
+				if (widgetDto != null && widgetDto.isLoadSuccessful()) {
 					widgetViewCreator.setDataViewsOfSavedData();
 				} else {
 					RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
-					remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, widgetViewCreator.getOnClickedPendingIntent(remoteViews));
+					setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
 					RemoteViewProcessor.onErrorProcess(remoteViews, widgetViewCreator.getContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
 					appWidgetManager.updateAppWidget(widgetViewCreator.getAppWidgetId(), remoteViews);
 				}

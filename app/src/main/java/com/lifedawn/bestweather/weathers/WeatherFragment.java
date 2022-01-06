@@ -5,9 +5,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -28,6 +30,7 @@ import android.util.ArrayMap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
@@ -65,6 +68,7 @@ import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.flickr.FlickrImgObj;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MainActivity;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.flickr.FlickrGetPhotosFromGalleryParameter;
@@ -135,9 +139,10 @@ import retrofit2.Response;
 
 
 public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadImgOfCurrentConditions, IGps {
-	private static final ExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadExecutor();
 	private static final Map<String, WeatherResponseObj> FINAL_RESPONSE_MAP = new HashMap<>();
 	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
+
+	private ExecutorService executorService;
 
 	private FragmentWeatherBinding binding;
 	private FavoriteAddressDto selectedFavoriteAddressDto;
@@ -188,6 +193,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		networkStatus = NetworkStatus.getInstance(getContext());
 		fusedLocation = FusedLocation.getInstance(getContext());
@@ -199,15 +205,17 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
+
+		MyApplication myApplication = (MyApplication) getActivity().getApplication();
+		executorService = myApplication.getExecutorService();
 	}
 
 	@Override
 	public void onHiddenChanged(boolean hidden) {
 		super.onHiddenChanged(hidden);
+
 		if (hidden) {
-			getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 		} else {
-			getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 		}
 	}
 
@@ -220,7 +228,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
 		FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.mainLayout.getLayoutParams();
 		layoutParams.topMargin = MainActivity.getHeightOfStatusBar(getContext());
@@ -358,7 +365,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void loadImgOfCurrentConditions(WeatherSourceType weatherSourceType, String val, Double latitude, Double longitude,
 	                                       ZoneId zoneId) {
-		EXECUTOR_SERVICE.execute(new Runnable() {
+		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
 				ZonedDateTime lastRefreshDateTime =
@@ -710,7 +717,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		};
 		multipleRestApiDownloader.setLoadingDialog(loadingDialog);
 
-		EXECUTOR_SERVICE.execute(new Runnable() {
+		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
 				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleRestApiDownloader);
@@ -744,7 +751,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			}
 		};
 		multipleRestApiDownloader.setLoadingDialog(loadingDialog);
-		EXECUTOR_SERVICE.execute(new Runnable() {
+		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
 				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleRestApiDownloader);
@@ -942,7 +949,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			}
 		}
 
-		EXECUTOR_SERVICE.execute(new Runnable() {
+		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
 				MainProcessing.reRequestWeatherDataBySameWeatherSourceIfFailed(getContext(), latitude, longitude, newRequestWeatherSources,
@@ -960,7 +967,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		setRequestWeatherSourceWithSourceTypes(responseResultObj.weatherSourceTypeSet, newRequestWeatherSources);
 		responseResultObj.requestWeatherSources = newRequestWeatherSources;
 
-		EXECUTOR_SERVICE.execute(new Runnable() {
+		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
 				MainProcessing.reRequestWeatherDataByAnotherWeatherSourceIfFailed(getContext(), latitude, longitude,

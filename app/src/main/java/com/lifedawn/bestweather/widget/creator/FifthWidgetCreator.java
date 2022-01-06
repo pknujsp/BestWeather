@@ -25,7 +25,6 @@ import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 
-import java.lang.reflect.TypeVariable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -57,7 +56,7 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 		if (needTempData) {
 			setTempDataViews(remoteViews);
 		} else {
-			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent(remoteViews));
+			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 		}
 
 		//setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());

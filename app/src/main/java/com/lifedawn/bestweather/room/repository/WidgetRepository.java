@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.AppDb;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dao.WidgetDao;
@@ -16,11 +17,13 @@ import java.util.concurrent.Executors;
 public class WidgetRepository {
 	private Context context;
 	private final WidgetDao widgetDao;
-	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private final ExecutorService executorService;
 
 	public WidgetRepository(Context context) {
 		this.context = context;
 		widgetDao = AppDb.getInstance(context).widgetDao();
+		executorService = MyApplication.getExecutorService();
+
 	}
 
 	public void add(WidgetDto widgetDto, DbQueryCallback<WidgetDto> callback) {

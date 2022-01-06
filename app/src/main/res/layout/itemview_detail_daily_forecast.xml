@@ -109,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-thin"
                 android:text="15°"
-                android:textColor="@color/black"
+                android:textColor="@color/light_blue_900"
                 android:textSize="38sp" />
         </LinearLayout>
 

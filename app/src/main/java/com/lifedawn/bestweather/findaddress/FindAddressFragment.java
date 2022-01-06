@@ -23,6 +23,7 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.CustomEditText;
 import com.lifedawn.bestweather.databinding.FragmentFindAddressBinding;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
@@ -41,8 +42,8 @@ public class FindAddressFragment extends Fragment {
 	private boolean selectedAddress = false;
 	private FavoriteAddressDto newFavoriteAddressDto;
 	private String requestFragment;
-	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 	private OnResultFragmentListener onResultFragmentListener;
+	private ExecutorService executorService;
 
 	public FindAddressFragment setOnResultFragmentListener(OnResultFragmentListener onResultFragmentListener) {
 		this.onResultFragmentListener = onResultFragmentListener;
@@ -53,6 +54,7 @@ public class FindAddressFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
+		executorService = MyApplication.getExecutorService();
 
 		Bundle bundle = getArguments();
 		requestFragment = bundle.getString(BundleKey.RequestFragment.name());

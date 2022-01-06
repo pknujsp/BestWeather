@@ -10,9 +10,12 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RemoteViews;
 
 import com.lifedawn.bestweather.R;
@@ -51,8 +54,6 @@ public class DialogActivity extends Activity {
 	private ActivityDialogBinding binding;
 	private Class<?> widgetClass;
 	private int appWidgetId;
-	private RemoteViews remoteViews;
-	private LocationType locationType;
 	private AbstractWidgetCreator widgetCreator;
 
 
@@ -64,7 +65,6 @@ public class DialogActivity extends Activity {
 
 		Bundle bundle = getIntent().getExtras();
 		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		remoteViews = bundle.getParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name());
 
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		final AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId);
@@ -101,67 +101,61 @@ public class DialogActivity extends Activity {
 			e.printStackTrace();
 		}
 
+		final View dialogView = getLayoutInflater().inflate(R.layout.view_widget_dialog, null);
+
+		((Button) dialogView.findViewById(R.id.openAppBtn)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				startActivity(intent);
+				finish();
+			}
+		});
+
+		((Button) dialogView.findViewById(R.id.updateBtn)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent refreshIntent = new Intent(getApplicationContext(), widgetClass);
+				refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+
+				Bundle bundle = new Bundle();
+				bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+				refreshIntent.putExtras(bundle);
+
+				PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, refreshIntent,
+						PendingIntent.FLAG_CANCEL_CURRENT);
+				try {
+					pendingIntent.send();
+				} catch (PendingIntent.CanceledException e) {
+					e.printStackTrace();
+				}
+				finish();
+			}
+		});
+
+		((Button) dialogView.findViewById(R.id.cancelBtn)).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
+
 		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						locationType = result.getLocationType();
-
-						String[] listItems = new String[]{getString(R.string.open_app), getString(R.string.cancel), getString(R.string.refresh)};
-
-						new AlertDialog.Builder(new ContextThemeWrapper(DialogActivity.this, R.style.Theme_AppCompat_Light_Dialog))
-								.setTitle(getString(R.string.widget_control))
+						AlertDialog alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(DialogActivity.this,
+								R.style.Theme_AppCompat_Light_Dialog))
 								.setCancelable(false)
-								.setItems(listItems, new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog, int which) {
-										if (which == 0) {
-											Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-											intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-											startActivity(intent);
-										} else if (which == 1) {
+								.setView(dialogView)
+								.create();
 
-										} else if (which == 2) {
-											Intent refreshIntent = new Intent(getApplicationContext(), widgetClass);
-											refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+						alertDialog.show();
+						alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-											Bundle bundle = new Bundle();
-											bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-											refreshIntent.putExtras(bundle);
-
-											PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, refreshIntent,
-													PendingIntent.FLAG_CANCEL_CURRENT);
-											try {
-												pendingIntent.send();
-											} catch (PendingIntent.CanceledException e) {
-												e.printStackTrace();
-											}
-										} else if (which == 3) {
-											/*
-											//현재 위치 업데이트
-											Intent refreshCurrentLocationIntent = new Intent(getApplicationContext(), widgetClass);
-											refreshCurrentLocationIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH_CURRENT_LOCATION));
-											Bundle bundle = new Bundle();
-											bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-											bundle.putParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
-											refreshCurrentLocationIntent.putExtras(bundle);
-
-											PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId,
-													refreshCurrentLocationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-											try {
-												pendingIntent.send();
-											} catch (PendingIntent.CanceledException e) {
-												e.printStackTrace();
-											}
-
-											 */
-										}
-										dialog.dismiss();
-										finish();
-									}
-								}).create().show();
 					}
 				});
 			}

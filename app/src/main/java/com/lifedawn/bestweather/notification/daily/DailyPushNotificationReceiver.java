@@ -68,7 +68,7 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 		JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
 		JobInfo jobInfo = new JobInfo.Builder(10000 + id, new ComponentName(context, DailyPushNotificationJobService.class))
-				.setMinimumLatency(500)
+				.setMinimumLatency(0)
 				.setOverrideDeadline(20000)
 				.setExtras(persistableBundle)
 				.build();

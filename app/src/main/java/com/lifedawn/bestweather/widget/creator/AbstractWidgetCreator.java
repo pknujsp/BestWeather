@@ -22,7 +22,6 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -156,13 +155,12 @@ public abstract class AbstractWidgetCreator {
 	}
 
 
-	public PendingIntent getOnClickedPendingIntent(RemoteViews remoteViews) {
+	public PendingIntent getOnClickedPendingIntent() {
 		Intent intent = new Intent(context, DialogActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 		Bundle bundle = new Bundle();
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-		bundle.putParcelable(WidgetNotiConstants.WidgetAttributes.REMOTE_VIEWS.name(), remoteViews);
 		intent.putExtras(bundle);
 
 		return PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);

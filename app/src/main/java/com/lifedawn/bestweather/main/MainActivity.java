@@ -87,6 +87,13 @@ public class MainActivity extends AppCompatActivity {
 
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
+		final Window window = getWindow();
+		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		window.setStatusBarColor(Color.TRANSPARENT);
+		window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
 		networkStatus = NetworkStatus.getInstance(getApplicationContext());
 		if (!networkStatus.networkAvailable()) {
 			Toast.makeText(this, R.string.disconnected_network, Toast.LENGTH_SHORT).show();

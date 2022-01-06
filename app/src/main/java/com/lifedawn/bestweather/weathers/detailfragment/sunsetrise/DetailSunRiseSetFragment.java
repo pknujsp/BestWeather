@@ -30,6 +30,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.databinding.FragmentDetailSunRiseSetBinding;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
@@ -61,7 +62,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 	private int minusWeeks = 1;
 	private int plusWeeks = 16;
 
-	private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private final ExecutorService executorService = MyApplication.getExecutorService();
 	private final DateTimeFormatter dateFormatterInInfo = DateTimeFormatter.ofPattern("yyyy.M.d EEE");
 	private final DateTimeFormatter timeFormatterInInfo = DateTimeFormatter.ofPattern("a hh:mm");
 

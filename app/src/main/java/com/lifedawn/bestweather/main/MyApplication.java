@@ -19,9 +19,12 @@ import com.lifedawn.bestweather.weathers.dataprocessing.util.UvIndexProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MyApplication extends Application {
 	private SharedPreferences sharedPreferences;
+	private static final ExecutorService executorService = Executors.newFixedThreadPool(3);
 
 	@Override
 	public void onCreate() {
@@ -71,4 +74,7 @@ public class MyApplication extends Application {
 		}
 	}
 
+	public static ExecutorService getExecutorService() {
+		return executorService;
+	}
 }

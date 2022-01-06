@@ -3,6 +3,7 @@ package com.lifedawn.bestweather.main;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -84,6 +85,11 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		public void onFragmentAttached(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
 		                               @NonNull @NotNull Context context) {
 			super.onFragmentAttached(fm, f, context);
+			if (!(f instanceof WeatherFragment)) {
+				binding.fragmentContainer.setPadding(0, MainActivity.getHeightOfStatusBar(getContext()), 0, 0);
+				getActivity().getWindow().setStatusBarColor(Color.BLUE);
+			}
+
 			if (f instanceof SettingsMainFragment) {
 				originalUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
 			}
@@ -92,6 +98,11 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		@Override
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
+			if (!(f instanceof WeatherFragment)) {
+				binding.fragmentContainer.setPadding(0, 0, 0, 0);
+				getActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
+			}
+
 			if (f instanceof SettingsMainFragment) {
 				final boolean newUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location),
 						true);

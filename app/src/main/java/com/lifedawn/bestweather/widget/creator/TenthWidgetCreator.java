@@ -52,7 +52,7 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 		if (needTempData) {
 			setTempDataViews(remoteViews);
 		} else {
-			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent(remoteViews));
+			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 		}
 
 		//setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());

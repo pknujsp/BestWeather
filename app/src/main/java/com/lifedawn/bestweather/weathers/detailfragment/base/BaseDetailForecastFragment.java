@@ -23,6 +23,7 @@ import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailForecastBinding;
 import com.lifedawn.bestweather.databinding.ViewDetailDailyForecastListBinding;
 import com.lifedawn.bestweather.databinding.ViewDetailHourlyForecastListBinding;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DateView;
@@ -49,7 +50,8 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	protected Double latitude;
 	protected Double longitude;
 	protected ForecastViewType forecastViewType;
-	protected ExecutorService executorService = Executors.newSingleThreadExecutor();
+	protected ExecutorService executorService = MyApplication.getExecutorService();
+
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {

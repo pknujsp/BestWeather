@@ -31,7 +31,6 @@ import java.util.concurrent.Executors;
 public class CustomEditText extends AppCompatEditText implements TextWatcher, View.OnTouchListener {
 	private Drawable closeDrawable;
 	private OnEditTextQueryListener onEditTextQueryListener;
-	private ExecutorService executorService = Executors.newFixedThreadPool(3);
 	private Timer timer = new Timer();
 
 	public CustomEditText(@NonNull @NotNull Context context) {

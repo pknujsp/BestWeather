@@ -29,23 +29,20 @@ public class RemoteViewProcessor {
 		remoteViews.setViewVisibility(R.id.valuesLayout, View.GONE);
 		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
 		remoteViews.setTextViewText(R.id.warning_process_btn, context.getString(R.string.again));
+		remoteViews.setViewVisibility(R.id.warning_process_btn, View.VISIBLE);
 
 		switch (errorType) {
 			case GPS_OFF:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.request_to_make_gps_on));
-				remoteViews.setViewVisibility(R.id.warning_process_btn, View.VISIBLE);
 				break;
 			case FAILED_LOAD_WEATHER_DATA:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.update_failed));
-				remoteViews.setViewVisibility(R.id.warning_process_btn, View.VISIBLE);
 				break;
 			case GPS_PERMISSION_REJECTED:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.message_needs_location_permission));
-				remoteViews.setViewVisibility(R.id.warning_process_btn, View.VISIBLE);
 				break;
 			case UNAVAILABLE_NETWORK:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.need_to_connect_network));
-				remoteViews.setViewVisibility(R.id.warning_process_btn, View.VISIBLE);
 				break;
 		}
 
