@@ -4,7 +4,7 @@ import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCa
 
 import java.util.Set;
 
-public class RequestOwm extends RequestWeatherSource {
+public class RequestOwmOneCall extends RequestWeatherSource {
 	private Set<OneCallParameter.OneCallApis> excludeApis;
 
 	public void setExcludeApis(Set<OneCallParameter.OneCallApis> excludeApis) {

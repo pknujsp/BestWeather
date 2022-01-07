@@ -9,15 +9,19 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.currentweather.OwmCurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 
 import org.jetbrains.annotations.NotNull;
 
 public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
 	private OwmOneCallResponse owmOneCallResponse;
+	private OwmCurrentConditionsResponse owmCurrentConditionsResponse;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,51 +39,51 @@ public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 		return this;
 	}
 
+	public OwmDetailCurrentConditionsFragment setOwmCurrentConditionsResponse(OwmCurrentConditionsResponse owmCurrentConditionsResponse) {
+		this.owmCurrentConditionsResponse = owmCurrentConditionsResponse;
+		return this;
+	}
+
 	@Override
 	public void setValuesToViews() {
 		// 현재기온,체감기온,기압,습도,이슬점,운량,자외선지수,시정,풍속,돌풍,풍향,강우량,강설량,날씨상태(흐림 등)
-		OwmOneCallResponse.Current current = owmOneCallResponse.getCurrent();
-		String notData = getString(R.string.not_available);
-		String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
-		String windUnitStr = ValueUnits.convertToStr(getContext(), windUnit);
-		String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
-		String mm = ValueUnits.convertToStr(getContext(), ValueUnits.mm);
-		String hpa = ValueUnits.convertToStr(getContext(), ValueUnits.hpa);
+		CurrentConditionsDto currentConditionsDto = null;
+		if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(getContext(), owmOneCallResponse
+					, windUnit, tempUnit, visibilityUnit);
+		} else if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_INDIVIDUAL) {
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(getContext(), owmCurrentConditionsResponse
+					, windUnit, tempUnit, visibilityUnit);
+		}
 
 		binding.conditionsGrid.removeAllViews();
 
-		addGridItem(R.string.weather, OpenWeatherMapResponseProcessor.getWeatherIconDescription(current.getWeather().get(0).getId()),
-				OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId(),
-						current.getWeather().get(0).getIcon().contains("n")));
-		addGridItem(R.string.temperature, ValueUnits.convertTemperature(current.getTemp(), tempUnit).toString() + tempUnitStr,
+		addGridItem(R.string.weather, currentConditionsDto.getWeatherDescription(),
+				currentConditionsDto.getWeatherIcon());
+		addGridItem(R.string.temperature, currentConditionsDto.getTemp(),
 				null);
-		addGridItem(R.string.real_feel_temperature, ValueUnits.convertTemperature(current.getFeelsLike(), tempUnit).toString() + tempUnitStr,
+		addGridItem(R.string.real_feel_temperature, currentConditionsDto.getFeelsLikeTemp(),
 				null);
-		addGridItem(R.string.humidity, current.getHumidity() + percent, null);
-		addGridItem(R.string.dew_point, ValueUnits.convertTemperature(current.getDewPoint(), tempUnit) + tempUnitStr,
-				null);
-		View windDirectionView = addGridItem(R.string.wind_direction, WindUtil.parseWindDirectionDegreeAsStr(getContext(), current.getWind_deg()),
+		addGridItem(R.string.humidity, currentConditionsDto.getHumidity(), null);
+		View windDirectionView = addGridItem(R.string.wind_direction, currentConditionsDto.getWindDirection(),
 				R.drawable.arrow);
-		((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(Integer.parseInt(current.getWind_deg()) + 180);
+		((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(currentConditionsDto.getWindDirectionDegree() + 180);
 		addGridItem(R.string.wind_speed,
-				ValueUnits.convertWindSpeed(current.getWind_speed(), windUnit) + windUnitStr, null);
+				currentConditionsDto.getWindSpeed(), null);
 		addGridItem(R.string.wind_gust,
-				current.getWindGust() == null ? notData :
-						ValueUnits.convertWindSpeed(current.getWindGust(), windUnit) + windUnitStr,
-				null);
-		addGridItem(R.string.wind_strength, WindUtil.getSimpleWindSpeedDescription(current.getWind_speed()),
-				null);
-		addGridItem(R.string.pressure, current.getPressure() + hpa, null);
-		addGridItem(R.string.uv_index, current.getUvi(), null);
+				currentConditionsDto.getWindGust() == null ? getString(R.string.not_available) :
+						currentConditionsDto.getWindGust(), null);
+		addGridItem(R.string.wind_strength, currentConditionsDto.getSimpleWindStrength(), null);
+		addGridItem(R.string.pressure, currentConditionsDto.getPressure(), null);
 		addGridItem(R.string.visibility,
-				ValueUnits.convertVisibility(current.getVisibility(), visibilityUnit) + ValueUnits.convertToStr(getContext(), visibilityUnit),
+				currentConditionsDto.getVisibility(),
 				null);
-		addGridItem(R.string.cloud_cover, current.getClouds() + percent, null);
-		addGridItem(R.string.rain_volume, current.getRain() == null ? notData :
-						current.getRain().getPrecipitation1Hour() + mm,
-				null);
-		addGridItem(R.string.snow_volume, current.getSnow() == null ? notData :
-						current.getSnow().getPrecipitation1Hour() + mm,
-				null);
+		addGridItem(R.string.cloud_cover, currentConditionsDto.getCloudiness(), null);
+		if (currentConditionsDto.isHasRainVolume()) {
+			addGridItem(R.string.rain_volume, currentConditionsDto.getRainVolume(), null);
+		}
+		if (currentConditionsDto.isHasSnowVolume()) {
+			addGridItem(R.string.snow_volume, currentConditionsDto.getSnowVolume(), null);
+		}
 	}
 }

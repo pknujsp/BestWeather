@@ -99,7 +99,6 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 		});
 		binding.toolbar.fragmentTitle.setText(R.string.always_notification);
 		binding.notificationSwitch.setText(R.string.use_always_notification);
-		binding.commons.multipleWeatherDataSourceLayout.setVisibility(View.GONE);
 
 		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.AutoRefreshIntervals));
 		binding.commons.autoRefreshIntervalSpinner.setAdapter(spinnerAdapter);
@@ -153,16 +152,7 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 			binding.commons.currentLocationRadio.setChecked(true);
 		}
 
-		WeatherDataSourceType defaultWeatherDataSourceType = alwaysNotiDataObj.getWeatherSourceType();
-		if (defaultWeatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
-			binding.commons.owmRadio.setChecked(true);
-		} else {
-			binding.commons.accuWeatherRadio.setChecked(true);
-		}
-
-		if (alwaysNotiDataObj.isTopPriorityKma()) {
-			binding.commons.kmaTopPrioritySwitch.setChecked(true);
-		}
+		binding.commons.kmaTopPrioritySwitch.setChecked(alwaysNotiDataObj.isTopPriorityKma());
 
 		final String[] intervalsStr = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
 		final long autoRefreshInterval = alwaysNotiDataObj.getUpdateIntervalMillis();
@@ -202,9 +192,7 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-
-				WeatherDataSourceType checked = checkedId == R.id.accu_weather_radio ? WeatherDataSourceType.ACCU_WEATHER
-						: WeatherDataSourceType.OWM_ONECALL;
+				WeatherDataSourceType checked = WeatherDataSourceType.OWM_ONECALL;
 				onCheckedWeatherDataSource(checked);
 			}
 		});
@@ -341,15 +329,18 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 
 	public void onCheckedWeatherDataSource(WeatherDataSourceType weatherDataSourceType) {
 		if (!initializing) {
-			alwaysNotiDataObj.setWeatherSourceType(weatherDataSourceType);
-			alwaysNotiViewCreator.savePreferences();
+			if (alwaysNotiDataObj.getWeatherSourceType() != weatherDataSourceType) {
 
-			alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
-				@Override
-				public boolean handleMessage(@NonNull Message msg) {
-					return false;
-				}
-			}));
+				alwaysNotiDataObj.setWeatherSourceType(weatherDataSourceType);
+				alwaysNotiViewCreator.savePreferences();
+
+				alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
+					@Override
+					public boolean handleMessage(@NonNull Message msg) {
+						return false;
+					}
+				}));
+			}
 		}
 	}
 

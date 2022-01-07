@@ -29,7 +29,6 @@ public class WeatherSourcesFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 	}
 	
@@ -43,10 +42,11 @@ public class WeatherSourcesFragment extends Fragment {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		
-		binding.accuWeather.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_accu_weather), true));
-		binding.openWeatherMap.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_open_weather_map), true));
+		//binding.accuWeather.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_accu_weather), true));
+		//binding.openWeatherMap.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_open_weather_map), true));
 		binding.kmaTopPriority.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), true));
-		
+
+		/*
 		Locale locale;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			locale = getResources().getConfiguration().getLocales().get(0);
@@ -54,12 +54,13 @@ public class WeatherSourcesFragment extends Fragment {
 			locale = getResources().getConfiguration().locale;
 		}
 		String country = locale.getCountry();
-		
+
 		if (country.equals("KR")) {
 			binding.kmaPriorityLayout.setVisibility(View.VISIBLE);
 		} else {
 			binding.kmaPriorityLayout.setVisibility(View.GONE);
 		}
+		 */
 		
 		binding.accuWeather.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
@@ -90,7 +91,7 @@ public class WeatherSourcesFragment extends Fragment {
 		binding.kmaTopPriority.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_kma_top_priority), isChecked).apply();
+				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_kma_top_priority), isChecked).commit();
 			}
 		});
 	}

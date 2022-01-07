@@ -21,6 +21,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ForecastViewType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailForecastBinding;
 import com.lifedawn.bestweather.databinding.ViewDetailDailyForecastListBinding;
@@ -53,7 +54,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	protected Double longitude;
 	protected ForecastViewType forecastViewType;
 	protected ExecutorService executorService = MyApplication.getExecutorService();
-
+	protected WeatherDataSourceType mainWeatherDataSourceType;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -72,6 +73,8 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
+		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
+				BundleKey.WeatherDataSource.name());
 	}
 
 	@Nullable

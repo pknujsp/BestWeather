@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.currentweather.OwmCurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
@@ -20,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class OwmSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
 	private OwmOneCallResponse owmOneCallResponse;
+	private OwmCurrentConditionsResponse owmCurrentConditionsResponse;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -42,11 +45,22 @@ public class OwmSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 		return this;
 	}
 
+	public void setOwmCurrentConditionsResponse(OwmCurrentConditionsResponse owmCurrentConditionsResponse) {
+		this.owmCurrentConditionsResponse = owmCurrentConditionsResponse;
+	}
+
+
 	@Override
 	public void setValuesToViews() {
 		super.setValuesToViews();
-		CurrentConditionsDto currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDto(getContext(), owmOneCallResponse
-				, windUnit, tempUnit, visibilityUnit);
+		CurrentConditionsDto currentConditionsDto = null;
+		if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(getContext(), owmOneCallResponse
+					, windUnit, tempUnit, visibilityUnit);
+		} else if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_INDIVIDUAL) {
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(getContext(), owmCurrentConditionsResponse
+					, windUnit, tempUnit, visibilityUnit);
+		}
 
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
 			String precipitation = null;

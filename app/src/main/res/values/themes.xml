@@ -17,20 +17,6 @@
         <item name="lineColor">@color/white</item>
     </style>
 
-    <style name="AppTheme.White" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="textColor">@color/black</item>
-        <item name="weatherCardBackgroundColor">#B3FFFFFF</item>
-        <item name="textColorInWeatherCard">@color/black</item>
-        <item name="toolbarTextColor">@color/black</item>
-        <item name="toolbarIconColor">@color/black</item>
-        <item name="backgroundColor">@color/white</item>
-        <item name="progressViewBackgroundColor">@color/app_main_color</item>
-        <item name="textColorInProgressView">@color/black</item>
-        <item name="iconColor">@color/blue</item>
-        <item name="progressViewIndicatorColor">@color/blue</item>
-        <item name="lineColor">@color/black</item>
-    </style>
-
     <style name="ThemeOverlay.BestWeather.AppWidgetContainer" parent="">
         <item name="appWidgetBackgroundColor">@color/light_blue_600</item>
         <item name="appWidgetTextColor">@color/light_blue_50</item>

@@ -11,7 +11,8 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqicn;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
-import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
@@ -105,8 +106,8 @@ public class WeatherRequestUtil {
 			}
 		}
 		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_ONECALL)) {
-			RequestOwm requestOwm = new RequestOwm();
-			requestWeatherSources.put(WeatherDataSourceType.OWM_ONECALL, requestOwm);
+			RequestOwmOneCall requestOwmOneCall = new RequestOwmOneCall();
+			requestWeatherSources.put(WeatherDataSourceType.OWM_ONECALL, requestOwmOneCall);
 
 			Set<OneCallParameter.OneCallApis> excludeSet = new HashSet<>();
 			excludeSet.add(OneCallParameter.OneCallApis.daily);
@@ -123,8 +124,21 @@ public class WeatherRequestUtil {
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
 				excludeSet.remove(OneCallParameter.OneCallApis.daily);
 			}
-			requestOwm.setExcludeApis(excludeSet);
-			requestOwm.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
+			requestOwmOneCall.setExcludeApis(excludeSet);
+			requestOwmOneCall.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
+		}
+		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_INDIVIDUAL)) {
+			RequestOwmIndividual requestOwmIndividual = new RequestOwmIndividual();
+			requestWeatherSources.put(WeatherDataSourceType.OWM_INDIVIDUAL, requestOwmIndividual);
+			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
+				requestOwmIndividual.addRequestServiceType(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS);
+			}
+			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
+				requestOwmIndividual.addRequestServiceType(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
+			}
+			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
+				requestOwmIndividual.addRequestServiceType(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
+			}
 		}
 		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.AQICN)) {
 			RequestAqicn requestAqicn = new RequestAqicn();

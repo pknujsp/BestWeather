@@ -101,6 +101,10 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
+		if (!countryCode.equals("KR")) {
+			binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
+		}
+
 		if (cardBackgroundColor != null) {
 			binding.card.setBackgroundColor(cardBackgroundColor);
 		}
@@ -174,7 +178,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 
 			binding.extraView.addView(textView);
 			binding.extraView.setVisibility(View.VISIBLE);
-		}else{
+		} else {
 			binding.extraView.setVisibility(View.GONE);
 		}
 	}

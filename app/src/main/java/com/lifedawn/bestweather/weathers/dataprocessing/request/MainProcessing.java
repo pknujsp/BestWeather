@@ -5,7 +5,8 @@ import android.util.ArrayMap;
 
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
-import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
@@ -41,9 +42,14 @@ public class MainProcessing {
 					multipleRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherDataSourceType.OWM_ONECALL)) {
-			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,
-					(RequestOwm) requestWeatherSources.get(WeatherDataSourceType.OWM_ONECALL), multipleRestApiDownloader);
+			OpenWeatherMapProcessing.requestWeatherDataOneCall(context, latitude, longitude,
+					(RequestOwmOneCall) requestWeatherSources.get(WeatherDataSourceType.OWM_ONECALL), multipleRestApiDownloader);
 		}
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.OWM_INDIVIDUAL)) {
+			OpenWeatherMapProcessing.requestWeatherDataIndividual(context, latitude, longitude,
+					(RequestOwmIndividual) requestWeatherSources.get(WeatherDataSourceType.OWM_INDIVIDUAL), multipleRestApiDownloader);
+		}
+
 		if (requestWeatherSources.containsKey(WeatherDataSourceType.AQICN)) {
 			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader);
 		}
@@ -79,9 +85,14 @@ public class MainProcessing {
 			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherDataSourceType.KMA_WEB), multipleRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherDataSourceType.OWM_ONECALL)) {
-			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,
-					(RequestOwm) requestWeatherSources.get(WeatherDataSourceType.OWM_ONECALL), multipleRestApiDownloader);
+			OpenWeatherMapProcessing.requestWeatherDataOneCall(context, latitude, longitude,
+					(RequestOwmOneCall) requestWeatherSources.get(WeatherDataSourceType.OWM_ONECALL), multipleRestApiDownloader);
 		}
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.OWM_INDIVIDUAL)) {
+			OpenWeatherMapProcessing.requestWeatherDataIndividual(context, latitude, longitude,
+					(RequestOwmIndividual) requestWeatherSources.get(WeatherDataSourceType.OWM_INDIVIDUAL), multipleRestApiDownloader);
+		}
+
 		return multipleRestApiDownloader;
 	}
 
@@ -106,9 +117,14 @@ public class MainProcessing {
 			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherDataSourceType.KMA_WEB), multipleRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherDataSourceType.OWM_ONECALL)) {
-			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,
-					(RequestOwm) requestWeatherSources.get(WeatherDataSourceType.OWM_ONECALL), multipleRestApiDownloader);
+			OpenWeatherMapProcessing.requestWeatherDataOneCall(context, latitude, longitude,
+					(RequestOwmOneCall) requestWeatherSources.get(WeatherDataSourceType.OWM_ONECALL), multipleRestApiDownloader);
 		}
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.OWM_INDIVIDUAL)) {
+			OpenWeatherMapProcessing.requestWeatherDataIndividual(context, latitude, longitude,
+					(RequestOwmIndividual) requestWeatherSources.get(WeatherDataSourceType.OWM_INDIVIDUAL), multipleRestApiDownloader);
+		}
+
 		if (requestWeatherSources.containsKey(WeatherDataSourceType.AQICN)) {
 			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader);
 		}

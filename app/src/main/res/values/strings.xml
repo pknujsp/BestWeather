@@ -54,11 +54,11 @@
     <string name="pref_title_unit_clock">12/24 시간제</string>
 
     <string name="pref_title_accu_weather">Accu Weather</string>
-    <string name="pref_summary_accu_weather">Accu Weather 설명</string>
+    <string name="pref_summary_accu_weather">추후 적용 예정입니다</string>
     <string name="pref_key_accu_weather">pref_key_accu_weather</string>
 
     <string name="pref_key_open_weather_map">pref_key_open_weather_map</string>
-    <string name="pref_summary_open_weather_map">OpenWeatherMap 설명</string>
+    <string name="pref_summary_open_weather_map">영국 런던에 본사가 있는 기업으로, 전 세계 대부분 지역의 날씨정보를 다룹니다.</string>
     <string name="pref_title_open_weather_map">OpenWeatherMap</string>
 
     <string name="pref_key_kma_top_priority">pref_key_kma_top_priority</string>
@@ -585,6 +585,7 @@
     <string name="empty_daily_notifications">추가한 일일 알림이 없습니다</string>
     <string name="will_you_delete_the_notification">알림을 삭제하시겠습니까?</string>
     <string name="removeNotification">알림 삭제</string>
+    <string name="containsKma">대한민국 기상청 포함</string>
 
 
 </resources>

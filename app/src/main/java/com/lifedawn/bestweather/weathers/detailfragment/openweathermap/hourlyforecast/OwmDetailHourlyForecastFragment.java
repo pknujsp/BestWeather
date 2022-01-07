@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailHourlyForecastFragment;
@@ -18,6 +20,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class OwmDetailHourlyForecastFragment extends BaseDetailHourlyForecastFragment {
 	private OwmOneCallResponse owmOneCallResponse;
+	private OwmHourlyForecastResponse owmHourlyForecastResponse;
+
+	public void setOwmHourlyForecastResponse(OwmHourlyForecastResponse owmHourlyForecastResponse) {
+		this.owmHourlyForecastResponse = owmHourlyForecastResponse;
+	}
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -211,8 +218,13 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailHourlyForecastFra
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(), owmOneCallResponse,
-						windUnit, tempUnit, visibilityUnit);
+				if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
+					hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(), owmOneCallResponse,
+							windUnit, tempUnit, visibilityUnit);
+				} else if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_INDIVIDUAL) {
+					hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(getContext(), owmHourlyForecastResponse,
+							windUnit, tempUnit, visibilityUnit);
+				}
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

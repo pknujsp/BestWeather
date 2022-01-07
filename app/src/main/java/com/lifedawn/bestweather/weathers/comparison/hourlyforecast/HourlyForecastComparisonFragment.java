@@ -18,7 +18,8 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.ForecastObj;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
-import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
@@ -28,6 +29,7 @@ import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCa
 import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.comparison.base.BaseForecastComparisonFragment;
@@ -408,20 +410,27 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 	private void loadForecasts() {
 		ArrayMap<WeatherDataSourceType, RequestWeatherSource> request = new ArrayMap<>();
 
-		RequestAccu requestAccu = new RequestAccu();
-		requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
+		//RequestAccu requestAccu = new RequestAccu();
+		//requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
 
-		RequestOwm requestOwm = new RequestOwm();
-		requestOwm.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
+		RequestOwmOneCall requestOwmOneCall = new RequestOwmOneCall();
+		requestOwmOneCall.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
 		Set<OneCallParameter.OneCallApis> exclude = new HashSet<>();
 		exclude.add(OneCallParameter.OneCallApis.alerts);
 		exclude.add(OneCallParameter.OneCallApis.minutely);
 		exclude.add(OneCallParameter.OneCallApis.current);
 		exclude.add(OneCallParameter.OneCallApis.daily);
-		requestOwm.setExcludeApis(exclude);
+		requestOwmOneCall.setExcludeApis(exclude);
 
-		request.put(WeatherDataSourceType.ACCU_WEATHER, requestAccu);
-		request.put(WeatherDataSourceType.OWM_ONECALL, requestOwm);
+		//request.put(WeatherDataSourceType.ACCU_WEATHER, requestAccu);
+		request.put(WeatherDataSourceType.OWM_ONECALL, requestOwmOneCall);
+
+		/*
+		RequestOwmIndividual requestOwmIndividual = new RequestOwmIndividual();
+		requestOwmIndividual.addRequestServiceType(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
+		request.put(WeatherDataSourceType.OWM_INDIVIDUAL,requestOwmIndividual);
+
+		 */
 
 		if (countryCode.equals("KR")) {
 			RequestKma requestKma = new RequestKma();
@@ -531,15 +540,28 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				hourlyForecastResponse.accuThrowable = accuHourlyForecastResponse.getT();
 			}
 		}
-		//owm
+		//owm onecall
 		if (responseMap.containsKey(WeatherDataSourceType.OWM_ONECALL)) {
 			arrayMap = responseMap.get(WeatherDataSourceType.OWM_ONECALL);
 			MultipleRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.owmSuccessful = true;
-				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(),
+				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(),
 						(OwmOneCallResponse) responseResult.getResponseObj(), windUnit, tempUnit, visibilityUnit);
+			} else {
+				hourlyForecastResponse.owmThrowable = responseResult.getT();
+			}
+		}
+		//owm individual
+		if (responseMap.containsKey(WeatherDataSourceType.OWM_INDIVIDUAL)) {
+			arrayMap = responseMap.get(WeatherDataSourceType.OWM_INDIVIDUAL);
+			MultipleRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
+
+			if (responseResult.isSuccessful()) {
+				hourlyForecastResponse.owmSuccessful = true;
+				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(getContext(),
+						(OwmHourlyForecastResponse) responseResult.getResponseObj(), windUnit, tempUnit, visibilityUnit);
 			} else {
 				hourlyForecastResponse.owmThrowable = responseResult.getT();
 			}

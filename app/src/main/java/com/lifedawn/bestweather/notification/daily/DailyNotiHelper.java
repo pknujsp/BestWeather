@@ -50,14 +50,14 @@ public class DailyNotiHelper {
 			calendar.add(Calendar.DATE, 1);
 		}
 
-		AlarmManagerCompat.setExactAndAllowWhileIdle(alarmManager, AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), getRefreshPendingIntent(dailyPushNotificationDto));
+		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), getRefreshPendingIntent(dailyPushNotificationDto));
 	}
 
 	public void disablePushNotification(int id) {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id + 6000, new Intent(context, DailyPushNotificationReceiver.class), 0);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id + 6000, new Intent(context,
+				DailyPushNotificationReceiver.class), PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
-			pendingIntent.cancel();
 		}
 	}
 

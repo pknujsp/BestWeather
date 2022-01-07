@@ -55,6 +55,8 @@
                     android:layout_alignTop="@id/accu_weather_name"
                     android:layout_alignBottom="@id/accu_weather_name"
                     android:layout_alignParentRight="true"
+                    android:checked="false"
+                    android:enabled="false"
                     android:gravity="center_vertical" />
             </RelativeLayout>
 
@@ -99,6 +101,8 @@
                     android:layout_alignTop="@id/open_weather_map_name"
                     android:layout_alignBottom="@id/open_weather_map_name"
                     android:layout_alignParentRight="true"
+                    android:checked="true"
+                    android:enabled="false"
                     android:gravity="center_vertical" />
 
             </RelativeLayout>

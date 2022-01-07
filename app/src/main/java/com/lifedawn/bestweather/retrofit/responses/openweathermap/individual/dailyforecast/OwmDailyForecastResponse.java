@@ -70,7 +70,7 @@ public class OwmDailyForecastResponse {
 		this.list = list;
 	}
 
-	protected static class City {
+	public static class City {
 		@Expose
 		@SerializedName("id")
 		private String id;
@@ -144,7 +144,7 @@ public class OwmDailyForecastResponse {
 		}
 	}
 
-	protected static class Item {
+	public static class Item {
 		@Expose
 		@SerializedName("dt")
 		private String dt;
@@ -178,6 +178,15 @@ public class OwmDailyForecastResponse {
 		private String pop;
 
 		@Expose
+		@SerializedName("rain")
+		private String rain;
+
+
+		@Expose
+		@SerializedName("snow")
+		private String snow;
+
+		@Expose
 		@SerializedName("temp")
 		private Temp temp;
 
@@ -188,6 +197,22 @@ public class OwmDailyForecastResponse {
 		@Expose
 		@SerializedName("weather")
 		private List<Weather> weather;
+
+		public String getRain() {
+			return rain;
+		}
+
+		public void setRain(String rain) {
+			this.rain = rain;
+		}
+
+		public String getSnow() {
+			return snow;
+		}
+
+		public void setSnow(String snow) {
+			this.snow = snow;
+		}
 
 		public String getDt() {
 			return dt;
@@ -276,7 +301,6 @@ public class OwmDailyForecastResponse {
 		public void setWeather(List<Weather> weather) {
 			this.weather = weather;
 		}
-
 
 
 	}

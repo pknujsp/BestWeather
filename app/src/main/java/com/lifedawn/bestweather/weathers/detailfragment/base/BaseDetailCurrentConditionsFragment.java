@@ -19,6 +19,7 @@ import androidx.preference.PreferenceManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailCurrentConditionsBinding;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
@@ -37,6 +38,7 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	protected Double latitude;
 	protected Double longitude;
 	protected ZoneId zoneId;
+	protected WeatherDataSourceType mainWeatherDataSourceType;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -47,7 +49,9 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
-
+		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
+				BundleKey.WeatherDataSource.name());
+		
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
 		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));

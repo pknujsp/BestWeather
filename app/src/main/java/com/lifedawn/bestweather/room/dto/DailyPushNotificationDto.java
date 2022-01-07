@@ -158,4 +158,11 @@ public class DailyPushNotificationDto implements Serializable {
 		weatherDataSourceTypeSet.remove(removeType);
 	}
 
+	public void setWeatherDataSourceTypeSet(Set<WeatherDataSourceType> weatherDataSourceTypeSet) {
+		this.weatherDataSourceTypeSet = weatherDataSourceTypeSet;
+	}
+
+	public Set<WeatherDataSourceType> getWeatherDataSourceTypeSet() {
+		return weatherDataSourceTypeSet;
+	}
 }

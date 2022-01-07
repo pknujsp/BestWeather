@@ -84,6 +84,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 				bundle.putDouble(BundleKey.Latitude.name(), latitude);
 				bundle.putDouble(BundleKey.Longitude.name(), longitude);
+				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
 
 				detailHourlyForecastFragment.setArguments(bundle);
 

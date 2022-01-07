@@ -86,6 +86,7 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
 				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
+				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
 
 				detailDailyForecastFragment.setArguments(bundle);
 

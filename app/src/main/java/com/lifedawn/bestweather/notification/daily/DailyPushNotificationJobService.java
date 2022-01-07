@@ -79,25 +79,20 @@ public class DailyPushNotificationJobService extends JobService {
 				}
 			});
 
-			if (localTime.isBefore(LocalTime.now())) {
-				jobFinished(params, false);
-			} else {
-				handler = new Handler(new Handler.Callback() {
-					@Override
-					public boolean handleMessage(@NonNull Message msg) {
-						if (msg.obj != null) {
-							if (((String) msg.obj).equals("finished")) {
-								jobFinished(params, false);
-								return true;
-							}
+			handler = new Handler(new Handler.Callback() {
+				@Override
+				public boolean handleMessage(@NonNull Message msg) {
+					if (msg.obj != null) {
+						if (((String) msg.obj).equals("finished")) {
+							jobFinished(params, false);
+							return true;
 						}
-						return false;
 					}
-				});
+					return false;
+				}
+			});
 
-				workNotification(getApplicationContext(), Executors.newSingleThreadExecutor(), id, dailyPushNotificationType);
-			}
-
+			workNotification(getApplicationContext(), Executors.newSingleThreadExecutor(), id, dailyPushNotificationType);
 		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 			repository.getAll(new DbQueryCallback<List<DailyPushNotificationDto>>() {
 				@Override

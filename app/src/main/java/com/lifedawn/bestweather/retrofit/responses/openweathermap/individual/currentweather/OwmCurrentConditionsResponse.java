@@ -61,7 +61,17 @@ public class OwmCurrentConditionsResponse {
 	@SerializedName("sys")
 	private Sys sys;
 
-	protected static class Main {
+	@Expose
+	@SerializedName("rain")
+	private Rain rain;
+
+
+	@Expose
+	@SerializedName("snow")
+	private Snow snow;
+
+
+	public static class Main {
 		@Expose
 		@SerializedName("temp")
 		private String temp;
@@ -135,7 +145,7 @@ public class OwmCurrentConditionsResponse {
 		}
 	}
 
-	protected static class Wind {
+	public static class Wind {
 		@Expose
 		@SerializedName("speed")
 		private String speed;
@@ -143,6 +153,18 @@ public class OwmCurrentConditionsResponse {
 		@Expose
 		@SerializedName("deg")
 		private String deg;
+
+		@Expose
+		@SerializedName("gust")
+		private String gust;
+
+		public String getGust() {
+			return gust;
+		}
+
+		public void setGust(String gust) {
+			this.gust = gust;
+		}
 
 		public String getSpeed() {
 			return speed;
@@ -161,7 +183,7 @@ public class OwmCurrentConditionsResponse {
 		}
 	}
 
-	protected static class Clouds {
+	public static class Clouds {
 		@Expose
 		@SerializedName("all")
 		private String all;
@@ -175,7 +197,7 @@ public class OwmCurrentConditionsResponse {
 		}
 	}
 
-	protected static class Sys {
+	public static class Sys {
 		@Expose
 		@SerializedName("type")
 		private String type;
@@ -222,6 +244,58 @@ public class OwmCurrentConditionsResponse {
 
 		public void setCountry(String country) {
 			this.country = country;
+		}
+	}
+
+	public static class Rain {
+		@Expose
+		@SerializedName("1h")
+		private String rainVolume1Hour;
+
+		@Expose
+		@SerializedName("3h")
+		private String rainVolume3Hour;
+
+		public String getRainVolume1Hour() {
+			return rainVolume1Hour;
+		}
+
+		public void setRainVolume1Hour(String rainVolume1Hour) {
+			this.rainVolume1Hour = rainVolume1Hour;
+		}
+
+		public String getRainVolume3Hour() {
+			return rainVolume3Hour;
+		}
+
+		public void setRainVolume3Hour(String rainVolume3Hour) {
+			this.rainVolume3Hour = rainVolume3Hour;
+		}
+	}
+
+	public static class Snow {
+		@Expose
+		@SerializedName("1h")
+		private String snowVolume1Hour;
+
+		@Expose
+		@SerializedName("3h")
+		private String snowVolume3Hour;
+
+		public String getSnowVolume1Hour() {
+			return snowVolume1Hour;
+		}
+
+		public void setSnowVolume1Hour(String snowVolume1Hour) {
+			this.snowVolume1Hour = snowVolume1Hour;
+		}
+
+		public String getSnowVolume3Hour() {
+			return snowVolume3Hour;
+		}
+
+		public void setSnowVolume3Hour(String snowVolume3Hour) {
+			this.snowVolume3Hour = snowVolume3Hour;
 		}
 	}
 
@@ -323,6 +397,22 @@ public class OwmCurrentConditionsResponse {
 
 	public Sys getSys() {
 		return sys;
+	}
+
+	public Rain getRain() {
+		return rain;
+	}
+
+	public void setRain(Rain rain) {
+		this.rain = rain;
+	}
+
+	public Snow getSnow() {
+		return snow;
+	}
+
+	public void setSnow(Snow snow) {
+		this.snow = snow;
 	}
 
 	public void setSys(Sys sys) {

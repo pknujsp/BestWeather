@@ -68,7 +68,7 @@ public class OwmHourlyForecastResponse {
 		this.city = city;
 	}
 
-	protected static class Item {
+	public static class Item {
 
 		@Expose
 		@SerializedName("visibility")
@@ -99,12 +99,36 @@ public class OwmHourlyForecastResponse {
 		private Clouds clouds;
 
 		@Expose
+		@SerializedName("rain")
+		private Rain rain;
+
+		@Expose
+		@SerializedName("snow")
+		private Snow snow;
+
+		@Expose
 		@SerializedName("sys")
 		private Sys sys;
 
 		@Expose
 		@SerializedName("dt_txt")
 		private String dtTxt;
+
+		public Rain getRain() {
+			return rain;
+		}
+
+		public void setRain(Rain rain) {
+			this.rain = rain;
+		}
+
+		public Snow getSnow() {
+			return snow;
+		}
+
+		public void setSnow(Snow snow) {
+			this.snow = snow;
+		}
 
 		public String getVisibility() {
 			return visibility;
@@ -178,8 +202,36 @@ public class OwmHourlyForecastResponse {
 			this.dtTxt = dtTxt;
 		}
 
+		public static class Rain {
+			@Expose
+			@SerializedName("1h")
+			private String rainVolumeOneHour;
 
-		protected static class Main {
+			public String getRainVolumeOneHour() {
+				return rainVolumeOneHour;
+			}
+
+			public void setRainVolumeOneHour(String rainVolumeOneHour) {
+				this.rainVolumeOneHour = rainVolumeOneHour;
+			}
+		}
+
+		public static class Snow {
+			@Expose
+			@SerializedName("1h")
+			private String snowVolumeOneHour;
+
+			public String getSnowVolumeOneHour() {
+				return snowVolumeOneHour;
+			}
+
+			public void setSnowVolumeOneHour(String snowVolumeOneHour) {
+				this.snowVolumeOneHour = snowVolumeOneHour;
+			}
+		}
+
+
+		public static class Main {
 			@Expose
 			@SerializedName("temp")
 			private String temp;
@@ -289,7 +341,7 @@ public class OwmHourlyForecastResponse {
 			}
 		}
 
-		protected static class Wind {
+		public static class Wind {
 			@Expose
 			@SerializedName("speed")
 			private String speed;
@@ -328,7 +380,7 @@ public class OwmHourlyForecastResponse {
 			}
 		}
 
-		protected static class Clouds {
+		public static class Clouds {
 			@Expose
 			@SerializedName("all")
 			private String all;
@@ -342,7 +394,7 @@ public class OwmHourlyForecastResponse {
 			}
 		}
 
-		protected static class Sys {
+		public static class Sys {
 			@Expose
 			@SerializedName("pod")
 			private String pod;
@@ -357,7 +409,7 @@ public class OwmHourlyForecastResponse {
 		}
 	}
 
-	protected static class City {
+	public static class City {
 		@Expose
 		@SerializedName("id")
 		private String id;

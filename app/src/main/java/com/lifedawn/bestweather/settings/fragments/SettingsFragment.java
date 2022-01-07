@@ -87,11 +87,9 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 		appThemePreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
-				AppThemes currentAppTheme = AppThemes.enumOf(sharedPreferences.getString(appThemePreference.getKey(), ""));
+				AppThemes currentAppTheme = AppThemes.valueOf(sharedPreferences.getString(appThemePreference.getKey(), ""));
 				int checkedItem = 0;
-				if (currentAppTheme == AppThemes.WHITE) {
-					checkedItem = 1;
-				}
+
 				CharSequence[] appThemes = new CharSequence[]{getString(R.string.black), getString(R.string.white)};
 				final int finalCheckedItem = checkedItem;
 
@@ -106,10 +104,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 											sharedPreferences.edit().putString(appThemePreference.getKey(), AppThemes.BLACK.name()).apply();
 											break;
 										//검정
-										case 1:
-											sharedPreferences.edit().putString(appThemePreference.getKey(), AppThemes.WHITE.name()).apply();
-											break;
-										//하양
+										default:
 									}
 									dialog.dismiss();
 									getActivity().finish();

@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers.detailfragment.base;
 
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.weathers.detailfragment.base.dialogfragments.DetailHourlyForecastDialogFragment;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 

@@ -4,6 +4,8 @@ import java.time.ZonedDateTime;
 
 public class CurrentConditionsDto {
 	private String temp;
+	private String minTemp;
+	private String maxTemp;
 	private String feelsLikeTemp;
 	private int weatherIcon;
 	private String weatherDescription;
@@ -45,6 +47,22 @@ public class CurrentConditionsDto {
 	public CurrentConditionsDto setTemp(String temp) {
 		this.temp = temp;
 		return this;
+	}
+
+	public String getMinTemp() {
+		return minTemp;
+	}
+
+	public void setMinTemp(String minTemp) {
+		this.minTemp = minTemp;
+	}
+
+	public String getMaxTemp() {
+		return maxTemp;
+	}
+
+	public void setMaxTemp(String maxTemp) {
+		this.maxTemp = maxTemp;
 	}
 
 	public String getFeelsLikeTemp() {

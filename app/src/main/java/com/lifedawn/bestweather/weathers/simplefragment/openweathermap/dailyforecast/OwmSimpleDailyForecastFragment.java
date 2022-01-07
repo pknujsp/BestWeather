@@ -18,6 +18,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
@@ -39,12 +40,16 @@ import java.util.List;
 
 public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	private OwmOneCallResponse owmOneCallResponse;
+	private OwmDailyForecastResponse owmDailyForecastResponse;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		needCompare = true;
+	}
 
+	public void setOwmDailyForecastResponse(OwmDailyForecastResponse owmDailyForecastResponse) {
+		this.owmDailyForecastResponse = owmDailyForecastResponse;
 	}
 
 	@Override
@@ -75,6 +80,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
 				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
+				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
 
 				detailDailyForecastFragment.setArguments(bundle);
 
@@ -104,9 +110,16 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
 
-		List<OwmOneCallResponse.Daily> items = owmOneCallResponse.getDaily();
+		List<DailyForecastDto> dailyForecastDtoList = null;
+		if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
+			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(getContext(), owmOneCallResponse,
+					windUnit, tempUnit);
+		} else if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_INDIVIDUAL) {
+			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(getContext(), owmDailyForecastResponse,
+					windUnit, tempUnit);
+		}
 
-		final int COLUMN_COUNT = items.size();
+		final int COLUMN_COUNT = dailyForecastDtoList.size();
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyOwm);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 
@@ -135,9 +148,6 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final String mm = "mm";
 		boolean haveSnow = false;
 		boolean haveRain = false;
-
-		List<DailyForecastDto> dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), owmOneCallResponse,
-				windUnit, tempUnit);
 
 		for (DailyForecastDto item : dailyForecastDtoList) {
 			dateList.add(item.getDate().format(dateTimeFormatter));

@@ -64,18 +64,14 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 
-
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-		AppThemes appTheme = AppThemes.enumOf(sharedPreferences.getString(getString(R.string.pref_key_app_theme), AppThemes.BLACK.name()));
+		AppThemes appTheme = AppThemes.valueOf(sharedPreferences.getString(getString(R.string.pref_key_app_theme), AppThemes.BLACK.name()));
 		if (appTheme == AppThemes.BLACK) {
 			setTheme(R.style.AppTheme_Black);
-		} else {
-			setTheme(R.style.AppTheme_White);
 		}
 
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);

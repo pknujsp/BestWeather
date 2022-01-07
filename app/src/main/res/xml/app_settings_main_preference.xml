@@ -9,10 +9,12 @@
         app:iconSpaceReserved="false" />
 
     <Preference
+        android:enabled="false"
         android:key="@string/pref_key_app_theme"
         android:summary="@string/pref_summary_app_theme"
         android:title="@string/pref_title_app_theme"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false"
+        app:isPreferenceVisible="false" />
 
     <Preference
         android:key="@string/pref_key_weather_data_sources"

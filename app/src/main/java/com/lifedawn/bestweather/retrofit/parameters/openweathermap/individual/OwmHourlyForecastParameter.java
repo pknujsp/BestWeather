@@ -17,6 +17,7 @@ public class OwmHourlyForecastParameter extends RequestParameter {
 
 		map.put("lat", latitude);
 		map.put("lon", longitude);
+		map.put("units", "metric");
 		map.put("appid", RetrofitClient.OWM_ONECALL_API_KEY);
 		if (count != null) {
 			map.put("cnt", count.toString());

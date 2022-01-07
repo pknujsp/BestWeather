@@ -66,8 +66,6 @@ public class DailyNotificationSettingsFragment extends Fragment {
 	private boolean newNotificationSession;
 	private boolean selectedFavoriteLocation = false;
 	private boolean initializing = true;
-	private boolean isKr;
-	private boolean useMultipleWeatherDataSource = false;
 
 	private WeatherDataSourceType mainWeatherDataSourceType;
 
@@ -78,14 +76,6 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		dailyNotiHelper = new DailyNotiHelper(getActivity().getApplicationContext());
 		repository = new DailyPushNotificationRepository(getContext());
 		mainWeatherDataSourceType = WeatherRequestUtil.getMainWeatherSourceType(getContext(), null);
-
-		Locale locale = null;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			locale = getResources().getConfiguration().getLocales().get(0);
-		} else {
-			locale = getResources().getConfiguration().locale;
-		}
-		isKr = locale.getCountry().equals("KR");
 
 		Bundle bundle = getArguments();
 		newNotificationSession = bundle.getBoolean(BundleKey.NewSession.name());
@@ -121,7 +111,6 @@ public class DailyNotificationSettingsFragment extends Fragment {
 
 		binding.toolbar.fragmentTitle.setText(R.string.daily_notification);
 
-		binding.commons.multipleWeatherDataSourceLayout.setVisibility(View.GONE);
 		binding.commons.autoRefreshIntervalSpinner.setVisibility(View.GONE);
 		binding.commons.autoRefreshIntervalLabel.setVisibility(View.GONE);
 		binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
@@ -255,15 +244,9 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		Set<WeatherDataSourceType> weatherDataSourceTypeSet = editingNotificationDto.getWeatherSourceTypeSet();
 		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_ONECALL)) {
 			binding.commons.owmRadio.setChecked(true);
-		} else if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.ACCU_WEATHER)) {
-			binding.commons.accuWeatherRadio.setChecked(true);
-		} else {
-			if (mainWeatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) {
-				binding.commons.accuWeatherRadio.setChecked(true);
-			} else {
-				binding.commons.owmRadio.setChecked(true);
-			}
 		}
+
+		binding.commons.kmaTopPrioritySwitch.setChecked(editingNotificationDto.isTopPriorityKma());
 
 		initializing = false;
 	}
@@ -333,12 +316,8 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				WeatherDataSourceType checked = checkedId == R.id.accu_weather_radio ? WeatherDataSourceType.ACCU_WEATHER
-						: WeatherDataSourceType.OWM_ONECALL;
-				WeatherDataSourceType unChecked = checkedId == R.id.accu_weather_radio ? WeatherDataSourceType.OWM_ONECALL
-						: WeatherDataSourceType.ACCU_WEATHER;
+				WeatherDataSourceType checked = WeatherDataSourceType.OWM_ONECALL;
 				editingNotificationDto.addWeatherSourceType(checked);
-				editingNotificationDto.removeWeatherSourceType(unChecked);
 			}
 		});
 		binding.commons.kmaTopPrioritySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

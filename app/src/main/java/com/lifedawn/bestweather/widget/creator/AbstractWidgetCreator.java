@@ -81,15 +81,12 @@ public abstract class AbstractWidgetCreator {
 		widgetDto.setDisplayClock(true);
 		widgetDto.setDisplayLocalClock(false);
 		widgetDto.setLocationType(LocationType.CurrentLocation);
-		widgetDto.addWeatherSourceType(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.pref_key_accu_weather),
-				false)
-				? WeatherDataSourceType.ACCU_WEATHER : WeatherDataSourceType.OWM_ONECALL);
+		widgetDto.addWeatherSourceType(WeatherDataSourceType.OWM_ONECALL);
 		widgetDto.setTextSizeAmount(0);
-		widgetDto.setTopPriorityKma(false);
+		widgetDto.setTopPriorityKma(true);
 		widgetDto.setUpdateIntervalMillis(0);
 
 		setTextSize(widgetDto.getTextSizeAmount());
-
 		return widgetDto;
 	}
 
@@ -229,6 +226,23 @@ public abstract class AbstractWidgetCreator {
 				text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponseText();
 				owmJsonObject.addProperty(RetrofitClient.ServiceType.OWM_ONE_CALL.name(), text);
 				rootJsonObject.add(weatherDataSourceType.name(), owmJsonObject);
+
+			} else if (weatherDataSourceType == WeatherDataSourceType.OWM_INDIVIDUAL) {
+				JsonObject owmIndividualJsonObject = new JsonObject();
+
+				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS).getResponseText();
+					owmIndividualJsonObject.addProperty(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS.name(), text);
+				}
+				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST).getResponseText();
+					owmIndividualJsonObject.addProperty(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST.name(), text);
+				}
+				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST).getResponseText();
+					owmIndividualJsonObject.addProperty(RetrofitClient.ServiceType.OWM_DAILY_FORECAST.name(), text);
+				}
+				rootJsonObject.add(weatherDataSourceType.name(), owmIndividualJsonObject);
 
 			} else if (weatherDataSourceType == WeatherDataSourceType.KMA_API) {
 				JsonObject kmaJsonObject = new JsonObject();

@@ -264,7 +264,8 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 			} else if (weatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) {
 				weatherSource = context.getString(R.string.accu_weather);
 				icon = R.drawable.accuicon;
-			} else if (weatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
+			} else if (weatherDataSourceType == WeatherDataSourceType.OWM_ONECALL
+					|| weatherDataSourceType == WeatherDataSourceType.OWM_INDIVIDUAL) {
 				weatherSource = context.getString(R.string.owm);
 				icon = R.drawable.owmicon;
 			}

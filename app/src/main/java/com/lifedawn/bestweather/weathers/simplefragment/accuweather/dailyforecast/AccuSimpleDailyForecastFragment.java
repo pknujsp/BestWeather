@@ -45,7 +45,6 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		needCompare = true;
-
 	}
 
 	@Override
@@ -76,6 +75,8 @@ public class AccuSimpleDailyForecastFragment extends BaseSimpleForecastFragment 
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
 				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
+				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
+
 				detailDailyForecastFragment.setArguments(bundle);
 
 				String tag = getString(R.string.tag_detail_daily_forecast_fragment);

@@ -77,6 +77,7 @@ public class AccuSimpleHourlyForecastFragment extends BaseSimpleForecastFragment
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
 				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
+				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
 
 				detailHourlyForecastFragment.setArguments(bundle);
 

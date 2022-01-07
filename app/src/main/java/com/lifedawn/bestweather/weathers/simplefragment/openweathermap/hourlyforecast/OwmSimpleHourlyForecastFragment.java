@@ -17,6 +17,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
@@ -39,11 +40,16 @@ import java.util.List;
 
 public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 	private OwmOneCallResponse owmOneCallResponse;
+	private OwmHourlyForecastResponse owmHourlyForecastResponse;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		needCompare = true;
+	}
+
+	public void setOwmHourlyForecastResponse(OwmHourlyForecastResponse owmHourlyForecastResponse) {
+		this.owmHourlyForecastResponse = owmHourlyForecastResponse;
 	}
 
 	@Override
@@ -74,6 +80,7 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
 				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
+				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
 
 				detailHourlyForecastFragment.setArguments(bundle);
 
@@ -99,11 +106,18 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		//owm hourly forecast simple : 날짜, 시각, 날씨, 기온, 강수확률, 강수량, 강설량
 		Context context = getContext();
 
+		List<HourlyForecastDto> hourlyForecastDtoList = null;
+		if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
+			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(),
+					owmOneCallResponse, windUnit, tempUnit, visibilityUnit);
+		} else if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_INDIVIDUAL) {
+			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(getContext(),
+					owmHourlyForecastResponse, windUnit, tempUnit, visibilityUnit);
+		}
+
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 
-		List<OwmOneCallResponse.Hourly> items = owmOneCallResponse.getHourly();
-
-		final int COLUMN_COUNT = items.size();
+		final int COLUMN_COUNT = hourlyForecastDtoList.size();
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCHourly);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 
@@ -130,9 +144,6 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		boolean haveRain = false;
 
 		final String degree = "°";
-
-		List<HourlyForecastDto> hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(),
-				owmOneCallResponse, windUnit, tempUnit, visibilityUnit);
 
 		for (HourlyForecastDto item : hourlyForecastDtoList) {
 			dateList.add(item.getHours());

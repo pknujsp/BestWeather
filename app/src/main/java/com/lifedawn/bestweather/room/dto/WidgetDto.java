@@ -247,4 +247,12 @@ public class WidgetDto {
 	public Set<WeatherDataSourceType> getWeatherSourceTypeSet() {
 		return weatherDataSourceTypeSet;
 	}
+
+	public Set<WeatherDataSourceType> getWeatherDataSourceTypeSet() {
+		return weatherDataSourceTypeSet;
+	}
+
+	public void setWeatherDataSourceTypeSet(Set<WeatherDataSourceType> weatherDataSourceTypeSet) {
+		this.weatherDataSourceTypeSet = weatherDataSourceTypeSet;
+	}
 }

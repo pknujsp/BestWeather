@@ -47,7 +47,8 @@ import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqicn;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
-import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
@@ -76,6 +77,9 @@ import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.currentweather.OwmCurrentConditionsResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -109,6 +113,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -650,13 +655,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private WeatherDataSourceType getMainWeatherSourceType(@NonNull String countryCode) {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		WeatherDataSourceType mainWeatherDataSourceType = null;
-
-		if (sharedPreferences.getBoolean(getString(R.string.pref_key_accu_weather), true)) {
-			mainWeatherDataSourceType = WeatherDataSourceType.ACCU_WEATHER;
-		} else {
-			mainWeatherDataSourceType = WeatherDataSourceType.OWM_ONECALL;
-		}
+		WeatherDataSourceType mainWeatherDataSourceType = WeatherDataSourceType.OWM_ONECALL;
 
 		if (countryCode.equals("KR")) {
 			boolean kmaIsTopPriority = sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), true);
@@ -870,22 +869,22 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		if (requestWeatherDataSourceType == WeatherDataSourceType.KMA_WEB) {
 
 			if (lastWeatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
-				others.add(WeatherDataSourceType.ACCU_WEATHER);
+				//others.add(WeatherDataSourceType.ACCU_WEATHER);
 			} else if (lastWeatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) {
 				others.add(WeatherDataSourceType.OWM_ONECALL);
 			} else {
 				others.add(WeatherDataSourceType.OWM_ONECALL);
-				others.add(WeatherDataSourceType.ACCU_WEATHER);
+				//others.add(WeatherDataSourceType.ACCU_WEATHER);
 			}
 		} else if (requestWeatherDataSourceType == WeatherDataSourceType.KMA_API) {
 
 			if (lastWeatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
-				others.add(WeatherDataSourceType.ACCU_WEATHER);
+				//others.add(WeatherDataSourceType.ACCU_WEATHER);
 			} else if (lastWeatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) {
 				others.add(WeatherDataSourceType.OWM_ONECALL);
 			} else {
 				others.add(WeatherDataSourceType.OWM_ONECALL);
-				others.add(WeatherDataSourceType.ACCU_WEATHER);
+				//	others.add(WeatherDataSourceType.ACCU_WEATHER);
 			}
 		} else if (requestWeatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) {
 
@@ -907,17 +906,33 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			if (lastWeatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
 				if (countryCode.equals("KR")) {
-					others.add(WeatherDataSourceType.ACCU_WEATHER);
+					//others.add(WeatherDataSourceType.ACCU_WEATHER);
 					others.add(WeatherDataSourceType.KMA_WEB);
 				} else {
-					others.add(WeatherDataSourceType.ACCU_WEATHER);
+					//others.add(WeatherDataSourceType.ACCU_WEATHER);
 				}
 			} else if (lastWeatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) {
 				if (countryCode.equals("KR")) {
 					others.add(WeatherDataSourceType.KMA_WEB);
 				}
 			} else {
-				others.add(WeatherDataSourceType.ACCU_WEATHER);
+				//others.add(WeatherDataSourceType.ACCU_WEATHER);
+			}
+		} else if (requestWeatherDataSourceType == WeatherDataSourceType.OWM_INDIVIDUAL) {
+
+			if (lastWeatherDataSourceType == WeatherDataSourceType.OWM_INDIVIDUAL) {
+				if (countryCode.equals("KR")) {
+					//others.add(WeatherDataSourceType.ACCU_WEATHER);
+					others.add(WeatherDataSourceType.KMA_WEB);
+				} else {
+					//others.add(WeatherDataSourceType.ACCU_WEATHER);
+				}
+			} else if (lastWeatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) {
+				if (countryCode.equals("KR")) {
+					others.add(WeatherDataSourceType.KMA_WEB);
+				}
+			} else {
+				//others.add(WeatherDataSourceType.ACCU_WEATHER);
 			}
 		}
 
@@ -992,14 +1007,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			newRequestWeatherSources.put(WeatherDataSourceType.KMA_WEB, requestKma);
 		}
 		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_ONECALL)) {
-			RequestOwm requestOwm = new RequestOwm();
-			requestOwm.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
+			RequestOwmOneCall requestOwmOneCall = new RequestOwmOneCall();
+			requestOwmOneCall.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
 			Set<OneCallParameter.OneCallApis> excludes = new HashSet<>();
 			excludes.add(OneCallParameter.OneCallApis.minutely);
 			excludes.add(OneCallParameter.OneCallApis.alerts);
-			requestOwm.setExcludeApis(excludes);
+			requestOwmOneCall.setExcludeApis(excludes);
 
-			newRequestWeatherSources.put(WeatherDataSourceType.OWM_ONECALL, requestOwm);
+			newRequestWeatherSources.put(WeatherDataSourceType.OWM_ONECALL, requestOwmOneCall);
 		}
 		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.ACCU_WEATHER)) {
 			RequestAccu requestAccu = new RequestAccu();
@@ -1007,6 +1022,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST).addRequestServiceType(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST);
 
 			newRequestWeatherSources.put(WeatherDataSourceType.ACCU_WEATHER, requestAccu);
+		}
+		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_INDIVIDUAL)) {
+			RequestOwmIndividual requestOwmIndividual = new RequestOwmIndividual();
+			requestOwmIndividual.addRequestServiceType(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS).addRequestServiceType(
+					RetrofitClient.ServiceType.OWM_HOURLY_FORECAST).addRequestServiceType(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
+
+			newRequestWeatherSources.put(WeatherDataSourceType.OWM_INDIVIDUAL, requestOwmIndividual);
 		}
 		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.AQICN)) {
 			RequestAqicn requestAqicn = new RequestAqicn();
@@ -1170,7 +1192,37 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
 			mainWeatherDataSourceType = WeatherDataSourceType.OWM_ONECALL;
+		} else if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_INDIVIDUAL)) {
+			arrayMap = responseMap.get(WeatherDataSourceType.OWM_INDIVIDUAL);
 
+			OwmSimpleCurrentConditionsFragment owmSimpleCurrentConditionsFragment = new OwmSimpleCurrentConditionsFragment();
+			OwmSimpleHourlyForecastFragment owmSimpleHourlyForecastFragment = new OwmSimpleHourlyForecastFragment();
+			OwmSimpleDailyForecastFragment owmSimpleDailyForecastFragment = new OwmSimpleDailyForecastFragment();
+			OwmDetailCurrentConditionsFragment owmDetailCurrentConditionsFragment = new OwmDetailCurrentConditionsFragment();
+
+			OwmCurrentConditionsResponse owmCurrentConditionsResponse =
+					(OwmCurrentConditionsResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS).getResponseObj();
+			OwmHourlyForecastResponse owmHourlyForecastResponse =
+					(OwmHourlyForecastResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST).getResponseObj();
+			OwmDailyForecastResponse owmDailyForecastResponse =
+					(OwmDailyForecastResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST).getResponseObj();
+
+			owmSimpleCurrentConditionsFragment.setOwmCurrentConditionsResponse(owmCurrentConditionsResponse);
+			owmSimpleCurrentConditionsFragment.setAirQualityResponse(airQualityResponse);
+			owmSimpleHourlyForecastFragment.setOwmHourlyForecastResponse(owmHourlyForecastResponse);
+			owmSimpleDailyForecastFragment.setOwmDailyForecastResponse(owmDailyForecastResponse);
+			owmDetailCurrentConditionsFragment.setOwmCurrentConditionsResponse(owmCurrentConditionsResponse);
+
+			simpleCurrentConditionsFragment = owmSimpleCurrentConditionsFragment;
+			simpleHourlyForecastFragment = owmSimpleHourlyForecastFragment;
+			simpleDailyForecastFragment = owmSimpleDailyForecastFragment;
+			detailCurrentConditionsFragment = owmDetailCurrentConditionsFragment;
+
+			currentConditionsWeatherVal = owmCurrentConditionsResponse.getWeather().get(0).getId();
+
+			ZoneOffset zoneOffsetSecond = ZoneOffset.ofTotalSeconds(Integer.parseInt(owmCurrentConditionsResponse.getTimezone()));
+			zoneId = zoneOffsetSecond.normalized();
+			mainWeatherDataSourceType = WeatherDataSourceType.OWM_INDIVIDUAL;
 		}
 
 		loadImgOfCurrentConditions(mainWeatherDataSourceType, currentConditionsWeatherVal, latitude, longitude,
@@ -1239,6 +1291,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private void changeWeatherDataSourcePicker(String countryCode) {
 		switch (mainWeatherDataSourceType) {
 			case KMA_WEB:
+			case KMA_API:
 				binding.weatherDataSourceName.setText(R.string.kma);
 				binding.weatherDataSourceIcon.setImageResource(R.drawable.kmaicon);
 				break;
@@ -1247,6 +1300,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				binding.weatherDataSourceIcon.setImageResource(R.drawable.accuicon);
 				break;
 			case OWM_ONECALL:
+			case OWM_INDIVIDUAL:
 				binding.weatherDataSourceName.setText(R.string.owm);
 				binding.weatherDataSourceIcon.setImageResource(R.drawable.owmicon);
 				break;
@@ -1255,19 +1309,17 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		binding.weatherDataSourceLayout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				CharSequence[] items = new CharSequence[countryCode.equals("KR") ? 3 : 2];
+				CharSequence[] items = new CharSequence[countryCode.equals("KR") ? 2 : 1];
 				int checkedItemIdx = 0;
 
 				if (countryCode.equals("KR")) {
 					items[0] = getString(R.string.kma);
-					items[1] = getString(R.string.accu_weather);
-					items[2] = getString(R.string.owm);
-
-					checkedItemIdx = (mainWeatherDataSourceType == WeatherDataSourceType.KMA_WEB) ? 0 : (mainWeatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) ? 1 : 2;
-				} else {
-					items[0] = getString(R.string.accu_weather);
 					items[1] = getString(R.string.owm);
-					checkedItemIdx = mainWeatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER ? 0 : 1;
+
+					checkedItemIdx = (mainWeatherDataSourceType == WeatherDataSourceType.KMA_WEB) ? 0 : 1;
+				} else {
+					items[0] = getString(R.string.owm);
+					checkedItemIdx = 0;
 				}
 				final int finalCheckedItemIdx = checkedItemIdx;
 
@@ -1280,15 +1332,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 								if (finalCheckedItemIdx != index) {
 									if (!items[index].equals(getString(R.string.kma))) {
-										// 선택된 제공사가 accu, owm 둘 중 하나이면 우선순위 변경
-										boolean accu = items[index].equals(getString(R.string.accu_weather));
-
-										SharedPreferences.Editor editor = sharedPreferences.edit();
-										editor.putBoolean(getString(R.string.pref_key_accu_weather), accu);
-										editor.putBoolean(getString(R.string.pref_key_open_weather_map), !accu);
-										editor.apply();
-
-										newWeatherDataSourceType = accu ? WeatherDataSourceType.ACCU_WEATHER : WeatherDataSourceType.OWM_ONECALL;
+										newWeatherDataSourceType = WeatherDataSourceType.OWM_ONECALL;
 									} else {
 										newWeatherDataSourceType = WeatherDataSourceType.KMA_WEB;
 									}
