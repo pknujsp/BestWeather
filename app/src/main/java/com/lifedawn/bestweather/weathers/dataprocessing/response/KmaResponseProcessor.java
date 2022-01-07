@@ -802,13 +802,12 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	                                                                     List<KmaHourlyForecast> hourlyForecastList, double latitude, double longitude,
 	                                                                     ValueUnits windUnit, ValueUnits tempUnit) {
 		final String tempDegree = "°";
-		final String windUnisStr = ValueUnits.convertToStr(context, windUnit);
 		final String mPerSec = "m/s";
 
 		final String zeroRainVolume = "0.0mm";
 		final String zeroSnowVolume = "0.0cm";
 		final String zeroPrecipitationVolume = "0.0mm";
-
+		final String percent = "%";
 		final ZoneId zoneId = ZoneId.of("Asia/Seoul");
 
 		final Map<Integer, SunRiseSetUtil.SunRiseSetObj> sunSetRiseDataMap = SunRiseSetUtil.getDailySunRiseSetMap(
@@ -828,6 +827,11 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		boolean hasRain;
 		boolean hasSnow;
 		String windSpeed = null;
+		int humidity = 0;
+		Double feelsLikeTemp = 0.0;
+		String windDirectionStr = null;
+		Integer windDirectionInt = 0;
+		final String poong = "풍";
 
 		for (KmaHourlyForecast finalHourlyForecast : hourlyForecastList) {
 			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
@@ -852,6 +856,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 			sunSet = sunSetRiseDataMap.get(finalHourlyForecast.getHour().getDayOfYear()).getSunset();
 			isNight = SunRiseSetUtil.isNight(itemCalendar, sunRise, sunSet);
 
+			humidity = Integer.parseInt(finalHourlyForecast.getHumidity().replace(percent, ""));
+
 			hourlyForecastDto.setHours(finalHourlyForecast.getHour())
 					.setTemp(ValueUnits.convertTemperature(finalHourlyForecast.getTemp(), tempUnit) + tempDegree)
 					.setRainVolume(rainVolume)
@@ -867,12 +873,20 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 			if (finalHourlyForecast.getWindDirection() != null) {
 				windSpeed = finalHourlyForecast.getWindSpeed().replace(mPerSec, "");
+				windDirectionStr = finalHourlyForecast.getWindDirection().replace(poong, "");
+				windDirectionInt = WindUtil.parseWindDirectionStrAsInt(windDirectionStr);
 
-				hourlyForecastDto.setWindDirectionVal(WindUtil.parseWindDirectionStrAsInt(finalHourlyForecast.getWindDirection()))
-						.setWindDirection(WindUtil.parseWindDirectionStrAsStr(context, finalHourlyForecast.getWindDirection()))
+				hourlyForecastDto.setWindDirectionVal(windDirectionInt)
+						.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, windDirectionInt.toString()))
 						.setWindStrength(WindUtil.getSimpleWindSpeedDescription(windSpeed))
 						.setWindSpeed(ValueUnits.convertWindSpeed(windSpeed, windUnit)
 								+ ValueUnits.convertToStr(context, windUnit));
+
+				feelsLikeTemp = WeatherUtil.calcFeelsLikeTemperature(Double.parseDouble(finalHourlyForecast.getTemp()),
+						ValueUnits.convertWindSpeed(windSpeed, ValueUnits.kmPerHour), humidity);
+
+				hourlyForecastDto.setFeelsLikeTemp(ValueUnits.convertTemperature(feelsLikeTemp.toString(),
+						tempUnit) + tempDegree);
 			}
 
 			hourlyForecastDtoList.add(hourlyForecastDto);

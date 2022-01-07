@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.SpinnerAdapter;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentDailyPushNotificationSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.daily.DailyNotiHelper;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
@@ -114,6 +116,10 @@ public class DailyNotificationSettingsFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
+		layoutParams.topMargin = MyApplication.getStatusBarHeight();
+		binding.toolbar.getRoot().setLayoutParams(layoutParams);
+
 		binding.toolbar.fragmentTitle.setText(R.string.daily_notification);
 
 		binding.commons.multipleWeatherDataSourceLayout.setVisibility(View.GONE);

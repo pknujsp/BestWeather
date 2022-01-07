@@ -63,14 +63,7 @@ public class MainActivity extends AppCompatActivity {
 		win.setAttributes(winParams);
 	}
 
-	public static int getHeightOfStatusBar(Context context) {
-		int height = 0;
-		int id = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-		if (id > 0) {
-			height = context.getResources().getDimensionPixelSize(id);
-		}
-		return height;
-	}
+
 
 
 	@Override
@@ -88,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
 		final Window window = getWindow();
+
 		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 		window.setStatusBarColor(Color.TRANSPARENT);

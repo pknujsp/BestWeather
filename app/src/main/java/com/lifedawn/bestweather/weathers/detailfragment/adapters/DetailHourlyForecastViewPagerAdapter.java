@@ -105,7 +105,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 
 			gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_direction), hourlyForecastDto.getWindDirection() == null ?
 					context.getString(R.string.noData) : hourlyForecastDto.getWindDirection(),
-					ContextCompat.getDrawable(context, R.drawable.arrow), hourlyForecastDto.getWindDirectionVal()));
+					ContextCompat.getDrawable(context, R.drawable.arrow), hourlyForecastDto.getWindDirectionVal() + 180));
 
 			gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_speed), hourlyForecastDto.getWindSpeed() == null ?
 					context.getString(R.string.noData) : hourlyForecastDto.getWindSpeed(), null));

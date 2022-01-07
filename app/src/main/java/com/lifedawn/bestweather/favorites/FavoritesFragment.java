@@ -25,6 +25,8 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -38,6 +40,7 @@ import com.lifedawn.bestweather.databinding.FragmentFavoritesBinding;
 import com.lifedawn.bestweather.databinding.ViewSearchBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.always.AlwaysNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.daily.fragment.DailyNotificationSettingsFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -131,6 +134,10 @@ public class FavoritesFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
+		layoutParams.topMargin = MyApplication.getStatusBarHeight();
+		binding.toolbar.getRoot().setLayoutParams(layoutParams);
+
 		binding.progressResultView.setContentView(binding.favoriteAddressList);
 
 		binding.toolbar.fragmentTitle.setText(R.string.favorite);

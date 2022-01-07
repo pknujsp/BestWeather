@@ -62,12 +62,26 @@ public class DailyPushNotificationJobService extends JobService {
 	public boolean onStartJob(JobParameters params) {
 		PersistableBundle bundle = params.getExtras();
 		final String action = bundle.getString("action");
+		DailyPushNotificationRepository repository = new DailyPushNotificationRepository(getApplicationContext());
+		DailyNotiHelper dailyNotiHelper = new DailyNotiHelper(getApplicationContext());
 
 		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
 			final Integer id = bundle.getInt(BundleKey.dtoId.name());
 			final LocalTime localTime = LocalTime.parse(bundle.getString("time"));
 			final DailyPushNotificationType dailyPushNotificationType = DailyPushNotificationType.valueOf(bundle.getString(
 					"DailyPushNotificationType"));
+
+			repository.get(id, new DbQueryCallback<DailyPushNotificationDto>() {
+				@Override
+				public void onResultSuccessful(DailyPushNotificationDto result) {
+					dailyNotiHelper.enablePushNotification(result);
+				}
+
+				@Override
+				public void onResultNoData() {
+
+				}
+			});
 
 			if (localTime.isBefore(LocalTime.now())) {
 				jobFinished(params, false);
@@ -89,11 +103,9 @@ public class DailyPushNotificationJobService extends JobService {
 			}
 
 		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-			DailyPushNotificationRepository repository = new DailyPushNotificationRepository(getApplicationContext());
 			repository.getAll(new DbQueryCallback<List<DailyPushNotificationDto>>() {
 				@Override
 				public void onResultSuccessful(List<DailyPushNotificationDto> result) {
-					DailyNotiHelper dailyNotiHelper = new DailyNotiHelper(getApplicationContext());
 					for (DailyPushNotificationDto notificationDto : result) {
 						if (notificationDto.isEnabled()) {
 							dailyNotiHelper.enablePushNotification(notificationDto);

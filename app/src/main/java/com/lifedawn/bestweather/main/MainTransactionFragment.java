@@ -85,10 +85,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		public void onFragmentAttached(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
 		                               @NonNull @NotNull Context context) {
 			super.onFragmentAttached(fm, f, context);
-			if (!(f instanceof WeatherFragment)) {
-				binding.fragmentContainer.setPadding(0, MainActivity.getHeightOfStatusBar(getContext()), 0, 0);
-				getActivity().getWindow().setStatusBarColor(Color.BLUE);
-			}
+
 
 			if (f instanceof SettingsMainFragment) {
 				originalUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
@@ -98,10 +95,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		@Override
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
-			if (!(f instanceof WeatherFragment)) {
-				binding.fragmentContainer.setPadding(0, 0, 0, 0);
-				getActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
-			}
+
 
 			if (f instanceof SettingsMainFragment) {
 				final boolean newUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location),
@@ -211,7 +205,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		binding.sideNavMenu.notificationAlarmSettings.setOnClickListener(sideNavOnClickListener);
 
 		int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
-		binding.sideNavMenu.currentLocationLayout.setPadding(padding, MainActivity.getHeightOfStatusBar(getContext()) + padding, padding,
+		binding.sideNavMenu.currentLocationLayout.setPadding(padding, MyApplication.getStatusBarHeight() + padding, padding,
 				padding);
 		binding.sideNavMenu.currentLocationLayout.setOnClickListener(new View.OnClickListener() {
 			@Override

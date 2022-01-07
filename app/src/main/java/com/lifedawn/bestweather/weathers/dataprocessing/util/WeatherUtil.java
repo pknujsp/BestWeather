@@ -4,7 +4,7 @@ public class WeatherUtil {
 	private WeatherUtil() {
 	}
 
-	public static double calcFeelsLikeTemperature(double celsiusTemperature, double kmPerHWindSpeed, double humidity) {
+	public static Double calcFeelsLikeTemperature(double celsiusTemperature, double kmPerHWindSpeed, double humidity) {
 		if (celsiusTemperature < 11.0) {
 				/*
 			- 겨울 체감온도 = 13.12 + 0.6215T - 11.37 V0.16 + 0.3965 V0.16T

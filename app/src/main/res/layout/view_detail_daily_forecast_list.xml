@@ -26,9 +26,10 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-condensed"
                 android:gravity="center"
+                android:includeFontPadding="false"
                 android:text="10.12"
                 android:textAlignment="center"
-                android:textColor="?attr/textColor"
+                android:textColor="@color/gray"
                 android:textSize="14sp" />
 
             <TextView
@@ -39,8 +40,8 @@
                 android:gravity="center"
                 android:text="Tue"
                 android:textAlignment="center"
-                android:textColor="@color/light_blue_900"
-                android:textSize="15sp" />
+                android:textColor="@color/black"
+                android:textSize="17sp" />
 
         </LinearLayout>
 

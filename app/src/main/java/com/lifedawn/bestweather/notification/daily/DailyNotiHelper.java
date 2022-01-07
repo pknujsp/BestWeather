@@ -46,6 +46,10 @@ public class DailyNotiHelper {
 		calendar.set(Calendar.MINUTE, localTime.getMinute());
 		calendar.set(Calendar.SECOND, 0);
 
+		if (calendar.compareTo(Calendar.getInstance()) <= 0) {
+			calendar.add(Calendar.DATE, 1);
+		}
+
 		AlarmManagerCompat.setExactAndAllowWhileIdle(alarmManager, AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), getRefreshPendingIntent(dailyPushNotificationDto));
 	}
 

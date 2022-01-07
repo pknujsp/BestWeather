@@ -25,6 +25,7 @@ import java.util.concurrent.Executors;
 public class MyApplication extends Application {
 	private SharedPreferences sharedPreferences;
 	private static final ExecutorService executorService = Executors.newFixedThreadPool(3);
+	private static int statusBarHeight;
 
 	@Override
 	public void onCreate() {
@@ -41,7 +42,15 @@ public class MyApplication extends Application {
 		OpenWeatherMapResponseProcessor.init(context);
 		FlickrUtil.init(context);
 		UvIndexProcessor.init(context);
+
+		int height = 0;
+		int id = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+		if (id > 0) {
+			height = context.getResources().getDimensionPixelSize(id);
+		}
+		statusBarHeight = height;
 	}
+
 
 	private void initPreferences() {
 		try {
@@ -76,5 +85,9 @@ public class MyApplication extends Application {
 
 	public static ExecutorService getExecutorService() {
 		return executorService;
+	}
+
+	public static int getStatusBarHeight() {
+		return statusBarHeight;
 	}
 }

@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -120,6 +121,10 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
+		layoutParams.topMargin = MyApplication.getStatusBarHeight();
+		binding.toolbar.getRoot().setLayoutParams(layoutParams);
+		binding.toolbar.fragmentTitle.setText(R.string.detail_air_quality);
 
 		MobileAds.initialize(getContext());
 		AdRequest adRequest = new AdRequest.Builder().build();
@@ -141,7 +146,6 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 			}
 		});
 
-		binding.toolbar.fragmentTitle.setText(R.string.detail_air_quality);
 		initBarChart(binding.pm10Chart);
 		initBarChart(binding.pm25Chart);
 		initBarChart(binding.o3Chart);
