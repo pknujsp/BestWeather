@@ -1,12 +1,8 @@
 package com.lifedawn.bestweather.notification.daily;
 
 import android.app.PendingIntent;
-import android.app.job.JobInfo;
 import android.app.job.JobParameters;
-import android.app.job.JobScheduler;
 import android.app.job.JobService;
-import android.app.job.JobServiceEngine;
-import android.app.job.JobWorkItem;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
@@ -28,7 +24,7 @@ import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FifthDailyNotificationViewCreator;
@@ -177,19 +173,19 @@ public class DailyPushNotificationJobService extends JobService {
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,
 	                            DailyPushNotificationDto dailyPushNotificationDto) {
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = viewCreator.getRequestWeatherDataTypeSet();
-		final Set<WeatherSourceType> weatherSourceTypeSet = dailyPushNotificationDto.getWeatherSourceTypeSet();
+		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = dailyPushNotificationDto.getWeatherSourceTypeSet();
 
 		WeatherRequestUtil.loadWeatherData(context, executorService, dailyPushNotificationDto.getCountryCode(),
 				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), requestWeatherDataTypeSet, new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {
-						viewCreator.setResultViews(remoteViews, dailyPushNotificationDto, weatherSourceTypeSet, this, requestWeatherDataTypeSet);
+						viewCreator.setResultViews(remoteViews, dailyPushNotificationDto, weatherDataSourceTypeSet, this, requestWeatherDataTypeSet);
 					}
 
 					@Override
 					public void onCanceled() {
 					}
-				}, weatherSourceTypeSet);
+				}, weatherDataSourceTypeSet);
 
 	}
 

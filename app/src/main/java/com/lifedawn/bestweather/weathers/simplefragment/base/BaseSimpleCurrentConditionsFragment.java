@@ -18,11 +18,10 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.TextUtil;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
 import com.lifedawn.bestweather.flickr.FlickrImgObj;
-import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
-import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
+import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
@@ -33,11 +32,10 @@ import org.jetbrains.annotations.NotNull;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.TimeZone;
 
 public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutSimpleCurrentConditionsBinding binding;
-	protected GeolocalizedFeedResponse airQualityResponse;
+	protected AqiCnGeolocalizedFeedResponse airQualityResponse;
 	protected SharedPreferences sharedPreferences;
 	protected ValueUnits tempUnit;
 	protected ValueUnits windUnit;
@@ -47,7 +45,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	protected Double longitude;
 	protected String addressName;
 	protected String countryCode;
-	protected WeatherSourceType mainWeatherSourceType;
+	protected WeatherDataSourceType mainWeatherDataSourceType;
 	protected ZoneId zoneId;
 	protected ZoneOffset zoneOffset;
 
@@ -66,7 +64,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
-		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(
+		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
 				BundleKey.WeatherDataSource.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
@@ -104,7 +102,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		});
 	}
 
-	public BaseSimpleCurrentConditionsFragment setAirQualityResponse(GeolocalizedFeedResponse airQualityResponse) {
+	public BaseSimpleCurrentConditionsFragment setAirQualityResponse(AqiCnGeolocalizedFeedResponse airQualityResponse) {
 		this.airQualityResponse = airQualityResponse;
 		return this;
 	}

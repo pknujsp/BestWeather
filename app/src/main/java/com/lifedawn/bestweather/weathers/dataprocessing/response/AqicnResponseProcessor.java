@@ -7,9 +7,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
@@ -96,17 +96,17 @@ public class AqicnResponseProcessor {
 		return AQI_GRADE_DESCRIPTIONS[5];
 	}
 
-	public static GeolocalizedFeedResponse getAirQualityObjFromJson(String response) {
-		return new Gson().fromJson(response, GeolocalizedFeedResponse.class);
+	public static AqiCnGeolocalizedFeedResponse getAirQualityObjFromJson(String response) {
+		return new Gson().fromJson(response, AqiCnGeolocalizedFeedResponse.class);
 	}
 
-	public static List<AirQualityForecastObj> getAirQualityForecastObjList(GeolocalizedFeedResponse geolocalizedFeedResponse, ZoneId timeZone) {
+	public static List<AirQualityForecastObj> getAirQualityForecastObjList(AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse, ZoneId timeZone) {
 		ArrayMap<String, AirQualityForecastObj> forecastObjMap = new ArrayMap<>();
 		final LocalDate todayDate = LocalDate.now(timeZone);
 		LocalDate date = null;
 
-		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm10Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm10();
-		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm10Forecast) {
+		List<AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm10Forecast = aqiCnGeolocalizedFeedResponse.getData().getForecast().getDaily().getPm10();
+		for (AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm10Forecast) {
 			date = getDate(valueMap.getDay());
 			if (date.isBefore(todayDate)) {
 				continue;
@@ -118,8 +118,8 @@ public class AqicnResponseProcessor {
 			forecastObjMap.get(valueMap.getDay()).pm10 = Integer.parseInt(valueMap.getAvg());
 		}
 
-		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm25Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getPm25();
-		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm25Forecast) {
+		List<AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm25Forecast = aqiCnGeolocalizedFeedResponse.getData().getForecast().getDaily().getPm25();
+		for (AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm25Forecast) {
 			date = getDate(valueMap.getDay());
 			if (date.isBefore(todayDate)) {
 				continue;
@@ -131,8 +131,8 @@ public class AqicnResponseProcessor {
 			forecastObjMap.get(valueMap.getDay()).pm25 = Integer.parseInt(valueMap.getAvg());
 		}
 
-		List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> o3Forecast = geolocalizedFeedResponse.getData().getForecast().getDaily().getO3();
-		for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : o3Forecast) {
+		List<AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> o3Forecast = aqiCnGeolocalizedFeedResponse.getData().getForecast().getDaily().getO3();
+		for (AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : o3Forecast) {
 			date = getDate(valueMap.getDay());
 			if (date.isBefore(todayDate)) {
 				continue;
@@ -156,10 +156,10 @@ public class AqicnResponseProcessor {
 		return forecastObjList;
 	}
 
-	public static String getAirQuality(Context context, GeolocalizedFeedResponse airQualityResponse) {
+	public static String getAirQuality(Context context, AqiCnGeolocalizedFeedResponse airQualityResponse) {
 		if (airQualityResponse != null) {
 			if (airQualityResponse.getStatus().equals("ok")) {
-				GeolocalizedFeedResponse.Data.IAqi iAqi = airQualityResponse.getData().getIaqi();
+				AqiCnGeolocalizedFeedResponse.Data.IAqi iAqi = airQualityResponse.getData().getIaqi();
 				int val = Integer.MIN_VALUE;
 
 				if (iAqi.getO3() != null) {
@@ -218,9 +218,9 @@ public class AqicnResponseProcessor {
 		}
 	}
 
-	public static AirQualityDto makeAirQualityDto(Context context, GeolocalizedFeedResponse geolocalizedFeedResponse, ZoneOffset zoneOffset) {
-		if (geolocalizedFeedResponse.getStatus().equals("ok")) {
-			GeolocalizedFeedResponse.Data data = geolocalizedFeedResponse.getData();
+	public static AirQualityDto makeAirQualityDto(Context context, AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse, ZoneOffset zoneOffset) {
+		if (aqiCnGeolocalizedFeedResponse.getStatus().equals("ok")) {
+			AqiCnGeolocalizedFeedResponse.Data data = aqiCnGeolocalizedFeedResponse.getData();
 
 			if (zoneOffset == null) {
 				zoneOffset = ZoneOffset.of(data.getTime().getTz());
@@ -246,7 +246,7 @@ public class AqicnResponseProcessor {
 			//------------------Current------------------------------------------------------------------------------
 			AirQualityDto.Current current = new AirQualityDto.Current();
 			airQualityDto.setCurrent(current);
-			GeolocalizedFeedResponse.Data.IAqi iAqi = data.getIaqi();
+			AqiCnGeolocalizedFeedResponse.Data.IAqi iAqi = data.getIaqi();
 
 			current.setPm10(iAqi.getPm10() != null ? (int) Double.parseDouble(iAqi.getPm10().getValue()) : -1);
 			current.setPm25(iAqi.getPm25() != null ? (int) Double.parseDouble(iAqi.getPm25().getValue()) : -1);
@@ -263,10 +263,10 @@ public class AqicnResponseProcessor {
 			ZonedDateTime date = ZonedDateTime.of(todayDate.toLocalDateTime(), zoneOffset);
 			LocalDate localDate = null;
 
-			GeolocalizedFeedResponse.Data.Forecast forecast = data.getForecast();
+			AqiCnGeolocalizedFeedResponse.Data.Forecast forecast = data.getForecast();
 
-			List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm10Forecast = forecast.getDaily().getPm10();
-			for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm10Forecast) {
+			List<AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm10Forecast = forecast.getDaily().getPm10();
+			for (AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm10Forecast) {
 				localDate = getDate(valueMap.getDay());
 				date = date.withYear(localDate.getYear()).withMonth(localDate.getMonthValue()).withDayOfMonth(localDate.getDayOfMonth());
 
@@ -286,8 +286,8 @@ public class AqicnResponseProcessor {
 				forecastArrMap.get(valueMap.getDay()).setPm10(pm10);
 			}
 
-			List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm25Forecast = forecast.getDaily().getPm25();
-			for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm25Forecast) {
+			List<AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> pm25Forecast = forecast.getDaily().getPm25();
+			for (AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : pm25Forecast) {
 				localDate = getDate(valueMap.getDay());
 				date = date.withYear(localDate.getYear()).withMonth(localDate.getMonthValue()).withDayOfMonth(localDate.getDayOfMonth());
 
@@ -307,8 +307,8 @@ public class AqicnResponseProcessor {
 				forecastArrMap.get(valueMap.getDay()).setPm25(pm25);
 			}
 
-			List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> o3Forecast = forecast.getDaily().getO3();
-			for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : o3Forecast) {
+			List<AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> o3Forecast = forecast.getDaily().getO3();
+			for (AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : o3Forecast) {
 				localDate = getDate(valueMap.getDay());
 				date = date.withYear(localDate.getYear()).withMonth(localDate.getMonthValue()).withDayOfMonth(localDate.getDayOfMonth());
 
@@ -328,9 +328,9 @@ public class AqicnResponseProcessor {
 				forecastArrMap.get(valueMap.getDay()).setO3(o3);
 			}
 
-			List<GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> uviForecast =
-					geolocalizedFeedResponse.getData().getForecast().getDaily().getUvi();
-			for (GeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : uviForecast) {
+			List<AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap> uviForecast =
+					aqiCnGeolocalizedFeedResponse.getData().getForecast().getDaily().getUvi();
+			for (AqiCnGeolocalizedFeedResponse.Data.Forecast.Daily.ValueMap valueMap : uviForecast) {
 				localDate = getDate(valueMap.getDay());
 				date = date.withYear(localDate.getYear()).withMonth(localDate.getMonthValue()).withDayOfMonth(localDate.getDayOfMonth());
 
@@ -375,11 +375,11 @@ public class AqicnResponseProcessor {
 	}
 
 	public static AirQualityDto parseTextToAirQualityDto(Context context, JsonObject jsonObject) {
-		if (jsonObject.get(WeatherSourceType.AQICN.name()) != null) {
-			JsonObject aqiCnObject = jsonObject.getAsJsonObject(WeatherSourceType.AQICN.name());
-			GeolocalizedFeedResponse geolocalizedFeedResponse =
+		if (jsonObject.get(WeatherDataSourceType.AQICN.name()) != null) {
+			JsonObject aqiCnObject = jsonObject.getAsJsonObject(WeatherDataSourceType.AQICN.name());
+			AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse =
 					getAirQualityObjFromJson(aqiCnObject.get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name()).getAsString());
-			AirQualityDto airQualityDto = makeAirQualityDto(context, geolocalizedFeedResponse,
+			AirQualityDto airQualityDto = makeAirQualityDto(context, aqiCnGeolocalizedFeedResponse,
 					ZoneOffset.of(jsonObject.get("zoneOffset").getAsString()));
 			return airQualityDto;
 		}

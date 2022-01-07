@@ -1,6 +1,4 @@
-package com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts;
-
-import android.graphics.drawable.Drawable;
+package com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -9,17 +7,11 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Direction;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.ValueUnit;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.Wind;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.WindGust;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Response;
-
-public class TwelveHoursOfHourlyForecastsResponse {
+public class AccuHourlyForecastsResponse {
 	private List<Item> items;
 
 	public List<Item> getItems() {

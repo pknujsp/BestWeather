@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,18 +11,15 @@ import android.view.ViewGroup;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
 
 import org.jetbrains.annotations.NotNull;
 
 public class OwmSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
-	private OneCallResponse oneCallResponse;
+	private OwmOneCallResponse owmOneCallResponse;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -41,15 +37,15 @@ public class OwmSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 		setValuesToViews();
 	}
 
-	public OwmSimpleCurrentConditionsFragment setOneCallResponse(OneCallResponse oneCallResponse) {
-		this.oneCallResponse = oneCallResponse;
+	public OwmSimpleCurrentConditionsFragment setOneCallResponse(OwmOneCallResponse owmOneCallResponse) {
+		this.owmOneCallResponse = owmOneCallResponse;
 		return this;
 	}
 
 	@Override
 	public void setValuesToViews() {
 		super.setValuesToViews();
-		CurrentConditionsDto currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDto(getContext(), oneCallResponse
+		CurrentConditionsDto currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDto(getContext(), owmOneCallResponse
 				, windUnit, tempUnit, visibilityUnit);
 
 		if (currentConditionsDto.isHasPrecipitationVolume()) {

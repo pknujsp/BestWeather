@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.kma.KmaCurrentConditionsParameters;
@@ -51,7 +51,7 @@ public final class KmaProcessing {
 	 * 현재 날씨 web
 	 */
 	public static Call<String> getCurrentConditionsData(KmaCurrentConditionsParameters parameter, JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS);
+		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS);
 		Call<String> call = querys.getKmaCurrentConditions(parameter.getParametersMap());
 		call.enqueue(new Callback<String>() {
 			@Override
@@ -82,7 +82,7 @@ public final class KmaProcessing {
 	 * 시간별, 일별 web
 	 */
 	public static Call<String> getForecastsData(KmaForecastsParameters parameter, JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_FORECASTS);
+		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 		Call<String> call = querys.getKmaHourlyAndDailyForecast(parameter.getParametersMap());
 		call.enqueue(new Callback<String>() {
 			@Override
@@ -128,7 +128,7 @@ public final class KmaProcessing {
 		parameter.setBaseDate(dateTime.toLocalDate().format(yyyyMMdd));
 		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "00");
 
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
+		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
 		Call<String> call = querys.getUltraSrtNcstByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
@@ -166,7 +166,7 @@ public final class KmaProcessing {
 		parameter.setBaseDate(dateTime.format(yyyyMMdd));
 		parameter.setBaseTime(dateTime.format(HH));
 
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
+		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
 		Call<String> call = querys.getUltraSrtNcstByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
@@ -207,7 +207,7 @@ public final class KmaProcessing {
 		parameter.setBaseDate(dateTime.toLocalDate().format(yyyyMMdd));
 		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "30");
 
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
+		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
 		Call<String> xmlCall = Objects.requireNonNull(querys).getUltraSrtFcstByXml(parameter.getMap());
 		xmlCall.enqueue(new Callback<String>() {
 			@Override
@@ -267,7 +267,7 @@ public final class KmaProcessing {
 		parameter.setBaseDate(dateTime.toLocalDate().format(yyyyMMdd));
 		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "00");
 
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.VILAGE_FCST);
+		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
 		Call<String> call = Objects.requireNonNull(querys).getVilageFcstByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
@@ -298,7 +298,7 @@ public final class KmaProcessing {
 	 * @param parameter
 	 */
 	public static Call<String> getMidLandFcstData(MidLandParameter parameter, JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.MID_LAND_FCST);
+		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_MID_LAND_FCST);
 		Call<String> call = Objects.requireNonNull(querys).getMidLandFcstByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
@@ -330,7 +330,7 @@ public final class KmaProcessing {
 	 * @param parameter
 	 */
 	public static Call<String> getMidTaData(MidTaParameter parameter, JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.MID_TA_FCST);
+		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_MID_TA_FCST);
 		Call<String> call = Objects.requireNonNull(querys).getMidTaByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
@@ -403,7 +403,7 @@ public final class KmaProcessing {
 						multipleRestApiDownloader.put("tmFc", tmFc);
 						Set<RetrofitClient.ServiceType> requestTypeSet = requestKma.getRequestServiceTypes();
 
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_NCST)) {
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST)) {
 							final UltraSrtNcstParameter ultraSrtNcstParameter = new UltraSrtNcstParameter();
 							ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY())
 									.setLatitude(latitude).setLongitude(longitude);
@@ -413,21 +413,21 @@ public final class KmaProcessing {
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, ultraSrtNcstParameter,
-													RetrofitClient.ServiceType.ULTRA_SRT_NCST, response, responseObj, responseText);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, ultraSrtNcstParameter,
+													RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST, response, responseObj, responseText);
 										}
 
 										@Override
 										public void onResponseResult(Throwable t) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, ultraSrtNcstParameter,
-													RetrofitClient.ServiceType.ULTRA_SRT_NCST, t);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, ultraSrtNcstParameter,
+													RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST, t);
 										}
 									});
-							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.ULTRA_SRT_NCST, ultraSrtNcstCall);
+							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST, ultraSrtNcstCall);
 
 						}
 
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST)) {
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_YESTERDAY_ULTRA_SRT_NCST)) {
 							final UltraSrtNcstParameter ultraSrtNcstParameter = new UltraSrtNcstParameter();
 							ultraSrtNcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY())
 									.setLatitude(latitude).setLongitude(longitude);
@@ -437,21 +437,21 @@ public final class KmaProcessing {
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, ultraSrtNcstParameter,
-													RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST, response, responseObj, responseText);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, ultraSrtNcstParameter,
+													RetrofitClient.ServiceType.KMA_YESTERDAY_ULTRA_SRT_NCST, response, responseObj, responseText);
 										}
 
 										@Override
 										public void onResponseResult(Throwable t) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, ultraSrtNcstParameter,
-													RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST, t);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, ultraSrtNcstParameter,
+													RetrofitClient.ServiceType.KMA_YESTERDAY_ULTRA_SRT_NCST, t);
 										}
 									});
-							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.YESTERDAY_ULTRA_SRT_NCST, yesterdayUltraSrtNcstCall);
+							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.KMA_YESTERDAY_ULTRA_SRT_NCST, yesterdayUltraSrtNcstCall);
 
 						}
 
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_FCST)) {
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST)) {
 							UltraSrtFcstParameter ultraSrtFcstParameter = new UltraSrtFcstParameter();
 							ultraSrtFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY()).setLatitude(latitude).setLongitude(longitude);
 
@@ -461,20 +461,20 @@ public final class KmaProcessing {
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, ultraSrtFcstParameter,
-													RetrofitClient.ServiceType.ULTRA_SRT_FCST, response, responseObj, responseText);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, ultraSrtFcstParameter,
+													RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST, response, responseObj, responseText);
 										}
 
 										@Override
 										public void onResponseResult(Throwable t) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, ultraSrtFcstParameter,
-													RetrofitClient.ServiceType.ULTRA_SRT_FCST, t);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, ultraSrtFcstParameter,
+													RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST, t);
 										}
 									});
-							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.ULTRA_SRT_FCST, ultraSrtFcstCall);
+							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST, ultraSrtFcstCall);
 
 						}
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.VILAGE_FCST)) {
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_VILAGE_FCST)) {
 							VilageFcstParameter vilageFcstParameter = new VilageFcstParameter();
 							vilageFcstParameter.setNx(nearbyKmaAreaCodeDto.getX()).setNy(nearbyKmaAreaCodeDto.getY())
 									.setLatitude(latitude).setLongitude(longitude);
@@ -484,19 +484,19 @@ public final class KmaProcessing {
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, vilageFcstParameter,
-													RetrofitClient.ServiceType.VILAGE_FCST, response, responseObj, responseText);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, vilageFcstParameter,
+													RetrofitClient.ServiceType.KMA_VILAGE_FCST, response, responseObj, responseText);
 										}
 
 										@Override
 										public void onResponseResult(Throwable t) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, vilageFcstParameter,
-													RetrofitClient.ServiceType.VILAGE_FCST, t);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, vilageFcstParameter,
+													RetrofitClient.ServiceType.KMA_VILAGE_FCST, t);
 										}
 									});
-							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.VILAGE_FCST, vilageFcstCall);
+							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.KMA_VILAGE_FCST, vilageFcstCall);
 						}
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_LAND_FCST)) {
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_MID_LAND_FCST)) {
 							MidLandParameter midLandParameter = new MidLandParameter();
 							midLandParameter.setRegId(nearbyKmaAreaCodeDto.getMidLandFcstCode()).setTmFc(tmFc)
 									.setLatitude(latitude).setLongitude(longitude);
@@ -504,21 +504,21 @@ public final class KmaProcessing {
 							Call<String> midLandFcstCall = getMidLandFcstData(midLandParameter, new JsonDownloader() {
 								@Override
 								public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-									multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, midLandParameter,
-											RetrofitClient.ServiceType.MID_LAND_FCST, response, responseObj, responseText);
+									multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, midLandParameter,
+											RetrofitClient.ServiceType.KMA_MID_LAND_FCST, response, responseObj, responseText);
 								}
 
 								@Override
 								public void onResponseResult(Throwable t) {
-									multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, midLandParameter,
-											RetrofitClient.ServiceType.MID_LAND_FCST, t);
+									multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, midLandParameter,
+											RetrofitClient.ServiceType.KMA_MID_LAND_FCST, t);
 								}
 
 							});
-							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.MID_LAND_FCST, midLandFcstCall);
+							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.KMA_MID_LAND_FCST, midLandFcstCall);
 
 						}
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_TA_FCST)) {
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_MID_TA_FCST)) {
 							MidTaParameter midTaParameter = new MidTaParameter();
 							midTaParameter.setRegId(nearbyKmaAreaCodeDto.getMidTaCode()).setTmFc(tmFc)
 									.setLatitude(latitude).setLongitude(longitude);
@@ -526,18 +526,18 @@ public final class KmaProcessing {
 							Call<String> midTaFcstCall = getMidTaData(midTaParameter, new JsonDownloader() {
 								@Override
 								public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-									multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, midTaParameter,
-											RetrofitClient.ServiceType.MID_TA_FCST, response, responseObj, responseText);
+									multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, midTaParameter,
+											RetrofitClient.ServiceType.KMA_MID_TA_FCST, response, responseObj, responseText);
 								}
 
 								@Override
 								public void onResponseResult(Throwable t) {
-									multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, midTaParameter,
-											RetrofitClient.ServiceType.MID_TA_FCST, t);
+									multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, midTaParameter,
+											RetrofitClient.ServiceType.KMA_MID_TA_FCST, t);
 								}
 
 							});
-							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.MID_TA_FCST, midTaFcstCall);
+							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.KMA_MID_TA_FCST, midTaFcstCall);
 
 						}
 					}
@@ -547,25 +547,25 @@ public final class KmaProcessing {
 						Exception exception = new Exception("not found lat,lon");
 						Set<RetrofitClient.ServiceType> requestTypeSet = requestKma.getRequestServiceTypes();
 
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_NCST)) {
-							multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, null,
-									RetrofitClient.ServiceType.ULTRA_SRT_NCST, exception);
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST)) {
+							multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, null,
+									RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST, exception);
 						}
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.ULTRA_SRT_FCST)) {
-							multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, null,
-									RetrofitClient.ServiceType.ULTRA_SRT_FCST, exception);
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST)) {
+							multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, null,
+									RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST, exception);
 						}
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.VILAGE_FCST)) {
-							multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, null,
-									RetrofitClient.ServiceType.VILAGE_FCST, exception);
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_VILAGE_FCST)) {
+							multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, null,
+									RetrofitClient.ServiceType.KMA_VILAGE_FCST, exception);
 						}
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_LAND_FCST)) {
-							multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, null,
-									RetrofitClient.ServiceType.MID_LAND_FCST, exception);
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_MID_LAND_FCST)) {
+							multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, null,
+									RetrofitClient.ServiceType.KMA_MID_LAND_FCST, exception);
 						}
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.MID_TA_FCST)) {
-							multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, null,
-									RetrofitClient.ServiceType.MID_TA_FCST, exception);
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_MID_TA_FCST)) {
+							multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, null,
+									RetrofitClient.ServiceType.KMA_MID_TA_FCST, exception);
 
 						}
 					}
@@ -609,7 +609,7 @@ public final class KmaProcessing {
 
 						final String code = nearbyKmaAreaCodeDto.getAdministrativeAreaCode();
 
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS)) {
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS)) {
 							final KmaCurrentConditionsParameters parameters = new KmaCurrentConditionsParameters(code);
 							parameters.setLatitude(latitude).setLongitude(longitude);
 
@@ -617,21 +617,21 @@ public final class KmaProcessing {
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, parameters,
-													RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS, response, responseObj, responseText);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, parameters,
+													RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS, response, responseObj, responseText);
 										}
 
 										@Override
 										public void onResponseResult(Throwable t) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, parameters,
-													RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS, t);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, parameters,
+													RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS, t);
 										}
 									});
-							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS, currentConditionsCall);
+							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS, currentConditionsCall);
 
 						}
 
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_FORECASTS)) {
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_WEB_FORECASTS)) {
 							final KmaForecastsParameters parameters = new KmaForecastsParameters(code);
 							parameters.setLatitude(latitude).setLongitude(longitude);
 
@@ -639,17 +639,17 @@ public final class KmaProcessing {
 									new JsonDownloader() {
 										@Override
 										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, parameters,
-													RetrofitClient.ServiceType.KMA_FORECASTS, response, responseObj, responseText);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, parameters,
+													RetrofitClient.ServiceType.KMA_WEB_FORECASTS, response, responseObj, responseText);
 										}
 
 										@Override
 										public void onResponseResult(Throwable t) {
-											multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, parameters,
-													RetrofitClient.ServiceType.KMA_FORECASTS, t);
+											multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, parameters,
+													RetrofitClient.ServiceType.KMA_WEB_FORECASTS, t);
 										}
 									});
-							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.KMA_FORECASTS, forecastsCall);
+							multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.KMA_WEB_FORECASTS, forecastsCall);
 
 						}
 
@@ -660,13 +660,13 @@ public final class KmaProcessing {
 						Exception exception = new Exception("not found lat,lon");
 						Set<RetrofitClient.ServiceType> requestTypeSet = requestKma.getRequestServiceTypes();
 
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS)) {
-							multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, null,
-									RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS, exception);
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS)) {
+							multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, null,
+									RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS, exception);
 						}
-						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_FORECASTS)) {
-							multipleRestApiDownloader.processResult(WeatherSourceType.KMA_WEB, null,
-									RetrofitClient.ServiceType.KMA_FORECASTS, exception);
+						if (requestTypeSet.contains(RetrofitClient.ServiceType.KMA_WEB_FORECASTS)) {
+							multipleRestApiDownloader.processResult(WeatherDataSourceType.KMA_WEB, null,
+									RetrofitClient.ServiceType.KMA_WEB_FORECASTS, exception);
 						}
 
 					}

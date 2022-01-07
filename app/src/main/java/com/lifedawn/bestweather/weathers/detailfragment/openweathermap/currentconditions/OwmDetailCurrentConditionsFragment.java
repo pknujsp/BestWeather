@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
@@ -17,7 +17,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentCo
 import org.jetbrains.annotations.NotNull;
 
 public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
-	private OneCallResponse oneCallResponse;
+	private OwmOneCallResponse owmOneCallResponse;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -30,15 +30,15 @@ public class OwmDetailCurrentConditionsFragment extends BaseDetailCurrentConditi
 		setValuesToViews();
 	}
 
-	public OwmDetailCurrentConditionsFragment setOneCallResponse(OneCallResponse oneCallResponse) {
-		this.oneCallResponse = oneCallResponse;
+	public OwmDetailCurrentConditionsFragment setOneCallResponse(OwmOneCallResponse owmOneCallResponse) {
+		this.owmOneCallResponse = owmOneCallResponse;
 		return this;
 	}
 
 	@Override
 	public void setValuesToViews() {
 		// 현재기온,체감기온,기압,습도,이슬점,운량,자외선지수,시정,풍속,돌풍,풍향,강우량,강설량,날씨상태(흐림 등)
-		OneCallResponse.Current current = oneCallResponse.getCurrent();
+		OwmOneCallResponse.Current current = owmOneCallResponse.getCurrent();
 		String notData = getString(R.string.not_available);
 		String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
 		String windUnitStr = ValueUnits.convertToStr(getContext(), windUnit);

@@ -5,7 +5,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 
 import java.io.Serializable;
@@ -25,7 +25,7 @@ public class DailyPushNotificationDto implements Serializable {
 	private DailyPushNotificationType notificationType;
 
 	@ColumnInfo(name = "weatherSourceTypeSet")
-	private Set<WeatherSourceType> weatherSourceTypeSet;
+	private Set<WeatherDataSourceType> weatherDataSourceTypeSet;
 
 	@ColumnInfo(name = "topPriorityKma")
 	private boolean topPriorityKma;
@@ -75,12 +75,12 @@ public class DailyPushNotificationDto implements Serializable {
 		this.locationType = locationType;
 	}
 
-	public void setWeatherSourceTypeSet(Set<WeatherSourceType> weatherSourceTypeSet) {
-		this.weatherSourceTypeSet = weatherSourceTypeSet;
+	public void setWeatherSourceTypeSet(Set<WeatherDataSourceType> weatherDataSourceTypeSet) {
+		this.weatherDataSourceTypeSet = weatherDataSourceTypeSet;
 	}
 
-	public Set<WeatherSourceType> getWeatherSourceTypeSet() {
-		return weatherSourceTypeSet;
+	public Set<WeatherDataSourceType> getWeatherSourceTypeSet() {
+		return weatherDataSourceTypeSet;
 	}
 
 	public boolean isTopPriorityKma() {
@@ -147,15 +147,15 @@ public class DailyPushNotificationDto implements Serializable {
 		this.notificationType = notificationType;
 	}
 
-	public void addWeatherSourceType(WeatherSourceType newType) {
-		if (weatherSourceTypeSet == null) {
-			weatherSourceTypeSet = new HashSet<>();
+	public void addWeatherSourceType(WeatherDataSourceType newType) {
+		if (weatherDataSourceTypeSet == null) {
+			weatherDataSourceTypeSet = new HashSet<>();
 		}
-		weatherSourceTypeSet.add(newType);
+		weatherDataSourceTypeSet.add(newType);
 	}
 
-	public void removeWeatherSourceType(WeatherSourceType removeType) {
-		weatherSourceTypeSet.remove(removeType);
+	public void removeWeatherSourceType(WeatherDataSourceType removeType) {
+		weatherDataSourceTypeSet.remove(removeType);
 	}
 
 }

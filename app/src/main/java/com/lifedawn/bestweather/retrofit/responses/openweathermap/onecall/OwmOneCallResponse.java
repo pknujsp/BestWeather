@@ -2,14 +2,13 @@ package com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.FeelsLike;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Temp;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Weather;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.dailyforecast.DailyForecast;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.FeelsLike;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.Temp;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.Weather;
 
 import java.util.List;
 
-public class OneCallResponse {
+public class OwmOneCallResponse {
 	@Expose
 	@SerializedName("lat")
 	private String latitude;

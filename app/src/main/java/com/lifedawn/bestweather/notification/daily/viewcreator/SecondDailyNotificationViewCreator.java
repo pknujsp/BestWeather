@@ -1,20 +1,14 @@
 package com.lifedawn.bestweather.notification.daily.viewcreator;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
@@ -25,7 +19,6 @@ import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -93,12 +86,12 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 	}
 
 	@Override
-	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherSourceType> weatherSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherDataSourceType> weatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		final String refreshDateTime = multipleRestApiDownloader.getRequestDateTime().toString();
 
-		WeatherSourceType weatherSourceType = WeatherResponseProcessor.getMainWeatherSourceType(weatherSourceTypeSet);
+		WeatherDataSourceType weatherDataSourceType = WeatherResponseProcessor.getMainWeatherSourceType(weatherDataSourceTypeSet);
 		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
-				weatherSourceType);
+				weatherDataSourceType);
 
 		boolean successful = currentConditionsDto != null;
 		if (successful) {

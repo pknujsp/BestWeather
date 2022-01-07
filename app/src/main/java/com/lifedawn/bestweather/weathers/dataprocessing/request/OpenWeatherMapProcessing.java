@@ -6,11 +6,11 @@ import android.util.Log;
 
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
@@ -34,9 +34,9 @@ public class OpenWeatherMapProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				OneCallResponse oneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
+				OwmOneCallResponse owmOneCallResponse = OpenWeatherMapResponseProcessor.getOneCallObjFromJson(
 						response.body().toString());
-				callback.onResponseResult(response, oneCallResponse, response.body().toString());
+				callback.onResponseResult(response, owmOneCallResponse, response.body().toString());
 				Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
 			}
 
@@ -63,14 +63,14 @@ public class OpenWeatherMapProcessing {
 				@Override
 				public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 					Log.e(RetrofitClient.LOG_TAG, "own one call 성공");
-					multipleRestApiDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
+					multipleRestApiDownloader.processResult(WeatherDataSourceType.OWM_ONECALL, oneCallParameter,
 							RetrofitClient.ServiceType.OWM_ONE_CALL, response, responseObj, responseText);
 				}
 
 				@Override
 				public void onResponseResult(Throwable t) {
 					Log.e(RetrofitClient.LOG_TAG, "own one call 실패");
-					multipleRestApiDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
+					multipleRestApiDownloader.processResult(WeatherDataSourceType.OWM_ONECALL, oneCallParameter,
 							RetrofitClient.ServiceType.OWM_ONE_CALL, t);
 				}
 
@@ -88,13 +88,13 @@ public class OpenWeatherMapProcessing {
 		Call<JsonElement> oneCallCall = getOneCall(oneCallParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-				multipleRestApiDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
+				multipleRestApiDownloader.processResult(WeatherDataSourceType.OWM_ONECALL, oneCallParameter,
 						RetrofitClient.ServiceType.OWM_ONE_CALL, response, responseObj, responseText);
 			}
 
 			@Override
 			public void onResponseResult(Throwable t) {
-				multipleRestApiDownloader.processResult(WeatherSourceType.OPEN_WEATHER_MAP, oneCallParameter,
+				multipleRestApiDownloader.processResult(WeatherDataSourceType.OWM_ONECALL, oneCallParameter,
 						RetrofitClient.ServiceType.OWM_ONE_CALL, t);
 			}
 

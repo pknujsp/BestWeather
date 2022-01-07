@@ -5,9 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-import retrofit2.SkipCallbackExecutor;
-
-public class GeoPositionResponse {
+public class AccuGeoPositionResponse {
 	@Expose
 	@SerializedName("Code")
 	private String code;
@@ -634,7 +632,7 @@ public class GeoPositionResponse {
 		return code;
 	}
 	
-	public GeoPositionResponse setCode(String code) {
+	public AccuGeoPositionResponse setCode(String code) {
 		this.code = code;
 		return this;
 	}
@@ -643,7 +641,7 @@ public class GeoPositionResponse {
 		return type;
 	}
 	
-	public GeoPositionResponse setType(String type) {
+	public AccuGeoPositionResponse setType(String type) {
 		this.type = type;
 		return this;
 	}
@@ -652,7 +650,7 @@ public class GeoPositionResponse {
 		return supplementalAdminAreas;
 	}
 	
-	public GeoPositionResponse setSupplementalAdminAreas(List<SupplementalAdminAreas> supplementalAdminAreas) {
+	public AccuGeoPositionResponse setSupplementalAdminAreas(List<SupplementalAdminAreas> supplementalAdminAreas) {
 		this.supplementalAdminAreas = supplementalAdminAreas;
 		return this;
 	}

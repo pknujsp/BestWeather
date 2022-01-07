@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.weathers.simplefragment.aqicn;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -20,9 +19,9 @@ import android.widget.TextView;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
-import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
@@ -41,12 +40,12 @@ import java.util.Locale;
 
 public class SimpleAirQualityFragment extends Fragment implements IWeatherValues {
 	private FragmentAirQualitySimpleBinding binding;
-	private GeolocalizedFeedResponse geolocalizedFeedResponse;
+	private AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse;
 	private Double latitude;
 	private Double longitude;
 	private String addressName;
 	private String countryCode;
-	private WeatherSourceType mainWeatherSourceType;
+	private WeatherDataSourceType mainWeatherDataSourceType;
 	private ZoneId zoneId;
 	private ValueUnits clockUnit;
 
@@ -58,7 +57,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
-		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(BundleKey.WeatherDataSource.name());
+		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(BundleKey.WeatherDataSource.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -82,7 +81,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			@Override
 			public void onClick(View view) {
 				DetailAirQualityFragment detailAirQualityFragment = new DetailAirQualityFragment();
-				detailAirQualityFragment.setResponse(geolocalizedFeedResponse);
+				detailAirQualityFragment.setResponse(aqiCnGeolocalizedFeedResponse);
 
 				Bundle bundle = new Bundle();
 				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
@@ -102,15 +101,15 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		setValuesToViews();
 	}
 
-	public SimpleAirQualityFragment setGeolocalizedFeedResponse(GeolocalizedFeedResponse geolocalizedFeedResponse) {
-		this.geolocalizedFeedResponse = geolocalizedFeedResponse;
+	public SimpleAirQualityFragment setGeolocalizedFeedResponse(AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse) {
+		this.aqiCnGeolocalizedFeedResponse = aqiCnGeolocalizedFeedResponse;
 		return this;
 	}
 
 	@Override
 	public void setValuesToViews() {
 		//응답 실패한 경우
-		if (geolocalizedFeedResponse == null || !geolocalizedFeedResponse.getStatus().equals("ok")) {
+		if (aqiCnGeolocalizedFeedResponse == null || !aqiCnGeolocalizedFeedResponse.getStatus().equals("ok")) {
 			binding.progressResultView.onFailed(getString(R.string.error));
 			return;
 		} else {
@@ -119,8 +118,8 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 		//측정소와의 거리 계산 후 50km이상의 거리에 있으면 표시보류
 		final Double distance = LocationDistance.distance(latitude, longitude,
-				Double.parseDouble(geolocalizedFeedResponse.getData().getCity().getGeo().get(0)),
-				Double.parseDouble(geolocalizedFeedResponse.getData().getCity().getGeo().get(1)), LocationDistance.Unit.KM);
+				Double.parseDouble(aqiCnGeolocalizedFeedResponse.getData().getCity().getGeo().get(0)),
+				Double.parseDouble(aqiCnGeolocalizedFeedResponse.getData().getCity().getGeo().get(1)), LocationDistance.Unit.KM);
 
 		String notData = getString(R.string.noData);
 		String distanceStr = String.format("%.2f", distance) + getString(R.string.km);
@@ -129,8 +128,8 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		}
 		binding.distanceToMeasuringStation.setText(distanceStr);
 
-		if (geolocalizedFeedResponse.getData().getCity().getName() != null) {
-			binding.measuringStationName.setText(geolocalizedFeedResponse.getData().getCity().getName());
+		if (aqiCnGeolocalizedFeedResponse.getData().getCity().getName() != null) {
+			binding.measuringStationName.setText(aqiCnGeolocalizedFeedResponse.getData().getCity().getName());
 		} else {
 			binding.measuringStationName.setText(notData);
 		}
@@ -153,7 +152,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 		 */
 
-		GeolocalizedFeedResponse.Data.IAqi iAqi = geolocalizedFeedResponse.getData().getIaqi();
+		AqiCnGeolocalizedFeedResponse.Data.IAqi iAqi = aqiCnGeolocalizedFeedResponse.getData().getIaqi();
 		if (iAqi.getPm10() == null) {
 			addGridItem(null, R.string.pm10_str, R.drawable.pm10);
 		} else {
@@ -201,7 +200,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 		LayoutInflater layoutInflater = LayoutInflater.from(getContext());
 
-		List<AirQualityForecastObj> forecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(geolocalizedFeedResponse,
+		List<AirQualityForecastObj> forecastObjList = AqicnResponseProcessor.getAirQualityForecastObjList(aqiCnGeolocalizedFeedResponse,
 				zoneId);
 		final int textColor = AppTheme.getColor(getContext(), R.attr.textColorInWeatherCard);
 

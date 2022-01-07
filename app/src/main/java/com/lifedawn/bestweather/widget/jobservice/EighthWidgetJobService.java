@@ -8,7 +8,7 @@ import android.widget.RemoteViews;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
@@ -19,9 +19,7 @@ import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.creator.EighthWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.SeventhWidgetCreator;
 import com.lifedawn.bestweather.widget.widgetprovider.EighthWidgetProvider;
-import com.lifedawn.bestweather.widget.widgetprovider.SeventhWidgetProvider;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -54,21 +52,21 @@ public class EighthWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherSourceType> requestWeatherSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
 		EighthWidgetCreator widgetCreator = (EighthWidgetCreator) widgetViewCreator;
 		widgetCreator.setWidgetDto(widgetDto);
 		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
-		final WeatherSourceType mainWeatherSourceType = WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherSourceTypeSet);
+		final WeatherDataSourceType mainWeatherDataSourceType = WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherDataSourceTypeSet);
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
-				mainWeatherSourceType);
+				mainWeatherDataSourceType);
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
-				mainWeatherSourceType);
+				mainWeatherDataSourceType);
 		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleRestApiDownloader,
-				mainWeatherSourceType);
+				mainWeatherDataSourceType);
 		AirQualityDto airQualityDto = null;
 		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty() && !dailyForecastDtoList.isEmpty();
 
@@ -91,7 +89,7 @@ public class EighthWidgetJobService extends AbstractWidgetJobService {
 							widgetDto.setBitmap(bitmap);
 						}
 					});
-			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, requestWeatherDataTypeSet, requestWeatherSourceTypeSet, widgetDto, zoneOffset);
+			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, requestWeatherDataTypeSet, requestWeatherDataSourceTypeSet, widgetDto, zoneOffset);
 		}
 
 		widgetDto.setLoadSuccessful(successful);
@@ -108,6 +106,6 @@ public class EighthWidgetJobService extends AbstractWidgetJobService {
 		}
 		widgetCreator.updateSettings(widgetDto, null);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
+		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
 	}
 }

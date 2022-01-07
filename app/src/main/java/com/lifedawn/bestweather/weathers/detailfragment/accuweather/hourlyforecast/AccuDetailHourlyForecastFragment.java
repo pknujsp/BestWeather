@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailHourlyForecastFragment;
 
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class AccuDetailHourlyForecastFragment extends BaseDetailHourlyForecastFragment {
-	private List<TwelveHoursOfHourlyForecastsResponse.Item> hourlyItemList;
+	private List<AccuHourlyForecastsResponse.Item> hourlyItemList;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -32,7 +32,7 @@ public class AccuDetailHourlyForecastFragment extends BaseDetailHourlyForecastFr
 		binding.toolbar.fragmentTitle.setText(R.string.detail_hourly_forecast);
 	}
 
-	public void setHourlyItemList(List<TwelveHoursOfHourlyForecastsResponse.Item> hourlyItemList) {
+	public void setHourlyItemList(List<AccuHourlyForecastsResponse.Item> hourlyItemList) {
 		this.hourlyItemList = hourlyItemList;
 	}
 

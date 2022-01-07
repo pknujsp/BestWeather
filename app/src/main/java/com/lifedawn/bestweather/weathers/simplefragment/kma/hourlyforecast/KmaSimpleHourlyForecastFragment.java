@@ -16,8 +16,8 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
@@ -191,46 +191,46 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		tempRow.setLineColor(Color.WHITE);
 		tempRow.setCircleColor(Color.WHITE);
 
-		if (textSizeMap.containsKey(WeatherDataType.date)) {
-			dateRow.setTextSize(textSizeMap.get(WeatherDataType.date));
+		if (textSizeMap.containsKey(WeatherValueType.date)) {
+			dateRow.setTextSize(textSizeMap.get(WeatherValueType.date));
 		}
-		if (textSizeMap.containsKey(WeatherDataType.time)) {
-			hourRow.setValueTextSize(textSizeMap.get(WeatherDataType.time));
+		if (textSizeMap.containsKey(WeatherValueType.time)) {
+			hourRow.setValueTextSize(textSizeMap.get(WeatherValueType.time));
 		}
-		if (textSizeMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setTempTextSizeSp(textSizeMap.get(WeatherDataType.temp));
+		if (textSizeMap.containsKey(WeatherValueType.temp)) {
+			tempRow.setTempTextSizeSp(textSizeMap.get(WeatherValueType.temp));
 		} else {
 			tempRow.setTempTextSizeSp(16);
 		}
-		if (textSizeMap.containsKey(WeatherDataType.pop)) {
-			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
+		if (textSizeMap.containsKey(WeatherValueType.pop)) {
+			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherValueType.pop));
 		}
-		if (textSizeMap.containsKey(WeatherDataType.rainVolume)) {
-			rainVolumeRow.setValueTextSize(textSizeMap.get(WeatherDataType.rainVolume));
+		if (textSizeMap.containsKey(WeatherValueType.rainVolume)) {
+			rainVolumeRow.setValueTextSize(textSizeMap.get(WeatherValueType.rainVolume));
 		}
-		if (textSizeMap.containsKey(WeatherDataType.snowVolume)) {
-			snowVolumeRow.setValueTextSize(textSizeMap.get(WeatherDataType.snowVolume));
+		if (textSizeMap.containsKey(WeatherValueType.snowVolume)) {
+			snowVolumeRow.setValueTextSize(textSizeMap.get(WeatherValueType.snowVolume));
 		}
 
-		if (textColorMap.containsKey(WeatherDataType.date)) {
-			dateRow.setTextColor(textColorMap.get(WeatherDataType.date));
+		if (textColorMap.containsKey(WeatherValueType.date)) {
+			dateRow.setTextColor(textColorMap.get(WeatherValueType.date));
 		}
-		if (textColorMap.containsKey(WeatherDataType.time)) {
-			hourRow.setValueTextColor(textColorMap.get(WeatherDataType.time));
+		if (textColorMap.containsKey(WeatherValueType.time)) {
+			hourRow.setValueTextColor(textColorMap.get(WeatherValueType.time));
 		}
-		if (textColorMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setTextColor(textColorMap.get(WeatherDataType.temp));
+		if (textColorMap.containsKey(WeatherValueType.temp)) {
+			tempRow.setTextColor(textColorMap.get(WeatherValueType.temp));
 		} else {
 			tempRow.setTextColor(Color.WHITE);
 		}
-		if (textColorMap.containsKey(WeatherDataType.pop)) {
-			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherDataType.pop));
+		if (textColorMap.containsKey(WeatherValueType.pop)) {
+			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherValueType.pop));
 		}
-		if (textColorMap.containsKey(WeatherDataType.rainVolume)) {
-			rainVolumeRow.setTextColor(textColorMap.get(WeatherDataType.rainVolume));
+		if (textColorMap.containsKey(WeatherValueType.rainVolume)) {
+			rainVolumeRow.setTextColor(textColorMap.get(WeatherValueType.rainVolume));
 		}
-		if (textColorMap.containsKey(WeatherDataType.snowVolume)) {
-			snowVolumeRow.setTextColor(textColorMap.get(WeatherDataType.snowVolume));
+		if (textColorMap.containsKey(WeatherValueType.snowVolume)) {
+			snowVolumeRow.setTextColor(textColorMap.get(WeatherValueType.snowVolume));
 		}
 
 		LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -251,7 +251,7 @@ public class KmaSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 				tempRowHeight);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
-		createValueUnitsDescription(WeatherSourceType.KMA_WEB, haveRain, haveSnow);
+		createValueUnitsDescription(WeatherDataSourceType.KMA_WEB, haveRain, haveSnow);
 	}
 
 }

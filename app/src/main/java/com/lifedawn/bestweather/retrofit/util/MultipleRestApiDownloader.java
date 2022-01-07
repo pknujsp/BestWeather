@@ -6,7 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 
@@ -29,7 +29,7 @@ public abstract class MultipleRestApiDownloader {
 	private Map<String, String> valueMap = new HashMap<>();
 	private Map<RetrofitClient.ServiceType, Call<?>> callMap = new HashMap<>();
 
-	protected Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ArrayMap<>();
+	protected Map<WeatherDataSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ArrayMap<>();
 
 	public MultipleRestApiDownloader() {
 	}
@@ -38,7 +38,7 @@ public abstract class MultipleRestApiDownloader {
 		return callMap;
 	}
 
-	public Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> getResponseMap() {
+	public Map<WeatherDataSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> getResponseMap() {
 		return responseMap;
 	}
 
@@ -103,14 +103,14 @@ public abstract class MultipleRestApiDownloader {
 
 	}
 
-	public void processResult(WeatherSourceType weatherSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
+	public void processResult(WeatherDataSourceType weatherDataSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
 	                          Response<?> response, Object responseObj, String responseText) {
 		responseCount++;
 
-		if (!responseMap.containsKey(weatherSourceType)) {
-			responseMap.put(weatherSourceType, new ArrayMap<>());
+		if (!responseMap.containsKey(weatherDataSourceType)) {
+			responseMap.put(weatherDataSourceType, new ArrayMap<>());
 		}
-		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, response, responseObj, responseText));
+		responseMap.get(weatherDataSourceType).put(serviceType, new ResponseResult(requestParameter, response, responseObj, responseText));
 		Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 
 		if (requestCount == responseCount) {
@@ -118,14 +118,14 @@ public abstract class MultipleRestApiDownloader {
 		}
 	}
 
-	public void processResult(WeatherSourceType weatherSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType, Throwable t) {
+	public void processResult(WeatherDataSourceType weatherDataSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType, Throwable t) {
 		responseCount++;
 
-		if (!responseMap.containsKey(weatherSourceType)) {
-			responseMap.put(weatherSourceType, new ArrayMap<>());
+		if (!responseMap.containsKey(weatherDataSourceType)) {
+			responseMap.put(weatherDataSourceType, new ArrayMap<>());
 		}
 
-		responseMap.get(weatherSourceType).put(serviceType, new ResponseResult(requestParameter, t));
+		responseMap.get(weatherDataSourceType).put(serviceType, new ResponseResult(requestParameter, t));
 		Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 
 		if (requestCount == responseCount) {
@@ -133,8 +133,8 @@ public abstract class MultipleRestApiDownloader {
 		}
 	}
 
-	public RequestParameter getRequestParameter(WeatherSourceType weatherSourceType, RetrofitClient.ServiceType serviceType) {
-		return responseMap.get(weatherSourceType).get(serviceType).getRequestParameter();
+	public RequestParameter getRequestParameter(WeatherDataSourceType weatherDataSourceType, RetrofitClient.ServiceType serviceType) {
+		return responseMap.get(weatherDataSourceType).get(serviceType).getRequestParameter();
 	}
 
 	public static class ResponseResult {

@@ -7,10 +7,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.geopositionsearch.GeoPositionResponse;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.geopositionsearch.AccuGeoPositionResponse;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
@@ -88,24 +88,24 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		return pty == null ? PTY_ICON_MAP.get("Null") : PTY_ICON_MAP.get(pty);
 	}
 
-	public static GeoPositionResponse getGeoPositionObjFromJson(String response) {
-		return new Gson().fromJson(response, GeoPositionResponse.class);
+	public static AccuGeoPositionResponse getGeoPositionObjFromJson(String response) {
+		return new Gson().fromJson(response, AccuGeoPositionResponse.class);
 	}
 
-	public static CurrentConditionsResponse getCurrentConditionsObjFromJson(JsonElement jsonElement) {
-		CurrentConditionsResponse response = new CurrentConditionsResponse();
+	public static AccuCurrentConditionsResponse getCurrentConditionsObjFromJson(JsonElement jsonElement) {
+		AccuCurrentConditionsResponse response = new AccuCurrentConditionsResponse();
 		response.setItems(jsonElement);
 		return response;
 	}
 
-	public static TwelveHoursOfHourlyForecastsResponse getHourlyForecastObjFromJson(JsonElement jsonElement) {
-		TwelveHoursOfHourlyForecastsResponse response = new TwelveHoursOfHourlyForecastsResponse();
+	public static AccuHourlyForecastsResponse getHourlyForecastObjFromJson(JsonElement jsonElement) {
+		AccuHourlyForecastsResponse response = new AccuHourlyForecastsResponse();
 		response.setItems(jsonElement);
 		return response;
 	}
 
-	public static FiveDaysOfDailyForecastsResponse getDailyForecastObjFromJson(String response) {
-		return new Gson().fromJson(response, FiveDaysOfDailyForecastsResponse.class);
+	public static AccuDailyForecastsResponse getDailyForecastObjFromJson(String response) {
+		return new Gson().fromJson(response, AccuDailyForecastsResponse.class);
 	}
 
 	public static String getFlickrGalleryName(String code) {
@@ -128,7 +128,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoList(Context context,
-	                                                                List<TwelveHoursOfHourlyForecastsResponse.Item> hourlyForecastList,
+	                                                                List<AccuHourlyForecastsResponse.Item> hourlyForecastList,
 	                                                                ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
 		final String tempDegree = "°";
 		final String percent = "%";
@@ -156,7 +156,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		ZoneId zoneId = ZonedDateTime.parse(hourlyForecastList.get(0).getDateTime()).getZone();
 
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
-		for (TwelveHoursOfHourlyForecastsResponse.Item hourly : hourlyForecastList) {
+		for (AccuHourlyForecastsResponse.Item hourly : hourlyForecastList) {
 			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
 
 			if (!hourly.getRain().getValue().equals(zero)) {
@@ -222,7 +222,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 
 
 	public static List<DailyForecastDto> makeDailyForecastDtoList(Context context,
-	                                                              List<FiveDaysOfDailyForecastsResponse.DailyForecasts> dailyForecastList, ValueUnits windUnit, ValueUnits tempUnit) {
+	                                                              List<AccuDailyForecastsResponse.DailyForecasts> dailyForecastList, ValueUnits windUnit, ValueUnits tempUnit) {
 		final String tempDegree = context.getString(R.string.degree_symbol);
 		final String mm = "mm";
 		final String cm = "cm";
@@ -246,7 +246,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 
 		ZoneId zoneId = ZonedDateTime.parse(dailyForecastList.get(0).getDateTime()).getZone();
 
-		for (FiveDaysOfDailyForecastsResponse.DailyForecasts daily : dailyForecastList) {
+		for (AccuDailyForecastsResponse.DailyForecasts daily : dailyForecastList) {
 			DailyForecastDto dailyForecastDto = new DailyForecastDto();
 
 			dailyForecastDto.setDate(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, zoneId))
@@ -350,7 +350,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static CurrentConditionsDto makeCurrentConditionsDto(Context context,
-	                                                            CurrentConditionsResponse.Item item,
+	                                                            AccuCurrentConditionsResponse.Item item,
 	                                                            ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
 		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
 		final String percent = "%";

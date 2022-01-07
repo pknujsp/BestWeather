@@ -17,7 +17,7 @@ import androidx.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureViewForRemoteViews;
@@ -173,17 +173,17 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherSourceType weatherSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
+		WeatherDataSourceType weatherDataSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
-			weatherSourceType = WeatherSourceType.KMA_WEB;
+			weatherDataSourceType = WeatherDataSourceType.KMA_WEB;
 		}
 
 		RemoteViews remoteViews = createRemoteViews(false);
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.parseTextToDailyForecastDtoList(context, jsonObject,
-				weatherSourceType);
+				weatherDataSourceType);
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 				dailyForecastDtoList, null);

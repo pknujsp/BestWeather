@@ -1,11 +1,11 @@
 package com.lifedawn.bestweather.notification.model;
 
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 
 public class NotificationDataObj {
 	private LocationType locationType;
-	private WeatherSourceType weatherSourceType;
+	private WeatherDataSourceType weatherDataSourceType;
 	private boolean topPriorityKma;
 	private long updateIntervalMillis;
 	private int selectedAddressDtoId;
@@ -24,12 +24,12 @@ public class NotificationDataObj {
 		return this;
 	}
 
-	public WeatherSourceType getWeatherSourceType() {
-		return weatherSourceType;
+	public WeatherDataSourceType getWeatherSourceType() {
+		return weatherDataSourceType;
 	}
 
-	public NotificationDataObj setWeatherSourceType(WeatherSourceType weatherSourceType) {
-		this.weatherSourceType = weatherSourceType;
+	public NotificationDataObj setWeatherSourceType(WeatherDataSourceType weatherDataSourceType) {
+		this.weatherDataSourceType = weatherDataSourceType;
 		return this;
 	}
 

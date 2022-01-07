@@ -5,37 +5,24 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
-import android.text.StaticLayout;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
-
-import static android.view.View.MeasureSpec.EXACTLY;
 
 public abstract class AbstractDailyNotiViewCreator {
 	protected final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
@@ -84,7 +71,7 @@ public abstract class AbstractDailyNotiViewCreator {
 
 	public abstract Set<RequestWeatherDataType> getRequestWeatherDataTypeSet();
 
-	public abstract void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherSourceType> weatherSourceTypeSet,
+	public abstract void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherDataSourceType> weatherDataSourceTypeSet,
 	                                    @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                                    Set<RequestWeatherDataType> requestWeatherDataTypeSet);
 

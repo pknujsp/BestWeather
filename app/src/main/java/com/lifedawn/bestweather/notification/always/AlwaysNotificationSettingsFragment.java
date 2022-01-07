@@ -26,7 +26,7 @@ import android.widget.Toast;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentBaseNotificationSettingsBinding;
@@ -153,8 +153,8 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 			binding.commons.currentLocationRadio.setChecked(true);
 		}
 
-		WeatherSourceType defaultWeatherSourceType = alwaysNotiDataObj.getWeatherSourceType();
-		if (defaultWeatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
+		WeatherDataSourceType defaultWeatherDataSourceType = alwaysNotiDataObj.getWeatherSourceType();
+		if (defaultWeatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
 			binding.commons.owmRadio.setChecked(true);
 		} else {
 			binding.commons.accuWeatherRadio.setChecked(true);
@@ -203,8 +203,8 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
 
-				WeatherSourceType checked = checkedId == R.id.accu_weather_radio ? WeatherSourceType.ACCU_WEATHER
-						: WeatherSourceType.OPEN_WEATHER_MAP;
+				WeatherDataSourceType checked = checkedId == R.id.accu_weather_radio ? WeatherDataSourceType.ACCU_WEATHER
+						: WeatherDataSourceType.OWM_ONECALL;
 				onCheckedWeatherDataSource(checked);
 			}
 		});
@@ -339,9 +339,9 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 		}
 	}
 
-	public void onCheckedWeatherDataSource(WeatherSourceType weatherSourceType) {
+	public void onCheckedWeatherDataSource(WeatherDataSourceType weatherDataSourceType) {
 		if (!initializing) {
-			alwaysNotiDataObj.setWeatherSourceType(weatherSourceType);
+			alwaysNotiDataObj.setWeatherSourceType(weatherDataSourceType);
 			alwaysNotiViewCreator.savePreferences();
 
 			alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {

@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory;
 import androidx.room.TypeConverter;
 
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 
 import java.io.ByteArrayOutputStream;
@@ -34,16 +34,16 @@ public class RoomTypeConverter {
 	}
 
 	@TypeConverter
-	public String toString(Set<WeatherSourceType> weatherSourceTypeSet) {
-		if (weatherSourceTypeSet == null) {
+	public String toString(Set<WeatherDataSourceType> weatherDataSourceTypeSet) {
+		if (weatherDataSourceTypeSet == null) {
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
 		int i = 0;
 
-		for (WeatherSourceType type : weatherSourceTypeSet) {
+		for (WeatherDataSourceType type : weatherDataSourceTypeSet) {
 			stringBuilder.append(type.name());
-			if (++i < weatherSourceTypeSet.size()) {
+			if (++i < weatherDataSourceTypeSet.size()) {
 				stringBuilder.append(",");
 			}
 		}
@@ -52,28 +52,28 @@ public class RoomTypeConverter {
 	}
 
 	@TypeConverter
-	public Set<WeatherSourceType> toSet(String value) {
+	public Set<WeatherDataSourceType> toSet(String value) {
 		String[] types = value.split(",");
-		Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
+		Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
 		for (String type : types) {
-			weatherSourceTypeSet.add(WeatherSourceType.valueOf(type));
+			weatherDataSourceTypeSet.add(WeatherDataSourceType.valueOf(type));
 		}
-		return weatherSourceTypeSet;
+		return weatherDataSourceTypeSet;
 	}
 
 	@TypeConverter
-	public String toString(WeatherSourceType weatherSourceType) {
-		if (weatherSourceType != null) {
-			return weatherSourceType.name();
+	public String toString(WeatherDataSourceType weatherDataSourceType) {
+		if (weatherDataSourceType != null) {
+			return weatherDataSourceType.name();
 		} else {
 			return null;
 		}
 	}
 
 	@TypeConverter
-	public WeatherSourceType toWeatherSourceType(String weatherSourceType) {
+	public WeatherDataSourceType toWeatherSourceType(String weatherSourceType) {
 		if (weatherSourceType != null) {
-			return WeatherSourceType.valueOf(weatherSourceType);
+			return WeatherDataSourceType.valueOf(weatherSourceType);
 		} else {
 			return null;
 		}

@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.retrofit.responses.openweathermap;
+package com.lifedawn.bestweather.retrofit.responses.openweathermap.individual;
 
 import android.graphics.drawable.Drawable;
 

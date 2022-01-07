@@ -1,16 +1,15 @@
-package com.lifedawn.bestweather.retrofit.responses.openweathermap.dailyforecast;
+package com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Coord;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.FeelsLike;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Temp;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Weather;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast.HourlyForecastResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.Coord;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.FeelsLike;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.Temp;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.Weather;
 
 import java.util.List;
 
-public class DailyForecast {
+public class OwmDailyForecastResponse {
 	@Expose
 	@SerializedName("city")
 	private City city;
@@ -71,7 +70,7 @@ public class DailyForecast {
 		this.list = list;
 	}
 
-	public static class City {
+	protected static class City {
 		@Expose
 		@SerializedName("id")
 		private String id;
@@ -145,7 +144,7 @@ public class DailyForecast {
 		}
 	}
 
-	public static class Item {
+	protected static class Item {
 		@Expose
 		@SerializedName("dt")
 		private String dt;

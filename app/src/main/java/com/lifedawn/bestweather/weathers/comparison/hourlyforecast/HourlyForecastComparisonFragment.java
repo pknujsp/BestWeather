@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.ArrayMap;
-import android.util.ArraySet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,16 +20,15 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.twelvehoursofhourlyforecasts.TwelveHoursOfHourlyForecastsResponse;
+import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast.HourlyForecastResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.comparison.base.BaseForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
@@ -55,7 +53,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class HourlyForecastComparisonFragment extends BaseForecastComparisonFragment {
 	private MultipleRestApiDownloader multipleRestApiDownloader;
@@ -84,7 +81,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 	private void setValuesToViews(HourlyForecastResponse hourlyForecastResponse) {
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 
-		final List<WeatherSourceType> weatherSourceTypeList = new ArrayList<>();
+		final List<WeatherDataSourceType> weatherDataSourceTypeList = new ArrayList<>();
 
 		List<ForecastObj<HourlyForecastDto>> kmaFinalHourlyForecasts = null;
 		List<ForecastObj<HourlyForecastDto>> accuFinalHourlyForecasts = null;
@@ -98,7 +95,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				kmaFinalHourlyForecasts.add(new ForecastObj<>(finalHourlyForecast.getHours(), finalHourlyForecast));
 			}
 
-			weatherSourceTypeList.add(WeatherSourceType.KMA_WEB);
+			weatherDataSourceTypeList.add(WeatherDataSourceType.KMA_WEB);
 			binding.kma.setVisibility(View.VISIBLE);
 		} else {
 			binding.kma.setVisibility(View.GONE);
@@ -111,7 +108,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				accuFinalHourlyForecasts.add(new ForecastObj<>(finalHourlyForecast.getHours(), finalHourlyForecast));
 			}
 
-			weatherSourceTypeList.add(WeatherSourceType.ACCU_WEATHER);
+			weatherDataSourceTypeList.add(WeatherDataSourceType.ACCU_WEATHER);
 			binding.accu.setVisibility(View.VISIBLE);
 		} else {
 			binding.accu.setVisibility(View.GONE);
@@ -125,7 +122,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				owmFinalHourlyForecasts.add(new ForecastObj<>(finalHourlyForecast.getHours(), finalHourlyForecast));
 			}
 
-			weatherSourceTypeList.add(WeatherSourceType.OPEN_WEATHER_MAP);
+			weatherDataSourceTypeList.add(WeatherDataSourceType.OWM_ONECALL);
 			binding.owm.setVisibility(View.VISIBLE);
 		} else {
 			binding.owm.setVisibility(View.GONE);
@@ -188,11 +185,11 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		IconTextView[] probabilityOfPrecipitationRows = new IconTextView[columnsCount];
 		IconTextView[] snowVolumeRows = new IconTextView[columnsCount];
 
-		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
+		for (int i = 0; i < weatherDataSourceTypeList.size(); i++) {
 			int specificRowWidth = 0;
 			int beginColumnIndex = 0;
 
-			if (weatherSourceTypeList.get(i) == WeatherSourceType.KMA_WEB) {
+			if (weatherDataSourceTypeList.get(i) == WeatherDataSourceType.KMA_WEB) {
 				specificRowWidth = kmaFinalHourlyForecasts.size() * columnWidth;
 
 				for (int idx = 0; idx < dateTimeList.size(); idx++) {
@@ -201,7 +198,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 						break;
 					}
 				}
-			} else if (weatherSourceTypeList.get(i) == WeatherSourceType.ACCU_WEATHER) {
+			} else if (weatherDataSourceTypeList.get(i) == WeatherDataSourceType.ACCU_WEATHER) {
 				specificRowWidth = accuFinalHourlyForecasts.size() * columnWidth;
 
 				for (int idx = 0; idx < dateTimeList.size(); idx++) {
@@ -210,7 +207,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 						break;
 					}
 				}
-			} else if (weatherSourceTypeList.get(i) == WeatherSourceType.OPEN_WEATHER_MAP) {
+			} else if (weatherDataSourceTypeList.get(i) == WeatherDataSourceType.OWM_ONECALL) {
 				specificRowWidth = owmFinalHourlyForecasts.size() * columnWidth;
 
 				for (int idx = 0; idx < dateTimeList.size(); idx++) {
@@ -253,7 +250,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		//날씨,기온,강수량,강수확률
 		//kma, accu weather, owm 순서
 
-		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
+		for (int i = 0; i < weatherDataSourceTypeList.size(); i++) {
 			List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 			List<String> tempList = new ArrayList<>();
 			List<String> popList = new ArrayList<>();
@@ -262,7 +259,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			boolean haveSnow = false;
 			boolean haveRain = false;
 
-			if (weatherSourceTypeList.get(i) == WeatherSourceType.KMA_WEB) {
+			if (weatherDataSourceTypeList.get(i) == WeatherDataSourceType.KMA_WEB) {
 				for (ForecastObj<HourlyForecastDto> item : kmaFinalHourlyForecasts) {
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 							ContextCompat.getDrawable(context, item.e.getWeatherIcon()), item.e.getWeatherDescription()));
@@ -283,7 +280,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					snowVolumeList.add(item.e.getSnowVolume().replace(cm, ""));
 				}
 
-			} else if (weatherSourceTypeList.get(i) == WeatherSourceType.ACCU_WEATHER) {
+			} else if (weatherDataSourceTypeList.get(i) == WeatherDataSourceType.ACCU_WEATHER) {
 				for (ForecastObj<HourlyForecastDto> item : accuFinalHourlyForecasts) {
 					dateTimeList.add(item.e.getHours());
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
@@ -305,7 +302,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					snowVolumeList.add(item.e.getSnowVolume().replace(cm, ""));
 				}
 
-			} else if (weatherSourceTypeList.get(i) == WeatherSourceType.OPEN_WEATHER_MAP) {
+			} else if (weatherDataSourceTypeList.get(i) == WeatherDataSourceType.OWM_ONECALL) {
 				for (ForecastObj<HourlyForecastDto> item : owmFinalHourlyForecasts) {
 					dateTimeList.add(item.e.getHours());
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context, item.e.getWeatherIcon()),
@@ -329,7 +326,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			}
 
-			weatherSourceUnitObjList.add(new WeatherSourceUnitObj(weatherSourceTypeList.get(i), haveRain, haveSnow));
+			weatherSourceUnitObjList.add(new WeatherSourceUnitObj(weatherDataSourceTypeList.get(i), haveRain, haveSnow));
 
 			weatherIconRows[i].setWeatherImgs(weatherIconObjList);
 			tempRows[i].setValueList(tempList);
@@ -348,7 +345,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		binding.datetime.addView(dateRow, rowLayoutParams);
 		binding.datetime.addView(clockRow, rowLayoutParams);
 		LinearLayout view = null;
-		notScrolledViews = new NotScrolledView[weatherSourceTypeList.size()];
+		notScrolledViews = new NotScrolledView[weatherDataSourceTypeList.size()];
 
 		LinearLayout.LayoutParams nonScrollRowLayoutParams = new LinearLayout.LayoutParams(valueRowWidth,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -358,7 +355,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 		final int tempRowTopMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
 
-		for (int i = 0; i < weatherSourceTypeList.size(); i++) {
+		for (int i = 0; i < weatherDataSourceTypeList.size(); i++) {
 			LinearLayout.LayoutParams specificRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 					ViewGroup.LayoutParams.WRAP_CONTENT);
 			specificRowLayoutParams.leftMargin = columnWidth * (Integer) weatherIconRows[i].getTag(R.id.begin_column_index);
@@ -374,7 +371,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			String sourceName;
 			int logoId;
-			switch (weatherSourceTypeList.get(i)) {
+			switch (weatherDataSourceTypeList.get(i)) {
 				case KMA_WEB:
 					view = binding.kma;
 					sourceName = getString(R.string.kma);
@@ -409,10 +406,10 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 	}
 
 	private void loadForecasts() {
-		ArrayMap<WeatherSourceType, RequestWeatherSource> request = new ArrayMap<>();
+		ArrayMap<WeatherDataSourceType, RequestWeatherSource> request = new ArrayMap<>();
 
 		RequestAccu requestAccu = new RequestAccu();
-		requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_12_HOURLY);
+		requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
 
 		RequestOwm requestOwm = new RequestOwm();
 		requestOwm.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
@@ -423,13 +420,13 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		exclude.add(OneCallParameter.OneCallApis.daily);
 		requestOwm.setExcludeApis(exclude);
 
-		request.put(WeatherSourceType.ACCU_WEATHER, requestAccu);
-		request.put(WeatherSourceType.OPEN_WEATHER_MAP, requestOwm);
+		request.put(WeatherDataSourceType.ACCU_WEATHER, requestAccu);
+		request.put(WeatherDataSourceType.OWM_ONECALL, requestOwm);
 
 		if (countryCode.equals("KR")) {
 			RequestKma requestKma = new RequestKma();
-			requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_FORECASTS);
-			request.put(WeatherSourceType.KMA_WEB, requestKma);
+			requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
+			request.put(WeatherDataSourceType.KMA_WEB, requestKma);
 		}
 
 		AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
@@ -469,16 +466,16 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 	private void setTable(MultipleRestApiDownloader multipleRestApiDownloader, Double latitude, Double longitude,
 	                      AlertDialog dialog) {
-		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
+		Map<WeatherDataSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap;
 		HourlyForecastResponse hourlyForecastResponse = new HourlyForecastResponse();
 
 		//kma api
-		if (responseMap.containsKey(WeatherSourceType.KMA_API)) {
-			arrayMap = responseMap.get(WeatherSourceType.KMA_API);
+		if (responseMap.containsKey(WeatherDataSourceType.KMA_API)) {
+			arrayMap = responseMap.get(WeatherDataSourceType.KMA_API);
 			MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponse = Objects.requireNonNull(arrayMap).get(
-					RetrofitClient.ServiceType.ULTRA_SRT_FCST);
-			MultipleRestApiDownloader.ResponseResult vilageFcstResponse = arrayMap.get(RetrofitClient.ServiceType.VILAGE_FCST);
+					RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
+			MultipleRestApiDownloader.ResponseResult vilageFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
 
 			if (ultraSrtFcstResponse.isSuccessful() && vilageFcstResponse.isSuccessful()) {
 
@@ -500,9 +497,9 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		}
 
 		//kma web
-		if (responseMap.containsKey(WeatherSourceType.KMA_WEB)) {
-			arrayMap = responseMap.get(WeatherSourceType.KMA_WEB);
-			MultipleRestApiDownloader.ResponseResult forecastsResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_FORECASTS);
+		if (responseMap.containsKey(WeatherDataSourceType.KMA_WEB)) {
+			arrayMap = responseMap.get(WeatherDataSourceType.KMA_WEB);
+			MultipleRestApiDownloader.ResponseResult forecastsResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 
 			if (forecastsResponseResult.isSuccessful()) {
 				Object[] objects = (Object[]) forecastsResponseResult.getResponseObj();
@@ -518,14 +515,14 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 
 		//accu
-		if (responseMap.containsKey(WeatherSourceType.ACCU_WEATHER)) {
-			arrayMap = responseMap.get(WeatherSourceType.ACCU_WEATHER);
+		if (responseMap.containsKey(WeatherDataSourceType.ACCU_WEATHER)) {
+			arrayMap = responseMap.get(WeatherDataSourceType.ACCU_WEATHER);
 			MultipleRestApiDownloader.ResponseResult accuHourlyForecastResponse = arrayMap.get(
-					RetrofitClient.ServiceType.ACCU_12_HOURLY);
+					RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
 
 			if (accuHourlyForecastResponse.isSuccessful()) {
-				TwelveHoursOfHourlyForecastsResponse hourlyForecastsResponse =
-						(TwelveHoursOfHourlyForecastsResponse) accuHourlyForecastResponse.getResponseObj();
+				AccuHourlyForecastsResponse hourlyForecastsResponse =
+						(AccuHourlyForecastsResponse) accuHourlyForecastResponse.getResponseObj();
 
 				hourlyForecastResponse.accuSuccessful = true;
 				hourlyForecastResponse.accuHourlyForecastList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(),
@@ -535,14 +532,14 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			}
 		}
 		//owm
-		if (responseMap.containsKey(WeatherSourceType.OPEN_WEATHER_MAP)) {
-			arrayMap = responseMap.get(WeatherSourceType.OPEN_WEATHER_MAP);
+		if (responseMap.containsKey(WeatherDataSourceType.OWM_ONECALL)) {
+			arrayMap = responseMap.get(WeatherDataSourceType.OWM_ONECALL);
 			MultipleRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.owmSuccessful = true;
 				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(),
-						(OneCallResponse) responseResult.getResponseObj(), windUnit, tempUnit, visibilityUnit);
+						(OwmOneCallResponse) responseResult.getResponseObj(), windUnit, tempUnit, visibilityUnit);
 			} else {
 				hourlyForecastResponse.owmThrowable = responseResult.getT();
 			}

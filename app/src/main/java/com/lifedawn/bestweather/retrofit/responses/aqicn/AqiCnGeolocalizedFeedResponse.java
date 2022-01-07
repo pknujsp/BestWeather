@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class GeolocalizedFeedResponse {
+public class AqiCnGeolocalizedFeedResponse {
 	@Expose
 	@SerializedName("status")
 	private String status;

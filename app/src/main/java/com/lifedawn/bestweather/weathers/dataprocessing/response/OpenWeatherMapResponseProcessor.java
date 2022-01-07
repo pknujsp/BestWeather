@@ -7,10 +7,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.currentweather.CurrentWeatherResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.dailyforecast.DailyForecast;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast.HourlyForecastResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.currentweather.OwmCurrentConditionsResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
@@ -92,17 +92,17 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		}
 	}
 
-	public static CurrentWeatherResponse getCurrentWeatherObjFromJson(String response) {
-		return new Gson().fromJson(response, CurrentWeatherResponse.class);
+	public static OwmCurrentConditionsResponse getCurrentWeatherObjFromJson(String response) {
+		return new Gson().fromJson(response, OwmCurrentConditionsResponse.class);
 	}
 
-	public static HourlyForecastResponse getHourlyForecastObjFromJson(String response) {
-		return new Gson().fromJson(response, HourlyForecastResponse.class);
+	public static OwmHourlyForecastResponse getHourlyForecastObjFromJson(String response) {
+		return new Gson().fromJson(response, OwmHourlyForecastResponse.class);
 	}
 
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoList(Context context,
-	                                                                OneCallResponse oneCallResponse,
+	                                                                OwmOneCallResponse owmOneCallResponse,
 	                                                                ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
 		final String tempDegree = "°";
 		final String percent = "%";
@@ -120,10 +120,10 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		boolean hasRain;
 		boolean hasSnow;
 
-		ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
+		ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 
-		for (OneCallResponse.Hourly hourly : oneCallResponse.getHourly()) {
+		for (OwmOneCallResponse.Hourly hourly : owmOneCallResponse.getHourly()) {
 			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
 
 			if (hourly.getRain() == null) {
@@ -173,7 +173,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 
 	public static List<DailyForecastDto> makeDailyForecastDtoList(Context context,
-	                                                              OneCallResponse oneCallResponse,
+	                                                              OwmOneCallResponse owmOneCallResponse,
 	                                                              ValueUnits windUnit, ValueUnits tempUnit) {
 		final String tempDegree = "°";
 		final String mm = "mm";
@@ -188,14 +188,14 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 		//아침/낮/저녁/밤 기온(체감) 제외
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
-		ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
+		ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
 
 		String rainVolume;
 		String snowVolume;
 		boolean hasRain;
 		boolean hasSnow;
 
-		for (OneCallResponse.Daily daily : oneCallResponse.getDaily()) {
+		for (OwmOneCallResponse.Daily daily : owmOneCallResponse.getDaily()) {
 			DailyForecastDto dailyForecastDto = new DailyForecastDto();
 			dailyForecastDto.setSingle(true).setSingleValues(new DailyForecastDto.Values())
 					.setDate(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, zoneId))
@@ -245,14 +245,14 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 
 	public static CurrentConditionsDto makeCurrentConditionsDto(Context context,
-	                                                            OneCallResponse oneCallResponse,
+	                                                            OwmOneCallResponse owmOneCallResponse,
 	                                                            ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
 		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
 		final String percent = "%";
-		final ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(oneCallResponse);
+		final ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
 
 		CurrentConditionsDto currentConditionsDto = new CurrentConditionsDto();
-		OneCallResponse.Current item = oneCallResponse.getCurrent();
+		OwmOneCallResponse.Current item = owmOneCallResponse.getCurrent();
 
 		currentConditionsDto.setCurrentTime(WeatherResponseProcessor.convertDateTimeOfCurrentConditions(Long.parseLong(item.getDt()) * 1000L
 				, zoneId));
@@ -296,19 +296,19 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		return currentConditionsDto;
 	}
 
-	public static DailyForecast getDailyForecastObjFromJson(String response) {
-		return new Gson().fromJson(response, DailyForecast.class);
+	public static OwmDailyForecastResponse getDailyForecastObjFromJson(String response) {
+		return new Gson().fromJson(response, OwmDailyForecastResponse.class);
 	}
 
-	public static OneCallResponse getOneCallObjFromJson(String response) {
-		return new Gson().fromJson(response, OneCallResponse.class);
+	public static OwmOneCallResponse getOneCallObjFromJson(String response) {
+		return new Gson().fromJson(response, OwmOneCallResponse.class);
 	}
 
 	public static String getFlickrGalleryName(String code) {
 		return FLICKR_MAP.get(code);
 	}
 
-	public static ZoneId getZoneId(OneCallResponse oneCallResponse) {
-		return ZoneId.of(oneCallResponse.getTimezone());
+	public static ZoneId getZoneId(OwmOneCallResponse owmOneCallResponse) {
+		return ZoneId.of(owmOneCallResponse.getTimezone());
 	}
 }

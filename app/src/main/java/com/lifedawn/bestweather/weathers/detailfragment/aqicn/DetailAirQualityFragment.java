@@ -7,13 +7,11 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.util.ArrayMap;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -52,14 +50,13 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.databinding.FragmentAirQualityDetailBinding;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.retrofit.responses.aqicn.GeolocalizedFeedResponse;
+import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.AirQualityForecastObj;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.FragmentType;
-import com.lifedawn.bestweather.weathers.view.NotScrolledView;
 import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
@@ -68,14 +65,12 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class DetailAirQualityFragment extends Fragment implements IWeatherValues {
-	private GeolocalizedFeedResponse response;
+	private AqiCnGeolocalizedFeedResponse response;
 	private FragmentAirQualityDetailBinding binding;
 	private ValueUnits clockUnit;
 	private ZoneId zoneId;
@@ -88,7 +83,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	private int pm25LineColor;
 	private int o3LineColor;
 
-	public void setResponse(GeolocalizedFeedResponse response) {
+	public void setResponse(AqiCnGeolocalizedFeedResponse response) {
 		this.response = response;
 	}
 
@@ -157,7 +152,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 	@Override
 	public void setValuesToViews() {
-		final GeolocalizedFeedResponse.Data.IAqi iAqi = response.getData().getIaqi();
+		final AqiCnGeolocalizedFeedResponse.Data.IAqi iAqi = response.getData().getIaqi();
 		ExecutorService executorService = MyApplication.getExecutorService();
 		executorService.execute(new Runnable() {
 			@Override

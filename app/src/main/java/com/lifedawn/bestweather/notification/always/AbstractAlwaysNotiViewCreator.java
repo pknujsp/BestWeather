@@ -21,13 +21,12 @@ import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
-import com.lifedawn.bestweather.notification.always.AlwaysNotificationReceiver;
 import com.lifedawn.bestweather.notification.model.NotificationDataObj;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
@@ -132,20 +131,20 @@ public abstract class AbstractAlwaysNotiViewCreator {
 		makeNotification(remoteViews, R.drawable.temp_icon, false);
 
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
-		WeatherSourceType weatherDataSourceType = notificationDataObj.getWeatherSourceType();
+		WeatherDataSourceType weatherDataSourceType = notificationDataObj.getWeatherSourceType();
 
 		if (notificationDataObj.isTopPriorityKma() && notificationDataObj.getCountryCode().equals("KR")) {
-			weatherDataSourceType = WeatherSourceType.KMA_WEB;
+			weatherDataSourceType = WeatherDataSourceType.KMA_WEB;
 		}
 
-		final Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
-		weatherSourceTypeSet.add(weatherDataSourceType);
+		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
+		weatherDataSourceTypeSet.add(weatherDataSourceType);
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
-			weatherSourceTypeSet.add(WeatherSourceType.AQICN);
+			weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
 		}
 
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
-		WeatherSourceType finalWeatherDataSourceType = weatherDataSourceType;
+		WeatherDataSourceType finalWeatherDataSourceType = weatherDataSourceType;
 		WeatherRequestUtil.loadWeatherData(context, executorService, notificationDataObj.getCountryCode(),
 				notificationDataObj.getLatitude(), notificationDataObj.getLongitude(), requestWeatherDataTypeSet,
 				new MultipleRestApiDownloader() {
@@ -158,7 +157,7 @@ public abstract class AbstractAlwaysNotiViewCreator {
 					public void onCanceled() {
 
 					}
-				}, weatherSourceTypeSet);
+				}, weatherDataSourceTypeSet);
 
 
 	}
@@ -179,7 +178,7 @@ public abstract class AbstractAlwaysNotiViewCreator {
 	abstract protected Set<RequestWeatherDataType> getRequestWeatherDataTypeSet();
 
 	abstract protected void setResultViews(Context context, RemoteViews remoteViews,
-	                                       WeatherSourceType requestWeatherSourceType, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
+	                                       WeatherDataSourceType requestWeatherDataSourceType, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                                       Set<RequestWeatherDataType> requestWeatherDataTypeSet);
 
 	abstract protected void makeNotification(RemoteViews remoteViews, int icon, boolean isFinished);

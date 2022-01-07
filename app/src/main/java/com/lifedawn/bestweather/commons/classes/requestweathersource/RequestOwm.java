@@ -1,8 +1,7 @@
 package com.lifedawn.bestweather.commons.classes.requestweathersource;
 
-import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
+import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class RequestOwm extends RequestWeatherSource {

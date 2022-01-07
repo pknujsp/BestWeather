@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts.FiveDaysOfDailyForecastsResponse;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailDailyForecastFragment;
 
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class AccuDetailDailyForecastFragment extends BaseDetailDailyForecastFragment {
-	private List<FiveDaysOfDailyForecastsResponse.DailyForecasts> dailyForecastsList;
+	private List<AccuDailyForecastsResponse.DailyForecasts> dailyForecastsList;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -32,7 +32,7 @@ public class AccuDetailDailyForecastFragment extends BaseDetailDailyForecastFrag
 		binding.toolbar.fragmentTitle.setText(R.string.detail_daily_forecast);
 	}
 
-	public AccuDetailDailyForecastFragment setDailyForecastsList(List<FiveDaysOfDailyForecastsResponse.DailyForecasts> dailyForecastsList) {
+	public AccuDetailDailyForecastFragment setDailyForecastsList(List<AccuDailyForecastsResponse.DailyForecasts> dailyForecastsList) {
 		this.dailyForecastsList = dailyForecastsList;
 		return this;
 	}

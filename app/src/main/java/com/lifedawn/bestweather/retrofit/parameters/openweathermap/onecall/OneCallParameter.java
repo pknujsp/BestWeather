@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.retrofit.parameters.openweathermap;
+package com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall;
 
 import android.util.ArrayMap;
 
@@ -35,7 +35,7 @@ public class OneCallParameter extends RequestParameter {
 			}
 		}
 
-		map.put("appid", RetrofitClient.OWM_API_KEY);
+		map.put("appid", RetrofitClient.OWM_ONECALL_API_KEY);
 
 		return map;
 	}

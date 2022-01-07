@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
@@ -17,7 +17,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentCo
 import org.jetbrains.annotations.NotNull;
 
 public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
-	private CurrentConditionsResponse currentConditionsResponse;
+	private AccuCurrentConditionsResponse accuCurrentConditionsResponse;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -30,8 +30,8 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 		setValuesToViews();
 	}
 
-	public AccuDetailCurrentConditionsFragment setCurrentConditionsResponse(CurrentConditionsResponse currentConditionsResponse) {
-		this.currentConditionsResponse = currentConditionsResponse;
+	public AccuDetailCurrentConditionsFragment setCurrentConditionsResponse(AccuCurrentConditionsResponse accuCurrentConditionsResponse) {
+		this.accuCurrentConditionsResponse = accuCurrentConditionsResponse;
 		return this;
 	}
 
@@ -39,7 +39,7 @@ public class AccuDetailCurrentConditionsFragment extends BaseDetailCurrentCondit
 	public void setValuesToViews() {
 		//날씨 아이콘, 기온, 체감기온, 습도, 이슬점, 풍향, 풍속, 돌풍, 바람세기, 기압, 자외선, 시정거리,
 		//운량, 강수량, 강수형태
-		CurrentConditionsResponse.Item item = currentConditionsResponse.getItems().get(0);
+		AccuCurrentConditionsResponse.Item item = accuCurrentConditionsResponse.getItems().get(0);
 		String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
 		String percent = ValueUnits.convertToStr(getContext(), ValueUnits.percent);
 

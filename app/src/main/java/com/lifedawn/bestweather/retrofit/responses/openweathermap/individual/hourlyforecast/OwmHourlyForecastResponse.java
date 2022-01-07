@@ -1,14 +1,13 @@
-package com.lifedawn.bestweather.retrofit.responses.openweathermap.hourlyforecast;
+package com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Coord;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Weather;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.currentweather.CurrentWeatherResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.Coord;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.Weather;
 
 import java.util.List;
 
-public class HourlyForecastResponse {
+public class OwmHourlyForecastResponse {
 	@Expose
 	@SerializedName("cod")
 	private String cod;
@@ -69,7 +68,7 @@ public class HourlyForecastResponse {
 		this.city = city;
 	}
 
-	public static class Item {
+	protected static class Item {
 
 		@Expose
 		@SerializedName("visibility")
@@ -180,7 +179,7 @@ public class HourlyForecastResponse {
 		}
 
 
-		public static class Main {
+		protected static class Main {
 			@Expose
 			@SerializedName("temp")
 			private String temp;
@@ -290,7 +289,7 @@ public class HourlyForecastResponse {
 			}
 		}
 
-		public static class Wind {
+		protected static class Wind {
 			@Expose
 			@SerializedName("speed")
 			private String speed;
@@ -329,7 +328,7 @@ public class HourlyForecastResponse {
 			}
 		}
 
-		public static class Clouds {
+		protected static class Clouds {
 			@Expose
 			@SerializedName("all")
 			private String all;
@@ -343,7 +342,7 @@ public class HourlyForecastResponse {
 			}
 		}
 
-		public static class Sys {
+		protected static class Sys {
 			@Expose
 			@SerializedName("pod")
 			private String pod;
@@ -358,7 +357,7 @@ public class HourlyForecastResponse {
 		}
 	}
 
-	public static class City {
+	protected static class City {
 		@Expose
 		@SerializedName("id")
 		private String id;

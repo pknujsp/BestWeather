@@ -25,7 +25,7 @@ import com.google.android.material.timepicker.TimeFormat;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentDailyPushNotificationSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
@@ -38,7 +38,6 @@ import com.lifedawn.bestweather.notification.daily.viewcreator.FirstDailyNotific
 import com.lifedawn.bestweather.notification.daily.viewcreator.FourthDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.SecondDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.ThirdDailyNotificationViewCreator;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Weather;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -70,7 +69,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 	private boolean isKr;
 	private boolean useMultipleWeatherDataSource = false;
 
-	private WeatherSourceType mainWeatherSourceType;
+	private WeatherDataSourceType mainWeatherDataSourceType;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -78,7 +77,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 
 		dailyNotiHelper = new DailyNotiHelper(getActivity().getApplicationContext());
 		repository = new DailyPushNotificationRepository(getContext());
-		mainWeatherSourceType = WeatherRequestUtil.getMainWeatherSourceType(getContext(), null);
+		mainWeatherDataSourceType = WeatherRequestUtil.getMainWeatherSourceType(getContext(), null);
 
 		Locale locale = null;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -95,7 +94,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			newNotificationDto = new DailyPushNotificationDto();
 			newNotificationDto.setEnabled(true);
 			newNotificationDto.setAlarmClock(LocalTime.of(8, 0).toString());
-			newNotificationDto.addWeatherSourceType(mainWeatherSourceType);
+			newNotificationDto.addWeatherSourceType(mainWeatherDataSourceType);
 			newNotificationDto.setNotificationType(DailyPushNotificationType.First);
 
 			editingNotificationDto = newNotificationDto;
@@ -176,13 +175,13 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			public void onClick(View v) {
 				if (editingNotificationDto.getNotificationType() == DailyPushNotificationType.Fourth
 						|| editingNotificationDto.getNotificationType() == DailyPushNotificationType.Fifth) {
-					Set<WeatherSourceType> weatherSourceTypeSet = new HashSet<>();
-					weatherSourceTypeSet.add(WeatherSourceType.AQICN);
-					editingNotificationDto.setWeatherSourceTypeSet(weatherSourceTypeSet);
+					Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
+					weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
+					editingNotificationDto.setWeatherSourceTypeSet(weatherDataSourceTypeSet);
 				} else if (editingNotificationDto.getNotificationType() == DailyPushNotificationType.Second) {
-					editingNotificationDto.addWeatherSourceType(WeatherSourceType.AQICN);
+					editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.AQICN);
 				} else {
-					editingNotificationDto.removeWeatherSourceType(WeatherSourceType.AQICN);
+					editingNotificationDto.removeWeatherSourceType(WeatherDataSourceType.AQICN);
 				}
 
 				if (newNotificationSession) {
@@ -253,13 +252,13 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		LocalTime localTime = LocalTime.parse(editingNotificationDto.getAlarmClock());
 		binding.hours.setText(localTime.format(hoursFormatter));
 
-		Set<WeatherSourceType> weatherSourceTypeSet = editingNotificationDto.getWeatherSourceTypeSet();
-		if (weatherSourceTypeSet.contains(WeatherSourceType.OPEN_WEATHER_MAP)) {
+		Set<WeatherDataSourceType> weatherDataSourceTypeSet = editingNotificationDto.getWeatherSourceTypeSet();
+		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_ONECALL)) {
 			binding.commons.owmRadio.setChecked(true);
-		} else if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
+		} else if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.ACCU_WEATHER)) {
 			binding.commons.accuWeatherRadio.setChecked(true);
 		} else {
-			if (mainWeatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+			if (mainWeatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) {
 				binding.commons.accuWeatherRadio.setChecked(true);
 			} else {
 				binding.commons.owmRadio.setChecked(true);
@@ -334,10 +333,10 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				WeatherSourceType checked = checkedId == R.id.accu_weather_radio ? WeatherSourceType.ACCU_WEATHER
-						: WeatherSourceType.OPEN_WEATHER_MAP;
-				WeatherSourceType unChecked = checkedId == R.id.accu_weather_radio ? WeatherSourceType.OPEN_WEATHER_MAP
-						: WeatherSourceType.ACCU_WEATHER;
+				WeatherDataSourceType checked = checkedId == R.id.accu_weather_radio ? WeatherDataSourceType.ACCU_WEATHER
+						: WeatherDataSourceType.OWM_ONECALL;
+				WeatherDataSourceType unChecked = checkedId == R.id.accu_weather_radio ? WeatherDataSourceType.OWM_ONECALL
+						: WeatherDataSourceType.ACCU_WEATHER;
 				editingNotificationDto.addWeatherSourceType(checked);
 				editingNotificationDto.removeWeatherSourceType(unChecked);
 			}

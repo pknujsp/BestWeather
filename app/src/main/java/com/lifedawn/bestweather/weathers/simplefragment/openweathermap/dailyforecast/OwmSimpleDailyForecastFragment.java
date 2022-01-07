@@ -16,9 +16,9 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.commons.enums.WeatherValueType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
-	private OneCallResponse oneCallResponse;
+	private OwmOneCallResponse owmOneCallResponse;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			@Override
 			public void onClick(View view) {
 				OwmDetailDailyForecastFragment detailDailyForecastFragment = new OwmDetailDailyForecastFragment();
-				detailDailyForecastFragment.setOneCallResponse(oneCallResponse);
+				detailDailyForecastFragment.setOneCallResponse(owmOneCallResponse);
 
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
@@ -90,8 +90,8 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		setValuesToViews();
 	}
 
-	public OwmSimpleDailyForecastFragment setOneCallResponse(OneCallResponse oneCallResponse) {
-		this.oneCallResponse = oneCallResponse;
+	public OwmSimpleDailyForecastFragment setOneCallResponse(OwmOneCallResponse owmOneCallResponse) {
+		this.owmOneCallResponse = owmOneCallResponse;
 		return this;
 	}
 
@@ -104,7 +104,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
 
-		List<OneCallResponse.Daily> items = oneCallResponse.getDaily();
+		List<OwmOneCallResponse.Daily> items = owmOneCallResponse.getDaily();
 
 		final int COLUMN_COUNT = items.size();
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyOwm);
@@ -136,7 +136,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		boolean haveSnow = false;
 		boolean haveRain = false;
 
-		List<DailyForecastDto> dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), oneCallResponse,
+		List<DailyForecastDto> dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), owmOneCallResponse,
 				windUnit, tempUnit);
 
 		for (DailyForecastDto item : dailyForecastDtoList) {
@@ -180,36 +180,36 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		dateRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
 
-		if (textSizeMap.containsKey(WeatherDataType.date)) {
-			dateRow.setValueTextSize(textSizeMap.get(WeatherDataType.date));
+		if (textSizeMap.containsKey(WeatherValueType.date)) {
+			dateRow.setValueTextSize(textSizeMap.get(WeatherValueType.date));
 		}
-		if (textSizeMap.containsKey(WeatherDataType.pop)) {
-			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
+		if (textSizeMap.containsKey(WeatherValueType.pop)) {
+			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherValueType.pop));
 		}
-		if (textSizeMap.containsKey(WeatherDataType.rainVolume)) {
-			rainVolumeRow.setValueTextSize(textSizeMap.get(WeatherDataType.rainVolume));
+		if (textSizeMap.containsKey(WeatherValueType.rainVolume)) {
+			rainVolumeRow.setValueTextSize(textSizeMap.get(WeatherValueType.rainVolume));
 		}
-		if (textSizeMap.containsKey(WeatherDataType.snowVolume)) {
-			snowVolumeRow.setValueTextSize(textSizeMap.get(WeatherDataType.snowVolume));
+		if (textSizeMap.containsKey(WeatherValueType.snowVolume)) {
+			snowVolumeRow.setValueTextSize(textSizeMap.get(WeatherValueType.snowVolume));
 		}
-		if (textSizeMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setTempTextSize(textSizeMap.get(WeatherDataType.temp));
+		if (textSizeMap.containsKey(WeatherValueType.temp)) {
+			tempRow.setTempTextSize(textSizeMap.get(WeatherValueType.temp));
 		}
 
-		if (textColorMap.containsKey(WeatherDataType.date)) {
-			dateRow.setValueTextColor(textColorMap.get(WeatherDataType.date));
+		if (textColorMap.containsKey(WeatherValueType.date)) {
+			dateRow.setValueTextColor(textColorMap.get(WeatherValueType.date));
 		}
-		if (textColorMap.containsKey(WeatherDataType.pop)) {
-			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherDataType.pop));
+		if (textColorMap.containsKey(WeatherValueType.pop)) {
+			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherValueType.pop));
 		}
-		if (textColorMap.containsKey(WeatherDataType.rainVolume)) {
-			rainVolumeRow.setTextColor(textColorMap.get(WeatherDataType.rainVolume));
+		if (textColorMap.containsKey(WeatherValueType.rainVolume)) {
+			rainVolumeRow.setTextColor(textColorMap.get(WeatherValueType.rainVolume));
 		}
-		if (textColorMap.containsKey(WeatherDataType.snowVolume)) {
-			snowVolumeRow.setTextColor(textColorMap.get(WeatherDataType.snowVolume));
+		if (textColorMap.containsKey(WeatherValueType.snowVolume)) {
+			snowVolumeRow.setTextColor(textColorMap.get(WeatherValueType.snowVolume));
 		}
-		if (textColorMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setTextColor(textColorMap.get(WeatherDataType.temp));
+		if (textColorMap.containsKey(WeatherValueType.temp)) {
+			tempRow.setTextColor(textColorMap.get(WeatherValueType.temp));
 		}
 
 		binding.forecastView.addView(dateRow, dateRowLayoutParams);
@@ -225,7 +225,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
-		createValueUnitsDescription(WeatherSourceType.OPEN_WEATHER_MAP, haveRain, haveSnow);
+		createValueUnitsDescription(WeatherDataSourceType.OWM_ONECALL, haveRain, haveSnow);
 
 	}
 

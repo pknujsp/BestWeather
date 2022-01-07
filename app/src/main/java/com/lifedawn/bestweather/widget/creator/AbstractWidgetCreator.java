@@ -21,7 +21,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -83,7 +83,7 @@ public abstract class AbstractWidgetCreator {
 		widgetDto.setLocationType(LocationType.CurrentLocation);
 		widgetDto.addWeatherSourceType(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context.getString(R.string.pref_key_accu_weather),
 				false)
-				? WeatherSourceType.ACCU_WEATHER : WeatherSourceType.OPEN_WEATHER_MAP);
+				? WeatherDataSourceType.ACCU_WEATHER : WeatherDataSourceType.OWM_ONECALL);
 		widgetDto.setTextSizeAmount(0);
 		widgetDto.setTopPriorityKma(false);
 		widgetDto.setUpdateIntervalMillis(0);
@@ -195,7 +195,7 @@ public abstract class AbstractWidgetCreator {
 	}
 
 	public void makeResponseTextToJson(MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet,
-	                                   Set<WeatherSourceType> weatherSourceTypeSet, WidgetDto widgetDto, ZoneOffset zoneOffset) {
+	                                   Set<WeatherDataSourceType> weatherDataSourceTypeSet, WidgetDto widgetDto, ZoneOffset zoneOffset) {
 		//json형태로 저장
 		/*
 		examples :
@@ -212,80 +212,80 @@ public abstract class AbstractWidgetCreator {
 		}
 
 		 */
-		Map<WeatherSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> arrayMap =
+		Map<WeatherDataSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> arrayMap =
 				multipleRestApiDownloader.getResponseMap();
 
 		final JsonObject rootJsonObject = new JsonObject();
 		String text = null;
 
 		//owm이면 onecall이므로 한번만 수행
-		for (WeatherSourceType weatherSourceType : weatherSourceTypeSet) {
+		for (WeatherDataSourceType weatherDataSourceType : weatherDataSourceTypeSet) {
 			ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> requestWeatherSourceArr =
-					arrayMap.get(weatherSourceType);
+					arrayMap.get(weatherDataSourceType);
 
-			if (weatherSourceType == WeatherSourceType.OPEN_WEATHER_MAP) {
+			if (weatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
 				JsonObject owmJsonObject = new JsonObject();
 
 				text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponseText();
 				owmJsonObject.addProperty(RetrofitClient.ServiceType.OWM_ONE_CALL.name(), text);
-				rootJsonObject.add(weatherSourceType.name(), owmJsonObject);
+				rootJsonObject.add(weatherDataSourceType.name(), owmJsonObject);
 
-			} else if (weatherSourceType == WeatherSourceType.KMA_API) {
+			} else if (weatherDataSourceType == WeatherDataSourceType.KMA_API) {
 				JsonObject kmaJsonObject = new JsonObject();
 
 				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ULTRA_SRT_NCST).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.ULTRA_SRT_NCST.name(), text);
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST).getResponseText();
+					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST.name(), text);
 
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name(), text);
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).getResponseText();
+					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name(), text);
 				}
 				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
-					if (!kmaJsonObject.has(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name())) {
-						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponseText();
-						kmaJsonObject.addProperty(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name(), text);
+					if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name())) {
+						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).getResponseText();
+						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name(), text);
 					}
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.VILAGE_FCST).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.VILAGE_FCST.name(), text);
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST).getResponseText();
+					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name(), text);
 				}
 				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.MID_TA_FCST).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.MID_TA_FCST.name(), text);
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_MID_TA_FCST).getResponseText();
+					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_MID_TA_FCST.name(), text);
 
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.MID_LAND_FCST).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.MID_LAND_FCST.name(), text);
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_MID_LAND_FCST).getResponseText();
+					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_MID_LAND_FCST.name(), text);
 
-					if (!kmaJsonObject.has(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name())) {
-						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ULTRA_SRT_FCST).getResponseText();
-						kmaJsonObject.addProperty(RetrofitClient.ServiceType.ULTRA_SRT_FCST.name(), text);
+					if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name())) {
+						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).getResponseText();
+						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name(), text);
 					}
-					if (!kmaJsonObject.has(RetrofitClient.ServiceType.VILAGE_FCST.name())) {
-						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.VILAGE_FCST).getResponseText();
-						kmaJsonObject.addProperty(RetrofitClient.ServiceType.VILAGE_FCST.name(), text);
+					if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name())) {
+						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST).getResponseText();
+						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name(), text);
 					}
 					long tmFc = Long.parseLong(multipleRestApiDownloader.get("tmFc"));
 					kmaJsonObject.addProperty("tmFc", tmFc);
 				}
-				rootJsonObject.add(weatherSourceType.name(), kmaJsonObject);
+				rootJsonObject.add(weatherDataSourceType.name(), kmaJsonObject);
 
-			} else if (weatherSourceType == WeatherSourceType.KMA_WEB) {
+			} else if (weatherDataSourceType == WeatherDataSourceType.KMA_WEB) {
 				JsonObject kmaJsonObject = new JsonObject();
 
 				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS.name(), text);
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_FORECASTS).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_FORECASTS.name(), text);
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS).getResponseText();
+					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS.name(), text);
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS).getResponseText();
+					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_WEB_FORECASTS.name(), text);
 				}
-				if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_FORECASTS.name())) {
+				if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_WEB_FORECASTS.name())) {
 					if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast) || requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_FORECASTS).getResponseText();
-						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_FORECASTS.name(), text);
+						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS).getResponseText();
+						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_WEB_FORECASTS.name(), text);
 					}
 				}
-				rootJsonObject.add(weatherSourceType.name(), kmaJsonObject);
+				rootJsonObject.add(weatherDataSourceType.name(), kmaJsonObject);
 
-			} else if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+			} else if (weatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) {
 				JsonObject accuJsonObject = new JsonObject();
 
 				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
@@ -293,24 +293,24 @@ public abstract class AbstractWidgetCreator {
 					accuJsonObject.addProperty(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS.name(), text);
 				}
 				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ACCU_12_HOURLY).getResponseText();
-					accuJsonObject.addProperty(RetrofitClient.ServiceType.ACCU_12_HOURLY.name(), text);
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST).getResponseText();
+					accuJsonObject.addProperty(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST.name(), text);
 				}
 				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY).getResponseText();
-					accuJsonObject.addProperty(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY.name(), text);
+					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST).getResponseText();
+					accuJsonObject.addProperty(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST.name(), text);
 				}
-				rootJsonObject.add(weatherSourceType.name(), accuJsonObject);
+				rootJsonObject.add(weatherDataSourceType.name(), accuJsonObject);
 
-			} else if (weatherSourceType == WeatherSourceType.AQICN) {
+			} else if (weatherDataSourceType == WeatherDataSourceType.AQICN) {
 				JsonObject aqiCnJsonObject = new JsonObject();
 
 				if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
-					text = arrayMap.get(WeatherSourceType.AQICN).get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED).getResponseText();
+					text = arrayMap.get(WeatherDataSourceType.AQICN).get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED).getResponseText();
 					aqiCnJsonObject.addProperty(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name(), text);
 				}
 
-				rootJsonObject.add(weatherSourceType.name(), aqiCnJsonObject);
+				rootJsonObject.add(weatherDataSourceType.name(), aqiCnJsonObject);
 			}
 		}
 

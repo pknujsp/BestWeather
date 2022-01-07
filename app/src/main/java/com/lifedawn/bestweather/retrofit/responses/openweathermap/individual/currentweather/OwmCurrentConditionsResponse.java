@@ -1,13 +1,13 @@
-package com.lifedawn.bestweather.retrofit.responses.openweathermap.currentweather;
+package com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.currentweather;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Coord;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Weather;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.Coord;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.Weather;
 
 import java.util.List;
 
-public class CurrentWeatherResponse {
+public class OwmCurrentConditionsResponse {
 
 	@Expose
 	@SerializedName("base")
@@ -61,8 +61,7 @@ public class CurrentWeatherResponse {
 	@SerializedName("sys")
 	private Sys sys;
 
-
-	public static class Main {
+	protected static class Main {
 		@Expose
 		@SerializedName("temp")
 		private String temp;
@@ -136,7 +135,7 @@ public class CurrentWeatherResponse {
 		}
 	}
 
-	public static class Wind {
+	protected static class Wind {
 		@Expose
 		@SerializedName("speed")
 		private String speed;
@@ -162,7 +161,7 @@ public class CurrentWeatherResponse {
 		}
 	}
 
-	public static class Clouds {
+	protected static class Clouds {
 		@Expose
 		@SerializedName("all")
 		private String all;
@@ -176,7 +175,7 @@ public class CurrentWeatherResponse {
 		}
 	}
 
-	public static class Sys {
+	protected static class Sys {
 		@Expose
 		@SerializedName("type")
 		private String type;

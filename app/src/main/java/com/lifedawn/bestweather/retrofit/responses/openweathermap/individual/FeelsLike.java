@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.retrofit.responses.openweathermap;
+package com.lifedawn.bestweather.retrofit.responses.openweathermap.individual;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

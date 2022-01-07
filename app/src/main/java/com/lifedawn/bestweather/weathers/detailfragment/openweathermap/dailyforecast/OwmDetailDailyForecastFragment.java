@@ -10,16 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailDailyForecastFragment;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 public class OwmDetailDailyForecastFragment extends BaseDetailDailyForecastFragment {
-	private OneCallResponse oneCallResponse;
+	private OwmOneCallResponse owmOneCallResponse;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -33,8 +31,8 @@ public class OwmDetailDailyForecastFragment extends BaseDetailDailyForecastFragm
 	}
 
 
-	public OwmDetailDailyForecastFragment setOneCallResponse(OneCallResponse oneCallResponse) {
-		this.oneCallResponse = oneCallResponse;
+	public OwmDetailDailyForecastFragment setOneCallResponse(OwmOneCallResponse owmOneCallResponse) {
+		this.owmOneCallResponse = owmOneCallResponse;
 		return this;
 	}
 
@@ -43,7 +41,7 @@ public class OwmDetailDailyForecastFragment extends BaseDetailDailyForecastFragm
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), oneCallResponse, windUnit, tempUnit);
+				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoList(getContext(), owmOneCallResponse, windUnit, tempUnit);
 
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {

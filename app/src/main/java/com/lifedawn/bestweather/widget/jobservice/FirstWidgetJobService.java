@@ -2,26 +2,19 @@ package com.lifedawn.bestweather.widget.jobservice;
 
 import android.annotation.SuppressLint;
 import android.app.job.JobParameters;
-import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.Message;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 
-import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
-import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
-import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
-import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.FirstWidgetCreator;
 import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
 
@@ -57,15 +50,15 @@ public class FirstWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherSourceType> requestWeatherSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
 		FirstWidgetCreator widgetCreator = (FirstWidgetCreator) widgetViewCreator;
 		widgetCreator.setWidgetDto(widgetDto);
 
-		final WeatherSourceType weatherSourceType = WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherSourceTypeSet);
+		final WeatherDataSourceType weatherDataSourceType = WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherDataSourceTypeSet);
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
-				weatherSourceType);
+				weatherDataSourceType);
 		AirQualityDto airQualityDto = null;
 		boolean successful = currentConditionsDto != null;
 
@@ -87,7 +80,7 @@ public class FirstWidgetJobService extends AbstractWidgetJobService {
 			widgetCreator.setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto,
 					currentConditionsDto, null);
 
-			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, requestWeatherDataTypeSet, requestWeatherSourceTypeSet, widgetDto, zoneOffset);
+			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, requestWeatherDataTypeSet, requestWeatherDataSourceTypeSet, widgetDto, zoneOffset);
 		}
 
 		widgetDto.setLoadSuccessful(successful);
@@ -105,6 +98,6 @@ public class FirstWidgetJobService extends AbstractWidgetJobService {
 
 		widgetCreator.updateSettings(widgetDto, null);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
+		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
 	}
 }

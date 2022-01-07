@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaDailyForecast;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
@@ -177,24 +177,24 @@ public class KmaSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		dateRowLayoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
 
-		if (textSizeMap.containsKey(WeatherDataType.date)) {
-			dateRow.setValueTextSize(textSizeMap.get(WeatherDataType.date));
+		if (textSizeMap.containsKey(WeatherValueType.date)) {
+			dateRow.setValueTextSize(textSizeMap.get(WeatherValueType.date));
 		}
-		if (textSizeMap.containsKey(WeatherDataType.pop)) {
-			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherDataType.pop));
+		if (textSizeMap.containsKey(WeatherValueType.pop)) {
+			probabilityOfPrecipitationRow.setValueTextSize(textSizeMap.get(WeatherValueType.pop));
 		}
-		if (textSizeMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setTempTextSize(textSizeMap.get(WeatherDataType.temp));
+		if (textSizeMap.containsKey(WeatherValueType.temp)) {
+			tempRow.setTempTextSize(textSizeMap.get(WeatherValueType.temp));
 		}
 
-		if (textColorMap.containsKey(WeatherDataType.date)) {
-			dateRow.setValueTextColor(textColorMap.get(WeatherDataType.date));
+		if (textColorMap.containsKey(WeatherValueType.date)) {
+			dateRow.setValueTextColor(textColorMap.get(WeatherValueType.date));
 		}
-		if (textColorMap.containsKey(WeatherDataType.pop)) {
-			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherDataType.pop));
+		if (textColorMap.containsKey(WeatherValueType.pop)) {
+			probabilityOfPrecipitationRow.setTextColor(textColorMap.get(WeatherValueType.pop));
 		}
-		if (textColorMap.containsKey(WeatherDataType.temp)) {
-			tempRow.setTextColor(textColorMap.get(WeatherDataType.temp));
+		if (textColorMap.containsKey(WeatherValueType.temp)) {
+			tempRow.setTextColor(textColorMap.get(WeatherValueType.temp));
 		}
 
 		binding.forecastView.addView(dateRow, dateRowLayoutParams);

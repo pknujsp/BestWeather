@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.ArrayMap;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
@@ -15,9 +14,9 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.parameters.openweathermap.OneCallParameter;
+import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
@@ -32,9 +31,9 @@ import java.util.concurrent.ExecutorService;
 public class WeatherRequestUtil {
 	public static void loadWeatherData(Context context, ExecutorService executorService, String countryCode, Double latitude, Double longitude,
 	                                   Set<RequestWeatherDataType> requestWeatherDataTypeSet,
-	                                   MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherSourceType> weatherSourceTypeSet) {
-		final ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
-		setRequestWeatherSourceWithSourceType(weatherSourceTypeSet, requestWeatherSources, requestWeatherDataTypeSet);
+	                                   MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataSourceType> weatherDataSourceTypeSet) {
+		final ArrayMap<WeatherDataSourceType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
+		setRequestWeatherSourceWithSourceType(weatherDataSourceTypeSet, requestWeatherSources, requestWeatherDataTypeSet);
 
 		executorService.execute(new Runnable() {
 			@Override
@@ -44,15 +43,15 @@ public class WeatherRequestUtil {
 		});
 	}
 
-	public static void initWeatherSourceUniqueValues(WeatherSourceType weatherSourceType, boolean aqi, Context context) {
-		switch (weatherSourceType) {
+	public static void initWeatherSourceUniqueValues(WeatherDataSourceType weatherDataSourceType, boolean aqi, Context context) {
+		switch (weatherDataSourceType) {
 			case KMA_WEB:
 				KmaResponseProcessor.init(context);
 				break;
 			case ACCU_WEATHER:
 				AccuWeatherResponseProcessor.init(context);
 				break;
-			case OPEN_WEATHER_MAP:
+			case OWM_ONECALL:
 				OpenWeatherMapResponseProcessor.init(context);
 				break;
 		}
@@ -61,53 +60,53 @@ public class WeatherRequestUtil {
 		}
 	}
 
-	public static void setRequestWeatherSourceWithSourceType(Set<WeatherSourceType> weatherSourceTypeSet,
-	                                                         ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	public static void setRequestWeatherSourceWithSourceType(Set<WeatherDataSourceType> weatherDataSourceTypeSet,
+	                                                         ArrayMap<WeatherDataSourceType, RequestWeatherSource> requestWeatherSources,
 	                                                         Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
-		if (weatherSourceTypeSet.contains(WeatherSourceType.KMA_API)) {
+		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.KMA_API)) {
 			RequestKma requestKma = new RequestKma();
-			requestWeatherSources.put(WeatherSourceType.KMA_API, requestKma);
+			requestWeatherSources.put(WeatherDataSourceType.KMA_API, requestKma);
 
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
-				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_NCST);
-				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST);
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
 			}
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
-				requestKma.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST).addRequestServiceType(RetrofitClient.ServiceType.VILAGE_FCST);
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).addRequestServiceType(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
 			}
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-				requestKma.addRequestServiceType(RetrofitClient.ServiceType.MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.MID_TA_FCST)
-						.addRequestServiceType(RetrofitClient.ServiceType.ULTRA_SRT_FCST).addRequestServiceType(RetrofitClient.ServiceType.VILAGE_FCST);
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.KMA_MID_TA_FCST)
+						.addRequestServiceType(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).addRequestServiceType(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
 			}
-		} else if (weatherSourceTypeSet.contains(WeatherSourceType.KMA_WEB)) {
+		} else if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.KMA_WEB)) {
 			RequestKma requestKma = new RequestKma();
-			requestWeatherSources.put(WeatherSourceType.KMA_WEB, requestKma);
+			requestWeatherSources.put(WeatherDataSourceType.KMA_WEB, requestKma);
 
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
-				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_CURRENT_CONDITIONS);
-				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_FORECASTS);
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS);
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 			}
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast) || requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_FORECASTS);
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 			}
 		}
 
-		if (weatherSourceTypeSet.contains(WeatherSourceType.ACCU_WEATHER)) {
+		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.ACCU_WEATHER)) {
 			RequestAccu requestAccu = new RequestAccu();
-			requestWeatherSources.put(WeatherSourceType.ACCU_WEATHER, requestAccu);
+			requestWeatherSources.put(WeatherDataSourceType.ACCU_WEATHER, requestAccu);
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.currentConditions)) {
 				requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS);
 			}
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.hourlyForecast)) {
-				requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_12_HOURLY);
+				requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
 			}
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.dailyForecast)) {
-				requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_5_DAYS_OF_DAILY);
+				requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST);
 			}
 		}
-		if (weatherSourceTypeSet.contains(WeatherSourceType.OPEN_WEATHER_MAP)) {
+		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_ONECALL)) {
 			RequestOwm requestOwm = new RequestOwm();
-			requestWeatherSources.put(WeatherSourceType.OPEN_WEATHER_MAP, requestOwm);
+			requestWeatherSources.put(WeatherDataSourceType.OWM_ONECALL, requestOwm);
 
 			Set<OneCallParameter.OneCallApis> excludeSet = new HashSet<>();
 			excludeSet.add(OneCallParameter.OneCallApis.daily);
@@ -127,9 +126,9 @@ public class WeatherRequestUtil {
 			requestOwm.setExcludeApis(excludeSet);
 			requestOwm.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
 		}
-		if (weatherSourceTypeSet.contains(WeatherSourceType.AQICN)) {
+		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.AQICN)) {
 			RequestAqicn requestAqicn = new RequestAqicn();
-			requestWeatherSources.put(WeatherSourceType.AQICN, requestAqicn);
+			requestWeatherSources.put(WeatherDataSourceType.AQICN, requestAqicn);
 
 			if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
 				requestAqicn.addRequestServiceType(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
@@ -137,26 +136,26 @@ public class WeatherRequestUtil {
 		}
 	}
 
-	public static WeatherSourceType getMainWeatherSourceType(Context context, @Nullable String countryCode) {
+	public static WeatherDataSourceType getMainWeatherSourceType(Context context, @Nullable String countryCode) {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		WeatherSourceType mainWeatherSourceType = null;
+		WeatherDataSourceType mainWeatherDataSourceType = null;
 
 		if (sharedPreferences.getBoolean(context.getString(R.string.pref_key_accu_weather), true)) {
-			mainWeatherSourceType = WeatherSourceType.ACCU_WEATHER;
+			mainWeatherDataSourceType = WeatherDataSourceType.ACCU_WEATHER;
 		} else {
-			mainWeatherSourceType = WeatherSourceType.OPEN_WEATHER_MAP;
+			mainWeatherDataSourceType = WeatherDataSourceType.OWM_ONECALL;
 		}
 
 		if (countryCode != null) {
 			if (countryCode.equals("KR")) {
 				boolean kmaIsTopPriority = sharedPreferences.getBoolean(context.getString(R.string.pref_key_kma_top_priority), true);
 				if (kmaIsTopPriority) {
-					mainWeatherSourceType = WeatherSourceType.KMA_WEB;
+					mainWeatherDataSourceType = WeatherDataSourceType.KMA_WEB;
 				}
 			}
 		}
 
-		return mainWeatherSourceType;
+		return mainWeatherDataSourceType;
 	}
 
 }

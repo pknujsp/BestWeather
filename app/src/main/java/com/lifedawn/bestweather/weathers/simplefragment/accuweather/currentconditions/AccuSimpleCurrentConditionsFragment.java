@@ -4,28 +4,22 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.CurrentConditionsResponse;
+import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 
 public class AccuSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
-	protected CurrentConditionsResponse currentConditionsResponse;
+	protected AccuCurrentConditionsResponse accuCurrentConditionsResponse;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -43,8 +37,8 @@ public class AccuSimpleCurrentConditionsFragment extends BaseSimpleCurrentCondit
 		setValuesToViews();
 	}
 
-	public AccuSimpleCurrentConditionsFragment setCurrentConditionsResponse(CurrentConditionsResponse currentConditionsResponse) {
-		this.currentConditionsResponse = currentConditionsResponse;
+	public AccuSimpleCurrentConditionsFragment setCurrentConditionsResponse(AccuCurrentConditionsResponse accuCurrentConditionsResponse) {
+		this.accuCurrentConditionsResponse = accuCurrentConditionsResponse;
 		return this;
 	}
 
@@ -52,7 +46,7 @@ public class AccuSimpleCurrentConditionsFragment extends BaseSimpleCurrentCondit
 	public void setValuesToViews() {
 		super.setValuesToViews();
 
-		CurrentConditionsDto currentConditionsDto = AccuWeatherResponseProcessor.makeCurrentConditionsDto(getContext(), currentConditionsResponse.getItems().get(0), windUnit,
+		CurrentConditionsDto currentConditionsDto = AccuWeatherResponseProcessor.makeCurrentConditionsDto(getContext(), accuCurrentConditionsResponse.getItems().get(0), windUnit,
 				tempUnit, visibilityUnit);
 
 		String precipitation = null;

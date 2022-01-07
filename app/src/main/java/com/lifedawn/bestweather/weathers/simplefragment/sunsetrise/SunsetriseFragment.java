@@ -18,7 +18,7 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.databinding.FragmentSunsetriseBinding;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.sunsetrise.DetailSunRiseSetFragment;
@@ -28,7 +28,6 @@ import com.luckycatlabs.sunrisesunset.dto.Location;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
-import java.util.TimeZone;
 
 public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	private FragmentSunsetriseBinding binding;
@@ -38,7 +37,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	private Double longitude;
 	private String addressName;
 	private String countryCode;
-	private WeatherSourceType mainWeatherSourceType;
+	private WeatherDataSourceType mainWeatherDataSourceType;
 	private ZoneId zoneId;
 
 	public enum SunSetRiseType {
@@ -54,7 +53,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
-		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(
+		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
 				BundleKey.WeatherDataSource.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 

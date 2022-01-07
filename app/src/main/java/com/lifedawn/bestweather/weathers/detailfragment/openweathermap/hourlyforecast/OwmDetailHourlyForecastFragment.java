@@ -10,16 +10,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OneCallResponse;
+import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailHourlyForecastFragment;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 public class OwmDetailHourlyForecastFragment extends BaseDetailHourlyForecastFragment {
-	private OneCallResponse oneCallResponse;
+	private OwmOneCallResponse owmOneCallResponse;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -32,8 +30,8 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailHourlyForecastFra
 		binding.toolbar.fragmentTitle.setText(R.string.detail_hourly_forecast);
 	}
 
-	public OwmDetailHourlyForecastFragment setOneCallResponse(OneCallResponse oneCallResponse) {
-		this.oneCallResponse = oneCallResponse;
+	public OwmDetailHourlyForecastFragment setOneCallResponse(OwmOneCallResponse owmOneCallResponse) {
+		this.owmOneCallResponse = owmOneCallResponse;
 		return this;
 	}
 
@@ -213,7 +211,7 @@ public class OwmDetailHourlyForecastFragment extends BaseDetailHourlyForecastFra
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(), oneCallResponse,
+				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoList(getContext(), owmOneCallResponse,
 						windUnit, tempUnit, visibilityUnit);
 
 				if (getActivity() != null) {

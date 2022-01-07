@@ -23,10 +23,9 @@ import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.Weather;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.NotScrolledView;
@@ -35,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Set;
 
 public class BaseForecastComparisonFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutForecastComparisonBinding binding;
@@ -50,7 +48,7 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 	protected Double longitude;
 	protected String addressName;
 	protected String countryCode;
-	protected WeatherSourceType mainWeatherSourceType;
+	protected WeatherDataSourceType mainWeatherDataSourceType;
 	protected ZoneId zoneId;
 
 	protected NotScrolledView[] notScrolledViews;
@@ -71,7 +69,7 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
-		mainWeatherSourceType = (WeatherSourceType) bundle.getSerializable(
+		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
 				BundleKey.WeatherDataSource.name());
 	}
 
@@ -129,12 +127,12 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 				String snowUnit = null;
 				String weatherSourceTypeName = null;
 
-				switch (weatherSourceTypeObj.weatherSourceType) {
+				switch (weatherSourceTypeObj.weatherDataSourceType) {
 					case ACCU_WEATHER:
 						weatherSourceTypeName = getString(R.string.accu_weather);
 						snowUnit = "cm";
 						break;
-					case OPEN_WEATHER_MAP:
+					case OWM_ONECALL:
 						weatherSourceTypeName = getString(R.string.owm);
 						snowUnit = "mm";
 						break;
@@ -181,12 +179,12 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 	}
 
 	protected static class WeatherSourceUnitObj {
-		final WeatherSourceType weatherSourceType;
+		final WeatherDataSourceType weatherDataSourceType;
 		final boolean haveRain;
 		final boolean haveSnow;
 
-		public WeatherSourceUnitObj(WeatherSourceType weatherSourceType, boolean haveRain, boolean haveSnow) {
-			this.weatherSourceType = weatherSourceType;
+		public WeatherSourceUnitObj(WeatherDataSourceType weatherDataSourceType, boolean haveRain, boolean haveSnow) {
+			this.weatherDataSourceType = weatherDataSourceType;
 			this.haveRain = haveRain;
 			this.haveSnow = haveSnow;
 		}

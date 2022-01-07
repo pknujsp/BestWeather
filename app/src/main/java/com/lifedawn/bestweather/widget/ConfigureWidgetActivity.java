@@ -37,7 +37,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.ActivityConfigureWidgetBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
@@ -392,22 +392,22 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		}
 
 		//기본 날씨 제공사 확인
-		WeatherSourceType weatherSourceType = null;
+		WeatherDataSourceType weatherDataSourceType = null;
 
 		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.pref_key_accu_weather), true)) {
-			weatherSourceType = WeatherSourceType.ACCU_WEATHER;
+			weatherDataSourceType = WeatherDataSourceType.ACCU_WEATHER;
 		} else {
-			weatherSourceType = WeatherSourceType.OPEN_WEATHER_MAP;
+			weatherDataSourceType = WeatherDataSourceType.OWM_ONECALL;
 		}
 
 		if (!useMultipleWeatherDataSource) {
 			binding.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 				@Override
 				public void onCheckedChanged(RadioGroup group, int checkedId) {
-					WeatherSourceType newType = checkedId == 0 ? WeatherSourceType.ACCU_WEATHER
-							: WeatherSourceType.OPEN_WEATHER_MAP;
-					WeatherSourceType previousType = checkedId == 1 ? WeatherSourceType.ACCU_WEATHER
-							: WeatherSourceType.OPEN_WEATHER_MAP;
+					WeatherDataSourceType newType = checkedId == 0 ? WeatherDataSourceType.ACCU_WEATHER
+							: WeatherDataSourceType.OWM_ONECALL;
+					WeatherDataSourceType previousType = checkedId == 1 ? WeatherDataSourceType.ACCU_WEATHER
+							: WeatherDataSourceType.OWM_ONECALL;
 
 					widgetDto.removeWeatherSourceType(previousType);
 					widgetDto.addWeatherSourceType(newType);
@@ -421,7 +421,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 				}
 			});
 
-			if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+			if (weatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) {
 				binding.accuWeatherRadio.setChecked(true);
 			} else {
 				binding.owmRadio.setChecked(true);
@@ -432,9 +432,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					if (isChecked) {
-						widgetDto.addWeatherSourceType(WeatherSourceType.ACCU_WEATHER);
+						widgetDto.addWeatherSourceType(WeatherDataSourceType.ACCU_WEATHER);
 					} else {
-						widgetDto.removeWeatherSourceType(WeatherSourceType.ACCU_WEATHER);
+						widgetDto.removeWeatherSourceType(WeatherDataSourceType.ACCU_WEATHER);
 					}
 				}
 			});
@@ -442,9 +442,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					if (isChecked) {
-						widgetDto.addWeatherSourceType(WeatherSourceType.OPEN_WEATHER_MAP);
+						widgetDto.addWeatherSourceType(WeatherDataSourceType.OWM_ONECALL);
 					} else {
-						widgetDto.removeWeatherSourceType(WeatherSourceType.OPEN_WEATHER_MAP);
+						widgetDto.removeWeatherSourceType(WeatherDataSourceType.OWM_ONECALL);
 					}
 				}
 			});
@@ -452,14 +452,14 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					if (isChecked) {
-						widgetDto.addWeatherSourceType(WeatherSourceType.KMA_WEB);
+						widgetDto.addWeatherSourceType(WeatherDataSourceType.KMA_WEB);
 					} else {
-						widgetDto.removeWeatherSourceType(WeatherSourceType.KMA_WEB);
+						widgetDto.removeWeatherSourceType(WeatherDataSourceType.KMA_WEB);
 					}
 				}
 			});
 
-			if (weatherSourceType == WeatherSourceType.ACCU_WEATHER) {
+			if (weatherDataSourceType == WeatherDataSourceType.ACCU_WEATHER) {
 				binding.accuWeatherChk.setChecked(true);
 			} else {
 				binding.owmChk.setChecked(true);

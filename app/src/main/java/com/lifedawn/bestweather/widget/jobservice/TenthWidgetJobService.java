@@ -8,17 +8,14 @@ import android.widget.RemoteViews;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
-import com.lifedawn.bestweather.widget.creator.NinthWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.TenthWidgetCreator;
-import com.lifedawn.bestweather.widget.widgetprovider.NinthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.TenthWidgetProvider;
 
 import java.time.ZoneId;
@@ -49,7 +46,7 @@ public class TenthWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherSourceType> requestWeatherSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
 		TenthWidgetCreator widgetCreator = (TenthWidgetCreator) widgetViewCreator;
@@ -57,7 +54,7 @@ public class TenthWidgetJobService extends AbstractWidgetJobService {
 		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
 		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleRestApiDownloader,
-				WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherSourceTypeSet));
+				WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherDataSourceTypeSet));
 		final boolean successful = !dailyForecastDtoList.isEmpty();
 
 		if (successful) {
@@ -71,7 +68,7 @@ public class TenthWidgetJobService extends AbstractWidgetJobService {
 							widgetDto.setBitmap(bitmap);
 						}
 					});
-			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, requestWeatherDataTypeSet, requestWeatherSourceTypeSet, widgetDto, zoneOffset);
+			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, requestWeatherDataTypeSet, requestWeatherDataSourceTypeSet, widgetDto, zoneOffset);
 		}
 
 		widgetDto.setLoadSuccessful(successful);
@@ -88,6 +85,6 @@ public class TenthWidgetJobService extends AbstractWidgetJobService {
 		}
 		widgetCreator.updateSettings(widgetDto, null);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
+		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
 	}
 }

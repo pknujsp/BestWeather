@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.retrofit.responses.accuweather.fivedaysofdailyforecasts;
+package com.lifedawn.bestweather.retrofit.responses.accuweather.dailyforecasts;
 
 import android.graphics.drawable.Drawable;
 
@@ -6,12 +6,10 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.Direction;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.ValueUnit;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.Wind;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.WindGust;
 
 import java.util.List;
 
-public class FiveDaysOfDailyForecastsResponse {
+public class AccuDailyForecastsResponse {
 	@Expose
 	@SerializedName("Headline")
 	private Headline headline;

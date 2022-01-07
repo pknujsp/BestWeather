@@ -17,7 +17,7 @@ import com.lifedawn.bestweather.retrofit.responses.accuweather.WindGust;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrentConditionsResponse {
+public class AccuCurrentConditionsResponse {
 	
 	private List<Item> items;
 	

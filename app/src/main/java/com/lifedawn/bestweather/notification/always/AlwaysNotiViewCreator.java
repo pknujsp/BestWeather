@@ -17,7 +17,7 @@ import androidx.preference.PreferenceManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
 
@@ -86,14 +86,14 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 	}
 
 	@Override
-	protected void setResultViews(Context context, RemoteViews remoteViews, WeatherSourceType requestWeatherSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	protected void setResultViews(Context context, RemoteViews remoteViews, WeatherDataSourceType requestWeatherDataSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
 		setHeaderViews(remoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		int icon = R.drawable.temp_icon;
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
-				requestWeatherSourceType);
+				requestWeatherDataSourceType);
 		if (currentConditionsDto != null) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
@@ -102,7 +102,7 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 		}
 
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
-				requestWeatherSourceType);
+				requestWeatherDataSourceType);
 		if (!hourlyForecastDtoList.isEmpty()) {
 			setHourlyForecastViews(remoteViews, hourlyForecastDtoList);
 		}
@@ -287,8 +287,8 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 
 		notificationDataObj = new AlwaysNotiDataObj();
 		notificationDataObj.setLocationType(LocationType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), LocationType.CurrentLocation.name())));
-		notificationDataObj.setWeatherSourceType(WeatherSourceType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
-				WeatherSourceType.OPEN_WEATHER_MAP.name())));
+		notificationDataObj.setWeatherSourceType(WeatherDataSourceType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
+				WeatherDataSourceType.OWM_ONECALL.name())));
 		notificationDataObj.setTopPriorityKma(notiPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false));
 		notificationDataObj.setUpdateIntervalMillis(notiPreferences.getLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L));
 		notificationDataObj.setSelectedAddressDtoId(notiPreferences.getInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0));
@@ -303,7 +303,7 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 	public void loadDefaultPreferences() {
 		notificationDataObj = new AlwaysNotiDataObj();
 		notificationDataObj.setLocationType(LocationType.CurrentLocation);
-		notificationDataObj.setWeatherSourceType(WeatherSourceType.OPEN_WEATHER_MAP);
+		notificationDataObj.setWeatherSourceType(WeatherDataSourceType.OWM_ONECALL);
 		notificationDataObj.setTopPriorityKma(false);
 		notificationDataObj.setUpdateIntervalMillis(0);
 		notificationDataObj.setSelectedAddressDtoId(0);

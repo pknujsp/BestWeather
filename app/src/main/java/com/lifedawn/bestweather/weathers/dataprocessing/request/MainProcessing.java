@@ -7,7 +7,7 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwm;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
-import com.lifedawn.bestweather.commons.enums.WeatherSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 
@@ -16,35 +16,35 @@ import java.util.Set;
 public class MainProcessing {
 
 	public static MultipleRestApiDownloader requestNewWeatherData(Context context, Double latitude, Double longitude,
-	                                                              ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	                                                              ArrayMap<WeatherDataSourceType, RequestWeatherSource> requestWeatherSources,
 	                                                              MultipleRestApiDownloader multipleRestApiDownloader) {
 		int totalRequestCount = 0;
 		for (RequestWeatherSource requestWeatherSource : requestWeatherSources.values()) {
 			totalRequestCount += requestWeatherSource.getRequestServiceTypes().size();
 		}
 
-		if (requestWeatherSources.containsKey(WeatherSourceType.ACCU_WEATHER)) {
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.ACCU_WEATHER)) {
 			//요청 좌표의 locationKey가 저장되어 있는지 확인
 			if (AccuWeatherProcessing.getLocationKey(context, latitude, longitude).isEmpty()) {
 				++totalRequestCount;
-				requestWeatherSources.get(WeatherSourceType.ACCU_WEATHER).addRequestServiceType(RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH);
+				requestWeatherSources.get(WeatherDataSourceType.ACCU_WEATHER).addRequestServiceType(RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH);
 			}
 		}
 
 		multipleRestApiDownloader.setRequestCount(totalRequestCount);
 
-		if (requestWeatherSources.containsKey(WeatherSourceType.ACCU_WEATHER)) {
-			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherSourceType.ACCU_WEATHER), multipleRestApiDownloader);
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.ACCU_WEATHER)) {
+			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherDataSourceType.ACCU_WEATHER), multipleRestApiDownloader);
 		}
-		if (requestWeatherSources.containsKey(WeatherSourceType.KMA_WEB)) {
-			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherSourceType.KMA_WEB),
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.KMA_WEB)) {
+			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherDataSourceType.KMA_WEB),
 					multipleRestApiDownloader);
 		}
-		if (requestWeatherSources.containsKey(WeatherSourceType.OPEN_WEATHER_MAP)) {
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.OWM_ONECALL)) {
 			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,
-					(RequestOwm) requestWeatherSources.get(WeatherSourceType.OPEN_WEATHER_MAP), multipleRestApiDownloader);
+					(RequestOwm) requestWeatherSources.get(WeatherDataSourceType.OWM_ONECALL), multipleRestApiDownloader);
 		}
-		if (requestWeatherSources.containsKey(WeatherSourceType.AQICN)) {
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.AQICN)) {
 			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader);
 		}
 
@@ -52,7 +52,7 @@ public class MainProcessing {
 	}
 
 	public static MultipleRestApiDownloader reRequestWeatherDataBySameWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
-	                                                                                        ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	                                                                                        ArrayMap<WeatherDataSourceType, RequestWeatherSource> requestWeatherSources,
 	                                                                                        MultipleRestApiDownloader multipleRestApiDownloader) {
 		//실패한 데이터는 모두 삭제(aqicn 제외)
 		Set<RetrofitClient.ServiceType> failedRequestServiceTypes = requestWeatherSources.valueAt(0).getRequestServiceTypes();
@@ -72,21 +72,21 @@ public class MainProcessing {
 
 		multipleRestApiDownloader.setResponseCount(totalResponseCount);
 
-		if (requestWeatherSources.containsKey(WeatherSourceType.ACCU_WEATHER)) {
-			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherSourceType.ACCU_WEATHER), multipleRestApiDownloader);
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.ACCU_WEATHER)) {
+			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherDataSourceType.ACCU_WEATHER), multipleRestApiDownloader);
 		}
-		if (requestWeatherSources.containsKey(WeatherSourceType.KMA_WEB)) {
-			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherSourceType.KMA_WEB), multipleRestApiDownloader);
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.KMA_WEB)) {
+			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherDataSourceType.KMA_WEB), multipleRestApiDownloader);
 		}
-		if (requestWeatherSources.containsKey(WeatherSourceType.OPEN_WEATHER_MAP)) {
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.OWM_ONECALL)) {
 			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,
-					(RequestOwm) requestWeatherSources.get(WeatherSourceType.OPEN_WEATHER_MAP), multipleRestApiDownloader);
+					(RequestOwm) requestWeatherSources.get(WeatherDataSourceType.OWM_ONECALL), multipleRestApiDownloader);
 		}
 		return multipleRestApiDownloader;
 	}
 
 	public static MultipleRestApiDownloader reRequestWeatherDataByAnotherWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
-	                                                                                           ArrayMap<WeatherSourceType, RequestWeatherSource> requestWeatherSources,
+	                                                                                           ArrayMap<WeatherDataSourceType, RequestWeatherSource> requestWeatherSources,
 	                                                                                           MultipleRestApiDownloader multipleRestApiDownloader) {
 		multipleRestApiDownloader.getResponseMap().clear();
 		multipleRestApiDownloader.setResponseCount(0);
@@ -99,17 +99,17 @@ public class MainProcessing {
 
 		multipleRestApiDownloader.setRequestCount(totalRequestCount);
 
-		if (requestWeatherSources.containsKey(WeatherSourceType.ACCU_WEATHER)) {
-			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherSourceType.ACCU_WEATHER), multipleRestApiDownloader);
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.ACCU_WEATHER)) {
+			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherDataSourceType.ACCU_WEATHER), multipleRestApiDownloader);
 		}
-		if (requestWeatherSources.containsKey(WeatherSourceType.KMA_WEB)) {
-			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherSourceType.KMA_WEB), multipleRestApiDownloader);
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.KMA_WEB)) {
+			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherDataSourceType.KMA_WEB), multipleRestApiDownloader);
 		}
-		if (requestWeatherSources.containsKey(WeatherSourceType.OPEN_WEATHER_MAP)) {
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.OWM_ONECALL)) {
 			OpenWeatherMapProcessing.requestWeatherData(context, latitude, longitude,
-					(RequestOwm) requestWeatherSources.get(WeatherSourceType.OPEN_WEATHER_MAP), multipleRestApiDownloader);
+					(RequestOwm) requestWeatherSources.get(WeatherDataSourceType.OWM_ONECALL), multipleRestApiDownloader);
 		}
-		if (requestWeatherSources.containsKey(WeatherSourceType.AQICN)) {
+		if (requestWeatherSources.containsKey(WeatherDataSourceType.AQICN)) {
 			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader);
 		}
 
