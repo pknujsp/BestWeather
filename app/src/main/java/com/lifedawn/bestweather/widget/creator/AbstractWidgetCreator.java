@@ -55,6 +55,8 @@ public abstract class AbstractWidgetCreator {
 		return this;
 	}
 
+	public abstract RemoteViews createTempViews(Integer parentWidth, Integer parentHeight);
+
 	public Context getContext() {
 		return context;
 	}
@@ -96,13 +98,11 @@ public abstract class AbstractWidgetCreator {
 			public void onResultSuccessful(WidgetDto result) {
 				widgetDto = result;
 
-				if (widgetDto == null) {
-					return;
+				if (widgetDto != null) {
+					setTextSize(widgetDto.getTextSizeAmount());
 				}
-
-				setTextSize(widgetDto.getTextSizeAmount());
 				if (callback != null) {
-					callback.onResultSuccessful(result);
+					callback.onResultSuccessful(widgetDto);
 				}
 			}
 
@@ -340,58 +340,53 @@ public abstract class AbstractWidgetCreator {
 		remoteViews.setImageViewBitmap(R.id.valuesView, bitmap);
 	}
 
-	protected Bitmap drawBitmap(ViewGroup rootLayout, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, RemoteViews remoteViews) {
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+	protected final Bitmap drawBitmap(ViewGroup rootLayout, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, RemoteViews remoteViews,
+	                                  @Nullable Integer parentWidth, @Nullable Integer parentHeight) {
+		int widthSize = 0;
+		int heightSize = 0;
 
-		final int[] widgetSize = getWidgetExactSizeInPx(appWidgetManager);
+		if (parentWidth == null || parentHeight == null) {
+			int[] widgetSize = getWidgetExactSizeInPx(AppWidgetManager.getInstance(context));
+
+			widthSize = widgetSize[0];
+			heightSize = widgetSize[1];
+		} else {
+			widthSize = parentWidth;
+			heightSize = parentHeight;
+		}
 		final float widgetPadding = context.getResources().getDimension(R.dimen.widget_padding);
 
-		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[0] - widgetPadding * 2), EXACTLY);
-		final int heightSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[1] - widgetPadding * 2), EXACTLY);
+		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (widthSize - widgetPadding * 2), EXACTLY);
+		final int heightSpec = View.MeasureSpec.makeMeasureSpec((int) (heightSize - widgetPadding * 2), EXACTLY);
 
 		rootLayout.measure(widthSpec, heightSpec);
+
+		Bitmap viewBmp = drawBitmap(rootLayout, remoteViews);
+		if (onDrawBitmapCallback != null) {
+			onDrawBitmapCallback.onCreatedBitmap(viewBmp);
+		}
+
+		return viewBmp;
+	}
+
+	protected final Bitmap drawBitmap(ViewGroup rootLayout, RemoteViews remoteViews) {
 		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());
 
 		rootLayout.setDrawingCacheEnabled(true);
 		rootLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
 		Bitmap viewBmp = rootLayout.getDrawingCache();
-		if (onDrawBitmapCallback != null) {
-			onDrawBitmapCallback.onCreatedBitmap(viewBmp);
-		}
 		remoteViews.setImageViewBitmap(R.id.valuesView, viewBmp);
-
 		return viewBmp;
 	}
 
-	protected Bitmap drawBitmap(ViewGroup rootLayout, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, RemoteViews remoteViews,
-	                            int minusHeight) {
+	protected final RemoteViews createBaseRemoteViews() {
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-
-		final int[] widgetSize = getWidgetExactSizeInPx(appWidgetManager);
-		final float widgetPadding = context.getResources().getDimension(R.dimen.widget_padding);
-
-		int height = (int) (minusHeight > 0 ? widgetSize[1] - widgetPadding - minusHeight : widgetSize[1] - widgetPadding * 2);
-
-		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (widgetSize[0] - widgetPadding * 2), EXACTLY);
-		final int heightSpec = View.MeasureSpec.makeMeasureSpec(height, EXACTLY);
-
-		rootLayout.measure(widthSpec, heightSpec);
-		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());
-
-		rootLayout.setDrawingCacheEnabled(true);
-		rootLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-
-		Bitmap viewBmp = rootLayout.getDrawingCache();
-		if (onDrawBitmapCallback != null) {
-			onDrawBitmapCallback.onCreatedBitmap(viewBmp);
-		}
-		remoteViews.setImageViewBitmap(R.id.valuesView, viewBmp);
-
-		return viewBmp;
+		int layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
+		return new RemoteViews(context.getPackageName(), layoutId);
 	}
 
-	abstract public RemoteViews createRemoteViews(boolean needTempData);
+	abstract public RemoteViews createRemoteViews();
 
 	abstract public void setTextSize(int amount);
 

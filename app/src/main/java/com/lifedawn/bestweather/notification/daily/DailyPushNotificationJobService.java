@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.PersistableBundle;
 import android.provider.Settings;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
@@ -63,7 +64,6 @@ public class DailyPushNotificationJobService extends JobService {
 
 		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
 			final Integer id = bundle.getInt(BundleKey.dtoId.name());
-			final LocalTime localTime = LocalTime.parse(bundle.getString("time"));
 			final DailyPushNotificationType dailyPushNotificationType = DailyPushNotificationType.valueOf(bundle.getString(
 					"DailyPushNotificationType"));
 
@@ -144,20 +144,15 @@ public class DailyPushNotificationJobService extends JobService {
 
 			@Override
 			public void onFailed(Fail fail) {
-				Intent intent = null;
 				RemoteViewProcessor.ErrorType errorType = null;
 
 				if (fail == Fail.REJECT_PERMISSION) {
 					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_REJECTED;
-					intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-					intent.setData(Uri.fromParts("package", context.getPackageName(), null));
 				} else {
 					errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
-					intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 				}
-				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, PendingIntent.getActivity(context, 100,
-						intent, PendingIntent.FLAG_UPDATE_CURRENT));
 				RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
+				remoteViews.setViewVisibility(R.id.warning_process_btn, View.GONE);
 				viewCreator.makeNotification(remoteViews, dailyPushNotificationDto.getId());
 			}
 		};
@@ -185,7 +180,6 @@ public class DailyPushNotificationJobService extends JobService {
 	}
 
 	public void workNotification(Context context, ExecutorService executorService, Integer notificationDtoId, DailyPushNotificationType type) {
-
 		repository = new DailyPushNotificationRepository(context);
 		repository.get(notificationDtoId, new DbQueryCallback<DailyPushNotificationDto>() {
 			@Override

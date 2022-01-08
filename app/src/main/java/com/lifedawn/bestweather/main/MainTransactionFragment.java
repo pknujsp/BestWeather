@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -234,12 +235,15 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), newWeatherFragment,
 				WeatherFragment.class.getName()).commitNow();
+		Log.e("MainTransactionFragment","onViewCreated");
 		initializing = false;
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
+		Log.e("MainTransactionFragment","onStart");
+
 		createFavoriteLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {

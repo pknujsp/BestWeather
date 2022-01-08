@@ -28,7 +28,6 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 		PersistableBundle persistableBundle = new PersistableBundle();
 		persistableBundle.putString("DailyPushNotificationType", arguments.getString(
 				"DailyPushNotificationType"));
-		persistableBundle.putString("time", arguments.getString("time"));
 		persistableBundle.putInt(BundleKey.dtoId.name(), id);
 		persistableBundle.putString("action", action);
 

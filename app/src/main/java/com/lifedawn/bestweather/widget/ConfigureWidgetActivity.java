@@ -8,7 +8,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.app.PendingIntent;
@@ -22,6 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
@@ -70,13 +70,14 @@ import com.lifedawn.bestweather.widget.widgetprovider.FifthWidgetProvider;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Locale;
-
 public class ConfigureWidgetActivity extends AppCompatActivity implements AbstractWidgetCreator.WidgetUpdateCallback {
 	private ActivityConfigureWidgetBinding binding;
 	private Integer appWidgetId;
 	private Integer layoutId;
 	private WidgetDto widgetDto;
+
+	private Integer previewContainerWidth;
+	private Integer previewContainerHeight;
 
 	private FavoriteAddressDto newSelectedAddressDto;
 
@@ -203,7 +204,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
 
 		widgetDto = widgetCreator.loadDefaultSettings();
-		updatePreview();
 
 		//위치, 날씨제공사, 대한민국 최우선, 자동 업데이트 간격, 날짜와 시각표시,
 		//현지 시각으로 표시, 글자크기, 배경 투명도
@@ -271,6 +271,28 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 			}
 		});
+
+
+		binding.previewLayout.getViewTreeObserver().addOnDrawListener(
+				new ViewTreeObserver.OnDrawListener() {
+					boolean initializing = true;
+
+					@Override
+					public void onDraw() {
+						if (initializing) {
+							initializing = false;
+							previewContainerWidth = binding.previewLayout.getWidth();
+							previewContainerHeight = binding.previewLayout.getHeight();
+							updatePreview();
+						}
+					}
+				}
+		);
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 	}
 
 	@Override
@@ -446,10 +468,11 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 	@Override
 	public void updatePreview() {
-		RemoteViews removeViews = widgetCreator.createRemoteViews(true);
+		binding.previewLayout.removeAllViews();
+
+		RemoteViews removeViews = widgetCreator.createTempViews(previewContainerWidth, previewContainerHeight);
 		View previewWidgetView = removeViews.apply(getApplicationContext(), binding.previewLayout);
 
-		binding.previewLayout.removeAllViews();
 		binding.previewLayout.setMinimumHeight(appWidgetManager.getAppWidgetInfo(appWidgetId).minHeight);
 		binding.previewLayout.addView(previewWidgetView);
 	}

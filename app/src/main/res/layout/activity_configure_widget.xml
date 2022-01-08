@@ -37,13 +37,13 @@
                     android:id="@+id/preview_layout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="8dp"
                     android:clickable="false"
                     android:focusable="false"
-                    android:minHeight="40dp"
-                    android:paddingLeft="16dp"
-                    android:paddingTop="8dp"
-                    android:paddingRight="16dp"
-                    android:paddingBottom="8dp" />
+                    android:minHeight="40dp" />
 
             </FrameLayout>
 

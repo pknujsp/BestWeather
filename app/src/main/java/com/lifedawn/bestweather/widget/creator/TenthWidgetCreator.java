@@ -44,18 +44,17 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	@Override
-	public RemoteViews createRemoteViews(boolean needTempData) {
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		int layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
-		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
+	public RemoteViews createTempViews(Integer parentWidth, Integer parentHeight) {
+		RemoteViews remoteViews = createBaseRemoteViews();
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
+				WeatherResponseProcessor.getTempDailyForecastDtoList(context, 7), null, parentWidth, parentHeight);
+		return remoteViews;
+	}
 
-		if (needTempData) {
-			setTempDataViews(remoteViews);
-		} else {
-			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
-		}
-
-		//setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
+	@Override
+	public RemoteViews createRemoteViews() {
+		RemoteViews remoteViews = createBaseRemoteViews();
+		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 
 		return remoteViews;
 	}
@@ -90,16 +89,13 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                         List<DailyForecastDto> dailyForecastDtoList, OnDrawBitmapCallback onDrawBitmapCallback) {
 
-		drawViews(remoteViews, addressName, lastRefreshDateTime, dailyForecastDtoList, onDrawBitmapCallback);
+		drawViews(remoteViews, addressName, lastRefreshDateTime, dailyForecastDtoList, onDrawBitmapCallback, null, null);
 	}
 
-	public void setTempDataViews(RemoteViews remoteViews) {
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
-				WeatherResponseProcessor.getTempDailyForecastDtoList(context, 7), null);
-	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
-	                       List<DailyForecastDto> dailyForecastDtoList, @Nullable OnDrawBitmapCallback onDrawBitmapCallback) {
+	                       List<DailyForecastDto> dailyForecastDtoList, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, @Nullable Integer parentWidth,
+	                       @Nullable Integer parentHeight) {
 		LayoutInflater layoutInflater = LayoutInflater.from(context);
 
 		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
@@ -162,7 +158,7 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 		rootLayout.addView(hourAndIconLinearLayout, hourAndIconRowLayoutParams);
 		rootLayout.addView(detailSingleTemperatureView, tempRowLayoutParams);
 
-		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews);
+		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews, parentWidth, parentHeight);
 	}
 
 
@@ -173,13 +169,13 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherDataSourceType weatherDataSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
+		WeatherDataSourceType weatherDataSourceType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherDataSourceType = WeatherDataSourceType.KMA_WEB;
 		}
 
-		RemoteViews remoteViews = createRemoteViews(false);
+		RemoteViews remoteViews = createRemoteViews();
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.parseTextToDailyForecastDtoList(context, jsonObject,

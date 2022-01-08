@@ -44,27 +44,19 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	@Override
-	public RemoteViews createRemoteViews(boolean needTempData) {
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		int layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
-		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
+	public RemoteViews createTempViews(Integer parentWidth, Integer parentHeight) {
+		RemoteViews remoteViews = createBaseRemoteViews();
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
+				WeatherResponseProcessor.getTempAirQualityDto(), WeatherResponseProcessor.getTempCurrentConditionsDto(context),
+				null, parentWidth, parentHeight);
+		return remoteViews;
+	}
 
-		if (needTempData) {
-			setTempDataViews(remoteViews);
-		} else {
-			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
-		}
+	@Override
+	public RemoteViews createRemoteViews() {
+		RemoteViews remoteViews = createBaseRemoteViews();
+		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 
-		/*
-		remoteViews.setViewVisibility(R.id.clockLayout, widgetDto.isDisplayClock() ? View.VISIBLE : View.GONE);
-		remoteViews.setCharSequence(R.id.dateClock, "setFormat24Hour", dateClockFormat);
-		remoteViews.setCharSequence(R.id.dateClock, "setFormat12Hour", dateClockFormat);
-		remoteViews.setCharSequence(R.id.timeClock, "setFormat24Hour", timeClockFormat);
-		remoteViews.setCharSequence(R.id.timeClock, "setFormat12Hour", timeClockFormat);
-
-		setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
-		setClockTimeZone(remoteViews);
-		 */
 		return remoteViews;
 	}
 
@@ -142,20 +134,14 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 		return view;
 	}
 
-	public void setTempDataViews(RemoteViews remoteViews) {
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
-				WeatherResponseProcessor.getTempAirQualityDto(), WeatherResponseProcessor.getTempCurrentConditionsDto(context),
-				null);
-	}
-
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto,
 	                         OnDrawBitmapCallback onDrawBitmapCallback) {
-		drawViews(remoteViews, addressName, lastRefreshDateTime, airQualityDto, currentConditionsDto, onDrawBitmapCallback);
+		drawViews(remoteViews, addressName, lastRefreshDateTime, airQualityDto, currentConditionsDto, onDrawBitmapCallback, null, null);
 	}
 
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto,
-	                       @Nullable OnDrawBitmapCallback onDrawBitmapCallback) {
+	                       @Nullable OnDrawBitmapCallback onDrawBitmapCallback, @Nullable Integer parentWidth, @Nullable Integer parentHeight) {
 		LayoutInflater layoutInflater = LayoutInflater.from(context);
 
 		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
@@ -178,8 +164,7 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 		rootLayout.addView(headerView, headerViewLayoutParams);
 		rootLayout.addView(currentConditionsView, currentConditionsViewLayoutParams);
 
-		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews);
-
+		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews, parentWidth, parentHeight);
 	}
 
 
@@ -191,7 +176,7 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 			weatherDataSourceType = WeatherDataSourceType.KMA_WEB;
 		}
 
-		RemoteViews remoteViews = createRemoteViews(false);
+		RemoteViews remoteViews = createRemoteViews();
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
 		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.parseTextToCurrentConditionsDto(context, jsonObject,

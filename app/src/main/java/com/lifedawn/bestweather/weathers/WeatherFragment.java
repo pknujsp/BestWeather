@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import android.util.ArrayMap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -189,6 +190,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.e("WeatherFragment", "onCreate");
 
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		networkStatus = NetworkStatus.getInstance(getContext());
@@ -202,8 +204,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
 
-		MyApplication myApplication = (MyApplication) getActivity().getApplication();
-		executorService = myApplication.getExecutorService();
+		executorService = MyApplication.getExecutorService();
 	}
 
 	@Override
@@ -228,6 +229,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		Log.e("WeatherFragment", "onViewCreated");
 
 		FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.mainLayout.getLayoutParams();
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
@@ -291,7 +293,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				}
 			}
 		});
-
 	}
 
 	public void load(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {

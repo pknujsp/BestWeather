@@ -88,7 +88,6 @@ public class FourthDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 		if (successful) {
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, airQualityDto);
 			RemoteViewProcessor.onSuccessfulProcess(remoteViews);
-
 		} else {
 			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
 		}

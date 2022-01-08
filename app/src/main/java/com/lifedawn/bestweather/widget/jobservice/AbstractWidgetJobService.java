@@ -82,7 +82,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 						widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId);
 					}
 
-					final RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
+					final RemoteViews remoteViews = widgetViewCreator.createRemoteViews();
 
 					RemoteViewProcessor.onBeginProcess(remoteViews);
 					appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
@@ -130,7 +130,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 			widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
 				@Override
 				public void onResultSuccessful(WidgetDto result) {
-					RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
+					RemoteViews remoteViews = widgetViewCreator.createRemoteViews();
 
 					NetworkStatus networkStatus = NetworkStatus.getInstance(getApplicationContext());
 					if (!networkStatus.networkAvailable2()) {
@@ -214,8 +214,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 							widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
 								@Override
 								public void onResultSuccessful(WidgetDto result) {
-
-									Address address = addressList.get(0);
+									final Address address = addressList.get(0);
 
 									result.setAddressName(address.getAddressLine(0));
 									result.setCountryCode(address.getCountryCode());
@@ -287,10 +286,15 @@ public abstract class AbstractWidgetJobService extends JobService {
 
 					@Override
 					public void onCanceled() {
+						setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
+						RemoteViewProcessor.onErrorProcess(remoteViews, widgetViewCreator.getContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+						appWidgetManager.updateAppWidget(widgetViewCreator.getAppWidgetId(), remoteViews);
 
+						Message message = handler.obtainMessage();
+						message.obj = "finished";
+						handler.sendMessage(message);
 					}
 				}, weatherDataSourceTypeSet);
-
 	}
 
 	protected void onActionBootCompleted(JobParameters jobParameters) {
@@ -322,10 +326,12 @@ public abstract class AbstractWidgetJobService extends JobService {
 				if (widgetDto != null && widgetDto.isLoadSuccessful()) {
 					widgetViewCreator.setDataViewsOfSavedData();
 				} else {
-					RemoteViews remoteViews = widgetViewCreator.createRemoteViews(false);
-					setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
-					RemoteViewProcessor.onErrorProcess(remoteViews, widgetViewCreator.getContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-					appWidgetManager.updateAppWidget(widgetViewCreator.getAppWidgetId(), remoteViews);
+					if (widgetDto != null) {
+						RemoteViews remoteViews = widgetViewCreator.createRemoteViews();
+						setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
+						RemoteViewProcessor.onErrorProcess(remoteViews, widgetViewCreator.getContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+						appWidgetManager.updateAppWidget(widgetViewCreator.getAppWidgetId(), remoteViews);
+					}
 				}
 				jobFinished(params, false);
 			}

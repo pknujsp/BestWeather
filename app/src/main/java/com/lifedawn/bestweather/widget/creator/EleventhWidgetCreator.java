@@ -52,18 +52,24 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	@Override
-	public RemoteViews createRemoteViews(boolean needTempData) {
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		int layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
-		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
+	public RemoteViews createTempViews(Integer parentWidth, Integer parentHeight) {
+		RemoteViews remoteViews = createBaseRemoteViews();
+		ArrayMap<WeatherDataSourceType, List<HourlyForecastDto>> hourlyForecastDtoListMap = new ArrayMap<>();
+		hourlyForecastDtoListMap.put(WeatherDataSourceType.KMA_WEB, WeatherResponseProcessor.getTempHourlyForecastDtoList(context,
+				cellCount));
+		hourlyForecastDtoListMap.put(WeatherDataSourceType.OWM_ONECALL, WeatherResponseProcessor.getTempHourlyForecastDtoList(context,
+				cellCount));
 
-		if (needTempData) {
-			setTempDataViews(remoteViews);
-		} else {
-			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
-		}
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
+				hourlyForecastDtoListMap,
+				null, parentWidth, parentHeight);
+		return remoteViews;
+	}
 
-		//setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
+	@Override
+	public RemoteViews createRemoteViews() {
+		RemoteViews remoteViews = createBaseRemoteViews();
+		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 
 		return remoteViews;
 	}
@@ -99,23 +105,13 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, ArrayMap<WeatherDataSourceType,
 			List<HourlyForecastDto>> hourlyForecastDtoListMap,
 	                         OnDrawBitmapCallback onDrawBitmapCallback) {
-		drawViews(remoteViews, addressName, lastRefreshDateTime, hourlyForecastDtoListMap, onDrawBitmapCallback);
+		drawViews(remoteViews, addressName, lastRefreshDateTime, hourlyForecastDtoListMap, onDrawBitmapCallback, null, null);
 	}
 
-	public void setTempDataViews(RemoteViews remoteViews) {
-		ArrayMap<WeatherDataSourceType, List<HourlyForecastDto>> hourlyForecastDtoListMap = new ArrayMap<>();
-		hourlyForecastDtoListMap.put(WeatherDataSourceType.ACCU_WEATHER, WeatherResponseProcessor.getTempHourlyForecastDtoList(context,
-				cellCount));
-		hourlyForecastDtoListMap.put(WeatherDataSourceType.OWM_ONECALL, WeatherResponseProcessor.getTempHourlyForecastDtoList(context,
-				cellCount));
-
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
-				hourlyForecastDtoListMap,
-				null);
-	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
-	                       ArrayMap<WeatherDataSourceType, List<HourlyForecastDto>> hourlyForecastDtoListMap, @Nullable OnDrawBitmapCallback onDrawBitmapCallback) {
+	                       ArrayMap<WeatherDataSourceType, List<HourlyForecastDto>> hourlyForecastDtoListMap, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, @Nullable Integer parentWidth,
+	                       @Nullable Integer parentHeight) {
 		RelativeLayout rootLayout = new RelativeLayout(context);
 		LayoutInflater layoutInflater = LayoutInflater.from(context);
 
@@ -300,7 +296,7 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 		rootLayout.addView(hoursRow, hoursRowLayoutParams);
 		rootLayout.addView(forecastTable, forecastViewsLayoutParams);
 
-		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews);
+		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews, parentWidth, parentHeight);
 	}
 
 
@@ -311,7 +307,7 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		RemoteViews remoteViews = createRemoteViews(false);
+		RemoteViews remoteViews = createRemoteViews();
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		ArrayMap<WeatherDataSourceType, List<HourlyForecastDto>> weatherSourceTypeListArrayMap = new ArrayMap<>();

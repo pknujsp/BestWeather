@@ -101,8 +101,6 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 			myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
 		} else {
 			if (checkPermissions()) {
-				boolean availableGoogleApi = availablePlayServices();
-
 				LocationRequest locationRequest = LocationRequest.create();
 				locationRequest.setInterval(300);
 				locationRequest.setFastestInterval(150);
@@ -133,15 +131,15 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 					}
 				};
 
+				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+
 				timer.schedule(new TimerTask() {
 					@Override
 					public void run() {
 						locationCallback.onLocationResult(LocationResult.create(new ArrayList<>()));
 					}
 				}, 3000L);
-
-				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
 
 				fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 			} else {

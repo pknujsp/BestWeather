@@ -55,19 +55,22 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	}
 
+
 	@Override
-	public RemoteViews createRemoteViews(boolean needTempData) {
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		int layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
-		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
+	public RemoteViews createTempViews(Integer parentWidth, Integer parentHeight) {
+		RemoteViews remoteViews = createBaseRemoteViews();
+		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), WeatherResponseProcessor.getTempAirQualityDto(),
+				WeatherResponseProcessor.getTempCurrentConditionsDto(context),
+				WeatherResponseProcessor.getTempHourlyForecastDtoList(context, cellCount), null, parentWidth, parentHeight);
+		return remoteViews;
+	}
 
-		if (needTempData) {
-			setTempDataViews(remoteViews);
-		} else {
-			remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
-		}
+	@Override
+	public RemoteViews createRemoteViews() {
+		RemoteViews remoteViews = createBaseRemoteViews();
+		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 
-		//setBackgroundAlpha(remoteViews, widgetDto.getBackgroundAlpha());
+
 		return remoteViews;
 	}
 
@@ -133,17 +136,14 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto,
 	                         List<HourlyForecastDto> hourlyForecastDtoList, OnDrawBitmapCallback onDrawBitmapCallback) {
-		drawViews(remoteViews, addressName, lastRefreshDateTime, airQualityDto, currentConditionsDto, hourlyForecastDtoList, onDrawBitmapCallback);
+		drawViews(remoteViews, addressName, lastRefreshDateTime, airQualityDto, currentConditionsDto, hourlyForecastDtoList,
+				onDrawBitmapCallback, null, null);
 	}
 
-	public void setTempDataViews(RemoteViews remoteViews) {
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), WeatherResponseProcessor.getTempAirQualityDto(),
-				WeatherResponseProcessor.getTempCurrentConditionsDto(context),
-				WeatherResponseProcessor.getTempHourlyForecastDtoList(context, cellCount), null);
-	}
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto,
-	                       List<HourlyForecastDto> hourlyForecastDtoList, @Nullable OnDrawBitmapCallback onDrawBitmapCallback) {
+	                       List<HourlyForecastDto> hourlyForecastDtoList, @Nullable OnDrawBitmapCallback onDrawBitmapCallback,
+	                       @Nullable Integer parentWidth, @Nullable Integer parentHeight) {
 		LayoutInflater layoutInflater = LayoutInflater.from(context);
 
 		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
@@ -251,7 +251,7 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		rootLayout.addView(hourAndIconLinearLayout, hourAndIconRowLayoutParams);
 		rootLayout.addView(detailSingleTemperatureView, tempRowLayoutParams);
 
-		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews);
+		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews, parentWidth, parentHeight);
 	}
 
 
@@ -262,13 +262,13 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setDataViewsOfSavedData() {
-		WeatherDataSourceType weatherDataSourceType =  WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
+		WeatherDataSourceType weatherDataSourceType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherSourceTypeSet());
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherDataSourceType = WeatherDataSourceType.KMA_WEB;
 		}
 
-		RemoteViews remoteViews = createRemoteViews(false);
+		RemoteViews remoteViews = createRemoteViews();
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
