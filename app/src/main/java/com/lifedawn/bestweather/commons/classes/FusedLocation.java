@@ -102,8 +102,8 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		} else {
 			if (checkPermissions()) {
 				LocationRequest locationRequest = LocationRequest.create();
-				locationRequest.setInterval(300);
-				locationRequest.setFastestInterval(150);
+				locationRequest.setInterval(400);
+				locationRequest.setFastestInterval(200);
 				locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 				Timer timer = new Timer();
@@ -139,7 +139,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 					public void run() {
 						locationCallback.onLocationResult(LocationResult.create(new ArrayList<>()));
 					}
-				}, 3000L);
+				}, 5000L);
 
 				fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 			} else {

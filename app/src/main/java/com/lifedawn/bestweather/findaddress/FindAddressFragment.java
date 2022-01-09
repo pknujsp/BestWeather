@@ -125,16 +125,16 @@ public class FindAddressFragment extends Fragment {
 								} else {
 									weatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
 										@Override
-										public void onResultSuccessful(Long result) {
+										public void onResultSuccessful(Long id) {
 											selectedAddress = true;
-											favoriteAddressDto.setId(result.intValue());
+											favoriteAddressDto.setId(id.intValue());
 											newFavoriteAddressDto = favoriteAddressDto;
 
 											if (getActivity() != null) {
 												getActivity().runOnUiThread(new Runnable() {
 													@Override
 													public void run() {
-														getParentFragmentManager().popBackStackImmediate();
+														getParentFragmentManager().popBackStack();
 													}
 												});
 											}

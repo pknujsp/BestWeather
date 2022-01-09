@@ -103,20 +103,17 @@ public abstract class AbstractAlwaysNotiViewCreator {
 
 			@Override
 			public void onFailed(Fail fail) {
-				Intent intent = null;
 				RemoteViewProcessor.ErrorType errorType = null;
 
 				if (fail == Fail.REJECT_PERMISSION) {
 					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_REJECTED;
-					intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-					intent.setData(Uri.fromParts("package", context.getPackageName(), null));
-				} else {
+				} else if (fail == Fail.DISABLED_GPS) {
 					errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
-					intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+				} else {
+					errorType = RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA;
 				}
 
-				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, PendingIntent.getActivity(context, 30, intent,
-						PendingIntent.FLAG_UPDATE_CURRENT));
+				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, getRefreshPendingIntent());
 				RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
 				makeNotification(remoteViews, R.drawable.temp_icon, true);
 			}

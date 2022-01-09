@@ -15,6 +15,7 @@ import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.FirstWidgetCreator;
 import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
 
@@ -27,8 +28,10 @@ import java.util.Set;
 public class FirstWidgetJobService extends AbstractWidgetJobService {
 
 	@Override
-	void createWidgetViewCreator(int appWidgetId) {
-		widgetViewCreator = new FirstWidgetCreator(getApplicationContext(), null, appWidgetId);
+	AbstractWidgetCreator createWidgetViewCreator(int appWidgetId) {
+		FirstWidgetCreator firstWidgetCreator = new FirstWidgetCreator(getApplicationContext(), null, appWidgetId);
+		widgetViewCreator = firstWidgetCreator;
+		return firstWidgetCreator;
 	}
 
 	@Override

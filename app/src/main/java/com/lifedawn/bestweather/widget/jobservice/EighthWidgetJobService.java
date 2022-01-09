@@ -18,6 +18,7 @@ import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
+import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.EighthWidgetCreator;
 import com.lifedawn.bestweather.widget.widgetprovider.EighthWidgetProvider;
 
@@ -36,8 +37,10 @@ public class EighthWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	void createWidgetViewCreator(int appWidgetId) {
-		widgetViewCreator = new EighthWidgetCreator(getApplicationContext(), null, appWidgetId);
+	AbstractWidgetCreator createWidgetViewCreator(int appWidgetId) {
+		EighthWidgetCreator eighthWidgetCreator = new EighthWidgetCreator(getApplicationContext(), null, appWidgetId);
+		widgetViewCreator = eighthWidgetCreator;
+		return eighthWidgetCreator;
 	}
 
 	@Override

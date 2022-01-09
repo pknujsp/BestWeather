@@ -191,6 +191,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.e("WeatherFragment", "onCreate");
+		getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		networkStatus = NetworkStatus.getInstance(getContext());
@@ -576,8 +578,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
 					@Override
 					public void onActivityResult(ActivityResult result) {
-						if (ContextCompat.checkSelfPermission(getContext(),
-								Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+						if (fusedLocation.checkPermissions()) {
 							binding.mainToolbar.gps.callOnClick();
 						}
 					}

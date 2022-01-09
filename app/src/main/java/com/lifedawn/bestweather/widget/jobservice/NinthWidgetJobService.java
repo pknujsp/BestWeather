@@ -15,6 +15,7 @@ import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
+import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.NinthWidgetCreator;
 import com.lifedawn.bestweather.widget.widgetprovider.NinthWidgetProvider;
 
@@ -33,8 +34,10 @@ public class NinthWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	void createWidgetViewCreator(int appWidgetId) {
-		widgetViewCreator = new NinthWidgetCreator(getApplicationContext(), null, appWidgetId);
+	AbstractWidgetCreator createWidgetViewCreator(int appWidgetId) {
+		NinthWidgetCreator ninthWidgetCreator = new NinthWidgetCreator(getApplicationContext(), null, appWidgetId);
+		widgetViewCreator = ninthWidgetCreator;
+		return ninthWidgetCreator;
 	}
 
 	@Override

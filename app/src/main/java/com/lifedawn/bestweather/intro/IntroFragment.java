@@ -13,11 +13,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
@@ -30,6 +32,7 @@ import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentIntroBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
+import com.lifedawn.bestweather.main.MyApplication;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,6 +46,21 @@ public class IntroFragment extends Fragment {
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 	private AlertDialog dialog;
 
+	private FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+		@Override
+		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
+			super.onFragmentDestroyed(fm, f);
+
+			if (f instanceof FindAddressFragment) {
+				if (((FindAddressFragment) f).isSelectedAddress()) {
+					MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
+					getParentFragment().getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, mainTransactionFragment,
+							mainTransactionFragment.getTag()).commitAllowingStateLoss();
+				}
+			}
+		}
+	};
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,6 +68,7 @@ public class IntroFragment extends Fragment {
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
+		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 	}
 
 	@Override
@@ -61,6 +80,9 @@ public class IntroFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
+		binding.getRoot().setPadding(0, MyApplication.getStatusBarHeight(), 0, 0);
+
 		binding.useCurrentLocation.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -71,7 +93,6 @@ public class IntroFragment extends Fragment {
 		binding.findAddress.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
 				FindAddressFragment findAddressFragment = new FindAddressFragment();
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.RequestFragment.name(), IntroFragment.class.getName());
@@ -86,11 +107,7 @@ public class IntroFragment extends Fragment {
 							final int newFavoriteAddressDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name());
 							sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
 									newFavoriteAddressDtoId).putString(getString(R.string.pref_key_last_selected_location_type),
-									LocationType.SelectedAddress.name()).putBoolean(getString(R.string.pref_key_show_intro), false).apply();
-
-							MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-							getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, mainTransactionFragment,
-									mainTransactionFragment.getTag()).commit();
+									LocationType.SelectedAddress.name()).putBoolean(getString(R.string.pref_key_show_intro), false).commit();
 						} else {
 
 						}
@@ -103,13 +120,17 @@ public class IntroFragment extends Fragment {
 		});
 	}
 
-	private FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
+	@Override
+	public void onDestroy() {
+		getParentFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
+		super.onDestroy();
+	}
+
+	private final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 		@Override
 		public void onSuccessful(LocationResult locationResult) {
-			dialog.dismiss();
-
 			//현재 위치 파악 성공
-			Location location = locationResult.getLocations().get(0);
+			final Location location = locationResult.getLocations().get(0);
 			final Double latitude = location.getLatitude();
 			final Double longitude = location.getLongitude();
 
@@ -118,9 +139,12 @@ public class IntroFragment extends Fragment {
 					getString(R.string.pref_key_last_selected_location_type), LocationType.CurrentLocation.name()).putBoolean(
 					getString(R.string.pref_key_show_intro), false).commit();
 
+			dialog.dismiss();
+
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-			getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, mainTransactionFragment,
-					mainTransactionFragment.getTag()).commit();
+			getParentFragment().getParentFragmentManager().beginTransaction()
+					.replace(R.id.fragment_container, mainTransactionFragment,
+							mainTransactionFragment.getTag()).commitNowAllowingStateLoss();
 		}
 
 		@Override
@@ -131,28 +155,34 @@ public class IntroFragment extends Fragment {
 				fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
 					@Override
 					public void onActivityResult(ActivityResult result) {
-
+						if (fusedLocation.isOnGps()) {
+							binding.useCurrentLocation.callOnClick();
+						}
 					}
 				});
 			} else if (fail == Fail.REJECT_PERMISSION) {
 				fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
 					@Override
 					public void onActivityResult(ActivityResult result) {
-
+						if (fusedLocation.checkPermissions()) {
+							binding.useCurrentLocation.callOnClick();
+						}
 					}
 				}, new ActivityResultCallback<Map<String, Boolean>>() {
 					@Override
 					public void onActivityResult(Map<String, Boolean> result) {
+						if (!result.containsValue(false)) {
+							binding.useCurrentLocation.callOnClick();
+						} else {
 
+						}
 					}
 				});
 
 			} else {
 				//검색 실패
-
+				Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
 			}
-
-			//-------------
 
 		}
 	};

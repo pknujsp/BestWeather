@@ -164,12 +164,10 @@ public abstract class AbstractWidgetJobService extends JobService {
 		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
 			onActionBootCompleted(params);
 		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REDRAW))) {
-			int[] appWidgetIds = bundle.getIntArray("appWidgetIds");
-			for (int id : appWidgetIds) {
-				onReDraw(id, params);
-			}
+			final int[] appWidgetIds = bundle.getIntArray("appWidgetIds");
+			onReDraw(appWidgetIds, params);
 		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED))) {
-			onReDraw(appWidgetId, params);
+			onReDraw(new int[]{appWidgetId}, params);
 		}
 
 		return true;
@@ -267,10 +265,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = widgetDto.getWeatherSourceTypeSet();
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
-			if (weatherDataSourceTypeSet.size() == 1) {
-				weatherDataSourceTypeSet.clear();
-				weatherDataSourceTypeSet.add(WeatherDataSourceType.KMA_WEB);
-			}
+			weatherDataSourceTypeSet.add(WeatherDataSourceType.KMA_WEB);
 		}
 
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
@@ -318,34 +313,47 @@ public abstract class AbstractWidgetJobService extends JobService {
 		});
 	}
 
-	protected void onReDraw(int appWidgetId, JobParameters params) {
-		createWidgetViewCreator(appWidgetId);
-		widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto widgetDto) {
-				if (widgetDto != null && widgetDto.isLoadSuccessful()) {
-					widgetViewCreator.setDataViewsOfSavedData();
-				} else {
+	protected void onReDraw(int[] appWidgetIds, JobParameters jobParameters) {
+		for (int i = 0; i < appWidgetIds.length; i++) {
+			final int appWidgetId = appWidgetIds[i];
+			final int finalIdx = i;
+
+			AbstractWidgetCreator widgetCreator = createWidgetViewCreator(appWidgetId);
+			widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
+				@Override
+				public void onResultSuccessful(WidgetDto widgetDto) {
 					if (widgetDto != null) {
-						RemoteViews remoteViews = widgetViewCreator.createRemoteViews();
-						setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
-						RemoteViewProcessor.onErrorProcess(remoteViews, widgetViewCreator.getContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-						appWidgetManager.updateAppWidget(widgetViewCreator.getAppWidgetId(), remoteViews);
+						if (widgetDto.isLoadSuccessful()) {
+							widgetCreator.setDataViewsOfSavedData();
+						} else {
+							RemoteViews remoteViews = widgetCreator.createRemoteViews();
+							setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
+							RemoteViewProcessor.onErrorProcess(remoteViews, getApplicationContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+							appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
+						}
+					} else {
+
+					}
+
+					if (finalIdx == appWidgetIds.length - 1) {
+						jobFinished(jobParameters, false);
+					}
+
+				}
+
+				@Override
+				public void onResultNoData() {
+					if (finalIdx == appWidgetIds.length - 1) {
+						jobFinished(jobParameters, false);
 					}
 				}
-				jobFinished(params, false);
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
+			});
+		}
 	}
 
 	abstract Class<?> getWidgetProviderClass();
 
-	abstract void createWidgetViewCreator(int appWidgetId);
+	abstract AbstractWidgetCreator createWidgetViewCreator(int appWidgetId);
 
 	abstract Set<RequestWeatherDataType> getRequestWeatherDataTypeSet();
 

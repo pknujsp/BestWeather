@@ -21,12 +21,11 @@ public class AlwaysNotificationReceiver extends BroadcastReceiver {
 		persistableBundle.putString("action", action);
 
 		JobInfo jobInfo = new JobInfo.Builder(1001, new ComponentName(context, AlwaysNotiJobService.class))
-				.setMinimumLatency(100)
+				.setMinimumLatency(0)
 				.setOverrideDeadline(1000)
 				.setExtras(persistableBundle)
 				.build();
 		jobScheduler.schedule(jobInfo);
-
 	}
 
 }
