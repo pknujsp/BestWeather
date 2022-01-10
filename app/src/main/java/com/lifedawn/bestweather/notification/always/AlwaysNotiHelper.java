@@ -29,19 +29,19 @@ public class AlwaysNotiHelper {
 			bundle.putString(NotificationType.class.getName(), NotificationType.Always.name());
 
 			refreshIntent.putExtras(bundle);
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 123, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Always.getNotificationId(), refreshIntent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
 
 			alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
 					millis, pendingIntent);
 		}
-
 	}
 
 	public void cancelAutoRefresh() {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 123, new Intent(context, AlwaysNotificationReceiver.class), 0);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Always.getNotificationId(), new Intent(context, AlwaysNotificationReceiver.class)
+				, PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
-			pendingIntent.cancel();
 		}
 	}
 

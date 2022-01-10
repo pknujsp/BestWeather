@@ -349,7 +349,7 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 			alwaysNotiDataObj.setUpdateIntervalMillis(val);
 			alwaysNotiViewCreator.savePreferences();
 
-			alwaysNotiHelper.onSelectedAutoRefreshInterval(val);
+			alwaysNotiHelper.onSelectedAutoRefreshInterval(alwaysNotiDataObj.getUpdateIntervalMillis());
 		}
 	}
 

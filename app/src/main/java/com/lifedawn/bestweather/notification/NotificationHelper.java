@@ -25,7 +25,7 @@ public class NotificationHelper {
 	private void createNotificationChannel(NotificationObj notificationObj) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			NotificationChannel channel = new NotificationChannel(notificationObj.channelId, notificationObj.channelName,
-					NotificationManager.IMPORTANCE_LOW);
+					NotificationManager.IMPORTANCE_HIGH);
 			channel.setDescription(notificationObj.channelDescription);
 
 			if (notificationObj.getNotificationType() == NotificationType.Always) {
