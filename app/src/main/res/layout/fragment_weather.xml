@@ -63,7 +63,7 @@
                             android:background="?attr/selectableItemBackground"
                             android:drawableRight="@drawable/expand_more"
                             android:drawableTint="@color/purple_500"
-                            android:fontFamily="sans-serif-light"
+                            android:fontFamily="sans-serif-condensed"
                             android:text="@string/loading"
                             android:textAlignment="center"
                             android:textSize="16sp" />
@@ -79,7 +79,7 @@
                         android:layout_marginLeft="16dp"
                         android:layout_marginRight="16dp"
                         android:layout_marginBottom="4dp"
-                        android:fontFamily="sans-serif-condensed-light"
+                        android:fontFamily="sans-serif-condensed"
                         android:text="@string/loading"
                         android:textAlignment="center"
                         android:textSize="22sp" />

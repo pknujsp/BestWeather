@@ -59,15 +59,17 @@ public class OwmSimpleHourlyForecastFragment extends BaseSimpleForecastFragment 
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				HourlyForecastComparisonFragment comparisonFragment = new HourlyForecastComparisonFragment();
-				comparisonFragment.setArguments(getArguments());
+				if (availableNetwork()) {
+					HourlyForecastComparisonFragment comparisonFragment = new HourlyForecastComparisonFragment();
+					comparisonFragment.setArguments(getArguments());
 
-				String tag = getString(R.string.tag_comparison_fragment);
-				FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
+					String tag = getString(R.string.tag_comparison_fragment);
+					FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
 
-				fragmentManager.beginTransaction().hide(
-						fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
-						comparisonFragment, tag).addToBackStack(tag).commit();
+					fragmentManager.beginTransaction().hide(
+							fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
+							comparisonFragment, tag).addToBackStack(tag).commit();
+				}
 			}
 		});
 

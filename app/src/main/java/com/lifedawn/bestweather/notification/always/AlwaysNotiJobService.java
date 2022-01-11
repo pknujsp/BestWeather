@@ -28,7 +28,7 @@ public class AlwaysNotiJobService extends JobService {
 		final String action = bundle.getString("action");
 
 		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			final AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(getApplicationContext(), null);
+			final AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(this, null);
 			alwaysNotiViewCreator.loadSavedPreferences();
 			alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
 				@Override
@@ -51,7 +51,7 @@ public class AlwaysNotiJobService extends JobService {
 					defaultSharedPreferences.getBoolean(NotificationType.Always.getPreferenceName(), false);
 
 			if (enabledAlwaysNotification) {
-				AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(getApplicationContext(), null);
+				AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(this, null);
 				alwaysNotiViewCreator.loadSavedPreferences();
 				if (alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
 					AlwaysNotiHelper alwaysNotiHelper = new AlwaysNotiHelper(getApplicationContext());

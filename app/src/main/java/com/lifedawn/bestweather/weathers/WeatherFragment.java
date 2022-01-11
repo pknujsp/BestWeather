@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
@@ -250,9 +251,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		binding.mainToolbar.gps.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (networkStatus.networkAvailable()) {
+				if (networkStatus.networkAvailable2()) {
 					dialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
 					fusedLocation.startLocationUpdates(myLocationCallback);
+				} else {
+					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -290,8 +293,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		binding.mainToolbar.refresh.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (networkStatus.networkAvailable()) {
+				if (networkStatus.networkAvailable2()) {
 					requestNewData();
+				} else {
+					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
 				}
 			}
 		});

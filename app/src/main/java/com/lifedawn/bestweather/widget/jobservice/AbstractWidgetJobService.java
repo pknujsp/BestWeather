@@ -256,7 +256,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 			}
 		};
 
-		FusedLocation.getInstance(getApplicationContext()).startLocationUpdates(locationCallback);
+		FusedLocation.getInstance(this).startLocationUpdates(locationCallback);
 	}
 
 

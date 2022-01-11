@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.ForecastObj;
+import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
@@ -71,14 +73,17 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		binding.rootScrollView.setVisibility(View.GONE);
 
 		binding.toolbar.fragmentTitle.setText(R.string.comparison_hourly_forecast);
-
 		binding.addressName.setText(addressName);
+
 		loadForecasts();
 	}
 
 	@Override
-	public void setValuesToViews() {
+	public void onStart() {
+		super.onStart();
+
 	}
+
 
 	private void setValuesToViews(HourlyForecastResponse hourlyForecastResponse) {
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
@@ -470,7 +475,9 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		multipleRestApiDownloader.cancel();
+		if (multipleRestApiDownloader != null) {
+			multipleRestApiDownloader.cancel();
+		}
 	}
 
 	private void setTable(MultipleRestApiDownloader multipleRestApiDownloader, Double latitude, Double longitude,

@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.weathers.comparison.dailyforecast;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,6 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,9 +17,8 @@ import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.ForecastObj;
-import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
+import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
-import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
@@ -78,8 +77,13 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		loadForecasts();
 	}
 
-	@SuppressLint("DefaultLocale")
-	private void setValuesToViews(DailyForecastResponse dailyForecastResponse) {
+	@Override
+	public void onStart() {
+		super.onStart();
+
+	}
+
+	private void setValues(DailyForecastResponse dailyForecastResponse) {
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 
 		List<WeatherDataSourceType> weatherDataSourceTypeList = new ArrayList<>();
@@ -490,7 +494,9 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		multipleRestApiDownloader.cancel();
+		if (multipleRestApiDownloader != null) {
+			multipleRestApiDownloader.cancel();
+		}
 	}
 
 	private void setTable(MultipleRestApiDownloader multipleRestApiDownloader, Double latitude, Double longitude,
@@ -602,7 +608,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					setValuesToViews(dailyForecastResponse);
+					setValues(dailyForecastResponse);
 					binding.rootScrollView.setVisibility(View.VISIBLE);
 					dialog.dismiss();
 				}

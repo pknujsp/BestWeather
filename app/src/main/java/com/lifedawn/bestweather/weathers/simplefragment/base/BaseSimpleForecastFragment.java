@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,11 +48,11 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	protected String countryCode;
 	protected WeatherDataSourceType mainWeatherDataSourceType;
 	protected ZoneId zoneId;
-	protected NetworkStatus networkStatus;
 	protected boolean needCompare;
 	protected Map<WeatherValueType, Integer> textSizeMap = new HashMap<>();
 	protected Map<WeatherValueType, Integer> textColorMap = new HashMap<>();
 	protected Integer cardBackgroundColor;
+	protected NetworkStatus networkStatus;
 
 	protected int headerVisibility = View.VISIBLE;
 
@@ -89,6 +90,8 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
 		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(BundleKey.WeatherDataSource.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
+
+		networkStatus = NetworkStatus.getInstance(getContext());
 	}
 
 	@Override
@@ -103,27 +106,14 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 
 		if (!countryCode.equals("KR")) {
 			binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
+		} else {
+			binding.weatherCardViewHeader.compareForecast.setVisibility(View.VISIBLE);
 		}
 
 		if (cardBackgroundColor != null) {
 			binding.card.setBackgroundColor(cardBackgroundColor);
 		}
 		binding.weatherCardViewHeader.getRoot().setVisibility(headerVisibility);
-		networkStatus = NetworkStatus.getInstance(getContext());
-		networkStatus.observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-			@Override
-			public void onChanged(Boolean available) {
-				if (available) {
-					if (needCompare) {
-						binding.weatherCardViewHeader.compareForecast.setClickable(true);
-					}
-				} else {
-					if (needCompare) {
-						binding.weatherCardViewHeader.compareForecast.setClickable(false);
-					}
-				}
-			}
-		});
 
 		binding.scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
 			@Override
@@ -139,6 +129,15 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	@Override
 	public void setValuesToViews() {
 
+	}
+
+	protected boolean availableNetwork() {
+		if (networkStatus.networkAvailable2()) {
+			return true;
+		} else {
+			Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
+			return false;
+		}
 	}
 
 	protected void createValueUnitsDescription(WeatherDataSourceType weatherDataSourceType, boolean haveRain, boolean haveSnow) {

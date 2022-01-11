@@ -35,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.ZoneId;
 import java.util.List;
 
-public class BaseForecastComparisonFragment extends Fragment implements IWeatherValues {
+public class BaseForecastComparisonFragment extends Fragment{
 	protected BaseLayoutForecastComparisonBinding binding;
 	protected DateView dateRow;
 	protected SharedPreferences sharedPreferences;
@@ -113,10 +113,6 @@ public class BaseForecastComparisonFragment extends Fragment implements IWeather
 		});
 	}
 
-	@Override
-	public void setValuesToViews() {
-
-	}
 
 	protected void createValueUnitsDescription(List<WeatherSourceUnitObj> weatherSourceUnitObjs) {
 		StringBuilder stringBuilder = new StringBuilder();
