@@ -8,12 +8,13 @@
     android:orientation="vertical"
     android:padding="48dp">
 
-    <ProgressBar
-        android:id="@+id/progress_circular"
-        android:layout_width="73dp"
-        android:layout_height="73dp"
-        android:indeterminate="true"
-        android:indeterminateTint="@android:color/holo_blue_light" />
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        app:lottie_rawRes="@raw/bluedottedprogress"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        android:id="@+id/progress_circular"/>
 
     <TextView
         android:id="@+id/progress_msg"
@@ -31,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="@drawable/btn_background"
+        android:background="@drawable/rounded_btn_background"
         android:clickable="true"
         android:text="@string/cancel"
         android:textAlignment="center"

@@ -55,7 +55,7 @@ public class DialogActivity extends Activity {
 	private Class<?> widgetClass;
 	private int appWidgetId;
 	private AbstractWidgetCreator widgetCreator;
-
+	private AlertDialog alertDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +109,8 @@ public class DialogActivity extends Activity {
 				Intent intent = new Intent(getApplicationContext(), MainActivity.class);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				startActivity(intent);
+				alertDialog.dismiss();
+
 				finish();
 			}
 		});
@@ -130,6 +132,7 @@ public class DialogActivity extends Activity {
 				} catch (PendingIntent.CanceledException e) {
 					e.printStackTrace();
 				}
+				alertDialog.dismiss();
 				finish();
 			}
 		});
@@ -137,9 +140,11 @@ public class DialogActivity extends Activity {
 		((Button) dialogView.findViewById(R.id.cancelBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				alertDialog.dismiss();
 				finish();
 			}
 		});
+
 
 		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 			@Override
@@ -147,7 +152,7 @@ public class DialogActivity extends Activity {
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						AlertDialog alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(DialogActivity.this,
+						alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(DialogActivity.this,
 								R.style.Theme_AppCompat_Light_Dialog))
 								.setCancelable(false)
 								.setView(dialogView)
@@ -155,7 +160,6 @@ public class DialogActivity extends Activity {
 
 						alertDialog.show();
 						alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
 					}
 				});
 			}

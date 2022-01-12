@@ -232,8 +232,8 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 			NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
 
 			builder.setOngoing(true).setSmallIcon(icon)
-					.setPriority(NotificationCompat.PRIORITY_MAX).setVibrate(new long[]{0L}).setDefaults(NotificationCompat.DEFAULT_LIGHTS |
-					NotificationCompat.DEFAULT_SOUND).setSound(null).setSilent(true).setStyle(new NotificationCompat.BigPictureStyle())
+					.setPriority(NotificationCompat.PRIORITY_MIN).setVibrate(new long[]{0L}).setDefaults(NotificationCompat.DEFAULT_LIGHTS |
+					NotificationCompat.DEFAULT_SOUND).setSound(null).setSilent(true)
 			.setAutoCancel(false).setCustomContentView(remoteViews).setCustomBigContentView(remoteViews);
 
 			NotificationManager notificationManager = context.getSystemService(NotificationManager.class);

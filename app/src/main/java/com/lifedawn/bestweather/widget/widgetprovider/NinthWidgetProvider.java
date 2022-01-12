@@ -5,9 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.EighthWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.NinthWidgetCreator;
 import com.lifedawn.bestweather.widget.jobservice.NinthWidgetJobService;
 
 public class NinthWidgetProvider extends AbstractAppWidgetProvider {
+
+	@Override
+	protected AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId) {
+		return new NinthWidgetCreator(context, null, appWidgetId);
+	}
+
 	@Override
 	public void onEnabled(Context context) {
 		super.onEnabled(context);

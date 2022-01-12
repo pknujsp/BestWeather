@@ -41,7 +41,7 @@ import java.util.concurrent.Executors;
 public abstract class AbstractAlwaysNotiViewCreator {
 	protected final NotificationUpdateCallback notificationUpdateCallback;
 	protected final ValueUnits windSpeedUnit;
-	protected final DateTimeFormatter dateTimeFormatter;
+	protected final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	protected final ValueUnits tempUnit;
 	protected final String tempDegree;
 	protected final NotificationType notificationType;
@@ -58,13 +58,9 @@ public abstract class AbstractAlwaysNotiViewCreator {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
 				ValueUnits.celsius.name()));
-		tempDegree = context.getString(R.string.degree_symbol);
+		tempDegree = "°";
 		windSpeedUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
 				ValueUnits.mPerSec.name()));
-		ValueUnits clockUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_clock),
-				ValueUnits.clock12.name()));
-		dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? context.getString(R.string.datetime_pattern_clock12) :
-				context.getString(R.string.datetime_pattern_clock24));
 		notificationHelper = new NotificationHelper(context);
 	}
 

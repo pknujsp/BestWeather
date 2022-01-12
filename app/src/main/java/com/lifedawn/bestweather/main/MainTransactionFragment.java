@@ -235,14 +235,13 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), newWeatherFragment,
 				WeatherFragment.class.getName()).commitNow();
-		Log.e("MainTransactionFragment","onViewCreated");
-		initializing = false;
+		Log.e("MainTransactionFragment", "onViewCreated");
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		Log.e("MainTransactionFragment","onStart");
+		Log.e("MainTransactionFragment", "onStart");
 
 		createFavoriteLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
@@ -256,7 +255,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 				if (lastSelectedLocationType == LocationType.CurrentLocation) {
 					if (usingCurrentLocation) {
 						WeatherFragment weatherFragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName());
-						weatherFragment.load(LocationType.CurrentLocation, null);
+						weatherFragment.load(lastSelectedLocationType, null);
 					} else {
 						if (favoriteAddressDtoList.size() > 0) {
 							binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
@@ -282,6 +281,8 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 			}
 		});
+		initializing = false;
+
 	}
 
 	private void createFavoriteLocationsList(DbQueryCallback<List<FavoriteAddressDto>> callback) {

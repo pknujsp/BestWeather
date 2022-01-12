@@ -76,6 +76,17 @@ public class WidgetDto {
 	@ColumnInfo(name = "responseText")
 	private String responseText;
 
+	@ColumnInfo(name = "initialized")
+	private boolean initialized;
+
+	public boolean isInitialized() {
+		return initialized;
+	}
+
+	public void setInitialized(boolean initialized) {
+		this.initialized = initialized;
+	}
+
 	public String getResponseText() {
 		return responseText;
 	}

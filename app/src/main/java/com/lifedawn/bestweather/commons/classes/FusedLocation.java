@@ -15,6 +15,7 @@ import android.os.Looper;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.provider.SyncStateContract;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -58,8 +59,8 @@ import java.util.TimerTask;
 
 public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedListener {
 	private static FusedLocation instance;
-	private static FusedLocationProviderClient fusedLocationClient;
-	private static LocationManager locationManager;
+	private FusedLocationProviderClient fusedLocationClient;
+	private LocationManager locationManager;
 
 	private Context context;
 
@@ -140,7 +141,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 						locationCallback.onLocationResult(LocationResult.create(new ArrayList<>()));
 					}
 				}, 5000L);
-
+				Log.e("FusedLocation", "requestLocationUpdates");
 				fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 			} else {
 				myLocationCallback.onFailed(MyLocationCallback.Fail.REJECT_PERMISSION);
@@ -209,5 +210,19 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		void onSuccessful(LocationResult locationResult);
 
 		void onFailed(Fail fail);
+
+		default Location getBestLocation(LocationResult locationResult) {
+			int bestIndex = 0;
+			float accuracy = Float.MIN_VALUE;
+			List<Location> locations = locationResult.getLocations();
+
+			for (int i = 0; i < locations.size(); i++) {
+				if (locations.get(i).getAccuracy() > accuracy) {
+					accuracy = locations.get(i).getAccuracy();
+					bestIndex = i;
+				}
+			}
+			return locations.get(bestIndex);
+		}
 	}
 }

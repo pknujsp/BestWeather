@@ -32,6 +32,7 @@ public class NotificationHelper {
 				channel.setVibrationPattern(new long[]{0L});
 				channel.enableLights(false);
 				channel.enableVibration(true);
+				channel.setImportance(NotificationManager.IMPORTANCE_LOW);
 			}
 
 			notificationManager.createNotificationChannel(channel);

@@ -36,7 +36,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/btn_background"
+            android:background="@drawable/rounded_btn_background"
             android:text="@string/startOnCurrentLocation"
             android:textColor="@color/white" />
 
@@ -44,7 +44,7 @@
             android:id="@+id/findAddress"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/btn_background"
+            android:background="@drawable/rounded_btn_background"
             android:backgroundTint="@color/design_default_color_secondary_variant"
             android:text="@string/find_address"
             android:textColor="@color/white" />

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout
         android:id="@+id/root_layout"
@@ -84,27 +85,41 @@
                         android:textAlignment="center"
                         android:textSize="22sp" />
 
-                    <TextView
-                        android:id="@+id/updated_datetime"
-                        style="@style/text_shadow"
+                    <RelativeLayout
+                        android:id="@+id/refreshDateTimeLayout"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_below="@id/address_name"
                         android:layout_alignRight="@id/address_name"
-                        android:layout_marginBottom="150dp"
-                        android:drawableLeft="@drawable/refresh"
-                        android:drawableTint="@color/white"
-                        android:fontFamily="sans-serif-condensed"
-                        android:gravity="center_vertical"
-                        android:text="@string/loading"
-                        android:textAlignment="textEnd"
-                        android:textSize="14sp" />
+                        android:layout_marginBottom="150dp">
+
+                        <ImageView
+                            android:id="@+id/refreshIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignTop="@id/updated_datetime"
+                            android:layout_alignBottom="@id/updated_datetime"
+                            android:layout_alignParentLeft="true"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/refresh"
+                            app:tint="@color/white" />
+
+                        <TextView
+                            android:id="@+id/updated_datetime"
+                            style="@style/text_shadow"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@id/refreshIcon"
+                            android:fontFamily="sans-serif-condensed"
+                            android:text="@string/loading"
+                            android:textSize="14sp" />
+                    </RelativeLayout>
 
                     <androidx.fragment.app.FragmentContainerView
                         android:id="@+id/simple_current_conditions"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/updated_datetime"
+                        android:layout_below="@id/refreshDateTimeLayout"
                         android:layout_marginBottom="8dp"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp" />

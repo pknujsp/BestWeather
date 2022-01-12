@@ -10,12 +10,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.ArraySet;
+import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
+import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.widget.WidgetHelper;
+import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 
 import java.util.List;
 import java.util.Set;
@@ -29,21 +34,63 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 
 	protected abstract Class<?> getJobServiceClass();
 
+	protected abstract AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId);
+
+	protected void reDraw(Context context, int[] appWidgetIds) {
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		final Class<?> widgetProviderClass = getClass();
+
+		for (int i = 0; i < appWidgetIds.length; i++) {
+			final int appWidgetId = appWidgetIds[i];
+
+			AbstractWidgetCreator widgetCreator = getWidgetCreatorInstance(context, appWidgetId);
+			widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
+				@Override
+				public void onResultSuccessful(WidgetDto widgetDto) {
+					if (widgetDto != null) {
+						if (widgetDto.isInitialized() && widgetDto.isLoadSuccessful()) {
+							widgetCreator.setDataViewsOfSavedData();
+						} else if (widgetDto.isInitialized() && !widgetDto.isLoadSuccessful()) {
+							RemoteViews remoteViews = widgetCreator.createRemoteViews();
+
+							widgetCreator.setRefreshPendingIntent(widgetProviderClass, remoteViews, appWidgetId);
+							RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+							appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
+						} else {
+
+						}
+					} else {
+
+					}
+
+				}
+
+				@Override
+				public void onResultNoData() {
+
+				}
+			});
+		}
+	}
+
 	@Override
 	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
 		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
-		scheduleJob(context, context.getString(R.string.com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED),
-				JOB_ID_ON_APP_WIDGET_OPTIONS_CHANGED, appWidgetId, null);
+		reDraw(context, new int[]{appWidgetId});
 	}
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
+		/*
 		PersistableBundle bundle = new PersistableBundle();
 		bundle.putIntArray("appWidgetIds", appWidgetIds);
 		for (int id : appWidgetIds) {
 			scheduleJob(context, context.getString(R.string.com_lifedawn_bestweather_action_REDRAW), JOB_REDRAW, id, bundle);
 		}
+
+		 */
+		reDraw(context, appWidgetIds);
 	}
 
 	@Override
@@ -74,6 +121,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 		super.onReceive(context, intent);
 		Bundle bundle = intent.getExtras();
 		final String action = intent.getAction();
+
 		int jobBeginId = 0;
 
 		if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_INIT))) {
@@ -82,10 +130,9 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			jobBeginId = JOB_REFRESH;
 		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
 			jobBeginId = JOB_ACTION_BOOT_COMPLETED;
-		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW))) {
-			jobBeginId = JOB_REDRAW;
 		} else if (action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-			jobBeginId = JOB_REDRAW;
+			int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+			reDraw(context, new int[]{appWidgetId});
 		}
 
 		if (jobBeginId != 0) {

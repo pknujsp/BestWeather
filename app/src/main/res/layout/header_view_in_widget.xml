@@ -2,15 +2,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="4dp">
+    android:paddingBottom="5dp">
+
+    <ImageView
+        android:id="@+id/locationId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/address"
+        android:layout_alignBottom="@id/address"
+        android:layout_alignParentLeft="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/location" />
 
     <TextView
         android:id="@+id/address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/refresh"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/locationId"
         android:maxLines="1"
         android:minLines="1"
         android:text="@string/address_name"
@@ -21,7 +30,7 @@
         android:id="@+id/refresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:layout_alignParentTop="true"
         android:layout_toLeftOf="@id/icon"
         android:gravity="center_vertical"
         android:text="@string/updated_time"
@@ -32,6 +41,7 @@
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
         android:layout_alignTop="@id/refresh"
         android:layout_alignBottom="@id/refresh"
         android:layout_alignParentRight="true"

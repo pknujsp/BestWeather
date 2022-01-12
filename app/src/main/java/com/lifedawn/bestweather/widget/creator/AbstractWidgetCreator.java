@@ -76,6 +76,17 @@ public abstract class AbstractWidgetCreator {
 	}
 
 
+	public void setRefreshPendingIntent(Class<?> widgetProviderClass, RemoteViews remoteViews,int appWidgetId) {
+		Intent refreshIntent = new Intent(context, widgetProviderClass);
+		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+
+		Bundle bundle = new Bundle();
+		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+		refreshIntent.putExtras(bundle);
+
+		remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, PendingIntent.getBroadcast(context, appWidgetId, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT));
+	}
+
 	public WidgetDto loadDefaultSettings() {
 		widgetDto = new WidgetDto();
 		widgetDto.setAppWidgetId(appWidgetId);

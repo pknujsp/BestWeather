@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
 	private NetworkStatus networkStatus;
 	private SharedPreferences sharedPreferences;
-	private boolean initializing = true;
 
 	public static void setWindowFlag(Activity activity, final int bits, boolean on) {
 		Window win = activity.getWindow();
@@ -97,9 +96,13 @@ public class MainActivity extends AppCompatActivity {
 				}).setCancelable(false).create();
 		networkStatus = NetworkStatus.getInstance(getApplicationContext());
 		networkStatus.observe(this, new Observer<Boolean>() {
+			boolean initializing = true;
+
 			@Override
 			public void onChanged(Boolean connection) {
-				if (!initializing && connection) {
+				if (initializing) {
+					initializing = false;
+				} else {
 					if (alertDialog != null) {
 						alertDialog.dismiss();
 					}
@@ -117,10 +120,11 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		initializing = false;
 	}
 
 	private void processNextStep() {
+		networkStatus.removeObservers(this);
+
 		// 초기화
 		MobileAds.initialize(this, new OnInitializationCompleteListener() {
 			@Override
@@ -136,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
 					introTransactionFragment.getTag()).commitNowAllowingStateLoss();
 		} else {
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commitNowAllowingStateLoss();
+			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commitNow();
 		}
 	}
 

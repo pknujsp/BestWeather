@@ -17,6 +17,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponse
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
+import com.lifedawn.bestweather.widget.creator.EighthWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.EleventhWidgetCreator;
 import com.lifedawn.bestweather.widget.widgetprovider.EleventhWidgetProvider;
 
@@ -90,7 +91,7 @@ public class EleventhWidgetJobService extends AbstractWidgetJobService {
 		} else {
 			if (widgetDto.getBitmap() == null) {
 				RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-				setRefreshPendingIntent(remoteViews, appWidgetId, context);
+				setRefreshPendingIntent(remoteViews, appWidgetId);
 			} else {
 				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());
 			}

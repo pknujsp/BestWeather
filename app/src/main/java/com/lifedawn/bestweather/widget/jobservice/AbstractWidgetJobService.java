@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.widget.jobservice;
 
-import android.app.PendingIntent;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.appwidget.AppWidgetManager;
@@ -8,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PersistableBundle;
@@ -44,7 +42,6 @@ public abstract class AbstractWidgetJobService extends JobService {
 	protected WidgetRepository widgetRepository;
 	protected AppWidgetManager appWidgetManager;
 	protected AbstractWidgetCreator widgetViewCreator;
-	protected WidgetHelper widgetHelper;
 	protected Handler handler;
 
 	public AbstractWidgetJobService() {
@@ -92,7 +89,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 					if (!networkStatus.networkAvailable2()) {
 						RemoteViewProcessor.ErrorType errorType = RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK;
 
-						setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
+						setRefreshPendingIntent(remoteViews, appWidgetId);
 						RemoteViewProcessor.onErrorProcess(remoteViews, getApplicationContext(), errorType);
 						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
@@ -102,12 +99,15 @@ public abstract class AbstractWidgetJobService extends JobService {
 						return;
 					}
 
+
 					if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
 						loadCurrentLocation(getApplicationContext(), remoteViews, appWidgetId);
 					} else {
 						loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, widgetDto);
 					}
 
+					widgetDto.setInitialized(true);
+					widgetRepository.update(widgetDto, null);
 				}
 
 				@Override
@@ -136,7 +136,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 					if (!networkStatus.networkAvailable2()) {
 						RemoteViewProcessor.ErrorType errorType = RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK;
 
-						setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
+						setRefreshPendingIntent(remoteViews, appWidgetId);
 						RemoteViewProcessor.onErrorProcess(remoteViews, getApplicationContext(), errorType);
 						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
@@ -163,11 +163,6 @@ public abstract class AbstractWidgetJobService extends JobService {
 			});
 		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
 			onActionBootCompleted(params);
-		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REDRAW))) {
-			final int[] appWidgetIds = bundle.getIntArray("appWidgetIds");
-			onReDraw(appWidgetIds, params);
-		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED))) {
-			onReDraw(new int[]{appWidgetId}, params);
 		}
 
 		return true;
@@ -178,15 +173,8 @@ public abstract class AbstractWidgetJobService extends JobService {
 		return false;
 	}
 
-	public final void setRefreshPendingIntent(RemoteViews remoteViews, int appWidgetId, Context context) {
-		Intent refreshIntent = new Intent(context, getWidgetProviderClass());
-		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-
-		Bundle bundle = new Bundle();
-		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-		refreshIntent.putExtras(bundle);
-
-		remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, PendingIntent.getBroadcast(context, appWidgetId, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT));
+	public final void setRefreshPendingIntent(RemoteViews remoteViews, int appWidgetId) {
+		widgetViewCreator.setRefreshPendingIntent(getWidgetProviderClass(), remoteViews, appWidgetId);
 	}
 
 	public void loadCurrentLocation(Context context, RemoteViews remoteViews, int appWidgetId) {
@@ -200,7 +188,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 						if (addressList.isEmpty()) {
 							RemoteViewProcessor.ErrorType errorType = RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA;
 
-							setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
+							setRefreshPendingIntent(remoteViews, appWidgetId);
 							RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
 							appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
@@ -246,7 +234,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 					errorType = RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA;
 				}
 
-				setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
+				setRefreshPendingIntent(remoteViews, appWidgetId);
 				RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
 				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
@@ -281,7 +269,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 
 					@Override
 					public void onCanceled() {
-						setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
+						setRefreshPendingIntent(remoteViews, appWidgetId);
 						RemoteViewProcessor.onErrorProcess(remoteViews, widgetViewCreator.getContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
 						appWidgetManager.updateAppWidget(widgetViewCreator.getAppWidgetId(), remoteViews);
 
@@ -311,44 +299,6 @@ public abstract class AbstractWidgetJobService extends JobService {
 
 			}
 		});
-	}
-
-	protected void onReDraw(int[] appWidgetIds, JobParameters jobParameters) {
-		for (int i = 0; i < appWidgetIds.length; i++) {
-			final int appWidgetId = appWidgetIds[i];
-			final int finalIdx = i;
-
-			AbstractWidgetCreator widgetCreator = createWidgetViewCreator(appWidgetId);
-			widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
-				@Override
-				public void onResultSuccessful(WidgetDto widgetDto) {
-					if (widgetDto != null) {
-						if (widgetDto.isLoadSuccessful()) {
-							widgetCreator.setDataViewsOfSavedData();
-						} else {
-							RemoteViews remoteViews = widgetCreator.createRemoteViews();
-							setRefreshPendingIntent(remoteViews, appWidgetId, getApplicationContext());
-							RemoteViewProcessor.onErrorProcess(remoteViews, getApplicationContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-							appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
-						}
-					} else {
-
-					}
-
-					if (finalIdx == appWidgetIds.length - 1) {
-						jobFinished(jobParameters, false);
-					}
-
-				}
-
-				@Override
-				public void onResultNoData() {
-					if (finalIdx == appWidgetIds.length - 1) {
-						jobFinished(jobParameters, false);
-					}
-				}
-			});
-		}
 	}
 
 	abstract Class<?> getWidgetProviderClass();

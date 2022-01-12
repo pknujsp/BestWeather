@@ -1,10 +1,14 @@
 package com.lifedawn.bestweather.findaddress;
 
 import android.location.Address;
+import android.location.Location;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -16,14 +20,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
+import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
+import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.CustomEditText;
+import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentFindAddressBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -33,8 +42,8 @@ import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 public class FindAddressFragment extends Fragment {
@@ -46,6 +55,10 @@ public class FindAddressFragment extends Fragment {
 	private String requestFragment;
 	private OnResultFragmentListener onResultFragmentListener;
 	private ExecutorService executorService;
+	private FusedLocation fusedLocation;
+	private NetworkStatus networkStatus;
+	private LocationLifeCycleObserver locationLifeCycleObserver;
+	private AlertDialog loadingDialog;
 
 	public FindAddressFragment setOnResultFragmentListener(OnResultFragmentListener onResultFragmentListener) {
 		this.onResultFragmentListener = onResultFragmentListener;
@@ -60,6 +73,10 @@ public class FindAddressFragment extends Fragment {
 
 		Bundle bundle = getArguments();
 		requestFragment = bundle.getString(BundleKey.RequestFragment.name());
+		fusedLocation = FusedLocation.getInstance(getContext());
+		networkStatus = NetworkStatus.getInstance(getContext());
+		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
+		getLifecycle().addObserver(locationLifeCycleObserver);
 	}
 
 	@Override
@@ -87,6 +104,24 @@ public class FindAddressFragment extends Fragment {
 			}
 		});
 
+		binding.currentLocationBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (networkStatus.networkAvailable2()) {
+					loadingDialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), new View.OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							loadingDialog.dismiss();
+							loadingDialog = null;
+						}
+					});
+					fusedLocation.startLocationUpdates(myLocationCallback);
+				} else {
+					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+
 		addressesAdapter = new FoundAddressesAdapter();
 		addressesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
 			@Override
@@ -101,60 +136,7 @@ public class FindAddressFragment extends Fragment {
 		addressesAdapter.setOnClickedAddressListener(new FoundAddressesAdapter.OnClickedAddressListener() {
 			@Override
 			public void onClickedAddress(Address address) {
-				final FavoriteAddressDto favoriteAddressDto = new FavoriteAddressDto();
-				favoriteAddressDto.setCountryName(address.getCountryName());
-				favoriteAddressDto.setCountryCode(address.getCountryCode());
-				favoriteAddressDto.setAddress(address.getAddressLine(0));
-				favoriteAddressDto.setLatitude(String.valueOf(address.getLatitude()));
-				favoriteAddressDto.setLongitude(String.valueOf(address.getLongitude()));
-
-				weatherViewModel.contains(favoriteAddressDto.getLatitude(), favoriteAddressDto.getLongitude(),
-						new DbQueryCallback<Boolean>() {
-							@Override
-							public void onResultSuccessful(Boolean contains) {
-								if (contains) {
-									if (getActivity() != null) {
-										selectedAddress = false;
-										getActivity().runOnUiThread(new Runnable() {
-											@Override
-											public void run() {
-												Toast.makeText(getContext(), R.string.duplicate_address, Toast.LENGTH_SHORT).show();
-											}
-										});
-									}
-								} else {
-									weatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
-										@Override
-										public void onResultSuccessful(Long id) {
-											selectedAddress = true;
-											favoriteAddressDto.setId(id.intValue());
-											newFavoriteAddressDto = favoriteAddressDto;
-
-											if (getActivity() != null) {
-												getActivity().runOnUiThread(new Runnable() {
-													@Override
-													public void run() {
-														getParentFragmentManager().popBackStack();
-													}
-												});
-											}
-										}
-
-										@Override
-										public void onResultNoData() {
-
-										}
-									});
-								}
-							}
-
-							@Override
-							public void onResultNoData() {
-
-							}
-						});
-
-
+				onClickedAddress(address);
 			}
 		});
 
@@ -200,6 +182,63 @@ public class FindAddressFragment extends Fragment {
 
 	}
 
+	private void onClickedNewLocation(Address address) {
+		final FavoriteAddressDto favoriteAddressDto = new FavoriteAddressDto();
+		favoriteAddressDto.setCountryName(address.getCountryName());
+		favoriteAddressDto.setCountryCode(address.getCountryCode());
+		favoriteAddressDto.setAddress(address.getAddressLine(0));
+		favoriteAddressDto.setLatitude(String.valueOf(address.getLatitude()));
+		favoriteAddressDto.setLongitude(String.valueOf(address.getLongitude()));
+
+		weatherViewModel.contains(favoriteAddressDto.getLatitude(), favoriteAddressDto.getLongitude(),
+				new DbQueryCallback<Boolean>() {
+					@Override
+					public void onResultSuccessful(Boolean contains) {
+						if (contains) {
+							if (getActivity() != null) {
+								selectedAddress = false;
+								getActivity().runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										Toast.makeText(getContext(), R.string.duplicate_address, Toast.LENGTH_SHORT).show();
+									}
+								});
+							}
+						} else {
+							weatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
+								@Override
+								public void onResultSuccessful(Long id) {
+									selectedAddress = true;
+									favoriteAddressDto.setId(id.intValue());
+									newFavoriteAddressDto = favoriteAddressDto;
+
+									if (getActivity() != null) {
+										getActivity().runOnUiThread(new Runnable() {
+											@Override
+											public void run() {
+												Toast.makeText(getContext(),
+														new String(getString(R.string.current_location) + " : " + address.getAddressLine(0)), Toast.LENGTH_SHORT).show();
+												getParentFragmentManager().popBackStack();
+											}
+										});
+									}
+								}
+
+								@Override
+								public void onResultNoData() {
+
+								}
+							});
+						}
+					}
+
+					@Override
+					public void onResultNoData() {
+
+					}
+				});
+	}
+
 	@Override
 	public void onDestroy() {
 		Bundle bundle = new Bundle();
@@ -210,8 +249,82 @@ public class FindAddressFragment extends Fragment {
 		}
 
 		onResultFragmentListener.onResultFragment(bundle);
+		getLifecycle().removeObserver(locationLifeCycleObserver);
+		if(loadingDialog != null){
+			loadingDialog.dismiss();
+			loadingDialog = null;
+		}
 		super.onDestroy();
 	}
+
+	private final FusedLocation.MyLocationCallback myLocationCallback = new FusedLocation.MyLocationCallback() {
+		@Override
+		public void onSuccessful(LocationResult locationResult) {
+			final Location location = getBestLocation(locationResult);
+			Geocoding.geocoding(getContext(), location.getLatitude(), location.getLongitude(),
+					new Geocoding.GeocodingCallback() {
+						@Override
+						public void onGeocodingResult(List<Address> addressList) {
+							MainThreadWorker.runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									if (loadingDialog != null) {
+										loadingDialog.dismiss();
+										loadingDialog = null;
+									}
+
+									if (addressList.size() > 0) {
+										onClickedNewLocation(addressList.get(0));
+									} else {
+										Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
+									}
+								}
+							});
+						}
+					});
+		}
+
+		@Override
+		public void onFailed(Fail fail) {
+			if (loadingDialog != null) {
+				loadingDialog.dismiss();
+				loadingDialog = null;
+			}
+
+			if (fail == Fail.DISABLED_GPS) {
+				fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
+					@Override
+					public void onActivityResult(ActivityResult result) {
+						if (fusedLocation.isOnGps()) {
+							binding.currentLocationBtn.callOnClick();
+						}
+					}
+				});
+			} else if (fail == Fail.REJECT_PERMISSION) {
+				fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
+					@Override
+					public void onActivityResult(ActivityResult result) {
+						if (fusedLocation.checkPermissions()) {
+							binding.currentLocationBtn.callOnClick();
+						}
+					}
+				}, new ActivityResultCallback<Map<String, Boolean>>() {
+					@Override
+					public void onActivityResult(Map<String, Boolean> result) {
+						if (!result.containsValue(false)) {
+							binding.currentLocationBtn.callOnClick();
+						} else {
+
+						}
+					}
+				});
+
+			} else {
+				//검색 실패
+				Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
+			}
+		}
+	};
 
 	public boolean isSelectedAddress() {
 		return selectedAddress;

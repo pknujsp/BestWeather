@@ -140,7 +140,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private static final Map<String, WeatherResponseObj> FINAL_RESPONSE_MAP = new HashMap<>();
 	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
 
-	private ExecutorService executorService;
+	private ExecutorService executorService = MyApplication.getExecutorService();
 
 	private FragmentWeatherBinding binding;
 	private FavoriteAddressDto selectedFavoriteAddressDto;
@@ -163,6 +163,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 	private AlertDialog dialog;
+
+	public WeatherFragment() {
+	}
 
 	public WeatherFragment setMenuOnClickListener(View.OnClickListener menuOnClickListener) {
 		this.menuOnClickListener = menuOnClickListener;
@@ -207,7 +210,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
 
-		executorService = MyApplication.getExecutorService();
 	}
 
 	@Override
@@ -233,6 +235,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		Log.e("WeatherFragment", "onViewCreated");
+		binding.scrollView.setVisibility(View.INVISIBLE);
 
 		FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.mainLayout.getLayoutParams();
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
@@ -340,7 +343,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
 					selectedFavoriteAddressDto.getId()).putString(getString(R.string.pref_key_last_selected_location_type),
-					locationType.name()).apply();
+					locationType.name()).commit();
 
 			mainWeatherDataSourceType = getMainWeatherSourceType(selectedFavoriteAddressDto.getCountryCode());
 			countryCode = selectedFavoriteAddressDto.getCountryCode();
@@ -544,17 +547,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			//현재 위치 파악 성공
 			//현재 위/경도 좌표를 최근 현재위치의 위/경도로 등록
 			//날씨 데이터 요청
-			int bestIndex = 0;
-			float accuracy = Float.MIN_VALUE;
-			List<Location> locations = locationResult.getLocations();
-
-			for (int i = 0; i < locations.size(); i++) {
-				if (locations.get(i).getAccuracy() > accuracy) {
-					accuracy = locations.get(i).getAccuracy();
-					bestIndex = i;
-				}
-			}
-			final Location location = locations.get(bestIndex);
+			final Location location = getBestLocation(locationResult);
 
 			SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString(getString(R.string.pref_key_last_current_location_latitude), String.valueOf(location.getLatitude())).putString(
@@ -619,6 +612,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	private void requestAddressOfLocation(Double latitude, Double longitude, boolean refresh) {
+		binding.scrollView.setVisibility(View.INVISIBLE);
+
 		Geocoding.geocoding(getContext(), latitude, longitude, new Geocoding.GeocodingCallback() {
 			@Override
 			public void onGeocodingResult(List<Address> addressList) {
@@ -641,7 +636,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							String addressStr = getString(R.string.current_location) + " : " + addressName;
 							binding.addressName.setText(addressStr);
 							weatherViewModel.setCurrentLocationAddressName(addressName);
-
 
 							if (refresh) {
 								requestNewData();
@@ -693,68 +687,70 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	public void requestNewData() {
+		binding.scrollView.setVisibility(View.INVISIBLE);
 		AlertDialog loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
-
-		//메인 날씨 제공사만 요청
-		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
-		weatherDataSourceTypeSet.add(mainWeatherDataSourceType);
-		weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
-
-		ArrayMap<WeatherDataSourceType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
-		setRequestWeatherSourceWithSourceTypes(weatherDataSourceTypeSet, requestWeatherSources);
-		final ResponseResultObj responseResultObj = new ResponseResultObj(weatherDataSourceTypeSet, requestWeatherSources, mainWeatherDataSourceType);
-
-		multipleRestApiDownloader = new MultipleRestApiDownloader() {
-			@Override
-			public void onResult() {
-				responseResultObj.multipleRestApiDownloader = this;
-				processOnResult(responseResultObj);
-			}
-
-			@Override
-			public void onCanceled() {
-
-			}
-		};
-		multipleRestApiDownloader.setLoadingDialog(loadingDialog);
 
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
+				//메인 날씨 제공사만 요청
+				final Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
+				weatherDataSourceTypeSet.add(mainWeatherDataSourceType);
+				weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
+
+				ArrayMap<WeatherDataSourceType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
+				setRequestWeatherSourceWithSourceTypes(weatherDataSourceTypeSet, requestWeatherSources);
+
+				final ResponseResultObj responseResultObj = new ResponseResultObj(weatherDataSourceTypeSet, requestWeatherSources, mainWeatherDataSourceType);
+
+				multipleRestApiDownloader = new MultipleRestApiDownloader() {
+					@Override
+					public void onResult() {
+						responseResultObj.multipleRestApiDownloader = this;
+						processOnResult(responseResultObj);
+					}
+
+					@Override
+					public void onCanceled() {
+
+					}
+				};
+				multipleRestApiDownloader.setLoadingDialog(loadingDialog);
 				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleRestApiDownloader);
 			}
 		});
 	}
 
 	private void requestNewDataWithAnotherWeatherSource(WeatherDataSourceType newWeatherDataSourceType, WeatherDataSourceType lastWeatherDataSourceType) {
+		binding.scrollView.setVisibility(View.INVISIBLE);
 		AlertDialog loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
-		ArrayMap<WeatherDataSourceType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
-
-		//메인 날씨 제공사만 요청
-		Set<WeatherDataSourceType> newWeatherDataSourceTypeSet = new HashSet<>();
-		newWeatherDataSourceTypeSet.add(newWeatherDataSourceType);
-		newWeatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
-
-		setRequestWeatherSourceWithSourceTypes(newWeatherDataSourceTypeSet, requestWeatherSources);
-
-		final ResponseResultObj responseResultObj = new ResponseResultObj(newWeatherDataSourceTypeSet, requestWeatherSources, newWeatherDataSourceType);
-		multipleRestApiDownloader = new MultipleRestApiDownloader() {
-			@Override
-			public void onResult() {
-				responseResultObj.multipleRestApiDownloader = this;
-				processOnResult(responseResultObj);
-			}
-
-			@Override
-			public void onCanceled() {
-
-			}
-		};
-		multipleRestApiDownloader.setLoadingDialog(loadingDialog);
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
+				ArrayMap<WeatherDataSourceType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
+
+				//메인 날씨 제공사만 요청
+				Set<WeatherDataSourceType> newWeatherDataSourceTypeSet = new HashSet<>();
+				newWeatherDataSourceTypeSet.add(newWeatherDataSourceType);
+				newWeatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
+
+				setRequestWeatherSourceWithSourceTypes(newWeatherDataSourceTypeSet, requestWeatherSources);
+
+				final ResponseResultObj responseResultObj = new ResponseResultObj(newWeatherDataSourceTypeSet, requestWeatherSources, newWeatherDataSourceType);
+				multipleRestApiDownloader = new MultipleRestApiDownloader() {
+					@Override
+					public void onResult() {
+						responseResultObj.multipleRestApiDownloader = this;
+						processOnResult(responseResultObj);
+					}
+
+					@Override
+					public void onCanceled() {
+
+					}
+				};
+				multipleRestApiDownloader.setLoadingDialog(loadingDialog);
 				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleRestApiDownloader);
 			}
 		});
@@ -947,6 +943,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private AlertDialog reRefreshBySameWeatherSource(ResponseResultObj responseResultObj) {
+		binding.scrollView.setVisibility(View.INVISIBLE);
 		final AlertDialog loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		final WeatherDataSourceType requestWeatherSource = responseResultObj.mainWeatherDataSourceType;
@@ -978,6 +975,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private AlertDialog reRefreshByAnotherWeatherSource(ResponseResultObj responseResultObj) {
+		binding.scrollView.setVisibility(View.INVISIBLE);
 		final AlertDialog loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		ArrayMap<WeatherDataSourceType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
@@ -1285,6 +1283,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 					binding.adViewBelowAirQuality.setVisibility(View.VISIBLE);
 					binding.adViewBottom.setVisibility(View.VISIBLE);
+					binding.scrollView.setVisibility(View.VISIBLE);
 
 					if (loadingDialog != null) {
 						loadingDialog.dismiss();

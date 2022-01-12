@@ -81,7 +81,7 @@ public class NinthWidgetJobService extends AbstractWidgetJobService {
 		} else {
 			if (widgetDto.getBitmap() == null) {
 				RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-				setRefreshPendingIntent(remoteViews, appWidgetId, context);
+				setRefreshPendingIntent(remoteViews, appWidgetId);
 			} else {
 				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());
 			}
