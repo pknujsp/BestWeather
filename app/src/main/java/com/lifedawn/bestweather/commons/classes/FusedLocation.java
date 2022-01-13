@@ -43,8 +43,12 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.CancellationToken;
+import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnTokenCanceledListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
@@ -61,7 +65,6 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 	private static FusedLocation instance;
 	private FusedLocationProviderClient fusedLocationClient;
 	private LocationManager locationManager;
-
 	private Context context;
 
 	public static FusedLocation getInstance(Context context) {
@@ -73,12 +76,8 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 	private FusedLocation(Context context) {
 		this.context = context;
-		if (fusedLocationClient == null) {
-			fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
-		}
-		if (locationManager == null) {
-			locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		}
+		fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
+		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 	}
 
 	@Override
@@ -103,13 +102,13 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		} else {
 			if (checkPermissions()) {
 				LocationRequest locationRequest = LocationRequest.create();
-				locationRequest.setInterval(400);
-				locationRequest.setFastestInterval(200);
+				locationRequest.setInterval(1000);
+				locationRequest.setFastestInterval(400);
 				locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 				Timer timer = new Timer();
 
-				LocationCallback locationCallback = new LocationCallback() {
+				final LocationCallback locationCallback = new LocationCallback() {
 					@Override
 					public void onLocationResult(@NonNull @NotNull LocationResult locationResult) {
 						timer.cancel();
@@ -131,18 +130,42 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 						super.onLocationAvailability(locationAvailability);
 					}
 				};
+				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+				CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
 				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
 
+				Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
+						cancellationTokenSource.getToken());
+
+				currentLocationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
+					@Override
+					public void onSuccess(@NonNull @NotNull Location location) {
+						if (location == null) {
+							if (!currentLocationTask.isCanceled()) {
+								ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+								ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+								fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+							}
+						} else {
+							List<Location> locations = new ArrayList<>();
+							locations.add(location);
+							locationCallback.onLocationResult(LocationResult.create(locations));
+						}
+					}
+				});
+
 				timer.schedule(new TimerTask() {
 					@Override
 					public void run() {
+						cancellationTokenSource.cancel();
 						locationCallback.onLocationResult(LocationResult.create(new ArrayList<>()));
 					}
 				}, 5000L);
+
 				Log.e("FusedLocation", "requestLocationUpdates");
-				fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
 			} else {
 				myLocationCallback.onFailed(MyLocationCallback.Fail.REJECT_PERMISSION);
 			}

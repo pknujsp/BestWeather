@@ -368,6 +368,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		if (multipleRestApiDownloader != null) {
 			multipleRestApiDownloader.cancel();
 		}
+		getLifecycle().removeObserver(locationLifeCycleObserver);
+		networkStatus.removeObservers(this);
 		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		super.onDestroy();
 	}
