@@ -138,11 +138,7 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 		RemoteViews remoteViews = alwaysNotiViewCreator.createRemoteViews(true);
 		View previewWidgetView = remoteViews.apply(getActivity().getApplicationContext(), binding.previewLayout);
 		binding.previewLayout.addView(previewWidgetView);
-	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
 		binding.notificationSwitch.setChecked(originalEnabled);
 		if (alwaysNotiDataObj.getLocationType() == LocationType.SelectedAddress) {
 			selectedFavoriteLocation = true;
@@ -164,11 +160,6 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 			}
 		}
 		initializing = false;
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
 	}
 
 

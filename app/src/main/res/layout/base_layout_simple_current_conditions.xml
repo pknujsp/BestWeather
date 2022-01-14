@@ -11,25 +11,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/wind"
-                style="@style/text_shadow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:text="wind"
-                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/precipitation"
                 style="@style/text_shadow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/wind"
+                android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
                 android:text="precipitation"
-                android:textSize="18sp" />
+                android:textSize="17sp" />
 
 
             <LinearLayout
@@ -89,7 +80,7 @@
                     android:fontFamily="sans-serif-thin"
                     android:includeFontPadding="false"
                     android:text="°C"
-                    android:textSize="40sp" />
+                    android:textSize="38sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -105,8 +96,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="8dp"
-                    android:text="@string/real_feel_temperature_simple"
                     android:fontFamily="sans-serif-thin"
+                    android:text="@string/real_feel_temperature_simple"
                     android:textSize="19sp" />
 
                 <TextView
@@ -127,7 +118,7 @@
                     android:fontFamily="sans-serif-thin"
                     android:includeFontPadding="false"
                     android:text="°C"
-                    android:textSize="19sp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/tempDescription"
@@ -140,30 +131,16 @@
             </LinearLayout>
 
 
-            <LinearLayout
-                android:id="@+id/flickrLayout"
+            <TextView
+                android:id="@+id/wind"
+                style="@style/text_shadow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_above="@id/airQualityLayout"
                 android:layout_alignParentRight="true"
-                android:gravity="right"
-                android:orientation="vertical">
+                android:layout_above="@id/airQualityLayout"
+                android:text="wind"
+                android:textSize="17sp" />
 
-                <ImageView
-                    android:layout_width="38dp"
-                    android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/flickrlogo" />
-
-                <TextView
-                    android:id="@+id/flickrImageUrl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:text="image"
-                    android:textSize="11sp" />
-            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/airQualityLayout"

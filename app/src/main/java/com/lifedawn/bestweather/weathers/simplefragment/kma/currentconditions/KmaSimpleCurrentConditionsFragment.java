@@ -103,7 +103,6 @@ public class KmaSimpleCurrentConditionsFragment extends BaseSimpleCurrentConditi
 		binding.tempUnit.setText(tempUnitStr);
 		binding.feelsLikeTempUnit.setText(tempUnitStr);
 
-
 		int yesterdayTemp = ValueUnits.convertTemperature(yesterdayFinalCurrentConditions == null ? kmaCurrentConditions.getYesterdayTemp()
 				: yesterdayFinalCurrentConditions.getTemperature(), tempUnit);
 		int todayTemp = Integer.parseInt(currentTemp);

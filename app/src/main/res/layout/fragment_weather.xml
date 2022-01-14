@@ -124,11 +124,50 @@
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp" />
 
+                    <LinearLayout
+                        android:id="@+id/flickrLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="14dp"
+                        android:layout_below="@id/simple_current_conditions"
+                        android:layout_marginBottom="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp">
+
+                        <ImageView
+                            android:layout_width="34dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginRight="8dp"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/flickrlogo" />
+
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/loadingAnimation"
+                            android:layout_width="34dp"
+                            android:layout_height="match_parent"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
+                            app:lottie_rawRes="@raw/bluedottedprogress" />
+
+                        <TextView
+                            android:id="@+id/flickrImageUrl"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:fontFamily="sans-serif-light"
+                            android:textSize="10dp" />
+
+
+                    </LinearLayout>
+
                     <androidx.fragment.app.FragmentContainerView
                         android:id="@+id/simple_hourly_forecast"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/simple_current_conditions"
+                        android:layout_below="@id/flickrLayout"
                         android:layout_marginBottom="32dp" />
 
                     <androidx.fragment.app.FragmentContainerView

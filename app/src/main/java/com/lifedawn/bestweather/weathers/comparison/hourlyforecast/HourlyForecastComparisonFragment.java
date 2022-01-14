@@ -78,11 +78,6 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		loadForecasts();
 	}
 
-	@Override
-	public void onStart() {
-		super.onStart();
-
-	}
 
 
 	private void setValuesToViews(HourlyForecastResponse hourlyForecastResponse) {

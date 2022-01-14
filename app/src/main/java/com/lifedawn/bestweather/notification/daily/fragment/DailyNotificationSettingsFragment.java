@@ -218,11 +218,6 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		initLocation();
 		initWeatherDataSource();
 		initNotificationTypeSpinner();
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
 
 		if (newNotificationSession) {
 			binding.commons.currentLocationRadio.setChecked(true);
@@ -250,6 +245,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 
 		initializing = false;
 	}
+
 
 	private void initNotificationTypeSpinner() {
 		final String[] notificationTypes = getResources().getStringArray(R.array.DailyPushNotificationType);

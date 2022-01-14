@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 		});
+
 		if (!networkStatus.networkAvailable()) {
 			alertDialog.show();
 		} else {
@@ -117,10 +118,6 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	@Override
-	protected void onStart() {
-		super.onStart();
-	}
 
 	private void processNextStep() {
 		networkStatus.removeObservers(this);
@@ -143,5 +140,6 @@ public class MainActivity extends AppCompatActivity {
 			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commitNow();
 		}
 	}
+
 
 }

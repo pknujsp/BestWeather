@@ -87,19 +87,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		binding.adView.loadAd(adRequest);
 
 		 */
-		binding.flickrLayout.setVisibility(View.GONE);
-		binding.flickrImageUrl.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (binding.flickrImageUrl.getTag() != null) {
-					String url = (String) binding.flickrImageUrl.getTag();
-					Intent intent = new Intent(Intent.ACTION_VIEW);
-					intent.setData(Uri.parse(url));
-					startActivity(intent);
-				}
 
-			}
-		});
 	}
 
 	public BaseSimpleCurrentConditionsFragment setAirQualityResponse(AqiCnGeolocalizedFeedResponse airQualityResponse) {
@@ -132,12 +120,5 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		binding.airQuality.setText(airQuality);
 	}
 
-	public void setFlickrImgInfo(FlickrImgObj flickrImgInfo) {
-		final String text = flickrImgInfo.getPhoto().getOwner();
-		binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
-				ContextCompat.getColor(getContext(), R.color.white)));
-		binding.flickrImageUrl.setTag(flickrImgInfo.getRealFlickrUrl());
 
-		binding.flickrLayout.setVisibility(View.VISIBLE);
-	}
 }

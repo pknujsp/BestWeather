@@ -50,7 +50,7 @@ public class MyApplication extends Application {
 
 		initPreferences();
 		WindUtil.init(context);
-		AccuWeatherResponseProcessor.init(context);
+		//AccuWeatherResponseProcessor.init(context);
 		AqicnResponseProcessor.init(context);
 		KmaResponseProcessor.init(context);
 		OpenWeatherMapResponseProcessor.init(context);

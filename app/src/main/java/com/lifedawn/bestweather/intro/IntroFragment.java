@@ -123,6 +123,7 @@ public class IntroFragment extends Fragment {
 	@Override
 	public void onDestroy() {
 		getParentFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
+		getLifecycle().removeObserver(locationLifeCycleObserver);
 		super.onDestroy();
 	}
 

@@ -55,7 +55,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 	private FragmentMainBinding binding;
 	private WeatherViewModel weatherViewModel;
-	private NetworkStatus networkStatus;
 	private boolean initializing = true;
 	private SharedPreferences sharedPreferences;
 	private List<FavoriteAddressDto> favoriteAddressDtoList = new ArrayList<>();
@@ -152,7 +151,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 
-		networkStatus = NetworkStatus.getInstance(getContext());
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
@@ -235,13 +233,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), newWeatherFragment,
 				WeatherFragment.class.getName()).commitNow();
-		Log.e("MainTransactionFragment", "onViewCreated");
-	}
 
-	@Override
-	public void onStart() {
-		super.onStart();
-		Log.e("MainTransactionFragment", "onStart");
 
 		createFavoriteLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
@@ -281,9 +273,11 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 			}
 		});
-		initializing = false;
 
+		initializing = false;
+		Log.e("MainTransactionFragment", "onViewCreated");
 	}
+
 
 	private void createFavoriteLocationsList(DbQueryCallback<List<FavoriteAddressDto>> callback) {
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {

@@ -2,11 +2,13 @@ package com.lifedawn.bestweather.weathers;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -46,6 +48,7 @@ import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
+import com.lifedawn.bestweather.commons.classes.TextUtil;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqicn;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
@@ -303,7 +306,23 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				}
 			}
 		});
+
+		binding.flickrImageUrl.setVisibility(View.GONE);
+		binding.loadingAnimation.setVisibility(View.VISIBLE);
+		binding.flickrImageUrl.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (binding.flickrImageUrl.getTag() != null) {
+					String url = (String) binding.flickrImageUrl.getTag();
+					Intent intent = new Intent(Intent.ACTION_VIEW);
+					intent.setData(Uri.parse(url));
+					startActivity(intent);
+				}
+
+			}
+		});
 	}
+
 
 	public void load(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
 		Glide.with(this).clear(binding.currentConditionsImg);
@@ -369,11 +388,18 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			multipleRestApiDownloader.cancel();
 		}
 		getLifecycle().removeObserver(locationLifeCycleObserver);
-		networkStatus.removeObservers(this);
 		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		super.onDestroy();
 	}
 
+	public void setFlickrImgInfo(FlickrImgObj flickrImgInfo) {
+		final String text = flickrImgInfo.getPhoto().getOwner();
+		binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
+				ContextCompat.getColor(getContext(), R.color.white)));
+		binding.flickrImageUrl.setTag(flickrImgInfo.getRealFlickrUrl());
+		binding.flickrImageUrl.setVisibility(View.VISIBLE);
+		binding.loadingAnimation.setVisibility(View.GONE);
+	}
 
 	@Override
 	public void loadImgOfCurrentConditions(WeatherDataSourceType weatherDataSourceType, String val, Double latitude, Double longitude,
@@ -457,9 +483,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 								if (getChildFragmentManager().findFragmentByTag(getString(R.string.tag_simple_current_conditions_fragment)) != null) {
 									Glide.with(WeatherFragment.this).load(BACKGROUND_IMG_MAP.get(galleryName).getImg()).transition(
 											DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
-									BaseSimpleCurrentConditionsFragment currentConditionsFragment =
-											(BaseSimpleCurrentConditionsFragment) getChildFragmentManager().findFragmentByTag(getString(R.string.tag_simple_current_conditions_fragment));
-									currentConditionsFragment.setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
+									setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
 								}
 							}
 						});
@@ -507,11 +531,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 												getActivity().runOnUiThread(new Runnable() {
 													@Override
 													public void run() {
-														if (getChildFragmentManager().findFragmentByTag(getString(R.string.tag_simple_current_conditions_fragment)) != null) {
-															BaseSimpleCurrentConditionsFragment currentConditionsFragment =
-																	(BaseSimpleCurrentConditionsFragment) getChildFragmentManager().findFragmentByTag(getString(R.string.tag_simple_current_conditions_fragment));
-															currentConditionsFragment.setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
-														}
+															setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
 													}
 												});
 											}
@@ -1356,6 +1376,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public LocationType getLocationType() {
 		return locationType;
 	}
+
+
 
 	private static class ResponseResultObj implements Serializable {
 		MultipleRestApiDownloader multipleRestApiDownloader;

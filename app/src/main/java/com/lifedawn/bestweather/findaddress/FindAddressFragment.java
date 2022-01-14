@@ -136,7 +136,7 @@ public class FindAddressFragment extends Fragment {
 		addressesAdapter.setOnClickedAddressListener(new FoundAddressesAdapter.OnClickedAddressListener() {
 			@Override
 			public void onClickedAddress(Address address) {
-				onClickedAddress(address);
+				onClickedNewLocation(address);
 			}
 		});
 
@@ -217,7 +217,7 @@ public class FindAddressFragment extends Fragment {
 											@Override
 											public void run() {
 												Toast.makeText(getContext(),
-														new String(getString(R.string.current_location) + " : " + address.getAddressLine(0)), Toast.LENGTH_SHORT).show();
+														address.getAddressLine(0), Toast.LENGTH_SHORT).show();
 												getParentFragmentManager().popBackStack();
 											}
 										});
@@ -250,7 +250,7 @@ public class FindAddressFragment extends Fragment {
 
 		onResultFragmentListener.onResultFragment(bundle);
 		getLifecycle().removeObserver(locationLifeCycleObserver);
-		if(loadingDialog != null){
+		if (loadingDialog != null) {
 			loadingDialog.dismiss();
 			loadingDialog = null;
 		}

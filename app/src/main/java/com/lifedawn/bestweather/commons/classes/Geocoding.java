@@ -23,7 +23,8 @@ public class Geocoding {
 					return;
 				}
 
-				Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+				boolean containKr = query.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*");
+				Geocoder geocoder = new Geocoder(context, containKr ? Locale.KOREA : Locale.US);
 
 				try {
 					List<Address> addressList = geocoder.getFromLocationName(query, 5);

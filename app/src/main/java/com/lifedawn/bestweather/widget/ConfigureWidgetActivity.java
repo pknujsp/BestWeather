@@ -290,15 +290,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		);
 	}
 
-	@Override
-	protected void onStart() {
-		super.onStart();
-	}
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-	}
 
 	private void initBackground() {
 		binding.backgroundTransparencySlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
