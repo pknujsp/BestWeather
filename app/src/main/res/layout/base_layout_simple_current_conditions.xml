@@ -2,176 +2,171 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/transparent">
 
+
+        <LinearLayout
+            android:id="@+id/weatherIconLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/weather_icon"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_gravity="center"
+                android:layout_marginRight="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/temp_icon" />
+
+            <TextView
+                android:id="@+id/sky"
+                style="@style/text_shadow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="weather"
+                android:textSize="22sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/precipitation"
+            style="@style/text_shadow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/weatherIconLayout"
+            android:text="precipitation"
+            android:textAlignment="center"
+            android:textSize="16sp" />
+
+
+        <TextView
+            android:id="@+id/wind"
+            style="@style/text_shadow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/airQualityLayout"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="6dp"
+            android:text="wind"
+            android:textSize="17sp" />
+
+
+        <LinearLayout
+            android:id="@+id/airQualityLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/tempLayout"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/text_shadow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="12dp"
+                android:text="@string/air_quality"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/airQuality"
+                style="@style/text_shadow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/good"
+                android:textSize="17sp" />
+
+        </LinearLayout>
+
+
         <RelativeLayout
+            android:id="@+id/tempLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_height="wrap_content"
+            android:layout_below="@id/precipitation">
 
             <TextView
-                android:id="@+id/precipitation"
+                android:id="@+id/temperature"
                 style="@style/text_shadow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
-                android:text="precipitation"
-                android:textSize="17sp" />
-
-
-            <LinearLayout
-                android:id="@+id/weatherIconLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/precipitation"
-                android:layout_alignParentLeft="true"
-                android:layout_marginTop="2dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/weather_icon"
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:layout_gravity="center"
-                    android:layout_marginRight="6dp"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/temp_icon" />
-
-                <TextView
-                    android:id="@+id/sky"
-                    style="@style/text_shadow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:includeFontPadding="false"
-                    android:text="weather"
-                    android:textSize="23sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/tempLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/weatherIconLayout"
-                android:layout_alignParentLeft="true"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/temperature"
-                    style="@style/text_shadow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-thin"
-                    android:includeFontPadding="false"
-                    android:text="10"
-                    android:textSize="92sp" />
-
-                <TextView
-                    android:id="@+id/tempUnit"
-                    style="@style/text_shadow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-thin"
-                    android:includeFontPadding="false"
-                    android:text="°C"
-                    android:textSize="38sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/tempDescriptionLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tempLayout"
-                android:layout_alignParentLeft="true"
-                android:orientation="horizontal">
-
-                <TextView
-                    style="@style/text_shadow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="8dp"
-                    android:fontFamily="sans-serif-thin"
-                    android:text="@string/real_feel_temperature_simple"
-                    android:textSize="19sp" />
-
-                <TextView
-                    android:id="@+id/feelsLikeTemp"
-                    style="@style/text_shadow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-thin"
-                    android:includeFontPadding="false"
-                    android:text="-20"
-                    android:textSize="28sp" />
-
-                <TextView
-                    android:id="@+id/feelsLikeTempUnit"
-                    style="@style/text_shadow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-thin"
-                    android:includeFontPadding="false"
-                    android:text="°C"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/tempDescription"
-                    style="@style/text_shadow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
-                    android:text="tempDescription"
-                    android:textSize="15sp" />
-            </LinearLayout>
-
+                android:fontFamily="sans-serif-thin"
+                android:includeFontPadding="false"
+                android:text="10"
+                android:textSize="100sp" />
 
             <TextView
-                android:id="@+id/wind"
+                android:id="@+id/tempUnit"
                 style="@style/text_shadow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_above="@id/airQualityLayout"
-                android:text="wind"
-                android:textSize="17sp" />
+                android:layout_alignBaseline="@id/temperature"
+                android:layout_toRightOf="@id/temperature"
+                android:fontFamily="sans-serif-thin"
+                android:includeFontPadding="false"
+                android:text="°C"
+                android:textSize="40sp" />
 
 
-            <LinearLayout
-                android:id="@+id/airQualityLayout"
+            <TextView
+                style="@style/text_shadow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@id/tempLayout"
+                android:layout_alignBaseline="@id/temperature"
+                android:layout_marginRight="8dp"
+                android:layout_toLeftOf="@id/feelsLikeTemp"
+                android:fontFamily="sans-serif-thin"
+                android:text="@string/real_feel_temperature_simple"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/feelsLikeTemp"
+                style="@style/text_shadow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/temperature"
+                android:layout_toLeftOf="@id/feelsLikeTempUnit"
+                android:fontFamily="sans-serif-thin"
+                android:includeFontPadding="false"
+                android:text="-20"
+                android:textSize="28sp" />
+
+            <TextView
+                android:id="@+id/feelsLikeTempUnit"
+                style="@style/text_shadow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/temperature"
                 android:layout_alignParentRight="true"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="16dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    style="@style/text_shadow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/air_quality"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/airQuality"
-                    style="@style/text_shadow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="12dp"
-                    android:text="@string/good"
-                    android:textSize="18sp" />
-
-            </LinearLayout>
+                android:fontFamily="sans-serif-thin"
+                android:includeFontPadding="false"
+                android:text="°C"
+                android:textSize="18sp" />
 
         </RelativeLayout>
 
-    </FrameLayout>
+
+        <TextView
+            android:id="@+id/tempDescription"
+            style="@style/text_shadow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tempLayout"
+            android:text="tempDescription"
+            android:textSize="15sp" />
+
+
+    </RelativeLayout>
+
 </layout>

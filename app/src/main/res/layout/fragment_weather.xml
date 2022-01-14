@@ -91,7 +91,7 @@
                         android:layout_height="match_parent"
                         android:layout_below="@id/address_name"
                         android:layout_alignRight="@id/address_name"
-                        android:layout_marginBottom="150dp">
+                        android:layout_marginBottom="140dp">
 
                         <ImageView
                             android:id="@+id/refreshIcon"
@@ -130,19 +130,10 @@
                         android:layout_height="14dp"
                         android:layout_below="@id/simple_current_conditions"
                         android:layout_marginBottom="8dp"
-                        android:gravity="center_vertical"
+                        android:gravity="center_vertical|right"
                         android:orientation="horizontal"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp">
-
-                        <ImageView
-                            android:layout_width="34dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginRight="8dp"
-                            android:adjustViewBounds="true"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/flickrlogo" />
-
 
                         <com.airbnb.lottie.LottieAnimationView
                             android:id="@+id/loadingAnimation"
@@ -160,6 +151,13 @@
                             android:fontFamily="sans-serif-light"
                             android:textSize="10dp" />
 
+                        <ImageView
+                            android:layout_width="34dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="6dp"
+                            android:adjustViewBounds="true"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/flickrlogo" />
 
                     </LinearLayout>
 
