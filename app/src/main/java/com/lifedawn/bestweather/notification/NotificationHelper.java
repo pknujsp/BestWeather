@@ -25,10 +25,11 @@ public class NotificationHelper {
 	private void createNotificationChannel(NotificationObj notificationObj) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			NotificationChannel channel = new NotificationChannel(notificationObj.channelId, notificationObj.channelName,
-					NotificationManager.IMPORTANCE_HIGH);
+					NotificationManager.IMPORTANCE_DEFAULT);
 			channel.setDescription(notificationObj.channelDescription);
 
-			if (notificationObj.getNotificationType() == NotificationType.Always) {
+			if (notificationObj.getNotificationType() == NotificationType.Always ||
+					notificationObj.getNotificationType() == NotificationType.Location) {
 				channel.setVibrationPattern(new long[]{0L});
 				channel.enableLights(false);
 				channel.enableVibration(true);
@@ -77,9 +78,12 @@ public class NotificationHelper {
 		} else if (notificationType == NotificationType.Daily) {
 			return new NotificationObj(context.getString(R.string.notificationDailyChannelName),
 					context.getString(R.string.notificationDailyChannelDescription), notificationType);
-		} else {
+		} else if (notificationType == NotificationType.Alarm) {
 			return new NotificationObj(context.getString(R.string.notificationAlarmChannelName),
 					context.getString(R.string.notificationAlarmChannelDescription), notificationType);
+		} else {
+			return new NotificationObj(context.getString(R.string.notificationLocationChannelName),
+					context.getString(R.string.notificationLocationChannelDescription), notificationType);
 		}
 	}
 

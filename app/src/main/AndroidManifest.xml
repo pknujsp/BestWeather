@@ -9,9 +9,8 @@
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".main.MyApplication"
@@ -32,7 +31,6 @@
             android:showWhenLocked="true"
             android:theme="@style/AppTheme.Black"
             android:turnScreenOn="true" />
-
         <activity
             android:name=".widget.ConfigureWidgetActivity"
             android:exported="false"
@@ -41,14 +39,12 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".widget.DialogActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
         <activity
             android:name=".main.MainActivity"
             android:exported="true"
@@ -78,7 +74,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/first_widget_info" />
         </receiver>
-
         <receiver
             android:name=".widget.widgetprovider.SecondWidgetProvider"
             android:enabled="true"
@@ -94,7 +89,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/second_widget_info" />
         </receiver>
-
         <receiver
             android:name=".widget.widgetprovider.ThirdWidgetProvider"
             android:enabled="true"
@@ -110,7 +104,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/third_widget_info" />
         </receiver>
-
         <receiver
             android:name=".widget.widgetprovider.FourthWidgetProvider"
             android:enabled="true"
@@ -126,7 +119,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/fourth_widget_info" />
         </receiver>
-
         <receiver
             android:name=".widget.widgetprovider.FifthWidgetProvider"
             android:exported="true"
@@ -141,7 +133,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/fifth_widget_info" />
         </receiver>
-
         <receiver
             android:name=".widget.widgetprovider.SixthWidgetProvider"
             android:exported="true"
@@ -156,7 +147,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/sixth_widget_info" />
         </receiver>
-
         <receiver
             android:name=".widget.widgetprovider.SeventhWidgetProvider"
             android:exported="true"
@@ -171,7 +161,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/seventh_widget_info" />
         </receiver>
-
         <receiver
             android:name=".widget.widgetprovider.EighthWidgetProvider"
             android:exported="true"
@@ -186,7 +175,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/eighth_widget_info" />
         </receiver>
-
         <receiver
             android:name=".widget.widgetprovider.NinthWidgetProvider"
             android:exported="true"
@@ -201,7 +189,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/ninth_widget_info" />
         </receiver>
-
         <receiver
             android:name=".widget.widgetprovider.TenthWidgetProvider"
             android:exported="true"
@@ -216,7 +203,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/tenth_widget_info" />
         </receiver>
-
         <receiver
             android:name=".widget.widgetprovider.EleventhWidgetProvider"
             android:exported="true"
@@ -231,7 +217,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/eleventh_widget_info" />
         </receiver>
-
         <receiver
             android:name=".notification.always.AlwaysNotificationReceiver"
             android:enabled="true"
@@ -241,7 +226,6 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".alarm.AlarmReceiver"
             android:enabled="true"
@@ -251,7 +235,6 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".notification.daily.DailyPushNotificationReceiver"
             android:enabled="true"
@@ -266,77 +249,66 @@
             android:name=".notification.always.AlwaysNotiJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".notification.daily.DailyPushNotificationJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.AbstractWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.FirstWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.SecondWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.ThirdWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.FourthWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.FifthWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.SixthWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.SeventhWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.EighthWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.NinthWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.TenthWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".widget.jobservice.EleventhWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".alarm.alarmnotifications.AlarmService"
             android:enabled="true"
             android:exported="true" />
-
+        <service
+            android:name=".widget.service.WidgetService"
+            android:enabled="true"
+            android:exported="true" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

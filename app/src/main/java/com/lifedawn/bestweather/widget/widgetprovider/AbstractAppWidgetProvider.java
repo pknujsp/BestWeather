@@ -31,6 +31,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	protected static final int JOB_ACTION_BOOT_COMPLETED = 300000;
 	protected static final int JOB_REDRAW = 400000;
 	protected static final int JOB_INIT = 500000;
+	protected static final int JOB_FOUNDED_CURRENT_LOCATION = 600000;
 
 	protected abstract Class<?> getJobServiceClass();
 
@@ -122,6 +123,8 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 		Bundle bundle = intent.getExtras();
 		final String action = intent.getAction();
 
+		PersistableBundle persistableBundle = null;
+
 		int jobBeginId = 0;
 
 		if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_INIT))) {
@@ -130,6 +133,32 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			jobBeginId = JOB_REFRESH;
 		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
 			jobBeginId = JOB_ACTION_BOOT_COMPLETED;
+		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_FOUND_CURRENT_LOCATION))) {
+			int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+
+			JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+			List<JobInfo> pendingJobs = jobScheduler.getAllPendingJobs();
+			if ( pendingJobs.size() > 0) {
+				final int initJobId = JOB_INIT + appWidgetId;
+				final int refreshJobId = JOB_REFRESH + appWidgetId;
+
+				Set<Integer> closeJobIdSet = new ArraySet<>();
+				closeJobIdSet.add(initJobId);
+				closeJobIdSet.add(refreshJobId);
+
+				for (JobInfo jobInfo : pendingJobs) {
+					if (closeJobIdSet.contains(jobInfo.getId())) {
+						jobScheduler.cancel(jobInfo.getId());
+					}
+				}
+			}
+			jobBeginId = JOB_FOUNDED_CURRENT_LOCATION;
+
+			persistableBundle = new PersistableBundle();
+			persistableBundle.putBoolean("succeed", bundle.getBoolean("succeed"));
+			if (bundle.containsKey("fail")) {
+				persistableBundle.putString("fail", bundle.getString("fail"));
+			}
 		} else if (action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 			int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
 			reDraw(context, new int[]{appWidgetId});
@@ -137,7 +166,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 
 		if (jobBeginId != 0) {
 			int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-			scheduleJob(context, action, jobBeginId, appWidgetId, null);
+			scheduleJob(context, action, jobBeginId, appWidgetId, persistableBundle);
 		}
 	}
 

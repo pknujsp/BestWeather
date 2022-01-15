@@ -404,6 +404,16 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void loadImgOfCurrentConditions(WeatherDataSourceType weatherDataSourceType, String val, Double latitude, Double longitude,
 	                                       ZoneId zoneId) {
+		if (getActivity() != null) {
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					binding.loadingAnimation.setVisibility(View.VISIBLE);
+					binding.flickrImageUrl.setVisibility(View.GONE);
+				}
+			});
+		}
+
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -531,7 +541,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 												getActivity().runOnUiThread(new Runnable() {
 													@Override
 													public void run() {
-															setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
+														setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
 													}
 												});
 											}
@@ -1376,7 +1386,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public LocationType getLocationType() {
 		return locationType;
 	}
-
 
 
 	private static class ResponseResultObj implements Serializable {

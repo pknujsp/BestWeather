@@ -5,8 +5,8 @@ import android.app.job.JobService;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Location;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PersistableBundle;
@@ -15,17 +15,18 @@ import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.work.Configuration;
 
-import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
-import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
+import com.lifedawn.bestweather.notification.NotificationHelper;
+import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
@@ -33,9 +34,12 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
+import com.lifedawn.bestweather.widget.service.WidgetService;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 
 public abstract class AbstractWidgetJobService extends JobService {
@@ -99,9 +103,8 @@ public abstract class AbstractWidgetJobService extends JobService {
 						return;
 					}
 
-
 					if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
-						loadCurrentLocation(getApplicationContext(), remoteViews, appWidgetId);
+						loadCurrentLocation(getApplicationContext(), appWidgetId, params, action);
 					} else {
 						loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, widgetDto);
 					}
@@ -150,7 +153,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 					appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 					if (result.getLocationType() == LocationType.CurrentLocation) {
-						loadCurrentLocation(getApplicationContext(), remoteViews, appWidgetId);
+						loadCurrentLocation(getApplicationContext(), appWidgetId, params, action);
 					} else {
 						loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, result);
 					}
@@ -163,6 +166,46 @@ public abstract class AbstractWidgetJobService extends JobService {
 			});
 		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
 			onActionBootCompleted(params);
+		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_FOUND_CURRENT_LOCATION))) {
+			boolean succeed = bundle.getBoolean("succeed");
+			createWidgetViewCreator(appWidgetId);
+			RemoteViews remoteViews = widgetViewCreator.createRemoteViews();
+
+			if (succeed) {
+				WidgetRepository widgetRepository = new WidgetRepository(getApplicationContext());
+				widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
+					@Override
+					public void onResultSuccessful(WidgetDto result) {
+						loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, result);
+					}
+
+					@Override
+					public void onResultNoData() {
+
+					}
+				});
+
+			} else {
+				FusedLocation.MyLocationCallback.Fail fail = FusedLocation.MyLocationCallback.Fail.valueOf(bundle.getString("fail"));
+				RemoteViewProcessor.ErrorType errorType = null;
+
+				if (fail == FusedLocation.MyLocationCallback.Fail.REJECT_PERMISSION) {
+					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_REJECTED;
+				} else if (fail == FusedLocation.MyLocationCallback.Fail.DISABLED_GPS) {
+					errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
+				} else {
+					errorType = RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA;
+				}
+
+				setRefreshPendingIntent(remoteViews, appWidgetId);
+				RemoteViewProcessor.onErrorProcess(remoteViews, getApplicationContext(), errorType);
+				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
+				Message message = handler.obtainMessage();
+				message.obj = "finished";
+				handler.sendMessage(message);
+			}
+
 		}
 
 		return true;
@@ -177,74 +220,21 @@ public abstract class AbstractWidgetJobService extends JobService {
 		widgetViewCreator.setRefreshPendingIntent(getWidgetProviderClass(), remoteViews, appWidgetId);
 	}
 
-	public void loadCurrentLocation(Context context, RemoteViews remoteViews, int appWidgetId) {
-		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
-			@Override
-			public void onSuccessful(LocationResult locationResult) {
-				final Location location = locationResult.getLocations().get(0);
-				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
-					@Override
-					public void onGeocodingResult(List<Address> addressList) {
-						if (addressList.isEmpty()) {
-							RemoteViewProcessor.ErrorType errorType = RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA;
+	public void loadCurrentLocation(Context context, int appWidgetId, JobParameters jobParameters, String action) {
+		Bundle bundle = new Bundle();
+		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+		bundle.putString("appWidgetProviderClassName", getWidgetProviderClass().getName());
 
-							setRefreshPendingIntent(remoteViews, appWidgetId);
-							RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
-							appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+		Intent intent = new Intent(context, WidgetService.class);
+		intent.putExtras(bundle);
+		intent.setAction(action);
 
-							Message message = handler.obtainMessage();
-							message.obj = "finished";
-							handler.sendMessage(message);
-						} else {
-							WidgetRepository widgetRepository = new WidgetRepository(context);
-							widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
-								@Override
-								public void onResultSuccessful(WidgetDto result) {
-									final Address address = addressList.get(0);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			startForegroundService(intent);
+		} else {
+			startService(intent);
+		}
 
-									result.setAddressName(address.getAddressLine(0));
-									result.setCountryCode(address.getCountryCode());
-									result.setLatitude(address.getLatitude());
-									result.setLongitude(address.getLongitude());
-
-									widgetRepository.update(result, null);
-									loadWeatherData(context, remoteViews, appWidgetId, result);
-								}
-
-								@Override
-								public void onResultNoData() {
-
-								}
-							});
-
-						}
-					}
-				});
-			}
-
-			@Override
-			public void onFailed(Fail fail) {
-				RemoteViewProcessor.ErrorType errorType = null;
-
-				if (fail == Fail.REJECT_PERMISSION) {
-					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_REJECTED;
-				} else if (fail == Fail.DISABLED_GPS) {
-					errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
-				} else {
-					errorType = RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA;
-				}
-
-				setRefreshPendingIntent(remoteViews, appWidgetId);
-				RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
-				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-
-				Message message = handler.obtainMessage();
-				message.obj = "finished";
-				handler.sendMessage(message);
-			}
-		};
-
-		FusedLocation.getInstance(this).startLocationUpdates(locationCallback);
 	}
 
 

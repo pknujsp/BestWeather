@@ -441,6 +441,12 @@
     <string name="com.lifedawn.bestweather.action.REFRESH_CURRENT_LOCATION" translatable="false">com.lifedawn.bestweather.action.REFRESH_CURRENT_LOCATION</string>
     <string name="com.lifedawn.bestweather.action.INIT" translatable="false">com.lifedawn.bestweather.action.INIT</string>
     <string name="com.lifedawn.bestweather.action.ALARM" translatable="false">com.lifedawn.bestweather.action.ALARM</string>
+    <string name="com_lifedawn_bestweather_action_RING_AGAIN">com_lifedawn_bestweather_action_RING_AGAIN</string>
+    <string name="com_lifedawn_bestweather_action_END_ALARM">com_lifedawn_bestweather_action_END_ALARM</string>
+    <string name="com_lifedawn_bestweather_action_SILENT_ALARM">com_lifedawn_bestweather_action_SILENT_ALARM</string>
+    <string name="com_lifedawn_bestweather_action_REDRAW">com_lifedawn_bestweather_action_REDRAW</string>
+    <string name="com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED">com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED</string>
+    <string name="com_lifedawn_bestweather_action_FOUND_CURRENT_LOCATION">com_lifedawn_bestweather_action_FOUND_CURRENT_LOCATION</string>
 
     <!-- auto refresh interval -->
     <string name="minutes_30">30분</string>
@@ -540,9 +546,7 @@
     <string name="precipitation">강수</string>
     <string name="againAlarmAfterNMinutes">분 후 다시 울림</string>
 
-    <string name="com_lifedawn_bestweather_action_RING_AGAIN">com_lifedawn_bestweather_action_RING_AGAIN</string>
-    <string name="com_lifedawn_bestweather_action_END_ALARM">com_lifedawn_bestweather_action_END_ALARM</string>
-    <string name="com_lifedawn_bestweather_action_SILENT_ALARM">com_lifedawn_bestweather_action_SILENT_ALARM</string>
+
     <string name="clickToSnoozeOrCancelAlarm">알람을 다시 울림/종료하시려면 눌러주세요</string>
     <string name="beginAlarm">알람 시작</string>
     <string name="wind">바람</string>
@@ -578,8 +582,7 @@
     <string name="FourthDailyPushNotification">현재 대기질</string>
     <string name="FifthDailyPushNotification">대기질 예보</string>
     <string name="remove">삭제</string>
-    <string name="com_lifedawn_bestweather_action_REDRAW">com_lifedawn_bestweather_action_REDRAW</string>
-    <string name="com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED">com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED</string>
+
     <string name="startOnCurrentLocation">현재위치로 시작</string>
     <string name="allDay">종일</string>
     <string name="empty_daily_notifications">추가한 일일 알림이 없습니다</string>
@@ -588,6 +591,9 @@
     <string name="containsKma">대한민국 기상청 포함</string>
     <string name="networkProblem">네트워크 문제</string>
     <string name="failedFindingLocation">현재 위치 파악 실패</string>
+    <string name="notificationLocationChannelName">위치 검색</string>
+    <string name="notificationLocationChannelDescription">현재 위치를 검색합니다</string>
+    <string name="findingCurrentLocationTitle">현재 위치 검색</string>
 
 
 </resources>
