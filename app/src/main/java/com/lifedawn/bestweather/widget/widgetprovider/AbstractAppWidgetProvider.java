@@ -83,14 +83,6 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
-		/*
-		PersistableBundle bundle = new PersistableBundle();
-		bundle.putIntArray("appWidgetIds", appWidgetIds);
-		for (int id : appWidgetIds) {
-			scheduleJob(context, context.getString(R.string.com_lifedawn_bestweather_action_REDRAW), JOB_REDRAW, id, bundle);
-		}
-
-		 */
 		reDraw(context, appWidgetIds);
 	}
 

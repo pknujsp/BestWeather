@@ -5,6 +5,7 @@ import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
