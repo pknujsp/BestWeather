@@ -74,7 +74,7 @@
                 style="@style/text_shadow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="12dp"
+                android:layout_marginRight="8dp"
                 android:text="@string/air_quality"
                 android:textSize="17sp" />
 
@@ -116,7 +116,7 @@
                 android:fontFamily="sans-serif-thin"
                 android:includeFontPadding="false"
                 android:text="°C"
-                android:textSize="40sp" />
+                android:textSize="42sp" />
 
 
             <TextView
@@ -140,7 +140,7 @@
                 android:fontFamily="sans-serif-thin"
                 android:includeFontPadding="false"
                 android:text="-20"
-                android:textSize="28sp" />
+                android:textSize="29sp" />
 
             <TextView
                 android:id="@+id/feelsLikeTempUnit"

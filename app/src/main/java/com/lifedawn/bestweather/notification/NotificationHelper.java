@@ -48,8 +48,10 @@ public class NotificationHelper {
 		}
 
 		Intent clickIntent = new Intent(context, MainActivity.class);
-		clickIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, clickIntent, 0);
+		clickIntent.setAction(Intent.ACTION_MAIN);
+		clickIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+		clickIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationType.getNotificationId(), clickIntent, 0);
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationObj.channelId)
 				.setSmallIcon(R.drawable.temp_icon)

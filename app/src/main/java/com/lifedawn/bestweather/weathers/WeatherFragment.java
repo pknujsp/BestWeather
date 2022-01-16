@@ -1,10 +1,8 @@
 package com.lifedawn.bestweather.weathers;
 
-import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
@@ -103,7 +101,6 @@ import com.lifedawn.bestweather.weathers.simplefragment.accuweather.currentcondi
 import com.lifedawn.bestweather.weathers.simplefragment.accuweather.dailyforecast.AccuSimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.accuweather.hourlyforecast.AccuSimpleHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.SimpleAirQualityFragment;
-import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.kma.currentconditions.KmaSimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.kma.dailyforecast.KmaSimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.kma.hourlyforecast.KmaSimpleHourlyForecastFragment;
@@ -257,7 +254,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		binding.mainToolbar.gps.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (networkStatus.networkAvailable2()) {
+				if (networkStatus.networkAvailable()) {
 					dialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
 					fusedLocation.startLocationUpdates(myLocationCallback);
 				} else {
@@ -299,7 +296,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		binding.mainToolbar.refresh.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (networkStatus.networkAvailable2()) {
+				if (networkStatus.networkAvailable()) {
 					requestNewData();
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
@@ -585,7 +582,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			editor.putString(getString(R.string.pref_key_last_current_location_latitude), String.valueOf(location.getLatitude())).putString(
 					getString(R.string.pref_key_last_current_location_longitude), String.valueOf(location.getLongitude())).commit();
 
-			dialog.dismiss();
 			onChangedCurrentLocation(location);
 			locationCallbackInMainFragment.onSuccessful(locationResult);
 		}
@@ -714,6 +710,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		this.latitude = currentLocation.getLatitude();
 		this.longitude = currentLocation.getLongitude();
 		FINAL_RESPONSE_MAP.remove(latitude.toString() + longitude.toString());
+		dialog.dismiss();
+
 		requestAddressOfLocation(latitude, longitude, true);
 	}
 

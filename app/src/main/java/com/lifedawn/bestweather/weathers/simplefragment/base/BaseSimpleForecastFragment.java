@@ -15,7 +15,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
@@ -132,7 +131,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	}
 
 	protected boolean availableNetwork() {
-		if (networkStatus.networkAvailable2()) {
+		if (networkStatus.networkAvailable()) {
 			return true;
 		} else {
 			Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();

@@ -15,7 +15,6 @@ import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 import androidx.work.Configuration;
 
 import com.lifedawn.bestweather.R;
@@ -25,8 +24,6 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
-import com.lifedawn.bestweather.notification.NotificationHelper;
-import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
@@ -38,8 +35,6 @@ import com.lifedawn.bestweather.widget.service.WidgetService;
 
 import java.util.List;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 
 public abstract class AbstractWidgetJobService extends JobService {
@@ -90,7 +85,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 
 					NetworkStatus networkStatus = NetworkStatus.getInstance(getApplicationContext());
 
-					if (!networkStatus.networkAvailable2()) {
+					if (!networkStatus.networkAvailable()) {
 						RemoteViewProcessor.ErrorType errorType = RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK;
 
 						setRefreshPendingIntent(remoteViews, appWidgetId);
@@ -136,7 +131,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 					RemoteViews remoteViews = widgetViewCreator.createRemoteViews();
 
 					NetworkStatus networkStatus = NetworkStatus.getInstance(getApplicationContext());
-					if (!networkStatus.networkAvailable2()) {
+					if (!networkStatus.networkAvailable()) {
 						RemoteViewProcessor.ErrorType errorType = RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK;
 
 						setRefreshPendingIntent(remoteViews, appWidgetId);

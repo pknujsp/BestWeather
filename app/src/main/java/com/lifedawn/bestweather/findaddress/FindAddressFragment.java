@@ -107,7 +107,7 @@ public class FindAddressFragment extends Fragment {
 		binding.currentLocationBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (networkStatus.networkAvailable2()) {
+				if (networkStatus.networkAvailable()) {
 					loadingDialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {

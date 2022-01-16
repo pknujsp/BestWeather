@@ -54,8 +54,10 @@ public abstract class AbstractDailyNotiViewCreator {
 		notificationObj.getNotificationBuilder().setCustomBigContentView(remoteViews);
 
 		Intent intent = new Intent(context, MainActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		remoteViews.setOnClickPendingIntent(R.id.root_layout, PendingIntent.getActivity(context, 0, intent, 0));
+		intent.setAction(Intent.ACTION_MAIN);
+		intent.addCategory(Intent.CATEGORY_LAUNCHER);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		remoteViews.setOnClickPendingIntent(R.id.root_layout, PendingIntent.getActivity(context, notificationObj.getNotificationId(), intent, 0));
 
 		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
 		Notification notification = notificationObj.getNotificationBuilder().build();
