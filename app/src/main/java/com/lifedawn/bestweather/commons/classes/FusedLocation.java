@@ -9,18 +9,14 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
-import android.os.SystemClock;
 import android.provider.Settings;
-import android.provider.SyncStateContract;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -28,27 +24,16 @@ import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApi;
 import com.google.android.gms.common.api.internal.ConnectionCallbacks;
 import com.google.android.gms.common.api.internal.OnConnectionFailedListener;
-import com.google.android.gms.common.api.internal.RegistrationMethods;
-import com.google.android.gms.common.internal.Constants;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.CancellationToken;
 import com.google.android.gms.tasks.CancellationTokenSource;
-import com.google.android.gms.tasks.OnCanceledListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.OnTokenCanceledListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
@@ -94,16 +79,22 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 	}
 
-	public void startLocationUpdates(MyLocationCallback myLocationCallback) {
+	public void startLocationUpdates(MyLocationCallback myLocationCallback, boolean isBackground) {
 		if (!isOnGps()) {
 			myLocationCallback.onFailed(MyLocationCallback.Fail.DISABLED_GPS);
 		} else if (!isOnNetwork()) {
 			myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
 		} else {
-			if (checkPermissions()) {
+			if (checkDefaultPermissions()) {
+
+				if (isBackground && !checkBackgroundLocationPermission()) {
+					myLocationCallback.onFailed(MyLocationCallback.Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION);
+					return;
+				}
+
 				LocationRequest locationRequest = LocationRequest.create();
-				locationRequest.setInterval(1000);
-				locationRequest.setFastestInterval(400);
+				locationRequest.setInterval(700);
+				locationRequest.setFastestInterval(320);
 				locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 				Timer timer = new Timer();
@@ -167,17 +158,22 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 				Log.e("FusedLocation", "requestLocationUpdates");
 			} else {
-				myLocationCallback.onFailed(MyLocationCallback.Fail.REJECT_PERMISSION);
+				myLocationCallback.onFailed(MyLocationCallback.Fail.DENIED_LOCATION_PERMISSIONS);
 			}
 		}
 	}
 
-	public boolean checkPermissions() {
-		int accessFineLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-		int accessCoarseLocation = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+	public boolean checkDefaultPermissions() {
+		return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+	}
 
-		return accessCoarseLocation == PackageManager.PERMISSION_GRANTED &&
-				accessFineLocation == PackageManager.PERMISSION_GRANTED;
+	public boolean checkBackgroundLocationPermission() {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+			return true;
+		} else {
+			return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+		}
 	}
 
 	public boolean isOnGps() {
@@ -227,7 +223,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 	public interface MyLocationCallback {
 		enum Fail {
-			DISABLED_GPS, REJECT_PERMISSION, FAILED_FIND_LOCATION
+			DISABLED_GPS, DENIED_LOCATION_PERMISSIONS, FAILED_FIND_LOCATION, DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION
 		}
 
 		void onSuccessful(LocationResult locationResult);

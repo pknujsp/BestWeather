@@ -9,7 +9,7 @@ import com.lifedawn.bestweather.R;
 public class RemoteViewProcessor {
 
 	public enum ErrorType {
-		UNAVAILABLE_NETWORK, FAILED_LOAD_WEATHER_DATA, GPS_OFF, GPS_PERMISSION_REJECTED
+		UNAVAILABLE_NETWORK, FAILED_LOAD_WEATHER_DATA, GPS_OFF, GPS_PERMISSION_DENIED, DENIED_BACKGROUND_LOCATION_PERMISSION
 	}
 
 	public static void onBeginProcess(RemoteViews remoteViews) {
@@ -38,11 +38,14 @@ public class RemoteViewProcessor {
 			case FAILED_LOAD_WEATHER_DATA:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.update_failed));
 				break;
-			case GPS_PERMISSION_REJECTED:
+			case GPS_PERMISSION_DENIED:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.message_needs_location_permission));
 				break;
 			case UNAVAILABLE_NETWORK:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.need_to_connect_network));
+				break;
+			case DENIED_BACKGROUND_LOCATION_PERMISSION:
+				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.uncheckedAllowAllTheTime));
 				break;
 		}
 

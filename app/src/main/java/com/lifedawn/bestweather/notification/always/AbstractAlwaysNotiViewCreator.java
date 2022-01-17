@@ -6,10 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -101,10 +99,12 @@ public abstract class AbstractAlwaysNotiViewCreator {
 			public void onFailed(Fail fail) {
 				RemoteViewProcessor.ErrorType errorType = null;
 
-				if (fail == Fail.REJECT_PERMISSION) {
-					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_REJECTED;
+				if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
+					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_DENIED;
 				} else if (fail == Fail.DISABLED_GPS) {
 					errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
+				} else if (fail == Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION) {
+					errorType = RemoteViewProcessor.ErrorType.DENIED_BACKGROUND_LOCATION_PERMISSION;
 				} else {
 					errorType = RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA;
 				}
@@ -115,7 +115,7 @@ public abstract class AbstractAlwaysNotiViewCreator {
 			}
 		};
 
-		FusedLocation.getInstance(context).startLocationUpdates(locationCallback);
+		FusedLocation.getInstance(context).startLocationUpdates(locationCallback, true);
 	}
 
 

@@ -115,7 +115,7 @@ public class FindAddressFragment extends Fragment {
 							loadingDialog = null;
 						}
 					});
-					fusedLocation.startLocationUpdates(myLocationCallback);
+					fusedLocation.startLocationUpdates(myLocationCallback, false);
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
 				}
@@ -300,11 +300,11 @@ public class FindAddressFragment extends Fragment {
 						}
 					}
 				});
-			} else if (fail == Fail.REJECT_PERMISSION) {
+			} else if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
 				fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
 					@Override
 					public void onActivityResult(ActivityResult result) {
-						if (fusedLocation.checkPermissions()) {
+						if (fusedLocation.checkDefaultPermissions()) {
 							binding.currentLocationBtn.callOnClick();
 						}
 					}

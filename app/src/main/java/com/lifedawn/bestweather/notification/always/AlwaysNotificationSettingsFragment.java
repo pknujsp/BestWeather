@@ -1,16 +1,21 @@
 package com.lifedawn.bestweather.notification.always;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -117,14 +122,31 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 							.putBoolean(notificationType.getPreferenceName(), isChecked).commit();
 
 					if (isChecked) {
-						alwaysNotiViewCreator.savePreferences();
-						alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
-							@Override
-							public boolean handleMessage(@NonNull Message msg) {
-								return false;
+						if (NotificationManagerCompat.from(getContext()).areNotificationsEnabled()) {
+							alwaysNotiViewCreator.savePreferences();
+							alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
+								@Override
+								public boolean handleMessage(@NonNull Message msg) {
+									return false;
+								}
+							}));
+							onSelectedAutoRefreshInterval(alwaysNotiDataObj.getUpdateIntervalMillis());
+						} else {
+							Toast.makeText(getContext(), R.string.disabledNotification, Toast.LENGTH_SHORT).show();
+							binding.notificationSwitch.setChecked(false);
+							binding.settingsLayout.setVisibility(View.GONE);
+
+							Intent intent = new Intent();
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+								intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+								intent.putExtra(Settings.EXTRA_APP_PACKAGE, getActivity().getPackageName());
+							} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+								intent.putExtra("app_package", getActivity().getPackageName());
+								intent.putExtra("app_uid", getActivity().getApplicationInfo().uid);
 							}
-						}));
-						onSelectedAutoRefreshInterval(alwaysNotiDataObj.getUpdateIntervalMillis());
+
+							startActivity(intent);
+						}
 					} else {
 						notificationHelper.cancelNotification(notificationType.getNotificationId());
 						alwaysNotiHelper.cancelAutoRefresh();

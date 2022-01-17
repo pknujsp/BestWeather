@@ -256,7 +256,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
 					dialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
-					fusedLocation.startLocationUpdates(myLocationCallback);
+					fusedLocation.startLocationUpdates(myLocationCallback, false);
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
 				}
@@ -600,11 +600,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						}
 					}
 				});
-			} else if (fail == Fail.REJECT_PERMISSION) {
+			} else if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
 				fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
 					@Override
 					public void onActivityResult(ActivityResult result) {
-						if (fusedLocation.checkPermissions()) {
+						if (fusedLocation.checkDefaultPermissions()) {
 							binding.mainToolbar.gps.callOnClick();
 						}
 					}

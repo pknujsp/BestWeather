@@ -1,8 +1,6 @@
 package com.lifedawn.bestweather.intro;
 
-import android.Manifest;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -11,7 +9,6 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
@@ -87,7 +84,7 @@ public class IntroFragment extends Fragment {
 			@Override
 			public void onClick(View view) {
 				dialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
-				fusedLocation.startLocationUpdates(locationCallback);
+				fusedLocation.startLocationUpdates(locationCallback, false);
 			}
 		});
 		binding.findAddress.setOnClickListener(new View.OnClickListener() {
@@ -161,11 +158,11 @@ public class IntroFragment extends Fragment {
 						}
 					}
 				});
-			} else if (fail == Fail.REJECT_PERMISSION) {
+			} else if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
 				fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
 					@Override
 					public void onActivityResult(ActivityResult result) {
-						if (fusedLocation.checkPermissions()) {
+						if (fusedLocation.checkDefaultPermissions()) {
 							binding.useCurrentLocation.callOnClick();
 						}
 					}

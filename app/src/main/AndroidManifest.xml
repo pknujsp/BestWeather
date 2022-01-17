@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <application
         android:name=".main.MyApplication"
@@ -303,10 +304,6 @@
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name=".alarm.alarmnotifications.AlarmService"
-            android:enabled="true"
-            android:exported="true" />
-        <service
-            android:name=".widget.service.WidgetService"
             android:enabled="true"
             android:exported="true" />
 

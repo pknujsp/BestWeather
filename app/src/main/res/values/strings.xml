@@ -594,6 +594,8 @@
     <string name="notificationLocationChannelName">위치 검색</string>
     <string name="notificationLocationChannelDescription">현재 위치를 검색합니다</string>
     <string name="findingCurrentLocationTitle">현재 위치 검색</string>
+    <string name="uncheckedAllowAllTheTime">위치 권한 항상 허용을 선택해주세요</string>
+    <string name="disabledNotification">알림이 차단되어있습니다. 차단을 해제해주세요.</string>
 
 
 </resources>

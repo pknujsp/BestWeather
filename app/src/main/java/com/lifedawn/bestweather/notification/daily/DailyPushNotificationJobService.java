@@ -1,17 +1,14 @@
 package com.lifedawn.bestweather.notification.daily;
 
-import android.app.PendingIntent;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PersistableBundle;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -39,7 +36,6 @@ import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -146,8 +142,8 @@ public class DailyPushNotificationJobService extends JobService {
 			public void onFailed(Fail fail) {
 				RemoteViewProcessor.ErrorType errorType = null;
 
-				if (fail == Fail.REJECT_PERMISSION) {
-					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_REJECTED;
+				if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
+					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_DENIED;
 				} else {
 					errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
 				}
@@ -157,7 +153,7 @@ public class DailyPushNotificationJobService extends JobService {
 			}
 		};
 
-		FusedLocation.getInstance(context).startLocationUpdates(locationCallback);
+		FusedLocation.getInstance(context).startLocationUpdates(locationCallback,true );
 	}
 
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,
