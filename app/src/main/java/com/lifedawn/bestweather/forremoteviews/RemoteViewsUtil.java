@@ -1,15 +1,18 @@
 package com.lifedawn.bestweather.forremoteviews;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.os.Build;
 import android.view.View;
 import android.widget.RemoteViews;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.IntentUtil;
 
-public class RemoteViewProcessor {
+public class RemoteViewsUtil {
 
 	public enum ErrorType {
-		UNAVAILABLE_NETWORK, FAILED_LOAD_WEATHER_DATA, GPS_OFF, GPS_PERMISSION_DENIED, DENIED_BACKGROUND_LOCATION_PERMISSION
+		UNAVAILABLE_NETWORK, FAILED_LOAD_WEATHER_DATA, GPS_OFF, DENIED_GPS_PERMISSIONS, DENIED_BACKGROUND_LOCATION_PERMISSION
 	}
 
 	public static void onBeginProcess(RemoteViews remoteViews) {
@@ -28,27 +31,51 @@ public class RemoteViewProcessor {
 		remoteViews.setViewVisibility(R.id.warning_layout, View.VISIBLE);
 		remoteViews.setViewVisibility(R.id.valuesLayout, View.GONE);
 		remoteViews.setViewVisibility(R.id.progressbar, View.GONE);
-		remoteViews.setTextViewText(R.id.warning_process_btn, context.getString(R.string.again));
-		remoteViews.setViewVisibility(R.id.warning_process_btn, View.VISIBLE);
+		remoteViews.setViewVisibility(R.id.refreshBtn, View.VISIBLE);
+
+		String btn2Text = null;
 
 		switch (errorType) {
 			case GPS_OFF:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.request_to_make_gps_on));
+				remoteViews.setOnClickPendingIntent(R.id.btn2, PendingIntent.getActivity(context, 0,
+						IntentUtil.getLocationSettingsIntent(), Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+								PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
+								PendingIntent.FLAG_UPDATE_CURRENT));
+				btn2Text = context.getString(R.string.enable_gps);
 				break;
 			case FAILED_LOAD_WEATHER_DATA:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.update_failed));
 				break;
-			case GPS_PERMISSION_DENIED:
+			case DENIED_GPS_PERMISSIONS:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.message_needs_location_permission));
+				remoteViews.setOnClickPendingIntent(R.id.btn2, PendingIntent.getActivity(context, 0,
+						IntentUtil.getAppSettingsIntent(context), Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+								PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
+								PendingIntent.FLAG_UPDATE_CURRENT));
+				btn2Text = context.getString(R.string.check_permission);
 				break;
 			case UNAVAILABLE_NETWORK:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.need_to_connect_network));
 				break;
 			case DENIED_BACKGROUND_LOCATION_PERMISSION:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.uncheckedAllowAllTheTime));
+				remoteViews.setOnClickPendingIntent(R.id.btn2,
+						PendingIntent.getActivity(context, 0,
+								IntentUtil.getAppSettingsIntent(context),
+								Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+										PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
+										PendingIntent.FLAG_UPDATE_CURRENT));
+				btn2Text = context.getString(R.string.check_permission);
 				break;
 		}
 
+		if (btn2Text != null) {
+			remoteViews.setTextViewText(R.id.btn2, btn2Text);
+			remoteViews.setViewVisibility(R.id.btn2, View.VISIBLE);
+		} else {
+			remoteViews.setViewVisibility(R.id.btn2, View.GONE);
+		}
 	}
 
 

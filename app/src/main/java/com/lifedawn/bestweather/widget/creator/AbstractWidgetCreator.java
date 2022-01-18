@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.view.View;
@@ -76,7 +77,7 @@ public abstract class AbstractWidgetCreator {
 	}
 
 
-	public void setRefreshPendingIntent(Class<?> widgetProviderClass, RemoteViews remoteViews,int appWidgetId) {
+	public void setRefreshPendingIntent(Class<?> widgetProviderClass, RemoteViews remoteViews, int appWidgetId) {
 		Intent refreshIntent = new Intent(context, widgetProviderClass);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
@@ -84,7 +85,9 @@ public abstract class AbstractWidgetCreator {
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 		refreshIntent.putExtras(bundle);
 
-		remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, PendingIntent.getBroadcast(context, appWidgetId, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT));
+		remoteViews.setOnClickPendingIntent(R.id.refreshBtn, PendingIntent.getBroadcast(context, appWidgetId, refreshIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
+				PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 
 	public WidgetDto loadDefaultSettings() {
@@ -171,7 +174,9 @@ public abstract class AbstractWidgetCreator {
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 		intent.putExtras(bundle);
 
-		return PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		return PendingIntent.getActivity(context, appWidgetId, intent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
+				PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	protected int getWidgetSizeInDp(AppWidgetManager appWidgetManager, String key) {

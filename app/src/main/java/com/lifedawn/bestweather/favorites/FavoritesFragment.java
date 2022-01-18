@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.AlarmSettingsFragment;
+import com.lifedawn.bestweather.commons.classes.IntentUtil;
 import com.lifedawn.bestweather.commons.classes.RecyclerViewItemDecoration;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
@@ -364,18 +365,14 @@ public class FavoritesFragment extends Fragment {
 					getString(R.string.pref_key_never_ask_again_permission_for_access_location), false);
 
 			if (neverAskAgain) {
-				Intent intent = new Intent();
-				intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-				intent.setData(Uri.fromParts("package", getActivity().getPackageName(), null));
-				startActivity(intent);
+				startActivity(IntentUtil.getAppSettingsIntent(getActivity()));
 			} else {
 				ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 0);
 			}
 			return false;
 		} else {
 			Toast.makeText(getContext(), R.string.request_to_make_gps_on, Toast.LENGTH_SHORT).show();
-			Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-			startActivity(intent);
+			startActivity(IntentUtil.getLocationSettingsIntent());
 			return false;
 		}
 	}

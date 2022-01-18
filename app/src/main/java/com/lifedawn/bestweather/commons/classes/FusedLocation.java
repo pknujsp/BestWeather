@@ -190,7 +190,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				activity.getString(R.string.check), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-						locationLifeCycleObserver.launchGpsLauncher(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS), gpsResultCallback);
+						locationLifeCycleObserver.launchGpsLauncher(IntentUtil.getLocationSettingsIntent(), gpsResultCallback);
 					}
 				}).setNegativeButton(activity.getString(R.string.no), new DialogInterface.OnClickListener() {
 			@Override
@@ -207,12 +207,9 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				context.getString(R.string.pref_key_never_ask_again_permission_for_access_location), false);
 
 		if (neverAskAgain) {
-			Intent intent = new Intent();
-			intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-			intent.setData(Uri.fromParts("package", activity.getPackageName(), null));
-			locationLifeCycleObserver.launchAppSettingsLauncher(intent, appSettingsResultCallback);
+			locationLifeCycleObserver.launchAppSettingsLauncher(IntentUtil.getAppSettingsIntent(activity), appSettingsResultCallback);
 		} else {
-			locationLifeCycleObserver.launchPermissionLauncher(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+			locationLifeCycleObserver.launchPermissionsLauncher(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
 					Manifest.permission.ACCESS_COARSE_LOCATION}, permissionsResultCallback);
 		}
 	}

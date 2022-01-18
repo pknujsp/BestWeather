@@ -19,7 +19,7 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
-import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
@@ -66,7 +66,7 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 	public void initNotification(Handler handler) {
 		this.handler = handler;
 		RemoteViews remoteViews = createRemoteViews(false);
-		RemoteViewProcessor.onBeginProcess(remoteViews);
+		RemoteViewsUtil.onBeginProcess(remoteViews);
 		makeNotification(remoteViews, R.drawable.refresh, false);
 
 		if (notificationDataObj.getLocationType() == LocationType.CurrentLocation) {
@@ -122,10 +122,10 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty();
 
 		if (successful) {
-			RemoteViewProcessor.onSuccessfulProcess(remoteViews);
+			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 		} else {
-			RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
-			remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, getRefreshPendingIntent());
+			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 		}
 
 		makeNotification(remoteViews, icon, true);
@@ -232,12 +232,13 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 			NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
 
 			builder.setOngoing(true).setSmallIcon(icon)
-					.setPriority(NotificationCompat.PRIORITY_MIN).setVibrate(new long[]{0L}).setDefaults(NotificationCompat.DEFAULT_LIGHTS |
-					NotificationCompat.DEFAULT_SOUND).setSound(null).setSilent(true)
-			.setAutoCancel(false).setCustomContentView(remoteViews).setCustomBigContentView(remoteViews);
+					.setPriority(NotificationCompat.PRIORITY_MAX).setVibrate(new long[]{0L}).setDefaults(NotificationCompat.DEFAULT_LIGHTS |
+					NotificationCompat.DEFAULT_SOUND).setSound(null).setSilent(true).setShowWhen(false)
+					.setAutoCancel(false).setCustomBigContentView(remoteViews).setCustomContentView(remoteViews)
+					.setBadgeIconType(NotificationCompat.BADGE_ICON_NONE);
+			Notification notification = builder.build();
 
 			NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-			Notification notification = builder.build();
 			notificationManager.notify(notificationType.getNotificationId(), notification);
 		} else {
 			notificationHelper.cancelNotification(notificationType.getNotificationId());

@@ -15,7 +15,7 @@ import android.widget.RemoteViews;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
@@ -54,7 +54,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 							RemoteViews remoteViews = widgetCreator.createRemoteViews();
 
 							widgetCreator.setRefreshPendingIntent(widgetProviderClass, remoteViews, appWidgetId);
-							RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+							RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 							appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
 						} else {
 

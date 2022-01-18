@@ -10,14 +10,13 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
-import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.EighthWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.EleventhWidgetCreator;
 import com.lifedawn.bestweather.widget.widgetprovider.EleventhWidgetProvider;
 
@@ -87,10 +86,10 @@ public class EleventhWidgetJobService extends AbstractWidgetJobService {
 		widgetDto.setLoadSuccessful(successful);
 
 		if (successful) {
-			RemoteViewProcessor.onSuccessfulProcess(remoteViews);
+			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 		} else {
 			if (widgetDto.getBitmap() == null) {
-				RemoteViewProcessor.onErrorProcess(remoteViews, context, RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+				RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 				setRefreshPendingIntent(remoteViews, appWidgetId);
 			} else {
 				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());

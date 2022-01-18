@@ -25,7 +25,7 @@ import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
-import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
@@ -81,16 +81,16 @@ public abstract class AbstractWidgetJobService extends JobService {
 
 					final RemoteViews remoteViews = widgetViewCreator.createRemoteViews();
 
-					RemoteViewProcessor.onBeginProcess(remoteViews);
+					RemoteViewsUtil.onBeginProcess(remoteViews);
 					appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 					NetworkStatus networkStatus = NetworkStatus.getInstance(getApplicationContext());
 
 					if (!networkStatus.networkAvailable()) {
-						RemoteViewProcessor.ErrorType errorType = RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK;
+						RemoteViewsUtil.ErrorType errorType = RemoteViewsUtil.ErrorType.UNAVAILABLE_NETWORK;
 
 						setRefreshPendingIntent(remoteViews, appWidgetId);
-						RemoteViewProcessor.onErrorProcess(remoteViews, getApplicationContext(), errorType);
+						RemoteViewsUtil.onErrorProcess(remoteViews, getApplicationContext(), errorType);
 						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 						Message message = handler.obtainMessage();
@@ -132,10 +132,10 @@ public abstract class AbstractWidgetJobService extends JobService {
 					RemoteViews remoteViews = widgetViewCreator.createRemoteViews();
 					NetworkStatus networkStatus = NetworkStatus.getInstance(getApplicationContext());
 					if (!networkStatus.networkAvailable()) {
-						RemoteViewProcessor.ErrorType errorType = RemoteViewProcessor.ErrorType.UNAVAILABLE_NETWORK;
+						RemoteViewsUtil.ErrorType errorType = RemoteViewsUtil.ErrorType.UNAVAILABLE_NETWORK;
 
 						setRefreshPendingIntent(remoteViews, appWidgetId);
-						RemoteViewProcessor.onErrorProcess(remoteViews, getApplicationContext(), errorType);
+						RemoteViewsUtil.onErrorProcess(remoteViews, getApplicationContext(), errorType);
 						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 						Message message = handler.obtainMessage();
@@ -144,7 +144,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 						return;
 					}
 
-					RemoteViewProcessor.onBeginProcess(remoteViews);
+					RemoteViewsUtil.onBeginProcess(remoteViews);
 					appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 					if (result.getLocationType() == LocationType.CurrentLocation) {
@@ -248,20 +248,20 @@ public abstract class AbstractWidgetJobService extends JobService {
 			});
 
 		} else {
-			RemoteViewProcessor.ErrorType errorType = null;
+			RemoteViewsUtil.ErrorType errorType = null;
 
 			if (fail == FusedLocation.MyLocationCallback.Fail.DENIED_LOCATION_PERMISSIONS) {
-				errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_DENIED;
+				errorType = RemoteViewsUtil.ErrorType.DENIED_GPS_PERMISSIONS;
 			} else if (fail == FusedLocation.MyLocationCallback.Fail.DISABLED_GPS) {
-				errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
+				errorType = RemoteViewsUtil.ErrorType.GPS_OFF;
 			} else if (fail == FusedLocation.MyLocationCallback.Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION) {
-				errorType = RemoteViewProcessor.ErrorType.DENIED_BACKGROUND_LOCATION_PERMISSION;
+				errorType = RemoteViewsUtil.ErrorType.DENIED_BACKGROUND_LOCATION_PERMISSION;
 			} else {
-				errorType = RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA;
+				errorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA;
 			}
 
 			setRefreshPendingIntent(remoteViews, appWidgetId);
-			RemoteViewProcessor.onErrorProcess(remoteViews, getApplicationContext(), errorType);
+			RemoteViewsUtil.onErrorProcess(remoteViews, getApplicationContext(), errorType);
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 			Message message = handler.obtainMessage();
@@ -294,7 +294,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 					@Override
 					public void onCanceled() {
 						setRefreshPendingIntent(remoteViews, appWidgetId);
-						RemoteViewProcessor.onErrorProcess(remoteViews, widgetViewCreator.getContext(), RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA);
+						RemoteViewsUtil.onErrorProcess(remoteViews, widgetViewCreator.getContext(), RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 						appWidgetManager.updateAppWidget(widgetViewCreator.getAppWidgetId(), remoteViews);
 
 						Message message = handler.obtainMessage();

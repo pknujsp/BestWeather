@@ -29,6 +29,7 @@ import android.widget.SpinnerAdapter;
 import android.widget.Toast;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.IntentUtil;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
@@ -136,16 +137,7 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 							binding.notificationSwitch.setChecked(false);
 							binding.settingsLayout.setVisibility(View.GONE);
 
-							Intent intent = new Intent();
-							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-								intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-								intent.putExtra(Settings.EXTRA_APP_PACKAGE, getActivity().getPackageName());
-							} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-								intent.putExtra("app_package", getActivity().getPackageName());
-								intent.putExtra("app_uid", getActivity().getApplicationInfo().uid);
-							}
-
-							startActivity(intent);
+							startActivity(IntentUtil.getNotificationSettingsIntent(getActivity()));
 						}
 					} else {
 						notificationHelper.cancelNotification(notificationType.getNotificationId());

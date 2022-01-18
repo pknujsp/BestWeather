@@ -33,10 +33,12 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 	private Activity activity;
 	private ActivityResultLauncher<Intent> requestOnGpsLauncher;
 	private ActivityResultLauncher<Intent> moveToAppDetailSettingsLauncher;
+	private ActivityResultLauncher<Intent> backgroundLocationPermissionLauncher;
 	private ActivityResultLauncher<String[]> requestLocationPermissionLauncher;
 
 	private ActivityResultCallback<ActivityResult> gpsResultCallback;
 	private ActivityResultCallback<ActivityResult> appSettingsResultCallback;
+	private ActivityResultCallback<ActivityResult> backgroundLocationPermissionResultCallback;
 	private ActivityResultCallback<Map<String, Boolean>> permissionResultCallback;
 
 	public LocationLifeCycleObserver(@NonNull ActivityResultRegistry mRegistry, Activity activity) {
@@ -97,6 +99,18 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 				}
 			}
 		});
+
+		backgroundLocationPermissionLauncher = mRegistry.register("backgroundLocationPermission", new ActivityResultContracts.StartActivityForResult(),
+				new ActivityResultCallback<ActivityResult>() {
+			@Override
+			public void onActivityResult(ActivityResult result) {
+				if (backgroundLocationPermissionResultCallback != null) {
+					backgroundLocationPermissionResultCallback.onActivityResult(result);
+				}
+
+
+			}
+		});
 	}
 
 	public void launchGpsLauncher(Intent intent, @NonNull ActivityResultCallback<ActivityResult> callback) {
@@ -109,8 +123,13 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 		moveToAppDetailSettingsLauncher.launch(intent);
 	}
 
-	public void launchPermissionLauncher(String[] input, @NonNull ActivityResultCallback<Map<String, Boolean>> callback) {
+	public void launchPermissionsLauncher(String[] input, @NonNull ActivityResultCallback<Map<String, Boolean>> callback) {
 		permissionResultCallback = callback;
 		requestLocationPermissionLauncher.launch(input);
+	}
+
+	public void launchBackgroundLocationPermissionLauncher(Intent intent, @NonNull ActivityResultCallback<ActivityResult> callback) {
+		backgroundLocationPermissionResultCallback = callback;
+		backgroundLocationPermissionLauncher.launch(intent);
 	}
 }

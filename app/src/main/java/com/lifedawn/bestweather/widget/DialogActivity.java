@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -128,7 +129,9 @@ public class DialogActivity extends Activity {
 				refreshIntent.putExtras(bundle);
 
 				PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, refreshIntent,
-						PendingIntent.FLAG_CANCEL_CURRENT);
+						Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+								PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
+								PendingIntent.FLAG_UPDATE_CURRENT);
 				try {
 					pendingIntent.send();
 				} catch (PendingIntent.CanceledException e) {

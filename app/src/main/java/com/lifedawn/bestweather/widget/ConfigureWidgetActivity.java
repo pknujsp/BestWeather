@@ -70,6 +70,8 @@ import com.lifedawn.bestweather.widget.widgetprovider.FifthWidgetProvider;
 
 import org.jetbrains.annotations.NotNull;
 
+import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
+
 public class ConfigureWidgetActivity extends AppCompatActivity implements AbstractWidgetCreator.WidgetUpdateCallback {
 	private ActivityConfigureWidgetBinding binding;
 	private Integer appWidgetId;
@@ -251,7 +253,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 								initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 								intent.putExtras(initBundle);
 
-								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent, 0);
+								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+										PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
+										PendingIntent.FLAG_UPDATE_CURRENT);
 								try {
 									pendingIntent.send();
 								} catch (PendingIntent.CanceledException e) {

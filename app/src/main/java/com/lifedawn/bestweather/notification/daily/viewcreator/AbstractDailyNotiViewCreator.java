@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.RemoteViews;
@@ -13,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.IntentUtil;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.main.MainActivity;
@@ -46,18 +48,18 @@ public abstract class AbstractDailyNotiViewCreator {
 		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Daily);
 		notificationObj.getNotificationBuilder().setSmallIcon(R.drawable.day_clear);
 		notificationObj.getNotificationBuilder().setContentTitle(context.getString(R.string.app_name));
-		notificationObj.getNotificationBuilder().setPriority(NotificationCompat.PRIORITY_DEFAULT);
-		notificationObj.getNotificationBuilder().setStyle(new NotificationCompat.BigTextStyle());
+		notificationObj.getNotificationBuilder().setPriority(NotificationCompat.PRIORITY_HIGH);
+		notificationObj.getNotificationBuilder().setStyle(new NotificationCompat.BigPictureStyle());
 		notificationObj.getNotificationBuilder().setAutoCancel(true);
 
 		notificationObj.getNotificationBuilder().setCustomContentView(remoteViews);
 		notificationObj.getNotificationBuilder().setCustomBigContentView(remoteViews);
 
-		Intent intent = new Intent(context, MainActivity.class);
-		intent.setAction(Intent.ACTION_MAIN);
-		intent.addCategory(Intent.CATEGORY_LAUNCHER);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		remoteViews.setOnClickPendingIntent(R.id.root_layout, PendingIntent.getActivity(context, notificationObj.getNotificationId(), intent, 0));
+		remoteViews.setOnClickPendingIntent(R.id.root_layout, PendingIntent.getActivity(context, notificationObj.getNotificationId(),
+				IntentUtil.getAppIntent(context),
+				Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+						PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
+						PendingIntent.FLAG_UPDATE_CURRENT));
 
 		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
 		Notification notification = notificationObj.getNotificationBuilder().build();

@@ -27,6 +27,7 @@ public class NotificationHelper {
 			NotificationChannel channel = new NotificationChannel(notificationObj.channelId, notificationObj.channelName,
 					NotificationManager.IMPORTANCE_DEFAULT);
 			channel.setDescription(notificationObj.channelDescription);
+			channel.setShowBadge(false);
 
 			if (notificationObj.getNotificationType() == NotificationType.Always ||
 					notificationObj.getNotificationType() == NotificationType.Location) {
@@ -51,11 +52,14 @@ public class NotificationHelper {
 		clickIntent.setAction(Intent.ACTION_MAIN);
 		clickIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		clickIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationType.getNotificationId(), clickIntent, 0);
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationType.getNotificationId(), clickIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
+				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationObj.channelId)
 				.setSmallIcon(R.drawable.temp_icon)
-				.setContentIntent(pendingIntent);
+				.setContentIntent(pendingIntent)
+				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
 		notificationObj.setNotificationBuilder(builder);
 		return notificationObj;

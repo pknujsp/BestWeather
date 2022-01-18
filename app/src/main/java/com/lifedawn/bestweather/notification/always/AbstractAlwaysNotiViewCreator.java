@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.RemoteViews;
@@ -21,7 +22,7 @@ import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
-import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
@@ -97,20 +98,20 @@ public abstract class AbstractAlwaysNotiViewCreator {
 
 			@Override
 			public void onFailed(Fail fail) {
-				RemoteViewProcessor.ErrorType errorType = null;
+				RemoteViewsUtil.ErrorType errorType = null;
 
 				if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
-					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_DENIED;
+					errorType = RemoteViewsUtil.ErrorType.DENIED_GPS_PERMISSIONS;
 				} else if (fail == Fail.DISABLED_GPS) {
-					errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
+					errorType = RemoteViewsUtil.ErrorType.GPS_OFF;
 				} else if (fail == Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION) {
-					errorType = RemoteViewProcessor.ErrorType.DENIED_BACKGROUND_LOCATION_PERMISSION;
+					errorType = RemoteViewsUtil.ErrorType.DENIED_BACKGROUND_LOCATION_PERMISSION;
 				} else {
-					errorType = RemoteViewProcessor.ErrorType.FAILED_LOAD_WEATHER_DATA;
+					errorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA;
 				}
 
-				remoteViews.setOnClickPendingIntent(R.id.warning_process_btn, getRefreshPendingIntent());
-				RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
+				remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+				RemoteViewsUtil.onErrorProcess(remoteViews, context, errorType);
 				makeNotification(remoteViews, R.drawable.temp_icon, true);
 			}
 		};
@@ -120,7 +121,7 @@ public abstract class AbstractAlwaysNotiViewCreator {
 
 
 	public void loadWeatherData(Context context, RemoteViews remoteViews) {
-		RemoteViewProcessor.onBeginProcess(remoteViews);
+		RemoteViewsUtil.onBeginProcess(remoteViews);
 		makeNotification(remoteViews, R.drawable.temp_icon, false);
 
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
@@ -164,7 +165,9 @@ public abstract class AbstractAlwaysNotiViewCreator {
 		refreshIntent.putExtras(bundle);
 
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 10551, refreshIntent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
+				Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+						PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
+						PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
 	}
 

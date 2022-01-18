@@ -23,7 +23,7 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
-import com.lifedawn.bestweather.forremoteviews.RemoteViewProcessor;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FifthDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FirstDailyNotificationViewCreator;
@@ -140,15 +140,20 @@ public class DailyPushNotificationJobService extends JobService {
 
 			@Override
 			public void onFailed(Fail fail) {
-				RemoteViewProcessor.ErrorType errorType = null;
+				RemoteViewsUtil.ErrorType errorType = null;
 
 				if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
-					errorType = RemoteViewProcessor.ErrorType.GPS_PERMISSION_DENIED;
+					errorType = RemoteViewsUtil.ErrorType.DENIED_GPS_PERMISSIONS;
+				} else if (fail == Fail.DISABLED_GPS) {
+					errorType = RemoteViewsUtil.ErrorType.GPS_OFF;
+				} else if (fail == Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION) {
+					errorType = RemoteViewsUtil.ErrorType.DENIED_BACKGROUND_LOCATION_PERMISSION;
 				} else {
-					errorType = RemoteViewProcessor.ErrorType.GPS_OFF;
+					errorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA;
 				}
-				RemoteViewProcessor.onErrorProcess(remoteViews, context, errorType);
-				remoteViews.setViewVisibility(R.id.warning_process_btn, View.GONE);
+
+				RemoteViewsUtil.onErrorProcess(remoteViews, context, errorType);
+				remoteViews.setViewVisibility(R.id.refreshBtn, View.GONE);
 				viewCreator.makeNotification(remoteViews, dailyPushNotificationDto.getId());
 			}
 		};
