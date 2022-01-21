@@ -79,12 +79,9 @@ public class WeatherResponseProcessor {
 	                                             ZoneOffset zoneOffset) {
 		MultipleRestApiDownloader.ResponseResult aqiCnResponseResult = multipleRestApiDownloader.getResponseMap().get(WeatherDataSourceType.AQICN).get(
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
-		AirQualityDto airQualityDto = null;
 
-		if (aqiCnResponseResult.isSuccessful()) {
-			airQualityDto = AqicnResponseProcessor.makeAirQualityDto(context, (AqiCnGeolocalizedFeedResponse) aqiCnResponseResult.getResponseObj(), zoneOffset);
-		}
-		return airQualityDto;
+		return AqicnResponseProcessor.makeAirQualityDto(context, (AqiCnGeolocalizedFeedResponse) aqiCnResponseResult.getResponseObj(),
+				zoneOffset);
 	}
 
 	public static CurrentConditionsDto parseTextToCurrentConditionsDto(Context context, JsonObject jsonObject,

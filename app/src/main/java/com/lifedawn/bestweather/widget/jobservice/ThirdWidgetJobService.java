@@ -84,10 +84,6 @@ public class ThirdWidgetJobService extends AbstractWidgetJobService {
 
 			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
 					zoneOffset);
-			if (airQualityDto == null) {
-				airQualityDto = new AirQualityDto();
-				airQualityDto.setAqi(-1);
-			}
 
 			widgetCreator.setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto,
 					currentConditionsDto, hourlyForecastDtoList, dailyForecastDtoList, new OnDrawBitmapCallback() {

@@ -83,7 +83,7 @@ public class FourthDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 		final String refreshDateTime = multipleRestApiDownloader.getRequestDateTime().toString();
 
 		final AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader, null);
-		final boolean successful = airQualityDto != null;
+		final boolean successful = airQualityDto.isSuccessful();
 
 		if (successful) {
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, airQualityDto);

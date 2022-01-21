@@ -53,7 +53,7 @@ public class SeventhWidgetJobService extends AbstractWidgetJobService {
 		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
 		final AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader, null);
-		final boolean successful = airQualityDto != null;
+		final boolean successful = airQualityDto.isSuccessful();
 
 		if (successful) {
 			ZoneOffset zoneOffset = ZoneOffset.of(airQualityDto.getTimeInfo().getTz());

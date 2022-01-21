@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.notification;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -27,14 +28,15 @@ public class NotificationHelper {
 			NotificationChannel channel = new NotificationChannel(notificationObj.channelId, notificationObj.channelName,
 					NotificationManager.IMPORTANCE_DEFAULT);
 			channel.setDescription(notificationObj.channelDescription);
+			channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
 			channel.setShowBadge(false);
 
 			if (notificationObj.getNotificationType() == NotificationType.Always ||
 					notificationObj.getNotificationType() == NotificationType.Location) {
-				channel.setVibrationPattern(new long[]{0L});
-				channel.enableLights(false);
-				channel.enableVibration(true);
 				channel.setImportance(NotificationManager.IMPORTANCE_LOW);
+				channel.enableVibration(false);
+				channel.setVibrationPattern(null);
+				channel.setSound(null, null);
 			}
 
 			notificationManager.createNotificationChannel(channel);
@@ -56,8 +58,9 @@ public class NotificationHelper {
 				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
 				PendingIntent.FLAG_UPDATE_CURRENT);
 
-		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationObj.channelId)
-				.setSmallIcon(R.drawable.temp_icon)
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationObj.channelId);
+		
+		builder.setSmallIcon(R.drawable.temp_icon)
 				.setContentIntent(pendingIntent)
 				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 

@@ -60,7 +60,7 @@ public class SixthWidgetJobService extends AbstractWidgetJobService {
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
 				WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherDataSourceTypeSet));
 		final AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader, null);
-		final boolean successful = currentConditionsDto != null && airQualityDto != null;
+		final boolean successful = currentConditionsDto != null && airQualityDto.isSuccessful();
 
 		if (successful) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();

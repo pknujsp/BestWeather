@@ -99,10 +99,6 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 
 			AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
 					zoneOffset);
-			if (airQualityDto == null) {
-				airQualityDto = new AirQualityDto();
-				airQualityDto.setAqi(-1);
-			}
 
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, airQualityDto, currentConditionsDto);
 			RemoteViewsUtil.onSuccessfulProcess(remoteViews);

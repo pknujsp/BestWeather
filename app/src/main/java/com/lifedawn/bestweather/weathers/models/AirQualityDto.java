@@ -14,6 +14,7 @@ public class AirQualityDto {
 	private Current current;
 	private Time timeInfo;
 	private List<DailyForecast> dailyForecastList;
+	private boolean successful;
 
 	public static class Current {
 		private Integer co;
@@ -429,5 +430,13 @@ public class AirQualityDto {
 
 	public void setTimeInfo(Time timeInfo) {
 		this.timeInfo = timeInfo;
+	}
+
+	public void setSuccessful(boolean successful) {
+		this.successful = successful;
+	}
+
+	public boolean isSuccessful() {
+		return successful;
 	}
 }

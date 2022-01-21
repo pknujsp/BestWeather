@@ -111,8 +111,10 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		//응답 실패한 경우
 		if (aqiCnGeolocalizedFeedResponse == null || !aqiCnGeolocalizedFeedResponse.getStatus().equals("ok")) {
 			binding.progressResultView.onFailed(getString(R.string.error));
+			binding.weatherCardViewHeader.detailForecast.setVisibility(View.GONE);
 			return;
 		} else {
+			binding.weatherCardViewHeader.detailForecast.setVisibility(View.VISIBLE);
 			binding.progressResultView.onSuccessful();
 		}
 

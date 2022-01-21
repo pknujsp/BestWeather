@@ -87,6 +87,8 @@
         <com.lifedawn.bestweather.commons.views.ProgressResultView
             android:id="@+id/progress_result_view"
             android:layout_width="match_parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             android:layout_height="wrap_content" />
 
 

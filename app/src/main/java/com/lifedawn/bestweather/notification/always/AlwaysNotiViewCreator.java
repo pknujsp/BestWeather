@@ -2,10 +2,15 @@ package com.lifedawn.bestweather.notification.always;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -19,8 +24,10 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
+import com.lifedawn.bestweather.commons.views.ViewUtil;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 
+import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
@@ -111,7 +118,7 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 		if (zoneOffset != null) {
 			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
 					zoneOffset);
-			if (airQualityDto != null) {
+			if (airQualityDto.isSuccessful()) {
 				setAirQualityViews(remoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 			} else {
 				setAirQualityViews(remoteViews, context.getString(R.string.noData));
@@ -229,16 +236,29 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 				PreferenceManager.getDefaultSharedPreferences(context).getBoolean(notificationType.getPreferenceName(), false);
 		if (enabled) {
 			NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(notificationType);
-			NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
 
-			builder.setOngoing(true).setSmallIcon(icon)
-					.setPriority(NotificationCompat.PRIORITY_MAX).setVibrate(new long[]{0L}).setDefaults(NotificationCompat.DEFAULT_LIGHTS |
-					NotificationCompat.DEFAULT_SOUND).setSound(null).setSilent(true).setShowWhen(false)
-					.setAutoCancel(false).setCustomBigContentView(remoteViews).setCustomContentView(remoteViews)
-					.setBadgeIconType(NotificationCompat.BADGE_ICON_NONE);
-			Notification notification = builder.build();
+			Intent clickIntent = new Intent(context, MainActivity.class);
+			clickIntent.setAction(Intent.ACTION_MAIN);
+			clickIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+			clickIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationType.getNotificationId(), clickIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
+					PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
+					PendingIntent.FLAG_UPDATE_CURRENT);
 
-			NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+			Notification notification = null;
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+				Notification.Builder builder = new Notification.Builder(context, notificationObj.getChannelId());
+
+				builder.setSmallIcon(icon)
+						.setContentIntent(pendingIntent)
+						.setVisibility(Notification.VISIBILITY_PUBLIC).setContentTitle("").setAutoCancel(false)
+						.setContentText("").setOngoing(true)
+						.setSmallIcon(icon).setOnlyAlertOnce(true)
+						.setCustomContentView(remoteViews).setCustomBigContentView(remoteViews);
+				notification = builder.build();
+			}
+
+			NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 			notificationManager.notify(notificationType.getNotificationId(), notification);
 		} else {
 			notificationHelper.cancelNotification(notificationType.getNotificationId());

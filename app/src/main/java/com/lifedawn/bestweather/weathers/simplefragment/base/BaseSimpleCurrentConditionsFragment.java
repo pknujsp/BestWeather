@@ -102,14 +102,13 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 
 	public void setAqiValuesToViews() {
 		AirQualityDto airQualityDto = AqicnResponseProcessor.makeAirQualityDto(getContext(), airQualityResponse, zoneOffset);
-		Double distance = 0.0;
 		String airQuality = null;
 
-		if (airQualityDto != null) {
-			distance = LocationDistance.distance(latitude, longitude, airQualityDto.getLatitude(), airQualityDto.getLongitude(),
+		if (airQualityDto.isSuccessful()) {
+			Double distance = LocationDistance.distance(latitude, longitude, airQualityDto.getLatitude(), airQualityDto.getLongitude(),
 					LocationDistance.Unit.KM);
 
-			if (distance > 100) {
+			if (distance > 100.0) {
 				airQuality = getString(R.string.noData);
 			} else {
 				airQuality = AqicnResponseProcessor.getGradeDescription((int) Double.parseDouble(airQualityResponse.getData().getAqi()));
