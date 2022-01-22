@@ -57,9 +57,7 @@ public abstract class AbstractDailyNotiViewCreator {
 
 		remoteViews.setOnClickPendingIntent(R.id.root_layout, PendingIntent.getActivity(context, notificationObj.getNotificationId(),
 				IntentUtil.getAppIntent(context),
-				Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-						PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-						PendingIntent.FLAG_UPDATE_CURRENT));
+				PendingIntent.FLAG_UPDATE_CURRENT));
 
 		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
 		Notification notification = notificationObj.getNotificationBuilder().build();

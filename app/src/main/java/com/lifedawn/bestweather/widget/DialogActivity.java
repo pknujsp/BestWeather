@@ -129,9 +129,7 @@ public class DialogActivity extends Activity {
 				refreshIntent.putExtras(bundle);
 
 				PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, refreshIntent,
-						Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-								PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-								PendingIntent.FLAG_UPDATE_CURRENT);
+						PendingIntent.FLAG_UPDATE_CURRENT);
 				try {
 					pendingIntent.send();
 				} catch (PendingIntent.CanceledException e) {

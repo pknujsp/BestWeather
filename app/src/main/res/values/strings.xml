@@ -284,6 +284,7 @@
     <string name="kma_mid_overcast_rain_and_snow">흐리고 비/눈</string>
     <string name="kma_mid_overcast_shower">흐리고 소나기</string>
     <string name="kma_mid_shower">소나기</string>
+    <string name="kma_mid_sleet">비/눈</string>
 
     <!-- aqi grade -->
     <string name="aqi_1_good">좋음</string>

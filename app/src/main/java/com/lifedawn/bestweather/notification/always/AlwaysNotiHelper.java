@@ -31,9 +31,7 @@ public class AlwaysNotiHelper {
 
 			refreshIntent.putExtras(bundle);
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Always.getNotificationId(), refreshIntent,
-					Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-							PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-							PendingIntent.FLAG_UPDATE_CURRENT);
+					PendingIntent.FLAG_UPDATE_CURRENT);
 
 			alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
 					millis, pendingIntent);
@@ -42,9 +40,7 @@ public class AlwaysNotiHelper {
 
 	public void cancelAutoRefresh() {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Always.getNotificationId(), new Intent(context, AlwaysNotificationReceiver.class)
-				, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-						PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-						PendingIntent.FLAG_UPDATE_CURRENT);
+				, PendingIntent.FLAG_UPDATE_CURRENT);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 		}

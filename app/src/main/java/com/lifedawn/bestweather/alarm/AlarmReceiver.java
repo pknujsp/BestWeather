@@ -152,9 +152,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 		bundle.putInt(BundleKey.dtoId.name(), alarmDtoId);
 		intent.putExtras(bundle);
 
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 5000, intent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-				PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 5000, intent, 		PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
 	}
 
@@ -165,9 +163,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 		bundle.putInt(BundleKey.dtoId.name(), alarmDtoId);
 		intent.putExtras(bundle);
 
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 6000, intent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-				PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 6000, intent, 		PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
 	}
 }

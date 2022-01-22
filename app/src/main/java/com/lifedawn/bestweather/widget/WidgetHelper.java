@@ -38,9 +38,7 @@ public class WidgetHelper {
 		refreshIntent.putExtras(bundle);
 
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, refreshIntent,
-				Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-						PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-						PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
 				val, pendingIntent);
@@ -48,9 +46,7 @@ public class WidgetHelper {
 
 	public void cancelAutoRefresh(int appWidgetId) {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, widgetProviderClass),
-				Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-						PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-						PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent.FLAG_UPDATE_CURRENT);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();

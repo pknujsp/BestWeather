@@ -46,9 +46,7 @@ public class AlarmUtil {
 	public static void cancelAlarm(Context context, AlarmDto alarmDto) {
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		alarmManager.cancel(PendingIntent.getBroadcast(context, 10000 + alarmDto.getId(), new Intent(context, AlarmReceiver.class),
-				Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-						PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-						PendingIntent.FLAG_UPDATE_CURRENT));
+				PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 
 	public static void modifyAlarm(Context context, AlarmDto alarmDto) {
@@ -67,9 +65,7 @@ public class AlarmUtil {
 
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 10000 + alarmDto.getId(), alarmIntent,
-				Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-						PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-						PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		Calendar calendar = Calendar.getInstance();
 		Calendar now = (Calendar) calendar.clone();
@@ -96,9 +92,7 @@ public class AlarmUtil {
 
 		AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 10000 + alarmDto.getId(), alarmIntent,
-				Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-						PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-						PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		Calendar calendar = Calendar.getInstance();
 

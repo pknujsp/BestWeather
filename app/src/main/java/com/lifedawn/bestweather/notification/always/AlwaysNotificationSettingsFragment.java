@@ -1,5 +1,8 @@
 package com.lifedawn.bestweather.notification.always;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,6 +40,7 @@ import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentBaseNotificationSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
+import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
@@ -139,6 +143,8 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 
 							startActivity(IntentUtil.getNotificationSettingsIntent(getActivity()));
 						}
+
+
 					} else {
 						notificationHelper.cancelNotification(notificationType.getNotificationId());
 						alwaysNotiHelper.cancelAutoRefresh();
@@ -149,8 +155,8 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 		});
 
 
-		RemoteViews remoteViews = alwaysNotiViewCreator.createRemoteViews(true);
-		View previewWidgetView = remoteViews.apply(getActivity().getApplicationContext(), binding.previewLayout);
+		RemoteViews[] remoteViews = alwaysNotiViewCreator.createRemoteViews(true);
+		View previewWidgetView = remoteViews[1].apply(getActivity().getApplicationContext(), binding.previewLayout);
 		binding.previewLayout.addView(previewWidgetView);
 
 		binding.notificationSwitch.setChecked(originalEnabled);

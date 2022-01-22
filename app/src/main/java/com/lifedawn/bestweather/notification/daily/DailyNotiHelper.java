@@ -35,9 +35,7 @@ public class DailyNotiHelper {
 		bundle.putString("DailyPushNotificationType", dailyPushNotificationDto.getNotificationType().name());
 
 		refreshIntent.putExtras(bundle);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, dailyPushNotificationDto.getId() + 6000, refreshIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-				PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, dailyPushNotificationDto.getId() + 6000, refreshIntent, 		PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
 	}
 
@@ -58,9 +56,7 @@ public class DailyNotiHelper {
 
 	public void disablePushNotification(int id) {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id + 6000, new Intent(context,
-				DailyPushNotificationReceiver.class), Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-				PendingIntent.FLAG_UPDATE_CURRENT);
+				DailyPushNotificationReceiver.class),		PendingIntent.FLAG_UPDATE_CURRENT);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 		}

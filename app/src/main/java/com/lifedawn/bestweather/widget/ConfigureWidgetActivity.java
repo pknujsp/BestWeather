@@ -253,9 +253,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 								initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 								intent.putExtras(initBundle);
 
-								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-										PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-										PendingIntent.FLAG_UPDATE_CURRENT);
+								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent, 		PendingIntent.FLAG_UPDATE_CURRENT);
 								try {
 									pendingIntent.send();
 								} catch (PendingIntent.CanceledException e) {

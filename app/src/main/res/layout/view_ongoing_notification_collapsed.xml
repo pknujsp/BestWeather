@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:layout_height="64dp"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:id="@+id/locationAndRefreshLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="right"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/location" />
+
+            <TextView
+                android:id="@+id/address"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-condensed"
+                android:maxLines="1"
+                android:minLines="1"
+                android:text="@string/address_name"
+                android:textColor="@color/textColorInNotification"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/refreshLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:clickable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/refresh" />
+
+            <TextView
+                android:id="@+id/refresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center_vertical"
+                android:text="@string/updated_time"
+                android:textColor="@color/textColorInNotification"
+                android:textSize="12sp" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/currentConditionsLayout"
+        android:layout_width="match_parent"
+        android:layout_toLeftOf="@id/locationAndRefreshLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_height="match_parent">
+
+
+        <ImageView
+            android:id="@+id/weatherIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="4dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/day_clear" />
+
+        <TextView
+            android:id="@+id/temp"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignTop="@id/weatherIcon"
+            android:layout_alignBottom="@id/weatherIcon"
+            android:layout_marginRight="16dp"
+            android:layout_toRightOf="@id/weatherIcon"
+            android:fontFamily="sans-serif-thin"
+            android:gravity="center_vertical"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:text="20°"
+            android:textColor="@color/textColorInNotification"
+            android:textSize="26sp" />
+
+
+        <TextView
+            android:id="@+id/airQuality"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignTop="@id/weatherIcon"
+            android:layout_alignBottom="@id/weatherIcon"
+            android:layout_marginRight="16dp"
+            android:layout_toRightOf="@id/temp"
+            android:fontFamily="sans-serif-condensed-light"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:text="@string/good"
+
+            android:textColor="@color/textColorInNotification"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/precipitation"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignTop="@id/weatherIcon"
+            android:layout_alignBottom="@id/weatherIcon"
+            android:layout_marginRight="16dp"
+            android:layout_toRightOf="@id/airQuality"
+            android:fontFamily="sans-serif-condensed-light"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:text="@string/not_precipitation"
+            android:textColor="@color/textColorInNotification"
+            android:textSize="13sp" />
+
+
+        <TextView
+            android:id="@+id/windSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignTop="@id/weatherIcon"
+            android:layout_alignBottom="@id/weatherIcon"
+            android:layout_toRightOf="@id/precipitation"
+            android:fontFamily="sans-serif-condensed-light"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:text="2.3m/s"
+            android:textColor="@color/textColorInNotification"
+
+            android:textSize="13sp" />
+
+
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/iconGray"
+        android:visibility="gone" />
+
+    <include
+        layout="@layout/layout_warning_for_remoteviews"
+        android:visibility="gone" />
+
+</RelativeLayout>

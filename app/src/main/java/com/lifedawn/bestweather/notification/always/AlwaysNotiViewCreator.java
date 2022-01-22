@@ -6,16 +6,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
@@ -24,7 +23,6 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
-import com.lifedawn.bestweather.commons.views.ViewUtil;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 
 import com.lifedawn.bestweather.main.MainActivity;
@@ -56,30 +54,33 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 	}
 
 	@Override
-	public RemoteViews createRemoteViews(boolean temp) {
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_always_notification);
+	public RemoteViews[] createRemoteViews(boolean temp) {
+		RemoteViews collapsedRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_ongoing_notification_collapsed);
+		RemoteViews expandedRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_ongoing_notification_expanded);
 
 		if (temp) {
-			setHourlyForecastViews(remoteViews, WeatherResponseProcessor.getTempHourlyForecastDtoList(context, hourlyForecastCount));
+			setHourlyForecastViews(expandedRemoteViews, WeatherResponseProcessor.getTempHourlyForecastDtoList(context, hourlyForecastCount));
 		} else {
-			remoteViews.setOnClickPendingIntent(R.id.refreshLayout, getRefreshPendingIntent());
+			collapsedRemoteViews.setOnClickPendingIntent(R.id.refreshLayout, getRefreshPendingIntent());
+			expandedRemoteViews.setOnClickPendingIntent(R.id.refreshLayout, getRefreshPendingIntent());
 		}
 
-		return remoteViews;
+		return new RemoteViews[]{collapsedRemoteViews, expandedRemoteViews};
 	}
 
 
 	@Override
 	public void initNotification(Handler handler) {
 		this.handler = handler;
-		RemoteViews remoteViews = createRemoteViews(false);
-		RemoteViewsUtil.onBeginProcess(remoteViews);
-		makeNotification(remoteViews, R.drawable.refresh, false);
+		RemoteViews[] remoteViewsArr = createRemoteViews(false);
+		RemoteViewsUtil.onBeginProcess(remoteViewsArr[0]);
+		RemoteViewsUtil.onBeginProcess(remoteViewsArr[1]);
+		makeNotification(remoteViewsArr[0], remoteViewsArr[1], R.drawable.refresh, false);
 
 		if (notificationDataObj.getLocationType() == LocationType.CurrentLocation) {
-			loadCurrentLocation(context, remoteViews);
+			loadCurrentLocation(context, remoteViewsArr[0], remoteViewsArr[1]);
 		} else {
-			loadWeatherData(context, remoteViews);
+			loadWeatherData(context, remoteViewsArr[0], remoteViewsArr[1]);
 		}
 	}
 
@@ -93,10 +94,11 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 	}
 
 	@Override
-	protected void setResultViews(Context context, RemoteViews remoteViews, WeatherDataSourceType requestWeatherDataSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	protected void setResultViews(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherDataSourceType requestWeatherDataSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
-		setHeaderViews(remoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
+		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
+		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		int icon = R.drawable.temp_icon;
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
@@ -104,14 +106,15 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 		if (currentConditionsDto != null) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
-			setCurrentConditionsViews(remoteViews, currentConditionsDto);
+			setCurrentConditionsViews(collapsedRemoteViews, currentConditionsDto);
+			setCurrentConditionsViews(expandedRemoteViews, currentConditionsDto);
 			icon = currentConditionsDto.getWeatherIcon();
 		}
 
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
 				requestWeatherDataSourceType);
 		if (!hourlyForecastDtoList.isEmpty()) {
-			setHourlyForecastViews(remoteViews, hourlyForecastDtoList);
+			setHourlyForecastViews(expandedRemoteViews, hourlyForecastDtoList);
 		}
 
 		AirQualityDto airQualityDto = null;
@@ -119,23 +122,29 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
 					zoneOffset);
 			if (airQualityDto.isSuccessful()) {
-				setAirQualityViews(remoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
+				setAirQualityViews(collapsedRemoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
+				setAirQualityViews(expandedRemoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 			} else {
-				setAirQualityViews(remoteViews, context.getString(R.string.noData));
+				setAirQualityViews(collapsedRemoteViews, context.getString(R.string.noData));
+				setAirQualityViews(expandedRemoteViews, context.getString(R.string.noData));
 			}
 		} else {
-			setAirQualityViews(remoteViews, context.getString(R.string.noData));
+			setAirQualityViews(collapsedRemoteViews, context.getString(R.string.noData));
+			setAirQualityViews(expandedRemoteViews, context.getString(R.string.noData));
 		}
 		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty();
 
 		if (successful) {
-			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+			RemoteViewsUtil.onSuccessfulProcess(collapsedRemoteViews);
+			RemoteViewsUtil.onSuccessfulProcess(expandedRemoteViews);
 		} else {
-			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-			remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+			RemoteViewsUtil.onErrorProcess(collapsedRemoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			collapsedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+			expandedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 		}
 
-		makeNotification(remoteViews, icon, true);
+		makeNotification(collapsedRemoteViews, expandedRemoteViews, icon, true);
 	}
 
 	public void setHeaderViews(RemoteViews remoteViews, String addressName, String dateTime) {
@@ -231,35 +240,23 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 		}
 	}
 
-	public void makeNotification(RemoteViews remoteViews, int icon, boolean isFinished) {
+	public void makeNotification(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, int icon, boolean isFinished) {
 		boolean enabled =
 				PreferenceManager.getDefaultSharedPreferences(context).getBoolean(notificationType.getPreferenceName(), false);
 		if (enabled) {
 			NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(notificationType);
 
-			Intent clickIntent = new Intent(context, MainActivity.class);
-			clickIntent.setAction(Intent.ACTION_MAIN);
-			clickIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-			clickIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationType.getNotificationId(), clickIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-					PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-					PendingIntent.FLAG_UPDATE_CURRENT);
+			NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
+			builder.setSmallIcon(icon).setAutoCancel(false).setOngoing(true).setOnlyAlertOnce(true)
+					.setCustomContentView(expandedRemoteViews).setCustomBigContentView(expandedRemoteViews).setSilent(true);
 
-			Notification notification = null;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-				Notification.Builder builder = new Notification.Builder(context, notificationObj.getChannelId());
-
-				builder.setSmallIcon(icon)
-						.setContentIntent(pendingIntent)
-						.setVisibility(Notification.VISIBILITY_PUBLIC).setContentTitle("").setAutoCancel(false)
-						.setContentText("").setOngoing(true)
-						.setSmallIcon(icon).setOnlyAlertOnce(true)
-						.setCustomContentView(remoteViews).setCustomBigContentView(remoteViews);
-				notification = builder.build();
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+				builder.setDefaults(0).setVibrate(null).setSound(null).setLights(0, 0, 0)
+						.setPriority(NotificationCompat.PRIORITY_LOW).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 			}
 
-			NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-			notificationManager.notify(notificationType.getNotificationId(), notification);
+			NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+			notificationManager.notify(notificationType.getNotificationId(), builder.build());
 		} else {
 			notificationHelper.cancelNotification(notificationType.getNotificationId());
 		}

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.service.notification.StatusBarNotification;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.lifedawn.bestweather.R;
@@ -16,7 +17,7 @@ import com.lifedawn.bestweather.main.MainActivity;
 
 public class NotificationHelper {
 	private Context context;
-	NotificationManager notificationManager;
+	private NotificationManager notificationManager;
 
 	public NotificationHelper(Context context) {
 		this.context = context;
@@ -29,14 +30,16 @@ public class NotificationHelper {
 					NotificationManager.IMPORTANCE_DEFAULT);
 			channel.setDescription(notificationObj.channelDescription);
 			channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-			channel.setShowBadge(false);
 
 			if (notificationObj.getNotificationType() == NotificationType.Always ||
 					notificationObj.getNotificationType() == NotificationType.Location) {
-				channel.setImportance(NotificationManager.IMPORTANCE_LOW);
 				channel.enableVibration(false);
 				channel.setVibrationPattern(null);
+				channel.enableLights(false);
+				channel.setShowBadge(false);
+
 				channel.setSound(null, null);
+				channel.setImportance(NotificationManager.IMPORTANCE_LOW);
 			}
 
 			notificationManager.createNotificationChannel(channel);
@@ -54,12 +57,10 @@ public class NotificationHelper {
 		clickIntent.setAction(Intent.ACTION_MAIN);
 		clickIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		clickIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationType.getNotificationId(), clickIntent, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-				PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationType.getNotificationId(), clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationObj.channelId);
-		
+
 		builder.setSmallIcon(R.drawable.temp_icon)
 				.setContentIntent(pendingIntent)
 				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);

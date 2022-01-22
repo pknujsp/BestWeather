@@ -64,11 +64,11 @@ public abstract class AbstractAlwaysNotiViewCreator {
 	}
 
 
-	abstract public RemoteViews createRemoteViews(boolean temp);
+	abstract public RemoteViews[] createRemoteViews(boolean temp);
 
 	abstract public void initNotification(Handler handler);
 
-	public void loadCurrentLocation(Context context, RemoteViews remoteViews) {
+	public void loadCurrentLocation(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
 
 		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
@@ -91,7 +91,7 @@ public abstract class AbstractAlwaysNotiViewCreator {
 								.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode())
 								.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getAddressName()).commit();
 
-						loadWeatherData(context, remoteViews);
+						loadWeatherData(context, collapsedRemoteViews, expandedRemoteViews);
 					}
 				});
 			}
@@ -110,9 +110,12 @@ public abstract class AbstractAlwaysNotiViewCreator {
 					errorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA;
 				}
 
-				remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
-				RemoteViewsUtil.onErrorProcess(remoteViews, context, errorType);
-				makeNotification(remoteViews, R.drawable.temp_icon, true);
+				collapsedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+				expandedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+				RemoteViewsUtil.onErrorProcess(collapsedRemoteViews, context, errorType);
+				RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, errorType);
+
+				makeNotification(collapsedRemoteViews, expandedRemoteViews, R.drawable.temp_icon, true);
 			}
 		};
 
@@ -120,9 +123,9 @@ public abstract class AbstractAlwaysNotiViewCreator {
 	}
 
 
-	public void loadWeatherData(Context context, RemoteViews remoteViews) {
-		RemoteViewsUtil.onBeginProcess(remoteViews);
-		makeNotification(remoteViews, R.drawable.temp_icon, false);
+	public void loadWeatherData(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
+		RemoteViewsUtil.onBeginProcess(expandedRemoteViews);
+		makeNotification(collapsedRemoteViews, expandedRemoteViews, R.drawable.temp_icon, false);
 
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
 		WeatherDataSourceType weatherDataSourceType = notificationDataObj.getWeatherSourceType();
@@ -144,7 +147,7 @@ public abstract class AbstractAlwaysNotiViewCreator {
 				new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {
-						setResultViews(context, remoteViews, finalWeatherDataSourceType, this, requestWeatherDataTypeSet);
+						setResultViews(context, collapsedRemoteViews, expandedRemoteViews, finalWeatherDataSourceType, this, requestWeatherDataTypeSet);
 					}
 
 					@Override
@@ -165,19 +168,17 @@ public abstract class AbstractAlwaysNotiViewCreator {
 		refreshIntent.putExtras(bundle);
 
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 10551, refreshIntent,
-				Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ?
-						PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE :
-						PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
 	}
 
 	abstract protected Set<RequestWeatherDataType> getRequestWeatherDataTypeSet();
 
-	abstract protected void setResultViews(Context context, RemoteViews remoteViews,
+	abstract protected void setResultViews(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews,
 	                                       WeatherDataSourceType requestWeatherDataSourceType, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                                       Set<RequestWeatherDataType> requestWeatherDataTypeSet);
 
-	abstract protected void makeNotification(RemoteViews remoteViews, int icon, boolean isFinished);
+	abstract protected void makeNotification(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, int icon, boolean isFinished);
 
 	abstract public void loadSavedPreferences();
 
