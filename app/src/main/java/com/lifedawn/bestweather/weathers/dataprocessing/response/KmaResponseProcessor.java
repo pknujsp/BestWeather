@@ -1059,6 +1059,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		currentConditionsDto.setFeelsLikeTemp(ValueUnits.convertTemperature(kmaCurrentConditions.getFeelsLikeTemp(), tempUnit) + tempUnitStr);
 
 		currentConditionsDto.setHumidity(kmaCurrentConditions.getHumidity());
+		currentConditionsDto.setYesterdayTemp(kmaCurrentConditions.getYesterdayTemp());
 
 		if (kmaCurrentConditions.getWindDirection() != null) {
 			Integer windDirectionDegree = WindUtil.parseWindDirectionStrAsInt(kmaCurrentConditions.getWindDirection());

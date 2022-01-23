@@ -88,6 +88,7 @@ import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
@@ -97,14 +98,16 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.F
 import com.lifedawn.bestweather.weathers.detailfragment.accuweather.currentconditions.AccuDetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.kma.currentconditions.KmaDetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.currentconditions.OwmDetailCurrentConditionsFragment;
-import com.lifedawn.bestweather.weathers.simplefragment.accuweather.currentconditions.AccuSimpleCurrentConditionsFragment;
+import com.lifedawn.bestweather.weathers.models.AirQualityDto;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.simplefragment.accuweather.dailyforecast.AccuSimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.accuweather.hourlyforecast.AccuSimpleHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.SimpleAirQualityFragment;
-import com.lifedawn.bestweather.weathers.simplefragment.kma.currentconditions.KmaSimpleCurrentConditionsFragment;
+import com.lifedawn.bestweather.weathers.simplefragment.currentconditions.SimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.kma.dailyforecast.KmaSimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.kma.hourlyforecast.KmaSimpleHourlyForecastFragment;
-import com.lifedawn.bestweather.weathers.simplefragment.openweathermap.currentconditions.OwmSimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.openweathermap.dailyforecast.OwmSimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.openweathermap.hourlyforecast.OwmSimpleHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.SunsetriseFragment;
@@ -1080,22 +1083,29 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		Map<WeatherDataSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap = null;
 
-		Fragment simpleCurrentConditionsFragment = null;
+		final ValueUnits tempUnit = ValueUnits.valueOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp),
+				ValueUnits.celsius.name()));
+		final ValueUnits windUnit = ValueUnits.valueOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind),
+				ValueUnits.mPerSec.name()));
+		final ValueUnits visibilityUnit = ValueUnits.valueOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility),
+				ValueUnits.km.name()));
+		final ValueUnits clockUnit = ValueUnits.valueOf(
+				sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
+
+		AirQualityDto airQualityDto = null;
+		CurrentConditionsDto currentConditionsDto = null;
+		List<HourlyForecastDto> hourlyForecastDtoList = null;
+		List<DailyForecastDto> dailyForecastDtoList = null;
+
+		final SimpleCurrentConditionsFragment simpleCurrentConditionsFragment = new SimpleCurrentConditionsFragment();
 		Fragment simpleHourlyForecastFragment = null;
 		Fragment simpleDailyForecastFragment = null;
 		Fragment detailCurrentConditionsFragment = null;
-		AqiCnGeolocalizedFeedResponse airQualityResponse = null;
+		final SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
+		final Fragment sunSetRiseFragment = new SunsetriseFragment();
 
 		String currentConditionsWeatherVal = null;
 		ZoneId zoneId = null;
-
-		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.AQICN)) {
-			MultipleRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherDataSourceType.AQICN).get(
-					RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
-			if (aqicnResponse.isSuccessful()) {
-				airQualityResponse = (AqiCnGeolocalizedFeedResponse) aqicnResponse.getResponseObj();
-			}
-		}
 
 		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.KMA_API)) {
 			arrayMap = responseMap.get(WeatherDataSourceType.KMA_API);
@@ -1116,21 +1126,20 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			finalDailyForecastList = KmaResponseProcessor.getDailyForecastListByXML(finalDailyForecastList, finalHourlyForecastList);
 
-			KmaSimpleCurrentConditionsFragment kmaSimpleCurrentConditionsFragment = new KmaSimpleCurrentConditionsFragment();
+			currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDtoOfXML(getContext(), finalCurrentConditions,
+					finalHourlyForecastList.get(0), windUnit, tempUnit, latitude, longitude);
+			currentConditionsDto.setYesterdayTemp(ValueUnits.convertTemperature(yesterDayFinalCurrentConditions.getTemperature(),
+					tempUnit) + ValueUnits.convertToStr(getContext(), tempUnit));
+
 			KmaSimpleHourlyForecastFragment kmaSimpleHourlyForecastFragment = new KmaSimpleHourlyForecastFragment();
 			KmaSimpleDailyForecastFragment kmaSimpleDailyForecastFragment = new KmaSimpleDailyForecastFragment();
 			KmaDetailCurrentConditionsFragment kmaDetailCurrentConditionsFragment = new KmaDetailCurrentConditionsFragment();
 
-			kmaSimpleCurrentConditionsFragment.setTodayFinalCurrentConditions(finalCurrentConditions).setFinalHourlyForecast(
-					finalHourlyForecastList.get(0)).setAirQualityResponse(airQualityResponse);
-			kmaSimpleCurrentConditionsFragment.setYesterdayFinalCurrentConditions(yesterDayFinalCurrentConditions);
-			kmaSimpleCurrentConditionsFragment.setFinalHourlyForecast(finalHourlyForecastList.get(0));
 			kmaSimpleHourlyForecastFragment.setFinalHourlyForecastList(finalHourlyForecastList);
 			kmaSimpleDailyForecastFragment.setFinalDailyForecastList(finalDailyForecastList);
 			kmaDetailCurrentConditionsFragment.setFinalCurrentConditions(finalCurrentConditions);
 			kmaDetailCurrentConditionsFragment.setFinalHourlyForecast(finalHourlyForecastList.get(0));
 
-			simpleCurrentConditionsFragment = kmaSimpleCurrentConditionsFragment;
 			simpleHourlyForecastFragment = kmaSimpleHourlyForecastFragment;
 			simpleDailyForecastFragment = kmaSimpleDailyForecastFragment;
 			detailCurrentConditionsFragment = kmaDetailCurrentConditionsFragment;
@@ -1151,19 +1160,17 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			ArrayList<KmaHourlyForecast> kmaHourlyForecasts = (ArrayList<KmaHourlyForecast>) forecasts[0];
 			ArrayList<KmaDailyForecast> kmaDailyForecasts = (ArrayList<KmaDailyForecast>) forecasts[1];
 
-			KmaSimpleCurrentConditionsFragment kmaSimpleCurrentConditionsFragment = new KmaSimpleCurrentConditionsFragment();
+			currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDtoOfWEB(getContext(),
+					kmaCurrentConditions, kmaHourlyForecasts.get(0), windUnit, tempUnit, latitude, longitude);
+
 			KmaSimpleHourlyForecastFragment kmaSimpleHourlyForecastFragment = new KmaSimpleHourlyForecastFragment();
 			KmaSimpleDailyForecastFragment kmaSimpleDailyForecastFragment = new KmaSimpleDailyForecastFragment();
 			KmaDetailCurrentConditionsFragment kmaDetailCurrentConditionsFragment = new KmaDetailCurrentConditionsFragment();
 
-			kmaSimpleCurrentConditionsFragment.setKmaCurrentConditions(kmaCurrentConditions).setKmaHourlyForecast(kmaHourlyForecasts.get(0))
-					.setAirQualityResponse(airQualityResponse);
-			//kmaSimpleCurrentConditionsFragment.setYesterdayFinalCurrentConditions(yesterDayFinalCurrentConditions);
 			kmaSimpleHourlyForecastFragment.setKmaHourlyForecasts(kmaHourlyForecasts);
 			kmaSimpleDailyForecastFragment.setKmaDailyForecasts(kmaDailyForecasts);
 			kmaDetailCurrentConditionsFragment.setKmaCurrentConditions(kmaCurrentConditions).setKmaHourlyForecast(kmaHourlyForecasts.get(0));
 
-			simpleCurrentConditionsFragment = kmaSimpleCurrentConditionsFragment;
 			simpleHourlyForecastFragment = kmaSimpleHourlyForecastFragment;
 			simpleDailyForecastFragment = kmaSimpleDailyForecastFragment;
 			detailCurrentConditionsFragment = kmaDetailCurrentConditionsFragment;
@@ -1177,7 +1184,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		} else if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.ACCU_WEATHER)) {
 			arrayMap = responseMap.get(WeatherDataSourceType.ACCU_WEATHER);
 
-			AccuSimpleCurrentConditionsFragment accuSimpleCurrentConditionsFragment = new AccuSimpleCurrentConditionsFragment();
 			AccuSimpleHourlyForecastFragment accuSimpleHourlyForecastFragment = new AccuSimpleHourlyForecastFragment();
 			AccuSimpleDailyForecastFragment accuSimpleDailyForecastFragment = new AccuSimpleDailyForecastFragment();
 			AccuDetailCurrentConditionsFragment accuDetailCurrentConditionsFragment = new AccuDetailCurrentConditionsFragment();
@@ -1185,27 +1191,26 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			AccuCurrentConditionsResponse accuCurrentConditionsResponse =
 					(AccuCurrentConditionsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponseObj();
 
-			accuSimpleCurrentConditionsFragment.setCurrentConditionsResponse(accuCurrentConditionsResponse).setAirQualityResponse(
-					airQualityResponse);
+			currentConditionsDto = AccuWeatherResponseProcessor.makeCurrentConditionsDto(getContext(), accuCurrentConditionsResponse.getItems().get(0), windUnit,
+					tempUnit, visibilityUnit);
+
 			accuSimpleHourlyForecastFragment.setTwelveHoursOfHourlyForecastsResponse(
 					(AccuHourlyForecastsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST).getResponseObj());
 			accuSimpleDailyForecastFragment.setFiveDaysOfDailyForecastsResponse(
 					(AccuDailyForecastsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST).getResponseObj());
 			accuDetailCurrentConditionsFragment.setCurrentConditionsResponse(accuCurrentConditionsResponse);
 
-			simpleCurrentConditionsFragment = accuSimpleCurrentConditionsFragment;
 			simpleHourlyForecastFragment = accuSimpleHourlyForecastFragment;
 			simpleDailyForecastFragment = accuSimpleDailyForecastFragment;
 			detailCurrentConditionsFragment = accuDetailCurrentConditionsFragment;
 
 			currentConditionsWeatherVal = accuCurrentConditionsResponse.getItems().get(0).getWeatherIcon();
 			zoneId = ZonedDateTime.parse(accuCurrentConditionsResponse.getItems().get(0).getLocalObservationDateTime()).getZone();
-
 			mainWeatherDataSourceType = WeatherDataSourceType.ACCU_WEATHER;
+
 		} else if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_ONECALL)) {
 			arrayMap = responseMap.get(WeatherDataSourceType.OWM_ONECALL);
 
-			OwmSimpleCurrentConditionsFragment owmSimpleCurrentConditionsFragment = new OwmSimpleCurrentConditionsFragment();
 			OwmSimpleHourlyForecastFragment owmSimpleHourlyForecastFragment = new OwmSimpleHourlyForecastFragment();
 			OwmSimpleDailyForecastFragment owmSimpleDailyForecastFragment = new OwmSimpleDailyForecastFragment();
 			OwmDetailCurrentConditionsFragment owmDetailCurrentConditionsFragment = new OwmDetailCurrentConditionsFragment();
@@ -1213,12 +1218,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			OwmOneCallResponse owmOneCallResponse =
 					(OwmOneCallResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponseObj();
 
-			owmSimpleCurrentConditionsFragment.setOneCallResponse(owmOneCallResponse).setAirQualityResponse(airQualityResponse);
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(getContext(), owmOneCallResponse
+					, windUnit, tempUnit, visibilityUnit);
+
 			owmSimpleHourlyForecastFragment.setOneCallResponse(owmOneCallResponse);
 			owmSimpleDailyForecastFragment.setOneCallResponse(owmOneCallResponse);
 			owmDetailCurrentConditionsFragment.setOneCallResponse(owmOneCallResponse);
 
-			simpleCurrentConditionsFragment = owmSimpleCurrentConditionsFragment;
 			simpleHourlyForecastFragment = owmSimpleHourlyForecastFragment;
 			simpleDailyForecastFragment = owmSimpleDailyForecastFragment;
 			detailCurrentConditionsFragment = owmDetailCurrentConditionsFragment;
@@ -1227,10 +1233,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
 			mainWeatherDataSourceType = WeatherDataSourceType.OWM_ONECALL;
+
 		} else if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_INDIVIDUAL)) {
 			arrayMap = responseMap.get(WeatherDataSourceType.OWM_INDIVIDUAL);
 
-			OwmSimpleCurrentConditionsFragment owmSimpleCurrentConditionsFragment = new OwmSimpleCurrentConditionsFragment();
 			OwmSimpleHourlyForecastFragment owmSimpleHourlyForecastFragment = new OwmSimpleHourlyForecastFragment();
 			OwmSimpleDailyForecastFragment owmSimpleDailyForecastFragment = new OwmSimpleDailyForecastFragment();
 			OwmDetailCurrentConditionsFragment owmDetailCurrentConditionsFragment = new OwmDetailCurrentConditionsFragment();
@@ -1242,13 +1248,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			OwmDailyForecastResponse owmDailyForecastResponse =
 					(OwmDailyForecastResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST).getResponseObj();
 
-			owmSimpleCurrentConditionsFragment.setOwmCurrentConditionsResponse(owmCurrentConditionsResponse);
-			owmSimpleCurrentConditionsFragment.setAirQualityResponse(airQualityResponse);
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(getContext(), owmCurrentConditionsResponse
+					, windUnit, tempUnit, visibilityUnit);
+
 			owmSimpleHourlyForecastFragment.setOwmHourlyForecastResponse(owmHourlyForecastResponse);
 			owmSimpleDailyForecastFragment.setOwmDailyForecastResponse(owmDailyForecastResponse);
 			owmDetailCurrentConditionsFragment.setOwmCurrentConditionsResponse(owmCurrentConditionsResponse);
 
-			simpleCurrentConditionsFragment = owmSimpleCurrentConditionsFragment;
 			simpleHourlyForecastFragment = owmSimpleHourlyForecastFragment;
 			simpleDailyForecastFragment = owmSimpleDailyForecastFragment;
 			detailCurrentConditionsFragment = owmDetailCurrentConditionsFragment;
@@ -1258,10 +1264,25 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			ZoneOffset zoneOffsetSecond = ZoneOffset.ofTotalSeconds(Integer.parseInt(owmCurrentConditionsResponse.getTimezone()));
 			zoneId = zoneOffsetSecond.normalized();
 			mainWeatherDataSourceType = WeatherDataSourceType.OWM_INDIVIDUAL;
+
 		}
 
-		loadImgOfCurrentConditions(mainWeatherDataSourceType, currentConditionsWeatherVal, latitude, longitude,
-				zoneId);
+		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.AQICN)) {
+			MultipleRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherDataSourceType.AQICN).get(
+					RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
+			AqiCnGeolocalizedFeedResponse airQualityResponse = (AqiCnGeolocalizedFeedResponse) aqicnResponse.getResponseObj();
+
+			simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);
+			airQualityDto = AqicnResponseProcessor.makeAirQualityDto(getContext(), airQualityResponse,
+					ZonedDateTime.now(zoneId).getOffset());
+		}
+
+		// current conditions --------------------------------------------------------------------------------------------------------------
+		simpleCurrentConditionsFragment.setCurrentConditionsDto(currentConditionsDto);
+		simpleCurrentConditionsFragment.setAirQualityDto(airQualityDto);
+
+		// hourly forecasts ----------------------------------------------------------------------------------------------------------------
+
 
 		if (getActivity() != null) {
 			final Bundle defaultBundle = new Bundle();
@@ -1272,28 +1293,27 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			defaultBundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
 			defaultBundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 
-			SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
-			simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);
 			simpleAirQualityFragment.setArguments(defaultBundle);
-
-			Fragment sunSetRiseFragment = new SunsetriseFragment();
 			sunSetRiseFragment.setArguments(defaultBundle);
 
 			Fragment finalSimpleDailyForecastFragment = simpleDailyForecastFragment;
 			Fragment finalSimpleHourlyForecastFragment = simpleHourlyForecastFragment;
-			Fragment finalSimpleCurrentConditionsFragment = simpleCurrentConditionsFragment;
 			Fragment finalDetailCurrentConditionsFragment = detailCurrentConditionsFragment;
 
 			finalSimpleHourlyForecastFragment.setArguments(defaultBundle);
 			finalSimpleDailyForecastFragment.setArguments(defaultBundle);
-			finalSimpleCurrentConditionsFragment.setArguments(defaultBundle);
+			simpleCurrentConditionsFragment.setArguments(defaultBundle);
 			finalDetailCurrentConditionsFragment.setArguments(defaultBundle);
 
-			ValueUnits clockUnit = ValueUnits.valueOf(
-					sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
+			String finalCurrentConditionsWeatherVal = currentConditionsWeatherVal;
+			ZoneId finalZoneId = zoneId;
+
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
+					loadImgOfCurrentConditions(mainWeatherDataSourceType, finalCurrentConditionsWeatherVal, latitude, longitude,
+							finalZoneId);
+
 					changeWeatherDataSourcePicker(countryCode);
 					ZonedDateTime dateTime = multipleRestApiDownloader.getRequestDateTime();
 					DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
@@ -1302,7 +1322,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					binding.updatedDatetime.setText(dateTime.format(dateTimeFormatter));
 
 					getChildFragmentManager().beginTransaction().replace(binding.simpleCurrentConditions.getId(),
-							finalSimpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment)).replace(
+							simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment)).replace(
 							binding.simpleHourlyForecast.getId(), finalSimpleHourlyForecastFragment,
 							getString(R.string.tag_simple_hourly_forecast_fragment)).replace(binding.simpleDailyForecast.getId(),
 							finalSimpleDailyForecastFragment, getString(R.string.tag_simple_daily_forecast_fragment)).replace(
@@ -1311,13 +1331,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment)).replace(
 							binding.sunSetRise.getId(), sunSetRiseFragment, getString(R.string.tag_sun_set_rise_fragment)).commitAllowingStateLoss();
 
-					binding.adViewBelowAirQuality.setVisibility(View.VISIBLE);
-					binding.adViewBottom.setVisibility(View.VISIBLE);
-					binding.scrollView.setVisibility(View.VISIBLE);
-
 					if (loadingDialog != null) {
 						loadingDialog.dismiss();
 					}
+
+					binding.adViewBelowAirQuality.setVisibility(View.VISIBLE);
+					binding.adViewBottom.setVisibility(View.VISIBLE);
+					binding.scrollView.setVisibility(View.VISIBLE);
 				}
 			});
 

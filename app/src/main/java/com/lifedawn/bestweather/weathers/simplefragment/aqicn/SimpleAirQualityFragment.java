@@ -27,6 +27,7 @@ import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.detailfragment.aqicn.DetailAirQualityFragment;
+import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.FragmentType;
 
@@ -40,6 +41,7 @@ import java.util.Locale;
 
 public class SimpleAirQualityFragment extends Fragment implements IWeatherValues {
 	private FragmentAirQualitySimpleBinding binding;
+	private AirQualityDto airQualityDto;
 	private AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse;
 	private Double latitude;
 	private Double longitude;
@@ -104,6 +106,10 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	public SimpleAirQualityFragment setGeolocalizedFeedResponse(AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse) {
 		this.aqiCnGeolocalizedFeedResponse = aqiCnGeolocalizedFeedResponse;
 		return this;
+	}
+
+	public void setAirQualityDto(AirQualityDto airQualityDto) {
+		this.airQualityDto = airQualityDto;
 	}
 
 	@Override

@@ -285,6 +285,16 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 			currentConditionsDto.setPrecipitationVolume(String.format(Locale.getDefault(), "%.2f mm", precipitationVolume));
 		}
 
+		if (currentConditionsDto.isHasPrecipitationVolume()) {
+			if (currentConditionsDto.isHasRainVolume() && currentConditionsDto.isHasSnowVolume()) {
+				currentConditionsDto.setPrecipitationType(context.getString(R.string.owm_icon_616_rain_and_snow));
+			} else if (currentConditionsDto.isHasRainVolume()) {
+				currentConditionsDto.setPrecipitationType(context.getString(R.string.rain));
+			} else {
+				currentConditionsDto.setPrecipitationType(context.getString(R.string.snow));
+			}
+		}
+
 		return currentConditionsDto;
 	}
 

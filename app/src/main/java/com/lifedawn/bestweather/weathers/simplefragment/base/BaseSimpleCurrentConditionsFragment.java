@@ -35,7 +35,7 @@ import java.time.ZonedDateTime;
 
 public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutSimpleCurrentConditionsBinding binding;
-	protected AqiCnGeolocalizedFeedResponse airQualityResponse;
+	protected AirQualityDto airQualityDto;
 	protected SharedPreferences sharedPreferences;
 	protected ValueUnits tempUnit;
 	protected ValueUnits windUnit;
@@ -90,9 +90,8 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 
 	}
 
-	public BaseSimpleCurrentConditionsFragment setAirQualityResponse(AqiCnGeolocalizedFeedResponse airQualityResponse) {
-		this.airQualityResponse = airQualityResponse;
-		return this;
+	public void setAirQualityDto(AirQualityDto airQualityDto) {
+		this.airQualityDto = airQualityDto;
 	}
 
 	@Override
@@ -101,7 +100,6 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	}
 
 	public void setAqiValuesToViews() {
-		AirQualityDto airQualityDto = AqicnResponseProcessor.makeAirQualityDto(getContext(), airQualityResponse, zoneOffset);
 		String airQuality = null;
 
 		if (airQualityDto.isSuccessful()) {
@@ -111,7 +109,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 			if (distance > 100.0) {
 				airQuality = getString(R.string.noData);
 			} else {
-				airQuality = AqicnResponseProcessor.getGradeDescription((int) Double.parseDouble(airQualityResponse.getData().getAqi()));
+				airQuality = AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
 			}
 		} else {
 			airQuality = getString(R.string.noData);

@@ -26,10 +26,19 @@ public class CurrentConditionsDto {
 	private String precipitationVolume;
 	private String precipitationType;
 	private ZonedDateTime currentTime;
+	private String yesterdayTemp;
 
 	private boolean hasRainVolume;
 	private boolean hasSnowVolume;
 	private boolean hasPrecipitationVolume;
+
+	public void setYesterdayTemp(String yesterdayTemp) {
+		this.yesterdayTemp = yesterdayTemp;
+	}
+
+	public String getYesterdayTemp() {
+		return yesterdayTemp;
+	}
 
 	public CurrentConditionsDto setCurrentTime(ZonedDateTime currentTime) {
 		this.currentTime = currentTime;
