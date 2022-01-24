@@ -108,9 +108,10 @@ public class DialogActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-				intent.setAction(Intent.ACTION_MAIN);
-				intent.addCategory(Intent.CATEGORY_LAUNCHER);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				//intent.setAction(Intent.ACTION_MAIN);
+				//intent.addCategory(Intent.CATEGORY_LAUNCHER);
+				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
 				startActivity(intent);
 				alertDialog.dismiss();
 

@@ -137,6 +137,7 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 		final long firstHours = TimeUnit.SECONDS.toHours(firstDateTime.toEpochSecond());
 		long hours = 0;
 		Map<WeatherDataSourceType, Integer> firstBeginIdxMap = new HashMap<>();
+
 		for (WeatherDataSourceType weatherDataSourceType : hourlyForecastDtoListMap.keySet()) {
 			hours = TimeUnit.SECONDS.toHours(hourlyForecastDtoListMap.get(weatherDataSourceType).get(0).getHours().toEpochSecond());
 			firstBeginIdxMap.put(weatherDataSourceType, (int) (firstHours - hours));
@@ -181,6 +182,7 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 
 			LinearLayout row = new LinearLayout(context);
 			row.setOrientation(LinearLayout.VERTICAL);
+			row.setGravity(Gravity.CENTER_VERTICAL);
 			row.setLayoutParams(forecastRowLayoutParams);
 
 			LinearLayout hourlyForecastListView = new LinearLayout(context);

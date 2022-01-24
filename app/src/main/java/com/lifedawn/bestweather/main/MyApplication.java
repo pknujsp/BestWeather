@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 
 public class MyApplication extends Application {
 	private SharedPreferences sharedPreferences;
-	private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
 	private static int statusBarHeight;
 	private static String localeCountryCode;
 

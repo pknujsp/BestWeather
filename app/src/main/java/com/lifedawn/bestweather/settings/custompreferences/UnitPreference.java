@@ -34,9 +34,8 @@ public class UnitPreference extends Preference {
 			unitTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
 			unitTextView.setTextColor(Color.BLACK);
 
-			int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32f, getContext().getResources().getDisplayMetrics());
-			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, height);
-			layoutParams.gravity = Gravity.RIGHT;
+			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
+			layoutParams.gravity = Gravity.CENTER_VERTICAL;
 
 			unitTextView.setLayoutParams(layoutParams);
 

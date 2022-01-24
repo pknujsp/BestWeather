@@ -54,10 +54,12 @@ public class NotificationHelper {
 		}
 
 		Intent clickIntent = new Intent(context, MainActivity.class);
-		clickIntent.setAction(Intent.ACTION_MAIN);
-		clickIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-		clickIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationType.getNotificationId(), clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		//clickIntent.setAction(Intent.ACTION_MAIN);
+		//clickIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+		clickIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationType.getNotificationId(), clickIntent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationObj.channelId);
 

@@ -38,10 +38,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.F
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
-import com.lifedawn.bestweather.weathers.simplefragment.accuweather.hourlyforecast.AccuSimpleHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
-import com.lifedawn.bestweather.weathers.simplefragment.kma.hourlyforecast.KmaSimpleHourlyForecastFragment;
-import com.lifedawn.bestweather.weathers.simplefragment.openweathermap.hourlyforecast.OwmSimpleHourlyForecastFragment;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
@@ -344,51 +341,6 @@ public class WeatherForAlarmFragment extends Fragment {
 
 		BaseSimpleForecastFragment hourlyForecastFragment = null;
 
-		switch (weatherDataSourceType) {
-			case KMA_WEB:
-				MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
-				MultipleRestApiDownloader.ResponseResult vilageFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
-
-				List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastListByXML(
-						(VilageFcstResponse) ultraSrtFcstResponseResult.getResponseObj(),
-						(VilageFcstResponse) vilageFcstResponseResult.getResponseObj());
-
-				KmaSimpleHourlyForecastFragment kmaSimpleHourlyForecastFragment = new KmaSimpleHourlyForecastFragment();
-				kmaSimpleHourlyForecastFragment.setFinalHourlyForecastList(finalHourlyForecastList);
-				kmaSimpleHourlyForecastFragment.setHeaderVisibility(View.GONE);
-				hourlyForecastFragment = kmaSimpleHourlyForecastFragment;
-
-				zoneId = KmaResponseProcessor.getZoneId();
-				break;
-			case ACCU_WEATHER:
-				MultipleRestApiDownloader.ResponseResult hourlyForecastResponseResult =
-						arrayMap.get(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
-
-				AccuHourlyForecastsResponse accuHourlyForecastsResponse =
-						(AccuHourlyForecastsResponse) hourlyForecastResponseResult.getResponseObj();
-
-				AccuSimpleHourlyForecastFragment accuSimpleHourlyForecastFragment = new AccuSimpleHourlyForecastFragment();
-				accuSimpleHourlyForecastFragment.setTwelveHoursOfHourlyForecastsResponse(accuHourlyForecastsResponse);
-				accuSimpleHourlyForecastFragment.setHeaderVisibility(View.GONE);
-
-				hourlyForecastFragment = accuSimpleHourlyForecastFragment;
-
-				zoneId = ZonedDateTime.parse(accuHourlyForecastsResponse.getItems().get(0).getDateTime()).getZone();
-				break;
-			case OWM_ONECALL:
-				MultipleRestApiDownloader.ResponseResult owmResponseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
-				OwmOneCallResponse owmOneCallResponse =
-						(OwmOneCallResponse) owmResponseResult.getResponseObj();
-
-				OwmSimpleHourlyForecastFragment owmSimpleHourlyForecastFragment = new OwmSimpleHourlyForecastFragment();
-				owmSimpleHourlyForecastFragment.setOneCallResponse(owmOneCallResponse);
-				owmSimpleHourlyForecastFragment.setHeaderVisibility(View.GONE);
-
-				hourlyForecastFragment = owmSimpleHourlyForecastFragment;
-
-				zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
-				break;
-		}
 
 		final Bundle defaultBundle = new Bundle();
 		defaultBundle.putDouble(BundleKey.Latitude.name(), latitude);

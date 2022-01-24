@@ -85,7 +85,7 @@ public abstract class AbstractWidgetCreator {
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 		refreshIntent.putExtras(bundle);
 
-		remoteViews.setOnClickPendingIntent(R.id.refreshBtn, PendingIntent.getBroadcast(context, appWidgetId, refreshIntent,		PendingIntent.FLAG_UPDATE_CURRENT));
+		remoteViews.setOnClickPendingIntent(R.id.refreshBtn, PendingIntent.getBroadcast(context, appWidgetId, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 
 	public WidgetDto loadDefaultSettings() {
@@ -172,7 +172,7 @@ public abstract class AbstractWidgetCreator {
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 		intent.putExtras(bundle);
 
-		return PendingIntent.getActivity(context, appWidgetId, intent, 		PendingIntent.FLAG_UPDATE_CURRENT);
+		return PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	protected int getWidgetSizeInDp(AppWidgetManager appWidgetManager, String key) {

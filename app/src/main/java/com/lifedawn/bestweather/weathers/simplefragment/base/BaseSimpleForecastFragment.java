@@ -81,7 +81,6 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
 
-
 		Bundle bundle = getArguments();
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());

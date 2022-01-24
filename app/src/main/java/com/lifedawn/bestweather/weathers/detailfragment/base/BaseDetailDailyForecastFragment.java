@@ -14,8 +14,8 @@ public class BaseDetailDailyForecastFragment extends BaseDetailForecastFragment 
 	public void onClickedItem(Integer position) {
 		DetailDailyForecastDialogFragment detailHourlyForecastDialogFragment =
 				new DetailDailyForecastDialogFragment();
-		detailHourlyForecastDialogFragment.setFirstSelectedPosition(position);
 		detailHourlyForecastDialogFragment.setDailyForecastDtoList(dailyForecastDtoList);
+		detailHourlyForecastDialogFragment.setFirstSelectedPosition(position);
 
 		detailHourlyForecastDialogFragment.show(getChildFragmentManager(),
 				DetailHourlyForecastDialogFragment.class.getName());

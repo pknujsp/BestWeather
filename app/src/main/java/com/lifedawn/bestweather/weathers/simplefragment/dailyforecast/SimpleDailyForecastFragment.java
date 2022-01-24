@@ -1,35 +1,30 @@
-package com.lifedawn.bestweather.weathers.simplefragment.openweathermap.dailyforecast;
+package com.lifedawn.bestweather.weathers.simplefragment.dailyforecast;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentManager;
-
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
+
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
+import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.weathers.detailfragment.dailyforecast.DetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.detailfragment.openweathermap.dailyforecast.OwmDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.weathers.view.DetailDoubleTemperatureView;
-import com.lifedawn.bestweather.weathers.FragmentType;
+import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
-import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
@@ -37,10 +32,11 @@ import org.jetbrains.annotations.NotNull;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
-	private OwmOneCallResponse owmOneCallResponse;
-	private OwmDailyForecastResponse owmDailyForecastResponse;
+public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
+	private List<DailyForecastDto> dailyForecastDtoList;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -48,8 +44,8 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		needCompare = true;
 	}
 
-	public void setOwmDailyForecastResponse(OwmDailyForecastResponse owmDailyForecastResponse) {
-		this.owmDailyForecastResponse = owmDailyForecastResponse;
+	public void setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
+		this.dailyForecastDtoList = dailyForecastDtoList;
 	}
 
 	@Override
@@ -76,8 +72,8 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				OwmDetailDailyForecastFragment detailDailyForecastFragment = new OwmDetailDailyForecastFragment();
-				detailDailyForecastFragment.setOneCallResponse(owmOneCallResponse);
+				DetailDailyForecastFragment detailDailyForecastFragment = new DetailDailyForecastFragment();
+				detailDailyForecastFragment.setDailyForecastDtoList(dailyForecastDtoList);
 
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
@@ -98,10 +94,6 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		setValuesToViews();
 	}
 
-	public OwmSimpleDailyForecastFragment setOneCallResponse(OwmOneCallResponse owmOneCallResponse) {
-		this.owmOneCallResponse = owmOneCallResponse;
-		return this;
-	}
 
 	@Override
 	public void setValuesToViews() {
@@ -112,20 +104,11 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
 
-		List<DailyForecastDto> dailyForecastDtoList = null;
-		if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
-			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(getContext(), owmOneCallResponse,
-					windUnit, tempUnit);
-		} else if (mainWeatherDataSourceType == WeatherDataSourceType.OWM_INDIVIDUAL) {
-			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(getContext(), owmDailyForecastResponse,
-					windUnit, tempUnit);
-		}
-
 		final int COLUMN_COUNT = dailyForecastDtoList.size();
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyOwm);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 
-		SingleWeatherIconView weatherIconRow = new SingleWeatherIconView(context, FragmentType.Simple, VIEW_WIDTH, WEATHER_ROW_HEIGHT,
+		DoubleWeatherIconView weatherIconRow = new DoubleWeatherIconView(context, FragmentType.Simple, VIEW_WIDTH, WEATHER_ROW_HEIGHT,
 				COLUMN_WIDTH);
 		IconTextView probabilityOfPrecipitationRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
 				COLUMN_WIDTH, R.drawable.pop);
@@ -138,45 +121,79 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<String> dateList = new ArrayList<>();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE");
 		//날씨 아이콘
-		List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
+		List<DoubleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 		//기온, 강수확률, 강수량
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
-		List<String> probabilityOfPrecipitationList = new ArrayList<>();
+		List<String> popList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
 
 		final String degree = "°";
 		final String mm = "mm";
+		final String cm = "cm";
+
 		boolean haveSnow = false;
 		boolean haveRain = false;
 
+		float rainVolume = 0f;
+		float snowVolume = 0f;
+
 		for (DailyForecastDto item : dailyForecastDtoList) {
+			rainVolume = 0f;
+			snowVolume = 0f;
+
 			dateList.add(item.getDate().format(dateTimeFormatter));
 			minTempList.add(Integer.parseInt(item.getMinTemp().replace(degree, "")));
 			maxTempList.add(Integer.parseInt(item.getMaxTemp().replace(degree, "")));
 
-			if (item.getSingleValues().isHasSnowVolume()) {
-				if (!haveSnow) {
-					haveSnow = true;
+			if (item.isSingle()) {
+				popList.add(item.getSingleValues().getPop());
+				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
+						item.getSingleValues().getWeatherIcon()), item.getSingleValues().getWeatherDescription()));
+
+				if (item.getSingleValues().getRainVolume() != null) {
+					rainVolume = Float.parseFloat(item.getSingleValues().getRainVolume().replace(mm, "").replace(cm, ""));
+				}
+				if (item.getSingleValues().getSnowVolume() != null) {
+					snowVolume = Float.parseFloat(item.getSingleValues().getSnowVolume().replace(mm, "").replace(cm, ""));
+				}
+			} else {
+				popList.add(item.getAmValues().getPop() + "/" + item.getPmValues().getPop());
+				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
+						item.getAmValues().getWeatherIcon()),
+						ContextCompat.getDrawable(context, item.getPmValues().getWeatherIcon()),
+						item.getAmValues().getWeatherDescription(),
+						item.getPmValues().getWeatherDescription()));
+
+				if (item.getAmValues().getRainVolume() != null || item.getPmValues().getRainVolume() != null) {
+					rainVolume = Float.parseFloat(item.getAmValues().getRainVolume().replace(mm, "").replace(cm, ""))
+							+ Float.parseFloat(item.getPmValues().getRainVolume().replace(mm, "").replace(cm, ""));
+				}
+				if (item.getAmValues().getSnowVolume() != null || item.getPmValues().getSnowVolume() != null) {
+					snowVolume = Float.parseFloat(item.getAmValues().getSnowVolume().replace(mm, "").replace(cm, ""))
+							+ Float.parseFloat(item.getPmValues().getSnowVolume().replace(mm, "").replace(cm, ""));
 				}
 			}
-			if (item.getSingleValues().isHasRainVolume()) {
-				if (!haveRain) {
+
+			rainVolumeList.add(String.format(Locale.getDefault(), rainVolume > 0f ? "%.2f" : "%.1f", rainVolume));
+			snowVolumeList.add(String.format(Locale.getDefault(), snowVolume > 0f ? "%.2f" : "%.1f", snowVolume));
+
+			if (!haveRain) {
+				if (rainVolume > 0f) {
 					haveRain = true;
 				}
 			}
-			snowVolumeList.add(item.getSingleValues().getSnowVolume().replace(mm, ""));
+			if (!haveSnow) {
+				if (snowVolume > 0f) {
+					haveSnow = true;
+				}
+			}
 
-			probabilityOfPrecipitationList.add(item.getSingleValues().getPop());
-			rainVolumeList.add(item.getSingleValues().getRainVolume().replace(mm, ""));
-
-			weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-					item.getSingleValues().getWeatherIcon()), item.getSingleValues().getWeatherDescription()));
 		}
 
-		weatherIconRow.setWeatherImgs(weatherIconObjList);
-		probabilityOfPrecipitationRow.setValueList(probabilityOfPrecipitationList);
+		weatherIconRow.setIcons(weatherIconObjList);
+		probabilityOfPrecipitationRow.setValueList(popList);
 		rainVolumeRow.setValueList(rainVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);
 
@@ -227,7 +244,9 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		binding.forecastView.addView(dateRow, dateRowLayoutParams);
 		binding.forecastView.addView(weatherIconRow, rowLayoutParams);
 		binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
-		binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
+		if (haveRain) {
+			binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
+		}
 		if (haveSnow) {
 			binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
 		}
@@ -237,7 +256,7 @@ public class OwmSimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
-		createValueUnitsDescription(WeatherDataSourceType.OWM_ONECALL, haveRain, haveSnow);
+		createValueUnitsDescription(mainWeatherDataSourceType, haveRain, haveSnow);
 
 	}
 

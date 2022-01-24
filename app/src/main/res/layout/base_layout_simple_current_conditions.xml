@@ -15,6 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
+            android:layout_marginBottom="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -34,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
                 android:text="weather"
-                android:textSize="22sp" />
+                android:textSize="23sp" />
 
         </LinearLayout>
 
@@ -65,8 +66,9 @@
             android:id="@+id/airQualityLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/tempLayout"
+            android:layout_above="@id/feelsLikeTemp"
             android:layout_alignParentRight="true"
+            android:layout_marginBottom="32dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -89,72 +91,65 @@
         </LinearLayout>
 
 
-        <RelativeLayout
-            android:id="@+id/tempLayout"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/temperature"
+            style="@style/text_shadow"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/precipitation">
+            android:layout_below="@id/precipitation"
+            android:layout_alignParentLeft="true"
+            android:fontFamily="sans-serif-thin"
+            android:includeFontPadding="false"
+            android:text="10"
+            android:textSize="100sp" />
 
-            <TextView
-                android:id="@+id/temperature"
-                style="@style/text_shadow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:fontFamily="sans-serif-thin"
-                android:includeFontPadding="false"
-                android:text="10"
-                android:textSize="100sp" />
-
-            <TextView
-                android:id="@+id/tempUnit"
-                style="@style/text_shadow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/temperature"
-                android:layout_toRightOf="@id/temperature"
-                android:fontFamily="sans-serif-thin"
-                android:includeFontPadding="false"
-                android:text="°C"
-                android:textSize="42sp" />
+        <TextView
+            android:id="@+id/tempUnit"
+            style="@style/text_shadow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/temperature"
+            android:layout_toRightOf="@id/temperature"
+            android:fontFamily="sans-serif-thin"
+            android:includeFontPadding="false"
+            android:text="°C"
+            android:textSize="44sp" />
 
 
-            <TextView
-                style="@style/text_shadow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/temperature"
-                android:layout_marginRight="8dp"
-                android:layout_toLeftOf="@id/feelsLikeTemp"
-                android:fontFamily="sans-serif-thin"
-                android:text="@string/real_feel_temperature_simple"
-                android:textSize="18sp" />
+        <TextView
+            style="@style/text_shadow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/temperature"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@id/feelsLikeTemp"
+            android:fontFamily="sans-serif-thin"
+            android:text="@string/real_feel_temperature_simple"
+            android:textSize="18sp" />
 
-            <TextView
-                android:id="@+id/feelsLikeTemp"
-                style="@style/text_shadow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/temperature"
-                android:layout_toLeftOf="@id/feelsLikeTempUnit"
-                android:fontFamily="sans-serif-thin"
-                android:includeFontPadding="false"
-                android:text="-20"
-                android:textSize="29sp" />
+        <TextView
+            android:id="@+id/feelsLikeTemp"
+            style="@style/text_shadow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/temperature"
+            android:layout_toLeftOf="@id/feelsLikeTempUnit"
+            android:fontFamily="sans-serif-thin"
+            android:includeFontPadding="false"
+            android:text="-20"
+            android:textSize="31sp" />
 
-            <TextView
-                android:id="@+id/feelsLikeTempUnit"
-                style="@style/text_shadow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/temperature"
-                android:layout_alignParentRight="true"
-                android:fontFamily="sans-serif-thin"
-                android:includeFontPadding="false"
-                android:text="°C"
-                android:textSize="18sp" />
-
-        </RelativeLayout>
+        <TextView
+            android:id="@+id/feelsLikeTempUnit"
+            style="@style/text_shadow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@id/temperature"
+            android:layout_alignParentRight="true"
+            android:fontFamily="sans-serif-thin"
+            android:includeFontPadding="false"
+            android:text="°C"
+            android:textSize="19sp" />
 
 
         <TextView
@@ -162,7 +157,7 @@
             style="@style/text_shadow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tempLayout"
+            android:layout_below="@id/temperature"
             android:text="tempDescription"
             android:textSize="15sp" />
 
