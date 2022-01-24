@@ -66,4 +66,6 @@
 
     <color name="sunGradientStart">#fff57b</color>
     <color name="sunGradientEnd">#fb8708</color>
+
+    <color name="divider">#79747E</color>
 </resources>

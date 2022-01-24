@@ -34,7 +34,6 @@
             android:layout_alignParentRight="true"
             android:text="@string/detail"
             android:textColor="?attr/textColorInWeatherCard"
-
             android:textSize="16sp" />
 
     </RelativeLayout>

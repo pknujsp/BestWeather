@@ -18,6 +18,7 @@
             android:id="@+id/side_navigation"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:background="@drawable/navigation_drawer_background"
             android:layout_gravity="start">
 
             <androidx.core.widget.NestedScrollView

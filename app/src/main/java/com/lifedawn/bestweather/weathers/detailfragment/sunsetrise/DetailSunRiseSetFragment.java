@@ -64,8 +64,6 @@ public class DetailSunRiseSetFragment extends Fragment {
 	private int plusWeeks = 16;
 
 	private final ExecutorService executorService = MyApplication.getExecutorService();
-	private final DateTimeFormatter dateFormatterInInfo = DateTimeFormatter.ofPattern("yyyy.M.d EEE");
-	private final DateTimeFormatter timeFormatterInInfo = DateTimeFormatter.ofPattern("a hh:mm");
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -110,6 +108,8 @@ public class DetailSunRiseSetFragment extends Fragment {
 			}
 		});
 
+		binding.chart.setNoDataText(getString(R.string.sun_set_rise));
+		binding.chart.setNoDataTextColor(Color.BLUE);
 		binding.chart.setDrawGridBackground(false);
 		binding.chart.getDescription().setEnabled(false);
 		binding.chart.setScaleXEnabled(false);

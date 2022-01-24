@@ -7,6 +7,10 @@
     <dimen name="toolbar_image_size">28dp</dimen>
     <dimen name="cornerRadius">16dp</dimen>
     <dimen name="btnCornerRadius">20dp</dimen>
+    <dimen name="dialogCornerRadius">28dp</dimen>
+    <dimen name="widgetCornerRadius">28dp</dimen>
+    <dimen name="navigationDrawerCornerRadius">16dp</dimen>
+    <dimen name="cardCornerRadius">12dp</dimen>
 
 
     <!-- forecast view 내의 길이, 크기 값
@@ -204,5 +208,6 @@
     <dimen name="feelsLikeTempTextSizeInEighthWidget">16sp</dimen>
     <dimen name="windSpeedTextSizeInEighthWidget">13sp</dimen>
     <dimen name="notificationPadding">8dp</dimen>
+    <dimen name="dialogPadding">24dp</dimen>
 
 </resources>

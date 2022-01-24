@@ -258,6 +258,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 	private void initBarChart(BarChart barChart) {
 		barChart.setNoDataText(getString(R.string.noData));
+		barChart.setNoDataTextColor(Color.BLUE);
 		barChart.getAxisRight().setEnabled(false);
 
 		barChart.setDrawBorders(false);
