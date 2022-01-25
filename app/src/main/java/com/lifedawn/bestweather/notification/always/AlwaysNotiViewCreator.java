@@ -209,7 +209,7 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 			}
 
 			if (haveSnow) {
-				if (hourlyForecastDtoList.get(i).isHasRain()) {
+				if (hourlyForecastDtoList.get(i).isHasSnow()) {
 					childRemoteViews.setTextViewText(R.id.snowVolume, hourlyForecastDtoList.get(i).getSnowVolume()
 							.replace(mm, "").replace(cm, ""));
 					childRemoteViews.setTextColor(R.id.snowVolume, textColor);
