@@ -99,8 +99,7 @@ public class FirstWidgetJobService extends AbstractWidgetJobService {
 			}
 		}
 
-		widgetCreator.updateSettings(widgetDto, null);
-		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
 		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
 	}
 }

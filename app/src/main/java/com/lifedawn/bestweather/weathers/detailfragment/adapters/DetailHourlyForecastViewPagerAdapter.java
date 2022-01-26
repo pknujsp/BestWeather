@@ -57,6 +57,12 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 	}
 
 	@Override
+	public void onViewRecycled(@NonNull ViewHolder holder) {
+		holder.clear();
+		super.onViewRecycled(holder);
+	}
+
+	@Override
 	public void onBindViewHolder(@NonNull @NotNull DetailHourlyForecastViewPagerAdapter.ViewHolder holder, int position) {
 		holder.onBind(hourlyForecastDtoList.get(position));
 	}
@@ -77,11 +83,15 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			binding.header.addView(headerBinding.getRoot());
 		}
 
-		public void onBind(HourlyForecastDto hourlyForecastDto) {
+		public void clear() {
 			binding.detailGridLayout.removeAllViews();
 			headerBinding.precipitationGridLayout.removeAllViews();
+		}
 
+		public void onBind(HourlyForecastDto hourlyForecastDto) {
 			//header 화면 구성
+			int position = getAdapterPosition();
+
 			headerBinding.date.setText(hourlyForecastDto.getHours().format(dateFormatter));
 			headerBinding.hours.setText(hourlyForecastDto.getHours().format(hoursFormatter));
 			headerBinding.weatherIcon.setImageResource(hourlyForecastDto.getWeatherIcon());
@@ -120,7 +130,9 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 				gridItemDtos.add(new GridItemDto(context.getString(R.string.pressure), hourlyForecastDto.getPressure(), null));
 			}
 
-			gridItemDtos.add(new GridItemDto(context.getString(R.string.humidity), hourlyForecastDto.getHumidity(), null));
+			if (hourlyForecastDto.getHumidity() != null) {
+				gridItemDtos.add(new GridItemDto(context.getString(R.string.humidity), hourlyForecastDto.getHumidity(), null));
+			}
 
 			//나머지 - 돌풍, 기압, 이슬점, 운량, 시정, 자외선, 체감기온
 
@@ -140,12 +152,16 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 		}
 
 		private void addDetailGridItem(LayoutInflater layoutInflater, List<GridItemDto> gridItemDtos) {
-			for (GridItemDto gridItem : gridItemDtos) {
-				View convertView = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
+			TextView label = null;
+			TextView value = null;
+			ImageView icon = null;
 
-				TextView label = convertView.findViewById(R.id.label);
-				TextView value = convertView.findViewById(R.id.value);
-				ImageView icon = convertView.findViewById(R.id.label_icon);
+			for (GridItemDto gridItem : gridItemDtos) {
+				View itemView = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null, false);
+
+				label = itemView.findViewById(R.id.label);
+				value = itemView.findViewById(R.id.value);
+				icon = itemView.findViewById(R.id.label_icon);
 
 				label.setText(gridItem.label);
 				value.setText(gridItem.value);
@@ -160,15 +176,15 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 				}
 
 				int cellCount = binding.detailGridLayout.getChildCount();
-				int row = cellCount / 4;
-				int column = cellCount % 4;
+				int row = cellCount / binding.detailGridLayout.getColumnCount();
+				int column = cellCount % binding.detailGridLayout.getColumnCount();
 
 				GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
 
-				layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
 				layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
+				layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
 
-				binding.detailGridLayout.addView(convertView, layoutParams);
+				binding.detailGridLayout.addView(itemView, layoutParams);
 			}
 		}
 

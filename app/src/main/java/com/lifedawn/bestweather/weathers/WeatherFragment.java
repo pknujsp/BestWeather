@@ -302,7 +302,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		});
 
 		binding.flickrImageUrl.setVisibility(View.GONE);
-		binding.loadingAnimation.setVisibility(View.VISIBLE);
 		binding.flickrImageUrl.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -427,7 +426,15 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				Calendar sunSetCalendar = sunRiseSunsetCalculator.getOfficialSunsetCalendarForDate(currentCalendar);
 
 				if (sunRiseCalendar == null || sunSetCalendar == null) {
-					binding.flickrLayout.setVisibility(View.GONE);
+					if (getActivity() != null) {
+						getActivity().runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								binding.loadingAnimation.setVisibility(View.VISIBLE);
+								binding.flickrImageUrl.setVisibility(View.GONE);
+							}
+						});
+					}
 					return;
 				}
 
@@ -528,10 +535,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 										@Override
 										public void onResourceReady(@NonNull @NotNull Drawable resource,
 										                            @Nullable @org.jetbrains.annotations.Nullable Transition<? super Drawable> transition) {
+
+											BACKGROUND_IMG_MAP.get(galleryName).setImg(resource);
+											Glide.with(WeatherFragment.this).load(resource).transition(
+													DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
+											
 											if (getActivity() != null) {
-												BACKGROUND_IMG_MAP.get(galleryName).setImg(resource);
-												Glide.with(WeatherFragment.this).load(resource).transition(
-														DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
 
 												getActivity().runOnUiThread(new Runnable() {
 													@Override

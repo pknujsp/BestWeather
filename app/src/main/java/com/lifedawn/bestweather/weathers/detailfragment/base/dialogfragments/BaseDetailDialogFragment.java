@@ -56,7 +56,7 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		binding.detailForecastViewPager.setOffscreenPageLimit(1);
+		binding.detailForecastViewPager.setOffscreenPageLimit(2);
 		binding.detailForecastViewPager.getChildAt(0).setOverScrollMode(View.OVER_SCROLL_NEVER);
 
 		compositePageTransformer = new CompositePageTransformer();

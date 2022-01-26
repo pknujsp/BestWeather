@@ -105,8 +105,7 @@ public class FourthWidgetJobService extends AbstractWidgetJobService {
 				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());
 			}
 		}
-		widgetCreator.updateSettings(widgetDto, null);
-		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
 		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
 	}
 }

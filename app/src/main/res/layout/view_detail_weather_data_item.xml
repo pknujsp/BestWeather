@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="6dp">
+    android:padding="4dp">
 
     <TextView
         android:id="@+id/label"
@@ -20,8 +20,8 @@
 
     <ImageView
         android:id="@+id/label_icon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginBottom="2dp"
         android:scaleType="centerInside"
         android:src="@drawable/temp_icon" />

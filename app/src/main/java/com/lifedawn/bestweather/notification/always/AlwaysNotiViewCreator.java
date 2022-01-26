@@ -170,6 +170,7 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 				context.getString(R.string.wind) + ": " + currentConditionsDto.getWindSpeed();
 		remoteViews.setTextViewText(R.id.windSpeed, windSpeedStr);
 		remoteViews.setTextViewText(R.id.temp, currentConditionsDto.getTemp());
+		remoteViews.setTextViewText(R.id.feelsLikeTemp, new String(context.getString(R.string.feelsLike) + " : " + currentConditionsDto.getFeelsLikeTemp()));
 	}
 
 	public void setHourlyForecastViews(RemoteViews remoteViews, List<HourlyForecastDto> hourlyForecastDtoList) {

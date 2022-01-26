@@ -48,16 +48,16 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 				@Override
 				public void onResultSuccessful(WidgetDto widgetDto) {
 					if (widgetDto != null) {
-						if (widgetDto.isInitialized() && widgetDto.isLoadSuccessful()) {
-							widgetCreator.setDataViewsOfSavedData();
-						} else if (widgetDto.isInitialized() && !widgetDto.isLoadSuccessful()) {
-							RemoteViews remoteViews = widgetCreator.createRemoteViews();
+						if (widgetDto.isInitialized()) {
+							if (widgetDto.isLoadSuccessful()) {
+								widgetCreator.setDataViewsOfSavedData();
+							} else {
+								RemoteViews remoteViews = widgetCreator.createRemoteViews();
 
-							widgetCreator.setRefreshPendingIntent(widgetProviderClass, remoteViews, appWidgetId);
-							RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-							appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
-						} else {
-
+								widgetCreator.setRefreshPendingIntent(widgetProviderClass, remoteViews, appWidgetId);
+								RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+								appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
+							}
 						}
 					} else {
 

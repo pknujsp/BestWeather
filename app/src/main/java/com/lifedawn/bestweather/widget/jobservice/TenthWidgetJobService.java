@@ -86,8 +86,10 @@ public class TenthWidgetJobService extends AbstractWidgetJobService {
 				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());
 			}
 		}
-		widgetCreator.updateSettings(widgetDto, null);
-		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+		if (!widgetDto.isInitialized()) {
+			widgetDto.setInitialized(true);
+		}
+
 		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
 	}
 }

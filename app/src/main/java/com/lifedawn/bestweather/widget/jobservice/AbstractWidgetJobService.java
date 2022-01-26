@@ -50,6 +50,16 @@ public abstract class AbstractWidgetJobService extends JobService {
 	}
 
 	@Override
+	public void onTaskRemoved(Intent rootIntent) {
+		super.onTaskRemoved(rootIntent);
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
+	@Override
 	public boolean onStartJob(JobParameters params) {
 		PersistableBundle bundle = params.getExtras();
 		final String action = bundle.getString("action");
@@ -105,7 +115,6 @@ public abstract class AbstractWidgetJobService extends JobService {
 						loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, widgetDto);
 					}
 
-					widgetDto.setInitialized(true);
 					widgetRepository.update(widgetDto, null);
 				}
 
@@ -334,6 +343,10 @@ public abstract class AbstractWidgetJobService extends JobService {
 	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews,
 	                              WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                              Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+		WidgetRepository widgetRepository = new WidgetRepository(context);
+		widgetRepository.update(widgetDto,null);
+		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
 		Message message = handler.obtainMessage();
 		message.obj = "finished";
 		handler.sendMessage(message);
