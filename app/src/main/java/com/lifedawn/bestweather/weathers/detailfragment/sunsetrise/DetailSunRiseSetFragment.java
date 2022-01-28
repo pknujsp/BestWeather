@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers.detailfragment.sunsetrise;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -83,6 +84,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 		return binding.getRoot();
 	}
 
+	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -147,7 +149,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 
 				if (sunRiseSetObjList.isEmpty()) {
 					//error
-					binding.chart.clearValues();
+					binding.chart.setNoDataText(getString(R.string.failed_calculating_sun_rise_set));
 				} else {
 					//차트 설정
 					List<BarEntry> sunRiseSetTimeDataList = new ArrayList<>();
@@ -267,20 +269,11 @@ public class DetailSunRiseSetFragment extends Fragment {
 	}
 
 	private List<SunRiseSetUtil.SunRiseSetObj> calcSunRiseSets(ZonedDateTime criteriaZonedDateTime) {
-		//TimeZone localTimeZone = TimeZone.getDefault();
-		//final int localOffset = localTimeZone.getRawOffset();
 		ZoneOffset zoneOffset = criteriaZonedDateTime.getOffset();
 		final int offset = zoneOffset.getTotalSeconds() * 1000;
 
 		TimeZone realTimeZone = new SimpleTimeZone(offset, "");
-		/*
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			realTimeZone = TimeZone.getTimeZone(zoneId);
-		} else {
-			realTimeZone = TimeZone.getTimeZone(zoneId.toString());
-		}
 
-		 */
 		ZonedDateTime criteria = ZonedDateTime.of(criteriaZonedDateTime.toLocalDateTime(), zoneId);
 
 		ZonedDateTime beginUtc0ZonedDateTime = criteria.minusWeeks(minusWeeks);
@@ -306,7 +299,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 			if (sunRiseSetObj.getSunrise() == null || sunRiseSetObj.getSunset() == null) {
 				// 일출/일몰 계산 오류 발생 하면 리스트 비우고 반환
 				list.clear();
-				break;
+				return list;
 			}
 			list.add(sunRiseSetObj);
 

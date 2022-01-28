@@ -6,7 +6,7 @@
     <item android:id="@android:id/background">
 
         <shape android:shape="rectangle">
-            <corners android:radius="@dimen/cornerRadius" />
+            <corners android:radius="@dimen/cardCornerRadius" />
             <solid android:color="@color/favorite_location_background_color" />
         </shape>
 

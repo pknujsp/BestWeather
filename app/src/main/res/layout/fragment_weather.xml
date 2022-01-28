@@ -41,11 +41,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
-                        android:layout_centerHorizontal="true"
                         android:layout_marginLeft="24dp"
                         android:layout_marginTop="24dp"
-                        android:layout_marginRight="24dp"
                         android:layout_marginBottom="16dp"
+                        android:layout_alignParentLeft="true"
                         android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:gravity="center_vertical"
@@ -78,13 +77,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/weatherDataSourceLayout"
-                        android:layout_centerHorizontal="true"
                         android:layout_marginLeft="24dp"
                         android:layout_marginRight="24dp"
                         android:layout_marginBottom="4dp"
+                        android:layout_alignParentLeft="true"
                         android:fontFamily="sans-serif-condensed"
                         android:text="@string/loading"
-                        android:textAlignment="center"
                         android:textSize="22sp" />
 
                     <RelativeLayout
@@ -92,9 +90,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_below="@id/address_name"
-                        android:layout_alignRight="@id/address_name"
+                        android:layout_alignParentLeft="true"
                         android:layout_marginLeft="24dp"
-                        android:layout_marginRight="24dp"
                         android:layout_marginBottom="140dp">
 
                         <ImageView

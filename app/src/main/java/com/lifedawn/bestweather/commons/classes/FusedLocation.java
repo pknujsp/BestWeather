@@ -94,7 +94,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 				LocationRequest locationRequest = LocationRequest.create();
 				locationRequest.setInterval(700);
-				locationRequest.setFastestInterval(320);
+				locationRequest.setFastestInterval(300);
 				locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 				Timer timer = new Timer();
@@ -121,32 +121,11 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 						super.onLocationAvailability(locationAvailability);
 					}
 				};
-				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+
 				CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
 				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
-
-				Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
-						cancellationTokenSource.getToken());
-
-				currentLocationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
-					@Override
-					public void onSuccess(@NonNull @NotNull Location location) {
-						if (location == null) {
-							if (!currentLocationTask.isCanceled()) {
-								ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-								ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
-								fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
-							}
-						} else {
-							List<Location> locations = new ArrayList<>();
-							locations.add(location);
-							locationCallback.onLocationResult(LocationResult.create(locations));
-						}
-					}
-				});
 
 				timer.schedule(new TimerTask() {
 					@Override
@@ -154,7 +133,28 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 						cancellationTokenSource.cancel();
 						locationCallback.onLocationResult(LocationResult.create(new ArrayList<>()));
 					}
-				}, 5000L);
+				}, 4500L);
+
+				Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
+						cancellationTokenSource.getToken());
+
+				currentLocationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
+					@Override
+					public void onSuccess(@NonNull @NotNull Location location) {
+						if (!currentLocationTask.isCanceled()) {
+							if (location == null) {
+								ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+								ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+								fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
+							} else {
+								List<Location> locations = new ArrayList<>();
+								locations.add(location);
+								locationCallback.onLocationResult(LocationResult.create(locations));
+							}
+						}
+
+					}
+				});
 
 				Log.e("FusedLocation", "requestLocationUpdates");
 			} else {

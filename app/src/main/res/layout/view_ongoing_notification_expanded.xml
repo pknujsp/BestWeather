@@ -110,7 +110,7 @@
                 android:maxLines="1"
                 android:text="20°"
                 android:textColor="@color/textColorInNotification"
-                android:textSize="20sp" />
+                android:textSize="18sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"

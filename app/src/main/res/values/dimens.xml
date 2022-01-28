@@ -209,5 +209,6 @@
     <dimen name="windSpeedTextSizeInEighthWidget">13sp</dimen>
     <dimen name="notificationPadding">8dp</dimen>
     <dimen name="dialogPadding">24dp</dimen>
+    <dimen name="cardLRPadding">16dp</dimen>
 
 </resources>

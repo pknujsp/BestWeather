@@ -60,11 +60,14 @@ public class SunSetRiseViewGroup extends FrameLayout {
 	private Point type2PointOnLine;
 
 	private String current;
+	private OnSunRiseSetListener onSunRiseSetListener;
 
-	public SunSetRiseViewGroup(Context context, Location location, ZoneId zoneId) {
+
+	public SunSetRiseViewGroup(Context context, Location location, ZoneId zoneId, OnSunRiseSetListener onSunRiseSetListener) {
 		super(context);
 		this.location = location;
 		this.zoneId = zoneId;
+		this.onSunRiseSetListener = onSunRiseSetListener;
 		init(context);
 	}
 
@@ -166,44 +169,6 @@ public class SunSetRiseViewGroup extends FrameLayout {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if (type1View != null && type2View != null && type3View != null) {
-			/*
-			canvas.drawRect(lineRect.left, lineRect.top, lineRect.right, lineRect.bottom, linePaint);
-			ZonedDateTime now = ZonedDateTime.now(zoneId);
-
-			long millis = now.toInstant().toEpochMilli();
-
-			long nowTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-			millis = type1View.getDateTime().toInstant().toEpochMilli();
-
-			long type1Minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-			millis = type2View.getDateTime().toInstant().toEpochMilli();
-
-			long type2Minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
-
-			long diff = type2Minutes - type1Minutes;
-
-			float heightPerMinute = (float) (type2PointOnLine.y - type1PointOnLine.y) / (float) diff;
-			float currentTimeY = type1PointOnLine.y + (heightPerMinute * (nowTimeMinutes - type1Minutes));
-			timeCirclePoint.x = type1PointOnLine.x;
-			timeCirclePoint.y = (int) currentTimeY;
-			canvas.drawCircle(timeCirclePoint.x, timeCirclePoint.y, circleRadius, timeCirclePaint);
-
-			timeTextRect.offsetTo(timeCirclePoint.x - lineMargin - lineWidth / 2, timeCirclePoint.y);
-			timeTextPaint.setTextAlign(Paint.Align.RIGHT);
-
-			String currentDateTime = now.format(dateTimeFormatter);
-
-			canvas.drawText(currentDateTime, timeTextRect.left, timeTextRect.top + timeTextPaint.descent() - timeTextPaint.ascent(),
-					timeTextPaint);
-
-			timeTextPaint.getTextBounds(currentDateTime, 0, currentDateTime.length(), currentTextRect);
-
-			timeTextPaint.setTextAlign(Paint.Align.CENTER);
-
-			canvas.drawText(current, timeTextRect.left - currentTextRect.width() / 2f, timeTextRect.top,
-					timeTextPaint);
-
-			 */
 			canvas.drawRect(lineRect.left, lineRect.top, lineRect.right, lineRect.bottom, linePaint);
 			ZonedDateTime now = ZonedDateTime.now(zoneId);
 
@@ -284,6 +249,8 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		errorView = null;
 
 		if (todaySunRiseCalendar == null || todaySunSetCalendar == null) {
+			onSunRiseSetListener.onCalcResult(false);
+
 			errorView = new TextView(getContext());
 			errorView.setText(R.string.failed_calculating_sun_rise_set);
 			errorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
@@ -293,6 +260,7 @@ public class SunSetRiseViewGroup extends FrameLayout {
 			addView(errorView);
 			return;
 		}
+
 
 		Calendar type1Calendar;
 		Calendar type2Calendar;
@@ -336,6 +304,7 @@ public class SunSetRiseViewGroup extends FrameLayout {
 			type3Calendar = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(tomorrowCalendar);
 			type3 = SunsetriseFragment.SunSetRiseType.SET;
 		}
+		onSunRiseSetListener.onCalcResult(true);
 
 		ZonedDateTime type1ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(type1Calendar.getTimeInMillis()),
 				zoneId);

@@ -161,6 +161,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 	private AlertDialog dialog;
 
+	private boolean firstCreate = false;
+
 	public WeatherFragment() {
 	}
 
@@ -206,7 +208,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
-
 	}
 
 	@Override
@@ -224,6 +225,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		firstCreate = true;
 		binding = FragmentWeatherBinding.inflate(inflater);
 		return binding.getRoot();
 	}
@@ -232,20 +234,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		Log.e("WeatherFragment", "onViewCreated");
-		binding.scrollView.setVisibility(View.INVISIBLE);
-
-		FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.mainLayout.getLayoutParams();
-		layoutParams.topMargin = MyApplication.getStatusBarHeight();
-		binding.mainLayout.setLayoutParams(layoutParams);
-
-		MobileAds.initialize(getContext());
-		AdRequest adRequest = new AdRequest.Builder().build();
-
-		binding.adViewBelowAirQuality.loadAd(adRequest);
-		binding.adViewBottom.loadAd(adRequest);
-
-		binding.adViewBelowAirQuality.setVisibility(View.GONE);
-		binding.adViewBottom.setVisibility(View.GONE);
 
 		binding.mainToolbar.openNavigationDrawer.setOnClickListener(menuOnClickListener);
 		binding.mainToolbar.gps.setOnClickListener(new View.OnClickListener() {
@@ -301,7 +289,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			}
 		});
 
-		binding.flickrImageUrl.setVisibility(View.GONE);
 		binding.flickrImageUrl.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -314,6 +301,26 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			}
 		});
+
+		if (firstCreate) {
+			binding.scrollView.setVisibility(View.INVISIBLE);
+
+			FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.mainLayout.getLayoutParams();
+			layoutParams.topMargin = MyApplication.getStatusBarHeight();
+			binding.mainLayout.setLayoutParams(layoutParams);
+
+			MobileAds.initialize(getContext());
+			AdRequest adRequest = new AdRequest.Builder().build();
+
+			binding.adViewBelowAirQuality.loadAd(adRequest);
+			binding.adViewBottom.loadAd(adRequest);
+
+			binding.adViewBelowAirQuality.setVisibility(View.GONE);
+			binding.adViewBottom.setVisibility(View.GONE);
+			binding.flickrImageUrl.setVisibility(View.GONE);
+
+			firstCreate = false;
+		}
 	}
 
 
@@ -539,7 +546,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 											BACKGROUND_IMG_MAP.get(galleryName).setImg(resource);
 											Glide.with(WeatherFragment.this).load(resource).transition(
 													DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
-											
+
 											if (getActivity() != null) {
 
 												getActivity().runOnUiThread(new Runnable() {

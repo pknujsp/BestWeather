@@ -91,9 +91,17 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 			}
 		});
 
-		sunSetRiseViewGroup = new SunSetRiseViewGroup(getContext(), location, zoneId);
+		sunSetRiseViewGroup = new SunSetRiseViewGroup(getContext(), location, zoneId, new OnSunRiseSetListener() {
+			@Override
+			public void onCalcResult(boolean calcSuccessful) {
+				if (calcSuccessful) {
+					binding.weatherCardViewHeader.detailForecast.setVisibility(View.VISIBLE);
+				} else {
+					binding.weatherCardViewHeader.detailForecast.setVisibility(View.GONE);
+				}
+			}
+		});
 		binding.rootLayout.addView(sunSetRiseViewGroup, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-		setValuesToViews();
 
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(Intent.ACTION_TIME_TICK);
