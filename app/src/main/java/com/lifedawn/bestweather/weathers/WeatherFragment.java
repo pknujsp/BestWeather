@@ -34,6 +34,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
+import com.github.matteobattilana.weather.PrecipType;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.location.LocationResult;
@@ -54,6 +55,7 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmI
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.enums.Flickr;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
@@ -233,7 +235,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		Log.e("WeatherFragment", "onViewCreated");
+
+		binding.rootLayout.setWeatherData(PrecipType.CLEAR);
 
 		binding.mainToolbar.openNavigationDrawer.setOnClickListener(menuOnClickListener);
 		binding.mainToolbar.gps.setOnClickListener(new View.OnClickListener() {
@@ -493,6 +496,22 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				// time : sunrise, sunset, day, night
 				// weather : clear, partly cloudy, mostly cloudy, overcast, rain, snow
 
+				if (getActivity() != null) {
+					String finalWeather = weather;
+					MainThreadWorker.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							if (finalWeather.equals(Flickr.Weather.rain.getText())) {
+								binding.rootLayout.setWeatherData(PrecipType.RAIN);
+							} else if (finalWeather.equals(Flickr.Weather.snow.getText())) {
+								binding.rootLayout.setWeatherData(PrecipType.SNOW);
+							} else {
+								binding.rootLayout.setWeatherData(PrecipType.CLEAR);
+							}
+						}
+					});
+				}
+
 				//이미 다운로드 된 이미지가 있으면 다운로드 하지 않음
 				if (BACKGROUND_IMG_MAP.containsKey(galleryName)) {
 					if (getActivity() != null) {
@@ -637,6 +656,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					}
 				});
 
+			} else if (fail == Fail.FAILED_FIND_LOCATION) {
+				Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
 			}
 		}
 	};

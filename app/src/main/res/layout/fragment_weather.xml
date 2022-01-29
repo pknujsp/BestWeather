@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
+    <com.github.matteobattilana.weather.WeatherView
         android:id="@+id/root_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -40,11 +40,11 @@
                         android:id="@+id/weatherDataSourceLayout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
                         android:layout_alignParentTop="true"
                         android:layout_marginLeft="24dp"
                         android:layout_marginTop="24dp"
                         android:layout_marginBottom="16dp"
-                        android:layout_alignParentLeft="true"
                         android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:gravity="center_vertical"
@@ -77,10 +77,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/weatherDataSourceLayout"
+                        android:layout_alignParentLeft="true"
                         android:layout_marginLeft="24dp"
                         android:layout_marginRight="24dp"
                         android:layout_marginBottom="4dp"
-                        android:layout_alignParentLeft="true"
                         android:fontFamily="sans-serif-condensed"
                         android:text="@string/loading"
                         android:textSize="22sp" />
@@ -220,6 +220,6 @@
 
         </LinearLayout>
 
-    </FrameLayout>
+    </com.github.matteobattilana.weather.WeatherView>
 
 </layout>

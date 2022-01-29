@@ -115,7 +115,7 @@ public abstract class AbstractAlwaysNotiViewCreator {
 				RemoteViewsUtil.onErrorProcess(collapsedRemoteViews, context, errorType);
 				RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, errorType);
 
-				makeNotification(collapsedRemoteViews, expandedRemoteViews, R.drawable.temp_icon, true);
+				makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_foreground, true);
 			}
 		};
 
@@ -125,7 +125,7 @@ public abstract class AbstractAlwaysNotiViewCreator {
 
 	public void loadWeatherData(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
 		RemoteViewsUtil.onBeginProcess(expandedRemoteViews);
-		makeNotification(collapsedRemoteViews, expandedRemoteViews, R.drawable.temp_icon, false);
+		makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_foreground, false);
 
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
 		WeatherDataSourceType weatherDataSourceType = notificationDataObj.getWeatherSourceType();
