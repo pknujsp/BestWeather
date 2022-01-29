@@ -21,7 +21,7 @@ public class WeatherViewController {
 			int volumeValue = 0;
 
 			if (volume == null) {
-		
+
 			} else {
 				if (volume.contains("mm") || volume.contains("cm")) {
 					String intStr = volume.replaceAll("[^0-9]", "");
