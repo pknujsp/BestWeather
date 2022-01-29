@@ -99,7 +99,7 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	}
 
 	public interface ILoadImgOfCurrentConditions extends Serializable {
-		void loadImgOfCurrentConditions(WeatherDataSourceType weatherDataSourceType, String val, Double latitude, Double longitude, ZoneId zoneId);
+		void loadImgOfCurrentConditions(WeatherDataSourceType weatherDataSourceType, String val, Double latitude, Double longitude, ZoneId zoneId, String volume);
 	}
 
 }

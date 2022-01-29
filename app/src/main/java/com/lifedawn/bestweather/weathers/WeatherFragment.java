@@ -48,6 +48,7 @@ import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.classes.TextUtil;
+import com.lifedawn.bestweather.commons.classes.WeatherViewController;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqicn;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
@@ -150,6 +151,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private FusedLocation fusedLocation;
 	private NetworkStatus networkStatus;
 	private FusedLocation.MyLocationCallback locationCallbackInMainFragment;
+	private WeatherViewController weatherViewController;
 
 	private WeatherDataSourceType mainWeatherDataSourceType;
 	private Double latitude;
@@ -236,7 +238,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		binding.rootLayout.setWeatherData(PrecipType.CLEAR);
+		weatherViewController = new WeatherViewController(binding.rootLayout);
+		weatherViewController.setWeatherView(PrecipType.CLEAR, null);
 
 		binding.mainToolbar.openNavigationDrawer.setOnClickListener(menuOnClickListener);
 		binding.mainToolbar.gps.setOnClickListener(new View.OnClickListener() {
@@ -406,7 +409,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	@Override
 	public void loadImgOfCurrentConditions(WeatherDataSourceType weatherDataSourceType, String val, Double latitude, Double longitude,
-	                                       ZoneId zoneId) {
+	                                       ZoneId zoneId, String volume) {
 		if (getActivity() != null) {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
@@ -502,12 +505,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						@Override
 						public void run() {
 							if (finalWeather.equals(Flickr.Weather.rain.getText())) {
-								binding.rootLayout.setWeatherData(PrecipType.RAIN);
+								weatherViewController.setWeatherView(PrecipType.RAIN, volume);
 							} else if (finalWeather.equals(Flickr.Weather.snow.getText())) {
-								binding.rootLayout.setWeatherData(PrecipType.SNOW);
+								weatherViewController.setWeatherView(PrecipType.SNOW, volume);
 							} else {
-								binding.rootLayout.setWeatherData(PrecipType.CLEAR);
+								weatherViewController.setWeatherView(PrecipType.CLEAR, volume);
 							}
+
 						}
 					});
 				}
@@ -1311,12 +1315,22 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		final String finalCurrentConditionsWeatherVal = currentConditionsWeatherVal;
 		final ZoneId finalZoneId = zoneId;
 
+		String precipitationVolume = null;
+		if (currentConditionsDto.isHasPrecipitationVolume()) {
+			precipitationVolume = currentConditionsDto.getPrecipitationVolume();
+		} else if (currentConditionsDto.isHasRainVolume()) {
+			precipitationVolume = currentConditionsDto.getRainVolume();
+		} else if (currentConditionsDto.isHasSnowVolume()) {
+			precipitationVolume = currentConditionsDto.getSnowVolume();
+		}
+		final String finalPrecipitationVolume = precipitationVolume;
+
 		if (getActivity() != null) {
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					loadImgOfCurrentConditions(mainWeatherDataSourceType, finalCurrentConditionsWeatherVal, latitude, longitude,
-							finalZoneId);
+							finalZoneId, finalPrecipitationVolume);
 
 					changeWeatherDataSourcePicker(countryCode);
 					ZonedDateTime dateTime = multipleRestApiDownloader.getRequestDateTime();
