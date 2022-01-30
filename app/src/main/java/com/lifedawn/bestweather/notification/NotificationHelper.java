@@ -40,6 +40,8 @@ public class NotificationHelper {
 
 				channel.setSound(null, null);
 				channel.setImportance(NotificationManager.IMPORTANCE_LOW);
+			} else if (notificationObj.getNotificationType() == NotificationType.Daily) {
+				channel.setImportance(NotificationManager.IMPORTANCE_HIGH);
 			}
 
 			notificationManager.createNotificationChannel(channel);

@@ -164,7 +164,7 @@ public class DailyPushNotificationJobService extends JobService {
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,
 	                            DailyPushNotificationDto dailyPushNotificationDto) {
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = viewCreator.getRequestWeatherDataTypeSet();
-		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = dailyPushNotificationDto.getWeatherSourceTypeSet();
+		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = dailyPushNotificationDto.getWeatherDataSourceTypeSet();
 
 		WeatherRequestUtil.loadWeatherData(context, executorService, dailyPushNotificationDto.getCountryCode(),
 				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), requestWeatherDataTypeSet, new MultipleRestApiDownloader() {

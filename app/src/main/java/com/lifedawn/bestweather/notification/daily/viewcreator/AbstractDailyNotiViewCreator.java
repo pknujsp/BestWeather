@@ -46,18 +46,15 @@ public abstract class AbstractDailyNotiViewCreator {
 	public void makeNotification(RemoteViews remoteViews, int notificationDtoId) {
 		NotificationHelper notificationHelper = new NotificationHelper(context);
 		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Daily);
-		notificationObj.getNotificationBuilder().setSmallIcon(R.drawable.day_clear);
-		notificationObj.getNotificationBuilder().setContentTitle(context.getString(R.string.app_name));
-		notificationObj.getNotificationBuilder().setPriority(NotificationCompat.PRIORITY_HIGH);
-		notificationObj.getNotificationBuilder().setStyle(new NotificationCompat.BigPictureStyle());
-		notificationObj.getNotificationBuilder().setAutoCancel(true);
 
-		notificationObj.getNotificationBuilder().setCustomContentView(remoteViews);
-		notificationObj.getNotificationBuilder().setCustomBigContentView(remoteViews);
+		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
+		builder.setSmallIcon(R.drawable.ic_launcher_foreground).setAutoCancel(true).setContentIntent(PendingIntent.getActivity(context, notificationObj.getNotificationId(),
+				IntentUtil.getAppIntent(context), PendingIntent.FLAG_UPDATE_CURRENT))
+				.setCustomContentView(remoteViews).setCustomBigContentView(remoteViews);
 
-		remoteViews.setOnClickPendingIntent(R.id.root_layout, PendingIntent.getActivity(context, notificationObj.getNotificationId(),
-				IntentUtil.getAppIntent(context),
-				PendingIntent.FLAG_UPDATE_CURRENT));
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			builder.setPriority(NotificationCompat.PRIORITY_HIGH).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+		}
 
 		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
 		Notification notification = notificationObj.getNotificationBuilder().build();

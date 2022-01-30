@@ -1,10 +1,14 @@
 package com.lifedawn.bestweather.notification.daily.viewcreator;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Icon;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
@@ -62,15 +66,6 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		valuesRemoteViews.setTextViewText(R.id.airQuality,
 				context.getString(R.string.currentAirQuality) + "\n" + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 
-		RemoteViews forecastHeader = new RemoteViews(context.getPackageName(), R.layout.air_quality_simple_forecast_item);
-
-		forecastHeader.setViewVisibility(R.id.date, View.INVISIBLE);
-		forecastHeader.setTextViewText(R.id.pm10, context.getString(R.string.pm10_str));
-		forecastHeader.setTextViewText(R.id.pm25, context.getString(R.string.pm25_str));
-		forecastHeader.setTextViewText(R.id.o3, context.getString(R.string.o3_str));
-
-		valuesRemoteViews.addView(R.id.airQualityForecast, forecastHeader);
-
 		AirQualityDto.DailyForecast current = new AirQualityDto.DailyForecast();
 		current.setDate(null).setPm10(new AirQualityDto.DailyForecast.Val().setAvg(airQualityDto.getCurrent().getPm10()))
 				.setPm25(new AirQualityDto.DailyForecast.Val().setAvg(airQualityDto.getCurrent().getPm25()))
@@ -80,32 +75,36 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		dailyForecastList.add(current);
 		dailyForecastList.addAll(airQualityDto.getDailyForecastList());
 
-		DateTimeFormatter forecastDateFormatter = DateTimeFormatter.ofPattern("M.d E");
+		DateTimeFormatter forecastDateFormatter = DateTimeFormatter.ofPattern("E");
 
 		for (AirQualityDto.DailyForecast item : dailyForecastList) {
-			RemoteViews forecast = new RemoteViews(context.getPackageName(), R.layout.air_quality_simple_forecast_item);
+			RemoteViews forecastItemView = new RemoteViews(context.getPackageName(), R.layout.item_view_color_airquality);
 
-			forecast.setTextViewText(R.id.date, item.getDate() == null ? context.getString(R.string.current) :
+			forecastItemView.setTextViewText(R.id.date, item.getDate() == null ? context.getString(R.string.current) :
 					item.getDate().format(forecastDateFormatter));
 			if (item.isHasPm10()) {
-				forecast.setTextViewText(R.id.pm10, AqicnResponseProcessor.getGradeDescription(item.getPm10().getAvg()));
+				forecastItemView.setInt(R.id.pm10, "setBackgroundColor",
+						AqicnResponseProcessor.getGradeColorId(item.getPm10().getAvg()));
 			} else {
-				forecast.setTextViewText(R.id.pm10, noData);
+				forecastItemView.setImageViewResource(R.id.pm10, R.drawable.ic_baseline_error_24);
 			}
 
 			if (item.isHasPm25()) {
-				forecast.setTextViewText(R.id.pm25, AqicnResponseProcessor.getGradeDescription(item.getPm25().getAvg()));
+				forecastItemView.setInt(R.id.pm25, "setBackgroundColor",
+						AqicnResponseProcessor.getGradeColorId(item.getPm25().getAvg()));
+
 			} else {
-				forecast.setTextViewText(R.id.pm25, noData);
+				forecastItemView.setImageViewResource(R.id.pm25, R.drawable.ic_baseline_error_24);
 			}
 
 			if (item.isHasO3()) {
-				forecast.setTextViewText(R.id.o3, AqicnResponseProcessor.getGradeDescription(item.getO3().getAvg()));
+				forecastItemView.setInt(R.id.o3, "setBackgroundColor",
+						AqicnResponseProcessor.getGradeColorId(item.getO3().getAvg()));
 			} else {
-				forecast.setTextViewText(R.id.o3, noData);
+				forecastItemView.setImageViewResource(R.id.o3, R.drawable.ic_baseline_error_24);
 			}
 
-			valuesRemoteViews.addView(R.id.airQualityForecast, forecast);
+			valuesRemoteViews.addView(R.id.forecast, forecastItemView);
 		}
 
 		remoteViews.addView(R.id.valuesView, valuesRemoteViews);

@@ -343,6 +343,11 @@ public abstract class AbstractWidgetJobService extends JobService {
 	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews,
 	                              WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                              Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+
+		if (!widgetDto.isInitialized()) {
+			widgetDto.setInitialized(true);
+		}
+
 		WidgetRepository widgetRepository = new WidgetRepository(context);
 		widgetRepository.update(widgetDto,null);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);

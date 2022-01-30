@@ -88,10 +88,7 @@ public class FourthWidgetJobService extends AbstractWidgetJobService {
 						}
 					});
 			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, requestWeatherDataTypeSet, requestWeatherDataSourceTypeSet, widgetDto, zoneOffset);
-
-
 		}
-
 
 		widgetDto.setLoadSuccessful(successful);
 

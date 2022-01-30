@@ -55,8 +55,11 @@ public class RoomTypeConverter {
 	public Set<WeatherDataSourceType> toSet(String value) {
 		String[] types = value.split(",");
 		Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
-		for (String type : types) {
-			weatherDataSourceTypeSet.add(WeatherDataSourceType.valueOf(type));
+
+		if (types.length > 0) {
+			for (String type : types) {
+				weatherDataSourceTypeSet.add(WeatherDataSourceType.valueOf(type));
+			}
 		}
 		return weatherDataSourceTypeSet;
 	}

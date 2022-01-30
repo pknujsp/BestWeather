@@ -162,17 +162,6 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		binding.check.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (editingNotificationDto.getNotificationType() == DailyPushNotificationType.Fourth
-						|| editingNotificationDto.getNotificationType() == DailyPushNotificationType.Fifth) {
-					Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
-					weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
-					editingNotificationDto.setWeatherSourceTypeSet(weatherDataSourceTypeSet);
-				} else if (editingNotificationDto.getNotificationType() == DailyPushNotificationType.Second) {
-					editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.AQICN);
-				} else {
-					editingNotificationDto.removeWeatherSourceType(WeatherDataSourceType.AQICN);
-				}
-
 				if (newNotificationSession) {
 					repository.add(newNotificationDto, new DbQueryCallback<DailyPushNotificationDto>() {
 						@Override
@@ -181,7 +170,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 								@Override
 								public void run() {
 									dailyNotiHelper.enablePushNotification(result);
-									getParentFragmentManager().popBackStackImmediate();
+									getParentFragmentManager().popBackStack();
 								}
 							});
 
@@ -201,7 +190,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 								@Override
 								public void run() {
 									dailyNotiHelper.modifyPushNotification(result);
-									getParentFragmentManager().popBackStackImmediate();
+									getParentFragmentManager().popBackStack();
 								}
 							});
 						}
@@ -236,7 +225,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		LocalTime localTime = LocalTime.parse(editingNotificationDto.getAlarmClock());
 		binding.hours.setText(localTime.format(hoursFormatter));
 
-		Set<WeatherDataSourceType> weatherDataSourceTypeSet = editingNotificationDto.getWeatherSourceTypeSet();
+		Set<WeatherDataSourceType> weatherDataSourceTypeSet = editingNotificationDto.getWeatherDataSourceTypeSet();
 		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_ONECALL)) {
 			binding.commons.owmRadio.setChecked(true);
 		}
@@ -248,9 +237,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 
 
 	private void initNotificationTypeSpinner() {
-		final String[] notificationTypes = getResources().getStringArray(R.array.DailyPushNotificationType);
-
-		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, notificationTypes);
+		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.DailyPushNotificationType));
 		binding.notificationTypesSpinner.setAdapter(spinnerAdapter);
 
 		binding.notificationTypesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -278,26 +265,36 @@ public class DailyNotificationSettingsFragment extends Fragment {
 				//시간별 예보
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new FirstDailyNotificationViewCreator(context);
+				editingNotificationDto.removeWeatherSourceType(WeatherDataSourceType.AQICN);
+				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.OWM_ONECALL);
 				break;
 			case Second:
 				//현재날씨
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new SecondDailyNotificationViewCreator(context);
+				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.AQICN);
+				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.OWM_ONECALL);
 				break;
 			case Third:
 				//일별 예보
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new ThirdDailyNotificationViewCreator(context);
+				editingNotificationDto.removeWeatherSourceType(WeatherDataSourceType.AQICN);
+				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.OWM_ONECALL);
 				break;
 			case Fourth:
 				//현재 대기질
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.GONE);
 				viewCreator = new FourthDailyNotificationViewCreator(context);
+				editingNotificationDto.getWeatherDataSourceTypeSet().clear();
+				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.AQICN);
 				break;
 			default:
 				//대기질 예보
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.GONE);
 				viewCreator = new FifthDailyNotificationViewCreator(context);
+				editingNotificationDto.getWeatherDataSourceTypeSet().clear();
+				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.AQICN);
 				break;
 		}
 

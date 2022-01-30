@@ -1,14 +1,19 @@
 package com.lifedawn.bestweather.main;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
+import android.content.ComponentName;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.service.notification.StatusBarNotification;
+import android.util.ArrayMap;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -35,7 +40,14 @@ import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.always.AlwaysNotiHelper;
 import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
+import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
@@ -79,6 +91,10 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+	}
 
 	private void processNextStep() {
 		// 초기화
@@ -95,11 +111,11 @@ public class MainActivity extends AppCompatActivity {
 			fragmentTransaction.add(binding.fragmentContainer.getId(), introTransactionFragment,
 					introTransactionFragment.getTag()).commit();
 		} else {
-			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commit();
-
 			initNotifications();
 			initWidgets();
+
+			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
+			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commit();
 		}
 	}
 
@@ -140,13 +156,67 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void initWidgets() {
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+		WidgetRepository widgetRepository = new WidgetRepository(getApplicationContext());
+		widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
+			@Override
+			public void onResultSuccessful(List<WidgetDto> result) {
+				if (result.size() > 0) {
+					AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+					ArrayMap<Class<?>, List<Integer>> widgetArrMap = new ArrayMap<>();
 
-		final int[] appWidgetIds = appWidgetManager.getAppWidgetIds(getComponentName());
-		if (appWidgetIds.length > 0) {
-			//WidgetRepository widgetRepository = new WidgetRepository(getApplicationContext());
+					for (WidgetDto widgetDto : result) {
+						final AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(widgetDto.getAppWidgetId());
+						ComponentName componentName = appWidgetProviderInfo.provider;
+						final String providerClassName = componentName.getClassName();
+						try {
+							Class<?> cls = Class.forName(providerClassName);
 
-		}
+							if (!widgetArrMap.containsKey(cls)) {
+								widgetArrMap.put(cls, new ArrayList<>());
+							}
+							widgetArrMap.get(cls).add(widgetDto.getAppWidgetId());
+						} catch (ClassNotFoundException e) {
+							e.printStackTrace();
+							return;
+						}
+					}
+
+					int requestCode = 100;
+					for (Class<?> cls : widgetArrMap.keySet()) {
+						Intent refreshIntent = null;
+						try {
+							refreshIntent = new Intent(getApplicationContext(), cls);
+							refreshIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+
+							Bundle bundle = new Bundle();
+							List<Integer> idList = widgetArrMap.valueAt(widgetArrMap.indexOfKey(cls));
+							int[] ids = new int[idList.size()];
+							int index = 0;
+
+							for (Integer id : idList) {
+								ids[index++] = id;
+							}
+							bundle.putIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+							refreshIntent.putExtras(bundle);
+
+							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode++, refreshIntent,
+									PendingIntent.FLAG_UPDATE_CURRENT);
+							pendingIntent.send();
+						} catch (PendingIntent.CanceledException e) {
+							e.printStackTrace();
+							return;
+						}
+					}
+
+
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
 	}
 
 }

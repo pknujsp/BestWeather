@@ -79,9 +79,6 @@ public class DailyPushNotificationDto implements Serializable {
 		this.weatherDataSourceTypeSet = weatherDataSourceTypeSet;
 	}
 
-	public Set<WeatherDataSourceType> getWeatherSourceTypeSet() {
-		return weatherDataSourceTypeSet;
-	}
 
 	public boolean isTopPriorityKma() {
 		return topPriorityKma;

@@ -16,7 +16,8 @@
             android:id="@+id/location_radio_group"
             style="@style/WidgetConfigureConfig"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="right">
 
             <RadioButton
                 android:id="@+id/current_location_radio"
@@ -33,7 +34,6 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
                 android:orientation="horizontal">
 
                 <Button
@@ -73,7 +73,8 @@
                 android:id="@+id/weather_data_source_radio_group"
                 style="@style/WidgetConfigureConfig"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="right">
 
                 <RadioButton
                     android:id="@+id/owm_radio"
