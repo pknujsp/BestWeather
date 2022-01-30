@@ -1286,7 +1286,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		// simple current conditions ------------------------------------------------------------------------------------------------------
 		simpleCurrentConditionsFragment.setCurrentConditionsDto(currentConditionsDto);
-		simpleCurrentConditionsFragment.setAirQualityDto(airQualityDto);
+		simpleCurrentConditionsFragment.setAirQualityDto(airQualityDto == null ? new AirQualityDto() : airQualityDto);
 
 		// hourly forecasts ----------------------------------------------------------------------------------------------------------------
 		simpleHourlyForecastFragment.setHourlyForecastDtoList(hourlyForecastDtoList);

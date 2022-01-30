@@ -40,7 +40,7 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 
 	@Override
 	public void setValuesToViews() {
-		super.setValuesToViews();
+		setAqiValuesToViews();
 
 		String precipitation = null;
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
