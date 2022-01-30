@@ -1,16 +1,24 @@
 package com.lifedawn.bestweather.main;
 
+import android.app.NotificationManager;
+import android.appwidget.AppWidgetManager;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.service.notification.StatusBarNotification;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.core.app.NotificationManagerCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
@@ -23,6 +31,11 @@ import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
 import com.lifedawn.bestweather.intro.IntroTransactionFragment;
+import com.lifedawn.bestweather.notification.NotificationHelper;
+import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.notification.always.AlwaysNotiHelper;
+import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
+import com.lifedawn.bestweather.room.repository.WidgetRepository;
 
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
@@ -84,8 +97,56 @@ public class MainActivity extends AppCompatActivity {
 		} else {
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commit();
+
+			initNotifications();
+			initWidgets();
 		}
 	}
 
+	private void initNotifications() {
+		//ongoing notification
+		final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		SharedPreferences sharedPreferences =
+				PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+
+		final boolean enabledOngoingNotification = sharedPreferences.getBoolean(NotificationType.Always.getPreferenceName(), false);
+
+		if (enabledOngoingNotification) {
+			StatusBarNotification[] statusBarNotifications = notificationManager.getActiveNotifications();
+			Boolean active = false;
+			for (StatusBarNotification statusBarNotification : statusBarNotifications) {
+				if (statusBarNotification.getId() == NotificationType.Always.getNotificationId()) {
+					active = true;
+					break;
+				}
+			}
+
+			if (!active) {
+				AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(getApplicationContext(), null);
+				alwaysNotiViewCreator.loadPreferences();
+				alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
+					@Override
+					public boolean handleMessage(@NonNull Message msg) {
+						return false;
+					}
+				}));
+				AlwaysNotiHelper alwaysNotiHelper = new AlwaysNotiHelper(getApplicationContext());
+				alwaysNotiHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
+			}
+			Log.e("Ongoing notification", active.toString());
+
+		}
+
+	}
+
+	private void initWidgets() {
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+
+		final int[] appWidgetIds = appWidgetManager.getAppWidgetIds(getComponentName());
+		if (appWidgetIds.length > 0) {
+			//WidgetRepository widgetRepository = new WidgetRepository(getApplicationContext());
+
+		}
+	}
 
 }
