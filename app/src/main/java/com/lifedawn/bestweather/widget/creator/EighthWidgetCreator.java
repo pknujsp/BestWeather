@@ -224,12 +224,10 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 				weatherDataSourceType, widgetDto.getLatitude(), widgetDto.getLongitude());
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,
 				weatherDataSourceType, widgetDto.getLatitude(), widgetDto.getLongitude());
-		List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.parseTextToDailyForecastDtoList(context, jsonObject,
-				weatherDataSourceType);
 		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto,
-				hourlyForecastDtoList, dailyForecastDtoList, airQualityDto, null);
+				hourlyForecastDtoList, null, airQualityDto, null);
 
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		appWidgetManager.updateAppWidget(appWidgetId,
