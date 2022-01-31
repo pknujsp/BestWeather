@@ -48,7 +48,6 @@ public class EighthWidgetJobService extends AbstractWidgetJobService {
 		Set<RequestWeatherDataType> set = new HashSet<>();
 		set.add(RequestWeatherDataType.currentConditions);
 		set.add(RequestWeatherDataType.hourlyForecast);
-		set.add(RequestWeatherDataType.dailyForecast);
 		set.add(RequestWeatherDataType.airQuality);
 
 		return set;
@@ -68,10 +67,8 @@ public class EighthWidgetJobService extends AbstractWidgetJobService {
 				mainWeatherDataSourceType);
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
 				mainWeatherDataSourceType);
-		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleRestApiDownloader,
-				mainWeatherDataSourceType);
 		AirQualityDto airQualityDto = null;
-		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty() && !dailyForecastDtoList.isEmpty();
+		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty();
 
 		if (successful) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
@@ -82,7 +79,7 @@ public class EighthWidgetJobService extends AbstractWidgetJobService {
 					zoneOffset);
 
 			widgetCreator.setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto,
-					hourlyForecastDtoList, dailyForecastDtoList, airQualityDto, new OnDrawBitmapCallback() {
+					hourlyForecastDtoList, null, airQualityDto, new OnDrawBitmapCallback() {
 						@Override
 						public void onCreatedBitmap(Bitmap bitmap) {
 							widgetDto.setBitmap(bitmap);

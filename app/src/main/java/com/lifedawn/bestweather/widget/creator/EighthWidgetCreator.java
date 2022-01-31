@@ -125,7 +125,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 
 		//현재 날씨------------------------------------------------------
 		valuesRemoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
-		String feelsLikeTemp = context.getString(R.string.feelsLike) + ": " + currentConditionsDto.getFeelsLikeTemp();
+		String feelsLikeTemp = context.getString(R.string.feelsLike) + ":" + currentConditionsDto.getFeelsLikeTemp();
 		valuesRemoteViews.setTextViewText(R.id.feelsLikeTemp, feelsLikeTemp);
 		valuesRemoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
 
@@ -138,16 +138,10 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		valuesRemoteViews.setTextViewText(R.id.precipitation, precipitation);
 		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
 		valuesRemoteViews.setTextViewText(R.id.airQuality, airQuality);
-		valuesRemoteViews.setTextViewText(R.id.windDirection,
-				context.getString(R.string.wind_direction) + ": " + currentConditionsDto.getWindDirection());
-		String windSpeed = currentConditionsDto.getWindSpeed() + ", " + currentConditionsDto.getWindStrength();
-		valuesRemoteViews.setTextViewText(R.id.windSpeed, windSpeed);
 
 		valuesRemoteViews.setTextViewTextSize(R.id.temperature, TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
 		valuesRemoteViews.setTextViewTextSize(R.id.feelsLikeTemp, TypedValue.COMPLEX_UNIT_PX, currentFeelsLikeTempTextSize);
 		valuesRemoteViews.setTextViewTextSize(R.id.precipitation, TypedValue.COMPLEX_UNIT_PX, currentPrecipitationTextSize);
-		valuesRemoteViews.setTextViewTextSize(R.id.windDirection, TypedValue.COMPLEX_UNIT_PX, currentWindDirectionTextSize);
-		valuesRemoteViews.setTextViewTextSize(R.id.windSpeed, TypedValue.COMPLEX_UNIT_PX, currentWindSpeedTextSize);
 		valuesRemoteViews.setTextViewTextSize(R.id.airQuality, TypedValue.COMPLEX_UNIT_PX, currentAirQualityTextSize);
 
 		//시간별 예보-------------------------------------------------------------------------------------
@@ -172,6 +166,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 			valuesRemoteViews.addView(R.id.hourlyForecast, hourlyRemoteViews);
 		}
 
+		/*
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("E");
 
 		//----------------daily---------------------------------------------------------------
@@ -200,6 +195,8 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 
 			valuesRemoteViews.addView(R.id.dailyForecast, dailyRemoteViews);
 		}
+
+		 */
 
 		remoteViews.removeAllViews(R.id.noBitmapValuesView);
 		remoteViews.addView(R.id.noBitmapValuesView, valuesRemoteViews);

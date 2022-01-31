@@ -157,7 +157,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		weatherViewModel.getCurrentLocationLiveData().observe(this, new Observer<String>() {
 			@Override
 			public void onChanged(String addressName) {
-				if (!initializing) {
+				if (addressName != null) {
 					binding.sideNavMenu.addressName.setText(addressName);
 				}
 
@@ -209,31 +209,10 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		binding.sideNavMenu.currentLocationLayout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				WeatherFragment weatherFragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName());
-				weatherFragment.load(LocationType.CurrentLocation, null);
+				addWeatherFragment(LocationType.CurrentLocation, null);
 				binding.drawerLayout.closeDrawer(binding.sideNavigation, false);
 			}
 		});
-
-		WeatherFragment newWeatherFragment = new WeatherFragment();
-		newWeatherFragment.setMenuOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				binding.drawerLayout.openDrawer(binding.sideNavigation);
-
-			}
-		});
-		newWeatherFragment.setiRefreshFavoriteLocationListOnSideNav((IRefreshFavoriteLocationListOnSideNav) this);
-		newWeatherFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
-			@Override
-			public void onResultFragment(Bundle result) {
-
-			}
-		});
-
-		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), newWeatherFragment,
-				WeatherFragment.class.getName()).commitNow();
-
 
 		createFavoriteLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
@@ -246,8 +225,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 				if (lastSelectedLocationType == LocationType.CurrentLocation) {
 					if (usingCurrentLocation) {
-						WeatherFragment weatherFragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName());
-						weatherFragment.load(lastSelectedLocationType, null);
+						addWeatherFragment(lastSelectedLocationType, null);
 					} else {
 						if (favoriteAddressDtoList.size() > 0) {
 							binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
@@ -275,7 +253,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		});
 
 		initializing = false;
-		Log.e("MainTransactionFragment", "onViewCreated");
 	}
 
 
@@ -402,8 +379,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			@Override
 			public void onClick(View view) {
 				binding.drawerLayout.closeDrawer(binding.sideNavigation);
-				WeatherFragment weatherFragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName());
-				weatherFragment.load(locationType, favoriteAddressDto);
+				addWeatherFragment(locationType, favoriteAddressDto);
 			}
 		});
 
@@ -500,4 +476,33 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			binding.drawerLayout.closeDrawer(binding.sideNavigation, false);
 		}
 	};
+
+	private void addWeatherFragment(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
+		Bundle bundle = new Bundle();
+
+		bundle.putSerializable("LocationType", locationType);
+		if (favoriteAddressDto != null) {
+			bundle.putSerializable("FavoriteAddressDto", favoriteAddressDto);
+		}
+
+		WeatherFragment newWeatherFragment = new WeatherFragment();
+		newWeatherFragment.setArguments(bundle);
+		newWeatherFragment.setMenuOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				binding.drawerLayout.openDrawer(binding.sideNavigation);
+
+			}
+		});
+		newWeatherFragment.setiRefreshFavoriteLocationListOnSideNav((IRefreshFavoriteLocationListOnSideNav) this);
+		newWeatherFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+			@Override
+			public void onResultFragment(Bundle result) {
+
+			}
+		});
+
+		getChildFragmentManager().beginTransaction().replace(binding.fragmentContainer.getId(), newWeatherFragment,
+				WeatherFragment.class.getName()).commitAllowingStateLoss();
+	}
 }

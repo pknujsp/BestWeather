@@ -106,15 +106,18 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 
 		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp());
 
-		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+		String airQuality = context.getString(R.string.air_quality) + ":" + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
 		((TextView) view.findViewById(R.id.airQuality)).setText(airQuality);
 
 		String precipitation = "";
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
-			precipitation += context.getString(R.string.precipitation) + ": " + currentConditionsDto.getPrecipitationVolume();
+			precipitation += context.getString(R.string.precipitation) + ":" + currentConditionsDto.getPrecipitationVolume();
 		} else {
 			precipitation = context.getString(R.string.not_precipitation);
 		}
+		String feelsLikeTemp = context.getString(R.string.feelsLike) + ":" + currentConditionsDto.getFeelsLikeTemp();
+		((TextView) view.findViewById(R.id.feelsLikeTemp)).setText(feelsLikeTemp);
+
 		((TextView) view.findViewById(R.id.precipitation)).setText(precipitation);
 		String humidity = context.getString(R.string.humidity) + ": " + currentConditionsDto.getHumidity();
 		((TextView) view.findViewById(R.id.humidity)).setText(humidity);

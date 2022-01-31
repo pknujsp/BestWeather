@@ -96,6 +96,11 @@ public class MainActivity extends AppCompatActivity {
 		super.onStart();
 	}
 
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+	}
+
 	private void processNextStep() {
 		// 초기화
 		MobileAds.initialize(this, new OnInitializationCompleteListener() {
