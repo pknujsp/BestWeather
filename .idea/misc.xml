@@ -18,6 +18,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/activity_main.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/air_quality_simple_forecast_item.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/app_main_toolbar.xml" value="0.33" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/base_layout_detail_current_conditions.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/base_layout_forecast_comparison.xml" value="0.25" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/base_layout_simple_current_conditions.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/base_layout_simple_forecast.xml" value="0.25" />
@@ -29,6 +30,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/first_daily_noti_view.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fourth_daily_noti_view.xml" value="0.25" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_air_quality_detail.xml" value="0.33" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_air_quality_simple.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_alert.xml" value="0.36614583333333334" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_base_notification_settings.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_daily_push_notification_list.xml" value="0.33" />
@@ -37,6 +39,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_main.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_notification.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_settings_main.xml" value="0.17806484295845998" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_sunsetrise.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_weather.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/header_view_in_widget.xml" value="1.25" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/headerview_detail_hourlyforecast.xml" value="0.17806484295845998" />

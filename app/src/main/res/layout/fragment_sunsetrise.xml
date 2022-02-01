@@ -7,12 +7,17 @@
         style="@style/forecasts_card_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
 
 
         <include
             android:id="@+id/weather_card_view_header"
-            layout="@layout/weather_card_header_view" />
+            layout="@layout/weather_card_header_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp" />
 
 
     </LinearLayout>

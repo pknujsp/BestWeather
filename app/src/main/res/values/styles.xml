@@ -17,7 +17,6 @@
     </style>
 
     <style name="forecasts_card_background">
-        <item name="android:padding">8dp</item>
         <item name="android:background">@drawable/simple_weather_card</item>
     </style>
 
