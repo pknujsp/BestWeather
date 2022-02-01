@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.weathers.FragmentType;
@@ -132,7 +133,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 
 		final String mm = "mm";
 		final String cm = "cm";
-		final String degree = "°";
+		final String degree = ValueUnits.convertToStr(null, tempUnit);
 
 		boolean haveSnow = false;
 		boolean haveRain = false;

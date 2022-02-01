@@ -97,11 +97,8 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 
 	public View makeCurrentConditionsViews(LayoutInflater layoutInflater, CurrentConditionsDto currentConditionsDto,
 	                                       AirQualityDto airQualityDto) {
-		final String celsius = "C";
-		final String fahrenheit = "F";
-
 		View view = layoutInflater.inflate(R.layout.view_current_conditions_for_simple_widget, null, false);
-		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp().replace(celsius, "").replace(fahrenheit, ""));
+		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp().replace(tempDegree, ""));
 		((ImageView) view.findViewById(R.id.weatherIcon)).setImageResource(currentConditionsDto.getWeatherIcon());
 
 		String precipitation = "";
@@ -174,7 +171,7 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		}
 
 		List<Integer> tempList = new ArrayList<>();
-		final String degree = "°";
+		final String degree = tempDegree;
 		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E 0");
 
 		for (int cell = 0; cell < cellCount; cell++) {

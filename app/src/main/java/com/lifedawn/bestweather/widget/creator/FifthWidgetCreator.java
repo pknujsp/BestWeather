@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
@@ -94,12 +95,9 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, CurrentConditionsDto currentConditionsDto,
 	                         List<HourlyForecastDto> hourlyForecastDtoList, OnDrawBitmapCallback onDrawBitmapCallback) {
-		final String degreeCelsius = "C";
-		final String degreeFahrenheit = "F";
-
 		HourlyForecastDto current = new HourlyForecastDto();
 		current.setHours(null).setWeatherIcon(currentConditionsDto.getWeatherIcon())
-				.setTemp(currentConditionsDto.getTemp().replace(degreeCelsius, "").replace(degreeFahrenheit, ""));
+				.setTemp(currentConditionsDto.getTemp().replace(tempDegree, ""));
 
 		hourlyForecastDtoList.add(current);
 		drawViews(remoteViews, addressName, lastRefreshDateTime, hourlyForecastDtoList, onDrawBitmapCallback, null, null);
@@ -124,7 +122,7 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 		headerView.setId(R.id.header);
 
 		List<Integer> tempList = new ArrayList<>();
-		final String degree = "°";
+		final String degree = tempDegree;
 		final String mm = "mm";
 		final String cm = "cm";
 

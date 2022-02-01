@@ -121,7 +121,6 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 		binding.toolbar.fragmentTitle.setText(R.string.detail_air_quality);
 
-		MobileAds.initialize(getContext());
 		AdRequest adRequest = new AdRequest.Builder().build();
 		binding.adViewBelowGrid.loadAd(adRequest);
 

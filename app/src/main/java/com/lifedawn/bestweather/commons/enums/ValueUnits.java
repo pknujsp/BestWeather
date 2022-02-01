@@ -31,9 +31,9 @@ public enum ValueUnits {
 	public static String convertToStr(Context context, ValueUnits valueUnit) {
 		switch (valueUnit) {
 			case celsius:
-				return context.getString(R.string.celsius);
+				return "℃";
 			case fahrenheit:
-				return context.getString(R.string.fahrenheit);
+				return "℉";
 			case mPerSec:
 				return context.getString(R.string.mPerSec);
 			case kmPerHour:
@@ -60,7 +60,7 @@ public enum ValueUnits {
 	public static Integer convertTemperature(String val, ValueUnits unit) {
 		Integer convertedVal = (int) Math.round(Double.parseDouble(val));
 		if (unit == fahrenheit) {
-			//화씨 (1°C × 9/5) + 32°F
+			//화씨 (1℃ × 9/5) + 32℉
 			convertedVal = (int) Math.round((convertedVal * (9.0 / 5.0) + 32));
 		}
 		return convertedVal;

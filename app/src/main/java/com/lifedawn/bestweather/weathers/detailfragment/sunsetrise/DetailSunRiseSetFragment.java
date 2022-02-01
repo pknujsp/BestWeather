@@ -28,6 +28,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.model.GradientColor;
+import com.google.android.gms.ads.AdRequest;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
@@ -62,7 +63,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 	private Double longitude;
 
 	private int minusWeeks = 1;
-	private int plusWeeks = 16;
+	private int plusWeeks = 20;
 
 	private final ExecutorService executorService = MyApplication.getExecutorService();
 
@@ -92,6 +93,9 @@ public class DetailSunRiseSetFragment extends Fragment {
 		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
+
+		AdRequest adRequest = new AdRequest.Builder().build();
+		binding.adViewBelowScrollView.loadAd(adRequest);
 
 		binding.toolbar.fragmentTitle.setText(R.string.detailSunRiseSet);
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
@@ -210,7 +214,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 						binding.chart.invalidate();
 
 						if (sunRiseSetObjList.size() > 0) {
-							binding.chart.zoom(0f, 8f, 0f, 0f);
+							binding.chart.zoom(0f, 7f, 0f, 0f);
 
 							final float x = binding.chart.getLeft() + binding.chart.getWidth() / 2f;
 							final float y = binding.chart.getTop() + binding.chart.getHeight() / 2f;

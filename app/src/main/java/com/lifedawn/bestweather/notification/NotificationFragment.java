@@ -57,7 +57,6 @@ public class NotificationFragment extends Fragment {
 			}
 		});
 
-		MobileAds.initialize(getContext());
 		AdRequest adRequest = new AdRequest.Builder().build();
 		binding.adViewBottom.loadAd(adRequest);
 

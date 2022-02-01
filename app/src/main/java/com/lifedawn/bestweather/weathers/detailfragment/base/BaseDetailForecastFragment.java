@@ -93,7 +93,6 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 
-		MobileAds.initialize(getContext());
 		AdRequest adRequest = new AdRequest.Builder().build();
 		binding.adViewBottom.loadAd(adRequest);
 
@@ -122,10 +121,14 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		private OnClickedListViewItemListener<Integer> onClickedForecastItem;
 		private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
 		private DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("H");
+		private final String tempDegree;
+		private final String degree = "°";
 
-		public HourlyForecastListAdapter(Context context, @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
+		public HourlyForecastListAdapter(Context context, @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem,
+		                                 ValueUnits tempUnit) {
 			this.context = context;
 			this.onClickedForecastItem = onClickedForecastItem;
+			tempDegree = ValueUnits.convertToStr(null, tempUnit);
 		}
 
 		public void setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
@@ -167,7 +170,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 				binding.date.setText(hourlyForecastDto.getHours().format(dateFormatter));
 				binding.hours.setText(hourlyForecastDto.getHours().format(hourFormatter));
 				binding.weatherIcon.setImageResource(hourlyForecastDto.getWeatherIcon());
-				binding.temp.setText(hourlyForecastDto.getTemp());
+				binding.temp.setText(hourlyForecastDto.getTemp().replace(tempDegree, degree));
 				binding.pop.setText(hourlyForecastDto.getPop());
 
 				if (hourlyForecastDto.isHasSnow()) {
@@ -192,13 +195,17 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		private List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
 		private Context context;
 		private OnClickedListViewItemListener<Integer> onClickedForecastItem;
+		private final String tempDegree;
+		private final String degree = "°";
 
 		private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
 		private DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
 
-		public DailyForecastListAdapter(Context context, @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
+		public DailyForecastListAdapter(Context context,
+		                                @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem, ValueUnits tempUnit) {
 			this.context = context;
 			this.onClickedForecastItem = onClickedForecastItem;
+			tempDegree = ValueUnits.convertToStr(null, tempUnit);
 		}
 
 		public void setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
@@ -289,8 +296,8 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 					}
 				}
 
-				binding.minTemp.setText(daily.getMinTemp());
-				binding.maxTemp.setText(daily.getMaxTemp());
+				binding.minTemp.setText(daily.getMinTemp().replace(tempDegree, degree));
+				binding.maxTemp.setText(daily.getMaxTemp().replace(tempDegree, degree));
 			}
 		}
 	}

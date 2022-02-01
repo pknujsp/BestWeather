@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.google.android.gms.ads.AdRequest;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.IAppbarTitle;
@@ -63,6 +64,9 @@ public class SettingsMainFragment extends Fragment implements IAppbarTitle {
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 
+		AdRequest adRequest = new AdRequest.Builder().build();
+		binding.adViewBottom.loadAd(adRequest);
+
 		SettingsFragment settingsFragment = new SettingsFragment(this);
 		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), settingsFragment).commitNow();
 
@@ -74,6 +78,8 @@ public class SettingsMainFragment extends Fragment implements IAppbarTitle {
 		});
 
 		binding.toolbar.fragmentTitle.setText(R.string.settings);
+
+
 	}
 
 	@Override

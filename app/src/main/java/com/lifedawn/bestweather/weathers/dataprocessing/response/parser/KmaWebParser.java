@@ -23,7 +23,7 @@ public class KmaWebParser {
 	}
 
 	public static KmaCurrentConditions parseCurrentConditions(Document document, String baseDateTime) {
-		//기온(5.8) tmp, 체감(체감 5.8°C) chill, 어제와 기온이 같아요 w-txt, 습도(40) lbl ic-hm val
+		//기온(5.8) tmp, 체감(체감 5.8℃) chill, 어제와 기온이 같아요 w-txt, 습도(40) lbl ic-hm val
 		//바람(북서 1.1) lbl ic-wind val, 1시간 강수량(-) lbl rn-hr1 ic-rn val
 		//발효중인 특보 cmp-impact-fct
 		final Elements rootElements = document.getElementsByClass("cmp-cur-weather");

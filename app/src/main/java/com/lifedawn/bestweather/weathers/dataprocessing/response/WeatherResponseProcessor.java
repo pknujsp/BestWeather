@@ -569,7 +569,7 @@ public class WeatherResponseProcessor {
 
 	public static CurrentConditionsDto getTempCurrentConditionsDto(Context context) {
 		CurrentConditionsDto tempCurrentConditions = new CurrentConditionsDto();
-		tempCurrentConditions.setTemp("-100°").setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(120)
+		tempCurrentConditions.setTemp("-100℃").setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(120)
 				.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, String.valueOf(tempCurrentConditions.getWindDirectionDegree())))
 				.setWindSpeed(ValueUnits.convertWindSpeed("2.6", ValueUnits.mPerSec) + ValueUnits.convertToStr(context, ValueUnits.mPerSec))
 				.setHumidity("45%")
@@ -579,7 +579,7 @@ public class WeatherResponseProcessor {
 	}
 
 	public static List<HourlyForecastDto> getTempHourlyForecastDtoList(Context context, int count) {
-		final String tempDegree = "10°";
+		final String tempDegree = "10℃";
 		final String percent = "%";
 
 		final String zeroSnowVolume = "0.0mm";
@@ -611,13 +611,11 @@ public class WeatherResponseProcessor {
 	}
 
 	public static List<DailyForecastDto> getTempDailyForecastDtoList(Context context, int count) {
-		final String minTemp = "-10°";
-		final String maxTemp = "10°";
-		final String percent = "%";
+		final String minTemp = "-10℃";
+		final String maxTemp = "10℃";
 
 		final String zeroSnowVolume = "0.0mm";
 		final String zeroRainVolume = "0.0mm";
-		final String zeroPrecipitationVolume = "0.0mm";
 		final String pop = "10%";
 
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();

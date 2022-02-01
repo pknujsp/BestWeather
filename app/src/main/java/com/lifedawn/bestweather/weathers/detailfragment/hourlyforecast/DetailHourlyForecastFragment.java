@@ -42,7 +42,7 @@ public class DetailHourlyForecastFragment extends BaseDetailHourlyForecastFragme
 	@Override
 	protected void setDataViewsByList() {
 		HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(getContext(),
-				this);
+				this, tempUnit);
 		adapter.setHourlyForecastDtoList(hourlyForecastDtoList);
 		binding.listview.setAdapter(adapter);
 	}

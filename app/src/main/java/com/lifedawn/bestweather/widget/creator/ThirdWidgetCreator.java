@@ -46,7 +46,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 	private int dailyForecastTempTextSize;
 
 	private final int hourlyForecastCount = 12;
-	private final int dailyForecastCount = 4;
+	private final int dailyForecastCount = 5;
 
 	public ThirdWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);

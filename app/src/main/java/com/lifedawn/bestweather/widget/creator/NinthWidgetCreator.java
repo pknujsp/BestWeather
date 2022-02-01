@@ -115,7 +115,7 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 		headerView.setId(R.id.header);
 
 		List<Integer> tempList = new ArrayList<>();
-		final String degree = "°";
+		final String degree = tempDegree;
 		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E\n0");
 		DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("E\nH");
 

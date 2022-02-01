@@ -41,7 +41,7 @@ public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment
 
 	@Override
 	protected void setDataViewsByList() {
-		DailyForecastListAdapter adapter = new DailyForecastListAdapter(getContext(), this);
+		DailyForecastListAdapter adapter = new DailyForecastListAdapter(getContext(), this, tempUnit);
 		adapter.setDailyForecastDtoList(dailyForecastDtoList);
 		binding.listview.setAdapter(adapter);
 	}

@@ -112,7 +112,7 @@
             android:layout_toRightOf="@id/temperature"
             android:fontFamily="sans-serif-thin"
             android:includeFontPadding="false"
-            android:text="°C"
+            android:text="℃"
             android:textSize="44sp" />
 
 
@@ -148,7 +148,7 @@
             android:layout_alignParentRight="true"
             android:fontFamily="sans-serif-thin"
             android:includeFontPadding="false"
-            android:text="°C"
+            android:text="℃"
             android:textSize="20sp" />
 
 

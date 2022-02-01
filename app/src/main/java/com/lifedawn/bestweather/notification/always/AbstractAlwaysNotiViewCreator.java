@@ -57,7 +57,7 @@ public abstract class AbstractAlwaysNotiViewCreator {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
 				ValueUnits.celsius.name()));
-		tempDegree = "°";
+		tempDegree = ValueUnits.convertToStr(null, tempUnit);
 		windSpeedUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
 				ValueUnits.mPerSec.name()));
 		notificationHelper = new NotificationHelper(context);

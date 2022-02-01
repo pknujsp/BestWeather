@@ -86,7 +86,6 @@ public class BaseForecastComparisonFragment extends Fragment{
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 
-		MobileAds.initialize(getContext());
 		AdRequest adRequest = new AdRequest.Builder().build();
 		binding.adViewBelowScrollView.loadAd(adRequest);
 

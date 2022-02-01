@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
@@ -129,7 +130,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
 
-		final String degree = "°";
+		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
 		final String mm = "mm";
 		final String cm = "cm";
 
@@ -144,8 +145,8 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			snowVolume = 0f;
 
 			dateList.add(item.getDate().format(dateTimeFormatter));
-			minTempList.add(Integer.parseInt(item.getMinTemp().replace(degree, "")));
-			maxTempList.add(Integer.parseInt(item.getMaxTemp().replace(degree, "")));
+			minTempList.add(Integer.parseInt(item.getMinTemp().replace(tempDegree, "")));
+			maxTempList.add(Integer.parseInt(item.getMaxTemp().replace(tempDegree, "")));
 
 			if (item.isSingle()) {
 				popList.add(item.getSingleValues().getPop());

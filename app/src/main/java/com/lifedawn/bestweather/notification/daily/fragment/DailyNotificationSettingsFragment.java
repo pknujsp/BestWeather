@@ -1,12 +1,12 @@
 package com.lifedawn.bestweather.notification.daily.fragment;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,8 +48,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 
@@ -68,10 +66,25 @@ public class DailyNotificationSettingsFragment extends Fragment {
 	private boolean initializing = true;
 
 	private WeatherDataSourceType mainWeatherDataSourceType;
+	private FavoriteAddressDto selectedFavoriteAddressDto;
+
+	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+		@Override
+		public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+			super.onFragmentDestroyed(fm, f);
+
+			if (f instanceof FavoritesFragment) {
+				if (!((FavoritesFragment) f).isClickedItem() && !selectedFavoriteLocation) {
+					binding.commons.currentLocationRadio.setChecked(true);
+				}
+			}
+		}
+	};
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 
 		dailyNotiHelper = new DailyNotiHelper(getActivity().getApplicationContext());
 		repository = new DailyPushNotificationRepository(getContext());
@@ -212,6 +225,12 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			binding.commons.currentLocationRadio.setChecked(true);
 		} else {
 			if (savedNotificationDto.getLocationType() == LocationType.SelectedAddress) {
+				selectedFavoriteAddressDto = new FavoriteAddressDto();
+				selectedFavoriteAddressDto.setAddress(savedNotificationDto.getAddressName());
+				selectedFavoriteAddressDto.setCountryCode(savedNotificationDto.getCountryCode());
+				selectedFavoriteAddressDto.setLatitude(String.valueOf(savedNotificationDto.getLatitude()));
+				selectedFavoriteAddressDto.setLongitude(String.valueOf(savedNotificationDto.getLongitude()));
+
 				selectedFavoriteLocation = true;
 				binding.commons.selectedLocationRadio.setChecked(true);
 				binding.commons.selectedAddressName.setText(savedNotificationDto.getAddressName());
@@ -235,6 +254,11 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		initializing = false;
 	}
 
+	@Override
+	public void onDestroy() {
+		getParentFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
+		super.onDestroy();
+	}
 
 	private void initNotificationTypeSpinner() {
 		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.DailyPushNotificationType));
@@ -335,7 +359,13 @@ public class DailyNotificationSettingsFragment extends Fragment {
 					binding.commons.changeAddressBtn.setVisibility(View.VISIBLE);
 					binding.commons.selectedAddressName.setVisibility(View.VISIBLE);
 
-					if (!selectedFavoriteLocation) {
+					if (selectedFavoriteLocation) {
+						editingNotificationDto.setAddressName(selectedFavoriteAddressDto.getAddress());
+						editingNotificationDto.setLatitude(Double.parseDouble(selectedFavoriteAddressDto.getLatitude()));
+						editingNotificationDto.setLongitude(Double.parseDouble(selectedFavoriteAddressDto.getLongitude()));
+						editingNotificationDto.setCountryCode(selectedFavoriteAddressDto.getCountryCode());
+						editingNotificationDto.setLocationType(LocationType.SelectedAddress);
+					} else {
 						openFavoritesFragment();
 					}
 				}
@@ -368,13 +398,14 @@ public class DailyNotificationSettingsFragment extends Fragment {
 					selectedFavoriteLocation = true;
 
 					FavoriteAddressDto addressDto = (FavoriteAddressDto) result.getSerializable(BundleKey.SelectedAddressDto.name());
+					selectedFavoriteAddressDto = addressDto;
 					binding.commons.selectedAddressName.setText(addressDto.getAddress());
 
 					//address,latitude,longitude,countryCode
-					editingNotificationDto.setAddressName(addressDto.getAddress());
-					editingNotificationDto.setLatitude(Double.parseDouble(addressDto.getLatitude()));
-					editingNotificationDto.setLongitude(Double.parseDouble(addressDto.getLongitude()));
-					editingNotificationDto.setCountryCode(addressDto.getCountryCode());
+					editingNotificationDto.setAddressName(selectedFavoriteAddressDto.getAddress());
+					editingNotificationDto.setLatitude(Double.parseDouble(selectedFavoriteAddressDto.getLatitude()));
+					editingNotificationDto.setLongitude(Double.parseDouble(selectedFavoriteAddressDto.getLongitude()));
+					editingNotificationDto.setCountryCode(selectedFavoriteAddressDto.getCountryCode());
 					editingNotificationDto.setLocationType(LocationType.SelectedAddress);
 				}
 			}

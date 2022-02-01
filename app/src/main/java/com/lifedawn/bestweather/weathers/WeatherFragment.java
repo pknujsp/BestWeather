@@ -317,7 +317,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.mainLayout.setLayoutParams(layoutParams);
 
-		MobileAds.initialize(getContext());
 		AdRequest adRequest = new AdRequest.Builder().build();
 
 		binding.adViewBelowAirQuality.loadAd(adRequest);

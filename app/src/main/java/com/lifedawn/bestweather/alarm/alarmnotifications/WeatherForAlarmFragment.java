@@ -307,8 +307,7 @@ public class WeatherForAlarmFragment extends Fragment {
 				}
 
 				weatherIcon = OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId(), current.getWeather().get(0).getIcon().contains("n"));
-				temp = ValueUnits.convertTemperature(current.getTemp(), tempUnit).toString() + ValueUnits.convertToStr(getContext(),
-						tempUnit);
+				temp = ValueUnits.convertTemperature(current.getTemp(), tempUnit) + ValueUnits.convertToStr(getContext(), tempUnit);
 				break;
 		}
 

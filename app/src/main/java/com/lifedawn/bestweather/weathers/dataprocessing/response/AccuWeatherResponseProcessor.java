@@ -130,7 +130,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 	public static List<HourlyForecastDto> makeHourlyForecastDtoList(Context context,
 	                                                                List<AccuHourlyForecastsResponse.Item> hourlyForecastList,
 	                                                                ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
-		final String tempDegree = "°";
+		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
 		final String percent = "%";
 		final String mm = "mm";
 		final String cm = "cm";
@@ -223,7 +223,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 
 	public static List<DailyForecastDto> makeDailyForecastDtoList(Context context,
 	                                                              List<AccuDailyForecastsResponse.DailyForecasts> dailyForecastList, ValueUnits windUnit, ValueUnits tempUnit) {
-		final String tempDegree = context.getString(R.string.degree_symbol);
+		final String tempDegree = ValueUnits.convertToStr(context, tempUnit);
 		final String mm = "mm";
 		final String cm = "cm";
 		final String percent = "%";

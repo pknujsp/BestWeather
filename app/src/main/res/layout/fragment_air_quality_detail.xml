@@ -34,11 +34,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
                         android:layout_marginBottom="4dp"
                         android:text="@string/currentAndForecast"
                         android:textColor="?attr/textColor"
@@ -49,7 +52,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:overScrollMode="never"
-                        android:scrollbarStyle="outsideOverlay">
+                        android:scrollbarSize="1dp"
+                        android:scrollbarStyle="insideInset"
+                        android:scrollbars="horizontal">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -65,6 +70,7 @@
                                 android:id="@+id/pm10NoScrollView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginLeft="8dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
                                 android:text="@string/pm10_str"
@@ -79,6 +85,7 @@
                                 android:id="@+id/pm25NoScrollView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginLeft="8dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
                                 android:text="@string/pm25_str"
@@ -93,6 +100,7 @@
                                 android:id="@+id/o3NoScrollView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:layout_marginLeft="8dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
                                 android:text="@string/o3_str"
@@ -238,6 +246,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             ads:adSize="BANNER"
-            ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+            ads:adUnitId="@string/BANNER_testUnitId" />
     </RelativeLayout>
 </layout>

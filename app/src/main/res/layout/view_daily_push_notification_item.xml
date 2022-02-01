@@ -21,7 +21,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@id/notiSwitch"
+                android:layout_toLeftOf="@id/switchLayout"
                 android:orientation="vertical">
 
                 <TextView
@@ -36,6 +36,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="NotificationType"
+                    android:textColor="@color/blue"
                     android:textSize="14sp" />
 
                 <TextView
@@ -52,6 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                android:id="@+id/switchLayout"
                 android:layout_centerVertical="true"
                 android:gravity="center"
                 android:orientation="vertical">

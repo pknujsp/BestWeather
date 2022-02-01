@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 
 import android.os.Handler;
@@ -60,16 +61,32 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 	private AlwaysNotiHelper alwaysNotiHelper;
 	private AlwaysNotiDataObj alwaysNotiDataObj;
 	private FavoriteAddressDto newSelectedAddressDto;
+	private FavoriteAddressDto originalSelectedFavoriteAddressDto;
 
 	private long[] intervalsLong;
 	private NotificationHelper notificationHelper;
 	private boolean originalEnabled;
 	private boolean selectedFavoriteLocation;
 
+	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+		@Override
+		public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+			super.onFragmentDestroyed(fm, f);
+
+			if (f instanceof FavoritesFragment) {
+				if (!((FavoritesFragment) f).isClickedItem() && !selectedFavoriteLocation) {
+					binding.commons.currentLocationRadio.setChecked(true);
+				}
+			}
+		}
+	};
+
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		notificationHelper = new NotificationHelper(getActivity().getApplicationContext());
+
+		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 
 		final String[] intervalsStr = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
 		intervalsLong = new long[intervalsStr.length];
@@ -161,6 +178,12 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 
 		binding.notificationSwitch.setChecked(originalEnabled);
 		if (alwaysNotiDataObj.getLocationType() == LocationType.SelectedAddress) {
+			originalSelectedFavoriteAddressDto = new FavoriteAddressDto();
+			originalSelectedFavoriteAddressDto.setAddress(alwaysNotiDataObj.getAddressName());
+			originalSelectedFavoriteAddressDto.setCountryCode(alwaysNotiDataObj.getCountryCode());
+			originalSelectedFavoriteAddressDto.setLatitude(String.valueOf(alwaysNotiDataObj.getLatitude()));
+			originalSelectedFavoriteAddressDto.setLongitude(String.valueOf(alwaysNotiDataObj.getLongitude()));
+
 			selectedFavoriteLocation = true;
 			binding.commons.selectedLocationRadio.setChecked(true);
 			binding.commons.selectedAddressName.setText(alwaysNotiDataObj.getAddressName());
@@ -182,6 +205,11 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 		initializing = false;
 	}
 
+	@Override
+	public void onDestroy() {
+		getParentFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
+		super.onDestroy();
+	}
 
 	protected void initAutoRefreshInterval() {
 		binding.commons.autoRefreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -229,7 +257,9 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 					binding.commons.changeAddressBtn.setVisibility(View.VISIBLE);
 					binding.commons.selectedAddressName.setVisibility(View.VISIBLE);
 
-					if (!selectedFavoriteLocation) {
+					if (selectedFavoriteLocation) {
+						onSelectedFavoriteLocation(originalSelectedFavoriteAddressDto);
+					} else {
 						openFavoritesFragment();
 					}
 				}
@@ -289,10 +319,11 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 
 	public void onSelectedFavoriteLocation(FavoriteAddressDto favoriteAddressDto) {
 		if (!initializing) {
-
+			originalSelectedFavoriteAddressDto = favoriteAddressDto;
 			alwaysNotiDataObj.setAddressName(favoriteAddressDto.getAddress())
 					.setCountryCode(favoriteAddressDto.getCountryCode())
 					.setLatitude(Float.parseFloat(favoriteAddressDto.getLatitude())).setLongitude(Float.parseFloat(favoriteAddressDto.getLongitude()));
+
 			alwaysNotiDataObj.setLocationType(LocationType.SelectedAddress);
 			alwaysNotiViewCreator.savePreferences();
 			alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {

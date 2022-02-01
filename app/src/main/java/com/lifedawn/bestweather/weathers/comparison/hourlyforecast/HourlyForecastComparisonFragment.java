@@ -79,7 +79,6 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 	}
 
 
-
 	private void setValuesToViews(HourlyForecastResponse hourlyForecastResponse) {
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 
@@ -353,7 +352,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		nonScrollRowLayoutParams.gravity = Gravity.CENTER_VERTICAL;
 		int nonScrollViewMargin = (int) getResources().getDimension(R.dimen.nonScrollViewTopBottomMargin);
-		nonScrollRowLayoutParams.setMargins(0, nonScrollViewMargin, 0, nonScrollViewMargin);
+		nonScrollRowLayoutParams.setMargins(nonScrollViewMargin, nonScrollViewMargin, 0, nonScrollViewMargin);
 
 		final int tempRowTopMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
 

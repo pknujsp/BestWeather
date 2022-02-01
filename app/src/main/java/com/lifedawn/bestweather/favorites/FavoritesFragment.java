@@ -65,6 +65,10 @@ public class FavoritesFragment extends Fragment {
 	private boolean clickedItem;
 	private String requestFragment;
 
+	public boolean isClickedItem() {
+		return clickedItem;
+	}
+
 	private FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
 		@Override
 		public void onFragmentAttached(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
@@ -152,30 +156,6 @@ public class FavoritesFragment extends Fragment {
 		binding.searchview.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				/*
-				dialog = new Dialog(getActivity());
-				dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-				final Window window = dialog.getWindow();
-
-				WindowManager.LayoutParams windowLayoutParams = window.getAttributes();
-				windowLayoutParams.gravity = Gravity.TOP | Gravity.LEFT;
-				windowLayoutParams.x = binding.searchview.getLeft();
-				windowLayoutParams.y = binding.searchview.getTop();
-
-				//window.setLayout(binding.searchview.getWidth(), 300);
-				//window.setGravity(Gravity.CENTER_HORIZONTAL);
-				//window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-				//window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-				//imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-
-				ViewSearchBinding searchViewBinding = ViewSearchBinding.inflate(getLayoutInflater());
-				dialog.setContentView(searchViewBinding.getRoot());
-				findDialogViews(dialog, searchViewBinding);
-				dialog.show();
-
-				 */
-
 				FindAddressFragment findAddressFragment = new FindAddressFragment();
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.RequestFragment.name(), FavoritesFragment.class.getName());
@@ -244,14 +224,6 @@ public class FavoritesFragment extends Fragment {
 		});
 	}
 
-	private void findDialogViews(final Dialog dialog, ViewSearchBinding binding) {
-		binding.back.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				dialog.dismiss();
-			}
-		});
-	}
 
 	@Override
 	public void onDestroy() {

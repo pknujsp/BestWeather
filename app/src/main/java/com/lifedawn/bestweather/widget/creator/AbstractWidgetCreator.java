@@ -42,7 +42,7 @@ public abstract class AbstractWidgetCreator {
 	protected final int appWidgetId;
 	protected final ValueUnits tempUnit;
 	protected final ValueUnits clockUnit;
-	protected final String tempDegree = "°";
+	protected final String tempDegree;
 
 	protected Context context;
 
@@ -72,6 +72,7 @@ public abstract class AbstractWidgetCreator {
 				ValueUnits.celsius.name()));
 		clockUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_clock),
 				ValueUnits.clock12.name()));
+		tempDegree = ValueUnits.convertToStr(null, tempUnit);
 
 		widgetRepository = new WidgetRepository(context);
 	}

@@ -74,9 +74,9 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 				String text = getString(R.string.thanYesterday);
 
 				if (todayTemp > yesterdayTemp) {
-					text += " " + (todayTemp - yesterdayTemp) + "° " + getString(R.string.higherTemperature);
+					text += " " + (todayTemp - yesterdayTemp) + tempUnitStr + " " + getString(R.string.higherTemperature);
 				} else {
-					text += " " + (yesterdayTemp - todayTemp) + "° " + getString(R.string.lowerTemperature);
+					text += " " + (yesterdayTemp - todayTemp) + tempUnitStr + " " + getString(R.string.lowerTemperature);
 				}
 				binding.tempDescription.setText(text);
 			}

@@ -98,11 +98,14 @@
                             android:id="@+id/refreshIcon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:adjustViewBounds="true"
                             android:layout_alignTop="@id/updated_datetime"
                             android:layout_alignBottom="@id/updated_datetime"
                             android:layout_alignParentLeft="true"
                             android:scaleType="centerInside"
+                            android:layout_centerVertical="true"
                             android:src="@drawable/refresh"
+                            style="@style/img_shadow"
                             app:tint="@color/white" />
 
                         <TextView
@@ -205,7 +208,7 @@
                         android:layout_below="@id/simple_air_quality"
                         android:layout_marginBottom="24dp"
                         ads:adSize="BANNER"
-                        ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+                        ads:adUnitId="@string/BANNER_testUnitId" />
 
                     <androidx.fragment.app.FragmentContainerView
                         android:id="@+id/sun_set_rise"
@@ -223,7 +226,7 @@
                         android:layout_below="@id/sun_set_rise"
                         android:layout_marginBottom="24dp"
                         ads:adSize="BANNER"
-                        ads:adUnitId="ca-app-pub-3940256099942544/6300978111" />
+                        ads:adUnitId="@string/BANNER_testUnitId" />
                 </RelativeLayout>
 
             </androidx.core.widget.NestedScrollView>

@@ -6,61 +6,62 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            style="@style/SettingsLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/location" />
+        <LinearLayout
+            style="@style/SettingsLayout"
+            android:orientation="vertical">
 
-        <RadioGroup
-            android:id="@+id/location_radio_group"
-            style="@style/WidgetConfigureConfig"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right">
 
-            <RadioButton
-                android:id="@+id/current_location_radio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/current_location" />
+            <TextView
+                style="@style/SettingsLabel"
+                android:text="@string/location" />
 
-            <RadioButton
-                android:id="@+id/selected_location_radio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/selected_location" />
+            <RadioGroup
+                android:id="@+id/location_radio_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/change_address_btn"
-                    android:layout_width="wrap_content"
+                <RadioButton
+                    android:id="@+id/current_location_radio"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/change_address"
-                    android:visibility="visible" />
+                    android:text="@string/current_location" />
 
-                <TextView
-                    android:id="@+id/selectedAddressName"
-                    style="@style/SettingsValue"
-                    android:layout_width="wrap_content"
+                <RadioButton
+                    android:id="@+id/selected_location_radio"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:text="selectedAddressName" />
+                    android:text="@string/selected_location" />
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <Button
+                        android:id="@+id/change_address_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rounded_btn_background"
+                        android:text="@string/change_address"
+                        android:visibility="visible" />
 
+                    <TextView
+                        android:id="@+id/selectedAddressName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:text="selectedAddressName"
+                        android:textColor="@color/black" />
 
-        </RadioGroup>
+                </LinearLayout>
+
+            </RadioGroup>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/singleWeatherDataSourceLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            style="@style/SettingsLayout"
             android:orientation="vertical">
 
             <TextView
@@ -73,8 +74,7 @@
                 android:id="@+id/weather_data_source_radio_group"
                 style="@style/WidgetConfigureConfig"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right">
+                android:layout_height="wrap_content">
 
                 <RadioButton
                     android:id="@+id/owm_radio"
@@ -87,26 +87,26 @@
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/kma_top_priority_switch"
-                style="@style/SettingsLabel"
+                style="@style/Switch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
                 android:text="@string/pref_title_kma_top_priority" />
+
         </LinearLayout>
 
+        <LinearLayout style="@style/SettingsLayout">
 
-        <TextView
-            android:id="@+id/autoRefreshIntervalLabel"
-            style="@style/SettingsLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/auto_refresh_interval" />
+            <TextView
+                android:id="@+id/autoRefreshIntervalLabel"
+                style="@style/SettingsLabel"
+                android:text="@string/auto_refresh_interval" />
 
-        <Spinner
-            android:id="@+id/auto_refresh_interval_spinner"
-            style="@style/WidgetConfigureConfig"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
+            <Spinner
+                android:id="@+id/auto_refresh_interval_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
     </LinearLayout>
+
 </layout>

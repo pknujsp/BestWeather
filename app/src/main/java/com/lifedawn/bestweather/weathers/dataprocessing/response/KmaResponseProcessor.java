@@ -717,7 +717,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	public static List<HourlyForecastDto> makeHourlyForecastDtoListOfXML(Context context,
 	                                                                     List<FinalHourlyForecast> hourlyForecastList, double latitude, double longitude,
 	                                                                     ValueUnits windUnit, ValueUnits tempUnit) {
-		final String tempDegree = "°";
+		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
 		final String percent = "%";
 		final String noSnow = "적설없음";
 		final String noRain = "강수없음";
@@ -801,7 +801,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	public static List<HourlyForecastDto> makeHourlyForecastDtoListOfWEB(Context context,
 	                                                                     List<KmaHourlyForecast> hourlyForecastList, double latitude, double longitude,
 	                                                                     ValueUnits windUnit, ValueUnits tempUnit) {
-		final String tempDegree = "°";
+		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
 		final String mPerSec = "m/s";
 
 		final String zeroRainVolume = "0.0mm";
@@ -895,8 +895,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<DailyForecastDto> makeDailyForecastDtoListOfXML(List<FinalDailyForecast> dailyForecastList, ValueUnits tempUnit) {
-		final String tempDegree = "°";
-		final String percent = "%";
+		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
 
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
 
@@ -935,7 +934,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<DailyForecastDto> makeDailyForecastDtoListOfWEB(List<KmaDailyForecast> dailyForecastList, ValueUnits tempUnit) {
-		final String tempDegree = "°";
+		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
 
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
 

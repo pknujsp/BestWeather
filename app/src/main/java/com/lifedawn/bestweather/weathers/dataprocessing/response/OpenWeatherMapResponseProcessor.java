@@ -96,7 +96,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	public static List<HourlyForecastDto> makeHourlyForecastDtoListOneCall(Context context,
 	                                                                       OwmOneCallResponse owmOneCallResponse,
 	                                                                       ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
-		final String tempDegree = "°";
+		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
 		final String percent = "%";
 		final String mm = "mm";
 
@@ -167,7 +167,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	public static List<DailyForecastDto> makeDailyForecastDtoListOneCall(Context context,
 	                                                                     OwmOneCallResponse owmOneCallResponse,
 	                                                                     ValueUnits windUnit, ValueUnits tempUnit) {
-		final String tempDegree = "°";
+		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
 		final String mm = "mm";
 		final String percent = "%";
 		final String wind = ValueUnits.convertToStr(context, windUnit);
@@ -355,7 +355,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	public static List<HourlyForecastDto> makeHourlyForecastDtoListIndividual(Context context,
 	                                                                          OwmHourlyForecastResponse owmHourlyForecastResponse,
 	                                                                          ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
-		final String tempDegree = "°";
+		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
 		final String percent = "%";
 		final String mm = "mm";
 
@@ -426,7 +426,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	public static List<DailyForecastDto> makeDailyForecastDtoListIndividual(Context context,
 	                                                                        OwmDailyForecastResponse owmDailyForecastResponse,
 	                                                                        ValueUnits windUnit, ValueUnits tempUnit) {
-		final String tempDegree = "°";
+		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
 		final String mm = "mm";
 		final String percent = "%";
 		final String wind = ValueUnits.convertToStr(context, windUnit);
