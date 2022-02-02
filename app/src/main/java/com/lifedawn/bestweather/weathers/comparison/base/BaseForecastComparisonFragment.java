@@ -35,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.ZoneId;
 import java.util.List;
 
-public class BaseForecastComparisonFragment extends Fragment{
+public class BaseForecastComparisonFragment extends Fragment {
 	protected BaseLayoutForecastComparisonBinding binding;
 	protected DateView dateRow;
 	protected SharedPreferences sharedPreferences;
@@ -43,6 +43,7 @@ public class BaseForecastComparisonFragment extends Fragment{
 	protected ValueUnits windUnit;
 	protected ValueUnits visibilityUnit;
 	protected ValueUnits clockUnit;
+	protected String tempUnitStr;
 
 	protected Double latitude;
 	protected Double longitude;
@@ -62,6 +63,7 @@ public class BaseForecastComparisonFragment extends Fragment{
 		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
+		tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
 
 		Bundle bundle = getArguments();
 		latitude = bundle.getDouble(BundleKey.Latitude.name());

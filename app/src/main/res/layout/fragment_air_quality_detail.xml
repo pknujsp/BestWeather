@@ -59,7 +59,9 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:paddingLeft="8dp"
+                            android:paddingRight="8dp">
 
                             <FrameLayout
                                 android:id="@+id/dateRow"
@@ -74,7 +76,8 @@
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
                                 android:text="@string/pm10_str"
-                                app:iconVisibility="gone" />
+                                app:iconSrc="@drawable/pm10"
+                                app:iconVisibility="visible" />
 
                             <com.github.mikephil.charting.charts.BarChart
                                 android:id="@+id/pm10Chart"
@@ -89,7 +92,8 @@
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
                                 android:text="@string/pm25_str"
-                                app:iconVisibility="gone" />
+                                app:iconSrc="@drawable/pm25"
+                                app:iconVisibility="visible" />
 
                             <com.github.mikephil.charting.charts.BarChart
                                 android:id="@+id/pm25Chart"
@@ -104,7 +108,8 @@
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
                                 android:text="@string/o3_str"
-                                app:iconVisibility="gone" />
+                                app:iconSrc="@drawable/o3"
+                                app:iconVisibility="visible" />
 
                             <com.github.mikephil.charting.charts.BarChart
                                 android:id="@+id/o3Chart"
@@ -126,21 +131,52 @@
                     android:layout_marginRight="16dp"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+
+                    <RelativeLayout
                         android:layout_marginBottom="4dp"
-                        android:text="@string/current"
-                        android:textColor="?attr/textColor"
-                        android:textSize="17sp" />
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_centerVertical="true"
+                            android:text="@string/current"
+                            android:textColor="?attr/textColor"
+                            android:textSize="17sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="8dp"
+                            android:text="@string/air_quality"
+                            android:textColor="@color/black"
+                            android:layout_centerVertical="true"
+                            android:layout_toLeftOf="@id/current_airquality"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/current_airquality"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/aqi_1_good"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentRight="true"
+                            android:textSize="16sp" />
+
+                    </RelativeLayout>
 
                     <androidx.gridlayout.widget.GridLayout
                         android:id="@+id/grid"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
+                        app:alignmentMode="alignBounds"
                         app:columnCount="3"
-                        app:orientation="horizontal" />
+                        app:orientation="horizontal"
+                        app:rowOrderPreserved="false"
+                        app:useDefaultMargins="false" />
 
                 </LinearLayout>
 

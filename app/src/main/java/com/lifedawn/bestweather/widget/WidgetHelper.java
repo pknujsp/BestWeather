@@ -53,4 +53,14 @@ public class WidgetHelper {
 		}
 	}
 
+	public boolean isRepeating(int appWidgetId) {
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, widgetProviderClass),
+				PendingIntent.FLAG_NO_CREATE);
+		if (pendingIntent != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 }

@@ -1,14 +1,17 @@
 package com.lifedawn.bestweather.weathers.detailfragment.adapters;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.gridlayout.widget.GridLayout;
 import androidx.preference.PreferenceManager;
@@ -85,7 +88,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 
 		public void clear() {
 			headerBinding.precipitationGridLayout.removeAllViews();
-			binding.detailGridLayout.removeAllViews();
+			binding.detailGridView.removeAllViews();
 		}
 
 		public void onBind(HourlyForecastDto hourlyForecastDto) {
@@ -146,44 +149,8 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.getUvIndex() != null) {
 				gridItemDtos.add(new GridItemDto(context.getString(R.string.uv_index), hourlyForecastDto.getUvIndex(), null));
 			}
-			addDetailGridItem(layoutInflater, gridItemDtos);
-		}
 
-		private void addDetailGridItem(LayoutInflater layoutInflater, List<GridItemDto> gridItemDtos) {
-			TextView label = null;
-			TextView value = null;
-			ImageView icon = null;
-
-			for (GridItemDto gridItem : gridItemDtos) {
-				View itemView = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null, false);
-
-				label = itemView.findViewById(R.id.label);
-				value = itemView.findViewById(R.id.value);
-				icon = itemView.findViewById(R.id.label_icon);
-
-				label.setText(gridItem.label);
-				value.setText(gridItem.value);
-
-				if (gridItem.img != null) {
-					icon.setImageDrawable(gridItem.img);
-					if (gridItem.imgRotate != null) {
-						icon.setRotation(gridItem.imgRotate);
-					}
-				} else {
-					icon.setVisibility(View.GONE);
-				}
-
-				int cellCount = binding.detailGridLayout.getChildCount();
-				int row = cellCount / binding.detailGridLayout.getColumnCount();
-				int column = cellCount % binding.detailGridLayout.getColumnCount();
-
-				GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
-
-				layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
-				layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
-
-				binding.detailGridLayout.addView(itemView, layoutParams);
-			}
+			addGridItems(gridItemDtos);
 		}
 
 		private void addPrecipitationGridItem(LayoutInflater layoutInflater, HourlyForecastDto hourlyForecastDto) {
@@ -261,5 +228,44 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 				headerBinding.precipitationGridLayout.addView(gridItem);
 			}
 		}
+
+		protected void addGridItems(List<GridItemDto> gridItemDtos) {
+			TextView label = null;
+			TextView value = null;
+			ImageView icon = null;
+			View convertView = null;
+
+			for (GridItemDto gridItem : gridItemDtos) {
+				convertView = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null, false);
+
+				label = convertView.findViewById(R.id.label);
+				value = convertView.findViewById(R.id.value);
+				icon = convertView.findViewById(R.id.label_icon);
+
+				label.setText(gridItem.label);
+				value.setText(gridItem.value);
+
+				if (gridItem.img != null) {
+					icon.setImageDrawable(gridItem.img);
+					if (gridItem.imgRotate != null) {
+						icon.setRotation(gridItem.imgRotate);
+					}
+				} else {
+					icon.setVisibility(View.GONE);
+				}
+
+				int cellCount = binding.detailGridView.getChildCount();
+				int row = cellCount / 3;
+				int column = cellCount % 3;
+
+				GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+
+				layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
+				layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
+
+				binding.detailGridView.addView(convertView, layoutParams);
+			}
+		}
+
 	}
 }

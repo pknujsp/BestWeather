@@ -139,7 +139,7 @@ public abstract class MultipleRestApiDownloader {
 
 	public static class ResponseResult {
 		private final RequestParameter requestParameter;
-		private final boolean successful;
+		private boolean successful;
 
 		private Response<?> response;
 		private Throwable t;

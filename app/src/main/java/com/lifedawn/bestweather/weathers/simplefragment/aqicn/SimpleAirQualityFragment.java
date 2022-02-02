@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.gridlayout.widget.GridLayout;
 import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
@@ -160,6 +161,14 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 		 */
 
+		final int overallGrade = (int) Double.parseDouble(aqiCnGeolocalizedFeedResponse.getData().getAqi() == null ? "-1" : aqiCnGeolocalizedFeedResponse.getData().getAqi());
+		final String currentOverallDescription =
+				AqicnResponseProcessor.getGradeDescription(overallGrade);
+		final int currentOverallColor = AqicnResponseProcessor.getGradeColorId(overallGrade);
+
+		binding.currentAirquality.setText(overallGrade == -1 ? getString(R.string.noData) : currentOverallDescription);
+		binding.currentAirquality.setTextColor(currentOverallColor);
+
 		AqiCnGeolocalizedFeedResponse.Data.IAqi iAqi = aqiCnGeolocalizedFeedResponse.getData().getIaqi();
 		if (iAqi.getPm10() == null) {
 			addGridItem(null, R.string.pm10_str, R.drawable.pm10);
@@ -263,7 +272,16 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 				value == null ? ContextCompat.getColor(getContext(), R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(
 						value));
 
-		binding.grid.addView(gridItem);
+		int cellCount = binding.grid.getChildCount();
+		int row = cellCount / binding.grid.getColumnCount();
+		int column = cellCount % binding.grid.getColumnCount();
+
+		GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+
+		layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
+		layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
+
+		binding.grid.addView(gridItem, layoutParams);
 		return gridItem;
 	}
 }

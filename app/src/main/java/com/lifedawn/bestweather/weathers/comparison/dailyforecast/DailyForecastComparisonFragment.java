@@ -255,6 +255,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 		final String cm = "cm";
 		final String mm = "mm";
+		final String degree = "°";
 
 		List<WeatherSourceUnitObj> weatherSourceUnitObjList = new ArrayList<>();
 
@@ -269,7 +270,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			if (weatherDataSourceTypeList.get(i) == WeatherDataSourceType.KMA_WEB) {
 				for (ForecastObj<DailyForecastDto> item : kmaFinalDailyForecasts) {
-					temp = item.e.getMinTemp() + " / " + item.e.getMaxTemp();
+					temp = item.e.getMinTemp().replace(tempUnitStr,degree) + " / " + item.e.getMaxTemp().replace(tempUnitStr,degree);
 					tempList.add(temp);
 
 					if (item.e.isSingle()) {
@@ -290,7 +291,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			} else if (weatherDataSourceTypeList.get(i) == WeatherDataSourceType.ACCU_WEATHER) {
 				for (ForecastObj<DailyForecastDto> item : accuFinalDailyForecasts) {
-					temp = item.e.getMinTemp() + " / " + item.e.getMaxTemp();
+					temp = item.e.getMinTemp().replace(tempUnitStr,degree) + " / " + item.e.getMaxTemp().replace(tempUnitStr,degree);
 					tempList.add(temp);
 
 					pop = item.e.getAmValues().getPop() + " / " + item.e.getPmValues().getPop();
@@ -325,7 +326,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			} else if (weatherDataSourceTypeList.get(i) == WeatherDataSourceType.OWM_ONECALL) {
 				for (ForecastObj<DailyForecastDto> item : owmFinalDailyForecasts) {
-					temp = item.e.getMinTemp() + " / " + item.e.getMaxTemp();
+					temp = item.e.getMinTemp().replace(tempUnitStr,degree) + " / " + item.e.getMaxTemp().replace(tempUnitStr,degree);
 					tempList.add(temp);
 
 					pop = item.e.getSingleValues().getPop();

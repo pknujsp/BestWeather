@@ -23,7 +23,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import androidx.core.app.NotificationManagerCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
@@ -36,18 +35,21 @@ import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
 import com.lifedawn.bestweather.intro.IntroTransactionFragment;
-import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.always.AlwaysNotiHelper;
 import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
+import com.lifedawn.bestweather.notification.daily.DailyNotiHelper;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
+import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
+import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
+import com.lifedawn.bestweather.widget.WidgetHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
@@ -116,7 +118,8 @@ public class MainActivity extends AppCompatActivity {
 			fragmentTransaction.add(binding.fragmentContainer.getId(), introTransactionFragment,
 					introTransactionFragment.getTag()).commit();
 		} else {
-			initNotifications();
+			initOngoingNotifications();
+			initDailyNotifications();
 			initWidgets();
 
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
@@ -124,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 	}
 
-	private void initNotifications() {
+	private void initOngoingNotifications() {
 		//ongoing notification
 		final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		SharedPreferences sharedPreferences =
@@ -142,22 +145,53 @@ public class MainActivity extends AppCompatActivity {
 				}
 			}
 
-			if (!active) {
-				AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(getApplicationContext(), null);
-				alwaysNotiViewCreator.loadPreferences();
+			AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(getApplicationContext(), null);
+			alwaysNotiViewCreator.loadPreferences();
+			AlwaysNotiHelper alwaysNotiHelper = new AlwaysNotiHelper(getApplicationContext());
+
+			if (active) {
+				if (alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
+					if (!alwaysNotiHelper.isRepeating()) {
+						alwaysNotiHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
+					}
+				}
+			} else {
+
 				alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
 					@Override
 					public boolean handleMessage(@NonNull Message msg) {
 						return false;
 					}
 				}));
-				AlwaysNotiHelper alwaysNotiHelper = new AlwaysNotiHelper(getApplicationContext());
 				alwaysNotiHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
 			}
 			Log.e("Ongoing notification", active.toString());
 
 		}
 
+	}
+
+	private void initDailyNotifications() {
+		DailyPushNotificationRepository repository = new DailyPushNotificationRepository(getApplicationContext());
+		repository.getAll(new DbQueryCallback<List<DailyPushNotificationDto>>() {
+			@Override
+			public void onResultSuccessful(List<DailyPushNotificationDto> result) {
+				DailyNotiHelper notiHelper = new DailyNotiHelper(getApplicationContext());
+
+				for (DailyPushNotificationDto dto : result) {
+					if (dto.isEnabled()) {
+						if (!notiHelper.isRepeating(dto.getId())) {
+							notiHelper.enablePushNotification(dto);
+						}
+					}
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
 	}
 
 	private void initWidgets() {
@@ -168,6 +202,8 @@ public class MainActivity extends AppCompatActivity {
 				if (result.size() > 0) {
 					AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 					ArrayMap<Class<?>, List<Integer>> widgetArrMap = new ArrayMap<>();
+					Map<Integer, WidgetDto> widgetDtoMap = new HashMap<>();
+					WidgetHelper widgetHelper = null;
 
 					for (WidgetDto widgetDto : result) {
 						final AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(widgetDto.getAppWidgetId());
@@ -180,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
 								widgetArrMap.put(cls, new ArrayList<>());
 							}
 							widgetArrMap.get(cls).add(widgetDto.getAppWidgetId());
+							widgetDtoMap.put(widgetDto.getAppWidgetId(), widgetDto);
 						} catch (ClassNotFoundException e) {
 							e.printStackTrace();
 							return;
@@ -200,6 +237,15 @@ public class MainActivity extends AppCompatActivity {
 
 							for (Integer id : idList) {
 								ids[index++] = id;
+
+								if (widgetDtoMap.get(id).getUpdateIntervalMillis() > 0) {
+									if (widgetHelper == null) {
+										widgetHelper = new WidgetHelper(getApplicationContext(), cls);
+									}
+									if (!widgetHelper.isRepeating(id)) {
+										widgetHelper.onSelectedAutoRefreshInterval(widgetDtoMap.get(id).getUpdateIntervalMillis(), id);
+									}
+								}
 							}
 							bundle.putIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
 							refreshIntent.putExtras(bundle);
@@ -207,6 +253,8 @@ public class MainActivity extends AppCompatActivity {
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode++, refreshIntent,
 									PendingIntent.FLAG_UPDATE_CURRENT);
 							pendingIntent.send();
+
+
 						} catch (PendingIntent.CanceledException e) {
 							e.printStackTrace();
 							return;

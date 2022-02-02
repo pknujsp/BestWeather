@@ -119,16 +119,12 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 
 	private boolean isReadStoragePermissionGranted() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-					== PackageManager.PERMISSION_GRANTED) {
-				return true;
-			} else {
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
-				return false;
-			}
-		} else {
+		if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+				== PackageManager.PERMISSION_GRANTED) {
 			return true;
+		} else {
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
+			return false;
 		}
 	}
 
@@ -253,7 +249,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 								initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 								intent.putExtras(initBundle);
 
-								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent, 		PendingIntent.FLAG_UPDATE_CURRENT);
+								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 								try {
 									pendingIntent.send();
 								} catch (PendingIntent.CanceledException e) {
@@ -291,7 +287,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 				}
 		);
 	}
-
 
 
 	private void initBackground() {

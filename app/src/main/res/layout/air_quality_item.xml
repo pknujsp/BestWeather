@@ -3,15 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
-    android:padding="8dp">
+    android:padding="4dp">
 
     <ImageView
         android:id="@+id/label_icon"
-        android:layout_width="34dp"
-        android:layout_height="34dp"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="6dp"
+        android:layout_width="32dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/value_int"
+        android:layout_alignBottom="@id/value_str"
+        android:layout_marginRight="4dp"
         android:scaleType="centerInside"
         android:src="@drawable/pm10" />
 
@@ -19,9 +19,9 @@
         android:id="@+id/label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:layout_toRightOf="@id/label_icon"
+        android:layout_alignParentTop="true"
         android:text="@string/pm10_str"
+        android:layout_marginBottom="4dp"
         android:textColor="@color/black"
         android:textSize="@dimen/labelTextSizeInAirQualityItem" />
 
@@ -30,8 +30,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/label"
-        android:layout_alignLeft="@id/label"
+        android:layout_toRightOf="@id/label_icon"
         android:includeFontPadding="false"
+        android:layout_marginBottom="2dp"
         android:text="30"
         android:textColor="@color/black"
         android:textSize="@dimen/gradeValueTextSizeInAirQualityItem" />
@@ -41,7 +42,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/value_int"
-        android:layout_alignLeft="@id/label"
+        android:layout_toRightOf="@id/label_icon"
+        android:includeFontPadding="false"
         android:text="@string/aqi_1_good"
         android:textColor="@color/black"
         android:textSize="@dimen/gradeDescriptionTextSizeInAirQualityItem" />

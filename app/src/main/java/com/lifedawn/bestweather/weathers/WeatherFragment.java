@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -131,6 +132,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.SimpleTimeZone;
@@ -197,6 +199,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			super.onFragmentCreated(fm, f, savedInstanceState);
 		}
 
+		@Override
+		public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+			super.onFragmentDestroyed(fm, f);
+			if(f instanceof AlertFragment){
+				binding.scrollView.setVisibility(View.VISIBLE);
+			}
+		}
 	};
 
 	@Override
@@ -313,9 +322,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		binding.scrollView.setVisibility(View.INVISIBLE);
 
-		FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.mainLayout.getLayoutParams();
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.mainToolbar.getRoot().getLayoutParams();
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
-		binding.mainLayout.setLayoutParams(layoutParams);
+		binding.mainToolbar.getRoot().setLayoutParams(layoutParams);
 
 		AdRequest adRequest = new AdRequest.Builder().build();
 
@@ -771,11 +780,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	public void reDraw() {
 		//날씨 프래그먼트 다시 그림
-		Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
-		weatherDataSourceTypeSet.add(mainWeatherDataSourceType);
-		weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
-		setWeatherFragments(weatherDataSourceTypeSet, FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader,
-				latitude, longitude, null);
+		if (FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString())) {
+			Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
+			weatherDataSourceTypeSet.add(mainWeatherDataSourceType);
+			weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
+			setWeatherFragments(weatherDataSourceTypeSet, FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader,
+					latitude, longitude, null);
+		}
 	}
 
 	public void onChangedCurrentLocation(Location currentLocation) {
@@ -916,7 +927,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 										alertFragment.setBtnOnClickListener(new View.OnClickListener() {
 											@Override
 											public void onClick(View v) {
-												getParentFragmentManager().popBackStackImmediate();
+												getChildFragmentManager().popBackStackImmediate();
 												responseResultObj.multipleRestApiDownloader.setLoadingDialog(
 														reRefreshBySameWeatherSource(responseResultObj));
 											}
@@ -929,9 +940,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 										alertFragment.setArguments(bundle);
 
-										FragmentTransaction fragmentTransaction = getParentFragmentManager().beginTransaction();
-										fragmentTransaction.hide(WeatherFragment.this).add(R.id.fragment_container, alertFragment,
+										FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+										binding.scrollView.setVisibility(View.GONE);
+										fragmentTransaction.add(R.id.fragment_container, alertFragment,
 												AlertFragment.class.getName()).addToBackStack(AlertFragment.class.getName()).commit();
+									} else {
+										binding.scrollView.setVisibility(View.VISIBLE);
 									}
 								} else if (which >= 2) {
 									//다른 제공사로 요청
@@ -1079,7 +1093,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		//실패한 자료만 재 요청
 		for (int i = 0; i < result.size(); i++) {
-			if (result.valueAt(i).getT() != null) {
+			if (!result.valueAt(i).isSuccessful()) {
 				failedRequestWeatherSource.addRequestServiceType(result.keyAt(i));
 			}
 		}
@@ -1381,6 +1395,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
+					FragmentManager fragmentManager = getChildFragmentManager();
+					if (fragmentManager.findFragmentByTag(AlertFragment.class.getName()) != null) {
+						fragmentManager.beginTransaction().remove(Objects.requireNonNull(fragmentManager.findFragmentByTag(AlertFragment.class.getName()))).commit();
+					}
+
 					loadImgOfCurrentConditions(mainWeatherDataSourceType, finalCurrentConditionsWeatherVal, latitude, longitude,
 							finalZoneId, finalPrecipitationVolume);
 

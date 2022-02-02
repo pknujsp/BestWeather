@@ -24,7 +24,7 @@
                 android:id="@+id/hours"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="18dp"
+                android:layout_marginBottom="16dp"
                 android:fontFamily="sans-serif-light"
                 android:text="10:00 PM"
                 android:textColor="@color/black"
@@ -83,7 +83,6 @@
                 app:columnCount="3"
                 app:rowOrderPreserved="false"
                 app:useDefaultMargins="false" />
-
 
         </LinearLayout>
 

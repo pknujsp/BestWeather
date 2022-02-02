@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/dialog_background"
@@ -13,26 +13,27 @@
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="20dp" />
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:layout_below="@id/header"
+            android:layout_alignParentBottom="true"
             android:overScrollMode="never"
-            android:scrollbars="vertical">
+            android:scrollbars="none">
 
             <androidx.gridlayout.widget.GridLayout
-                android:id="@+id/detailGridLayout"
+                android:id="@+id/detailGridView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center"
+                android:layout_height="wrap_content"
                 app:alignmentMode="alignBounds"
-                app:columnCount="4"
-                app:useDefaultMargins="false"
-                tools:listitem="@layout/view_detail_weather_data_item" />
+                app:columnCount="3"
+                app:orientation="horizontal"
+                app:rowOrderPreserved="false"
+                app:useDefaultMargins="false" />
 
         </androidx.core.widget.NestedScrollView>
-    </LinearLayout>
+
+    </RelativeLayout>
 </layout>

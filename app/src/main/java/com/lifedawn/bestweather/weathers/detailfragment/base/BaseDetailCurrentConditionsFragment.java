@@ -94,8 +94,8 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		((TextView) gridItem.findViewById(R.id.value)).setTextColor(Color.WHITE);
 
 		int cellCount = binding.conditionsGrid.getChildCount();
-		int row = cellCount / 4;
-		int column = cellCount % 4;
+		int row = cellCount / binding.conditionsGrid.getColumnCount();
+		int column = cellCount % binding.conditionsGrid.getColumnCount();
 
 		GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
 

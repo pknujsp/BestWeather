@@ -30,9 +30,6 @@ public class DailyPushNotificationDto implements Serializable {
 	@ColumnInfo(name = "topPriorityKma")
 	private boolean topPriorityKma;
 
-	@ColumnInfo(name = "updateIntervalMillis")
-	private long updateIntervalMillis;
-
 	@ColumnInfo(name = "addressName")
 	private String addressName;
 
@@ -86,14 +83,6 @@ public class DailyPushNotificationDto implements Serializable {
 
 	public void setTopPriorityKma(boolean topPriorityKma) {
 		this.topPriorityKma = topPriorityKma;
-	}
-
-	public long getUpdateIntervalMillis() {
-		return updateIntervalMillis;
-	}
-
-	public void setUpdateIntervalMillis(long updateIntervalMillis) {
-		this.updateIntervalMillis = updateIntervalMillis;
 	}
 
 	public String getAddressName() {

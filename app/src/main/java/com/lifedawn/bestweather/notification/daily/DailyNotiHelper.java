@@ -35,7 +35,7 @@ public class DailyNotiHelper {
 		bundle.putString("DailyPushNotificationType", dailyPushNotificationDto.getNotificationType().name());
 
 		refreshIntent.putExtras(bundle);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, dailyPushNotificationDto.getId() + 6000, refreshIntent, 		PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, dailyPushNotificationDto.getId() + 6000, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
 	}
 
@@ -56,9 +56,10 @@ public class DailyNotiHelper {
 
 	public void disablePushNotification(int id) {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id + 6000, new Intent(context,
-				DailyPushNotificationReceiver.class),		PendingIntent.FLAG_UPDATE_CURRENT);
+				DailyPushNotificationReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
+			pendingIntent.cancel();
 		}
 	}
 
@@ -70,4 +71,13 @@ public class DailyNotiHelper {
 		}
 	}
 
+	public boolean isRepeating(int id) {
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id + 6000, new Intent(context,
+				DailyPushNotificationReceiver.class), PendingIntent.FLAG_NO_CREATE);
+		if (pendingIntent != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

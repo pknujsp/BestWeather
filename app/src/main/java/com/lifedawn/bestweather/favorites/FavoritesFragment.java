@@ -29,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.AlarmSettingsFragment;
@@ -142,6 +143,8 @@ public class FavoritesFragment extends Fragment {
 		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
+
+		binding.adViewBottom.loadAd(new AdRequest.Builder().build());
 
 		binding.progressResultView.setContentView(binding.favoriteAddressList);
 

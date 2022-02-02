@@ -46,4 +46,14 @@ public class AlwaysNotiHelper {
 		}
 	}
 
+	public boolean isRepeating() {
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Always.getNotificationId(), new Intent(context, AlwaysNotificationReceiver.class)
+				, PendingIntent.FLAG_NO_CREATE);
+		if (pendingIntent != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 }

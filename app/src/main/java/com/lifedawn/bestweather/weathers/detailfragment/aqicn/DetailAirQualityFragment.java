@@ -19,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.gridlayout.widget.GridLayout;
 import androidx.preference.PreferenceManager;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -175,6 +176,13 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 			}
 		});
 
+		final int overallGrade = (int) Double.parseDouble(response.getData().getAqi() == null ? "-1" : response.getData().getAqi());
+		final String currentOverallDescription =
+				AqicnResponseProcessor.getGradeDescription(overallGrade);
+		final int currentOverallColor = AqicnResponseProcessor.getGradeColorId(overallGrade);
+
+		binding.currentAirquality.setText(overallGrade == -1 ? getString(R.string.noData) : currentOverallDescription);
+		binding.currentAirquality.setTextColor(currentOverallColor);
 
 		String notData = getString(R.string.noData);
 		if (iAqi.getCo() == null) {
@@ -564,7 +572,16 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(value == null ? ContextCompat.getColor(getContext(), R.color.not_data_color)
 				: AqicnResponseProcessor.getGradeColorId(value));
 
-		binding.grid.addView(gridItem);
+		int cellCount = binding.grid.getChildCount();
+		int row = cellCount / binding.grid.getColumnCount();
+		int column = cellCount % binding.grid.getColumnCount();
+
+		GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+
+		layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
+		layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
+
+		binding.grid.addView(gridItem, layoutParams);
 		return gridItem;
 	}
 

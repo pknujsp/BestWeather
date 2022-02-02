@@ -245,6 +245,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 		final String cm = "cm";
 		final String mm = "mm";
+		final String degree = "°";
 
 		List<WeatherSourceUnitObj> weatherSourceUnitObjList = new ArrayList<>();
 
@@ -264,7 +265,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				for (ForecastObj<HourlyForecastDto> item : kmaFinalHourlyForecasts) {
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 							ContextCompat.getDrawable(context, item.e.getWeatherIcon()), item.e.getWeatherDescription()));
-					tempList.add(item.e.getTemp());
+					tempList.add(item.e.getTemp().replace(tempUnitStr,degree));
 
 					popList.add(item.e.getPop());
 					rainVolumeList.add(item.e.getRainVolume().replace(mm, ""));
@@ -286,7 +287,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					dateTimeList.add(item.e.getHours());
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 							ContextCompat.getDrawable(context, item.e.getWeatherIcon()), item.e.getWeatherDescription()));
-					tempList.add(item.e.getTemp());
+					tempList.add(item.e.getTemp().replace(tempUnitStr,degree));
 					popList.add(item.e.getPop());
 					rainVolumeList.add(item.e.getRainVolume().replace(mm, ""));
 
@@ -308,7 +309,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					dateTimeList.add(item.e.getHours());
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context, item.e.getWeatherIcon()),
 							item.e.getWeatherDescription()));
-					tempList.add(item.e.getTemp());
+					tempList.add(item.e.getTemp().replace(tempUnitStr,degree));
 					popList.add(item.e.getPop());
 					rainVolumeList.add(item.e.getRainVolume().replace("mm", ""));
 

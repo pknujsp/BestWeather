@@ -60,21 +60,53 @@
                 android:textSize="14sp" />
 
 
-            <TextView
+            <RelativeLayout
                 style="@style/sub_title_in_forecast_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/current"
-                android:textColor="?attr/textColorInWeatherCard" />
+                android:gravity="center_vertical">
 
+                <TextView
+                    style="@style/sub_title_in_forecast_card"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="0dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/current"
+                    android:textColor="?attr/textColorInWeatherCard" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:text="@string/air_quality"
+                    android:textColor="@color/white"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/current_airquality"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/current_airquality"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/aqi_1_good"
+                    android:textColor="@color/white"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:textSize="16sp" />
+
+            </RelativeLayout>
 
             <androidx.gridlayout.widget.GridLayout
                 android:id="@+id/grid"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                app:alignmentMode="alignBounds"
                 app:columnCount="3"
-                app:orientation="horizontal" />
+                app:orientation="horizontal"
+                app:rowOrderPreserved="false"
+                app:useDefaultMargins="false" />
 
             <TextView
                 style="@style/sub_title_in_forecast_card"

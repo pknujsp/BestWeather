@@ -252,6 +252,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			}
 		});
 
+
 		initializing = false;
 	}
 
