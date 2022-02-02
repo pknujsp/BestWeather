@@ -41,7 +41,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 		ValueUnits clockUnit =
 				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock),
 						ValueUnits.clock24.name()));
-		hoursFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "h:00 a" : "H:00");
+		hoursFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "h a" : "H");
 	}
 
 	public DetailHourlyForecastViewPagerAdapter setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
@@ -72,7 +72,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 		return hourlyForecastDtoList.size();
 	}
 
-	protected class ViewHolder extends RecyclerView.ViewHolder {
+	protected final class ViewHolder extends RecyclerView.ViewHolder {
 		private ItemviewDetailForecastBinding binding;
 		private HeaderviewDetailHourlyforecastBinding headerBinding;
 
@@ -84,14 +84,12 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 		}
 
 		public void clear() {
-			binding.detailGridLayout.removeAllViews();
 			headerBinding.precipitationGridLayout.removeAllViews();
+			binding.detailGridLayout.removeAllViews();
 		}
 
 		public void onBind(HourlyForecastDto hourlyForecastDto) {
 			//header 화면 구성
-			int position = getAdapterPosition();
-
 			headerBinding.date.setText(hourlyForecastDto.getHours().format(dateFormatter));
 			headerBinding.hours.setText(hourlyForecastDto.getHours().format(hoursFormatter));
 			headerBinding.weatherIcon.setImageResource(hourlyForecastDto.getWeatherIcon());

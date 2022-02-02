@@ -17,19 +17,19 @@
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:overScrollMode="never"
             android:scrollbars="vertical">
 
             <androidx.gridlayout.widget.GridLayout
                 android:id="@+id/detailGridLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center"
                 app:alignmentMode="alignBounds"
                 app:columnCount="4"
-                app:rowOrderPreserved="false"
                 app:useDefaultMargins="false"
                 tools:listitem="@layout/view_detail_weather_data_item" />
 

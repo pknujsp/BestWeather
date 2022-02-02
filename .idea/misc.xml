@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/arrow.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/card_background.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/dialog_background.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/error.xml" value="0.2255" />
@@ -16,6 +17,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/selector_switch_thumb.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/simple_weather_card.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/widget_background.xml" value="0.3764102564102564" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/winddirection.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/activity_configure_widget.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/activity_main.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/air_quality_simple_forecast_item.xml" value="0.17806484295845998" />
