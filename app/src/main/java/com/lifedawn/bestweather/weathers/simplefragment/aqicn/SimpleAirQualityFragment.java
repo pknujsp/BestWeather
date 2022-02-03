@@ -142,28 +142,9 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		} else {
 			binding.measuringStationName.setText(notData);
 		}
-		/*
-		if (geolocalizedFeedResponse.getData().getTime().getIso() != null) {
-			// time : 2021-10-22T11:16:41+09:00
-			ZonedDateTime syncDateTime = null;
-			try {
-				syncDateTime = ZonedDateTime.parse(geolocalizedFeedResponse.getData().getTime().getIso());
-			} catch (Exception e) {
-
-			}
-			DateTimeFormatter syncDateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "M.d E a h:mm" : "M.d" +
-							" E HH:mm",
-					Locale.getDefault());
-			binding.updatedTime.setText(syncDateTime.format(syncDateTimeFormatter));
-		} else {
-			binding.updatedTime.setText(notData);
-		}
-
-		 */
 
 		final int overallGrade = (int) Double.parseDouble(aqiCnGeolocalizedFeedResponse.getData().getAqi() == null ? "-1" : aqiCnGeolocalizedFeedResponse.getData().getAqi());
-		final String currentOverallDescription =
-				AqicnResponseProcessor.getGradeDescription(overallGrade);
+		final String currentOverallDescription = AqicnResponseProcessor.getGradeDescription(overallGrade);
 		final int currentOverallColor = AqicnResponseProcessor.getGradeColorId(overallGrade);
 
 		binding.currentAirquality.setText(overallGrade == -1 ? getString(R.string.noData) : currentOverallDescription);
@@ -213,7 +194,6 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			Integer no2 = (int) Double.parseDouble(iAqi.getNo2().getValue());
 			addGridItem(no2, R.string.no2_str, R.drawable.no2);
 		}
-
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 		LayoutInflater layoutInflater = LayoutInflater.from(getContext());
 
@@ -277,7 +257,6 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		int column = cellCount % binding.grid.getColumnCount();
 
 		GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
-
 		layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
 		layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
 

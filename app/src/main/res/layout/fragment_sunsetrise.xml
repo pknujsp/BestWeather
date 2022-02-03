@@ -19,6 +19,5 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp" />
 
-
     </LinearLayout>
 </layout>
