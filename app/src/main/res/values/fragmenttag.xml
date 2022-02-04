@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- fragment tag -->
+    <string name="tag_favorites_fragment" translatable="false">tag_favorites_fragment</string>
+    <string name="tag_settings_main_fragment" translatable="false">tag_settings_main_fragment</string>
+    <string name="tag_units_fragment" translatable="false">tag_units_fragment</string>
+    <string name="tag_weather_data_sources_fragment" translatable="false">tag_weather_data_sources_fragment</string>
+    <string name="tag_find_address_fragment" translatable="false">tag_find_address_fragment</string>
+    <string name="tag_simple_current_conditions_fragment" translatable="false">tag_simple_current_conditions_fragment</string>
+    <string name="tag_simple_hourly_forecast_fragment" translatable="false">tag_simple_hourly_forecast_fragment</string>
+    <string name="tag_simple_daily_forecast_fragment" translatable="false">tag_simple_daily_forecast_fragment</string>
+    <string name="tag_detail_current_conditions_fragment" translatable="false">tag_detail_current_conditions_fragment</string>
+    <string name="tag_simple_air_quality_fragment" translatable="false">tag_simple_air_quality_fragment</string>
+    <string name="tag_sun_set_rise_fragment" translatable="false">tag_sun_set_rise_fragment</string>
+    <string name="tag_detail_hourly_forecast_fragment" translatable="false">tag_detail_hourly_forecast_fragment</string>
+    <string name="tag_comparison_fragment" translatable="false">tag_comparison_fragment</string>
+    <string name="tag_detail_air_quality_fragment" translatable="false">tag_detail_air_quality_fragment</string>
+    <string name="tag_detail_daily_forecast_fragment" translatable="false">tag_detail_daily_forecast_fragment</string>
+    <string name="tag_intro_fragment" translatable="false">tag_intro_fragment</string>
+</resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_key_value_units" translatable="false">pref_key_value_units</string>
+
+    <string name="pref_key_app_theme" translatable="false">pref_key_app_theme</string>
+
+    <string name="pref_key_unit_temp" translatable="false">pref_key_unit_temp</string>
+
+    <string name="pref_key_unit_visibility" translatable="false">pref_key_unit_visibility</string>
+
+    <string name="pref_key_unit_wind" translatable="false">pref_key_unit_wind</string>
+
+    <string name="pref_key_unit_clock" translatable="false">pref_key_unit_clock</string>
+
+    <string name="pref_key_accu_weather" translatable="false">pref_key_accu_weather</string>
+
+    <string name="pref_key_open_weather_map" translatable="false">pref_key_open_weather_map</string>
+
+    <string name="pref_key_kma_top_priority" translatable="false">pref_key_kma_top_priority</string>
+
+    <string name="pref_key_use_current_location" translatable="false">pref_key_use_current_location</string>
+
+    <string name="pref_key_unit_preference" translatable="false">pref_key_unit_preference</string>
+
+    <string name="pref_key_weather_data_sources" translatable="false">pref_key_weather_data_sources</string>
+
+    <string name="pref_key_last_current_location_latitude" translatable="false">pref_key_last_current_location_latitude</string>
+    <string name="pref_key_last_current_location_longitude" translatable="false">pref_key_last_current_location_longitude</string>
+
+    <string name="pref_key_main_weather_data_source" translatable="false">pref_key_main_weather_data_source</string>
+
+    <string name="pref_key_last_selected_favorite_address_id" translatable="false">pref_key_last_selected_favorite_address_id</string>
+    <string name="pref_key_last_selected_location_type" translatable="false">pref_key_last_selected_location_type</string>
+
+    <string name="pref_key_show_intro" translatable="false">pref_key_show_intro</string>
+
+    <string name="pref_key_never_ask_again_permission_for_access_location" translatable="false">pref_key_never_ask_again_permission_for_access_location</string>
+
+    <string name="pref_key_forecast_view_type" translatable="false">pref_key_forecast_view_type</string>
+</resources>

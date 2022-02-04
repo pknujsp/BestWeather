@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.SunRiseSetType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.theme.AppTheme;
 
@@ -39,16 +40,17 @@ public class SunSetRiseInfoView extends View {
 	private int pixelWidth;
 	private int pixelHeight;
 
-	public SunSetRiseInfoView(Context context, ZonedDateTime dateTime, SunsetriseFragment.SunSetRiseType sunSetRiseType) {
+
+	public SunSetRiseInfoView(Context context, ZonedDateTime dateTime, SunRiseSetType sunSetRiseType) {
 		super(context);
 		init(dateTime, sunSetRiseType);
 	}
 
-	private void init(ZonedDateTime dateTime, SunsetriseFragment.SunSetRiseType sunSetRiseType) {
+	private void init(ZonedDateTime dateTime, SunRiseSetType sunRiseSetType) {
 		this.dateTime = dateTime;
-		this.typeIcon = ContextCompat.getDrawable(getContext(), sunSetRiseType == SunsetriseFragment.SunSetRiseType.RISE ?
+		this.typeIcon = ContextCompat.getDrawable(getContext(), sunRiseSetType == SunRiseSetType.RISE ?
 				R.drawable.sunrise : R.drawable.sunset);
-		this.type = getContext().getString(sunSetRiseType == SunsetriseFragment.SunSetRiseType.RISE ? R.string.sunrise : R.string.sunset);
+		this.type = getContext().getString(sunRiseSetType == SunRiseSetType.RISE ? R.string.sunrise : R.string.sunset);
 
 		typeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		typeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 15f, getResources().getDisplayMetrics()));

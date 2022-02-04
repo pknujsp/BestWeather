@@ -6,25 +6,27 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.text.Layout;
+import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.text.StaticLayout;
-import android.text.TextDirectionHeuristics;
 import android.text.TextPaint;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.SunRiseSetType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -44,13 +46,18 @@ public class SunSetRiseViewGroup extends FrameLayout {
 
 	private int type1BottomMargin;
 	private int type2BottomMargin;
-	private int lineMargin;
-	private int lineWidth;
-	private int circleRadius;
+	private int fullLineMargin;
+	private int fullLineWidth;
+	private int imgRadius;
+	private int roundedRectRadius;
+	private int dividerHeight;
 
-	private Paint linePaint;
+	private Paint dividerPaint;
+	private Paint fullLinePaint;
+	private Paint currentLinePaint;
 	private TextPaint timeTextPaint;
-	private Rect lineRect;
+	private RectF fullLineRect;
+	private RectF currentLineRect;
 	private Rect timeTextRect;
 	private Rect currentTextRect;
 	private Point timeCirclePoint;
@@ -61,6 +68,13 @@ public class SunSetRiseViewGroup extends FrameLayout {
 
 	private String current;
 	private OnSunRiseSetListener onSunRiseSetListener;
+	private Drawable img;
+	private Rect imgRect = new Rect();
+
+	private void setImg(SunRiseSetType sunRiseSetType) {
+		this.img = ContextCompat.getDrawable(getContext(), sunRiseSetType == SunRiseSetType.RISE ? R.drawable.day_clear :
+				R.drawable.night_clear);
+	}
 
 
 	public SunSetRiseViewGroup(Context context, Location location, ZoneId zoneId, OnSunRiseSetListener onSunRiseSetListener) {
@@ -73,14 +87,25 @@ public class SunSetRiseViewGroup extends FrameLayout {
 
 	private void init(Context context) {
 		setWillNotDraw(false);
-		type1BottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 35f, getResources().getDisplayMetrics());
-		type2BottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15f, getResources().getDisplayMetrics());
-		lineMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10f, getResources().getDisplayMetrics());
-		lineWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f, getResources().getDisplayMetrics());
-		circleRadius = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
+		DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+		type1BottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32f, displayMetrics);
+		type2BottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, displayMetrics);
+		fullLineMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, displayMetrics);
+		fullLineWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, displayMetrics);
+		imgRadius = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18f, displayMetrics);
+		roundedRectRadius = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, displayMetrics);
+		dividerHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, displayMetrics);
 
-		linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		linePaint.setColor(Color.GREEN);
+		dividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		dividerPaint.setColor(Color.GRAY);
+
+		fullLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		fullLinePaint.setStyle(Paint.Style.FILL);
+		fullLinePaint.setColor(Color.GRAY);
+
+		currentLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		currentLinePaint.setStyle(Paint.Style.FILL);
+		currentLinePaint.setColor(Color.WHITE);
 
 		timeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		timeTextPaint.setColor(AppTheme.getColor(context, R.attr.textColorInWeatherCard));
@@ -90,7 +115,8 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		timeCirclePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		timeCirclePaint.setColor(Color.WHITE);
 
-		lineRect = new Rect();
+		fullLineRect = new RectF();
+		currentLineRect = new RectF();
 		timeTextRect = new Rect();
 		timeCirclePoint = new Point();
 		currentTextRect = new Rect();
@@ -158,9 +184,9 @@ public class SunSetRiseViewGroup extends FrameLayout {
 
 			type3View.layout(childLeft, childTop, childRight, childBottom);
 
-			type1PointOnLine.x = childLeft - lineMargin - lineWidth / 2;
+			type1PointOnLine.x = childLeft - fullLineMargin - fullLineWidth / 2;
 			type2PointOnLine.x = type1PointOnLine.x;
-			lineRect.set(childLeft - lineMargin - lineWidth, lineTop, childLeft - lineMargin, lineBottom);
+			fullLineRect.set(childLeft - fullLineMargin - fullLineWidth, lineTop, childLeft - fullLineMargin, lineBottom);
 		} else {
 			errorView.layout(0, 0, getWidth(), (int) errorView.getTextSize() * 2);
 		}
@@ -169,7 +195,6 @@ public class SunSetRiseViewGroup extends FrameLayout {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if (type1View != null && type2View != null && type3View != null) {
-			canvas.drawRect(lineRect.left, lineRect.top, lineRect.right, lineRect.bottom, linePaint);
 			ZonedDateTime now = ZonedDateTime.now(zoneId);
 
 			long millis = now.toInstant().toEpochMilli();
@@ -187,7 +212,27 @@ public class SunSetRiseViewGroup extends FrameLayout {
 			float currentTimeY = type1PointOnLine.y + (heightPerMinute * (nowTimeMinutes - type1Minutes));
 			timeCirclePoint.x = type1PointOnLine.x;
 			timeCirclePoint.y = (int) currentTimeY;
-			canvas.drawCircle(timeCirclePoint.x, timeCirclePoint.y, circleRadius, timeCirclePaint);
+
+			imgRect.left = timeCirclePoint.x - imgRadius;
+			imgRect.top = timeCirclePoint.y - imgRadius;
+			imgRect.right = timeCirclePoint.x + imgRadius;
+			imgRect.bottom = timeCirclePoint.y + imgRadius;
+
+			currentLineRect.left = fullLineRect.left;
+			currentLineRect.right = fullLineRect.right;
+			currentLineRect.top = fullLineRect.top;
+			currentLineRect.bottom = imgRect.centerY();
+
+			canvas.drawRoundRect(fullLineRect, roundedRectRadius, roundedRectRadius, fullLinePaint);
+			canvas.drawRoundRect(currentLineRect, roundedRectRadius, roundedRectRadius, currentLinePaint);
+
+			canvas.drawLine(fullLineRect.left, fullLineRect.top, fullLineRect.right + fullLineMargin / 2f, fullLineRect.top + dividerHeight, dividerPaint);
+			canvas.drawLine(fullLineRect.left, type2PointOnLine.y, fullLineRect.right + fullLineMargin / 2f,
+					type2PointOnLine.y + dividerHeight,
+					dividerPaint);
+
+			img.setBounds(imgRect);
+			img.draw(canvas);
 
 			drawCurrent(now.format(dateTimeFormatter), canvas);
 		}
@@ -202,12 +247,11 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		StaticLayout sl = builder.build();
 		canvas.save();
 
-		int criteriaX = timeCirclePoint.x - lineMargin - timeTextRect.width() / 2 - lineWidth / 2;
+		int criteriaX = timeCirclePoint.x - fullLineMargin - timeTextRect.width() / 2 - fullLineWidth / 2;
 		int criteriaY = timeCirclePoint.y;
 
 		float textHeight = timeTextRect.height();
-		float textYCoordinate = criteriaY + timeTextRect.exactCenterY() -
-				((sl.getLineCount() * textHeight) / 2);
+		float textYCoordinate = criteriaY + timeTextRect.exactCenterY() - ((sl.getLineCount() * textHeight) / 2);
 
 		canvas.translate(criteriaX, textYCoordinate);
 
@@ -266,44 +310,45 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		Calendar type2Calendar;
 		Calendar type3Calendar;
 
-		SunsetriseFragment.SunSetRiseType type1;
-		SunsetriseFragment.SunSetRiseType type2;
-		SunsetriseFragment.SunSetRiseType type3;
+		SunRiseSetType type1;
+		SunRiseSetType type2;
+		SunRiseSetType type3;
 
 		if (todayCalendar.before(todaySunRiseCalendar)) {
 			//일출 전 새벽 (0시 0분 <= 현재 시각 < 일출)
 			//순서 : 전날 11.06 일몰 - 당일 11.07 일출 - 당일 11.07 일몰
 			type1Calendar = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(yesterdayCalendar);
-			type1 = SunsetriseFragment.SunSetRiseType.SET;
+			type1 = SunRiseSetType.SET;
 
 			type2Calendar = todaySunRiseCalendar;
-			type2 = SunsetriseFragment.SunSetRiseType.RISE;
+			type2 = SunRiseSetType.RISE;
 
 			type3Calendar = todaySunSetCalendar;
-			type3 = SunsetriseFragment.SunSetRiseType.SET;
+			type3 = SunRiseSetType.SET;
 		} else if (todayCalendar.compareTo(todaySunRiseCalendar) >= 0 && todayCalendar.compareTo(todaySunSetCalendar) <= 0) {
 			//일출 후, 일몰 전 (일출 <= 현재 시각 <= 일몰)
 			//순서 : 당일 11.07 일출 - 당일 11.07 일몰 - 다음날 11.08 일출
 			type1Calendar = todaySunRiseCalendar;
-			type1 = SunsetriseFragment.SunSetRiseType.RISE;
+			type1 = SunRiseSetType.RISE;
 
 			type2Calendar = todaySunSetCalendar;
-			type2 = SunsetriseFragment.SunSetRiseType.SET;
+			type2 = SunRiseSetType.SET;
 
 			type3Calendar = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(tomorrowCalendar);
-			type3 = SunsetriseFragment.SunSetRiseType.RISE;
+			type3 = SunRiseSetType.RISE;
 		} else {
 			//일몰 후 (일몰 < 현재 시각 < 24시 0분 )
 			//순서 : 당일 11.07 일몰 - 다음날 11.08 일출 - 다음날 11.08 일몰
 			type1Calendar = todaySunSetCalendar;
-			type1 = SunsetriseFragment.SunSetRiseType.SET;
+			type1 = SunRiseSetType.SET;
 
 			type2Calendar = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(tomorrowCalendar);
-			type2 = SunsetriseFragment.SunSetRiseType.RISE;
+			type2 = SunRiseSetType.RISE;
 
 			type3Calendar = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(tomorrowCalendar);
-			type3 = SunsetriseFragment.SunSetRiseType.SET;
+			type3 = SunRiseSetType.SET;
 		}
+		setImg(type1);
 		onSunRiseSetListener.onCalcResult(true);
 
 		ZonedDateTime type1ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(type1Calendar.getTimeInMillis()),

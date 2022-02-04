@@ -40,9 +40,6 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	private WeatherDataSourceType mainWeatherDataSourceType;
 	private ZoneId zoneId;
 
-	public enum SunSetRiseType {
-		RISE, SET
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

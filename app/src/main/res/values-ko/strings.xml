@@ -1,79 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">BestWeather</string>
-
-    <!-- 날씨 제공사 -->
-    <string name="kma">Korea MA</string>
+    <string name="app_name">BestWeather</string>
+    <string name="kma">대한민국 기상청</string>
     <string name="accu_weather">Accu Weather</string>
     <string name="owm">Accu Weather</string>
-
-    <!-- airquality -->
-    <string name="pm10_str">PM10</string>
-    <string name="pm25_str">PM2.5</string>
-    <string name="pm10" translatable="false">pm10</string>
-    <string name="pm25" translatable="false">pm2.5</string>
-    <string name="o3_str">O3</string>
-    <string name="no2_str">NO2</string>
-    <string name="so2_str">SO2</string>
-    <string name="co_str">CO</string>
-
-    <string name="pm10_description">Fine dust with a diameter of less than 10 μm penetrates deep into the lungs, causing respiratory diseases.</string>
-    <string name="pm25_description">Very fine dust with a diameter of 2.5 μm or less.</string>
-    <string name="o3_description">Concentration in the atmosphere can affect the respiratory and eye and lead to decreased lung function.</string>
-    <string name="no2_description">Effects on the respiratory system.</string>
-    <string name="so2_description">Effects on the respiratory system.</string>
-    <string name="co_description">It can cause headaches and dizziness.</string>
-
-    <!-- 날씨 예보 종류 -->
-    <string name="current_conditions">Current</string>
-    <string name="hourly_forecast">Hourly</string>
-    <string name="daily_forecast">Daily</string>
-    <string name="air_quality">AirQuality</string>
-    <string name="sun_set_rise">Sun Rise/Set</string>
-
-    <!-- preference text -->
-    <string name="settings">settings</string>
-
-    <string name="pref_summary_value_units">temperature : ℃, ℉ / wind speed : m/s, km/h etc.</string>
-    <string name="pref_title_value_units">value unit</string>
-
-    <string name="pref_summary_app_theme">black, white</string>
-    <string name="pref_title_app_theme">App Theme</string>
-
-    <string name="pref_title_unit_temp">Temperature</string>
-
-    <string name="pref_title_unit_visibility">Visibility</string>
-
-    <string name="pref_title_unit_wind">Wind Speed</string>
-
-    <string name="pref_title_unit_clock">12/24 clock</string>
-
+    <string name="pm10_str">미세먼지</string>
+    <string name="pm25_str">초미세먼지</string>
+    <string name="o3_str">오존</string>
+    <string name="no2_str">이산화질소</string>
+    <string name="so2_str">이산화황</string>
+    <string name="co_str">일산화탄소</string>
+    <string name="pm10_description">지름이 10μm 이하인 미세한 먼지, 폐 깊숙히까지 침투하여 호흡기 질환의 원인이 됨</string>
+    <string name="pm25_description">지름이 2.5μm 이하인 매우 미세한 먼지</string>
+    <string name="o3_description">대기 중 농도가 짙으면 호흡기, 눈에 영향을 미치며 폐 기능 저하를 가져올수 있다</string>
+    <string name="no2_description">호흡기에 영향</string>
+    <string name="so2_description">호흡기에 영향</string>
+    <string name="co_description">두통과 현기증 유발 가능</string>
+    <string name="current_conditions">현재 날씨</string>
+    <string name="hourly_forecast">시간별 예보</string>
+    <string name="daily_forecast">일별 예보</string>
+    <string name="air_quality">대기질</string>
+    <string name="sun_set_rise">일출, 일몰</string>
+    <string name="settings">설정</string>
+    <string name="pref_summary_value_units">온도 : ℃, ℉ / 풍속 : m/s, km/h 등</string>
+    <string name="pref_title_value_units">값 단위</string>
+    <string name="pref_summary_app_theme">검정, 하양 중 선택</string>
+    <string name="pref_title_app_theme">앱 테마</string>
+    <string name="pref_title_unit_temp">기온</string>
+    <string name="pref_title_unit_visibility">가시거리</string>
+    <string name="pref_title_unit_wind">풍속</string>
+    <string name="pref_title_unit_clock">12/24 시간제</string>
     <string name="pref_title_accu_weather">Accu Weather</string>
     <string name="pref_summary_accu_weather">추후 적용 예정입니다</string>
-
     <string name="pref_summary_open_weather_map">영국 런던에 본사가 있는 기업으로, 전 세계 대부분 지역의 날씨정보를 다룹니다.</string>
     <string name="pref_title_open_weather_map">OpenWeatherMap</string>
-
     <string name="pref_summary_kma_top_priority">요청한 날씨 자료의 지역이 대한민국인 경우 대한민국 기상청의 자료를 기본으로 표시합니다</string>
     <string name="pref_title_kma_top_priority">대한민국 기상청을 최우선 순위로 설정</string>
-
     <string name="pref_summary_use_current_location">GPS를 통해 현재 위치의 날씨를 표시</string>
     <string name="pref_title_use_current_location">현재 위치 사용</string>
-
     <string name="pref_summary_weather_data_sources">Accu Weather, OpenWeatherMap, Kma~</string>
     <string name="pref_title_weather_data_sources">날씨 제공사</string>
-
     <string name="pref_title_forecast_view_type">예보 데이터 목록의 표시 유형</string>
-
-    <!-- appthemes -->
-    <string name="black">Black</string>
-    <string name="white">White</string>
-
-    <!-- 풍향 -->
-    <string name="wind_direction_N">N</string>
-    <string name="wind_direction_NNE">NNE</string>
-    <string name="wind_direction_NE">NE</string>
-    <string name="wind_direction_ENE">ENE</string>
-    <string name="wind_direction_E">E</string>
+    <string name="black">검정</string>
+    <string name="white">하양</string>
+    <string name="wind_direction_N">북</string>
+    <string name="wind_direction_NNE">북북동</string>
+    <string name="wind_direction_NE">북동</string>
+    <string name="wind_direction_ENE">동북동</string>
+    <string name="wind_direction_E">동</string>
     <string name="wind_direction_ESE">동남동</string>
     <string name="wind_direction_SE">남동</string>
     <string name="wind_direction_SSE">남남동</string>
@@ -85,16 +59,11 @@
     <string name="wind_direction_WNW">서북서</string>
     <string name="wind_direction_NW">북서</string>
     <string name="wind_direction_NNW">북북서</string>
-
-
-    <!-- accu weather precipitation type -->
-    <string name="accu_weather_pty_rain">rain</string>
-    <string name="accu_weather_pty_snow">snow</string>
-    <string name="accu_weather_pty_ice">ice</string>
+    <string name="accu_weather_pty_rain">비</string>
+    <string name="accu_weather_pty_snow">눈</string>
+    <string name="accu_weather_pty_ice">결빙</string>
     <string name="accu_weather_pty_not">강수없음</string>
     <string name="accu_weather_pty_mixed">비와 눈</string>
-
-    <!-- accu weather weather icon text -->
     <string name="accu_weather_icon_1_sunny">맑음</string>
     <string name="accu_weather_icon_2_mostly_sunny">대개 맑음</string>
     <string name="accu_weather_icon_3_partly_sunny">조금 맑음</string>
@@ -127,17 +96,15 @@
     <string name="accu_weather_icon_34_mostly_clear">대개 맑음</string>
     <string name="accu_weather_icon_35_partly_cloudy">조금 흐림</string>
     <string name="accu_weather_icon_36_intermittent_clouds">간헐적으로 구름</string>
-    <string name="accu_weather_icon_37_hazy_moonlight">Hazy moonlight</string>
-    <string name="accu_weather_icon_38_mostly_cloudy">Mostly cloudy</string>
-    <string name="accu_weather_icon_39_partly_cloudy_and_showers">Partly cloudy and showers</string>
-    <string name="accu_weather_icon_40_mostly_cloudy_and_showers">Mostly cloudy and showers</string>
+    <string name="accu_weather_icon_37_hazy_moonlight">흐릿한 달빛</string>
+    <string name="accu_weather_icon_38_mostly_cloudy">대체로 흐림</string>
+    <string name="accu_weather_icon_39_partly_cloudy_and_showers">조금 흐리고 소나기</string>
+    <string name="accu_weather_icon_40_mostly_cloudy_and_showers">대체로 흐리고 소나기</string>
     <string name="accu_weather_icon_41_partly_cloudy_and_thunderstorms">조금 흐리고 뇌우</string>
     <string name="accu_weather_icon_42_mostly_cloudy_and_thunderstorms">대체로 흐리고 뇌우</string>
     <string name="accu_weather_icon_43_mostly_cloudy_and_flurries">대체로 흐리고 눈보라</string>
     <string name="accu_weather_icon_44_mostly_cloudy_and_snow">대체로 흐리고 눈</string>
-
-    <!-- open weather map weather icon text -->
-    <string name="owm_icon_200_thunderstorm_with_light_rain">Thunderstorm with light rain</string>
+    <string name="owm_icon_200_thunderstorm_with_light_rain">가벼운 비를 동반한 뇌우</string>
     <string name="owm_icon_201_thunderstorm_with_rain">비를 동반한 뇌우</string>
     <string name="owm_icon_202_thunderstorm_with_heavy_rain">많은 비를 동반한 뇌우</string>
     <string name="owm_icon_210_light_thunderstorm">가벼운 뇌우</string>
@@ -147,7 +114,6 @@
     <string name="owm_icon_230_thunderstorm_with_light_drizzle">가벼운 가랑비를 동반한 뇌우</string>
     <string name="owm_icon_231_thunderstorm_with_drizzle">가랑비를 동반한 뇌우</string>
     <string name="owm_icon_232_thunderstorm_with_heavy_drizzle">심한 가랑비를 동반한 뇌우</string>
-
     <string name="owm_icon_300_light_intensity_drizzle">약한 이슬비</string>
     <string name="owm_icon_301_drizzle">가랑비</string>
     <string name="owm_icon_302_heavy_intensity_drizzle">굵은 이슬비</string>
@@ -157,7 +123,6 @@
     <string name="owm_icon_313_shower_rain_and_drizzle">소나기와 가랑비</string>
     <string name="owm_icon_314_heavy_shower_rain_and_drizzle">심한 소나기와 가랑비</string>
     <string name="owm_icon_321_shower_drizzle">이슬비</string>
-
     <string name="owm_icon_500_light_rain">가벼운 비</string>
     <string name="owm_icon_501_moderate_rain">적당한 비</string>
     <string name="owm_icon_502_heavy_intensity_rain">집중호우</string>
@@ -168,7 +133,6 @@
     <string name="owm_icon_521_shower_rain">소나기</string>
     <string name="owm_icon_522_heavy_intensity_shower_rain">강한 소나기</string>
     <string name="owm_icon_531_ragged_shower_rain">너덜너덜 내리는 소나기</string>
-
     <string name="owm_icon_600_light_snow">가벼운 눈</string>
     <string name="owm_icon_601_snow">눈</string>
     <string name="owm_icon_602_heavy_snow">많은 눈</string>
@@ -180,10 +144,9 @@
     <string name="owm_icon_620_light_shower_snow">가벼운 소나기 눈</string>
     <string name="owm_icon_621_shower_snow">소나기 눈</string>
     <string name="owm_icon_622_heavy_shower_snow">폭설</string>
-
-    <string name="owm_icon_701_mist">Mist</string>
+    <string name="owm_icon_701_mist">박무</string>
     <string name="owm_icon_711_smoke">Smoke</string>
-    <string name="owm_icon_721_haze">Haze</string>
+    <string name="owm_icon_721_haze">연무</string>
     <string name="owm_icon_731_dust">황사</string>
     <string name="owm_icon_741_fog">안개</string>
     <string name="owm_icon_751_sand">모래</string>
@@ -191,18 +154,14 @@
     <string name="owm_icon_762_volcanic_ash">화산재</string>
     <string name="owm_icon_771_squalls">스콜</string>
     <string name="owm_icon_781_tornado">토네이도</string>
-
     <string name="owm_icon_800_clear">맑음</string>
     <string name="owm_icon_801_few_clouds">구름조금</string>
     <string name="owm_icon_802_scattered_clouds">흩어진 구름</string>
     <string name="owm_icon_803_broken_clouds">부서진 구름</string>
     <string name="owm_icon_804_overcast_clouds">흐림</string>
-
-    <!-- kma sky text -->
     <string name="kma_sky_1_clear">맑음</string>
     <string name="kma_sky_3_mostly_cloudy">구름 많음</string>
     <string name="kma_sky_4_overcast">흐림</string>
-
     <string name="kma_pty_0_not">강수없음</string>
     <string name="kma_pty_1_rain">비</string>
     <string name="kma_pty_2_rain_and_snow">진눈깨비</string>
@@ -211,7 +170,6 @@
     <string name="kma_pty_5_raindrop">빗방울</string>
     <string name="kma_pty_6_raindrop_and_snow_blizzard">빗방울눈날림</string>
     <string name="kma_pty_7_snow_blizzard">눈날림</string>
-
     <string name="kma_mid_clear">맑음</string>
     <string name="kma_mid_mostly_cloudy">구름많음</string>
     <string name="kma_mid_mostly_cloudy_rain">구름많고 비</string>
@@ -222,27 +180,23 @@
     <string name="kma_mid_overcast_rain">흐리고 비</string>
     <string name="kma_mid_overcast_snow">흐리고 눈</string>
     <string name="kma_mid_overcast_rain_and_snow">흐리고 비/눈</string>
-    <string name="kma_mid_overcast_shower">Overcast and shower</string>
+    <string name="kma_mid_overcast_shower">흐리고 소나기</string>
     <string name="kma_mid_shower">소나기</string>
-    <string name="kma_mid_sleet">sleet</string>
-
-    <!-- aqi grade -->
-    <string name="aqi_1_good">good</string>
-    <string name="aqi_2_Moderate">moderate</string>
-    <string name="aqi_3_unhealthy_for_sensitive_groups">a little bad</string>
-    <string name="aqi_4_unhealthy">bad</string>
-    <string name="aqi_5_very_unhealthy">very bad</string>
-    <string name="aqi_6_hazardous">hazardous</string>
-
-    <!-- forecast label -->
-    <string name="date">Date</string>
-    <string name="clock">Clock</string>
-    <string name="weather">Weather</string>
-    <string name="temperature">Temperature</string>
+    <string name="kma_mid_sleet">비/눈</string>
+    <string name="aqi_1_good">좋음</string>
+    <string name="aqi_2_Moderate">보통</string>
+    <string name="aqi_3_unhealthy_for_sensitive_groups">약간 나쁨</string>
+    <string name="aqi_4_unhealthy">나쁨</string>
+    <string name="aqi_5_very_unhealthy">매우 나쁨</string>
+    <string name="aqi_6_hazardous">최악</string>
+    <string name="date">날짜</string>
+    <string name="clock">시각</string>
+    <string name="weather">날씨</string>
+    <string name="temperature">기온</string>
     <string name="probability_of_precipitation">강수확률</string>
     <string name="probability_of_snow">강설확률</string>
     <string name="probability_of_rain">강우확률</string>
-    <string name="rain_volume">Rain volume</string>
+    <string name="rain_volume">강우량</string>
     <string name="snow_volume">강설량</string>
     <string name="precipitation_volume">강수량</string>
     <string name="current">현재</string>
@@ -260,8 +214,6 @@
     <string name="cloud_cover">운량</string>
     <string name="precipitation_type">강수형태</string>
     <string name="pressure">기압</string>
-
-    <!-- 바람세기 -->
     <string name="wind_strength_1">약한 바람</string>
     <string name="wind_strength_2">약간 강한 바람</string>
     <string name="wind_strength_3">강한 바람</string>
@@ -270,22 +222,16 @@
     <string name="wind_strength_2_simple">약간 강</string>
     <string name="wind_strength_3_simple">강</string>
     <string name="wind_strength_4_simple">매우 강</string>
-
-    <!-- sunrise,set -->
-    <string name="sunset">sunset</string>
-    <string name="sunrise">sunrise</string>
-
-    <!-- 자외선 지수 -->
-    <string name="uv_index_1_low">low</string>
-    <string name="uv_index_2_moderate">moderate</string>
-    <string name="uv_index_3_high">high</string>
-    <string name="uv_index_4_very_high">very high</string>
-    <string name="uv_index_5_extreme">extreme</string>
-
-    <!-- etc -->
+    <string name="sunset">일몰</string>
+    <string name="sunrise">일출</string>
+    <string name="uv_index_1_low">낮음</string>
+    <string name="uv_index_2_moderate">보통</string>
+    <string name="uv_index_3_high">높음</string>
+    <string name="uv_index_4_very_high">매우높음</string>
+    <string name="uv_index_5_extreme">위험</string>
     <string name="fresh_snow_cover">신적설</string>
-    <string name="thunderstorm">Thunderstorm</string>
-    <string name="noData">No data</string>
+    <string name="thunderstorm">낙뢰</string>
+    <string name="noData">정보없음</string>
     <string name="message_request_double_click_for_close">한번 더 누르면 종료됩니다</string>
     <string name="msg_kma_always_enabled_in_south_korea">날씨 데이터 요청 지역이 대한민국인 경우에만 대한민국 기상청의 자료가 제공됩니다</string>
     <string name="msg_at_least_one_must_be_selected">최소 하나는 선택되어야 합니다</string>
@@ -345,11 +291,7 @@
     <string name="disconnected_network">네트워크가 연결되어 있지 않습니다</string>
     <string name="connected_network">네트워크가 연결되었습니다</string>
     <string name="need_to_connect_network">네트워크 연결을 해주세요</string>
-    <string name="appwidget_text" translatable="false">EXAMPLE</string>
-    <string name="add_widget" translatable="false">Add widget</string>
-    <string name="ACTION_CHECK_GPS" translatable="false">ACTION_CHECK_GPS</string>
-    <string name="ACTION_CHECK_PERMISSION" translatable="false">ACTION_CHECK_PERMISSION</string>
-    <string name="refresh">refresh</string>
+    <string name="refresh">업데이트</string>
     <string name="refresh_current_location">현재 위치 업데이트</string>
     <string name="widget_control">위젯 관리</string>
     <string name="check_permission">권한 확인</string>
@@ -366,36 +308,18 @@
     <string name="not_selected_address">주소가 선택되지 않았습니다</string>
     <string name="click_again_to_select_address">현재 위치 선택되지 않음, 선택하기</string>
     <string name="change_address">주소 변경</string>
-
-
-    <!-- auto refresh interval -->
-    <string name="minutes_30">30 minutes</string>
-    <string name="disable_auto_refresh">manual refresh</string>
-    <string name="hours_1">1 hours</string>
-    <string name="hours_2">2 hours</string>
-    <string name="hours_3">3 hours</string>
-    <string name="hours_6">6 hours</string>
-
-    <string name="clock_12_pattern" translatable="false">a h:mm</string>
-    <string name="clock_24_pattern" translatable="false">HH:mm</string>
-    <string name="date_pattern" translatable="false">M.d E</string>
-    <string name="datetime_pattern_clock12" translatable="false">M.d E a h:mm</string>
-    <string name="datetime_pattern_clock24" translatable="false">M.d E H:mm</string>
-    <string name="datetime_pattern_in_detail_forecast_clock12" translatable="false">M.d E a h</string>
-    <string name="datetime_pattern_in_detail_forecast_clock24" translatable="false">M.d E H</string>
-
-    <!-- widget -->
-    <string name="widget_current_label">Current</string>
-    <string name="firstWidgetLabel">Current</string>
-    <string name="thirdWidgetLabel">Current/Hourly/Daily 종합</string>
+    <string name="minutes_30">30분</string>
+    <string name="disable_auto_refresh">수동업데이트</string>
+    <string name="hours_1">1시간</string>
+    <string name="hours_2">2시간</string>
+    <string name="hours_3">3시간</string>
+    <string name="hours_6">6시간</string>
+    <string name="widget_current_label">현재</string>
+    <string name="firstWidgetLabel">현재</string>
+    <string name="thirdWidgetLabel">현재/시간별/일별 종합</string>
     <string name="secondWidgetLabel">현재/시간별 간단히</string>
     <string name="fourthWidgetLabel">현재/일별 간단히</string>
-
     <string name="real_feel_temperature_simple">체감</string>
-    <string name="time_pattern_if_hours_0_of_hourly_forecast_in_widget" translatable="false">E 0</string>
-    <string name="time_pattern_of_hourly_forecast_in_widget" translatable="false">H</string>
-    <string name="date_pattern_of_daily_forecast_in_widget" translatable="false">E</string>
-    <string name="degree_symbol" translatable="false">°</string>
     <string name="failed_calculating_sun_rise_set">일출/일몰 계산 오류</string>
     <string name="loading">Loading</string>
     <string name="not_available">없음</string>
@@ -408,19 +332,12 @@
     <string name="always_notification">항상 표시되는 알림</string>
     <string name="daily_notification">당일 알림</string>
     <string name="use_always_notification">항상 표시되는 알림 사용</string>
-
-
-    <!-- notification -->
     <string name="notificationAlwaysChannelName">항상 알림</string>
     <string name="notificationAlwaysChannelDescription">날씨 정보를 항상 표시합니다</string>
-
     <string name="notificationDailyChannelName">매일 알림</string>
     <string name="notificationDailyChannelDescription">매일 정해진 시각에 날씨 정보를 알립니다</string>
-
     <string name="notificationAlarmChannelName">알람</string>
     <string name="notificationAlarmChannelDescription">설정한 요일, 시각에 알람 표시</string>
-
-
     <string name="use_daily_notification">당일 알림 사용</string>
     <string name="alarmClock">알림 시각</string>
     <string name="connect_network">네트워크 연결</string>
@@ -431,15 +348,15 @@
     <string name="alarmSound">소리</string>
     <string name="alarmVibration">진동</string>
     <string name="repeatAlarm">다시 울림</string>
-    <string name="simpleSunday">Sun</string>
-    <string name="simpleMonday">Mon</string>
-    <string name="simpleTuesday">Tue</string>
-    <string name="simpleWednesday">Wed</string>
-    <string name="simpleThursday">Thu</string>
-    <string name="simpleFriday">Fri</string>
-    <string name="simpleSaturday">Sat</string>
-    <string name="silent">silent</string>
-    <string name="alarmSoundVolume">volume</string>
+    <string name="simpleSunday">일</string>
+    <string name="simpleMonday">월</string>
+    <string name="simpleTuesday">화</string>
+    <string name="simpleWednesday">수</string>
+    <string name="simpleThursday">목</string>
+    <string name="simpleFriday">금</string>
+    <string name="simpleSaturday">토</string>
+    <string name="silent">무음</string>
+    <string name="alarmSoundVolume">소리 크기</string>
     <string name="fiveMinutes">5분</string>
     <string name="tenMinutes">10분</string>
     <string name="fifteenMinutes">15분</string>
@@ -462,14 +379,9 @@
     <string name="ringAgain">다시 울림</string>
     <string name="precipitation">강수</string>
     <string name="againAlarmAfterNMinutes">분 후 다시 울림</string>
-
-
     <string name="clickToSnoozeOrCancelAlarm">알람을 다시 울림/종료하시려면 눌러주세요</string>
     <string name="beginAlarm">알람 시작</string>
     <string name="wind">바람</string>
-    <string name="zeroSnowVolume" translatable="false">0.0cm</string>
-    <string name="zeroRainVolume" translatable="false">0.0mm</string>
-    <string name="zeroPrecipitationVolume" translatable="false">0.0mm</string>
     <string name="am">오전</string>
     <string name="pm">오후</string>
     <string name="today">오늘</string>
@@ -498,10 +410,9 @@
     <string name="ThirdDailyPushNotification">일별 예보</string>
     <string name="FourthDailyPushNotification">현재 대기질</string>
     <string name="FifthDailyPushNotification">대기질 예보</string>
-    <string name="remove">remove</string>
-
+    <string name="remove">삭제</string>
     <string name="startOnCurrentLocation">현재위치로 시작</string>
-    <string name="allDay">all day</string>
+    <string name="allDay">종일</string>
     <string name="empty_daily_notifications">추가한 일일 알림이 없습니다</string>
     <string name="will_you_delete_the_notification">알림을 삭제하시겠습니까?</string>
     <string name="removeNotification">알림 삭제</string>
@@ -513,5 +424,4 @@
     <string name="findingCurrentLocationTitle">현재 위치 검색</string>
     <string name="uncheckedAllowAllTheTime">위치 권한 항상 허용을 선택해주세요</string>
     <string name="disabledNotification">알림이 차단되어있습니다. 차단을 해제해주세요.</string>
-
 </resources>

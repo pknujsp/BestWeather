@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- intent action -->
+    <string name="com.lifedawn.bestweather.action.REFRESH" translatable="false">com.lifedawn.bestweather.action.REFRESH</string>
+    <string name="com.lifedawn.bestweather.action.SHOW_DIALOG" translatable="false">com.lifedawn.bestweather.action.SHOW_DIALOG</string>
+    <string name="com.lifedawn.bestweather.action.REFRESH_CURRENT_LOCATION" translatable="false">com.lifedawn.bestweather.action.REFRESH_CURRENT_LOCATION</string>
+    <string name="com.lifedawn.bestweather.action.INIT" translatable="false">com.lifedawn.bestweather.action.INIT</string>
+    <string name="com.lifedawn.bestweather.action.ALARM" translatable="false">com.lifedawn.bestweather.action.ALARM</string>
+    <string name="com_lifedawn_bestweather_action_RING_AGAIN" translatable="false">com_lifedawn_bestweather_action_RING_AGAIN</string>
+    <string name="com_lifedawn_bestweather_action_END_ALARM" translatable="false">com_lifedawn_bestweather_action_END_ALARM</string>
+    <string name="com_lifedawn_bestweather_action_SILENT_ALARM" translatable="false">com_lifedawn_bestweather_action_SILENT_ALARM</string>
+    <string name="com_lifedawn_bestweather_action_REDRAW" translatable="false">com_lifedawn_bestweather_action_REDRAW</string>
+    <string name="com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED" translatable="false">com_lifedawn_bestweather_action_ON_APP_WIDGET_OPTIONS_CHANGED</string>
+    <string name="com_lifedawn_bestweather_action_FOUND_CURRENT_LOCATION" translatable="false">com_lifedawn_bestweather_action_FOUND_CURRENT_LOCATION</string>
+
+</resources>

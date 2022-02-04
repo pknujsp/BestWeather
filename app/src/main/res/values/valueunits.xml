@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- value units -->
+
+    <!-- alt + 41417 -->
+    <string name="celsius" translatable="false">℃</string>
+    <!-- alt + 41653 -->
+    <string name="fahrenheit" translatable="false">℉</string>
+    <string name="mPerSec" translatable="false">m/s</string>
+    <string name="kmPerHour" translatable="false">km/h</string>
+    <string name="km" translatable="false">km</string>
+    <string name="mile" translatable="false">mile</string>
+    <string name="clock12" translatable="false">a h:mm</string>
+    <string name="clock24" translatable="false">H:mm</string>
+    <string name="percent" translatable="false">%</string>
+    <string name="hpa" translatable="false">hpa</string>
+    <string name="mm" translatable="false">mm</string>
+</resources>

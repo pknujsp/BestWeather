@@ -202,7 +202,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		@Override
 		public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
-			if(f instanceof AlertFragment){
+			if (f instanceof AlertFragment) {
 				binding.scrollView.setVisibility(View.VISIBLE);
 			}
 		}
@@ -347,6 +347,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	public void load(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
+		Log.e("load", "load");
 		Glide.with(this).clear(binding.currentConditionsImg);
 
 		binding.mainToolbar.gps.setVisibility(locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
@@ -480,6 +481,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						getActivity().runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
+								Glide.with(WeatherFragment.this).clear(binding.currentConditionsImg);
 								binding.loadingAnimation.setVisibility(View.GONE);
 								binding.flickrImageUrl.setVisibility(View.GONE);
 							}
@@ -559,11 +561,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						getActivity().runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								if (getChildFragmentManager().findFragmentByTag(getString(R.string.tag_simple_current_conditions_fragment)) != null) {
-									Glide.with(WeatherFragment.this).load(BACKGROUND_IMG_MAP.get(galleryName).getImg()).transition(
-											DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
-									setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
-								}
+								Glide.with(WeatherFragment.this).load(BACKGROUND_IMG_MAP.get(galleryName).getImg()).transition(
+										DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
+								setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
 							}
 						});
 					}
