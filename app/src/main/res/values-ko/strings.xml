@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">BestWeather</string>
     <string name="kma">대한민국 기상청</string>
-    <string name="accu_weather">Accu Weather</string>
-    <string name="owm">Accu Weather</string>
+    <string name="accu_weather">AccuWeather</string>
+    <string name="owm">OpenWeatherMap</string>
     <string name="pm10_str">미세먼지</string>
     <string name="pm25_str">초미세먼지</string>
     <string name="o3_str">오존</string>
@@ -30,7 +30,7 @@
     <string name="pref_title_unit_visibility">가시거리</string>
     <string name="pref_title_unit_wind">풍속</string>
     <string name="pref_title_unit_clock">12/24 시간제</string>
-    <string name="pref_title_accu_weather">Accu Weather</string>
+    <string name="pref_title_accu_weather">AccuWeather</string>
     <string name="pref_summary_accu_weather">추후 적용 예정입니다</string>
     <string name="pref_summary_open_weather_map">영국 런던에 본사가 있는 기업으로, 전 세계 대부분 지역의 날씨정보를 다룹니다.</string>
     <string name="pref_title_open_weather_map">OpenWeatherMap</string>
@@ -388,10 +388,10 @@
     <string name="detailSunRiseSet">상세 일출, 일몰</string>
     <string name="currentAndForecast">현재및 예보</string>
     <string name="fifthWidgetLabel">현재/시간별 그래프</string>
-    <string name="TheTemperatureIsTheSameAsYesterday">어제 이 시각과 기온이 같습니다</string>
-    <string name="thanYesterday">어제 이 시각 대비</string>
-    <string name="higherTemperature">높습니다</string>
-    <string name="lowerTemperature">낮습니다</string>
+    <string name="TheTemperatureIsTheSameAsYesterday">어제와 같은 기온</string>
+    <string name="thanYesterday">어제보다</string>
+    <string name="higherTemperature">높음</string>
+    <string name="lowerTemperature">낮음</string>
     <string name="sixthWidgetLabel">현재+세부 대기질</string>
     <string name="seventhWidgetLabel">현재 대기질+대기예보</string>
     <string name="eighthWidgetLabel">종합2</string>
@@ -424,4 +424,6 @@
     <string name="findingCurrentLocationTitle">현재 위치 검색</string>
     <string name="uncheckedAllowAllTheTime">위치 권한 항상 허용을 선택해주세요</string>
     <string name="disabledNotification">알림이 차단되어있습니다. 차단을 해제해주세요.</string>
+    <string name="errorNotification">알림 오류</string>
+    <string name="message_needs_background_location_permission">위치 권한 \'항상 허용\'이 필요합니다</string>
 </resources>

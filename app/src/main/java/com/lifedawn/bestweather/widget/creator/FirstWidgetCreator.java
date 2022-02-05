@@ -18,6 +18,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
@@ -134,6 +135,12 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 		((TextView) view.findViewById(R.id.windDirection)).setTextSize(TypedValue.COMPLEX_UNIT_PX, windDirectionTextSize);
 		((TextView) view.findViewById(R.id.windSpeed)).setTextSize(TypedValue.COMPLEX_UNIT_PX, windSpeedTextSize);
 		((TextView) view.findViewById(R.id.windStrength)).setTextSize(TypedValue.COMPLEX_UNIT_PX, windStrengthTextSize);
+
+		if (currentConditionsDto.getYesterdayTemp() != null) {
+			String yesterdayCompText = WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
+					currentConditionsDto.getYesterdayTemp(), tempUnit, context);
+			((TextView) view.findViewById(R.id.yesterdayTemperature)).setText(yesterdayCompText);
+		}
 
 		return view;
 	}

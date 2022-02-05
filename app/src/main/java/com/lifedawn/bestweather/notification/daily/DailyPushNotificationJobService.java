@@ -140,25 +140,23 @@ public class DailyPushNotificationJobService extends JobService {
 
 			@Override
 			public void onFailed(Fail fail) {
-				RemoteViewsUtil.ErrorType errorType = null;
+				String failText = null;
 
 				if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
-					errorType = RemoteViewsUtil.ErrorType.DENIED_GPS_PERMISSIONS;
+					failText = getString(R.string.message_needs_location_permission);
 				} else if (fail == Fail.DISABLED_GPS) {
-					errorType = RemoteViewsUtil.ErrorType.GPS_OFF;
+					failText = getString(R.string.request_to_make_gps_on);
 				} else if (fail == Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION) {
-					errorType = RemoteViewsUtil.ErrorType.DENIED_BACKGROUND_LOCATION_PERMISSION;
+					failText = getString(R.string.message_needs_background_location_permission);
 				} else {
-					errorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA;
+					failText = getString(R.string.failedFindingLocation);
 				}
 
-				RemoteViewsUtil.onErrorProcess(remoteViews, context, errorType);
-				remoteViews.setViewVisibility(R.id.refreshBtn, View.GONE);
-				viewCreator.makeNotification(remoteViews, dailyPushNotificationDto.getId());
+				viewCreator.makeFailedNotification(dailyPushNotificationDto.getId(), failText);
 			}
 		};
 
-		FusedLocation.getInstance(context).startLocationUpdates(locationCallback,true );
+		FusedLocation.getInstance(context).startLocationUpdates(locationCallback, true);
 	}
 
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,

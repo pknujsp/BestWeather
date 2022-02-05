@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
-    android:orientation="vertical">
+    android:layout_height="130dp"
+    android:orientation="vertical"
+    android:padding="@dimen/notificationPadding">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,13 +20,8 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/temp_address"
-                android:textColor="@color/blue"
-                android:textSize="13sp" />
+            <include layout="@layout/address_with_icon" />
+
 
             <TextView
                 android:id="@+id/measuring_station_name"

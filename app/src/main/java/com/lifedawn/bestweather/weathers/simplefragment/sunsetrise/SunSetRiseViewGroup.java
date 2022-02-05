@@ -97,6 +97,7 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		dividerHeight = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, displayMetrics);
 
 		dividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		dividerPaint.setStyle(Paint.Style.FILL);
 		dividerPaint.setColor(Color.GRAY);
 
 		fullLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -228,6 +229,12 @@ public class SunSetRiseViewGroup extends FrameLayout {
 
 			canvas.drawLine(fullLineRect.left, fullLineRect.top, fullLineRect.right + fullLineMargin / 2f, fullLineRect.top + dividerHeight, dividerPaint);
 			canvas.drawLine(fullLineRect.left, type2PointOnLine.y, fullLineRect.right + fullLineMargin / 2f,
+					type2PointOnLine.y + dividerHeight,
+					dividerPaint);
+
+			canvas.drawRect(fullLineRect.right, fullLineRect.top, fullLineRect.right + fullLineMargin / 2f,
+					fullLineRect.top + dividerHeight, dividerPaint);
+			canvas.drawRect(fullLineRect.right, type2PointOnLine.y, fullLineRect.right + fullLineMargin / 2f,
 					type2PointOnLine.y + dividerHeight,
 					dividerPaint);
 

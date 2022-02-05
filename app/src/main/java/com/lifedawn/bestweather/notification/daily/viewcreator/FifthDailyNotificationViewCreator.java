@@ -39,7 +39,7 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 	@Override
 	public RemoteViews createRemoteViews(boolean needTempData) {
-		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_notification);
+		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.fifth_daily_noti_view);
 
 		if (needTempData) {
 			setTempDataViews(remoteViews);
@@ -54,16 +54,14 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                       AirQualityDto airQualityDto) {
-		RemoteViews valuesRemoteViews = new RemoteViews(context.getPackageName(), R.layout.fifth_daily_noti_view);
-
-		valuesRemoteViews.setTextViewText(R.id.address, addressName);
-		valuesRemoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
+		remoteViews.setTextViewText(R.id.address, addressName);
+		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
 
 		final String noData = "-";
-		valuesRemoteViews.setTextViewText(R.id.measuring_station_name,
+		remoteViews.setTextViewText(R.id.measuring_station_name,
 				context.getString(R.string.measuring_station_name) + ": " + (airQualityDto.getCityName() == null ?
 						noData : airQualityDto.getCityName()));
-		valuesRemoteViews.setTextViewText(R.id.airQuality,
+		remoteViews.setTextViewText(R.id.airQuality,
 				context.getString(R.string.currentAirQuality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 
 		AirQualityDto.DailyForecast current = new AirQualityDto.DailyForecast();
@@ -83,31 +81,32 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			forecastItemView.setTextViewText(R.id.date, item.getDate() == null ? context.getString(R.string.current) :
 					item.getDate().format(forecastDateFormatter));
 			if (item.isHasPm10()) {
-				forecastItemView.setInt(R.id.pm10, "setBackgroundColor",
-						AqicnResponseProcessor.getGradeColorId(item.getPm10().getAvg()));
+				//forecastItemView.setInt(R.id.pm10, "setBackgroundColor", AqicnResponseProcessor.getGradeColorId(item.getPm10().getAvg()));
+				forecastItemView.setTextViewText(R.id.pm10, item.getPm10().getAvg().toString());
+				forecastItemView.setTextColor(R.id.pm10, AqicnResponseProcessor.getGradeColorId(item.getPm10().getAvg()));
 			} else {
 				forecastItemView.setImageViewResource(R.id.pm10, R.drawable.ic_baseline_error_24);
 			}
 
 			if (item.isHasPm25()) {
-				forecastItemView.setInt(R.id.pm25, "setBackgroundColor",
-						AqicnResponseProcessor.getGradeColorId(item.getPm25().getAvg()));
-
+				//forecastItemView.setInt(R.id.pm25, "setBackgroundColor", AqicnResponseProcessor.getGradeColorId(item.getPm25().getAvg()));
+				forecastItemView.setTextViewText(R.id.pm25, item.getPm25().getAvg().toString());
+				forecastItemView.setTextColor(R.id.pm25, AqicnResponseProcessor.getGradeColorId(item.getPm25().getAvg()));
 			} else {
 				forecastItemView.setImageViewResource(R.id.pm25, R.drawable.ic_baseline_error_24);
 			}
 
 			if (item.isHasO3()) {
-				forecastItemView.setInt(R.id.o3, "setBackgroundColor",
-						AqicnResponseProcessor.getGradeColorId(item.getO3().getAvg()));
+				//forecastItemView.setInt(R.id.o3, "setBackgroundColor", AqicnResponseProcessor.getGradeColorId(item.getO3().getAvg()));
+				forecastItemView.setTextViewText(R.id.o3, item.getO3().getAvg().toString());
+				forecastItemView.setTextColor(R.id.o3, AqicnResponseProcessor.getGradeColorId(item.getO3().getAvg()));
 			} else {
 				forecastItemView.setImageViewResource(R.id.o3, R.drawable.ic_baseline_error_24);
 			}
 
-			valuesRemoteViews.addView(R.id.forecast, forecastItemView);
+			remoteViews.addView(R.id.forecast, forecastItemView);
 		}
 
-		remoteViews.addView(R.id.valuesView, valuesRemoteViews);
 	}
 
 
@@ -121,10 +120,11 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		if (successful) {
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, airQualityDto);
 			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+			makeNotification(remoteViews, dailyPushNotificationDto.getId());
 		} else {
-			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			makeFailedNotification(dailyPushNotificationDto.getId(), context.getString(R.string.msg_failed_update));
 		}
-		makeNotification(remoteViews, dailyPushNotificationDto.getId());
+
 	}
 
 	@Override

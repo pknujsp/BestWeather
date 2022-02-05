@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/arrow.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/card_background.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/day_clear.xml" value="0.2265" />
@@ -10,19 +11,22 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/error.xml" value="0.2255" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/favorite_address_background_in_side_nav.xml" value="0.2165" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/ic_baseline_error_24.xml" value="0.2255" />
-        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/icon_circle_background.xml" value="0.3764102564102564" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/icon_circle_background.xml" value="0.25" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/icon_rounded_rect_background.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/img_btn_background.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/navigation_drawer_background.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/rectangle_btn_background.xml" value="0.2255" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/rounded_btn_background.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/selector_switch_thumb.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/simple_weather_card.xml" value="0.3764102564102564" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/temp_icon.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/widget_background.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/winddirection.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/activity_configure_widget.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/activity_main.xml" value="0.17806484295845998" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/address_with_icon.xml" value="0.36614583333333334" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/air_quality_item.xml" value="0.33" />
-        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/air_quality_simple_forecast_item.xml" value="0.17806484295845998" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/air_quality_simple_forecast_item.xml" value="0.25" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/app_main_toolbar.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/base_layout_detail_current_conditions.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/base_layout_detail_forecast.xml" value="0.17806484295845998" />
@@ -53,7 +57,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/header_view_in_widget.xml" value="0.32047244094488186" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/headerview_detail_hourlyforecast.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/item_view_color_airquality.xml" value="0.36614583333333334" />
-        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/itemview_detail_daily_forecast.xml" value="0.17806484295845998" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/itemview_detail_daily_forecast.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/itemview_detail_forecast.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/layout_warning_for_remoteviews.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/progress_view.xml" value="0.25" />
@@ -78,13 +82,15 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_seventh_widget.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_simple_air_quality_item.xml" value="0.25" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_sixth_widget.xml" value="0.33" />
-        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_third_widget.xml" value="0.17806484295845998" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_third_widget.xml" value="0.5" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_widget.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_widget_dialog.xml" value="0.5" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/weather_card_header_view.xml" value="0.33" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/weather_data_info.xml" value="0.36614583333333334" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.154" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/xml/app_settings_main_preference.xml" value="0.17806484295845998" />
+        <entry key="..\:/Android/Android Projects/BestWeather/nativetemplates/src/main/res/layout/gnt_medium_template_view.xml" value="0.36614583333333334" />
       </map>
     </option>
   </component>

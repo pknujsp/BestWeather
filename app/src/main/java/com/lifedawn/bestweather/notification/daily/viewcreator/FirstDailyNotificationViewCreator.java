@@ -35,7 +35,7 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 	@Override
 	public RemoteViews createRemoteViews(boolean needTempData) {
-		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_notification);
+		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.first_daily_noti_view);
 
 		if (needTempData) {
 			setTempDataViews(remoteViews);
@@ -52,8 +52,6 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                       List<HourlyForecastDto> hourlyForecastDtoList) {
-		RemoteViews valuesRemoveViews = new RemoteViews(context.getPackageName(), R.layout.first_daily_noti_view);
-
 		DateTimeFormatter hours0Formatter = DateTimeFormatter.ofPattern("E H");
 		DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("H");
 
@@ -106,13 +104,12 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			forecastRemoteViews.setTextViewText(R.id.temperature, hourlyForecastDtoList.get(cell).getTemp());
 			forecastRemoteViews.setViewVisibility(R.id.rightIcon, View.GONE);
 
-			valuesRemoveViews.addView(R.id.hourlyForecast, forecastRemoteViews);
+			remoteViews.addView(R.id.hourlyForecast, forecastRemoteViews);
 		}
 
-		valuesRemoveViews.setTextViewText(R.id.address, addressName);
-		valuesRemoveViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
+		remoteViews.setTextViewText(R.id.address, addressName);
+		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
 
-		remoteViews.addView(R.id.valuesView, valuesRemoveViews);
 	}
 
 	@Override
@@ -127,10 +124,10 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		if (successful) {
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, hourlyForecastDtoList);
 			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+			makeNotification(remoteViews, dailyPushNotificationDto.getId());
 		} else {
-			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			makeFailedNotification(dailyPushNotificationDto.getId(),context.getString(R.string.msg_failed_update));
 		}
-		makeNotification(remoteViews, dailyPushNotificationDto.getId());
 
 	}
 

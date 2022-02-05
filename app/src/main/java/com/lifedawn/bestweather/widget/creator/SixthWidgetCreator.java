@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
@@ -182,7 +183,7 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 
 	private void addAirQualityGridItem(LayoutInflater layoutInflater, GridLayout gridLayout, String label, String gradeValue,
 	                                   String gradeDescription, int iconId) {
-		RelativeLayout view = (RelativeLayout) layoutInflater.inflate(R.layout.air_quality_item, null);
+		LinearLayout view = (LinearLayout) layoutInflater.inflate(R.layout.air_quality_item, null);
 		((ImageView) view.findViewById(R.id.label_icon)).setImageResource(iconId);
 
 		TextView labelTextView = view.findViewById(R.id.label);
@@ -197,7 +198,16 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 		gradeValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, gradeValueTextSize);
 		gradeDescriptionTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, gradeDescriptionTextSize);
 
-		gridLayout.addView(view);
+		int cellCount = gridLayout.getChildCount();
+		int row = cellCount / gridLayout.getColumnCount();
+		int column = cellCount % gridLayout.getColumnCount();
+
+		GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+
+		layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
+		layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
+
+		gridLayout.addView(view, layoutParams);
 	}
 
 	@Override

@@ -4,6 +4,9 @@
     <string name="temp_precipitationRain">비: 1.2mm</string>
     <string name="temp_noPrecipitation">강수없음</string>
     <string name="temp_temperature">12℃</string>
+    <string name="temp_yesterdayTemperature">어제보다 2℃ 낮음</string>
+    <string name="temp_minTemperature">7℃</string>
+    <string name="temp_maxTemperature">13℃</string>
     <string name="temp_feelsLikeTemperature">체감: 12℃</string>
     <string name="temp_address">주소</string>
     <string name="temp_date">3.6 월</string>
@@ -19,4 +22,6 @@
     <string name="temp_snowVolume">0.0cm</string>
     <string name="temp_precipitationVolume">0.0mm</string>
     <string name="temp_measuringStation">측정소: A측정소</string>
+    <string name="temp_measuringStationName">A측정소</string>
+    <string name="temp_tempWindDirectionDegree">180</string>
 </resources>

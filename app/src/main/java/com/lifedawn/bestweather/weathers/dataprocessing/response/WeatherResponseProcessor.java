@@ -569,22 +569,21 @@ public class WeatherResponseProcessor {
 
 	public static CurrentConditionsDto getTempCurrentConditionsDto(Context context) {
 		CurrentConditionsDto tempCurrentConditions = new CurrentConditionsDto();
-		tempCurrentConditions.setTemp("-100℃").setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(120)
+		tempCurrentConditions.setTemp(context.getString(R.string.temp_temperature)).setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(Integer.parseInt(context.getString(R.string.temp_tempWindDirectionDegree)))
 				.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, String.valueOf(tempCurrentConditions.getWindDirectionDegree())))
-				.setWindSpeed(ValueUnits.convertWindSpeed("2.6", ValueUnits.mPerSec) + ValueUnits.convertToStr(context, ValueUnits.mPerSec))
-				.setHumidity("45%")
-				.setWindStrength(WindUtil.getWindSpeedDescription("2.6"));
+				.setWindSpeed(context.getString(R.string.temp_windSpeed))
+				.setHumidity(context.getString(R.string.temp_humidity))
+				.setWindStrength(context.getString(R.string.temp_simpleWindStrength));
 
 		return tempCurrentConditions;
 	}
 
 	public static List<HourlyForecastDto> getTempHourlyForecastDtoList(Context context, int count) {
-		final String tempDegree = "10℃";
-		final String percent = "%";
+		final String tempDegree = context.getString(R.string.temp_temperature);
 
-		final String zeroSnowVolume = "0.0mm";
-		final String zeroRainVolume = "0.0mm";
-		final String zeroPrecipitationVolume = "0.0mm";
+		final String zeroSnowVolume = context.getString(R.string.temp_snowVolume);
+		final String zeroRainVolume = context.getString(R.string.temp_rainVolume);
+		final String zeroPrecipitationVolume = context.getString(R.string.temp_precipitationVolume);
 
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 
@@ -596,7 +595,7 @@ public class WeatherResponseProcessor {
 			hourlyForecastDto.setHours(zonedDateTime)
 					.setWeatherIcon(R.drawable.day_clear)
 					.setTemp(tempDegree)
-					.setPop(10 + percent)
+					.setPop(context.getString(R.string.temp_pop))
 					.setPrecipitationVolume(zeroPrecipitationVolume)
 					.setHasRain(false)
 					.setHasSnow(false)
@@ -611,12 +610,12 @@ public class WeatherResponseProcessor {
 	}
 
 	public static List<DailyForecastDto> getTempDailyForecastDtoList(Context context, int count) {
-		final String minTemp = "-10℃";
-		final String maxTemp = "10℃";
+		final String minTemp = context.getString(R.string.temp_minTemperature);
+		final String maxTemp = context.getString(R.string.temp_maxTemperature);
 
-		final String zeroSnowVolume = "0.0mm";
-		final String zeroRainVolume = "0.0mm";
-		final String pop = "10%";
+		final String zeroSnowVolume =context.getString(R.string.temp_snowVolume);
+		final String zeroRainVolume =context.getString(R.string.temp_rainVolume);
+		final String pop = context.getString(R.string.temp_pop);
 
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
 
@@ -639,7 +638,7 @@ public class WeatherResponseProcessor {
 
 	public static AirQualityDto getTempAirQualityDto() {
 		AirQualityDto airQualityDto = new AirQualityDto();
-		airQualityDto.setAqi(160).setCityName("stationName");
+		airQualityDto.setAqi(160).setCityName("A");
 
 		AirQualityDto.Current current = new AirQualityDto.Current();
 		airQualityDto.setCurrent(current);

@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
@@ -41,8 +43,12 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.matteobattilana.weather.PrecipType;
+import com.google.android.ads.nativetemplates.NativeTemplateStyle;
+import com.google.android.ads.nativetemplates.TemplateView;
+import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
@@ -149,6 +155,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
 
 	private ExecutorService executorService = MyApplication.getExecutorService();
+	private DateTimeFormatter dateTimeFormatter;
 
 	private FragmentWeatherBinding binding;
 	private FavoriteAddressDto selectedFavoriteAddressDto;
@@ -327,9 +334,20 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		binding.mainToolbar.getRoot().setLayoutParams(layoutParams);
 
 		AdRequest adRequest = new AdRequest.Builder().build();
-
+		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_testUnitId))
+				.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
+					@Override
+					public void onNativeAdLoaded(NativeAd nativeAd) {
+						NativeTemplateStyle styles = new
+								NativeTemplateStyle.Builder().withMainBackgroundColor(new ColorDrawable(Color.WHITE)).build();
+						TemplateView template = binding.adViewBottom;
+						template.setStyles(styles);
+						template.setNativeAd(nativeAd);
+					}
+				})
+				.build();
+		adLoader.loadAd(adRequest);
 		binding.adViewBelowAirQuality.loadAd(adRequest);
-		binding.adViewBottom.loadAd(adRequest);
 
 		binding.adViewBelowAirQuality.setVisibility(View.GONE);
 		binding.adViewBottom.setVisibility(View.GONE);
@@ -1199,6 +1217,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		List<HourlyForecastDto> hourlyForecastDtoList = null;
 		List<DailyForecastDto> dailyForecastDtoList = null;
 
+		ZonedDateTime currentConditionsUpdatedTime = null;
+		ZonedDateTime hourlyForecastUpdatedTime = null;
+		ZonedDateTime dailyForecastUpdatedTime = null;
+		ZonedDateTime airQualityUpdatedTime = null;
+
 		final SimpleCurrentConditionsFragment simpleCurrentConditionsFragment = new SimpleCurrentConditionsFragment();
 		final SimpleHourlyForecastFragment simpleHourlyForecastFragment = new SimpleHourlyForecastFragment();
 		final SimpleDailyForecastFragment simpleDailyForecastFragment = new SimpleDailyForecastFragment();
@@ -1405,7 +1428,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 					changeWeatherDataSourcePicker(countryCode);
 					ZonedDateTime dateTime = multipleRestApiDownloader.getRequestDateTime();
-					DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
+					dateTimeFormatter = DateTimeFormatter.ofPattern(
 							clockUnit == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
 									getString(R.string.datetime_pattern_clock24), Locale.getDefault());
 					binding.updatedDatetime.setText(dateTime.format(dateTimeFormatter));
@@ -1488,6 +1511,22 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						}).create().show();
 			}
 		});
+	}
+
+	private void setWeatherDataInfo(ZonedDateTime currentConditions, ZonedDateTime hourlyForecast, ZonedDateTime dailyForecast,
+	                                ZonedDateTime airQuality) {
+		if (currentConditions != null) {
+			binding.weatherDataInfo.currentConditionsUpdatedTime.setText(currentConditions.format(dateTimeFormatter));
+		}
+		if (hourlyForecast != null) {
+			binding.weatherDataInfo.hourlyForecastUpdatedTime.setText(hourlyForecast.format(dateTimeFormatter));
+		}
+		if (dailyForecast != null) {
+			binding.weatherDataInfo.dailyForecastUpdatedTime.setText(dailyForecast.format(dateTimeFormatter));
+		}
+		if (airQuality != null) {
+			binding.weatherDataInfo.airQualityUpdatedTime.setText(airQuality.format(dateTimeFormatter));
+		}
 	}
 
 	public LocationType getLocationType() {

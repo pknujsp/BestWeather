@@ -27,7 +27,7 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 
 	@Override
 	public RemoteViews createRemoteViews(boolean needTempData) {
-		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_notification);
+		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.second_daily_noti_view);
 
 		if (needTempData) {
 			setTempDataViews(remoteViews);
@@ -53,36 +53,32 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto,
 	                       CurrentConditionsDto currentConditionsDto) {
-		RemoteViews valuesRemoveViews = new RemoteViews(context.getPackageName(), R.layout.second_daily_noti_view);
-
 		String precipitation = "";
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
 			precipitation += context.getString(R.string.precipitation) + ": " + currentConditionsDto.getPrecipitationVolume();
 		} else {
 			precipitation = context.getString(R.string.not_precipitation);
 		}
-		valuesRemoveViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
-		valuesRemoveViews.setTextViewText(R.id.humidity, currentConditionsDto.getHumidity());
-		valuesRemoveViews.setTextViewText(R.id.precipitation, precipitation);
-		valuesRemoveViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
+		remoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
+		remoteViews.setTextViewText(R.id.humidity, currentConditionsDto.getHumidity());
+		remoteViews.setTextViewText(R.id.precipitation, precipitation);
+		remoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
 
 		if (currentConditionsDto.getWindDirection() != null) {
-			valuesRemoveViews.setTextViewText(R.id.windDirection, currentConditionsDto.getWindDirection());
-			valuesRemoveViews.setTextViewText(R.id.windSpeed, currentConditionsDto.getWindSpeed());
-			valuesRemoveViews.setTextViewText(R.id.windStrength, currentConditionsDto.getWindStrength());
+			remoteViews.setTextViewText(R.id.windDirection, currentConditionsDto.getWindDirection());
+			remoteViews.setTextViewText(R.id.windSpeed, currentConditionsDto.getWindSpeed());
+			remoteViews.setTextViewText(R.id.windStrength, currentConditionsDto.getWindStrength());
 		} else {
-			valuesRemoveViews.setViewVisibility(R.id.windDirection, View.GONE);
-			valuesRemoveViews.setViewVisibility(R.id.windSpeed, View.GONE);
-			valuesRemoveViews.setTextViewText(R.id.windStrength, context.getString(R.string.noWindData));
+			remoteViews.setViewVisibility(R.id.windDirection, View.GONE);
+			remoteViews.setViewVisibility(R.id.windSpeed, View.GONE);
+			remoteViews.setTextViewText(R.id.windStrength, context.getString(R.string.noWindData));
 		}
 
-		valuesRemoveViews.setTextViewText(R.id.airQuality, context.getString(R.string.air_quality) + ": " +
+		remoteViews.setTextViewText(R.id.airQuality, context.getString(R.string.air_quality) + ": " +
 				AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 
-		valuesRemoveViews.setTextViewText(R.id.address, addressName);
-		valuesRemoveViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-
-		remoteViews.addView(R.id.valuesView, valuesRemoveViews);
+		remoteViews.setTextViewText(R.id.address, addressName);
+		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
 	}
 
 	@Override
@@ -102,10 +98,12 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, airQualityDto, currentConditionsDto);
 			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+			makeNotification(remoteViews, dailyPushNotificationDto.getId());
 		} else {
-			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			makeFailedNotification(dailyPushNotificationDto.getId(),context.getString(R.string.msg_failed_update));
+
 		}
-		makeNotification(remoteViews, dailyPushNotificationDto.getId());
+
 	}
 
 	@Override

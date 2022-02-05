@@ -2,8 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="180dp"
-    android:orientation="vertical">
+    android:layout_height="230dp"
+    android:orientation="vertical"
+    android:padding="@dimen/notificationPadding">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,13 +20,8 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/temp_address"
-                android:textColor="@color/blue"
-                android:textSize="13sp" />
+            <include layout="@layout/address_with_icon" />
+
 
             <TextView
                 android:id="@+id/measuring_station_name"
@@ -137,7 +133,8 @@
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginRight="4dp"
-            android:background="@color/aqi_1_good" />
+            android:background="@drawable/icon_rounded_rect_background"
+            android:backgroundTint="@color/aqi_1_good" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -151,7 +148,8 @@
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginRight="4dp"
-            android:background="@color/aqi_2_Moderate" />
+            android:background="@drawable/icon_rounded_rect_background"
+            android:backgroundTint="@color/aqi_2_Moderate" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -165,7 +163,9 @@
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginRight="4dp"
-            android:background="@color/aqi_3_unhealthy_for_sensitive_groups" />
+            android:background="@drawable/icon_rounded_rect_background"
+
+            android:backgroundTint="@color/aqi_3_unhealthy_for_sensitive_groups" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -179,7 +179,9 @@
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginRight="4dp"
-            android:background="@color/aqi_4_unhealthy" />
+            android:background="@drawable/icon_rounded_rect_background"
+
+            android:backgroundTint="@color/aqi_4_unhealthy" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -193,7 +195,9 @@
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginRight="4dp"
-            android:background="@color/aqi_5_very_unhealthy" />
+            android:background="@drawable/icon_rounded_rect_background"
+
+            android:backgroundTint="@color/aqi_5_very_unhealthy" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -207,7 +211,9 @@
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_marginRight="4dp"
-            android:background="@color/aqi_6_hazardous" />
+            android:background="@drawable/icon_rounded_rect_background"
+
+            android:backgroundTint="@color/aqi_6_hazardous" />
 
         <TextView
             android:layout_width="wrap_content"

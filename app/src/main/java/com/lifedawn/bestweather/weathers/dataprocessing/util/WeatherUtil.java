@@ -1,5 +1,12 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.util;
 
+import android.content.Context;
+
+import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
+
 public class WeatherUtil {
 	private WeatherUtil() {
 	}
@@ -27,6 +34,38 @@ public class WeatherUtil {
 							- Math.atan(humidity - 1.67633) + (0.00391838 * Math.pow(humidity, 1.5) * Math.atan(0.023101 * humidity)) - 4.686035;
 
 			return -0.2442 + (0.55399 * tw) + (0.45535 * celsiusTemperature) - (0.0022 * Math.pow(tw, 2)) + (0.00278 * tw * celsiusTemperature) + 3.5;
+		}
+	}
+
+	public static String makeTempCompareToYesterdayText(String currentTempText, String yesterdayTemp, ValueUnits tempUnit, Context context) {
+		String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+		int yesterdayTempVal = ValueUnits.convertTemperature(yesterdayTemp.replace(tempUnitStr,
+				""), tempUnit);
+		int todayTempVal = Integer.parseInt(currentTempText.replace(tempUnitStr, ""));
+
+		if (yesterdayTempVal == todayTempVal) {
+			return context.getString(R.string.TheTemperatureIsTheSameAsYesterday);
+		} else {
+			String text = null;
+
+			if (todayTempVal > yesterdayTempVal) {
+				if (MyApplication.getLocaleCountryCode().equals("KR")) {
+					text = context.getString(R.string.thanYesterday) + " " + (todayTempVal - yesterdayTempVal) + tempUnitStr
+							+ " " + context.getString(R.string.higherTemperature);
+				} else {
+					text = (todayTempVal - yesterdayTempVal) + tempUnitStr
+							+ " " + context.getString(R.string.higherTemperature) + " " + context.getString(R.string.thanYesterday);
+				}
+			} else {
+				if (MyApplication.getLocaleCountryCode().equals("KR")) {
+					text = context.getString(R.string.thanYesterday) + " " + (yesterdayTempVal - todayTempVal) + tempUnitStr
+							+ " " + context.getString(R.string.lowerTemperature);
+				} else {
+					text = (todayTempVal - yesterdayTempVal) + tempUnitStr
+							+ " " + context.getString(R.string.lowerTemperature) + " " + context.getString(R.string.thanYesterday);
+				}
+			}
+			return text;
 		}
 	}
 }

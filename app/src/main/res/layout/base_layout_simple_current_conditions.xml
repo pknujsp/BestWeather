@@ -26,7 +26,7 @@
                 android:layout_gravity="center"
                 android:layout_marginRight="6dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/temp_icon" />
+                android:src="@drawable/day_clear" />
 
             <TextView
                 android:id="@+id/sky"
@@ -158,7 +158,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/temperature"
-            android:text="tempDescription"
+            android:text="@string/temp_yesterdayTemperature"
             android:textSize="15sp" />
 
 

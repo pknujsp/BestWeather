@@ -211,5 +211,7 @@
     <dimen name="dialogPadding">24dp</dimen>
     <dimen name="cardLRPadding">16dp</dimen>
     <dimen name="feelsLikeTempTextSizeInFirstWidget">20sp</dimen>
+    <dimen name="yesterdayTempTextSizeInCurrentWidget">14sp</dimen>
+    <dimen name="yesterdayTempTextSizeInThirdWidget">14sp</dimen>
 
 </resources>

@@ -21,6 +21,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
@@ -129,6 +130,12 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		((TextView) view.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
 		((TextView) view.findViewById(R.id.airQuality)).setTextSize(TypedValue.COMPLEX_UNIT_PX, aqiTextSize);
 		((TextView) view.findViewById(R.id.precipitation)).setTextSize(TypedValue.COMPLEX_UNIT_PX, precipitationTextSize);
+
+		if (currentConditionsDto.getYesterdayTemp() != null) {
+			String yesterdayCompText = WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
+					currentConditionsDto.getYesterdayTemp(), tempUnit, context);
+			((TextView) view.findViewById(R.id.yesterdayTemperature)).setText(yesterdayCompText);
+		}
 	}
 
 	public void setHourlyForecastViews(View view, LayoutInflater layoutInflater, List<HourlyForecastDto> hourlyForecastDtoList) {

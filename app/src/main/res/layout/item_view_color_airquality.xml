@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_weight="1"
@@ -11,32 +12,38 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        android:textColor="@color/black"
         android:text="@string/date"
+        android:textColor="@color/black"
         android:textSize="13sp" />
 
-    <ImageView
+    <TextView
         android:id="@+id/pm10"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="3dp"
         android:layout_weight="1"
-        android:background="@color/aqi_1_good" />
+        android:gravity="center"
+        android:text="12"
+        android:textSize="13sp"
+        android:textStyle="bold" />
 
-    <ImageView
+    <TextView
         android:id="@+id/pm25"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="3dp"
         android:layout_weight="1"
-        android:background="@color/aqi_2_Moderate" />
+        android:gravity="center"
+        android:text="12"
+        android:textSize="13sp"
+        android:textStyle="bold" />
 
-    <ImageView
+    <TextView
         android:id="@+id/o3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="3dp"
         android:layout_weight="1"
-        android:background="@color/aqi_3_unhealthy_for_sensitive_groups" />
+        android:gravity="center"
+        android:text="12"
+        android:textSize="13sp"
+        android:textStyle="bold" />
 
 </LinearLayout>

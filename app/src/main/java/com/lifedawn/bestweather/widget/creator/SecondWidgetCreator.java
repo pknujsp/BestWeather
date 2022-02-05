@@ -98,7 +98,7 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 	public View makeCurrentConditionsViews(LayoutInflater layoutInflater, CurrentConditionsDto currentConditionsDto,
 	                                       AirQualityDto airQualityDto) {
 		View view = layoutInflater.inflate(R.layout.view_current_conditions_for_simple_widget, null, false);
-		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp().replace(tempDegree, ""));
+		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp().replace(tempDegree, "°"));
 		((ImageView) view.findViewById(R.id.weatherIcon)).setImageResource(currentConditionsDto.getWeatherIcon());
 
 		String precipitation = "";

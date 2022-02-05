@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -33,6 +34,7 @@ import com.lifedawn.bestweather.notification.model.AlwaysNotiDataObj;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
@@ -99,7 +101,7 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 		ZoneOffset zoneOffset = null;
 		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
-		int icon = R.drawable.temp_icon;
+		int icon = R.mipmap.ic_launcher_foreground;
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
 				requestWeatherDataSourceType);
@@ -170,7 +172,13 @@ public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
 				context.getString(R.string.wind) + ": " + currentConditionsDto.getWindSpeed();
 		remoteViews.setTextViewText(R.id.windSpeed, windSpeedStr);
 		remoteViews.setTextViewText(R.id.temp, currentConditionsDto.getTemp());
-		remoteViews.setTextViewText(R.id.feelsLikeTemp, new String(context.getString(R.string.feelsLike) + " : " + currentConditionsDto.getFeelsLikeTemp()));
+		remoteViews.setTextViewText(R.id.feelsLikeTemp, new String(context.getString(R.string.feelsLike) + ": " + currentConditionsDto.getFeelsLikeTemp()));
+
+		if (currentConditionsDto.getYesterdayTemp() != null) {
+			String yesterdayCompText = WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
+					currentConditionsDto.getYesterdayTemp(), tempUnit, context);
+			remoteViews.setTextViewText(R.id.yesterdayTemperature, yesterdayCompText);
+		}
 	}
 
 	public void setHourlyForecastViews(RemoteViews remoteViews, List<HourlyForecastDto> hourlyForecastDtoList) {

@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
 
@@ -65,21 +66,9 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		binding.feelsLikeTempUnit.setText(tempUnitStr);
 
 		if (currentConditionsDto.getYesterdayTemp() != null) {
-			int yesterdayTemp = ValueUnits.convertTemperature(currentConditionsDto.getYesterdayTemp().replace(tempUnitStr, ""), tempUnit);
-			int todayTemp = Integer.parseInt(currentTempText);
+			binding.tempDescription.setText(WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
+					currentConditionsDto.getYesterdayTemp(), tempUnit, getContext()));
 
-			if (yesterdayTemp == todayTemp) {
-				binding.tempDescription.setText(R.string.TheTemperatureIsTheSameAsYesterday);
-			} else {
-				String text = getString(R.string.thanYesterday);
-
-				if (todayTemp > yesterdayTemp) {
-					text += " " + (todayTemp - yesterdayTemp) + tempUnitStr + " " + getString(R.string.higherTemperature);
-				} else {
-					text += " " + (yesterdayTemp - todayTemp) + tempUnitStr + " " + getString(R.string.lowerTemperature);
-				}
-				binding.tempDescription.setText(text);
-			}
 			binding.tempDescription.setVisibility(View.VISIBLE);
 		} else {
 			binding.tempDescription.setVisibility(View.GONE);

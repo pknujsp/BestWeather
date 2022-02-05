@@ -48,9 +48,32 @@ public abstract class AbstractDailyNotiViewCreator {
 		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Daily);
 
 		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
-		builder.setSmallIcon(R.drawable.ic_launcher_foreground).setAutoCancel(true).setContentIntent(PendingIntent.getActivity(context, notificationObj.getNotificationId(),
+		builder.setSmallIcon(R.mipmap.ic_launcher_foreground).setAutoCancel(true).setContentIntent(PendingIntent.getActivity(context,
+				notificationObj.getNotificationId(),
 				IntentUtil.getAppIntent(context), PendingIntent.FLAG_UPDATE_CURRENT))
 				.setCustomContentView(remoteViews).setCustomBigContentView(remoteViews);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			builder.setPriority(NotificationCompat.PRIORITY_HIGH).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+		}
+
+		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+		Notification notification = notificationObj.getNotificationBuilder().build();
+		notificationManager.notify(notificationObj.getNotificationId() + notificationDtoId, notification);
+
+		if (handler != null) {
+			Message message = handler.obtainMessage();
+			message.obj = "finished";
+			handler.sendMessage(message);
+		}
+	}
+
+	public void makeFailedNotification(int notificationDtoId, String failText) {
+		NotificationHelper notificationHelper = new NotificationHelper(context);
+		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Daily);
+
+		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
+		builder.setSmallIcon(R.mipmap.ic_launcher_foreground).setAutoCancel(true).setContentText(failText).setContentTitle(context.getString(R.string.errorNotification));
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 			builder.setPriority(NotificationCompat.PRIORITY_HIGH).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);

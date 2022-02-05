@@ -141,8 +141,7 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getNo2()));
 
 		for (int i = 0; i < 3; i++) {
-			addAirQualityGridItem(layoutInflater, gridLayout, particleNames[i], gradeValueList.get(i), gradeDescriptionList.get(i)
-			);
+			addAirQualityGridItem(layoutInflater, gridLayout, particleNames[i], gradeValueList.get(i), gradeDescriptionList.get(i));
 		}
 
 		LinearLayout forecastLayout = seventhView.findViewById(R.id.airQualityForecast);
@@ -247,7 +246,16 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		gradeValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, currentGradeValueTextSize);
 		gradeDescriptionTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, currentGradeDescriptionTextSize);
 
-		gridLayout.addView(view);
+		int cellCount = gridLayout.getChildCount();
+		int row = cellCount / gridLayout.getColumnCount();
+		int column = cellCount % gridLayout.getColumnCount();
+
+		GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+
+		layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
+		layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
+
+		gridLayout.addView(view, layoutParams);
 	}
 
 	@Override

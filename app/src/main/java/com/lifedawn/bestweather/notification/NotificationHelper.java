@@ -65,7 +65,7 @@ public class NotificationHelper {
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationObj.channelId);
 
-		builder.setSmallIcon(R.drawable.temp_icon)
+		builder.setSmallIcon(R.mipmap.ic_launcher_foreground)
 				.setContentIntent(pendingIntent)
 				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 

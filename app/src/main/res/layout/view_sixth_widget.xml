@@ -65,10 +65,12 @@
 
     <androidx.gridlayout.widget.GridLayout
         android:id="@+id/airQualityGrid"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        app:alignmentMode="alignBounds"
         app:columnCount="3"
-        app:orientation="horizontal" />
+        app:orientation="horizontal"
+        app:rowOrderPreserved="false"
+        app:useDefaultMargins="false" />
 
 </LinearLayout>

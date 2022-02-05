@@ -113,4 +113,6 @@ dependencies {
 
     implementation 'com.github.MatteoBattilana:WeatherView:3.0.0'
 
+    implementation project(':nativetemplates')
+
 }

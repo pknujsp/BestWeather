@@ -231,14 +231,25 @@
                         android:layout_marginRight="8dp"
                         android:layout_marginBottom="24dp" />
 
-                    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+                    <com.google.android.ads.nativetemplates.TemplateView
                         android:id="@+id/adViewBottom"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_below="@id/sun_set_rise"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
                         android:layout_marginBottom="24dp"
-                        ads:adSize="BANNER"
-                        ads:adUnitId="@string/BANNER_testUnitId" />
+                        app:gnt_template_type="@layout/gnt_medium_template_view" />
+
+                    <include
+                        android:id="@+id/weatherDataInfo"
+                        layout="@layout/weather_data_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/adViewBottom"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginRight="16dp"
+                        android:layout_marginBottom="24dp" />
                 </RelativeLayout>
 
             </androidx.core.widget.NestedScrollView>

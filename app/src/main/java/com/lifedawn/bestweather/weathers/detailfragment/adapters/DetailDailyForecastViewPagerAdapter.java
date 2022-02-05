@@ -4,15 +4,20 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.gridlayout.widget.GridLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.ItemviewDetailDailyForecastBinding;
+import com.lifedawn.bestweather.weathers.detailfragment.dto.GridItemDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -50,6 +55,12 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 	}
 
 	@Override
+	public void onViewRecycled(@NonNull ViewHolder holder) {
+		holder.clear();
+		super.onViewRecycled(holder);
+	}
+
+	@Override
 	public int getItemCount() {
 		return dailyForecastDtoList.size();
 	}
@@ -62,15 +73,20 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 			binding = ItemviewDetailDailyForecastBinding.bind(itemView);
 		}
 
-		public void onBind(DailyForecastDto dailyForecastDto) {
+		public void clear() {
 			binding.amList.removeAllViews();
+			binding.precipitationGridLayout.removeAllViews();
+		}
 
+		public void onBind(DailyForecastDto dailyForecastDto) {
 			binding.date.setText(dailyForecastDto.getDate().format(dateFormatter));
 
 			binding.minTemp.setText(dailyForecastDto.getMinTemp());
 			binding.maxTemp.setText(dailyForecastDto.getMaxTemp());
 
 			List<LabelValueItem> labelValueItemList = new ArrayList<>();
+
+			setPrecipitationGridItems(dailyForecastDto);
 
 			//날씨 아이콘, 최저/최고 기온, 강수확률, 강수량, 강우량, 강설량 설정
 			if (dailyForecastDto.isSingle()) {
@@ -81,21 +97,6 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				binding.rightIcon.setVisibility(View.GONE);
 
 				binding.weatherDescription.setText(dailyForecastDto.getSingleValues().getWeatherDescription());
-
-				addListItem(labelValueItemList, context.getString(R.string.probability_of_precipitation), dailyForecastDto.getSingleValues().getPop());
-
-				if (dailyForecastDto.getSingleValues().isHasPrecipitationVolume()) {
-					addListItem(labelValueItemList, context.getString(R.string.precipitation_volume),
-							dailyForecastDto.getSingleValues().getPrecipitationVolume());
-				}
-				if (dailyForecastDto.getSingleValues().isHasRainVolume()) {
-					addListItem(labelValueItemList, context.getString(R.string.rain_volume),
-							dailyForecastDto.getSingleValues().getRainVolume());
-				}
-				if (dailyForecastDto.getSingleValues().isHasSnowVolume()) {
-					addListItem(labelValueItemList, context.getString(R.string.snow_volume),
-							dailyForecastDto.getSingleValues().getSnowVolume());
-				}
 
 				addListItem(labelValueItemList, context.getString(R.string.wind_direction), dailyForecastDto.getSingleValues().getWindDirection());
 				addListItem(labelValueItemList, context.getString(R.string.wind_speed), dailyForecastDto.getSingleValues().getWindSpeed());
@@ -119,41 +120,6 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				binding.leftIcon.setVisibility(View.VISIBLE);
 				binding.rightIcon.setVisibility(View.VISIBLE);
 
-				addListItem(labelValueItemList, context.getString(R.string.probability_of_precipitation),
-						dailyForecastDto.getAmValues().getPop(),
-						dailyForecastDto.getPmValues().getPop());
-
-				if (dailyForecastDto.getAmValues().isHasPrecipitationVolume() ||
-						dailyForecastDto.getPmValues().isHasPrecipitationVolume()) {
-					addListItem(labelValueItemList, context.getString(R.string.precipitation_volume),
-							dailyForecastDto.getAmValues().getPrecipitationVolume(),
-							dailyForecastDto.getPmValues().getPrecipitationVolume());
-				}
-
-				if (dailyForecastDto.getAmValues().isHasRainVolume() ||
-						dailyForecastDto.getPmValues().isHasRainVolume()) {
-					addListItem(labelValueItemList, context.getString(R.string.rain_volume),
-							dailyForecastDto.getAmValues().getRainVolume(),
-							dailyForecastDto.getPmValues().getRainVolume());
-				}
-
-				if (dailyForecastDto.getAmValues().isHasSnowVolume() ||
-						dailyForecastDto.getPmValues().isHasSnowVolume()) {
-					addListItem(labelValueItemList, context.getString(R.string.snow_volume),
-							dailyForecastDto.getAmValues().getSnowVolume(),
-							dailyForecastDto.getPmValues().getSnowVolume());
-				}
-
-				addListItem(labelValueItemList, context.getString(R.string.probability_of_rain),
-						dailyForecastDto.getAmValues().getPor(), dailyForecastDto.getPmValues().getPor());
-
-				if (dailyForecastDto.getAmValues().getPos() != null || dailyForecastDto.getPmValues().getPos() != null) {
-					if (!dailyForecastDto.getAmValues().getPos().equals(zeroPercent) || !dailyForecastDto.getPmValues().getPos().equals(zeroPercent)) {
-						addListItem(labelValueItemList, context.getString(R.string.probability_of_snow),
-								dailyForecastDto.getAmValues().getPos(), dailyForecastDto.getPmValues().getPos());
-					}
-				}
-
 				addListItem(labelValueItemList, context.getString(R.string.wind_direction),
 						dailyForecastDto.getAmValues().getWindDirection(), dailyForecastDto.getPmValues().getWindDirection());
 				addListItem(labelValueItemList, context.getString(R.string.wind_speed), dailyForecastDto.getAmValues().getWindSpeed(), dailyForecastDto.getPmValues().getWindSpeed());
@@ -175,7 +141,96 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 			}
 
 		}
+
+		protected void addGridItems(List<GridItemDto> gridItemDtos) {
+			TextView label = null;
+			TextView value = null;
+			View convertView = null;
+			final int blueColor = ContextCompat.getColor(context, R.color.blue);
+
+			for (GridItemDto gridItem : gridItemDtos) {
+				convertView = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null, false);
+
+				label = convertView.findViewById(R.id.label);
+				value = convertView.findViewById(R.id.value);
+				convertView.findViewById(R.id.label_icon).setVisibility(View.GONE);
+
+				label.setText(gridItem.label);
+				value.setText(gridItem.value);
+				value.setTextColor(blueColor);
+
+				int cellCount = binding.precipitationGridLayout.getChildCount();
+				int row = cellCount / binding.precipitationGridLayout.getColumnCount();
+				int column = cellCount % binding.precipitationGridLayout.getColumnCount();
+
+				GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+
+				layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
+				layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
+
+				binding.precipitationGridLayout.addView(convertView, layoutParams);
+			}
+		}
+
+		private void setPrecipitationGridItems(DailyForecastDto dailyForecastDto) {
+			List<GridItemDto> gridItemDtoList = new ArrayList<>();
+
+			if (dailyForecastDto.isSingle()) {
+				final DailyForecastDto.Values single = dailyForecastDto.getSingleValues();
+
+				if (single.getPop() != null) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.probability_of_precipitation), single.getPop(), null));
+				}
+				if (single.getPor() != null) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.probability_of_rain), single.getPor(), null));
+				}
+				if (single.getPos() != null) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.probability_of_snow), single.getPos(), null));
+				}
+				if (single.isHasPrecipitationVolume()) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.precipitation_volume), single.getPrecipitationVolume(), null));
+				}
+				if (single.isHasRainVolume()) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.rain_volume), single.getRainVolume(), null));
+				}
+				if (single.isHasSnowVolume()) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.snow_volume), single.getSnowVolume(), null));
+				}
+			} else {
+				final DailyForecastDto.Values am = dailyForecastDto.getAmValues();
+				final DailyForecastDto.Values pm = dailyForecastDto.getPmValues();
+				final String divider = " / ";
+
+				if (am.getPop() != null || pm.getPop() != null) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.probability_of_precipitation), am.getPop() + divider + pm.getPop(),
+							null));
+				}
+				if (am.getPor() != null || pm.getPor() != null) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.probability_of_rain), am.getPor() + divider + pm.getPor(),
+							null));
+				}
+				if (am.getPos() != null || pm.getPos() != null) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.probability_of_snow), am.getPos() + divider + pm.getPos(), null));
+				}
+				if (am.isHasPrecipitationVolume()) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.precipitation_volume),
+							am.getPrecipitationVolume() + divider + pm.getPrecipitationVolume(),
+							null));
+				}
+				if (am.isHasRainVolume()) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.rain_volume),
+							am.getRainVolume() + divider + pm.getRainVolume(), null));
+				}
+				if (am.isHasSnowVolume()) {
+					gridItemDtoList.add(new GridItemDto(context.getString(R.string.snow_volume),
+							am.getSnowVolume() + divider + pm.getSnowVolume(), null));
+				}
+			}
+
+			addGridItems(gridItemDtoList);
+		}
 	}
+
 
 	protected void addListItem(List<LabelValueItem> list, String label, @Nullable String val) {
 		if (val != null) {

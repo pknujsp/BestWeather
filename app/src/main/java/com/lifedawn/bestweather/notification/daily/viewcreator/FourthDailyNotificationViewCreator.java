@@ -32,7 +32,7 @@ public class FourthDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 
 	@Override
 	public RemoteViews createRemoteViews(boolean needTempData) {
-		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_notification);
+		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.fourth_daily_noti_view);
 
 		if (needTempData) {
 			setTempDataViews(remoteViews);
@@ -49,32 +49,28 @@ public class FourthDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 
 
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto) {
-		RemoteViews valuesRemoveViews = new RemoteViews(context.getPackageName(), R.layout.fourth_daily_noti_view);
-
-		valuesRemoveViews.setTextViewText(R.id.address, addressName);
-		valuesRemoveViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
+		remoteViews.setTextViewText(R.id.address, addressName);
+		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
 
 		final String noData = "-";
-		valuesRemoveViews.setTextViewText(R.id.measuring_station_name,
+		remoteViews.setTextViewText(R.id.measuring_station_name,
 				context.getString(R.string.measuring_station_name) + ": " + (airQualityDto.getCityName() == null ?
 						noData : airQualityDto.getCityName()));
-		valuesRemoveViews.setTextViewText(R.id.airQuality,
+		remoteViews.setTextViewText(R.id.airQuality,
 				context.getString(R.string.currentAirQuality) + "\n" + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 
-		valuesRemoveViews.setTextViewText(R.id.pm10, !airQualityDto.getCurrent().isHasPm10() ? noData :
+		remoteViews.setTextViewText(R.id.pm10, !airQualityDto.getCurrent().isHasPm10() ? noData :
 				AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getPm10()));
-		valuesRemoveViews.setTextViewText(R.id.pm25, !airQualityDto.getCurrent().isHasPm25() ? noData :
+		remoteViews.setTextViewText(R.id.pm25, !airQualityDto.getCurrent().isHasPm25() ? noData :
 				AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getPm25()));
-		valuesRemoveViews.setTextViewText(R.id.so2, !airQualityDto.getCurrent().isHasSo2() ? noData :
+		remoteViews.setTextViewText(R.id.so2, !airQualityDto.getCurrent().isHasSo2() ? noData :
 				AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getSo2()));
-		valuesRemoveViews.setTextViewText(R.id.co, !airQualityDto.getCurrent().isHasCo() ? noData :
+		remoteViews.setTextViewText(R.id.co, !airQualityDto.getCurrent().isHasCo() ? noData :
 				AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getCo()));
-		valuesRemoveViews.setTextViewText(R.id.o3, !airQualityDto.getCurrent().isHasO3() ? noData :
+		remoteViews.setTextViewText(R.id.o3, !airQualityDto.getCurrent().isHasO3() ? noData :
 				AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getO3()));
-		valuesRemoveViews.setTextViewText(R.id.no2, !airQualityDto.getCurrent().isHasNo2() ? noData :
+		remoteViews.setTextViewText(R.id.no2, !airQualityDto.getCurrent().isHasNo2() ? noData :
 				AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getNo2()));
-
-		remoteViews.addView(R.id.valuesView, valuesRemoveViews);
 	}
 
 
@@ -88,10 +84,12 @@ public class FourthDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 		if (successful) {
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, airQualityDto);
 			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+			makeNotification(remoteViews, dailyPushNotificationDto.getId());
 		} else {
-			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			makeFailedNotification(dailyPushNotificationDto.getId(), context.getString(R.string.msg_failed_update));
+
 		}
-		makeNotification(remoteViews, dailyPushNotificationDto.getId());
+
 	}
 
 	@Override
