@@ -64,7 +64,7 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 				context.getString(R.string.measuring_station_name) + ": " + (airQualityDto.getCityName() == null ?
 						noData : airQualityDto.getCityName()));
 		valuesRemoteViews.setTextViewText(R.id.airQuality,
-				context.getString(R.string.currentAirQuality) + "\n" + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
+				context.getString(R.string.currentAirQuality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 
 		AirQualityDto.DailyForecast current = new AirQualityDto.DailyForecast();
 		current.setDate(null).setPm10(new AirQualityDto.DailyForecast.Val().setAvg(airQualityDto.getCurrent().getPm10()))

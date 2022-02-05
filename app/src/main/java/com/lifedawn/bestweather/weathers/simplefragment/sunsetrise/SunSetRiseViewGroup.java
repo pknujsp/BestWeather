@@ -231,8 +231,10 @@ public class SunSetRiseViewGroup extends FrameLayout {
 					type2PointOnLine.y + dividerHeight,
 					dividerPaint);
 
+			/*
 			img.setBounds(imgRect);
 			img.draw(canvas);
+			 */
 
 			drawCurrent(now.format(dateTimeFormatter), canvas);
 		}

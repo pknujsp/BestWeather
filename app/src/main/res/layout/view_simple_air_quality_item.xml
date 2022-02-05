@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="2dp"
-        android:text="label"
+        android:text="@string/pm10_str"
         android:textColor="@color/black"
         android:textSize="@dimen/labelTextSizeInSimpleAirQualityItem" />
 
@@ -35,7 +35,7 @@
             android:id="@+id/gradeDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="description"
+            android:text="@string/aqi_1_good"
             android:textColor="@color/black"
             android:textSize="@dimen/gradeDescriptionTextSizeInSimpleAirQualityItem" />
 

@@ -142,7 +142,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		final int padding = (int) context.getResources().getDimension(R.dimen.forecastItemViewInLinearPadding);
 
 		for (int i = 0; i < hourlyForecastCount; i++) {
-			View itemView = layoutInflater.inflate(R.layout.view_hourly_forecast_item_in_linear, null, false);
+			View itemView = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
 			itemView.setLayoutParams(layoutParams);
 			itemView.setPadding(0, padding, 0, padding);
 
@@ -152,11 +152,15 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 				hours = String.valueOf(hourlyForecastDtoList.get(i).getHours().getHour());
 			}
 
-			((TextView) itemView.findViewById(R.id.hour)).setText(hours);
+			((TextView) itemView.findViewById(R.id.dateTime)).setText(hours);
 			((TextView) itemView.findViewById(R.id.temperature)).setText(hourlyForecastDtoList.get(i).getTemp());
-			((ImageView) itemView.findViewById(R.id.weatherIcon)).setImageResource(hourlyForecastDtoList.get(i).getWeatherIcon());
+			((ImageView) itemView.findViewById(R.id.leftIcon)).setImageResource(hourlyForecastDtoList.get(i).getWeatherIcon());
+			itemView.findViewById(R.id.rightIcon).setVisibility(View.GONE);
+			itemView.findViewById(R.id.popLayout).setVisibility(View.GONE);
+			itemView.findViewById(R.id.rainVolumeLayout).setVisibility(View.GONE);
+			itemView.findViewById(R.id.snowVolumeLayout).setVisibility(View.GONE);
 
-			((TextView) itemView.findViewById(R.id.hour)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourlyForecastHourTextSize);
+			((TextView) itemView.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourlyForecastHourTextSize);
 			((TextView) itemView.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourlyForecastTempTextSize);
 
 			if (i >= hourlyForecastCount / 2) {
@@ -179,11 +183,11 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		final int padding = (int) context.getResources().getDimension(R.dimen.forecastItemViewInLinearPadding);
 
 		for (int day = 0; day < dailyForecastCount; day++) {
-			View itemView = layoutInflater.inflate(R.layout.view_daily_forecast_item_in_linear, null, false);
+			View itemView = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
 			itemView.setLayoutParams(layoutParams);
 			itemView.setPadding(0, padding, 0, padding);
 
-			((TextView) itemView.findViewById(R.id.date)).setText(dailyForecastDtoList.get(day).getDate().format(dateFormatter));
+			((TextView) itemView.findViewById(R.id.dateTime)).setText(dailyForecastDtoList.get(day).getDate().format(dateFormatter));
 			temp = dailyForecastDtoList.get(day).getMinTemp() + "/" + dailyForecastDtoList.get(day).getMaxTemp();
 			((TextView) itemView.findViewById(R.id.temperature)).setText(temp);
 
@@ -195,7 +199,11 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 				((ImageView) itemView.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(day).getPmValues().getWeatherIcon());
 			}
 
-			((TextView) itemView.findViewById(R.id.date)).setTextSize(TypedValue.COMPLEX_UNIT_PX, dailyForecastDateTextSize);
+			itemView.findViewById(R.id.popLayout).setVisibility(View.GONE);
+			itemView.findViewById(R.id.rainVolumeLayout).setVisibility(View.GONE);
+			itemView.findViewById(R.id.snowVolumeLayout).setVisibility(View.GONE);
+
+			((TextView) itemView.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, dailyForecastDateTextSize);
 			((TextView) itemView.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, dailyForecastTempTextSize);
 
 			((ViewGroup) view.findViewById(R.id.daily_forecast_row)).addView(itemView);

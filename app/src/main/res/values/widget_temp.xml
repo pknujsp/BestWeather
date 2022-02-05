@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="temp_airQuality">대기질: 좋음</string>
+    <string name="temp_precipitationRain">비: 1.2mm</string>
+    <string name="temp_noPrecipitation">강수없음</string>
+    <string name="temp_temperature">12℃</string>
+    <string name="temp_feelsLikeTemperature">체감: 12℃</string>
+    <string name="temp_address">주소</string>
+    <string name="temp_date">3.6 월</string>
+    <string name="temp_time">16:30</string>
+    <string name="temp_dateTime">3.6 월 16:30</string>
+    <string name="temp_windDirection">남</string>
+    <string name="temp_windSpeed">2.2m/s</string>
+    <string name="temp_simpleWindStrength">약</string>
+    <string name="temp_detailWindStrength">약한 바람</string>
+    <string name="temp_humidity">습도: 50%</string>
+    <string name="temp_pop">10%</string>
+    <string name="temp_rainVolume">0.0mm</string>
+    <string name="temp_snowVolume">0.0cm</string>
+    <string name="temp_precipitationVolume">0.0mm</string>
+    <string name="temp_measuringStation">측정소: A측정소</string>
+</resources>

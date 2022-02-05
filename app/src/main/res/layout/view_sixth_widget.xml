@@ -14,11 +14,9 @@
         android:textColor="@color/widgetTextColor"
         android:textSize="@dimen/stationNameTextSizeInSixthWidget" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/weatherIcon"
@@ -30,24 +28,26 @@
 
         <TextView
             android:id="@+id/temperature"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif-thin"
-            android:text="5°"
+            android:layout_toRightOf="@id/weatherIcon"
+            android:text="@string/temp_temperature"
             android:textColor="@color/widgetTextColor"
             android:textSize="@dimen/tempTextSizeInSixthWidget" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/precipitation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/not_precipitation"
+                android:text="@string/temp_noPrecipitation"
                 android:textColor="@color/widgetTextColor"
                 android:textSize="@dimen/precipitationtTextSizeInSixthWidget" />
 
@@ -55,13 +55,13 @@
                 android:id="@+id/airQuality"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/air_quality"
+                android:text="@string/temp_airQuality"
                 android:textColor="@color/widgetTextColor"
                 android:textSize="@dimen/airQualityTextSizeInSixthWidget" />
 
         </LinearLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <androidx.gridlayout.widget.GridLayout
         android:id="@+id/airQualityGrid"

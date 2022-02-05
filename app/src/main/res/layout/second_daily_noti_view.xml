@@ -25,9 +25,8 @@
             android:layout_alignTop="@id/weatherIcon"
             android:layout_alignBottom="@id/weatherIcon"
             android:layout_toRightOf="@id/weatherIcon"
-            android:fontFamily="sans-serif-thin"
             android:gravity="center_vertical"
-            android:text="15°"
+            android:text="@string/temp_temperature"
             android:textColor="@color/black"
             android:textSize="32sp" />
 
@@ -42,7 +41,7 @@
                 android:id="@+id/address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/address_name"
+                android:text="@string/temp_address"
                 android:textColor="@color/blue"
                 android:textSize="14sp" />
 
@@ -57,7 +56,7 @@
                     android:id="@+id/refresh"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10.11 Mon 14:20"
+                    android:text="@string/temp_dateTime"
                     android:textColor="@color/textColorInNotification"
                     android:textSize="13sp" />
 
@@ -89,7 +88,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="@string/not_precipitation"
+                android:text="@string/temp_noPrecipitation"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
@@ -98,7 +97,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
-                android:text="@string/humidity"
+                android:text="@string/temp_humidity"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
@@ -106,7 +105,7 @@
                 android:id="@+id/airQuality"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/air_quality"
+                android:text="@string/temp_airQuality"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
         </LinearLayout>
@@ -131,7 +130,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="4dp"
-                    android:text="@string/wind_direction"
+                    android:text="@string/temp_windDirection"
                     android:textColor="@color/black"
                     android:textSize="13sp" />
 
@@ -139,7 +138,7 @@
                     android:id="@+id/windSpeed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2.1m/s"
+                    android:text="@string/temp_windSpeed"
                     android:textColor="@color/black"
                     android:textSize="13sp" />
 
@@ -150,7 +149,7 @@
                 android:id="@+id/windStrength"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/wind_strength_2"
+                android:text="@string/temp_detailWindStrength"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 

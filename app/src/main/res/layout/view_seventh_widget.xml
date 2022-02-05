@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:layout_weight="1"
-            android:text="@string/measuring_station_name"
+            android:text="@string/temp_measuringStation"
             android:textColor="@color/widgetTextColor"
             android:textSize="@dimen/stationNameTextSizeInSeventhWidget" />
 
@@ -27,7 +27,7 @@
             android:id="@+id/airQuality"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/air_quality"
+            android:text="@string/temp_airQuality"
             android:textColor="@color/widgetTextColor"
             android:textSize="@dimen/airQualityTextSizeInSeventhWidget" />
     </LinearLayout>

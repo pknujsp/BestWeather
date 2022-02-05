@@ -23,7 +23,7 @@
                 android:id="@+id/address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/address_name"
+                android:text="@string/temp_address"
                 android:textColor="@color/blue"
                 android:textSize="13sp" />
 
@@ -31,7 +31,7 @@
                 android:id="@+id/measuring_station_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/measuring_station_name"
+                android:text="@string/temp_measuringStation"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
@@ -51,7 +51,7 @@
                     android:id="@+id/refresh"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10.11 Mon 14:20"
+                    android:text="@string/temp_dateTime"
                     android:textColor="@color/textColorInNotification"
                     android:textSize="13sp" />
 
@@ -63,7 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Current AQI\nGood"
+            android:text="@string/temp_airQuality"
             android:textColor="@color/black"
             android:textSize="14sp" />
 
@@ -92,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-thin"
-                android:text="Good"
+                android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
@@ -115,7 +115,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-thin"
-                android:text="Good"
+                android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
@@ -138,7 +138,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-thin"
-                android:text="Good"
+                android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
@@ -161,7 +161,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-thin"
-                android:text="Good"
+                android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
@@ -184,7 +184,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-thin"
-                android:text="Good"
+                android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 
@@ -207,7 +207,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-thin"
-                android:text="Good"
+                android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
 

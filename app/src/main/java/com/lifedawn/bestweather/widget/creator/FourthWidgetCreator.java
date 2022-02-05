@@ -160,7 +160,7 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 
 		List<Integer> minTempList = new ArrayList<>();
 		List<Integer> maxTempList = new ArrayList<>();
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEE");
+		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("E");
 		String pop = null;
 
 		boolean haveRain = false;

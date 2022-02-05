@@ -23,7 +23,7 @@
         android:layout_toRightOf="@id/locationId"
         android:maxLines="1"
         android:minLines="1"
-        android:text="@string/address_name"
+        android:text="@string/temp_address"
         android:textColor="@color/widgetTextColor"
         android:textSize="@dimen/addressTextSizeInCommonWidgetHeader" />
 
