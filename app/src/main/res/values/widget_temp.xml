@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="temp_airQuality">대기질: 좋음</string>
-    <string name="temp_precipitationRain">비: 1.2mm</string>
-    <string name="temp_noPrecipitation">강수없음</string>
-    <string name="temp_temperature">12℃</string>
+    <string name="temp_airQuality">aqi: good</string>
+    <string name="temp_precipitationRain">rain: 1.2mm</string>
+    <string name="temp_noPrecipitation">no precipitation</string>
+    <string name="temp_temperature" translatable="false">12℃</string>
     <string name="temp_yesterdayTemperature">어제보다 2℃ 낮음</string>
-    <string name="temp_minTemperature">7℃</string>
-    <string name="temp_maxTemperature">13℃</string>
-    <string name="temp_feelsLikeTemperature">체감: 12℃</string>
-    <string name="temp_address">주소</string>
-    <string name="temp_date">3.6 월</string>
-    <string name="temp_time">16:30</string>
-    <string name="temp_dateTime">3.6 월 16:30</string>
-    <string name="temp_windDirection">남</string>
-    <string name="temp_windSpeed">2.2m/s</string>
-    <string name="temp_simpleWindStrength">약</string>
-    <string name="temp_detailWindStrength">약한 바람</string>
-    <string name="temp_humidity">습도: 50%</string>
-    <string name="temp_pop">10%</string>
-    <string name="temp_rainVolume">0.0mm</string>
-    <string name="temp_snowVolume">0.0cm</string>
-    <string name="temp_precipitationVolume">0.0mm</string>
-    <string name="temp_measuringStation">측정소: A측정소</string>
-    <string name="temp_measuringStationName">A측정소</string>
-    <string name="temp_tempWindDirectionDegree">180</string>
+    <string name="temp_minTemperature" translatable="false">7℃</string>
+    <string name="temp_maxTemperature" translatable="false">13℃</string>
+    <string name="temp_feelsLikeTemperature">feels: 12℃</string>
+    <string name="temp_address">address</string>
+    <string name="temp_date">3.6 Mon</string>
+    <string name="temp_time" translatable="false">16:30</string>
+    <string name="temp_dateTime">3.6 Mon 16:30</string>
+    <string name="temp_windDirection">N</string>
+    <string name="temp_windSpeed" translatable="false">2.2m/s</string>
+    <string name="temp_simpleWindStrength">weak</string>
+    <string name="temp_detailWindStrength">weak kind</string>
+    <string name="temp_humidity">humidity: 50%</string>
+    <string name="temp_pop" translatable="false">10%</string>
+    <string name="temp_rainVolume" translatable="false">0.0mm</string>
+    <string name="temp_snowVolume" translatable="false">0.0cm</string>
+    <string name="temp_precipitationVolume" translatable="false">0.0mm</string>
+    <string name="temp_measuringStation">station: A station</string>
+    <string name="temp_measuringStationName">A station</string>
+    <string name="temp_tempWindDirectionDegree" translatable="false">180</string>
 </resources>

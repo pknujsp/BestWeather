@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">BestWeather</string>
+    <string name="app_name">BestWeather</string>
 
     <!-- 날씨 제공사 -->
     <string name="kma">KoreaMA</string>
@@ -46,11 +46,11 @@
     <string name="pref_title_unit_wind">Wind Speed</string>
     <string name="pref_title_unit_clock">12/24 clock</string>
 
-    <string name="pref_title_accu_weather">AccuWeather</string>
+    <string name="pref_title_accu_weather" translatable="false">AccuWeather</string>
     <string name="pref_summary_accu_weather">추후 적용 예정입니다</string>
 
     <string name="pref_summary_open_weather_map">영국 런던에 본사가 있는 기업으로, 전 세계 대부분 지역의 날씨정보를 다룹니다.</string>
-    <string name="pref_title_open_weather_map">OpenWeatherMap</string>
+    <string name="pref_title_open_weather_map" translatable="false">OpenWeatherMap</string>
 
     <string name="pref_summary_kma_top_priority">요청한 날씨 자료의 지역이 대한민국인 경우 대한민국 기상청의 자료를 기본으로 표시합니다</string>
     <string name="pref_title_kma_top_priority">대한민국 기상청을 최우선 순위로 설정</string>
@@ -58,7 +58,7 @@
     <string name="pref_summary_use_current_location">GPS를 통해 현재 위치의 날씨를 표시</string>
     <string name="pref_title_use_current_location">현재 위치 사용</string>
 
-    <string name="pref_summary_weather_data_sources">AccuWeather, OpenWeatherMap, Kma~</string>
+    <string name="pref_summary_weather_data_sources">OpenWeatherMap, Kma~</string>
     <string name="pref_title_weather_data_sources">날씨 제공사</string>
 
     <string name="pref_title_forecast_view_type">예보 데이터 목록의 표시 유형</string>
@@ -73,29 +73,29 @@
     <string name="wind_direction_NE">NE</string>
     <string name="wind_direction_ENE">ENE</string>
     <string name="wind_direction_E">E</string>
-    <string name="wind_direction_ESE">동남동</string>
-    <string name="wind_direction_SE">남동</string>
-    <string name="wind_direction_SSE">남남동</string>
-    <string name="wind_direction_S">남</string>
-    <string name="wind_direction_SSW">남남서</string>
-    <string name="wind_direction_SW">남서</string>
-    <string name="wind_direction_WSW">서남서</string>
-    <string name="wind_direction_W">서</string>
-    <string name="wind_direction_WNW">서북서</string>
-    <string name="wind_direction_NW">북서</string>
-    <string name="wind_direction_NNW">북북서</string>
+    <string name="wind_direction_ESE">ESE</string>
+    <string name="wind_direction_SE">SE</string>
+    <string name="wind_direction_SSE">SSE</string>
+    <string name="wind_direction_S">S</string>
+    <string name="wind_direction_SSW">SSW</string>
+    <string name="wind_direction_SW">SW</string>
+    <string name="wind_direction_WSW">WSW</string>
+    <string name="wind_direction_W">W</string>
+    <string name="wind_direction_WNW">WNW</string>
+    <string name="wind_direction_NW">NW</string>
+    <string name="wind_direction_NNW">NNW</string>
 
 
     <!-- accu weather precipitation type -->
     <string name="accu_weather_pty_rain">rain</string>
     <string name="accu_weather_pty_snow">snow</string>
     <string name="accu_weather_pty_ice">ice</string>
-    <string name="accu_weather_pty_not">강수없음</string>
+    <string name="accu_weather_pty_not">no precipitation</string>
     <string name="accu_weather_pty_mixed">비와 눈</string>
 
     <!-- accu weather weather icon text -->
-    <string name="accu_weather_icon_1_sunny">맑음</string>
-    <string name="accu_weather_icon_2_mostly_sunny">대개 맑음</string>
+    <string name="accu_weather_icon_1_sunny">sunny</string>
+    <string name="accu_weather_icon_2_mostly_sunny">mostly sunny</string>
     <string name="accu_weather_icon_3_partly_sunny">조금 맑음</string>
     <string name="accu_weather_icon_4_intermittent_clouds">간헐적으로 구름</string>
     <string name="accu_weather_icon_5_hazy_sunshine">흐릿한 햇살</string>
@@ -310,7 +310,7 @@
     <string name="compare">compare</string>
     <string name="detail">detail</string>
     <string name="favorite">favorite</string>
-    <string name="title_pick_weather_data_source">날씨 제공사 선택</string>
+    <string name="title_pick_weather_data_source">select weather data source</string>
     <string name="precipitation_of_snow">precipitation of snow</string>
     <string name="precipitation_of_rain">precipitation of rain</string>
     <string name="hours_of_precipitation">hours of precipitation</string>
@@ -351,17 +351,17 @@
     <string name="refresh">refresh</string>
     <string name="refresh_current_location">refresh current location</string>
     <string name="widget_control">Widget Control</string>
-    <string name="check_permission">Check</string>
-    <string name="enable_gps">Enable GPS</string>
-    <string name="open_app">Open App</string>
-    <string name="text_size">글자 크기</string>
+    <string name="check_permission">check</string>
+    <string name="enable_gps">enable GPS</string>
+    <string name="open_app">open App</string>
+    <string name="text_size">text size</string>
     <string name="location">location</string>
     <string name="selected_location">선택한 주소</string>
     <string name="background_transparency">배경 투명도</string>
     <string name="auto_refresh_interval">자동 업데이트 간격</string>
     <string name="display_datetime">날짜와 시각 표시</string>
     <string name="display_local_datetime">현지 시각으로 표시</string>
-    <string name="create_widget">위젯 생성</string>
+    <string name="create_widget">create widget</string>
     <string name="not_selected_address">주소가 선택되지 않았습니다</string>
     <string name="click_again_to_select_address">현재 위치 선택되지 않음, 선택하기</string>
     <string name="change_address">주소 변경</string>
@@ -400,7 +400,7 @@
     <string name="list_type">리스트 형식</string>
     <string name="table_type">테이블 형식</string>
     <string name="kma_less_than_1mm">1.0mm 미만</string>
-    <string name="kma_no_snow">적설없음</string>
+    <string name="kma_no_snow">no snow</string>
     <string name="empty_search_query">검색어를 입력해주세요</string>
     <string name="notification">notification</string>
     <string name="always_notification">ongoing notification</string>
@@ -454,8 +454,8 @@
     <string name="count">count</string>
     <string name="pleaseSelectDay">알람을 울릴 요일을 선택해주세요</string>
     <string name="registeredAlarm">알람 등록되었습니다</string>
-    <string name="cancelAlarm">알람 종료</string>
-    <string name="ringAgain">다시 울림</string>
+    <string name="cancelAlarm">cancel</string>
+    <string name="ringAgain">again</string>
     <string name="precipitation">precipitation</string>
     <string name="againAlarmAfterNMinutes">분 후 다시 울림</string>
 
@@ -470,23 +470,23 @@
     <string name="today">today</string>
     <string name="detailSunRiseSet">Detail sun rise/set</string>
     <string name="currentAndForecast">current, forecast</string>
-    <string name="fifthWidgetLabel">현재/시간별 그래프</string>
+    <string name="fifthWidgetLabel">current/hourly graph</string>
     <string name="TheTemperatureIsTheSameAsYesterday">The temperature is the same as yesterday</string>
     <string name="thanYesterday">than yesterday</string>
     <string name="higherTemperature">higher</string>
     <string name="lowerTemperature">lower</string>
-    <string name="sixthWidgetLabel">현재+세부 대기질</string>
-    <string name="seventhWidgetLabel">현재 대기질+대기예보</string>
-    <string name="eighthWidgetLabel">종합2</string>
-    <string name="ninthWidgetLabel">긴 시간별 예보</string>
-    <string name="tenthWidgetLabel">긴 일별 예보</string>
-    <string name="eleventhWidgetLabel">시간별 예보 비교</string>
+    <string name="sixthWidgetLabel">current/current aqi</string>
+    <string name="seventhWidgetLabel">aqi current/forecast</string>
+    <string name="eighthWidgetLabel">current/hourly/daily 2</string>
+    <string name="ninthWidgetLabel">long hourly</string>
+    <string name="tenthWidgetLabel">long daily</string>
+    <string name="eleventhWidgetLabel">compare to hourly</string>
     <string name="feelsLike">feels</string>
     <string name="notSelectedDefaultWeatherSource">기본 날씨 제공사가 선택되지 않았습니다</string>
     <string name="noWindData">no wind data</string>
     <string name="registeredDailyNotification">일일 알림 등록되었습니다</string>
     <string name="save">save</string>
-    <string name="currentAirQuality">현재 대기질</string>
+    <string name="currentAirQuality">current air quality</string>
     <string name="notificationType">notification type</string>
     <string name="FirstDailyPushNotification">Hourly</string>
     <string name="SecondDailyPushNotification">Current</string>

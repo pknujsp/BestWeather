@@ -182,7 +182,7 @@
 
     <dimen name="forecastItemViewInLinearPadding">3dp</dimen>
     <dimen name="stationNameTextSizeInSixthWidget">14sp</dimen>
-    <dimen name="tempTextSizeInSixthWidget">30sp</dimen>
+    <dimen name="tempTextSizeInSixthWidget">26sp</dimen>
     <dimen name="precipitationtTextSizeInSixthWidget">13sp</dimen>
     <dimen name="airQualityTextSizeInSixthWidget">13sp</dimen>
     <dimen name="stationNameTextSizeInSeventhWidget">13sp</dimen>
@@ -213,5 +213,6 @@
     <dimen name="feelsLikeTempTextSizeInFirstWidget">20sp</dimen>
     <dimen name="yesterdayTempTextSizeInCurrentWidget">14sp</dimen>
     <dimen name="yesterdayTempTextSizeInThirdWidget">14sp</dimen>
+    <dimen name="yesterdayTempTextSizeInSixWidget">14sp</dimen>
 
 </resources>

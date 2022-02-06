@@ -79,6 +79,17 @@ public class WidgetDto {
 	@ColumnInfo(name = "initialized")
 	private boolean initialized;
 
+	@ColumnInfo(name = "multipleWeatherDataSource")
+	private boolean multipleWeatherDataSource;
+
+	public boolean isMultipleWeatherDataSource() {
+		return multipleWeatherDataSource;
+	}
+
+	public void setMultipleWeatherDataSource(boolean multipleWeatherDataSource) {
+		this.multipleWeatherDataSource = multipleWeatherDataSource;
+	}
+
 	public boolean isInitialized() {
 		return initialized;
 	}

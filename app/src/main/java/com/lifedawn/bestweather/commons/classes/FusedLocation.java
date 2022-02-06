@@ -93,7 +93,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				}
 
 				LocationRequest locationRequest = LocationRequest.create();
-				locationRequest.setInterval(700);
+				locationRequest.setInterval(600);
 				locationRequest.setFastestInterval(300);
 				locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
@@ -131,9 +131,10 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 					@Override
 					public void run() {
 						cancellationTokenSource.cancel();
-						locationCallback.onLocationResult(LocationResult.create(new ArrayList<>()));
+						myLocationCallback.onFailed(MyLocationCallback.Fail.TIME_OUT);
+						fusedLocationClient.removeLocationUpdates(locationCallback);
 					}
-				}, 4500L);
+				}, 5000L);
 
 				Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
 						cancellationTokenSource.getToken());
@@ -220,7 +221,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 	public interface MyLocationCallback {
 		enum Fail {
-			DISABLED_GPS, DENIED_LOCATION_PERMISSIONS, FAILED_FIND_LOCATION, DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION
+			DISABLED_GPS, DENIED_LOCATION_PERMISSIONS, FAILED_FIND_LOCATION, DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION, TIME_OUT
 		}
 
 		void onSuccessful(LocationResult locationResult);

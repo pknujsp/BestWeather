@@ -269,6 +269,8 @@ public abstract class AbstractWidgetJobService extends JobService {
 				errorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA;
 			}
 
+			Log.e("location", fail.name());
+
 			setRefreshPendingIntent(remoteViews, appWidgetId);
 			RemoteViewsUtil.onErrorProcess(remoteViews, getApplicationContext(), errorType);
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
@@ -286,6 +288,9 @@ public abstract class AbstractWidgetJobService extends JobService {
 		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = widgetDto.getWeatherSourceTypeSet();
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
+			if (!widgetDto.isMultipleWeatherDataSource()) {
+				weatherDataSourceTypeSet.remove(WeatherDataSourceType.OWM_ONECALL);
+			}
 			weatherDataSourceTypeSet.add(WeatherDataSourceType.KMA_WEB);
 		}
 
@@ -349,7 +354,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 		}
 
 		WidgetRepository widgetRepository = new WidgetRepository(context);
-		widgetRepository.update(widgetDto,null);
+		widgetRepository.update(widgetDto, null);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 		Message message = handler.obtainMessage();

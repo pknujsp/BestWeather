@@ -21,6 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
@@ -49,6 +50,13 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 
 	public EleventhWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
+	}
+
+	@Override
+	public WidgetDto loadDefaultSettings() {
+		WidgetDto widgetDto = super.loadDefaultSettings();
+		widgetDto.setMultipleWeatherDataSource(true);
+		return widgetDto;
 	}
 
 	@Override

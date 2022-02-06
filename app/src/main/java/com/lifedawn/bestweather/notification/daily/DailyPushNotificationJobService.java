@@ -164,6 +164,13 @@ public class DailyPushNotificationJobService extends JobService {
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = viewCreator.getRequestWeatherDataTypeSet();
 		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = dailyPushNotificationDto.getWeatherDataSourceTypeSet();
 
+		if (dailyPushNotificationDto.isTopPriorityKma() && dailyPushNotificationDto.getCountryCode().equals("KR")) {
+			if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_ONECALL)) {
+				weatherDataSourceTypeSet.remove(WeatherDataSourceType.OWM_ONECALL);
+				weatherDataSourceTypeSet.add(WeatherDataSourceType.KMA_WEB);
+			}
+		}
+
 		WeatherRequestUtil.loadWeatherData(context, executorService, dailyPushNotificationDto.getCountryCode(),
 				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), requestWeatherDataTypeSet, new MultipleRestApiDownloader() {
 					@Override

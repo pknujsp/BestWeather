@@ -92,6 +92,7 @@ public abstract class AbstractWidgetCreator {
 	public WidgetDto loadDefaultSettings() {
 		widgetDto = new WidgetDto();
 		widgetDto.setAppWidgetId(appWidgetId);
+		widgetDto.setMultipleWeatherDataSource(false);
 		widgetDto.setBackgroundAlpha(100);
 		widgetDto.setDisplayClock(true);
 		widgetDto.setDisplayLocalClock(false);

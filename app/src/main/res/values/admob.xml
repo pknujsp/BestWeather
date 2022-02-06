@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="testId">ca-app-pub-3940256099942544~3347511713</string>
-    <string name="BANNER_testUnitId">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="NATIVE_ADVANCE_testUnitId">ca-app-pub-3940256099942544/2247696110</string>
+    <string name="testId" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="BANNER_testUnitId" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="NATIVE_ADVANCE_testUnitId" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
 </resources>
