@@ -7,7 +7,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -34,7 +32,7 @@ import com.lifedawn.bestweather.commons.interfaces.OnClickedPopupMenuItemListene
 import com.lifedawn.bestweather.databinding.FragmentDailyPushNotificationListBinding;
 import com.lifedawn.bestweather.databinding.ViewDailyPushNotificationItemBinding;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.notification.daily.DailyNotiHelper;
+import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
@@ -53,13 +51,13 @@ public class DailyPushNotificationListFragment extends Fragment {
 	private NotificationListAdapter adapter;
 	private DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a h:mm");
 	private DailyPushNotificationRepository repository;
-	private DailyNotiHelper dailyNotiHelper;
+	private DailyNotificationHelper dailyNotificationHelper;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		repository = new DailyPushNotificationRepository(getContext());
-		dailyNotiHelper = new DailyNotiHelper(getContext());
+		dailyNotificationHelper = new DailyNotificationHelper(getContext());
 	}
 
 	@Override
@@ -109,7 +107,7 @@ public class DailyPushNotificationListFragment extends Fragment {
 				repository.update(dailyPushNotificationDto, new DbQueryCallback<DailyPushNotificationDto>() {
 					@Override
 					public void onResultSuccessful(DailyPushNotificationDto result) {
-						dailyNotiHelper.modifyPushNotification(result);
+						dailyNotificationHelper.modifyPushNotification(result);
 					}
 
 					@Override
@@ -135,7 +133,7 @@ public class DailyPushNotificationListFragment extends Fragment {
 								.setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
 									@Override
 									public void onClick(DialogInterface dialog, int which) {
-										dailyNotiHelper.disablePushNotification(e.getId());
+										dailyNotificationHelper.disablePushNotification(e);
 										repository.delete(e, new DbQueryCallback<Boolean>() {
 											@Override
 											public void onResultSuccessful(Boolean result) {

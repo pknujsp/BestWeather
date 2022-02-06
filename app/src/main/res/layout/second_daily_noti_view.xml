@@ -2,21 +2,22 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="130dp"
+    android:layout_height="150dp"
     android:orientation="vertical"
     android:padding="@dimen/notificationPadding">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp">
 
         <ImageView
             android:id="@+id/weatherIcon"
             android:layout_width="52dp"
             android:layout_height="52dp"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="4dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="6dp"
             android:scaleType="centerInside"
             android:src="@drawable/day_clear" />
 
@@ -24,13 +25,23 @@
             android:id="@+id/temperature"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/weatherIcon"
-            android:layout_alignBottom="@id/weatherIcon"
             android:layout_toRightOf="@id/weatherIcon"
-            android:gravity="center_vertical"
+            android:includeFontPadding="false"
             android:text="@string/temp_temperature"
+
             android:textColor="@color/black"
             android:textSize="32sp" />
+
+        <TextView
+            android:id="@+id/yesterdayTemperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/temperature"
+            android:layout_toRightOf="@id/weatherIcon"
+            android:includeFontPadding="false"
+            android:text="@string/temp_yesterdayTemperature"
+            android:textColor="@color/widgetTextColor"
+            android:textSize="13sp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -130,7 +141,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="4dp"
                     android:text="@string/temp_windDirection"
-                    android:textColor="@color/black"
+                    android:textColor="@color/blue"
                     android:textSize="13sp" />
 
                 <TextView

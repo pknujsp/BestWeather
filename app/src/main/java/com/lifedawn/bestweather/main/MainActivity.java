@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.main;
 
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
@@ -10,16 +9,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.service.notification.StatusBarNotification;
 import android.util.ArrayMap;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -35,14 +29,10 @@ import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
 import com.lifedawn.bestweather.intro.IntroTransactionFragment;
-import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.notification.always.AlwaysNotiHelper;
-import com.lifedawn.bestweather.notification.always.AlwaysNotiViewCreator;
-import com.lifedawn.bestweather.notification.daily.DailyNotiHelper;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
+import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
-import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 
@@ -129,69 +119,13 @@ public class MainActivity extends AppCompatActivity {
 
 	private void initOngoingNotifications() {
 		//ongoing notification
-		final NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		SharedPreferences sharedPreferences =
-				PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-		final boolean enabledOngoingNotification = sharedPreferences.getBoolean(NotificationType.Always.getPreferenceName(), false);
-
-		if (enabledOngoingNotification) {
-			StatusBarNotification[] statusBarNotifications = notificationManager.getActiveNotifications();
-			Boolean active = false;
-			for (StatusBarNotification statusBarNotification : statusBarNotifications) {
-				if (statusBarNotification.getId() == NotificationType.Always.getNotificationId()) {
-					active = true;
-					break;
-				}
-			}
-
-			AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(getApplicationContext(), null);
-			alwaysNotiViewCreator.loadPreferences();
-			AlwaysNotiHelper alwaysNotiHelper = new AlwaysNotiHelper(getApplicationContext());
-
-			if (active) {
-				if (alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
-					if (!alwaysNotiHelper.isRepeating()) {
-						alwaysNotiHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
-					}
-				}
-			} else {
-
-				alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
-					@Override
-					public boolean handleMessage(@NonNull Message msg) {
-						return false;
-					}
-				}));
-				alwaysNotiHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
-			}
-			Log.e("Ongoing notification", active.toString());
-
-		}
-
+		OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
+		ongoingNotificationHelper.reStartNotification();
 	}
 
-	private void initDailyNotifications() {
-		DailyPushNotificationRepository repository = new DailyPushNotificationRepository(getApplicationContext());
-		repository.getAll(new DbQueryCallback<List<DailyPushNotificationDto>>() {
-			@Override
-			public void onResultSuccessful(List<DailyPushNotificationDto> result) {
-				DailyNotiHelper notiHelper = new DailyNotiHelper(getApplicationContext());
-
-				for (DailyPushNotificationDto dto : result) {
-					if (dto.isEnabled()) {
-						if (!notiHelper.isRepeating(dto.getId())) {
-							notiHelper.enablePushNotification(dto);
-						}
-					}
-				}
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
+	public void initDailyNotifications() {
+		DailyNotificationHelper notiHelper = new DailyNotificationHelper(getApplicationContext());
+		notiHelper.reStartNotifications();
 	}
 
 	private void initWidgets() {
@@ -253,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode++, refreshIntent,
 									PendingIntent.FLAG_UPDATE_CURRENT);
 							pendingIntent.send();
-
 
 						} catch (PendingIntent.CanceledException e) {
 							e.printStackTrace();

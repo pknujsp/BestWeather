@@ -5,15 +5,18 @@ import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
+import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 
@@ -64,6 +67,14 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 		remoteViews.setTextViewText(R.id.precipitation, precipitation);
 		remoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
 
+		if (currentConditionsDto.getYesterdayTemp() != null) {
+			ValueUnits tempUnit =
+					ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
+			String yesterdayCompText = WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
+					currentConditionsDto.getYesterdayTemp(), tempUnit, context);
+			remoteViews.setTextViewText(R.id.yesterdayTemperature, yesterdayCompText);
+		}
+
 		if (currentConditionsDto.getWindDirection() != null) {
 			remoteViews.setTextViewText(R.id.windDirection, currentConditionsDto.getWindDirection());
 			remoteViews.setTextViewText(R.id.windSpeed, currentConditionsDto.getWindSpeed());
@@ -100,7 +111,7 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 			makeNotification(remoteViews, dailyPushNotificationDto.getId());
 		} else {
-			makeFailedNotification(dailyPushNotificationDto.getId(),context.getString(R.string.msg_failed_update));
+			makeFailedNotification(dailyPushNotificationDto.getId(), context.getString(R.string.msg_failed_update));
 
 		}
 

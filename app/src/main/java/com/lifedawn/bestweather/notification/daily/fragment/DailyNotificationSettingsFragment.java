@@ -30,7 +30,7 @@ import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentDailyPushNotificationSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.notification.daily.DailyNotiHelper;
+import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FifthDailyNotificationViewCreator;
@@ -55,7 +55,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 	private final DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a h:mm");
 
 	private FragmentDailyPushNotificationSettingsBinding binding;
-	private DailyNotiHelper dailyNotiHelper;
+	private DailyNotificationHelper dailyNotificationHelper;
 	private DailyPushNotificationRepository repository;
 	private DailyPushNotificationDto savedNotificationDto;
 	private DailyPushNotificationDto newNotificationDto;
@@ -86,7 +86,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 
-		dailyNotiHelper = new DailyNotiHelper(getActivity().getApplicationContext());
+		dailyNotificationHelper = new DailyNotificationHelper(getActivity().getApplicationContext());
 		repository = new DailyPushNotificationRepository(getContext());
 		mainWeatherDataSourceType = WeatherRequestUtil.getMainWeatherSourceType(getContext(), null);
 
@@ -185,7 +185,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 									String text =
 											LocalTime.parse(result.getAlarmClock()).format(hoursFormatter) + ", " + getString(R.string.registeredDailyNotification);
 									Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
-									dailyNotiHelper.enablePushNotification(result);
+									dailyNotificationHelper.enablePushNotification(result);
 									getParentFragmentManager().popBackStack();
 								}
 							});
@@ -205,7 +205,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 							getActivity().runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									dailyNotiHelper.modifyPushNotification(result);
+									dailyNotificationHelper.modifyPushNotification(result);
 									getParentFragmentManager().popBackStack();
 								}
 							});

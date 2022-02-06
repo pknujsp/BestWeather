@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.notification.always;
+package com.lifedawn.bestweather.notification.ongoing;
 
 
 import android.app.job.JobParameters;
@@ -16,8 +16,8 @@ import androidx.work.Configuration;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.notification.NotificationType;
 
-public class AlwaysNotiJobService extends JobService {
-	public AlwaysNotiJobService() {
+public class OngoingNotiJobService extends JobService {
+	public OngoingNotiJobService() {
 		Configuration.Builder builder = new Configuration.Builder();
 		builder.setJobSchedulerJobIdRange(1000, 2000);
 	}
@@ -28,7 +28,7 @@ public class AlwaysNotiJobService extends JobService {
 		final String action = bundle.getString("action");
 
 		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			final AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(this, null);
+			final OngoingNotiViewCreator alwaysNotiViewCreator = new OngoingNotiViewCreator(this, null);
 			alwaysNotiViewCreator.loadSavedPreferences();
 			alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
 				@Override
@@ -51,11 +51,11 @@ public class AlwaysNotiJobService extends JobService {
 					defaultSharedPreferences.getBoolean(NotificationType.Always.getPreferenceName(), false);
 
 			if (enabledAlwaysNotification) {
-				AlwaysNotiViewCreator alwaysNotiViewCreator = new AlwaysNotiViewCreator(this, null);
+				OngoingNotiViewCreator alwaysNotiViewCreator = new OngoingNotiViewCreator(this, null);
 				alwaysNotiViewCreator.loadSavedPreferences();
 				if (alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
-					AlwaysNotiHelper alwaysNotiHelper = new AlwaysNotiHelper(getApplicationContext());
-					alwaysNotiHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
+					OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
+					ongoingNotificationHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
 				}
 
 				alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {

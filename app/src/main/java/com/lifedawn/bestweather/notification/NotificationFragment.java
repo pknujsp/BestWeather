@@ -9,17 +9,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.AlarmListFragment;
 import com.lifedawn.bestweather.databinding.FragmentNotificationBinding;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.notification.always.AlwaysNotificationSettingsFragment;
-import com.lifedawn.bestweather.notification.daily.fragment.DailyNotificationSettingsFragment;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.daily.fragment.DailyPushNotificationListFragment;
 
 import org.jetbrains.annotations.NotNull;
@@ -60,11 +56,11 @@ public class NotificationFragment extends Fragment {
 		binding.always.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AlwaysNotificationSettingsFragment alwaysNotificationSettingsFragment = new AlwaysNotificationSettingsFragment();
-				String tag = AlwaysNotificationSettingsFragment.class.getName();
+				OngoingNotificationSettingsFragment ongoingNotificationSettingsFragment = new OngoingNotificationSettingsFragment();
+				String tag = OngoingNotificationSettingsFragment.class.getName();
 
 				getParentFragmentManager().beginTransaction().hide(NotificationFragment.this).add(R.id.fragment_container,
-						alwaysNotificationSettingsFragment,
+						ongoingNotificationSettingsFragment,
 						tag)
 						.addToBackStack(tag).commit();
 			}

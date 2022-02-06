@@ -1,17 +1,11 @@
-package com.lifedawn.bestweather.notification.always;
+package com.lifedawn.bestweather.notification.ongoing;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -19,7 +13,6 @@ import androidx.preference.PreferenceManager;
 
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +34,6 @@ import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentBaseNotificationSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
-import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
@@ -52,13 +44,13 @@ import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import org.jetbrains.annotations.NotNull;
 
 
-public class AlwaysNotificationSettingsFragment extends Fragment implements NotificationUpdateCallback {
+public class OngoingNotificationSettingsFragment extends Fragment implements NotificationUpdateCallback {
 	private final NotificationType notificationType = NotificationType.Always;
 	private FragmentBaseNotificationSettingsBinding binding;
 
-	private AlwaysNotiViewCreator alwaysNotiViewCreator;
+	private OngoingNotiViewCreator alwaysNotiViewCreator;
 	private boolean initializing = true;
-	private AlwaysNotiHelper alwaysNotiHelper;
+	private OngoingNotificationHelper ongoingNotificationHelper;
 	private AlwaysNotiDataObj alwaysNotiDataObj;
 	private FavoriteAddressDto newSelectedAddressDto;
 	private FavoriteAddressDto originalSelectedFavoriteAddressDto;
@@ -95,8 +87,8 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 			intervalsLong[i] = Long.parseLong(intervalsStr[i]);
 		}
 
-		alwaysNotiViewCreator = new AlwaysNotiViewCreator(getActivity().getApplicationContext(), this);
-		alwaysNotiHelper = new AlwaysNotiHelper(getActivity().getApplicationContext());
+		alwaysNotiViewCreator = new OngoingNotiViewCreator(getActivity().getApplicationContext(), this);
+		ongoingNotificationHelper = new OngoingNotificationHelper(getActivity().getApplicationContext());
 
 		initPreferences();
 		alwaysNotiDataObj = alwaysNotiViewCreator.getNotificationDataObj();
@@ -164,7 +156,7 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 
 					} else {
 						notificationHelper.cancelNotification(notificationType.getNotificationId());
-						alwaysNotiHelper.cancelAutoRefresh();
+						ongoingNotificationHelper.cancelAutoRefresh();
 					}
 				}
 
@@ -277,7 +269,7 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 	protected void openFavoritesFragment() {
 		FavoritesFragment favoritesFragment = new FavoritesFragment();
 		Bundle bundle = new Bundle();
-		bundle.putString(BundleKey.RequestFragment.name(), AlwaysNotificationSettingsFragment.class.getName());
+		bundle.putString(BundleKey.RequestFragment.name(), OngoingNotificationSettingsFragment.class.getName());
 		favoritesFragment.setArguments(bundle);
 
 		favoritesFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
@@ -311,7 +303,7 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 
 		String tag = FavoritesFragment.class.getName();
 
-		getParentFragmentManager().beginTransaction().hide(AlwaysNotificationSettingsFragment.this).add(R.id.fragment_container,
+		getParentFragmentManager().beginTransaction().hide(OngoingNotificationSettingsFragment.this).add(R.id.fragment_container,
 				favoritesFragment,
 				tag).addToBackStack(tag).commit();
 	}
@@ -391,7 +383,7 @@ public class AlwaysNotificationSettingsFragment extends Fragment implements Noti
 			alwaysNotiDataObj.setUpdateIntervalMillis(val);
 			alwaysNotiViewCreator.savePreferences();
 
-			alwaysNotiHelper.onSelectedAutoRefreshInterval(alwaysNotiDataObj.getUpdateIntervalMillis());
+			ongoingNotificationHelper.onSelectedAutoRefreshInterval(alwaysNotiDataObj.getUpdateIntervalMillis());
 		}
 	}
 

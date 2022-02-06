@@ -9,7 +9,6 @@ import android.location.Location;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PersistableBundle;
-import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
@@ -23,7 +22,6 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
-import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FifthDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FirstDailyNotificationViewCreator;
@@ -56,7 +54,7 @@ public class DailyPushNotificationJobService extends JobService {
 		PersistableBundle bundle = params.getExtras();
 		final String action = bundle.getString("action");
 		DailyPushNotificationRepository repository = new DailyPushNotificationRepository(getApplicationContext());
-		DailyNotiHelper dailyNotiHelper = new DailyNotiHelper(getApplicationContext());
+		DailyNotificationHelper dailyNotificationHelper = new DailyNotificationHelper(getApplicationContext());
 
 		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
 			final Integer id = bundle.getInt(BundleKey.dtoId.name());
@@ -66,7 +64,7 @@ public class DailyPushNotificationJobService extends JobService {
 			repository.get(id, new DbQueryCallback<DailyPushNotificationDto>() {
 				@Override
 				public void onResultSuccessful(DailyPushNotificationDto result) {
-					dailyNotiHelper.enablePushNotification(result);
+					dailyNotificationHelper.enablePushNotification(result);
 				}
 
 				@Override
@@ -95,7 +93,7 @@ public class DailyPushNotificationJobService extends JobService {
 				public void onResultSuccessful(List<DailyPushNotificationDto> result) {
 					for (DailyPushNotificationDto notificationDto : result) {
 						if (notificationDto.isEnabled()) {
-							dailyNotiHelper.enablePushNotification(notificationDto);
+							dailyNotificationHelper.enablePushNotification(notificationDto);
 						}
 					}
 					jobFinished(params, false);

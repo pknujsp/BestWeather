@@ -1,17 +1,12 @@
-package com.lifedawn.bestweather.notification.always;
+package com.lifedawn.bestweather.notification.ongoing;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.RemoteViews;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -26,7 +21,6 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 
-import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
@@ -47,11 +41,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class AlwaysNotiViewCreator extends AbstractAlwaysNotiViewCreator {
+public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	private final int hourlyForecastCount = 8;
 	private Handler handler;
 
-	public AlwaysNotiViewCreator(Context context, NotificationUpdateCallback notificationUpdateCallback) {
+	public OngoingNotiViewCreator(Context context, NotificationUpdateCallback notificationUpdateCallback) {
 		super(context, NotificationType.Always, notificationUpdateCallback);
 	}
 

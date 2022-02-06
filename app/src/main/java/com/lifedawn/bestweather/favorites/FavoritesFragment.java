@@ -1,13 +1,10 @@
 package com.lifedawn.bestweather.favorites;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
@@ -21,11 +18,9 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -39,11 +34,10 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentFavoritesBinding;
-import com.lifedawn.bestweather.databinding.ViewSearchBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.notification.always.AlwaysNotificationSettingsFragment;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.daily.fragment.DailyNotificationSettingsFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -99,7 +93,7 @@ public class FavoritesFragment extends Fragment {
 				if (requestFragment.equals(MainTransactionFragment.class.getName())) {
 					checkHaveLocations();
 				} else if (requestFragment.equals(ConfigureWidgetActivity.class.getName()) ||
-						requestFragment.equals(AlwaysNotificationSettingsFragment.class.getName()) ||
+						requestFragment.equals(OngoingNotificationSettingsFragment.class.getName()) ||
 						requestFragment.equals(AlarmSettingsFragment.class.getName()) ||
 						requestFragment.equals(DailyNotificationSettingsFragment.class.getName())) {
 					if (!clickedItem) {
@@ -354,7 +348,7 @@ public class FavoritesFragment extends Fragment {
 
 	private void onClickedItem(FavoriteAddressDto favoriteAddressDto) {
 		if (requestFragment.equals(ConfigureWidgetActivity.class.getName()) ||
-				requestFragment.equals(AlwaysNotificationSettingsFragment.class.getName()) ||
+				requestFragment.equals(OngoingNotificationSettingsFragment.class.getName()) ||
 				requestFragment.equals(AlarmSettingsFragment.class.getName()) ||
 				requestFragment.equals(DailyNotificationSettingsFragment.class.getName())) {
 			Bundle bundle = new Bundle();

@@ -227,7 +227,7 @@
                 android:resource="@xml/eleventh_widget_info" />
         </receiver>
         <receiver
-            android:name=".notification.always.AlwaysNotificationReceiver"
+            android:name=".notification.ongoing.OngoingNotificationReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -255,7 +255,7 @@
         </receiver>
 
         <service
-            android:name=".notification.always.AlwaysNotiJobService"
+            android:name=".notification.ongoing.OngoingNotiJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service

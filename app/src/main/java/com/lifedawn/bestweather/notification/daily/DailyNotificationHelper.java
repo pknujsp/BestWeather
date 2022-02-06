@@ -12,21 +12,24 @@ import androidx.core.app.AlarmManagerCompat;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.AlarmReceiver;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
+import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 
 import java.time.LocalTime;
 import java.util.Calendar;
+import java.util.List;
 
-public class DailyNotiHelper {
+public class DailyNotificationHelper {
 	private Context context;
 	private AlarmManager alarmManager;
 
-	public DailyNotiHelper(Context context) {
+	public DailyNotificationHelper(Context context) {
 		this.context = context;
 		alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 	}
 
-	public PendingIntent getRefreshPendingIntent(DailyPushNotificationDto dailyPushNotificationDto) {
+	public PendingIntent getRefreshPendingIntent(DailyPushNotificationDto dailyPushNotificationDto, int flags) {
 		Intent refreshIntent = new Intent(context, DailyPushNotificationReceiver.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 		Bundle bundle = new Bundle();
@@ -35,8 +38,7 @@ public class DailyNotiHelper {
 		bundle.putString("DailyPushNotificationType", dailyPushNotificationDto.getNotificationType().name());
 
 		refreshIntent.putExtras(bundle);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, dailyPushNotificationDto.getId() + 6000, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-		return pendingIntent;
+		return PendingIntent.getBroadcast(context, dailyPushNotificationDto.getId() + 7000, refreshIntent, flags);
 	}
 
 	public void enablePushNotification(DailyPushNotificationDto dailyPushNotificationDto) {
@@ -45,18 +47,17 @@ public class DailyNotiHelper {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.HOUR_OF_DAY, localTime.getHour());
 		calendar.set(Calendar.MINUTE, localTime.getMinute());
-		calendar.set(Calendar.SECOND, 0);
 
-		if (calendar.compareTo(Calendar.getInstance()) <= 0) {
+		if (calendar.before(Calendar.getInstance())) {
 			calendar.add(Calendar.DATE, 1);
 		}
 
-		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), getRefreshPendingIntent(dailyPushNotificationDto));
+		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+				getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 
-	public void disablePushNotification(int id) {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id + 6000, new Intent(context,
-				DailyPushNotificationReceiver.class), PendingIntent.FLAG_NO_CREATE);
+	public void disablePushNotification(DailyPushNotificationDto dailyPushNotificationDto) {
+		PendingIntent pendingIntent = getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();
@@ -64,20 +65,43 @@ public class DailyNotiHelper {
 	}
 
 	public void modifyPushNotification(DailyPushNotificationDto dailyPushNotificationDto) {
-		disablePushNotification(dailyPushNotificationDto.getId());
+		disablePushNotification(dailyPushNotificationDto);
 
 		if (dailyPushNotificationDto.isEnabled()) {
 			enablePushNotification(dailyPushNotificationDto);
 		}
 	}
 
-	public boolean isRepeating(int id) {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id + 6000, new Intent(context,
-				DailyPushNotificationReceiver.class), PendingIntent.FLAG_NO_CREATE);
+	public boolean isRepeating(DailyPushNotificationDto dailyPushNotificationDto) {
+		PendingIntent pendingIntent = getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_NO_CREATE);
+
 		if (pendingIntent != null) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	public void reStartNotifications() {
+		DailyPushNotificationRepository repository = new DailyPushNotificationRepository(context);
+		repository.getAll(new DbQueryCallback<List<DailyPushNotificationDto>>() {
+			@Override
+			public void onResultSuccessful(List<DailyPushNotificationDto> result) {
+				if (result.size() > 0) {
+					for (DailyPushNotificationDto dto : result) {
+						if (dto.isEnabled()) {
+							if (!isRepeating(dto)) {
+								enablePushNotification(dto);
+							}
+						}
+					}
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
 	}
 }

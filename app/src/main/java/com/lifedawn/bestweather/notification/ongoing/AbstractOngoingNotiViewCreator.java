@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.notification.always;
+package com.lifedawn.bestweather.notification.ongoing;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.RemoteViews;
@@ -37,7 +36,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public abstract class AbstractAlwaysNotiViewCreator {
+public abstract class AbstractOngoingNotiViewCreator {
 	protected final NotificationUpdateCallback notificationUpdateCallback;
 	protected final ValueUnits windSpeedUnit;
 	protected final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
@@ -49,7 +48,7 @@ public abstract class AbstractAlwaysNotiViewCreator {
 	protected NotificationHelper notificationHelper;
 	protected NotificationDataObj notificationDataObj;
 
-	public AbstractAlwaysNotiViewCreator(Context context, NotificationType notificationType, NotificationUpdateCallback notificationUpdateCallback) {
+	public AbstractOngoingNotiViewCreator(Context context, NotificationType notificationType, NotificationUpdateCallback notificationUpdateCallback) {
 		this.context = context;
 		this.notificationUpdateCallback = notificationUpdateCallback;
 		this.notificationType = notificationType;
@@ -160,7 +159,7 @@ public abstract class AbstractAlwaysNotiViewCreator {
 	}
 
 	protected PendingIntent getRefreshPendingIntent() {
-		Intent refreshIntent = new Intent(context, AlwaysNotificationReceiver.class);
+		Intent refreshIntent = new Intent(context, OngoingNotificationReceiver.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 		Bundle bundle = new Bundle();
 		bundle.putString(NotificationType.class.getName(), notificationType.name());
