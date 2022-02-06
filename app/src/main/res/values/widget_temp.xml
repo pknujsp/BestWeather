@@ -15,7 +15,7 @@
     <string name="temp_windDirection">N</string>
     <string name="temp_windSpeed" translatable="false">2.2m/s</string>
     <string name="temp_simpleWindStrength">weak</string>
-    <string name="temp_detailWindStrength">weak kind</string>
+    <string name="temp_detailWindStrength">weak wind</string>
     <string name="temp_humidity">humidity: 50%</string>
     <string name="temp_pop" translatable="false">10%</string>
     <string name="temp_rainVolume" translatable="false">0.0mm</string>
@@ -24,4 +24,5 @@
     <string name="temp_measuringStation">station: A station</string>
     <string name="temp_measuringStationName">A station</string>
     <string name="temp_tempWindDirectionDegree" translatable="false">180</string>
+
 </resources>

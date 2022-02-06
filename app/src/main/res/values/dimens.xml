@@ -68,7 +68,7 @@
     <dimen name="gradeValueTextSizeInAirQualityBarView">13sp</dimen>
     <dimen name="gradeTextSizeInAirQualityBarView">13sp</dimen>
     <dimen name="barWidthInAirQualityBarView">27dp</dimen>
-    <dimen name="columnWidthInAirQualityBarView">57dp</dimen>
+    <dimen name="minColumnWidthInAirQualityBarView">63dp</dimen>
     <dimen name="viewHeightOfAirQualityBarView">100dp</dimen>
     <dimen name="iconValueViewMargin">6dp</dimen>
     <dimen name="nonScrollViewTopBottomMargin">8dp</dimen>

@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="4dp">
+    android:padding="4dp"
+    app:layout_columnWeight="1">
 
     <TextView
         android:id="@+id/label"
@@ -33,6 +34,8 @@
         android:fontFamily="sans-serif-condensed-light"
         android:text="value"
         android:textAlignment="center"
+        android:maxLines="2"
+        android:minLines="1"
         android:textColor="@color/black"
         android:textSize="20sp" />
 

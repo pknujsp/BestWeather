@@ -2,8 +2,6 @@
 <resources>
     <string name="app_name">BestWeather</string>
     <string name="kma">대한민국 기상청</string>
-    <string name="accu_weather">AccuWeather</string>
-    <string name="owm">OpenWeatherMap</string>
     <string name="pm10_str">미세먼지</string>
     <string name="pm25_str">초미세먼지</string>
     <string name="o3_str">오존</string>
@@ -87,8 +85,8 @@
     <string name="accu_weather_icon_25_sleet">진눈깨비</string>
     <string name="accu_weather_icon_26_freezing_rain">어는비</string>
     <string name="accu_weather_icon_29_rain_and_snow">비와 눈</string>
-    <string name="accu_weather_icon_30_hot">더움</string>
-    <string name="accu_weather_icon_31_cold">추움</string>
+    <string name="accu_weather_icon_30_hot">폭염</string>
+    <string name="accu_weather_icon_31_cold">한파</string>
     <string name="accu_weather_icon_32_wind">바람</string>
     <string name="accu_weather_icon_33_clear">맑음</string>
     <string name="accu_weather_icon_34_mostly_clear">대개 맑음</string>
@@ -143,7 +141,7 @@
     <string name="owm_icon_621_shower_snow">소나기 눈</string>
     <string name="owm_icon_622_heavy_shower_snow">폭설</string>
     <string name="owm_icon_701_mist">박무</string>
-    <string name="owm_icon_711_smoke">Smoke</string>
+    <string name="owm_icon_711_smoke">대기 오염</string>
     <string name="owm_icon_721_haze">연무</string>
     <string name="owm_icon_731_dust">황사</string>
     <string name="owm_icon_741_fog">안개</string>
@@ -319,7 +317,7 @@
     <string name="fourthWidgetLabel">현재/일별 간단히</string>
     <string name="real_feel_temperature_simple">체감</string>
     <string name="failed_calculating_sun_rise_set">일출/일몰 계산 오류</string>
-    <string name="loading">Loading</string>
+    <string name="loading">처리중</string>
     <string name="not_available">없음</string>
     <string name="list_type">리스트 형식</string>
     <string name="table_type">테이블 형식</string>
@@ -438,4 +436,8 @@
     <string name="temp_humidity">습도: 50%</string>
     <string name="temp_measuringStation">측정소: A측정소</string>
     <string name="temp_measuringStationName">A측정소</string>
+    <string name="snow_volume_of_grid">강설량</string>
+    <string name="rain_volume_of_grid">강우량</string>
+    <string name="precipitation_volume_of_grid">강수량</string>
+    <string name="wind_chill_temperature_of_grid">체감온도</string>
 </resources>

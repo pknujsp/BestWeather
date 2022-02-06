@@ -106,11 +106,12 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			List<GridItemDto> gridItemDtos = new ArrayList<>();
 
 			if (hourlyForecastDto.getFeelsLikeTemp() != null) {
-				gridItemDtos.add(new GridItemDto(context.getString(R.string.real_feel_temperature), hourlyForecastDto.getFeelsLikeTemp(),
+				gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_chill_temperature_of_grid), hourlyForecastDto.getFeelsLikeTemp(),
 						null));
 			}
 			if (hourlyForecastDto.getPrecipitationType() != null) {
-				gridItemDtos.add(new GridItemDto(context.getString(R.string.precipitation_type), hourlyForecastDto.getPrecipitationType(),
+				gridItemDtos.add(new GridItemDto(context.getString(R.string.precipitation_type),
+						hourlyForecastDto.getPrecipitationType(),
 						ContextCompat.getDrawable(context, hourlyForecastDto.getPrecipitationTypeIcon())));
 			}
 
@@ -193,7 +194,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasPrecipitation()) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.precipitation_volume));
+				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.precipitation_volume_of_grid));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPrecipitationVolume());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 
@@ -206,7 +207,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasRain()) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.rain_volume));
+				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.rain_volume_of_grid));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getRainVolume());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 
@@ -219,7 +220,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasSnow()) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.snow_volume));
+				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.snow_volume_of_grid));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getSnowVolume());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 

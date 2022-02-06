@@ -144,7 +144,8 @@
             android:layout_below="@id/clockLayout"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginRight="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="36dp"
             android:layout_toLeftOf="@id/currentConditionsLayout"
             android:orientation="horizontal" />
     </RelativeLayout>

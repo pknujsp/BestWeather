@@ -38,7 +38,8 @@ public class RetrofitClient {
 	public static final String XML_DATATYPE = "XML";
 	public static final String LOG_TAG = "Retrofit Response";
 
-	private static final OkHttpClient client = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS).build();
+	private static final OkHttpClient client = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS)
+			.connectTimeout(3, TimeUnit.SECONDS).build();
 
 	public enum ServiceType {
 		KMA_YESTERDAY_ULTRA_SRT_NCST, KMA_ULTRA_SRT_NCST, KMA_ULTRA_SRT_FCST, KMA_MID_LAND_FCST, KMA_MID_TA_FCST, KMA_VILAGE_FCST,

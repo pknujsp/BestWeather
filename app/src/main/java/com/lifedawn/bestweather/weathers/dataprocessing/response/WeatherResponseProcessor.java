@@ -569,7 +569,7 @@ public class WeatherResponseProcessor {
 
 	public static CurrentConditionsDto getTempCurrentConditionsDto(Context context) {
 		CurrentConditionsDto tempCurrentConditions = new CurrentConditionsDto();
-		tempCurrentConditions.setTemp(context.getString(R.string.temp_temperature)).setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(Integer.parseInt(context.getString(R.string.temp_tempWindDirectionDegree)))
+		tempCurrentConditions.setTemp(context.getString(R.string.temp_temperature)).setFeelsLikeTemp(context.getString(R.string.temp_feelsLikeTemperature)).setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(Integer.parseInt(context.getString(R.string.temp_tempWindDirectionDegree)))
 				.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, String.valueOf(tempCurrentConditions.getWindDirectionDegree())))
 				.setWindSpeed(context.getString(R.string.temp_windSpeed))
 				.setHumidity(context.getString(R.string.temp_humidity))
@@ -613,8 +613,8 @@ public class WeatherResponseProcessor {
 		final String minTemp = context.getString(R.string.temp_minTemperature);
 		final String maxTemp = context.getString(R.string.temp_maxTemperature);
 
-		final String zeroSnowVolume =context.getString(R.string.temp_snowVolume);
-		final String zeroRainVolume =context.getString(R.string.temp_rainVolume);
+		final String zeroSnowVolume = context.getString(R.string.temp_snowVolume);
+		final String zeroRainVolume = context.getString(R.string.temp_rainVolume);
 		final String pop = context.getString(R.string.temp_pop);
 
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();

@@ -55,7 +55,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
 				WeatherResponseProcessor.getTempCurrentConditionsDto(context),
 				WeatherResponseProcessor.getTempHourlyForecastDtoList(context, hourlyForecastCount),
-				WeatherResponseProcessor.getTempDailyForecastDtoList(context, dailyForecastCount)
+				null
 				, WeatherResponseProcessor.getTempAirQualityDto(), null);
 		return remoteViews;
 	}
@@ -125,8 +125,13 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 
 		//현재 날씨------------------------------------------------------
 		valuesRemoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
-		String feelsLikeTemp = context.getString(R.string.feelsLike) + ":" + currentConditionsDto.getFeelsLikeTemp();
-		valuesRemoteViews.setTextViewText(R.id.feelsLikeTemp, feelsLikeTemp);
+		if (currentConditionsDto.getFeelsLikeTemp() != null) {
+			String feelsLikeTemp = context.getString(R.string.feelsLike) + ": " + currentConditionsDto.getFeelsLikeTemp();
+			valuesRemoteViews.setTextViewText(R.id.feelsLikeTemp, feelsLikeTemp);
+		} else {
+			valuesRemoteViews.setViewVisibility(R.id.feelsLikeTemp, View.GONE);
+
+		}
 		valuesRemoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
 
 		String precipitation = "";

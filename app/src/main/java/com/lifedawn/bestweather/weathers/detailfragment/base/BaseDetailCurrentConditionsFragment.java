@@ -51,7 +51,7 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
 				BundleKey.WeatherDataSource.name());
-		
+
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
 		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));

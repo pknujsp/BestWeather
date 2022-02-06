@@ -28,9 +28,9 @@ import java.util.Set;
 public class FirstWidgetJobService extends AbstractWidgetJobService {
 
 	@Override
-	AbstractWidgetCreator createWidgetViewCreator(int appWidgetId) {
+	AbstractWidgetCreator createWidgetViewCreator(int appWidgetId, int jobId) {
 		FirstWidgetCreator firstWidgetCreator = new FirstWidgetCreator(getApplicationContext(), null, appWidgetId);
-		widgetViewCreator = firstWidgetCreator;
+		widgetCreatorMap.put(jobId, firstWidgetCreator);
 		return firstWidgetCreator;
 	}
 
@@ -53,10 +53,10 @@ public class FirstWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet, int jobId) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
-		FirstWidgetCreator widgetCreator = (FirstWidgetCreator) widgetViewCreator;
+		FirstWidgetCreator widgetCreator = (FirstWidgetCreator) widgetCreatorMap.get(jobId);
 		widgetCreator.setWidgetDto(widgetDto);
 
 		final WeatherDataSourceType weatherDataSourceType = WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherDataSourceTypeSet);
@@ -88,18 +88,6 @@ public class FirstWidgetJobService extends AbstractWidgetJobService {
 
 		widgetDto.setLoadSuccessful(successful);
 
-		if (successful) {
-			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
-		} else {
-			if (widgetDto.getBitmap() == null) {
-				RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-				setRefreshPendingIntent(remoteViews, appWidgetId);
-			} else {
-				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());
-			}
-		}
-
-
-		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
+		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet, jobId);
 	}
 }

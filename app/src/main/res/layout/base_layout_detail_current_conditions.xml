@@ -7,16 +7,16 @@
         style="@style/forecasts_card_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:paddingTop="12dp"
-        android:paddingBottom="12dp"
-        android:orientation="vertical">
+        android:paddingBottom="12dp">
 
         <include
             android:id="@+id/weather_card_view_header"
             layout="@layout/weather_card_header_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp" />
 
         <androidx.gridlayout.widget.GridLayout
             android:id="@+id/conditions_grid"
@@ -25,7 +25,7 @@
             android:paddingLeft="@dimen/cardLRPadding"
             android:paddingRight="@dimen/cardLRPadding"
             app:alignmentMode="alignBounds"
-            app:columnCount="4"
+            app:columnCount="3"
             app:orientation="horizontal"
             app:rowOrderPreserved="false"
             app:useDefaultMargins="false" />

@@ -32,9 +32,9 @@ public class SeventhWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	AbstractWidgetCreator createWidgetViewCreator(int appWidgetId) {
+	AbstractWidgetCreator createWidgetViewCreator(int appWidgetId, int jobId) {
 		SeventhWidgetCreator seventhWidgetCreator = new SeventhWidgetCreator(getApplicationContext(), null, appWidgetId);
-		widgetViewCreator = seventhWidgetCreator;
+		widgetCreatorMap.put(jobId, seventhWidgetCreator);
 		return seventhWidgetCreator;
 	}
 
@@ -47,8 +47,8 @@ public class SeventhWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
-		SeventhWidgetCreator widgetCreator = (SeventhWidgetCreator) widgetViewCreator;
+	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet, int jobId) {
+		SeventhWidgetCreator widgetCreator = (SeventhWidgetCreator) widgetCreatorMap.get(jobId);
 		widgetCreator.setWidgetDto(widgetDto);
 		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
@@ -62,7 +62,7 @@ public class SeventhWidgetJobService extends AbstractWidgetJobService {
 					airQualityDto, new OnDrawBitmapCallback() {
 						@Override
 						public void onCreatedBitmap(Bitmap bitmap) {
-							widgetDto.setBitmap(bitmap);
+
 						}
 					});
 			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, requestWeatherDataTypeSet, requestWeatherDataSourceTypeSet, widgetDto, zoneOffset);
@@ -70,17 +70,8 @@ public class SeventhWidgetJobService extends AbstractWidgetJobService {
 
 		widgetDto.setLoadSuccessful(successful);
 
-		if (successful) {
-			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
-		} else {
-			if (widgetDto.getBitmap() == null) {
-				RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-				setRefreshPendingIntent(remoteViews, appWidgetId);
-			} else {
-				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());
-			}
-		}
 
-		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
+
+		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet, jobId);
 	}
 }

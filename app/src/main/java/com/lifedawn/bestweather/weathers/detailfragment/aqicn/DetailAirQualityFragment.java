@@ -44,7 +44,6 @@ import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
 import com.github.mikephil.charting.utils.ViewPortHandler;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
@@ -280,7 +279,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		barChart.getXAxis().setDrawGridLines(false);
 		barChart.getXAxis().setGranularityEnabled(true);
 		barChart.getXAxis().setGranularity(1f);
-		barChart.getXAxis().setTextSize(14f);
+		barChart.getXAxis().setTextSize(13f);
 		barChart.getXAxis().setCenterAxisLabels(false);
 		barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
 		barChart.getXAxis().setDrawLabels(true);
@@ -431,7 +430,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		MainThreadWorker.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				final int cellWidth = (int) getResources().getDimension(R.dimen.columnWidthInAirQualityBarView);
+				final int cellWidth = (int) getResources().getDimension(R.dimen.minColumnWidthInAirQualityBarView);
 				final int viewWidth = cellWidth * dateList.size();
 				TextsView dateView = new TextsView(getContext(), viewWidth, cellWidth, dateList);
 				dateView.setValueTextSize(14);

@@ -70,8 +70,6 @@ public class WidgetDto {
 	@ColumnInfo(name = "loadSuccessful")
 	private boolean loadSuccessful;
 
-	@ColumnInfo(name = "bitmap")
-	private Bitmap bitmap;
 
 	@ColumnInfo(name = "responseText")
 	private String responseText;
@@ -104,14 +102,6 @@ public class WidgetDto {
 
 	public void setResponseText(String responseText) {
 		this.responseText = responseText;
-	}
-
-	public Bitmap getBitmap() {
-		return bitmap;
-	}
-
-	public void setBitmap(Bitmap bitmap) {
-		this.bitmap = bitmap;
 	}
 
 	public long getId() {

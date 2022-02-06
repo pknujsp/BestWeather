@@ -41,13 +41,13 @@ public class DetailCurrentConditionsFragment extends BaseDetailCurrentConditions
 			addGridItem(R.string.precipitation_type, currentConditionsDto.getPrecipitationType(), null);
 		}
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
-			addGridItem(R.string.precipitation_volume, currentConditionsDto.getPrecipitationVolume(), null);
+			addGridItem(R.string.precipitation_volume_of_grid, currentConditionsDto.getPrecipitationVolume(), null);
 		}
 		if (currentConditionsDto.isHasRainVolume()) {
-			addGridItem(R.string.rain_volume, currentConditionsDto.getRainVolume(), null);
+			addGridItem(R.string.rain_volume_of_grid, currentConditionsDto.getRainVolume(), null);
 		}
 		if (currentConditionsDto.isHasSnowVolume()) {
-			addGridItem(R.string.snow_volume, currentConditionsDto.getSnowVolume(), null);
+			addGridItem(R.string.snow_volume_of_grid, currentConditionsDto.getSnowVolume(), null);
 		}
 
 		if (currentConditionsDto.getTemp() != null) {
@@ -55,7 +55,7 @@ public class DetailCurrentConditionsFragment extends BaseDetailCurrentConditions
 					null);
 		}
 		if (currentConditionsDto.getFeelsLikeTemp() != null) {
-			addGridItem(R.string.real_feel_temperature, currentConditionsDto.getFeelsLikeTemp(),
+			addGridItem(R.string.wind_chill_temperature_of_grid, currentConditionsDto.getFeelsLikeTemp(),
 					null);
 		}
 		if (currentConditionsDto.getHumidity() != null) {

@@ -2,11 +2,13 @@ package com.lifedawn.bestweather.widget.widgetprovider;
 
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.appwidget.AppWidgetHost;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.ArraySet;
@@ -31,17 +33,24 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	protected static final int JOB_ACTION_BOOT_COMPLETED = 300000;
 	protected static final int JOB_REDRAW = 400000;
 	protected static final int JOB_INIT = 500000;
+	protected AppWidgetManager appWidgetManager;
 
 	protected abstract Class<?> getJobServiceClass();
 
 	protected abstract AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId);
 
 	protected void reDraw(Context context, int[] appWidgetIds) {
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		if (appWidgetManager == null) {
+			appWidgetManager = AppWidgetManager.getInstance(context);
+		}
 		final Class<?> widgetProviderClass = getClass();
 
 		for (int i = 0; i < appWidgetIds.length; i++) {
 			final int appWidgetId = appWidgetIds[i];
+
+			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null) {
+				continue;
+			}
 
 			AbstractWidgetCreator widgetCreator = getWidgetCreatorInstance(context, appWidgetId);
 			widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
@@ -138,6 +147,14 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 
 
 	protected final void scheduleJob(Context context, String action, int jobIdBegin, int appWidgetId, @Nullable PersistableBundle extras) {
+		if (appWidgetManager == null) {
+			appWidgetManager = AppWidgetManager.getInstance(context);
+		}
+
+		if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null) {
+			return;
+		}
+
 		final PersistableBundle persistableBundle = new PersistableBundle();
 		if (extras != null) {
 			persistableBundle.putAll(extras);
@@ -151,19 +168,30 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 
 		JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
-		List<JobInfo> pendingJobs = jobScheduler.getAllPendingJobs();
-		if (jobIdBegin == JOB_REFRESH && pendingJobs.size() > 0) {
-			Set<Integer> closeJobIdSet = new ArraySet<>();
-			closeJobIdSet.add(JOB_ID_ON_APP_WIDGET_OPTIONS_CHANGED + appWidgetId);
-			closeJobIdSet.add(JOB_ACTION_BOOT_COMPLETED + appWidgetId);
-			closeJobIdSet.add(JOB_REDRAW + appWidgetId);
+		/*
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+			JobInfo existingJobInfo = jobScheduler.getPendingJob(newJobId);
+			if (existingJobInfo != null) {
+				jobScheduler.cancel(existingJobInfo.getId());
+			}
+		} else {
+			List<JobInfo> pendingJobs = jobScheduler.getAllPendingJobs();
+			if (jobIdBegin == JOB_REFRESH && pendingJobs.size() > 0) {
+				Set<Integer> closeJobIdSet = new ArraySet<>();
+				closeJobIdSet.add(JOB_ID_ON_APP_WIDGET_OPTIONS_CHANGED + appWidgetId);
+				closeJobIdSet.add(JOB_ACTION_BOOT_COMPLETED + appWidgetId);
+				closeJobIdSet.add(JOB_REDRAW + appWidgetId);
 
-			for (JobInfo jobInfo : pendingJobs) {
-				if (closeJobIdSet.contains(jobInfo.getId())) {
-					jobScheduler.cancel(jobInfo.getId());
+				for (JobInfo jobInfo : pendingJobs) {
+					if (closeJobIdSet.contains(jobInfo.getId())) {
+						jobScheduler.cancel(jobInfo.getId());
+						jobScheduler.
+					}
 				}
 			}
 		}
+
+		 */
 
 		jobScheduler.schedule(newJobInfo);
 	}

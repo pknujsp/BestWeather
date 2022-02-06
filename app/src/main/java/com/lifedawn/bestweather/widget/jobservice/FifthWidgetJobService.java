@@ -35,9 +35,9 @@ public class FifthWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	AbstractWidgetCreator createWidgetViewCreator(int appWidgetId) {
+	AbstractWidgetCreator createWidgetViewCreator(int appWidgetId, int jobId) {
 		FifthWidgetCreator fifthWidgetCreator = new FifthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		widgetViewCreator = fifthWidgetCreator;
+		widgetCreatorMap.put(jobId, fifthWidgetCreator);
 		return fifthWidgetCreator;
 	}
 
@@ -51,10 +51,10 @@ public class FifthWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet, int jobId) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
-		FifthWidgetCreator widgetCreator = (FifthWidgetCreator) widgetViewCreator;
+		FifthWidgetCreator widgetCreator = (FifthWidgetCreator) widgetCreatorMap.get(jobId);
 		widgetCreator.setWidgetDto(widgetDto);
 		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
@@ -74,7 +74,7 @@ public class FifthWidgetJobService extends AbstractWidgetJobService {
 					hourlyForecastDtoList, new OnDrawBitmapCallback() {
 						@Override
 						public void onCreatedBitmap(Bitmap bitmap) {
-							widgetDto.setBitmap(bitmap);
+
 						}
 					});
 			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, requestWeatherDataTypeSet, requestWeatherDataSourceTypeSet, widgetDto, zoneOffset);
@@ -82,17 +82,7 @@ public class FifthWidgetJobService extends AbstractWidgetJobService {
 
 		widgetDto.setLoadSuccessful(successful);
 
-		if (successful) {
-			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
-		} else {
-			if (widgetDto.getBitmap() == null) {
-				RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-				setRefreshPendingIntent(remoteViews, appWidgetId);
-			} else {
-				widgetCreator.drawBitmap(remoteViews, widgetDto.getBitmap());
-			}
-		}
 
-		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet);
+		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet, jobId);
 	}
 }
