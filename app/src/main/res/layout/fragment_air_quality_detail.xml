@@ -51,10 +51,7 @@
                         android:id="@+id/horizontalScrollView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:overScrollMode="never"
-                        android:scrollbarSize="1dp"
-                        android:scrollbarStyle="insideInset"
-                        android:scrollbars="horizontal">
+                        android:scrollbars="none">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -133,9 +130,9 @@
 
 
                     <RelativeLayout
-                        android:layout_marginBottom="4dp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:gravity="center_vertical">
 
                         <TextView
@@ -150,20 +147,20 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
                             android:layout_marginRight="8dp"
+                            android:layout_toLeftOf="@id/current_airquality"
                             android:text="@string/air_quality"
                             android:textColor="@color/black"
-                            android:layout_centerVertical="true"
-                            android:layout_toLeftOf="@id/current_airquality"
                             android:textSize="16sp" />
 
                         <TextView
                             android:id="@+id/current_airquality"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/aqi_1_good"
-                            android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:text="@string/aqi_1_good"
                             android:textSize="16sp" />
 
                     </RelativeLayout>

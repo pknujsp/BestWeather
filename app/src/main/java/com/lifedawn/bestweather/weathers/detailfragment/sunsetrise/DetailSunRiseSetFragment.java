@@ -28,6 +28,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.model.GradientColor;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
@@ -94,8 +95,14 @@ public class DetailSunRiseSetFragment extends Fragment {
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 
-		AdRequest adRequest = new AdRequest.Builder().build();
-		binding.adViewBelowScrollView.loadAd(adRequest);
+		binding.adViewBelowScrollView.loadAd(new AdRequest.Builder().build());
+		binding.adViewBelowScrollView.setAdListener(new AdListener() {
+			@Override
+			public void onAdClosed() {
+				super.onAdClosed();
+				binding.adViewBelowScrollView.loadAd(new AdRequest.Builder().build());
+			}
+		});
 
 		binding.toolbar.fragmentTitle.setText(R.string.detailSunRiseSet);
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {

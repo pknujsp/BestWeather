@@ -57,9 +57,6 @@ public class NotificationFragment extends Fragment {
 			}
 		});
 
-		AdRequest adRequest = new AdRequest.Builder().build();
-		binding.adViewBottom.loadAd(adRequest);
-
 		binding.always.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

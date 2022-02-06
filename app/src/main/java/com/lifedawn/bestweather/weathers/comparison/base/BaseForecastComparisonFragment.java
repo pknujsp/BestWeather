@@ -18,6 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
@@ -88,8 +89,14 @@ public class BaseForecastComparisonFragment extends Fragment {
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 
-		AdRequest adRequest = new AdRequest.Builder().build();
-		binding.adViewBelowScrollView.loadAd(adRequest);
+		binding.adViewBelowScrollView.loadAd(new AdRequest.Builder().build());
+		binding.adViewBelowScrollView.setAdListener(new AdListener() {
+			@Override
+			public void onAdClosed() {
+				super.onAdClosed();
+				binding.adViewBelowScrollView.loadAd(new AdRequest.Builder().build());
+			}
+		});
 
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override

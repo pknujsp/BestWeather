@@ -43,6 +43,7 @@ import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
@@ -121,8 +122,14 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 		binding.toolbar.fragmentTitle.setText(R.string.detail_air_quality);
 
-		AdRequest adRequest = new AdRequest.Builder().build();
-		binding.adViewBelowGrid.loadAd(adRequest);
+		binding.adViewBelowGrid.loadAd(new AdRequest.Builder().build());
+		binding.adViewBelowGrid.setAdListener(new AdListener() {
+			@Override
+			public void onAdClosed() {
+				super.onAdClosed();
+				binding.adViewBelowGrid.loadAd(new AdRequest.Builder().build());
+			}
+		});
 
 		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override

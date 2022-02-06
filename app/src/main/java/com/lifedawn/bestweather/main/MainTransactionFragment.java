@@ -4,11 +4,13 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -21,10 +23,19 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.ads.nativetemplates.NativeTemplateStyle;
+import com.google.android.ads.nativetemplates.TemplateView;
+import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.nativead.NativeAd;
+import com.google.android.gms.ads.nativead.NativeAdOptions;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.CloseWindow;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
@@ -62,7 +73,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	private final CloseWindow closeWindow = new CloseWindow(new CloseWindow.OnBackKeyDoubleClickedListener() {
 		@Override
 		public void onDoubleClicked() {
-			requireActivity().finish();
+
 		}
 	});
 
@@ -72,7 +83,8 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			if (getChildFragmentManager().getBackStackEntryCount() > 0) {
 				getChildFragmentManager().popBackStackImmediate();
 			} else {
-				closeWindow.clicked(getActivity());
+				//closeWindow.clicked(getActivity());
+				onBeforeCloseApp();
 			}
 		}
 
@@ -134,6 +146,52 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		}
 
 	};
+
+	protected void onBeforeCloseApp() {
+		View view = getLayoutInflater().inflate(R.layout.close_app_dialog, null);
+		AlertDialog dialog = new MaterialAlertDialogBuilder(requireActivity())
+				.setView(view).create();
+		dialog.show();
+
+		Window window = dialog.getWindow();
+		if (window != null) {
+			window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+			WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+			layoutParams.copyFrom(dialog.getWindow().getAttributes());
+			layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
+			//layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+			//window.setAttributes(layoutParams);
+		}
+
+		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_testUnitId))
+				.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
+					@Override
+					public void onNativeAdLoaded(NativeAd nativeAd) {
+						NativeTemplateStyle styles = new
+								NativeTemplateStyle.Builder().withMainBackgroundColor(new ColorDrawable(Color.WHITE)).build();
+						TemplateView template = (TemplateView) view.findViewById(R.id.adView);
+						template.setStyles(styles);
+						template.setNativeAd(nativeAd);
+					}
+				}).withNativeAdOptions(new NativeAdOptions.Builder().setRequestCustomMuteThisAd(true).build())
+				.build();
+		adLoader.loadAd(new AdRequest.Builder().build());
+
+		view.findViewById(R.id.cancelBtn).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+			}
+		});
+		view.findViewById(R.id.closeBtn).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+				requireActivity().finish();
+			}
+		});
+
+	}
 
 	private void setCurrentLocationState(boolean newState) {
 		binding.sideNavMenu.currentLocationLayout.setClickable(newState);

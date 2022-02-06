@@ -56,7 +56,7 @@ public class DailyNotiHelper {
 
 	public void disablePushNotification(int id) {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id + 6000, new Intent(context,
-				DailyPushNotificationReceiver.class), PendingIntent.FLAG_UPDATE_CURRENT);
+				DailyPushNotificationReceiver.class), PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();

@@ -45,10 +45,13 @@ import com.bumptech.glide.request.transition.Transition;
 import com.github.matteobattilana.weather.PrecipType;
 import com.google.android.ads.nativetemplates.NativeTemplateStyle;
 import com.google.android.ads.nativetemplates.TemplateView;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.nativead.NativeAd;
+import com.google.android.gms.ads.nativead.NativeAdOptions;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
@@ -343,11 +346,27 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						TemplateView template = binding.adViewBottom;
 						template.setStyles(styles);
 						template.setNativeAd(nativeAd);
+
+						if (nativeAd.isCustomMuteThisAdEnabled()) {
+
+						}
 					}
-				})
+				}).withNativeAdOptions(new NativeAdOptions.Builder().setRequestCustomMuteThisAd(true).build())
 				.build();
 		adLoader.loadAd(adRequest);
 		binding.adViewBelowAirQuality.loadAd(adRequest);
+		binding.adViewBelowAirQuality.setAdListener(new AdListener() {
+			@Override
+			public void onAdClosed() {
+				super.onAdClosed();
+				binding.adViewBelowAirQuality.loadAd(new AdRequest.Builder().build());
+			}
+
+			@Override
+			public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+				super.onAdFailedToLoad(loadAdError);
+			}
+		});
 
 		binding.adViewBelowAirQuality.setVisibility(View.GONE);
 		binding.adViewBottom.setVisibility(View.GONE);

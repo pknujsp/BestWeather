@@ -34,7 +34,7 @@
     <string name="settings">settings</string>
 
     <string name="pref_summary_value_units">temperature : ℃, ℉ / wind speed : m/s, km/h etc.</string>
-    <string name="pref_title_value_units">value unit</string>
+    <string name="pref_title_value_units">Value unit</string>
 
     <string name="pref_summary_app_theme">black, white</string>
     <string name="pref_title_app_theme">App Theme</string>
@@ -53,13 +53,13 @@
     <string name="pref_title_open_weather_map" translatable="false">OpenWeatherMap</string>
 
     <string name="pref_summary_kma_top_priority">If the requested weather data is in the Republic of Korea, data from the Korea Meteorological Administration is displayed by default.</string>
-    <string name="pref_title_kma_top_priority">The Korea Meteorological Administration is set as a top priority</string>
+    <string name="pref_title_kma_top_priority">The Korea MA is set as a top priority</string>
 
     <string name="pref_summary_use_current_location">Display the current location\'s weather via GPS</string>
     <string name="pref_title_use_current_location">Use your current location</string>
 
     <string name="pref_summary_weather_data_sources">OpenWeatherMap, Kma~</string>
-    <string name="pref_title_weather_data_sources">weather provider</string>
+    <string name="pref_title_weather_data_sources">Weather provider</string>
 
     <string name="pref_title_forecast_view_type">type of forecast data list</string>
 
@@ -241,7 +241,7 @@
     <string name="rain_volume">rain volume</string>
     <string name="snow_volume">snow volume</string>
     <string name="precipitation_volume">precipitation volume</string>
-    <string name="current">current</string>
+    <string name="current">Current</string>
     <string name="rain">rain</string>
     <string name="snow">snow</string>
     <string name="real_feel_temperature">wind chill temp</string>
@@ -303,9 +303,9 @@
     <string name="comparison_daily_forecast">Daily Forecast Comparison</string>
     <string name="detail_hourly_forecast">Detailed Hourly Forecast</string>
     <string name="detail_daily_forecast">Detailed Daily Forecast</string>
-    <string name="good">good</string>
-    <string name="compare">compare</string>
-    <string name="detail">detail</string>
+    <string name="good">Good</string>
+    <string name="compare">Compare</string>
+    <string name="detail">Detail</string>
     <string name="favorite">favorite</string>
     <string name="title_pick_weather_data_source">select weather provider</string>
     <string name="precipitation_of_snow">precipitation of snow</string>
@@ -313,13 +313,13 @@
     <string name="hours_of_precipitation">hours of precipitation</string>
     <string name="hours_of_rain">hours of rain</string>
     <string name="precipitation_intensity">precipitation intensity</string>
-    <string name="measuring_station_name">station</string>
-    <string name="address_name">address</string>
-    <string name="updated_time">updated time</string>
-    <string name="detail_air_quality">detail air quality</string>
+    <string name="measuring_station_name">Station</string>
+    <string name="address_name">Address</string>
+    <string name="updated_time">Updated time</string>
+    <string name="detail_air_quality">Detailed Air quality</string>
     <string name="not_precipitation">no precipitation</string>
     <string name="the_measuring_station_is_very_far_away">The measuring station is very far away.</string>
-    <string name="distance_to_measuring_station">distance</string>
+    <string name="distance_to_measuring_station">Distance</string>
     <string name="duplicate_address">This address has already been added</string>
     <string name="msg_empty_locations">There is no place to display the weather. Please use your current location or add a favorite.</string>
     <string name="title_empty_locations">no place to show</string>
@@ -465,8 +465,8 @@
     <string name="am">AM</string>
     <string name="pm">PM</string>
     <string name="today">today</string>
-    <string name="detailSunRiseSet">detail sun rise/set</string>
-    <string name="currentAndForecast">current, forecast</string>
+    <string name="detailSunRiseSet">Detailed sun rise/set</string>
+    <string name="currentAndForecast">Current, forecast</string>
     <string name="fifthWidgetLabel">current/hourly graph</string>
     <string name="TheTemperatureIsTheSameAsYesterday">The temperature is the same as yesterday</string>
     <string name="thanYesterday">than yesterday</string>

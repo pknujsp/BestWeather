@@ -64,9 +64,6 @@ public class SettingsMainFragment extends Fragment implements IAppbarTitle {
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 
-		AdRequest adRequest = new AdRequest.Builder().build();
-		binding.adViewBottom.loadAd(adRequest);
-
 		SettingsFragment settingsFragment = new SettingsFragment(this);
 		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), settingsFragment).commitNow();
 

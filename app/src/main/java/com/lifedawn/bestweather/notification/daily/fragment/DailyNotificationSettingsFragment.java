@@ -182,6 +182,9 @@ public class DailyNotificationSettingsFragment extends Fragment {
 							getActivity().runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
+									String text =
+											LocalTime.parse(result.getAlarmClock()).format(hoursFormatter) + ", " + getString(R.string.registeredDailyNotification);
+									Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
 									dailyNotiHelper.enablePushNotification(result);
 									getParentFragmentManager().popBackStack();
 								}

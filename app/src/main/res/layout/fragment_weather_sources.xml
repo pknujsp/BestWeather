@@ -34,6 +34,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_marginTop="32dp"
+                    android:layout_toLeftOf="@id/accu_weather"
                     android:layout_toRightOf="@id/accuicon"
                     android:text="@string/accu_weather"
                     android:textColor="@color/black"
@@ -44,7 +45,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/accu_weather_name"
+
                     android:layout_alignLeft="@id/accu_weather_name"
+                    android:layout_toLeftOf="@id/accu_weather"
                     android:text="@string/pref_summary_accu_weather"
                     android:textSize="14sp" />
 
@@ -80,8 +83,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
+                    android:layout_toLeftOf="@id/open_weather_map"
                     android:layout_toRightOf="@id/owmicon"
                     android:text="@string/owm"
+
                     android:textColor="@color/black"
                     android:textSize="22sp" />
 
@@ -89,8 +94,10 @@
                     android:id="@+id/open_weather_map_description"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+
                     android:layout_below="@id/open_weather_map_name"
                     android:layout_alignLeft="@id/open_weather_map_name"
+                    android:layout_toLeftOf="@id/open_weather_map"
                     android:text="@string/pref_summary_open_weather_map"
                     android:textSize="14sp" />
 
@@ -128,7 +135,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
+                    android:layout_toLeftOf="@id/kma_top_priority"
                     android:layout_toRightOf="@id/kmaicon"
+
                     android:text="@string/pref_title_kma_top_priority"
                     android:textColor="@color/black"
                     android:textSize="17sp" />
@@ -154,12 +163,6 @@
                     android:gravity="center_vertical" />
 
             </RelativeLayout>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/msg_kma_always_enabled_in_south_korea"
-                android:textSize="14sp" />
 
         </LinearLayout>
 
