@@ -44,15 +44,17 @@ public class DailyNotificationHelper {
 	public void enablePushNotification(DailyPushNotificationDto dailyPushNotificationDto) {
 		LocalTime localTime = LocalTime.parse(dailyPushNotificationDto.getAlarmClock());
 
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.HOUR_OF_DAY, localTime.getHour());
-		calendar.set(Calendar.MINUTE, localTime.getMinute());
+		Calendar alarmCalendar = Calendar.getInstance();
+		alarmCalendar.set(Calendar.HOUR_OF_DAY, localTime.getHour());
+		alarmCalendar.set(Calendar.MINUTE, localTime.getMinute());
 
-		if (calendar.before(Calendar.getInstance())) {
-			calendar.add(Calendar.DATE, 1);
+		Calendar current = Calendar.getInstance();
+
+		if (alarmCalendar.before(current)) {
+			alarmCalendar.add(Calendar.DATE, 1);
 		}
 
-		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(),
 				getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_UPDATE_CURRENT));
 	}
 

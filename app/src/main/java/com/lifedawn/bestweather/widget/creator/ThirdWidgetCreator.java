@@ -127,6 +127,9 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		}
 		((TextView) view.findViewById(R.id.precipitation)).setText(precipitation);
 
+		String feelsLikeTemp = context.getString(R.string.feelsLike) + ": " + currentConditionsDto.getFeelsLikeTemp();
+		((TextView) view.findViewById(R.id.feelsLikeTemp)).setText(feelsLikeTemp);
+
 		((TextView) view.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
 		((TextView) view.findViewById(R.id.airQuality)).setTextSize(TypedValue.COMPLEX_UNIT_PX, aqiTextSize);
 		((TextView) view.findViewById(R.id.precipitation)).setTextSize(TypedValue.COMPLEX_UNIT_PX, precipitationTextSize);

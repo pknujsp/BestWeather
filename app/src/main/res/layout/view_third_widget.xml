@@ -14,7 +14,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:gravity="center"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
 
@@ -38,6 +38,19 @@
                     android:text="@string/temp_temperature"
                     android:textColor="@color/widgetTextColor"
                     android:textSize="@dimen/tempTextSizeInFullWidget" />
+
+                <TextView
+                    android:id="@+id/feelsLikeTemp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@id/temperature"
+                    android:layout_marginLeft="8dp"
+                    android:layout_toRightOf="@id/temperature"
+                    android:includeFontPadding="false"
+                    android:text="@string/temp_feelsLikeTemperature"
+                    android:textColor="@color/widgetTextColor"
+                    android:textSize="@dimen/feelsLikeTempTextSizeInThirdWidget" />
+
 
                 <TextView
                     android:id="@+id/yesterdayTemperature"

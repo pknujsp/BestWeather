@@ -32,6 +32,8 @@
                         android:id="@+id/notificationList"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentBottom="true"
                         android:orientation="vertical"
                         tools:itemCount="3"
                         tools:listitem="@layout/view_daily_push_notification_item" />

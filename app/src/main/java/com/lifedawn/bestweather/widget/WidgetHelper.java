@@ -27,26 +27,25 @@ public class WidgetHelper {
 	public void onSelectedAutoRefreshInterval(long val, int appWidgetId) {
 		cancelAutoRefresh(appWidgetId);
 
-		if (val == 0) {
-			return;
+		if (val > 0) {
+			Intent refreshIntent = new Intent(context, widgetProviderClass);
+			refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+			Bundle bundle = new Bundle();
+			bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+			refreshIntent.putExtras(bundle);
+
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, refreshIntent,
+					PendingIntent.FLAG_UPDATE_CURRENT);
+
+			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), val, pendingIntent);
 		}
 
-		Intent refreshIntent = new Intent(context, widgetProviderClass);
-		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-		Bundle bundle = new Bundle();
-		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-		refreshIntent.putExtras(bundle);
 
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, refreshIntent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
-
-		alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
-				val, pendingIntent);
 	}
 
 	public void cancelAutoRefresh(int appWidgetId) {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, widgetProviderClass),
-				PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();

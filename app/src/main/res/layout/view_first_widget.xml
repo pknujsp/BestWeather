@@ -38,10 +38,10 @@
                 android:id="@+id/feelsLikeTemp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/temperature"
                 android:layout_marginLeft="8dp"
                 android:layout_toRightOf="@id/temperature"
                 android:includeFontPadding="false"
-                android:layout_alignBaseline="@id/temperature"
                 android:text="@string/temp_feelsLikeTemperature"
                 android:textColor="@color/widgetTextColor"
                 android:textSize="@dimen/feelsLikeTempTextSizeInFirstWidget" />

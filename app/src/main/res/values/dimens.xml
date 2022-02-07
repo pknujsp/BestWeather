@@ -214,5 +214,6 @@
     <dimen name="yesterdayTempTextSizeInCurrentWidget">14sp</dimen>
     <dimen name="yesterdayTempTextSizeInThirdWidget">14sp</dimen>
     <dimen name="yesterdayTempTextSizeInSixWidget">14sp</dimen>
+    <dimen name="feelsLikeTempTextSizeInThirdWidget">18sp</dimen>
 
 </resources>

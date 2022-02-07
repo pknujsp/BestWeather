@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
@@ -43,8 +44,13 @@ import com.github.mikephil.charting.utils.MPPointF;
 import com.github.mikephil.charting.utils.Transformer;
 import com.github.mikephil.charting.utils.Utils;
 import com.github.mikephil.charting.utils.ViewPortHandler;
+import com.google.android.ads.nativetemplates.NativeTemplateStyle;
+import com.google.android.ads.nativetemplates.TemplateView;
 import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.nativead.NativeAd;
+import com.google.android.gms.ads.nativead.NativeAdOptions;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
@@ -154,6 +160,25 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		setAirPollutionMaterialsInfo();
 		setAqiGradeInfo();
 		setValuesToViews();
+
+		AdRequest adRequest = new AdRequest.Builder().build();
+		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_testUnitId))
+				.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
+					@Override
+					public void onNativeAdLoaded(NativeAd nativeAd) {
+						NativeTemplateStyle styles = new
+								NativeTemplateStyle.Builder().withMainBackgroundColor(new ColorDrawable(Color.WHITE)).build();
+						TemplateView template = binding.adView;
+						template.setStyles(styles);
+						template.setNativeAd(nativeAd);
+
+						if (nativeAd.isCustomMuteThisAdEnabled()) {
+
+						}
+					}
+				}).withNativeAdOptions(new NativeAdOptions.Builder().setRequestCustomMuteThisAd(true).build())
+				.build();
+		adLoader.loadAd(adRequest);
 	}
 
 	@Override

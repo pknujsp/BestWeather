@@ -6,7 +6,6 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         android:background="?attr/backgroundColor"
         android:orientation="vertical">
 
@@ -126,6 +125,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
+                    android:clickable="false"
                     android:orientation="vertical">
 
 
@@ -184,6 +184,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
+                    android:layout_marginBottom="24dp"
+                    android:clickable="false"
                     android:orientation="vertical">
 
                     <TextView
@@ -269,6 +271,15 @@
 
 
                 </LinearLayout>
+
+                <com.google.android.ads.nativetemplates.TemplateView
+                    android:id="@+id/adView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="24dp"
+                    app:gnt_template_type="@layout/gnt_medium_template_view" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 

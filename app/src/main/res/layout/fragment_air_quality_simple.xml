@@ -28,7 +28,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
+                android:layout_marginBottom="4dp"
                 android:text="@string/measuring_station_name"
                 android:textColor="?attr/textColorInWeatherCard"
                 android:textSize="16sp" />
@@ -45,7 +45,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="3dp"
+                android:layout_marginBottom="4dp"
                 android:text="@string/distance_to_measuring_station"
                 android:textColor="?attr/textColorInWeatherCard"
                 android:textSize="16sp" />
@@ -64,36 +64,40 @@
                 style="@style/sub_title_in_forecast_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:gravity="center_vertical">
 
                 <TextView
                     style="@style/sub_title_in_forecast_card"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="0dp"
                     android:layout_alignParentLeft="true"
                     android:layout_centerVertical="true"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginEnd="0dp"
+                    android:layout_marginBottom="0dp"
                     android:text="@string/current"
                     android:textColor="?attr/textColorInWeatherCard" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_marginRight="8dp"
+                    android:layout_toLeftOf="@id/current_airquality"
                     android:text="@string/air_quality"
                     android:textColor="@color/white"
-                    android:layout_centerVertical="true"
-                    android:layout_toLeftOf="@id/current_airquality"
                     android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/current_airquality"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
                     android:text="@string/aqi_1_good"
                     android:textColor="@color/white"
-                    android:layout_centerVertical="true"
-                    android:layout_alignParentRight="true"
                     android:textSize="16sp" />
 
             </RelativeLayout>
@@ -102,9 +106,11 @@
                 android:id="@+id/grid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
                 app:alignmentMode="alignBounds"
                 app:columnCount="3"
                 app:orientation="horizontal"
+
                 app:rowOrderPreserved="false"
                 app:useDefaultMargins="false" />
 
@@ -112,6 +118,7 @@
                 style="@style/sub_title_in_forecast_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:text="@string/daily_forecast"
                 android:textColor="?attr/textColorInWeatherCard" />
 
@@ -126,9 +133,7 @@
         <com.lifedawn.bestweather.commons.views.ProgressResultView
             android:id="@+id/progress_result_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp" />
+            android:layout_height="wrap_content" />
 
 
     </LinearLayout>

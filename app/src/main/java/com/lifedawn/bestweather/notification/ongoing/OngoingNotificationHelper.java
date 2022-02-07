@@ -42,14 +42,14 @@ public class OngoingNotificationHelper {
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Always.getNotificationId(), refreshIntent,
 					PendingIntent.FLAG_UPDATE_CURRENT);
 
-			alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
+			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
 					millis, pendingIntent);
 		}
 	}
 
 	public void cancelAutoRefresh() {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Always.getNotificationId(), new Intent(context, OngoingNotificationReceiver.class)
-				, PendingIntent.FLAG_UPDATE_CURRENT);
+				, PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 		}
