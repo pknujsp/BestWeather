@@ -114,17 +114,17 @@ public abstract class AbstractOngoingNotiViewCreator {
 				RemoteViewsUtil.onErrorProcess(collapsedRemoteViews, context, errorType);
 				RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, errorType);
 
-				makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_foreground, true);
+				makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_round, true);
 			}
 		};
 
-		FusedLocation.getInstance(context).startLocationUpdates(locationCallback, true);
+		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, true);
 	}
 
 
 	public void loadWeatherData(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
 		RemoteViewsUtil.onBeginProcess(expandedRemoteViews);
-		makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_foreground, false);
+		makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_round, false);
 
 		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
 		WeatherDataSourceType weatherDataSourceType = notificationDataObj.getWeatherSourceType();

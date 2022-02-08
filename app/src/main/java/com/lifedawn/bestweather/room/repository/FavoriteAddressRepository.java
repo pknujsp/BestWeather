@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
 
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.AppDb;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dao.FavoriteAddressDao;
@@ -20,7 +21,7 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 	private FavoriteAddressDao favoriteAddressDao;
 	private MutableLiveData<FavoriteAddressDto> addAddressesLiveData = new MutableLiveData<>();
 	private MutableLiveData<FavoriteAddressDto> deleteAddressesLiveData = new MutableLiveData<>();
-	private ExecutorService executors = Executors.newFixedThreadPool(2);
+	private ExecutorService executors = MyApplication.getExecutorService();
 	private SharedPreferences sharedPreferences;
 	private Context context;
 

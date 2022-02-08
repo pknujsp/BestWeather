@@ -115,7 +115,7 @@ public class FindAddressFragment extends Fragment {
 							loadingDialog = null;
 						}
 					});
-					fusedLocation.startLocationUpdates(myLocationCallback, false);
+					fusedLocation.findCurrentLocation(myLocationCallback, false);
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
 				}

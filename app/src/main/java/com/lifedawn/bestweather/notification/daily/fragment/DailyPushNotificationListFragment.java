@@ -104,23 +104,18 @@ public class DailyPushNotificationListFragment extends Fragment {
 			@Override
 			public void onCheckedSwitch(DailyPushNotificationDto dailyPushNotificationDto, boolean isChecked) {
 				dailyPushNotificationDto.setEnabled(isChecked);
-				repository.update(dailyPushNotificationDto, new DbQueryCallback<DailyPushNotificationDto>() {
-					@Override
-					public void onResultSuccessful(DailyPushNotificationDto result) {
-						dailyNotificationHelper.modifyPushNotification(result);
-					}
+				dailyNotificationHelper.modifyPushNotification(dailyPushNotificationDto);
 
-					@Override
-					public void onResultNoData() {
-
-					}
-				});
+				repository.update(dailyPushNotificationDto, null);
+				String text = LocalTime.parse(dailyPushNotificationDto.getAlarmClock()).format(hoursFormatter)
+						+ ", ";
 
 				if (isChecked) {
-					String text =
-							LocalTime.parse(dailyPushNotificationDto.getAlarmClock()).format(hoursFormatter) + ", " + getString(R.string.registeredDailyNotification);
-					Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+					text += getString(R.string.registeredDailyNotification);
+				} else {
+					text += getString(R.string.unregisteredDailyNotification);
 				}
+				Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
 			}
 		}, new OnClickedPopupMenuItemListener<DailyPushNotificationDto>() {
 			@Override

@@ -13,11 +13,10 @@ public class OngoingNotificationReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		final String action = intent.getAction();
 
-		if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+		if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 			OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(context);
 			ongoingNotificationHelper.reStartNotification();
 		} else {
-
 			JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
 			PersistableBundle persistableBundle = new PersistableBundle();

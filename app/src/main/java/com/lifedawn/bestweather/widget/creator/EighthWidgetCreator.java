@@ -130,7 +130,6 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 			valuesRemoteViews.setTextViewText(R.id.feelsLikeTemp, feelsLikeTemp);
 		} else {
 			valuesRemoteViews.setViewVisibility(R.id.feelsLikeTemp, View.GONE);
-
 		}
 		valuesRemoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
 

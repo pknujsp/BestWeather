@@ -83,11 +83,9 @@ public class FourthDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 
 		if (successful) {
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, airQualityDto);
-			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 			makeNotification(remoteViews, dailyPushNotificationDto.getId());
 		} else {
 			makeFailedNotification(dailyPushNotificationDto.getId(), context.getString(R.string.msg_failed_update));
-
 		}
 
 	}

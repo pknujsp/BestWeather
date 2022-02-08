@@ -281,16 +281,16 @@
     <!-- etc -->
     <string name="fresh_snow_cover">fresh cover snow</string>
     <string name="thunderstorm">thunderstorm</string>
-    <string name="noData">no data</string>
+    <string name="noData">No data</string>
     <string name="message_request_double_click_for_close">Press once more to exit</string>
     <string name="msg_kma_always_enabled_in_south_korea">If the requested weather data is in the Republic of Korea, data from the Korea Meteorological Administration is displayed by default.</string>
     <string name="msg_at_least_one_must_be_selected">At least one must be selected</string>
-    <string name="finding_address">searcing address</string>
+    <string name="finding_address">searching address</string>
     <string name="hint_input_address">input address</string>
     <string name="find_address">search address</string>
     <string name="not_search_result">No search results</string>
     <string name="empty_favorite_addresses">Favorite is empty</string>
-    <string name="current_location">current location</string>
+    <string name="current_location">Current location</string>
     <string name="request_to_make_gps_on">Please turn on GPS</string>
     <string name="check">ok</string>
     <string name="no">no</string>
@@ -353,7 +353,7 @@
     <string name="open_app">open app</string>
     <string name="text_size">text size</string>
     <string name="location">location</string>
-    <string name="selected_location">selected location</string>
+    <string name="selected_location">Selected location</string>
     <string name="background_transparency">background transparency</string>
     <string name="auto_refresh_interval">auto update interval</string>
     <string name="display_datetime">display datetime</string>
@@ -444,10 +444,10 @@
     <string name="twoCount">2</string>
     <string name="threeCount">3</string>
     <string name="fiveCount">5</string>
-    <string name="disabledRepeatAlarm">No repetition.</string>
+    <string name="disabledRepeatAlarm">No repetition</string>
     <string name="minute">minutes</string>
     <string name="evenryMinutes">every minutes</string>
-    <string name="endless">conituous</string>
+    <string name="endless">continuous</string>
     <string name="count">count</string>
     <string name="pleaseSelectDay">Please select the day of the week to sound the alarm</string>
     <string name="registeredAlarm">Alarm has been registered</string>
@@ -464,7 +464,7 @@
     <string name="zeroPrecipitationVolume" translatable="false">0.0mm</string>
     <string name="am">AM</string>
     <string name="pm">PM</string>
-    <string name="today">today</string>
+    <string name="today">Today</string>
     <string name="detailSunRiseSet">Detailed sun rise/set</string>
     <string name="currentAndForecast">Current, forecast</string>
     <string name="fifthWidgetLabel">current/hourly graph</string>
@@ -480,11 +480,11 @@
     <string name="eleventhWidgetLabel">compare to hourly</string>
     <string name="feelsLike">chill</string>
     <string name="notSelectedDefaultWeatherSource">No default weather provider selected</string>
-    <string name="noWindData">no wind data</string>
+    <string name="noWindData">No wind data</string>
     <string name="registeredDailyNotification">Daily notification registered</string>
     <string name="save">save</string>
-    <string name="currentAirQuality">current air quality</string>
-    <string name="notificationType">notification type</string>
+    <string name="currentAirQuality">Current Aqi</string>
+    <string name="notificationType">Notification type</string>
     <string name="FirstDailyPushNotification">Hourly</string>
     <string name="SecondDailyPushNotification">Current</string>
     <string name="ThirdDailyPushNotification">Daily</string>
@@ -505,7 +505,7 @@
     <string name="findingCurrentLocationTitle">Search current location</string>
     <string name="uncheckedAllowAllTheTime">Please select \'Allow all the time\' for Location Permissions</string>
     <string name="disabledNotification">Notifications are blocked. Please unblock it.</string>
-    <string name="errorNotification">notification error</string>
+    <string name="errorNotification">Notification error</string>
     <string name="message_needs_background_location_permission">Location permission \'\'Allow all the time\' is required</string>
     <string name="accu_weather_icon_5_hazy_sunshine">hazy sunshine</string>
     <string name="accu_weather_icon_11_fog">fog</string>
@@ -514,5 +514,7 @@
     <string name="rain_volume_of_grid">rain</string>
     <string name="precipitation_volume_of_grid">precipitation</string>
     <string name="wind_chill_temperature_of_grid">chill</string>
+    <string name="temp_airQuality2">current air quality\nGood</string>
+    <string name="unregisteredDailyNotification">Daily notification unregistered</string>
 
 </resources>

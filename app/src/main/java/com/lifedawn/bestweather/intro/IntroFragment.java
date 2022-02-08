@@ -84,7 +84,7 @@ public class IntroFragment extends Fragment {
 			@Override
 			public void onClick(View view) {
 				dialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
-				fusedLocation.startLocationUpdates(locationCallback, false);
+				fusedLocation.findCurrentLocation(locationCallback, false);
 			}
 		});
 		binding.findAddress.setOnClickListener(new View.OnClickListener() {

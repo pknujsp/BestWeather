@@ -30,17 +30,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.BitmapEncoder;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.request.transition.Transition;
 import com.github.matteobattilana.weather.PrecipType;
 import com.google.android.ads.nativetemplates.NativeTemplateStyle;
@@ -49,7 +46,6 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdOptions;
 import com.google.android.gms.location.LocationResult;
@@ -269,7 +265,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
 					dialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
-					fusedLocation.startLocationUpdates(myLocationCallback, false);
+					fusedLocation.findCurrentLocation(myLocationCallback, false);
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
 				}

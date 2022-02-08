@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.notification.daily;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
 import android.os.Handler;
@@ -64,7 +63,7 @@ public class DailyPushNotificationJobService extends JobService {
 			repository.get(id, new DbQueryCallback<DailyPushNotificationDto>() {
 				@Override
 				public void onResultSuccessful(DailyPushNotificationDto result) {
-					dailyNotificationHelper.enablePushNotification(result);
+					//dailyNotificationHelper.enablePushNotification(result);
 				}
 
 				@Override
@@ -87,24 +86,6 @@ public class DailyPushNotificationJobService extends JobService {
 			});
 
 			workNotification(getApplicationContext(), Executors.newSingleThreadExecutor(), id, dailyPushNotificationType);
-		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-			repository.getAll(new DbQueryCallback<List<DailyPushNotificationDto>>() {
-				@Override
-				public void onResultSuccessful(List<DailyPushNotificationDto> result) {
-					for (DailyPushNotificationDto notificationDto : result) {
-						if (notificationDto.isEnabled()) {
-							dailyNotificationHelper.enablePushNotification(notificationDto);
-						}
-					}
-					jobFinished(params, false);
-				}
-
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
-
 		}
 		return true;
 	}
@@ -154,7 +135,7 @@ public class DailyPushNotificationJobService extends JobService {
 			}
 		};
 
-		FusedLocation.getInstance(context).startLocationUpdates(locationCallback, true);
+		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, true);
 	}
 
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,

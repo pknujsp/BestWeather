@@ -82,15 +82,15 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E");
 		String pop = null;
-		Double rainVolume = 0.0;
-		Double snowVolume = 0.0;
+		float rainVolume = 0f;
+		float snowVolume = 0f;
 
 		for (int cell = 0; cell < cellCount; cell++) {
 			RemoteViews forecastRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_forecast_item_in_linear);
 
 			forecastRemoteViews.setTextViewText(R.id.dateTime, dailyForecastDtoList.get(cell).getDate().format(dateTimeFormatter));
-			rainVolume = 0.0;
-			snowVolume = 0.0;
+			rainVolume = 0f;
+			snowVolume = 0f;
 
 			if (dailyForecastDtoList.get(cell).isSingle()) {
 				forecastRemoteViews.setImageViewResource(R.id.leftIcon, dailyForecastDtoList.get(cell).getSingleValues().getWeatherIcon());
@@ -130,7 +130,7 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			}
 
 			if (haveRain) {
-				if (rainVolume > 0.0) {
+				if (rainVolume > 0f) {
 					forecastRemoteViews.setTextViewText(R.id.rainVolume, String.format(Locale.getDefault(), "%.2f", rainVolume));
 				} else {
 					forecastRemoteViews.setViewVisibility(R.id.rainVolumeLayout, View.INVISIBLE);
@@ -140,7 +140,7 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			}
 
 			if (haveSnow) {
-				if (rainVolume > 0.0) {
+				if (snowVolume > 0f) {
 					forecastRemoteViews.setTextViewText(R.id.snowVolume, String.format(Locale.getDefault(), "%.2f", snowVolume));
 				} else {
 					forecastRemoteViews.setViewVisibility(R.id.snowVolumeLayout, View.INVISIBLE);
@@ -169,7 +169,6 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 		if (successful) {
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, dailyForecastDtoList);
-			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 			makeNotification(remoteViews, dailyPushNotificationDto.getId());
 		} else {
 			makeFailedNotification(dailyPushNotificationDto.getId(), context.getString(R.string.msg_failed_update));

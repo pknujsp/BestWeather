@@ -569,7 +569,7 @@ public class WeatherResponseProcessor {
 
 	public static CurrentConditionsDto getTempCurrentConditionsDto(Context context) {
 		CurrentConditionsDto tempCurrentConditions = new CurrentConditionsDto();
-		tempCurrentConditions.setTemp(context.getString(R.string.temp_temperature)).setFeelsLikeTemp(context.getString(R.string.temp_feelsLikeTemperature)).setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(Integer.parseInt(context.getString(R.string.temp_tempWindDirectionDegree)))
+		tempCurrentConditions.setTemp(context.getString(R.string.temp_temperature)).setFeelsLikeTemp(context.getString(R.string.temp_temperature)).setWeatherIcon(R.drawable.day_clear).setWindDirectionDegree(Integer.parseInt(context.getString(R.string.temp_tempWindDirectionDegree)))
 				.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, String.valueOf(tempCurrentConditions.getWindDirectionDegree())))
 				.setWindSpeed(context.getString(R.string.temp_windSpeed))
 				.setHumidity(context.getString(R.string.temp_humidity))
@@ -657,7 +657,7 @@ public class WeatherResponseProcessor {
 		AirQualityDto.DailyForecast.Val val = new AirQualityDto.DailyForecast.Val();
 		val.setMin(10).setMax(20).setAvg(15);
 
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 7; i++) {
 			AirQualityDto.DailyForecast dailyForecast = new AirQualityDto.DailyForecast();
 			dailyForecast.setDate(zonedDateTime).setUvi(val).setO3(val).setPm25(val).setPm10(val);
 

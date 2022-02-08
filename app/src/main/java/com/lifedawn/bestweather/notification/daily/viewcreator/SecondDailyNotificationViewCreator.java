@@ -85,6 +85,13 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 			remoteViews.setTextViewText(R.id.windStrength, context.getString(R.string.noWindData));
 		}
 
+		if (currentConditionsDto.getFeelsLikeTemp() != null) {
+			String feelsLikeTemp = context.getString(R.string.feelsLike) + ": " + currentConditionsDto.getFeelsLikeTemp();
+			remoteViews.setTextViewText(R.id.feelsLikeTemp, feelsLikeTemp);
+		} else {
+			remoteViews.setViewVisibility(R.id.feelsLikeTemp, View.GONE);
+		}
+
 		remoteViews.setTextViewText(R.id.airQuality, context.getString(R.string.air_quality) + ": " +
 				AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 
@@ -108,7 +115,6 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 					zoneOffset);
 
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, airQualityDto, currentConditionsDto);
-			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 			makeNotification(remoteViews, dailyPushNotificationDto.getId());
 		} else {
 			makeFailedNotification(dailyPushNotificationDto.getId(), context.getString(R.string.msg_failed_update));

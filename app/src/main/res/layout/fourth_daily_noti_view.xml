@@ -3,8 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="140dp"
+    android:gravity="center_vertical"
     android:orientation="vertical"
     android:padding="@dimen/notificationPadding">
+
+    <include
+        layout="@layout/header_view_in_widget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,53 +20,22 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/measuring_station_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:text="@string/temp_measuringStation"
+            android:textColor="@color/black"
+            android:textSize="13sp" />
 
-            <include layout="@layout/address_with_icon" />
-
-
-            <TextView
-                android:id="@+id/measuring_station_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/temp_measuringStation"
-                android:textColor="@color/black"
-                android:textSize="13sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/refresh" />
-
-                <TextView
-                    android:id="@+id/refresh"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/temp_dateTime"
-                    android:textColor="@color/textColorInNotification"
-                    android:textSize="13sp" />
-
-            </LinearLayout>
-        </LinearLayout>
 
         <TextView
             android:id="@+id/airQuality"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/temp_airQuality"
+            android:text="@string/temp_airQuality2"
             android:textColor="@color/black"
             android:textSize="14sp" />
 

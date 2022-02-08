@@ -59,10 +59,9 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 		final String noData = "-";
 		remoteViews.setTextViewText(R.id.measuring_station_name,
-				context.getString(R.string.measuring_station_name) + ": " + (airQualityDto.getCityName() == null ?
-						noData : airQualityDto.getCityName()));
+				context.getString(R.string.measuring_station_name) + ": " + (airQualityDto.getCityName() == null ? noData : airQualityDto.getCityName()));
 		remoteViews.setTextViewText(R.id.airQuality,
-				context.getString(R.string.currentAirQuality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
+				context.getString(R.string.currentAirQuality) + "\n" + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 
 		AirQualityDto.DailyForecast current = new AirQualityDto.DailyForecast();
 		current.setDate(null).setPm10(new AirQualityDto.DailyForecast.Val().setAvg(airQualityDto.getCurrent().getPm10()))
@@ -73,15 +72,27 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		dailyForecastList.add(current);
 		dailyForecastList.addAll(airQualityDto.getDailyForecastList());
 
-		DateTimeFormatter forecastDateFormatter = DateTimeFormatter.ofPattern("E");
+		final DateTimeFormatter forecastDateFormatter = DateTimeFormatter.ofPattern("E");
+		final String packageName = context.getPackageName();
 
+		final int maxCount = 7;
+		int count = dailyForecastList.size();
+		if (maxCount < count) {
+			count = maxCount;
+		}
+
+		int i = 1;
 		for (AirQualityDto.DailyForecast item : dailyForecastList) {
-			RemoteViews forecastItemView = new RemoteViews(context.getPackageName(), R.layout.item_view_color_airquality);
+			if (i++ > count) {
+				break;
+			}
+
+			RemoteViews forecastItemView = new RemoteViews(packageName, R.layout.item_view_color_airquality);
 
 			forecastItemView.setTextViewText(R.id.date, item.getDate() == null ? context.getString(R.string.current) :
 					item.getDate().format(forecastDateFormatter));
+
 			if (item.isHasPm10()) {
-				//forecastItemView.setInt(R.id.pm10, "setBackgroundColor", AqicnResponseProcessor.getGradeColorId(item.getPm10().getAvg()));
 				forecastItemView.setTextViewText(R.id.pm10, item.getPm10().getAvg().toString());
 				forecastItemView.setTextColor(R.id.pm10, AqicnResponseProcessor.getGradeColorId(item.getPm10().getAvg()));
 			} else {
@@ -89,7 +100,6 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			}
 
 			if (item.isHasPm25()) {
-				//forecastItemView.setInt(R.id.pm25, "setBackgroundColor", AqicnResponseProcessor.getGradeColorId(item.getPm25().getAvg()));
 				forecastItemView.setTextViewText(R.id.pm25, item.getPm25().getAvg().toString());
 				forecastItemView.setTextColor(R.id.pm25, AqicnResponseProcessor.getGradeColorId(item.getPm25().getAvg()));
 			} else {
@@ -97,7 +107,6 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			}
 
 			if (item.isHasO3()) {
-				//forecastItemView.setInt(R.id.o3, "setBackgroundColor", AqicnResponseProcessor.getGradeColorId(item.getO3().getAvg()));
 				forecastItemView.setTextViewText(R.id.o3, item.getO3().getAvg().toString());
 				forecastItemView.setTextColor(R.id.o3, AqicnResponseProcessor.getGradeColorId(item.getO3().getAvg()));
 			} else {
@@ -106,25 +115,21 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 			remoteViews.addView(R.id.forecast, forecastItemView);
 		}
-
 	}
 
 
 	@Override
 	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherDataSourceType> weatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		final String refreshDateTime = multipleRestApiDownloader.getRequestDateTime().toString();
-
 		final AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader, null);
 		final boolean successful = airQualityDto.isSuccessful();
 
 		if (successful) {
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, airQualityDto);
-			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 			makeNotification(remoteViews, dailyPushNotificationDto.getId());
 		} else {
 			makeFailedNotification(dailyPushNotificationDto.getId(), context.getString(R.string.msg_failed_update));
 		}
-
 	}
 
 	@Override

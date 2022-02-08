@@ -95,7 +95,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		ZoneOffset zoneOffset = null;
 		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
-		int icon = R.mipmap.ic_launcher_foreground;
+		int icon = R.mipmap.ic_launcher_round;
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
 				requestWeatherDataSourceType);

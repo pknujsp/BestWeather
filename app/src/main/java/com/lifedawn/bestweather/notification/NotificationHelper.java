@@ -56,8 +56,6 @@ public class NotificationHelper {
 		}
 
 		Intent clickIntent = new Intent(context, MainActivity.class);
-		//clickIntent.setAction(Intent.ACTION_MAIN);
-		//clickIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 		clickIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationType.getNotificationId(), clickIntent,
@@ -65,8 +63,7 @@ public class NotificationHelper {
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationObj.channelId);
 
-		builder.setSmallIcon(R.mipmap.ic_launcher_foreground)
-				.setContentIntent(pendingIntent)
+		builder.setContentIntent(pendingIntent).setSmallIcon(R.mipmap.ic_launcher_round)
 				.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
 		notificationObj.setNotificationBuilder(builder);
@@ -82,7 +79,6 @@ public class NotificationHelper {
 				break;
 			}
 		}
-
 	}
 
 	private NotificationObj getNotificationObj(NotificationType notificationType) {

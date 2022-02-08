@@ -2,9 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="230dp"
+    android:layout_height="240dp"
     android:orientation="vertical"
     android:padding="@dimen/notificationPadding">
+
+    <include
+        layout="@layout/header_view_in_widget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,53 +19,21 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/measuring_station_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
-
-            <include layout="@layout/address_with_icon" />
-
-
-            <TextView
-                android:id="@+id/measuring_station_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/temp_measuringStation"
-                android:textColor="@color/black"
-                android:textSize="13sp" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/refresh" />
-
-                <TextView
-                    android:id="@+id/refresh"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/temp_dateTime"
-                    android:textColor="@color/textColorInNotification"
-                    android:textSize="13sp" />
-
-            </LinearLayout>
-        </LinearLayout>
+            android:text="@string/temp_measuringStation"
+            android:textColor="@color/black"
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/airQuality"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/temp_airQuality"
+            android:text="@string/temp_airQuality2"
             android:textColor="@color/black"
             android:textSize="14sp" />
 
@@ -68,12 +42,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="32dp"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
@@ -117,7 +92,6 @@
             android:id="@+id/forecast"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:orientation="horizontal" />
 
     </LinearLayout>
@@ -126,104 +100,121 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:gravity="right|center_vertical"
-        android:orientation="horizontal">
+        android:gravity="right"
+        android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_marginRight="4dp"
-            android:background="@drawable/icon_rounded_rect_background"
-            android:backgroundTint="@color/aqi_1_good" />
-
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:includeFontPadding="false"
-            android:text="@string/aqi_1_good"
-            android:textSize="13dp" />
+            android:gravity="center_vertical|right"
+            android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_marginRight="4dp"
-            android:background="@drawable/icon_rounded_rect_background"
-            android:backgroundTint="@color/aqi_2_Moderate" />
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginRight="4dp"
+                android:background="@drawable/icon_circle_background"
+                android:backgroundTint="@color/aqi_1_good" />
 
-        <TextView
-            android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:includeFontPadding="false"
+                android:text="@string/aqi_1_good"
+                android:textColor="@color/black"
+
+                android:textSize="13dp" />
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginRight="4dp"
+                android:background="@drawable/icon_circle_background"
+                android:backgroundTint="@color/aqi_2_Moderate" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:includeFontPadding="false"
+                android:text="@string/aqi_2_Moderate"
+                android:textColor="@color/black"
+                android:textSize="13dp" />
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginRight="4dp"
+                android:background="@drawable/icon_circle_background"
+                android:backgroundTint="@color/aqi_3_unhealthy_for_sensitive_groups" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@string/aqi_3_unhealthy_for_sensitive_groups"
+                android:textColor="@color/black"
+                android:textSize="13dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:includeFontPadding="false"
-            android:text="@string/aqi_2_Moderate"
-            android:textSize="13dp" />
+            android:gravity="center_vertical|right"
+            android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_marginRight="4dp"
-            android:background="@drawable/icon_rounded_rect_background"
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginRight="4dp"
+                android:background="@drawable/icon_circle_background"
 
-            android:backgroundTint="@color/aqi_3_unhealthy_for_sensitive_groups" />
+                android:backgroundTint="@color/aqi_4_unhealthy" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:includeFontPadding="false"
-            android:text="@string/aqi_3_unhealthy_for_sensitive_groups"
-            android:textSize="13dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:includeFontPadding="false"
+                android:text="@string/aqi_4_unhealthy"
+                android:textColor="@color/black"
+                android:textSize="13dp" />
 
-        <ImageView
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_marginRight="4dp"
-            android:background="@drawable/icon_rounded_rect_background"
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginRight="4dp"
+                android:background="@drawable/icon_circle_background"
+                android:backgroundTint="@color/aqi_5_very_unhealthy" />
 
-            android:backgroundTint="@color/aqi_4_unhealthy" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="4dp"
+                android:includeFontPadding="false"
+                android:text="@string/aqi_5_very_unhealthy"
+                android:textColor="@color/black"
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:includeFontPadding="false"
-            android:text="@string/aqi_4_unhealthy"
-            android:textSize="13dp" />
+                android:textSize="13dp" />
 
-        <ImageView
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_marginRight="4dp"
-            android:background="@drawable/icon_rounded_rect_background"
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginRight="4dp"
+                android:background="@drawable/icon_circle_background"
+                android:backgroundTint="@color/aqi_6_hazardous" />
 
-            android:backgroundTint="@color/aqi_5_very_unhealthy" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:text="@string/aqi_6_hazardous"
+                android:textColor="@color/black"
+                android:textSize="13dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:includeFontPadding="false"
-            android:text="@string/aqi_5_very_unhealthy"
-            android:textSize="13dp" />
-
-        <ImageView
-            android:layout_width="12dp"
-            android:layout_height="12dp"
-            android:layout_marginRight="4dp"
-            android:background="@drawable/icon_rounded_rect_background"
-
-            android:backgroundTint="@color/aqi_6_hazardous" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            android:includeFontPadding="false"
-            android:text="@string/aqi_6_hazardous"
-            android:textSize="13dp" />
-
-
+        </LinearLayout>
     </LinearLayout>
 
 

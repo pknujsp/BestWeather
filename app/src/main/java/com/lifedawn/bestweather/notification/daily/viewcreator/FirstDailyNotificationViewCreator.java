@@ -84,21 +84,14 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 				forecastRemoteViews.setTextViewText(R.id.rainVolume,
 						hourlyForecastDtoList.get(cell).getRainVolume().replace(mm, "").replace(cm, ""));
 			} else {
-				forecastRemoteViews.setViewVisibility(R.id.rainVolumeLayout, View.INVISIBLE);
+				forecastRemoteViews.setViewVisibility(R.id.rainVolumeLayout, haveRain ? View.INVISIBLE : View.GONE);
 			}
 
 			if (hourlyForecastDtoList.get(cell).isHasSnow()) {
 				forecastRemoteViews.setTextViewText(R.id.snowVolume,
 						hourlyForecastDtoList.get(cell).getSnowVolume().replace(mm, "").replace(cm, ""));
 			} else {
-				forecastRemoteViews.setViewVisibility(R.id.snowVolumeLayout, View.INVISIBLE);
-			}
-
-			if (!haveRain) {
-				forecastRemoteViews.setViewVisibility(R.id.rainVolumeLayout, View.GONE);
-			}
-			if (!haveSnow) {
-				forecastRemoteViews.setViewVisibility(R.id.snowVolumeLayout, View.GONE);
+				forecastRemoteViews.setViewVisibility(R.id.snowVolumeLayout, haveSnow ? View.INVISIBLE : View.GONE);
 			}
 
 			forecastRemoteViews.setTextViewText(R.id.temperature, hourlyForecastDtoList.get(cell).getTemp());
@@ -109,7 +102,6 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 		remoteViews.setTextViewText(R.id.address, addressName);
 		remoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-
 	}
 
 	@Override
@@ -119,14 +111,12 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		WeatherDataSourceType weatherDataSourceType = WeatherResponseProcessor.getMainWeatherSourceType(weatherDataSourceTypeSet);
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context,
 				multipleRestApiDownloader, weatherDataSourceType);
-		boolean successful = !hourlyForecastDtoList.isEmpty();
 
-		if (successful) {
+		if (!hourlyForecastDtoList.isEmpty()) {
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, hourlyForecastDtoList);
-			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 			makeNotification(remoteViews, dailyPushNotificationDto.getId());
 		} else {
-			makeFailedNotification(dailyPushNotificationDto.getId(),context.getString(R.string.msg_failed_update));
+			makeFailedNotification(dailyPushNotificationDto.getId(), context.getString(R.string.msg_failed_update));
 		}
 
 	}

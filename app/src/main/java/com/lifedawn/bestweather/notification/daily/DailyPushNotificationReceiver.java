@@ -18,7 +18,7 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		final String action = intent.getAction();
 
-		if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+		if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 			DailyNotificationHelper notiHelper = new DailyNotificationHelper(context);
 			notiHelper.reStartNotifications();
 		} else {
@@ -35,7 +35,7 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 
 			JobInfo jobInfo = new JobInfo.Builder(10000 + id, new ComponentName(context, DailyPushNotificationJobService.class))
 					.setMinimumLatency(0)
-					.setOverrideDeadline(20000)
+					.setOverrideDeadline(10000)
 					.setExtras(persistableBundle)
 					.build();
 			jobScheduler.schedule(jobInfo);

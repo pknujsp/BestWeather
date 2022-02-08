@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
 		if (sharedPreferences.getBoolean(getString(R.string.pref_key_show_intro), true)) {
 			IntroTransactionFragment introTransactionFragment = new IntroTransactionFragment();
-			fragmentTransaction.add(binding.fragmentContainer.getId(), introTransactionFragment,
+			fragmentTransaction.replace(binding.fragmentContainer.getId(), introTransactionFragment,
 					introTransactionFragment.getTag()).commit();
 		} else {
 			initOngoingNotifications();
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
 			initWidgets();
 
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commit();
+			fragmentTransaction.replace(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commit();
 		}
 	}
 

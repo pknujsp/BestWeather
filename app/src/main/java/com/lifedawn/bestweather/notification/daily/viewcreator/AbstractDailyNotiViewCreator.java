@@ -48,7 +48,7 @@ public abstract class AbstractDailyNotiViewCreator {
 		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Daily);
 
 		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
-		builder.setSmallIcon(R.mipmap.ic_launcher_foreground).setAutoCancel(true).setContentIntent(PendingIntent.getActivity(context,
+		builder.setAutoCancel(true).setSmallIcon(R.mipmap.ic_launcher_round).setContentIntent(PendingIntent.getActivity(context,
 				notificationObj.getNotificationId(),
 				IntentUtil.getAppIntent(context), PendingIntent.FLAG_UPDATE_CURRENT))
 				.setCustomContentView(remoteViews).setCustomBigContentView(remoteViews);
@@ -73,7 +73,7 @@ public abstract class AbstractDailyNotiViewCreator {
 		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Daily);
 
 		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
-		builder.setSmallIcon(R.mipmap.ic_launcher_foreground).setAutoCancel(true).setContentText(failText).setContentTitle(context.getString(R.string.errorNotification));
+		builder.setSmallIcon(R.mipmap.ic_launcher_round).setAutoCancel(true).setContentText(failText).setContentTitle(context.getString(R.string.errorNotification));
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 			builder.setPriority(NotificationCompat.PRIORITY_HIGH).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);

@@ -251,7 +251,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 			}
 		};
 
-		FusedLocation.getInstance(this).startLocationUpdates(locationCallback, true);
+		FusedLocation.getInstance(this).findCurrentLocation(locationCallback, true);
 	}
 
 	private void onLocationResult(@Nullable FusedLocation.MyLocationCallback.Fail fail, int appWidgetId, RemoteViews remoteViews, int jobId) {

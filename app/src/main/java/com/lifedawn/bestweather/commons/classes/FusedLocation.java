@@ -79,7 +79,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 	}
 
-	public void startLocationUpdates(MyLocationCallback myLocationCallback, boolean isBackground) {
+	public void findCurrentLocation(MyLocationCallback myLocationCallback, boolean isBackground) {
 		if (!isOnGps()) {
 			myLocationCallback.onFailed(MyLocationCallback.Fail.DISABLED_GPS);
 		} else if (!isOnNetwork()) {

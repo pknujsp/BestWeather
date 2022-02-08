@@ -423,6 +423,7 @@
     <string name="errorNotification">알림 오류</string>
     <string name="message_needs_background_location_permission">위치 권한 \'항상 허용\'이 필요합니다</string>
     <string name="temp_airQuality">대기질: 좋음</string>
+    <string name="temp_airQuality2">대기질\n좋음</string>
     <string name="temp_precipitationRain">비: 1.2mm</string>
     <string name="temp_noPrecipitation">강수없음</string>
     <string name="temp_yesterdayTemperature">어제보다 2℃ 낮음</string>
@@ -440,4 +441,5 @@
     <string name="rain_volume_of_grid">강우량</string>
     <string name="precipitation_volume_of_grid">강수량</string>
     <string name="wind_chill_temperature_of_grid">체감온도</string>
+    <string name="unregisteredDailyNotification">일일 알림 해제되었습니다</string>
 </resources>
