@@ -96,21 +96,21 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 				forecastItemView.setTextViewText(R.id.pm10, item.getPm10().getAvg().toString());
 				forecastItemView.setTextColor(R.id.pm10, AqicnResponseProcessor.getGradeColorId(item.getPm10().getAvg()));
 			} else {
-				forecastItemView.setImageViewResource(R.id.pm10, R.drawable.ic_baseline_error_24);
+				forecastItemView.setTextViewText(R.id.pm10, "?");
 			}
 
 			if (item.isHasPm25()) {
 				forecastItemView.setTextViewText(R.id.pm25, item.getPm25().getAvg().toString());
 				forecastItemView.setTextColor(R.id.pm25, AqicnResponseProcessor.getGradeColorId(item.getPm25().getAvg()));
 			} else {
-				forecastItemView.setImageViewResource(R.id.pm25, R.drawable.ic_baseline_error_24);
+				forecastItemView.setTextViewText(R.id.pm25, "?");
 			}
 
 			if (item.isHasO3()) {
 				forecastItemView.setTextViewText(R.id.o3, item.getO3().getAvg().toString());
 				forecastItemView.setTextColor(R.id.o3, AqicnResponseProcessor.getGradeColorId(item.getO3().getAvg()));
 			} else {
-				forecastItemView.setImageViewResource(R.id.o3, R.drawable.ic_baseline_error_24);
+				forecastItemView.setTextViewText(R.id.o3, "?");
 			}
 
 			remoteViews.addView(R.id.forecast, forecastItemView);
