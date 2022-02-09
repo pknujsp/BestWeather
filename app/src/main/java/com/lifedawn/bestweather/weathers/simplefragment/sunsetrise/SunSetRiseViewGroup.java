@@ -306,8 +306,8 @@ public class SunSetRiseViewGroup extends FrameLayout {
 
 			errorView = new TextView(getContext());
 			errorView.setText(R.string.failed_calculating_sun_rise_set);
-			errorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
-			errorView.setTextColor(AppTheme.getColor(getContext(), R.attr.textColorInWeatherCard));
+			errorView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
+			errorView.setTextColor(Color.WHITE);
 			errorView.setGravity(Gravity.CENTER);
 			errorView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 			addView(errorView);

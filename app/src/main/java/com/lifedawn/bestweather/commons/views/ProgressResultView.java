@@ -86,4 +86,8 @@ public class ProgressResultView extends FrameLayout implements OnProgressViewLis
 	public boolean isSuccess() {
 		return succeed;
 	}
+
+	public void setTextColor(int color) {
+		binding.status.setTextColor(color);
+	}
 }

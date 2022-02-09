@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers.simplefragment.aqicn;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -82,6 +83,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.progressResultView.setContentView(binding.contentContainer);
+		binding.progressResultView.setTextColor(Color.WHITE);
 
 		binding.weatherCardViewHeader.forecastName.setText(R.string.air_quality);
 		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);

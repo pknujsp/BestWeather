@@ -56,6 +56,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alert.AlertFragment;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
+import com.lifedawn.bestweather.commons.classes.GlideApp;
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
@@ -256,6 +257,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
+		binding.loadingAnimation.setVisibility(View.GONE);
+		binding.flickrImageUrl.setVisibility(View.GONE);
+
 		weatherViewController = new WeatherViewController(binding.rootLayout);
 		weatherViewController.setWeatherView(PrecipType.CLEAR, null);
 
@@ -380,8 +384,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	public void load(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
-		Log.e("load", "load");
-		Glide.with(this).clear(binding.currentConditionsImg);
+		GlideApp.with(this).clear(binding.currentConditionsImg);
 
 		binding.mainToolbar.gps.setVisibility(locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
 		binding.mainToolbar.find.setVisibility(locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
@@ -514,7 +517,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						getActivity().runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								Glide.with(WeatherFragment.this).clear(binding.currentConditionsImg);
+								GlideApp.with(WeatherFragment.this).clear(binding.currentConditionsImg);
 								binding.loadingAnimation.setVisibility(View.GONE);
 								binding.flickrImageUrl.setVisibility(View.GONE);
 							}
@@ -594,7 +597,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						getActivity().runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								Glide.with(WeatherFragment.this).load(BACKGROUND_IMG_MAP.get(galleryName).getImg()).transition(
+								GlideApp.with(WeatherFragment.this).load(BACKGROUND_IMG_MAP.get(galleryName).getImg()).transition(
 										DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
 								setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
 							}
@@ -630,15 +633,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 									flickrImgObj.setPhoto(photo);
 									BACKGROUND_IMG_MAP.put(galleryName, flickrImgObj);
 
-									RequestOptions moduleOption = new RequestOptions()
-											.timeout(500).encodeQuality(100)
+									RequestOptions moduleOption = new RequestOptions().encodeQuality(100)
 											.diskCacheStrategy(DiskCacheStrategy.AUTOMATIC);
 
-									Glide.with(WeatherFragment.this).asBitmap().load(backgroundImgUrl).apply(moduleOption).into(new CustomTarget<Bitmap>() {
+									GlideApp.with(WeatherFragment.this).asBitmap().load(backgroundImgUrl).apply(moduleOption).into(new CustomTarget<Bitmap>() {
 										@Override
 										public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
 											BACKGROUND_IMG_MAP.get(galleryName).setImg(resource);
-											Glide.with(WeatherFragment.this).load(resource).transition(
+											GlideApp.with(WeatherFragment.this).load(resource).transition(
 													DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
 
 											if (getActivity() != null) {
@@ -660,7 +662,18 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 										@Override
 										public void onLoadFailed(@Nullable Drawable errorDrawable) {
 											super.onLoadFailed(errorDrawable);
-											Glide.with(WeatherFragment.this).clear(binding.currentConditionsImg);
+											GlideApp.with(WeatherFragment.this).clear(binding.currentConditionsImg);
+
+											if (getActivity() != null) {
+												getActivity().runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
+														String text = getString(R.string.error);
+														binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
+																ContextCompat.getColor(getContext(), R.color.white)));
+													}
+												});
+											}
 										}
 									});
 								} else {
@@ -673,7 +686,18 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 						@Override
 						public void onFailure(Call<JsonElement> call, Throwable t) {
+							GlideApp.with(WeatherFragment.this).clear(binding.currentConditionsImg);
 
+							if (getActivity() != null) {
+								getActivity().runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										String text = getString(R.string.error);
+										binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
+												ContextCompat.getColor(getContext(), R.color.white)));
+									}
+								});
+							}
 						}
 					});
 				}
