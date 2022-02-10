@@ -434,7 +434,6 @@
     <string name="temp_windDirection">남</string>
     <string name="temp_simpleWindStrength">약</string>
     <string name="temp_detailWindStrength">약한 바람</string>
-    <string name="temp_humidity">습도: 50%</string>
     <string name="temp_measuringStation">측정소: A측정소</string>
     <string name="temp_measuringStationName">A측정소</string>
     <string name="snow_volume_of_grid">강설량</string>
@@ -442,4 +441,6 @@
     <string name="precipitation_volume_of_grid">강수량</string>
     <string name="wind_chill_temperature_of_grid">체감온도</string>
     <string name="unregisteredDailyNotification">일일 알림 해제되었습니다</string>
+    <string name="temp_humidity_str">습도: 50%</string>
+
 </resources>

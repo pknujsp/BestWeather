@@ -172,6 +172,8 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 			String yesterdayCompText = WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
 					currentConditionsDto.getYesterdayTemp(), tempUnit, context);
 			remoteViews.setTextViewText(R.id.yesterdayTemperature, yesterdayCompText);
+		} else {
+			remoteViews.setViewVisibility(R.id.yesterdayTemperature, View.GONE);
 		}
 	}
 

@@ -95,7 +95,7 @@
                 android:id="@+id/humidity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/temp_humidity"
+                android:text="@string/temp_humidity_str"
                 android:textColor="@color/widgetTextColor"
                 android:textSize="@dimen/humidityTextSizeInCurrentWidget" />
 

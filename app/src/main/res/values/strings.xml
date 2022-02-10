@@ -477,7 +477,7 @@
     <string name="eighthWidgetLabel">current/hourly/daily 2</string>
     <string name="ninthWidgetLabel">long hourly</string>
     <string name="tenthWidgetLabel">long daily</string>
-    <string name="eleventhWidgetLabel">compare to hourly</string>
+    <string name="eleventhWidgetLabel">compare hourly</string>
     <string name="feelsLike">chill</string>
     <string name="notSelectedDefaultWeatherSource">No default weather provider selected</string>
     <string name="noWindData">No wind data</string>
@@ -516,5 +516,6 @@
     <string name="wind_chill_temperature_of_grid">chill</string>
     <string name="temp_airQuality2">current air quality\nGood</string>
     <string name="unregisteredDailyNotification">Daily notification unregistered</string>
+    <string name="temp_humidity_str">humidity: 50%</string>
 
 </resources>

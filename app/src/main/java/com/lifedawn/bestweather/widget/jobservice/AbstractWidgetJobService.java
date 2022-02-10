@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class AbstractWidgetJobService extends JobService {
@@ -45,10 +46,11 @@ public abstract class AbstractWidgetJobService extends JobService {
 	protected AppWidgetManager appWidgetManager;
 	protected Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
 	protected Map<Integer, Handler> handlerMap = new HashMap<>();
+	protected ExecutorService executorService = Executors.newFixedThreadPool(3);
 
 	public AbstractWidgetJobService() {
 		Configuration.Builder builder = new Configuration.Builder();
-		builder.setJobSchedulerJobIdRange(100000, Integer.MAX_VALUE);
+		builder.setJobSchedulerJobIdRange(0, Integer.MAX_VALUE);
 	}
 
 	@Override
@@ -77,8 +79,8 @@ public abstract class AbstractWidgetJobService extends JobService {
 	public boolean onStartJob(JobParameters params) {
 		PersistableBundle bundle = params.getExtras();
 		final int jobId = params.getJobId();
-		final String action = bundle.getString("action");
 		final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+		final String action = bundle.getString("action");
 
 		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_INIT))) {
 			Handler handler = new Handler(new Handler.Callback() {
@@ -92,8 +94,8 @@ public abstract class AbstractWidgetJobService extends JobService {
 				}
 			});
 			handlerMap.put(jobId, handler);
-			createWidgetViewCreator(appWidgetId, jobId);
-			AbstractWidgetCreator widgetViewCreator = widgetCreatorMap.get(jobId);
+			final AbstractWidgetCreator widgetViewCreator = createWidgetViewCreator(appWidgetId, jobId);
+
 			widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 				@Override
 				public void onResultSuccessful(WidgetDto widgetDto) {
@@ -137,7 +139,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 				}
 			});
 		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			Handler handler = new Handler(new Handler.Callback() {
+			final Handler handler = new Handler(new Handler.Callback() {
 				@Override
 				public boolean handleMessage(@NonNull Message msg) {
 					if (msg.obj != null && ((String) msg.obj).equals("finished")) {
@@ -149,12 +151,12 @@ public abstract class AbstractWidgetJobService extends JobService {
 			});
 			handlerMap.put(jobId, handler);
 
-			createWidgetViewCreator(appWidgetId, jobId);
 			widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
 				@Override
 				public void onResultSuccessful(WidgetDto result) {
-					RemoteViews remoteViews = widgetCreatorMap.get(jobId).createRemoteViews();
+					final RemoteViews remoteViews = createWidgetViewCreator(appWidgetId, jobId).createRemoteViews();
 					NetworkStatus networkStatus = NetworkStatus.getInstance(getApplicationContext());
+
 					if (!networkStatus.networkAvailable()) {
 						RemoteViewsUtil.ErrorType errorType = RemoteViewsUtil.ErrorType.UNAVAILABLE_NETWORK;
 
@@ -165,16 +167,15 @@ public abstract class AbstractWidgetJobService extends JobService {
 						Message message = handler.obtainMessage();
 						message.obj = "finished";
 						handler.sendMessage(message);
-						return;
-					}
-
-					RemoteViewsUtil.onBeginProcess(remoteViews);
-					appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-
-					if (result.getLocationType() == LocationType.CurrentLocation) {
-						loadCurrentLocation(getApplicationContext(), appWidgetId, remoteViews, jobId);
 					} else {
-						loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, result, jobId);
+						RemoteViewsUtil.onBeginProcess(remoteViews);
+						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
+						if (result.getLocationType() == LocationType.CurrentLocation) {
+							loadCurrentLocation(getApplicationContext(), appWidgetId, remoteViews, jobId);
+						} else {
+							loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, result, jobId);
+						}
 					}
 				}
 
@@ -313,8 +314,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
 			weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
 		}
-
-		WeatherRequestUtil.loadWeatherData(context, Executors.newSingleThreadExecutor(), widgetDto.getCountryCode(), widgetDto.getLatitude(),
+		WeatherRequestUtil.loadWeatherData(context, executorService, widgetDto.getCountryCode(), widgetDto.getLatitude(),
 				widgetDto.getLongitude(), requestWeatherDataTypeSet, new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {

@@ -517,7 +517,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						getActivity().runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								GlideApp.with(WeatherFragment.this).clear(binding.currentConditionsImg);
 								binding.loadingAnimation.setVisibility(View.GONE);
 								binding.flickrImageUrl.setVisibility(View.GONE);
 							}
@@ -662,7 +661,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 										@Override
 										public void onLoadFailed(@Nullable Drawable errorDrawable) {
 											super.onLoadFailed(errorDrawable);
-											GlideApp.with(WeatherFragment.this).clear(binding.currentConditionsImg);
 
 											if (getActivity() != null) {
 												getActivity().runOnUiThread(new Runnable() {
@@ -686,7 +684,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 						@Override
 						public void onFailure(Call<JsonElement> call, Throwable t) {
-							GlideApp.with(WeatherFragment.this).clear(binding.currentConditionsImg);
 
 							if (getActivity() != null) {
 								getActivity().runOnUiThread(new Runnable() {
@@ -1256,11 +1253,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		List<HourlyForecastDto> hourlyForecastDtoList = null;
 		List<DailyForecastDto> dailyForecastDtoList = null;
 
-		ZonedDateTime currentConditionsUpdatedTime = null;
-		ZonedDateTime hourlyForecastUpdatedTime = null;
-		ZonedDateTime dailyForecastUpdatedTime = null;
-		ZonedDateTime airQualityUpdatedTime = null;
-
 		final SimpleCurrentConditionsFragment simpleCurrentConditionsFragment = new SimpleCurrentConditionsFragment();
 		final SimpleHourlyForecastFragment simpleHourlyForecastFragment = new SimpleHourlyForecastFragment();
 		final SimpleDailyForecastFragment simpleDailyForecastFragment = new SimpleDailyForecastFragment();
@@ -1480,7 +1472,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
 							getString(R.string.tag_detail_current_conditions_fragment)).replace(binding.simpleAirQuality.getId(),
 							simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment)).replace(
-							binding.sunSetRise.getId(), sunSetRiseFragment, getString(R.string.tag_sun_set_rise_fragment)).commitAllowingStateLoss();
+							binding.sunSetRise.getId(), sunSetRiseFragment, getString(R.string.tag_sun_set_rise_fragment)).commit();
 
 					if (loadingDialog != null) {
 						loadingDialog.dismiss();

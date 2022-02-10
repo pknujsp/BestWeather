@@ -97,8 +97,6 @@ public class ThirdWidgetJobService extends AbstractWidgetJobService {
 
 		widgetDto.setLoadSuccessful(successful);
 
-
-
 		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet, jobId);
 	}
 }

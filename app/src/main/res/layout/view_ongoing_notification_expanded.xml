@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="190dp"
+    android:layout_height="200dp"
     android:padding="8dp"
-    tools:layout_height="190dp">
+    tools:layout_height="200dp">
 
     <LinearLayout
         android:id="@+id/valuesLayout"
@@ -171,13 +171,14 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
             android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/hourlyForecast"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="horizontal" />
 
         </LinearLayout>

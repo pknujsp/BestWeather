@@ -140,8 +140,9 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 			String yesterdayCompText = WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
 					currentConditionsDto.getYesterdayTemp(), tempUnit, context);
 			((TextView) view.findViewById(R.id.yesterdayTemperature)).setText(yesterdayCompText);
+		} else {
+			view.findViewById(R.id.yesterdayTemperature).setVisibility(View.GONE);
 		}
-
 		return view;
 	}
 

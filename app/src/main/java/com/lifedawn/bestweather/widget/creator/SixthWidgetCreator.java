@@ -125,7 +125,12 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 			String yesterdayCompText = WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
 					currentConditionsDto.getYesterdayTemp(), tempUnit, context);
 			((TextView) sixWidgetView.findViewById(R.id.yesterdayTemperature)).setText(yesterdayCompText);
+		} else {
+			sixWidgetView.findViewById(R.id.yesterdayTemperature).setVisibility(View.GONE);
 		}
+
+		String feelsLikeTemp = context.getString(R.string.feelsLike) + ": " + currentConditionsDto.getFeelsLikeTemp();
+		((TextView) sixWidgetView.findViewById(R.id.feelsLikeTemp)).setText(feelsLikeTemp);
 
 		String precipitation = "";
 		if (currentConditionsDto.isHasPrecipitationVolume()) {

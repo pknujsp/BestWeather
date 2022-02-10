@@ -28,11 +28,9 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
-	protected static final int JOB_ID_ON_APP_WIDGET_OPTIONS_CHANGED = 100000;
-	protected static final int JOB_REFRESH = 200000;
-	protected static final int JOB_ACTION_BOOT_COMPLETED = 300000;
-	protected static final int JOB_REDRAW = 400000;
-	protected static final int JOB_INIT = 500000;
+	protected static final int JOB_REFRESH = 10000;
+	protected static final int JOB_ACTION_BOOT_COMPLETED = 20000;
+	protected static final int JOB_INIT = 40000;
 	protected AppWidgetManager appWidgetManager;
 
 	protected abstract Class<?> getJobServiceClass();
@@ -123,8 +121,6 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 		Bundle bundle = intent.getExtras();
 		final String action = intent.getAction();
 
-		PersistableBundle persistableBundle = null;
-
 		int jobBeginId = 0;
 
 		if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_INIT))) {
@@ -139,8 +135,8 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 		}
 
 		if (jobBeginId != 0) {
-			int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-			scheduleJob(context, action, jobBeginId, appWidgetId, persistableBundle);
+			final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+			scheduleJob(context, action, jobBeginId, appWidgetId, null);
 		}
 
 	}
@@ -151,22 +147,19 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			appWidgetManager = AppWidgetManager.getInstance(context);
 		}
 
-		if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null) {
-			return;
-		}
+		if (appWidgetManager.getAppWidgetInfo(appWidgetId) != null) {
+			JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
-		final PersistableBundle persistableBundle = new PersistableBundle();
-		if (extras != null) {
-			persistableBundle.putAll(extras);
-		}
-		persistableBundle.putString("action", action);
-		persistableBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+			final PersistableBundle persistableBundle = new PersistableBundle();
+			if (extras != null) {
+				persistableBundle.putAll(extras);
+			}
+			persistableBundle.putString("action", action);
+			persistableBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 
-		final int newJobId = jobIdBegin + appWidgetId;
-		JobInfo newJobInfo = new JobInfo.Builder(newJobId, new ComponentName(context, getJobServiceClass()))
-				.setMinimumLatency(0).setOverrideDeadline(1000).setExtras(persistableBundle).build();
-
-		JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+			final int newJobId = jobIdBegin + appWidgetId;
+			JobInfo newJobInfo = new JobInfo.Builder(newJobId, new ComponentName(context, getJobServiceClass()))
+					.setMinimumLatency(0).setOverrideDeadline(1000).setExtras(persistableBundle).build();
 
 		/*
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -193,7 +186,11 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 
 		 */
 
-		jobScheduler.schedule(newJobInfo);
+			jobScheduler.schedule(newJobInfo);
+
+		}
+
+
 	}
 
 }
