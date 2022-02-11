@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.app.WallpaperManager;
 import android.appwidget.AppWidgetManager;
@@ -172,25 +173,19 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			widgetCreator = new SecondWidgetCreator(getApplicationContext(), this, appWidgetId);
 		} else if (providerClassName.equals(ThirdWidgetProvider.class.getName())) {
 			widgetCreator = new ThirdWidgetCreator(getApplicationContext(), this, appWidgetId);
-
 		} else if (providerClassName.equals(FourthWidgetProvider.class.getName())) {
 			widgetCreator = new FourthWidgetCreator(getApplicationContext(), this, appWidgetId);
-
 		} else if (providerClassName.equals(FifthWidgetProvider.class.getName())) {
 			widgetCreator = new FifthWidgetCreator(getApplicationContext(), this, appWidgetId);
-
 		} else if (providerClassName.equals(SixthWidgetProvider.class.getName())) {
 			widgetCreator = new SixthWidgetCreator(getApplicationContext(), this, appWidgetId);
-
 		} else if (providerClassName.equals(SeventhWidgetProvider.class.getName())) {
 			widgetCreator = new SeventhWidgetCreator(getApplicationContext(), this, appWidgetId);
 			binding.weatherDataSourceLayout.setVisibility(View.GONE);
 		} else if (providerClassName.equals(EighthWidgetProvider.class.getName())) {
 			widgetCreator = new EighthWidgetCreator(getApplicationContext(), this, appWidgetId);
-
 		} else if (providerClassName.equals(NinthWidgetProvider.class.getName())) {
 			widgetCreator = new NinthWidgetCreator(getApplicationContext(), this, appWidgetId);
-
 		} else if (providerClassName.equals(TenthWidgetProvider.class.getName())) {
 			widgetCreator = new TenthWidgetCreator(getApplicationContext(), this, appWidgetId);
 		} else if (providerClassName.equals(EleventhWidgetProvider.class.getName())) {
@@ -249,7 +244,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 								initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 								intent.putExtras(initBundle);
 
-								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent,
+										PendingIntent.FLAG_ONE_SHOT);
 								try {
 									pendingIntent.send();
 								} catch (PendingIntent.CanceledException e) {
@@ -269,7 +265,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 			}
 		});
-
 
 		binding.previewLayout.getViewTreeObserver().addOnDrawListener(
 				new ViewTreeObserver.OnDrawListener() {
@@ -310,13 +305,16 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 	private void initTextSize() {
 		binding.textSizeSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+			@SuppressLint("RestrictedApi")
 			@Override
-			public void onStartTrackingTouch(@NonNull @NotNull Slider slider) {
+			public void onStartTrackingTouch(@NonNull Slider slider) {
 				setTextSizeInWidget((int) slider.getValue());
+
 			}
 
+			@SuppressLint("RestrictedApi")
 			@Override
-			public void onStopTrackingTouch(@NonNull @NotNull Slider slider) {
+			public void onStopTrackingTouch(@NonNull Slider slider) {
 				setTextSizeInWidget((int) slider.getValue());
 			}
 		});

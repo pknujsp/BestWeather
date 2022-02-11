@@ -17,15 +17,14 @@ public class WidgetHelper {
 	private AlarmManager alarmManager;
 	private Class<?> widgetProviderClass;
 
-	public WidgetHelper(Context context, Class<?> widgetProviderClass) {
+	public WidgetHelper(Context context) {
 		this.context = context;
 		this.alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		this.widgetProviderClass = widgetProviderClass;
 	}
 
 
-	public void onSelectedAutoRefreshInterval(long val, int appWidgetId) {
-		cancelAutoRefresh(appWidgetId);
+	public void onSelectedAutoRefreshInterval(long val, int appWidgetId, Class<?> widgetProviderClass) {
+		cancelAutoRefresh(appWidgetId, widgetProviderClass);
 
 		if (val > 0) {
 			Intent refreshIntent = new Intent(context, widgetProviderClass);
@@ -39,11 +38,9 @@ public class WidgetHelper {
 
 			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), val, pendingIntent);
 		}
-
-
 	}
 
-	public void cancelAutoRefresh(int appWidgetId) {
+	public void cancelAutoRefresh(int appWidgetId, Class<?> widgetProviderClass) {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, widgetProviderClass),
 				PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
@@ -52,7 +49,7 @@ public class WidgetHelper {
 		}
 	}
 
-	public boolean isRepeating(int appWidgetId) {
+	public boolean isRepeating(int appWidgetId, Class<?> widgetProviderClass) {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, widgetProviderClass),
 				PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {

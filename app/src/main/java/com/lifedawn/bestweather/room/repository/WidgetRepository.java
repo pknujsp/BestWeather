@@ -22,7 +22,7 @@ public class WidgetRepository {
 	public WidgetRepository(Context context) {
 		this.context = context;
 		widgetDao = AppDb.getInstance(context).widgetDao();
-		executorService = MyApplication.getExecutorService();
+		executorService = Executors.newFixedThreadPool(2);
 
 	}
 

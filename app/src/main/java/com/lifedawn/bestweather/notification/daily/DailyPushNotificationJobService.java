@@ -53,7 +53,6 @@ public class DailyPushNotificationJobService extends JobService {
 		PersistableBundle bundle = params.getExtras();
 		final String action = bundle.getString("action");
 		DailyPushNotificationRepository repository = new DailyPushNotificationRepository(getApplicationContext());
-		DailyNotificationHelper dailyNotificationHelper = new DailyNotificationHelper(getApplicationContext());
 
 		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
 			final Integer id = bundle.getInt(BundleKey.dtoId.name());

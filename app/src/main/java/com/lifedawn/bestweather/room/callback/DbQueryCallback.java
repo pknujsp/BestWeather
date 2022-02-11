@@ -1,6 +1,6 @@
 package com.lifedawn.bestweather.room.callback;
 
-public interface DbQueryCallback<T> {
+public interface DbQueryCallback<T>  {
 	void onResultSuccessful(T result);
 
 	void onResultNoData();

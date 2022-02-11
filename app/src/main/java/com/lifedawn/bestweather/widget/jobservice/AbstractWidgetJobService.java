@@ -25,6 +25,7 @@ import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -42,11 +43,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class AbstractWidgetJobService extends JobService {
-	protected WidgetRepository widgetRepository;
-	protected AppWidgetManager appWidgetManager;
-	protected Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
-	protected Map<Integer, Handler> handlerMap = new HashMap<>();
-	protected ExecutorService executorService = Executors.newFixedThreadPool(3);
+	protected static WidgetRepository widgetRepository;
+	protected static AppWidgetManager appWidgetManager;
+	protected static Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
+	protected static Map<Integer, BackgroundCallback> backgroundCallbackMap = new HashMap<>();
+	protected static Map<Integer, Class<?>> widgetClassMap = new HashMap<>();
+	protected static ExecutorService executorService = Executors.newFixedThreadPool(3);
+
+	private static final String TAG = "AbstractWidgetJobService";
 
 	public AbstractWidgetJobService() {
 		Configuration.Builder builder = new Configuration.Builder();
@@ -77,116 +81,113 @@ public abstract class AbstractWidgetJobService extends JobService {
 
 	@Override
 	public boolean onStartJob(JobParameters params) {
-		PersistableBundle bundle = params.getExtras();
-		final int jobId = params.getJobId();
-		final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-		final String action = bundle.getString("action");
+		executorService.execute(new Runnable() {
+			@Override
+			public void run() {
+				PersistableBundle bundle = params.getExtras();
+				final int jobId = params.getJobId();
+				final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
+				final String action = bundle.getString("action");
+				final String widgetProviderClassName = bundle.getString("widgetProviderClassName");
 
-		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_INIT))) {
-			Handler handler = new Handler(new Handler.Callback() {
-				@Override
-				public boolean handleMessage(@NonNull Message msg) {
-					if (msg.obj != null && ((String) msg.obj).equals("finished")) {
-						jobFinished(params, false);
-						return true;
-					}
-					return false;
-				}
-			});
-			handlerMap.put(jobId, handler);
-			final AbstractWidgetCreator widgetViewCreator = createWidgetViewCreator(appWidgetId, jobId);
+				Class<?> widgetClass = null;
 
-			widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
-				@Override
-				public void onResultSuccessful(WidgetDto widgetDto) {
-					WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext(), getWidgetProviderClass());
-					if (widgetDto.getUpdateIntervalMillis() > 0) {
-						widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId);
-					}
-
-					final RemoteViews remoteViews = widgetViewCreator.createRemoteViews();
-
-					RemoteViewsUtil.onBeginProcess(remoteViews);
-					appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-
-					NetworkStatus networkStatus = NetworkStatus.getInstance(getApplicationContext());
-
-					if (!networkStatus.networkAvailable()) {
-						RemoteViewsUtil.ErrorType errorType = RemoteViewsUtil.ErrorType.UNAVAILABLE_NETWORK;
-
-						setRefreshPendingIntent(remoteViews, appWidgetId, jobId);
-						RemoteViewsUtil.onErrorProcess(remoteViews, getApplicationContext(), errorType);
-						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-
-						Message message = handler.obtainMessage();
-						message.obj = "finished";
-						handler.sendMessage(message);
-						return;
-					}
-
-					if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
-						loadCurrentLocation(getApplicationContext(), appWidgetId, remoteViews, jobId);
-					} else {
-						loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, widgetDto, jobId);
-					}
-
-					widgetRepository.update(widgetDto, null);
+				try {
+					widgetClass = Class.forName(widgetProviderClassName);
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
 				}
 
-				@Override
-				public void onResultNoData() {
+				widgetClassMap.put(jobId, widgetClass);
 
-				}
-			});
-		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			final Handler handler = new Handler(new Handler.Callback() {
-				@Override
-				public boolean handleMessage(@NonNull Message msg) {
-					if (msg.obj != null && ((String) msg.obj).equals("finished")) {
-						jobFinished(params, false);
-						return true;
-					}
-					return false;
-				}
-			});
-			handlerMap.put(jobId, handler);
+				Log.e(TAG,
+						"jobId: " + jobId + ", appWidgetId: " + appWidgetId + ", jobService: " + getClass().getName() + ", widgetProvider: " + widgetClass.getName());
 
-			widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
-				@Override
-				public void onResultSuccessful(WidgetDto result) {
-					final RemoteViews remoteViews = createWidgetViewCreator(appWidgetId, jobId).createRemoteViews();
-					NetworkStatus networkStatus = NetworkStatus.getInstance(getApplicationContext());
+				if (action.equals(getString(R.string.com_lifedawn_bestweather_action_INIT))) {
+					addBackgroundCallback(params);
+					final AbstractWidgetCreator widgetViewCreator = createWidgetViewCreator(appWidgetId, jobId);
 
-					if (!networkStatus.networkAvailable()) {
-						RemoteViewsUtil.ErrorType errorType = RemoteViewsUtil.ErrorType.UNAVAILABLE_NETWORK;
+					widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
+						@Override
+						public void onResultSuccessful(WidgetDto widgetDto) {
+							WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
+							if (widgetDto.getUpdateIntervalMillis() > 0) {
+								widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId,
+										widgetClassMap.get(jobId));
+							}
 
-						setRefreshPendingIntent(remoteViews, appWidgetId, jobId);
-						RemoteViewsUtil.onErrorProcess(remoteViews, getApplicationContext(), errorType);
-						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+							final RemoteViews remoteViews = widgetViewCreator.createRemoteViews();
 
-						Message message = handler.obtainMessage();
-						message.obj = "finished";
-						handler.sendMessage(message);
-					} else {
-						RemoteViewsUtil.onBeginProcess(remoteViews);
-						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+							RemoteViewsUtil.onBeginProcess(remoteViews);
+							appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
-						if (result.getLocationType() == LocationType.CurrentLocation) {
-							loadCurrentLocation(getApplicationContext(), appWidgetId, remoteViews, jobId);
-						} else {
-							loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, result, jobId);
+							NetworkStatus networkStatus = NetworkStatus.getInstance(getApplicationContext());
+
+							if (!networkStatus.networkAvailable()) {
+								RemoteViewsUtil.ErrorType errorType = RemoteViewsUtil.ErrorType.UNAVAILABLE_NETWORK;
+
+								setRefreshPendingIntent(remoteViews, appWidgetId, jobId);
+								RemoteViewsUtil.onErrorProcess(remoteViews, getApplicationContext(), errorType);
+								appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
+								backgroundCallbackMap.get(jobId).onResult();
+								return;
+							}
+
+							if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
+								loadCurrentLocation(getApplicationContext(), appWidgetId, remoteViews, jobId);
+							} else {
+								loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, widgetDto, jobId);
+							}
+
+							widgetRepository.update(widgetDto, null);
 						}
-					}
+
+						@Override
+						public void onResultNoData() {
+
+						}
+					});
+				} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
+					addBackgroundCallback(params);
+
+					widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
+						@Override
+						public void onResultSuccessful(WidgetDto result) {
+							final RemoteViews remoteViews = createWidgetViewCreator(appWidgetId, jobId).createRemoteViews();
+							NetworkStatus networkStatus = NetworkStatus.getInstance(getApplicationContext());
+
+							if (!networkStatus.networkAvailable()) {
+								RemoteViewsUtil.ErrorType errorType = RemoteViewsUtil.ErrorType.UNAVAILABLE_NETWORK;
+
+								setRefreshPendingIntent(remoteViews, appWidgetId, jobId);
+								RemoteViewsUtil.onErrorProcess(remoteViews, getApplicationContext(), errorType);
+								appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
+								backgroundCallbackMap.get(jobId).onResult();
+							} else {
+								RemoteViewsUtil.onBeginProcess(remoteViews);
+								appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
+								if (result.getLocationType() == LocationType.CurrentLocation) {
+									loadCurrentLocation(getApplicationContext(), appWidgetId, remoteViews, jobId);
+								} else {
+									loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, result, jobId);
+								}
+							}
+						}
+
+						@Override
+						public void onResultNoData() {
+
+						}
+					});
+				} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+					onActionBootCompleted(params);
 				}
 
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
-		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
-			onActionBootCompleted(params);
-		}
+			}
+		});
 
 		return true;
 	}
@@ -197,7 +198,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 	}
 
 	public final void setRefreshPendingIntent(RemoteViews remoteViews, int appWidgetId, int jobId) {
-		widgetCreatorMap.get(jobId).setRefreshPendingIntent(getWidgetProviderClass(), remoteViews, appWidgetId);
+		widgetCreatorMap.get(jobId).setRefreshPendingIntent(widgetClassMap.get(jobId), remoteViews, appWidgetId);
 	}
 
 	public void loadCurrentLocation(Context context, int appWidgetId, RemoteViews remoteViews, int jobId) {
@@ -290,11 +291,8 @@ public abstract class AbstractWidgetJobService extends JobService {
 			RemoteViewsUtil.onErrorProcess(remoteViews, getApplicationContext(), errorType);
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
-			Handler handler = handlerMap.get(jobId);
+			backgroundCallbackMap.get(jobId).onResult();
 
-			Message message = handler.obtainMessage();
-			message.obj = "finished";
-			handler.sendMessage(message);
 		}
 
 	}
@@ -328,10 +326,8 @@ public abstract class AbstractWidgetJobService extends JobService {
 						RemoteViewsUtil.onErrorProcess(remoteViews, getApplicationContext(), RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
-						Handler handler = handlerMap.get(jobId);
-						Message message = handler.obtainMessage();
-						message.obj = "finished";
-						handler.sendMessage(message);
+						backgroundCallbackMap.get(jobId).onResult();
+
 					}
 				}, weatherDataSourceTypeSet);
 	}
@@ -341,10 +337,11 @@ public abstract class AbstractWidgetJobService extends JobService {
 		widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
 			@Override
 			public void onResultSuccessful(List<WidgetDto> list) {
-				WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext(), getWidgetProviderClass());
+				WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
 				for (WidgetDto widgetDto : list) {
 					if (widgetDto.getUpdateIntervalMillis() > 0) {
-						widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId());
+						widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId(),
+								widgetClassMap.get(jobParameters.getJobId()));
 					}
 				}
 				jobFinished(jobParameters, false);
@@ -380,10 +377,18 @@ public abstract class AbstractWidgetJobService extends JobService {
 		widgetRepository.update(widgetDto, null);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
-		Handler handler = handlerMap.get(jobId);
+		backgroundCallbackMap.get(jobId).onResult();
+	}
 
-		Message message = handler.obtainMessage();
-		message.obj = "finished";
-		handler.sendMessage(message);
+	protected final BackgroundCallback addBackgroundCallback(JobParameters jobParameters) {
+		BackgroundCallback backgroundCallback = new BackgroundCallback() {
+			@Override
+			public void onResult() {
+				jobFinished(jobParameters, false);
+			}
+		};
+
+		backgroundCallbackMap.put(jobParameters.getJobId(), backgroundCallback);
+		return backgroundCallback;
 	}
 }

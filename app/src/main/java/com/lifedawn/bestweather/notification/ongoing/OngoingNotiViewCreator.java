@@ -93,7 +93,6 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	protected void setResultViews(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherDataSourceType requestWeatherDataSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
-		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		int icon = R.mipmap.ic_launcher_round;
 
@@ -102,7 +101,6 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		if (currentConditionsDto != null) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
-			setCurrentConditionsViews(collapsedRemoteViews, currentConditionsDto);
 			setCurrentConditionsViews(expandedRemoteViews, currentConditionsDto);
 			icon = currentConditionsDto.getWeatherIcon();
 		}
@@ -118,25 +116,19 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
 					zoneOffset);
 			if (airQualityDto.isSuccessful()) {
-				setAirQualityViews(collapsedRemoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 				setAirQualityViews(expandedRemoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 			} else {
-				setAirQualityViews(collapsedRemoteViews, context.getString(R.string.noData));
 				setAirQualityViews(expandedRemoteViews, context.getString(R.string.noData));
 			}
 		} else {
-			setAirQualityViews(collapsedRemoteViews, context.getString(R.string.noData));
 			setAirQualityViews(expandedRemoteViews, context.getString(R.string.noData));
 		}
 		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty();
 
 		if (successful) {
-			RemoteViewsUtil.onSuccessfulProcess(collapsedRemoteViews);
 			RemoteViewsUtil.onSuccessfulProcess(expandedRemoteViews);
 		} else {
-			RemoteViewsUtil.onErrorProcess(collapsedRemoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 			RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-			collapsedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 			expandedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 		}
 
@@ -162,10 +154,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 			precipitation = context.getString(R.string.not_precipitation);
 		}
 		remoteViews.setTextViewText(R.id.precipitation, precipitation);
-		String windSpeedStr =
-				context.getString(R.string.wind) + ": " + currentConditionsDto.getWindSpeed();
-		remoteViews.setTextViewText(R.id.windSpeed, windSpeedStr);
-		remoteViews.setTextViewText(R.id.temp, currentConditionsDto.getTemp());
+		remoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
 		remoteViews.setTextViewText(R.id.feelsLikeTemp, new String(context.getString(R.string.feelsLike) + ": " + currentConditionsDto.getFeelsLikeTemp()));
 
 		if (currentConditionsDto.getYesterdayTemp() != null) {

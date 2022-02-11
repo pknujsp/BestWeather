@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
 						}
 					}
 
-					int requestCode = 100;
+					int requestCode = 100000;
 					for (Class<?> cls : widgetArrMap.keySet()) {
 						Intent refreshIntent = null;
 						try {
@@ -169,15 +169,17 @@ public class MainActivity extends AppCompatActivity {
 							int[] ids = new int[idList.size()];
 							int index = 0;
 
+							if (widgetHelper == null) {
+								widgetHelper = new WidgetHelper(getApplicationContext());
+							}
+
 							for (Integer id : idList) {
 								ids[index++] = id;
 
 								if (widgetDtoMap.get(id).getUpdateIntervalMillis() > 0) {
-									if (widgetHelper == null) {
-										widgetHelper = new WidgetHelper(getApplicationContext(), cls);
-									}
-									if (!widgetHelper.isRepeating(id)) {
-										widgetHelper.onSelectedAutoRefreshInterval(widgetDtoMap.get(id).getUpdateIntervalMillis(), id);
+
+									if (!widgetHelper.isRepeating(id, cls)) {
+										widgetHelper.onSelectedAutoRefreshInterval(widgetDtoMap.get(id).getUpdateIntervalMillis(), id, cls);
 									}
 								}
 							}

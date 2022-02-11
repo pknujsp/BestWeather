@@ -1,7 +1,9 @@
 package com.lifedawn.bestweather.widget.jobservice;
 
 import android.annotation.SuppressLint;
+import android.app.job.JobParameters;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.widget.RemoteViews;
 
@@ -36,7 +38,7 @@ public class FourthWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	AbstractWidgetCreator createWidgetViewCreator(int appWidgetId, int jobId) {
+	FourthWidgetCreator createWidgetViewCreator(int appWidgetId, int jobId) {
 		FourthWidgetCreator fourthWidgetCreator = new FourthWidgetCreator(getApplicationContext(), null, appWidgetId);
 		widgetCreatorMap.put(jobId, fourthWidgetCreator);
 		return fourthWidgetCreator;
@@ -94,5 +96,45 @@ public class FourthWidgetJobService extends AbstractWidgetJobService {
 
 
 		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, requestWeatherDataTypeSet, jobId);
+	}
+
+	@Override
+	public void onTaskRemoved(Intent rootIntent) {
+		super.onTaskRemoved(rootIntent);
+	}
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
+	@Override
+	public boolean onStartJob(JobParameters params) {
+		return super.onStartJob(params);
+	}
+
+	@Override
+	public boolean onStopJob(JobParameters params) {
+		return super.onStopJob(params);
+	}
+
+	@Override
+	public void loadCurrentLocation(Context context, int appWidgetId, RemoteViews remoteViews, int jobId) {
+		super.loadCurrentLocation(context, appWidgetId, remoteViews, jobId);
+	}
+
+	@Override
+	public void loadWeatherData(Context context, RemoteViews remoteViews, int appWidgetId, WidgetDto widgetDto, int jobId) {
+		super.loadWeatherData(context, remoteViews, appWidgetId, widgetDto, jobId);
+	}
+
+	@Override
+	protected void onActionBootCompleted(JobParameters jobParameters) {
+		super.onActionBootCompleted(jobParameters);
 	}
 }

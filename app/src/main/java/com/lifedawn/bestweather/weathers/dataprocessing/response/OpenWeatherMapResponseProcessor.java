@@ -114,8 +114,9 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 		ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
+		List<OwmOneCallResponse.Hourly> hourlyList = owmOneCallResponse.getHourly();
 
-		for (OwmOneCallResponse.Hourly hourly : owmOneCallResponse.getHourly()) {
+		for (OwmOneCallResponse.Hourly hourly : hourlyList) {
 			HourlyForecastDto hourlyForecastDto = new HourlyForecastDto();
 
 			if (hourly.getRain() == null) {

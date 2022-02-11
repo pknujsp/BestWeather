@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.ArraySet;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -31,6 +32,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	protected static final int JOB_REFRESH = 10000;
 	protected static final int JOB_ACTION_BOOT_COMPLETED = 20000;
 	protected static final int JOB_INIT = 40000;
+	private static final String TAG = "AbstractAppWidgetProvider";
 	protected AppWidgetManager appWidgetManager;
 
 	protected abstract Class<?> getJobServiceClass();
@@ -104,11 +106,11 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
-		WidgetHelper widgetHelper = new WidgetHelper(context, getClass());
+		WidgetHelper widgetHelper = new WidgetHelper(context);
 		WidgetRepository widgetRepository = new WidgetRepository(context);
 
 		for (int appWidgetId : appWidgetIds) {
-			widgetHelper.cancelAutoRefresh(appWidgetId);
+			widgetHelper.cancelAutoRefresh(appWidgetId,getClass());
 			widgetRepository.delete(appWidgetId, null);
 		}
 		super.onDeleted(context, appWidgetIds);
@@ -156,6 +158,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			}
 			persistableBundle.putString("action", action);
 			persistableBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+			persistableBundle.putString("widgetProviderClassName", getJobServiceClass().getName());
 
 			final int newJobId = jobIdBegin + appWidgetId;
 			JobInfo newJobInfo = new JobInfo.Builder(newJobId, new ComponentName(context, getJobServiceClass()))
@@ -185,6 +188,10 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 		}
 
 		 */
+			Log.e(TAG,
+					"jobId: " + newJobId + ", appWidgetId: " + appWidgetId + ", jobService: " + getJobServiceClass() + ", " +
+							"widgetProvider" + ": " + getClass());
+
 
 			jobScheduler.schedule(newJobInfo);
 

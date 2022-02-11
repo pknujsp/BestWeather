@@ -52,5 +52,7 @@ public class ThirdWidgetProvider extends AbstractAppWidgetProvider {
 	protected Class<?> getJobServiceClass() {
 		return ThirdWidgetJobService.class;
 	}
+
+
 }
 

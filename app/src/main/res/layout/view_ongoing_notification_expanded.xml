@@ -16,6 +16,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -65,63 +66,71 @@
         </LinearLayout>
 
         <RelativeLayout
-            android:id="@+id/currentConditionsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="6dp">
-
-            <ImageView
-                android:id="@+id/weatherIcon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="4dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/day_clear" />
-
-            <TextView
-                android:id="@+id/temp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/weatherIcon"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:text="@string/temp_temperature"
-                android:textColor="@color/textColorInNotification"
-                android:textSize="24sp" />
-
-            <TextView
-                android:id="@+id/yesterdayTemperature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/temp"
-                android:layout_alignLeft="@id/temp"
-                android:includeFontPadding="false"
-                android:text="@string/temp_yesterdayTemperature"
-                android:textColor="@color/widgetTextColor"
-                android:textSize="13sp" />
-
-            <TextView
-                android:id="@+id/feelsLikeTemp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/temp"
-                android:layout_marginLeft="8dp"
-                android:layout_toRightOf="@id/temp"
-                android:gravity="center_vertical"
-                android:includeFontPadding="false"
-                android:maxLines="1"
-                android:text="@string/temp_feelsLikeTemperature"
-                android:textColor="@color/textColorInNotification"
-                android:textSize="17sp" />
+            android:layout_marginBottom="4dp"
+            android:gravity="center_vertical">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+
+                <ImageView
+                    android:id="@+id/weatherIcon"
+                    android:layout_width="42dp"
+                    android:layout_height="42dp"
+                    android:layout_marginRight="6dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/day_clear" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/temperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:includeFontPadding="false"
+                        android:text="@string/temp_temperature"
+                        android:textColor="@color/widgetTextColor"
+                        android:textSize="26sp" />
+
+                    <TextView
+                        android:id="@+id/feelsLikeTemp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@id/temperature"
+                        android:layout_marginLeft="4dp"
+                        android:layout_toRightOf="@id/temperature"
+                        android:includeFontPadding="false"
+                        android:text="@string/temp_feelsLikeTemperature"
+                        android:textColor="@color/widgetTextColor"
+                        android:textSize="17sp" />
+
+
+                    <TextView
+                        android:id="@+id/yesterdayTemperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/temperature"
+                        android:includeFontPadding="false"
+                        android:text="@string/temp_yesterdayTemperature"
+                        android:textColor="@color/widgetTextColor"
+                        android:textSize="13sp" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:gravity="center"
@@ -131,41 +140,19 @@
                     android:id="@+id/airQuality"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
-                    android:fontFamily="sans-serif-condensed-light"
-                    android:maxLines="1"
                     android:text="@string/temp_airQuality"
-                    android:textColor="@color/textColorInNotification"
-                    android:textSize="13sp" />
+                    android:textColor="@color/widgetTextColor"
+                    android:textSize="@dimen/airQualityTextSizeInFullWidget" />
 
                 <TextView
                     android:id="@+id/precipitation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:fontFamily="sans-serif-condensed-light"
-                    android:maxLines="1"
                     android:text="@string/temp_noPrecipitation"
-                    android:textColor="@color/textColorInNotification"
-                    android:textSize="13sp" />
+                    android:textColor="@color/widgetTextColor"
+                    android:textSize="@dimen/precipitationTextSizeInFullWidget" />
 
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/windSpeed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@id/weatherIcon"
-                android:layout_alignBottom="@id/weatherIcon"
-                android:fontFamily="sans-serif-condensed-light"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                android:text="2.3m/s"
-                android:textColor="@color/textColorInNotification"
-                android:textSize="13sp"
-
-                android:visibility="gone" />
-
 
         </RelativeLayout>
 
@@ -179,6 +166,7 @@
                 android:id="@+id/hourlyForecast"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
                 android:orientation="horizontal" />
 
         </LinearLayout>
