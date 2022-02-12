@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "203444498827",
+    "project_id": "bestweather-7c99a",
+    "storage_bucket": "bestweather-7c99a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203444498827:android:625982254791fd58cfbf8e",
+        "android_client_info": {
+          "package_name": "com.lifedawn.bestweather"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "203444498827-5poju7kpm5otkq9ptfinolh9m377n85d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lifedawn.bestweather",
+            "certificate_hash": "54c4ba76e0b306e1eb69cc539fee285fd0296968"
+          }
+        },
+        {
+          "client_id": "203444498827-2l34rvrcsgm79qpi5cpihi74nmi56m8q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrOD-A_TqsOUBQlJana4OwHf0Rt2Kwy0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "203444498827-2l34rvrcsgm79qpi5cpihi74nmi56m8q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

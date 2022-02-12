@@ -110,7 +110,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 		WidgetRepository widgetRepository = new WidgetRepository(context);
 
 		for (int appWidgetId : appWidgetIds) {
-			widgetHelper.cancelAutoRefresh(appWidgetId,getClass());
+			widgetHelper.cancelAutoRefresh(appWidgetId, getClass());
 			widgetRepository.delete(appWidgetId, null);
 		}
 		super.onDeleted(context, appWidgetIds);
@@ -158,7 +158,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			}
 			persistableBundle.putString("action", action);
 			persistableBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-			persistableBundle.putString("widgetProviderClassName", getJobServiceClass().getName());
+			persistableBundle.putString("widgetProviderClassName", getClass().getName());
 
 			final int newJobId = jobIdBegin + appWidgetId;
 			JobInfo newJobInfo = new JobInfo.Builder(newJobId, new ComponentName(context, getJobServiceClass()))

@@ -121,4 +121,18 @@ dependencies {
 
     implementation project(':nativetemplates')
 
+    apply plugin: 'com.android.application'
+
+    apply plugin: 'com.google.gms.google-services'
+
+    apply plugin: 'com.google.firebase.crashlytics'
+
+    dependencies {
+
+        implementation platform('com.google.firebase:firebase-bom:29.1.0')
+        implementation 'com.google.firebase:firebase-crashlytics'
+        implementation 'com.google.firebase:firebase-analytics'
+
+    }
+
 }
