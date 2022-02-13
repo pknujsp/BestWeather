@@ -92,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="8dp"
-                android:fontFamily="sans-serif-thin"
+                android:fontFamily="sans-serif-light"
                 android:text="15°"
                 android:textColor="@color/black"
                 android:textSize="38sp" />
@@ -107,7 +107,7 @@
                 android:id="@id/maxTemp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-thin"
+                android:fontFamily="sans-serif-light"
                 android:text="15°"
                 android:textColor="@color/light_blue_900"
                 android:textSize="38sp" />

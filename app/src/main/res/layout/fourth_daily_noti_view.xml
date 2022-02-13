@@ -64,7 +64,7 @@
                 android:id="@+id/pm10"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-thin"
+                android:fontFamily="sans-serif-light"
                 android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
@@ -87,7 +87,7 @@
                 android:id="@+id/pm25"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-thin"
+                android:fontFamily="sans-serif-light"
                 android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
@@ -110,7 +110,7 @@
                 android:id="@+id/o3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-thin"
+                android:fontFamily="sans-serif-light"
                 android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
@@ -133,7 +133,7 @@
                 android:id="@+id/no2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-thin"
+                android:fontFamily="sans-serif-light"
                 android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
@@ -156,7 +156,7 @@
                 android:id="@+id/co"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-thin"
+                android:fontFamily="sans-serif-light"
                 android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />
@@ -179,7 +179,7 @@
                 android:id="@+id/so2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-thin"
+                android:fontFamily="sans-serif-light"
                 android:text="@string/aqi_1_good"
                 android:textColor="@color/black"
                 android:textSize="13sp" />

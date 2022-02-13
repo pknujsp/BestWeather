@@ -6,7 +6,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/cardLRPadding"
-        android:paddingRight="@dimen/cardLRPadding">
+        android:paddingRight="@dimen/cardLRPadding"
+        >
 
         <TextView
             android:id="@+id/forecast_name"
@@ -14,7 +15,8 @@
             android:layout_height="wrap_content"
             android:text="forecastName"
             android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            />
 
         <TextView
             android:id="@+id/compare_forecast"
@@ -25,7 +27,8 @@
             android:layout_toLeftOf="@id/detail_forecast"
             android:text="@string/compare"
             android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            />
 
         <TextView
             android:id="@+id/detail_forecast"
@@ -35,7 +38,8 @@
             android:layout_alignParentRight="true"
             android:text="@string/detail"
             android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            />
 
     </RelativeLayout>
 

@@ -83,7 +83,7 @@
                 android:src="@mipmap/ic_launcher_foreground" />
 
             <TextView
-                style="@style/text_shadow"
+                style="@style/text_shadow_white"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/app_name"

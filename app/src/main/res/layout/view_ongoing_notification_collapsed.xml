@@ -100,7 +100,7 @@
             android:layout_alignBottom="@id/weatherIcon"
             android:layout_marginRight="16dp"
             android:layout_toRightOf="@id/weatherIcon"
-            android:fontFamily="sans-serif-thin"
+            android:fontFamily="sans-serif-light"
             android:gravity="center_vertical"
             android:includeFontPadding="false"
             android:maxLines="1"

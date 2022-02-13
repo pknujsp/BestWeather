@@ -1394,19 +1394,21 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		}
 
-		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.AQICN)) {
-			MultipleRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherDataSourceType.AQICN).get(
-					RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
-			AqiCnGeolocalizedFeedResponse airQualityResponse = (AqiCnGeolocalizedFeedResponse) aqicnResponse.getResponseObj();
+		MultipleRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherDataSourceType.AQICN).get(
+				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
+		AqiCnGeolocalizedFeedResponse airQualityResponse = null;
 
-			simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);
-			airQualityDto = AqicnResponseProcessor.makeAirQualityDto(getContext(), airQualityResponse,
-					ZonedDateTime.now(zoneId).getOffset());
+		if (aqicnResponse.isSuccessful()) {
+			airQualityResponse = (AqiCnGeolocalizedFeedResponse) aqicnResponse.getResponseObj();
 		}
+
+		simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);
+		airQualityDto = AqicnResponseProcessor.makeAirQualityDto(getContext(), airQualityResponse,
+				ZonedDateTime.now(zoneId).getOffset());
 
 		// simple current conditions ------------------------------------------------------------------------------------------------------
 		simpleCurrentConditionsFragment.setCurrentConditionsDto(currentConditionsDto);
-		simpleCurrentConditionsFragment.setAirQualityDto(airQualityDto == null ? new AirQualityDto() : airQualityDto);
+		simpleCurrentConditionsFragment.setAirQualityDto(airQualityDto);
 
 		// hourly forecasts ----------------------------------------------------------------------------------------------------------------
 		simpleHourlyForecastFragment.setHourlyForecastDtoList(hourlyForecastDtoList);

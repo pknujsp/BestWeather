@@ -116,9 +116,6 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		return this;
 	}
 
-	public void setAirQualityDto(AirQualityDto airQualityDto) {
-		this.airQualityDto = airQualityDto;
-	}
 
 	@Override
 	public void setValuesToViews() {

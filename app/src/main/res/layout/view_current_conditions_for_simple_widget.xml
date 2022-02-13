@@ -40,7 +40,7 @@
             android:includeFontPadding="false"
             android:maxLines="1"
             android:text="@string/temp_temperature"
-            android:fontFamily="sans-serif-thin"
+            android:fontFamily="sans-serif-light"
             android:textAlignment="center"
             android:textColor="@color/widgetTextColor"
             android:textSize="@dimen/tempTextSizeInCurrentConditionsViewForSimpleWidget" />

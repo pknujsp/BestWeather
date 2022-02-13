@@ -30,7 +30,7 @@
 
             <TextView
                 android:id="@+id/sky"
-                style="@style/text_shadow"
+                style="@style/text_shadow_white"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:includeFontPadding="false"
@@ -41,7 +41,7 @@
 
         <TextView
             android:id="@+id/precipitation"
-            style="@style/text_shadow"
+            style="@style/text_shadow_white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/weatherIconLayout"
@@ -52,7 +52,7 @@
 
         <TextView
             android:id="@+id/wind"
-            style="@style/text_shadow"
+            style="@style/text_shadow_white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@id/airQualityLayout"
@@ -73,7 +73,7 @@
             android:orientation="horizontal">
 
             <TextView
-                style="@style/text_shadow"
+                style="@style/text_shadow_white"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="8dp"
@@ -82,7 +82,7 @@
 
             <TextView
                 android:id="@+id/airQuality"
-                style="@style/text_shadow"
+                style="@style/text_shadow_white"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/good"
@@ -93,60 +93,60 @@
 
         <TextView
             android:id="@+id/temperature"
-            style="@style/text_shadow"
+            style="@style/text_shadow_white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/precipitation"
             android:layout_alignParentLeft="true"
-            android:fontFamily="sans-serif-thin"
+            android:fontFamily="sans-serif-light"
             android:includeFontPadding="false"
             android:text="10"
             android:textSize="100sp" />
 
         <TextView
             android:id="@+id/tempUnit"
-            style="@style/text_shadow"
+            style="@style/text_shadow_white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/temperature"
             android:layout_toRightOf="@id/temperature"
-            android:fontFamily="sans-serif-thin"
+            android:fontFamily="sans-serif-light"
             android:includeFontPadding="false"
             android:text="℃"
             android:textSize="44sp" />
 
 
         <TextView
-            style="@style/text_shadow"
+            style="@style/text_shadow_white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/temperature"
             android:layout_marginRight="8dp"
             android:layout_toLeftOf="@id/feelsLikeTemp"
-            android:fontFamily="sans-serif-thin"
+            android:fontFamily="sans-serif-light"
             android:text="@string/real_feel_temperature_simple"
             android:textSize="18sp" />
 
         <TextView
             android:id="@+id/feelsLikeTemp"
-            style="@style/text_shadow"
+            style="@style/text_shadow_white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/temperature"
             android:layout_toLeftOf="@id/feelsLikeTempUnit"
-            android:fontFamily="sans-serif-thin"
+            android:fontFamily="sans-serif-light"
             android:includeFontPadding="false"
             android:text="-20"
             android:textSize="33sp" />
 
         <TextView
             android:id="@+id/feelsLikeTempUnit"
-            style="@style/text_shadow"
+            style="@style/text_shadow_white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/temperature"
             android:layout_alignParentRight="true"
-            android:fontFamily="sans-serif-thin"
+            android:fontFamily="sans-serif-light"
             android:includeFontPadding="false"
             android:text="℃"
             android:textSize="20sp" />
@@ -154,12 +154,13 @@
 
         <TextView
             android:id="@+id/tempDescription"
-            style="@style/text_shadow"
+            style="@style/text_shadow_white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/temperature"
             android:text="@string/temp_yesterdayTemperature"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            />
 
 
     </RelativeLayout>
