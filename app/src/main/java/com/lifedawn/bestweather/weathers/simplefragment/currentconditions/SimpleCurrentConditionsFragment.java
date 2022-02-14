@@ -10,7 +10,10 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
+import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
 
@@ -18,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
 	private CurrentConditionsDto currentConditionsDto;
+	private AirQualityDto airQualityDto;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,10 +43,13 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		this.currentConditionsDto = currentConditionsDto;
 	}
 
+	public void setAirQualityDto(AirQualityDto airQualityDto) {
+		this.airQualityDto = airQualityDto;
+	}
+
+
 	@Override
 	public void setValuesToViews() {
-		setAqiValuesToViews();
-
 		String precipitation = null;
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
 			precipitation = currentConditionsDto.getPrecipitationType() + " : " + currentConditionsDto.getPrecipitationVolume();
@@ -73,6 +80,22 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		} else {
 			binding.tempDescription.setVisibility(View.GONE);
 		}
+
+		String airQuality = null;
+
+		if (airQualityDto.isSuccessful()) {
+			Double distance = LocationDistance.distance(latitude, longitude, airQualityDto.getLatitude(), airQualityDto.getLongitude(),
+					LocationDistance.Unit.KM);
+
+			if (distance > 100.0) {
+				airQuality = getString(R.string.noData);
+			} else {
+				airQuality = AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+			}
+		} else {
+			airQuality = getString(R.string.noData);
+		}
+		binding.airQuality.setText(airQuality);
 	}
 
 }

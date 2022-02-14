@@ -35,7 +35,6 @@ import java.time.ZonedDateTime;
 
 public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutSimpleCurrentConditionsBinding binding;
-	protected AirQualityDto airQualityDto;
 	protected SharedPreferences sharedPreferences;
 	protected ValueUnits tempUnit;
 	protected ValueUnits windUnit;
@@ -82,30 +81,9 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		super.onViewCreated(view, savedInstanceState);
 	}
 
-	public void setAirQualityDto(AirQualityDto airQualityDto) {
-		this.airQualityDto = airQualityDto;
-	}
 
 	@Override
 	public void setValuesToViews() {
-	}
-
-	public void setAqiValuesToViews() {
-		String airQuality = null;
-
-		if (airQualityDto.isSuccessful()) {
-			Double distance = LocationDistance.distance(latitude, longitude, airQualityDto.getLatitude(), airQualityDto.getLongitude(),
-					LocationDistance.Unit.KM);
-
-			if (distance > 100.0) {
-				airQuality = getString(R.string.noData);
-			} else {
-				airQuality = AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
-			}
-		} else {
-			airQuality = getString(R.string.noData);
-		}
-		binding.airQuality.setText(airQuality);
 	}
 
 

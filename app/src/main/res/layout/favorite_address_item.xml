@@ -4,7 +4,9 @@
     style="@style/ListItemBackground"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical">
+    android:clickable="true"
+    android:gravity="center_vertical"
+    >
 
     <TextView
         android:id="@+id/address_name"
@@ -14,10 +16,10 @@
         android:layout_centerVertical="true"
         android:layout_marginRight="8dp"
         android:layout_toLeftOf="@id/delete"
-        android:clickable="true"
         android:text="addressName"
         android:textColor="@color/textGrayColor"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        />
 
     <ImageButton
         android:id="@+id/delete"
@@ -27,6 +29,7 @@
         android:layout_centerVertical="true"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/delete"
-        app:tint="?attr/iconColor" />
+        app:tint="?attr/iconColor"
+        />
 
 </RelativeLayout>

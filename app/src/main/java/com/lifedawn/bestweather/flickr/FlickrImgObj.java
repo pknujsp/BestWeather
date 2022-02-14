@@ -8,8 +8,35 @@ import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryRespo
 import java.io.Serializable;
 
 public class FlickrImgObj implements Serializable {
-	Bitmap img;
-	PhotosFromGalleryResponse.Photos.Photo photo;
+	private Bitmap img;
+	private String weather;
+	private String time;
+	private String volume;
+	private PhotosFromGalleryResponse.Photos.Photo photo;
+
+	public String getVolume() {
+		return volume;
+	}
+
+	public void setVolume(String volume) {
+		this.volume = volume;
+	}
+
+	public String getWeather() {
+		return weather;
+	}
+
+	public void setWeather(String weather) {
+		this.weather = weather;
+	}
+
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
+	}
 
 	public Bitmap getImg() {
 		return img;

@@ -27,14 +27,8 @@ public class GlideSetup extends AppGlideModule {
 		final OkHttpClient okHttpClient = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS)
 				.writeTimeout(5, TimeUnit.SECONDS).connectTimeout(5, TimeUnit.SECONDS).build();
 
-		OkHttpUrlLoader.Factory factory = new OkHttpUrlLoader.Factory(new Call.Factory() {
-			@NonNull
-			@Override
-			public Call newCall(@NonNull Request request) {
-				return okHttpClient.newCall(request);
-			}
-		});
-		glide.getRegistry().append(GlideUrl.class, InputStream.class, factory);
+		OkHttpUrlLoader.Factory factory = new OkHttpUrlLoader.Factory(okHttpClient);
+		glide.getRegistry().replace(GlideUrl.class, InputStream.class, factory);
 	}
 
 }

@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
@@ -25,7 +24,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import android.util.ArrayMap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,12 +31,7 @@ import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.transition.Transition;
 import com.github.matteobattilana.weather.PrecipType;
 import com.google.android.ads.nativetemplates.NativeTemplateStyle;
 import com.google.android.ads.nativetemplates.TemplateView;
@@ -50,8 +43,6 @@ import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdOptions;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alert.AlertFragment;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
@@ -79,17 +70,15 @@ import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.flickr.FlickrImgObj;
+import com.lifedawn.bestweather.flickr.FlickrLoader;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.retrofit.client.Querys;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.parameters.flickr.FlickrGetPhotosFromGalleryParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
-import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaCurrentConditions;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaDailyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
@@ -105,7 +94,6 @@ import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
@@ -122,7 +110,6 @@ import com.lifedawn.bestweather.weathers.simplefragment.dailyforecast.SimpleDail
 import com.lifedawn.bestweather.weathers.simplefragment.hourlyforecast.SimpleHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.SunsetriseFragment;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
-import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -132,27 +119,18 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Set;
-import java.util.SimpleTimeZone;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadImgOfCurrentConditions, IGps {
 	private static final Map<String, WeatherResponseObj> FINAL_RESPONSE_MAP = new HashMap<>();
-	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
 
 	private ExecutorService executorService = MyApplication.getExecutorService();
 	private DateTimeFormatter dateTimeFormatter;
@@ -204,6 +182,22 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
 		                              @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 			super.onFragmentCreated(fm, f, savedInstanceState);
+		}
+
+		@Override
+		public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
+			super.onFragmentViewCreated(fm, f, v, savedInstanceState);
+			if (f instanceof SimpleCurrentConditionsFragment) {
+				binding.adViewBelowAirQuality.setVisibility(View.VISIBLE);
+				binding.adViewBottom.setVisibility(View.VISIBLE);
+				binding.scrollView.setVisibility(View.VISIBLE);
+			}
+		}
+
+		@Override
+		public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
+			super.onFragmentStarted(fm, f);
+
 		}
 
 		@Override
@@ -384,7 +378,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	public void load(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
-		GlideApp.with(this).clear(binding.currentConditionsImg);
 
 		binding.mainToolbar.gps.setVisibility(locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
 		binding.mainToolbar.find.setVisibility(locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
@@ -472,13 +465,25 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 
-	public void setFlickrImgInfo(FlickrImgObj flickrImgInfo) {
+	private void setFlickrImgInfo(FlickrImgObj flickrImgInfo) {
 		final String text = flickrImgInfo.getPhoto().getOwner();
 		binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
 				ContextCompat.getColor(getContext(), R.color.white)));
 		binding.flickrImageUrl.setTag(flickrImgInfo.getRealFlickrUrl());
 		binding.flickrImageUrl.setVisibility(View.VISIBLE);
 		binding.loadingAnimation.setVisibility(View.GONE);
+
+		setBackgroundWeatherView(flickrImgInfo.getWeather(), flickrImgInfo.getVolume());
+	}
+
+	private void setBackgroundWeatherView(String weather, String volume) {
+		if (weather.equals(Flickr.Weather.rain.getText())) {
+			weatherViewController.setWeatherView(PrecipType.RAIN, volume);
+		} else if (weather.equals(Flickr.Weather.snow.getText())) {
+			weatherViewController.setWeatherView(PrecipType.SNOW, volume);
+		} else {
+			weatherViewController.setWeatherView(PrecipType.CLEAR, volume);
+		}
 	}
 
 	@Override
@@ -488,219 +493,40 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
+					GlideApp.with(WeatherFragment.this).clear(binding.currentConditionsImg);
 					binding.loadingAnimation.setVisibility(View.VISIBLE);
 					binding.flickrImageUrl.setVisibility(View.GONE);
 				}
 			});
 		}
 
-		executorService.execute(new Runnable() {
+		FlickrLoader.loadImg(requireActivity(), weatherDataSourceType, val, latitude, longitude, zoneId, volume, new FlickrLoader.GlideImgCallback() {
 			@Override
-			public void run() {
-				ZonedDateTime lastRefreshDateTime =
-						ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader.getRequestDateTime().toString());
-				lastRefreshDateTime = lastRefreshDateTime.withZoneSameInstant(zoneId);
-
-				SimpleTimeZone timeZone = new SimpleTimeZone(lastRefreshDateTime.getOffset().getTotalSeconds() * 1000, "");
-				Calendar currentCalendar = Calendar.getInstance(timeZone);
-				currentCalendar.set(lastRefreshDateTime.getYear(), lastRefreshDateTime.getMonthValue() - 1,
-						lastRefreshDateTime.getDayOfMonth(), lastRefreshDateTime.getHour(), lastRefreshDateTime.getMinute(),
-						lastRefreshDateTime.getSecond());
-
-				SunriseSunsetCalculator sunRiseSunsetCalculator = new SunriseSunsetCalculator(
-						new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), currentCalendar.getTimeZone());
-				Calendar sunRiseCalendar = sunRiseSunsetCalculator.getOfficialSunriseCalendarForDate(currentCalendar);
-				Calendar sunSetCalendar = sunRiseSunsetCalculator.getOfficialSunsetCalendarForDate(currentCalendar);
-
-				if (sunRiseCalendar == null || sunSetCalendar == null) {
-					if (getActivity() != null) {
-						getActivity().runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								binding.loadingAnimation.setVisibility(View.GONE);
-								binding.flickrImageUrl.setVisibility(View.GONE);
-							}
-						});
-					}
-					return;
-				}
-
-				final long currentTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(currentCalendar.getTimeInMillis());
-				final long sunRiseTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunRiseCalendar.getTimeInMillis());
-				final long sunSetTimeMinutes = TimeUnit.MILLISECONDS.toMinutes(sunSetCalendar.getTimeInMillis());
-
-				String time = null;
-				//현재 시각 파악 : 낮, 밤, 일출, 일몰(+-20분)
-				if (currentTimeMinutes < sunRiseTimeMinutes - 2) {
-					//새벽
-					time = "night";
-				} else if (currentTimeMinutes <= sunRiseTimeMinutes + 15) {
-					//일출
-					time = "sunrise";
-				} else if (currentTimeMinutes > sunRiseTimeMinutes + 15 && currentTimeMinutes <= sunSetTimeMinutes - 15) {
-					//낮
-					time = "day";
-				} else if (currentTimeMinutes < sunSetTimeMinutes + 2) {
-					//일몰
-					time = "sunset";
-				} else {
-					//밤
-					time = "night";
-				}
-
-				String weather = null;
-				switch (weatherDataSourceType) {
-					case KMA_WEB:
-						String pty = KmaResponseProcessor.convertPtyTextToCode(val);
-						String sky = KmaResponseProcessor.convertSkyTextToCode(val);
-						weather = (pty == null) ? KmaResponseProcessor.getSkyFlickrGalleryName(
-								sky) : KmaResponseProcessor.getPtyFlickrGalleryName(pty);
-						break;
-					case KMA_API:
-						String code = val.substring(0, 1);
-						weather = val.contains("_sky") ? KmaResponseProcessor.getSkyFlickrGalleryName(
-								code) : KmaResponseProcessor.getPtyFlickrGalleryName(code);
-						break;
-					case ACCU_WEATHER:
-						weather = AccuWeatherResponseProcessor.getFlickrGalleryName(val);
-						break;
-					case OWM_ONECALL:
-						weather = OpenWeatherMapResponseProcessor.getFlickrGalleryName(val);
-						break;
-				}
-
-				final String galleryName = time + " " + weather;
-				// time : sunrise, sunset, day, night
-				// weather : clear, partly cloudy, mostly cloudy, overcast, rain, snow
-
+			public void onLoadedImg(Bitmap bitmap, FlickrImgObj flickrImgObj, boolean successful) {
 				if (getActivity() != null) {
-					String finalWeather = weather;
-					MainThreadWorker.runOnUiThread(new Runnable() {
+					requireActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							if (finalWeather.equals(Flickr.Weather.rain.getText())) {
-								weatherViewController.setWeatherView(PrecipType.RAIN, volume);
-							} else if (finalWeather.equals(Flickr.Weather.snow.getText())) {
-								weatherViewController.setWeatherView(PrecipType.SNOW, volume);
-							} else {
-								weatherViewController.setWeatherView(PrecipType.CLEAR, volume);
-							}
-
-						}
-					});
-				}
-
-				//이미 다운로드 된 이미지가 있으면 다운로드 하지 않음
-				if (BACKGROUND_IMG_MAP.containsKey(galleryName)) {
-					if (getActivity() != null) {
-						getActivity().runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								GlideApp.with(WeatherFragment.this).load(BACKGROUND_IMG_MAP.get(galleryName).getImg()).transition(
+							if (successful) {
+								GlideApp.with(WeatherFragment.this).load(bitmap).transition(
 										DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
-								setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
-							}
-						});
-					}
-
-				} else {
-					FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
-					photosFromGalleryParameter.setGalleryId(FlickrUtil.getWeatherGalleryId(galleryName));
-
-					Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
-					Call<JsonElement> call = querys.getPhotosFromGallery(photosFromGalleryParameter.getMap());
-					call.enqueue(new Callback<JsonElement>() {
-						@Override
-						public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-							if (getActivity() == null) {
-								return;
-							}
-
-							Gson gson = new Gson();
-							PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
-									PhotosFromGalleryResponse.class);
-
-							if (photosFromGalleryResponse.getStat().equals("ok")) {
-								if (!photosFromGalleryResponse.getPhotos().getTotal().equals("0")) {
-									// https://live.staticflickr.com/65535/50081787401_355bcec912_b.jpg
-									// https://live.staticflickr.com/server/id_secret_size.jpg
-									int randomIdx = new Random().nextInt(Integer.parseInt(photosFromGalleryResponse.getPhotos().getTotal()));
-									PhotosFromGalleryResponse.Photos.Photo photo = photosFromGalleryResponse.getPhotos().getPhoto().get(randomIdx);
-									final String backgroundImgUrl = "https://live.staticflickr.com/" + photo.getServer() + "/" + photo.getId() + "_" + photo.getSecret() + "_b.jpg";
-
-									final FlickrImgObj flickrImgObj = new FlickrImgObj();
-									flickrImgObj.setPhoto(photo);
-									BACKGROUND_IMG_MAP.put(galleryName, flickrImgObj);
-
-									RequestOptions moduleOption = new RequestOptions().encodeQuality(100)
-											.diskCacheStrategy(DiskCacheStrategy.AUTOMATIC);
-
-									GlideApp.with(WeatherFragment.this).asBitmap().load(backgroundImgUrl).apply(moduleOption).into(new CustomTarget<Bitmap>() {
-										@Override
-										public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-											BACKGROUND_IMG_MAP.get(galleryName).setImg(resource);
-											GlideApp.with(WeatherFragment.this).load(resource).transition(
-													DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
-
-											if (getActivity() != null) {
-
-												getActivity().runOnUiThread(new Runnable() {
-													@Override
-													public void run() {
-														setFlickrImgInfo(BACKGROUND_IMG_MAP.get(galleryName));
-													}
-												});
-											}
-										}
-
-										@Override
-										public void onLoadCleared(@Nullable Drawable placeholder) {
-
-										}
-
-										@Override
-										public void onLoadFailed(@Nullable Drawable errorDrawable) {
-											super.onLoadFailed(errorDrawable);
-
-											if (getActivity() != null) {
-												getActivity().runOnUiThread(new Runnable() {
-													@Override
-													public void run() {
-														String text = getString(R.string.error);
-														binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
-																ContextCompat.getColor(getContext(), R.color.white)));
-													}
-												});
-											}
-										}
-									});
-								} else {
-
-								}
+								setFlickrImgInfo(flickrImgObj);
 							} else {
+								binding.loadingAnimation.setVisibility(View.GONE);
+								binding.flickrImageUrl.setVisibility(View.VISIBLE);
+								final String text = getString(R.string.error);
+								binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
+										ContextCompat.getColor(getContext(), R.color.white)));
 
-							}
-						}
-
-						@Override
-						public void onFailure(Call<JsonElement> call, Throwable t) {
-
-							if (getActivity() != null) {
-								getActivity().runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										String text = getString(R.string.error);
-										binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
-												ContextCompat.getColor(getContext(), R.color.white)));
-									}
-								});
+								if(flickrImgObj != null){
+									setBackgroundWeatherView(flickrImgObj.getWeather(), flickrImgObj.getVolume());
+								}
 							}
 						}
 					});
 				}
 			}
-		});
-
+		}, ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader.getRequestDateTime().toString()));
 	}
 
 	private final FusedLocation.MyLocationCallback myLocationCallback = new FusedLocation.MyLocationCallback() {
@@ -1479,10 +1305,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					if (loadingDialog != null) {
 						loadingDialog.dismiss();
 					}
-
-					binding.adViewBelowAirQuality.setVisibility(View.VISIBLE);
-					binding.adViewBottom.setVisibility(View.VISIBLE);
-					binding.scrollView.setVisibility(View.VISIBLE);
 				}
 			});
 

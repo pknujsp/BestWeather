@@ -38,7 +38,7 @@ public class RetrofitClient {
 	public static final String XML_DATATYPE = "XML";
 	public static final String LOG_TAG = "Retrofit Response";
 
-	private static final OkHttpClient client = new OkHttpClient.Builder().readTimeout(5, TimeUnit.SECONDS)
+	private static final OkHttpClient client = new OkHttpClient.Builder().readTimeout(4, TimeUnit.SECONDS)
 			.connectTimeout(3, TimeUnit.SECONDS).build();
 
 	public enum ServiceType {

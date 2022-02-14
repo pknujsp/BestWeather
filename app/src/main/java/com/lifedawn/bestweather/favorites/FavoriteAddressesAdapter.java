@@ -61,7 +61,7 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 			addressTextView = (TextView) itemView.findViewById(R.id.address_name);
 			deleteBtn = (ImageButton) itemView.findViewById(R.id.delete);
 
-			addressTextView.setOnClickListener(new View.OnClickListener() {
+			itemView.getRootView().setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					onClickedAddressListener.onClicked(favoriteAddressDtoList.get(getAdapterPosition()));
