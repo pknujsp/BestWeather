@@ -19,22 +19,22 @@ public class Photo implements Serializable
     private String server;
     @SerializedName("farm")
     @Expose
-    private Integer farm;
+    private String farm;
     @SerializedName("dateuploaded")
     @Expose
     private String dateuploaded;
     @SerializedName("isfavorite")
     @Expose
-    private Integer isfavorite;
+    private String isfavorite;
     @SerializedName("license")
     @Expose
-    private Integer license;
+    private String license;
     @SerializedName("safety_level")
     @Expose
-    private Integer safetyLevel;
+    private String safetyLevel;
     @SerializedName("rotation")
     @Expose
-    private Integer rotation;
+    private String rotation;
     @SerializedName("originalsecret")
     @Expose
     private String originalsecret;
@@ -58,7 +58,7 @@ public class Photo implements Serializable
     private Dates dates;
     @SerializedName("views")
     @Expose
-    private Integer views;
+    private String views;
     @SerializedName("editability")
     @Expose
     private Editability editability;
@@ -112,11 +112,11 @@ public class Photo implements Serializable
         this.server = server;
     }
 
-    public Integer getFarm() {
+    public String getFarm() {
         return farm;
     }
 
-    public void setFarm(Integer farm) {
+    public void setFarm(String farm) {
         this.farm = farm;
     }
 
@@ -128,35 +128,35 @@ public class Photo implements Serializable
         this.dateuploaded = dateuploaded;
     }
 
-    public Integer getIsfavorite() {
+    public String getIsfavorite() {
         return isfavorite;
     }
 
-    public void setIsfavorite(Integer isfavorite) {
+    public void setIsfavorite(String isfavorite) {
         this.isfavorite = isfavorite;
     }
 
-    public Integer getLicense() {
+    public String getLicense() {
         return license;
     }
 
-    public void setLicense(Integer license) {
+    public void setLicense(String license) {
         this.license = license;
     }
 
-    public Integer getSafetyLevel() {
+    public String getSafetyLevel() {
         return safetyLevel;
     }
 
-    public void setSafetyLevel(Integer safetyLevel) {
+    public void setSafetyLevel(String safetyLevel) {
         this.safetyLevel = safetyLevel;
     }
 
-    public Integer getRotation() {
+    public String getRotation() {
         return rotation;
     }
 
-    public void setRotation(Integer rotation) {
+    public void setRotation(String rotation) {
         this.rotation = rotation;
     }
 
@@ -216,12 +216,12 @@ public class Photo implements Serializable
         this.dates = dates;
     }
 
-    public Integer getViews() {
-        return views;
+    public void setViews(String views) {
+        this.views = views;
     }
 
-    public void setViews(Integer views) {
-        this.views = views;
+    public String getViews() {
+        return views;
     }
 
     public Editability getEditability() {
@@ -296,4 +296,7 @@ public class Photo implements Serializable
         this.media = media;
     }
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
 }

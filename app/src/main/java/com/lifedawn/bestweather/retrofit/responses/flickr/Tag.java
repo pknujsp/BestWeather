@@ -25,7 +25,7 @@ public class Tag implements Serializable
     private String content;
     @SerializedName("machine_tag")
     @Expose
-    private Integer machineTag;
+    private String machineTag;
     private final static long serialVersionUID = -5059050205966008593L;
 
     public String getId() {
@@ -68,12 +68,15 @@ public class Tag implements Serializable
         this.content = content;
     }
 
-    public Integer getMachineTag() {
+    public String getMachineTag() {
         return machineTag;
     }
 
-    public void setMachineTag(Integer machineTag) {
+    public void setMachineTag(String machineTag) {
         this.machineTag = machineTag;
     }
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
 }

@@ -22,10 +22,10 @@ public class Owner implements Serializable
     private String location;
     @SerializedName("iconserver")
     @Expose
-    private Integer iconserver;
+    private String iconserver;
     @SerializedName("iconfarm")
     @Expose
-    private Integer iconfarm;
+    private String iconfarm;
     @SerializedName("path_alias")
     @Expose
     private String pathAlias;
@@ -63,20 +63,24 @@ public class Owner implements Serializable
         this.location = location;
     }
 
-    public Integer getIconserver() {
+    public String getIconserver() {
         return iconserver;
     }
 
-    public void setIconserver(Integer iconserver) {
+    public void setIconserver(String iconserver) {
         this.iconserver = iconserver;
     }
 
-    public Integer getIconfarm() {
+    public String getIconfarm() {
         return iconfarm;
     }
 
-    public void setIconfarm(Integer iconfarm) {
+    public void setIconfarm(String iconfarm) {
         this.iconfarm = iconfarm;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
 
     public String getPathAlias() {
