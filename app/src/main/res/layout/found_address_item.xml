@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:clickable="true"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="8dp"
+    >
 
     <TextView
         android:id="@+id/country"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:fontFamily="sans-serif-light"
         android:text="country"
         android:textColor="?attr/textColor"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        />
 
     <TextView
         android:id="@+id/address_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/country"
         android:layout_marginTop="2dp"
         android:fontFamily="sans-serif-light"
         android:text="addressName"
         android:textColor="?attr/textColor"
-        android:textSize="17sp" />
-</RelativeLayout>
+        android:textSize="17sp"
+        />
+</LinearLayout></layout>

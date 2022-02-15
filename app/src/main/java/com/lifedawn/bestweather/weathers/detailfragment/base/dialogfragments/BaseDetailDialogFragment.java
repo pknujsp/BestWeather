@@ -16,6 +16,8 @@ import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.DialogFragmentDetailForecastBinding;
 
@@ -76,6 +78,18 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 				super.onPageSelected(position);
 			}
 		});
+	}
+
+	protected void setTabCustomView() {
+		TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(binding.tabLayout, binding.detailForecastViewPager,
+				new TabLayoutMediator.TabConfigurationStrategy() {
+					@Override
+					public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+					}
+				}
+		);
+		tabLayoutMediator.attach();
+		binding.tabLayout.selectTab(binding.tabLayout.getTabAt(firstSelectedPosition));
 	}
 
 	@Override

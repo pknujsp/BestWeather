@@ -35,6 +35,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 	private LayoutInflater layoutInflater;
 	private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
 	private DateTimeFormatter hoursFormatter;
+	private final String feelsLikeTempLabel;
 
 	private List<HourlyForecastDto> hourlyForecastDtoList;
 
@@ -45,6 +46,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock),
 						ValueUnits.clock24.name()));
 		hoursFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "h a" : "H");
+		feelsLikeTempLabel = context.getString(R.string.feelsLike) + ": ";
 	}
 
 	public DetailHourlyForecastViewPagerAdapter setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
@@ -75,7 +77,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 		return hourlyForecastDtoList.size();
 	}
 
-	protected final class ViewHolder extends RecyclerView.ViewHolder {
+	class ViewHolder extends RecyclerView.ViewHolder {
 		private ItemviewDetailForecastBinding binding;
 		private HeaderviewDetailHourlyforecastBinding headerBinding;
 
@@ -97,6 +99,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			headerBinding.hours.setText(hourlyForecastDto.getHours().format(hoursFormatter));
 			headerBinding.weatherIcon.setImageResource(hourlyForecastDto.getWeatherIcon());
 			headerBinding.temp.setText(hourlyForecastDto.getTemp());
+			headerBinding.feelsLikeTemp.setText(new String(feelsLikeTempLabel + hourlyForecastDto.getFeelsLikeTemp()));
 			headerBinding.weatherDescription.setText(hourlyForecastDto.getWeatherDescription());
 
 			addPrecipitationGridItem(layoutInflater, hourlyForecastDto);
@@ -230,7 +233,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			}
 		}
 
-		protected void addGridItems(List<GridItemDto> gridItemDtos) {
+		private void addGridItems(List<GridItemDto> gridItemDtos) {
 			TextView label = null;
 			TextView value = null;
 			ImageView icon = null;

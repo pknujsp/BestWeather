@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.databinding.FoundAddressItemBinding;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +39,10 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 	@NotNull
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-		return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.found_address_item, null));
+		FoundAddressItemBinding binding = FoundAddressItemBinding.inflate(LayoutInflater.from(parent.getContext()));
+		binding.getRoot().setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT));
+		return new ViewHolder(binding);
 	}
 
 	@Override
@@ -60,27 +64,25 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 	}
 
 	class ViewHolder extends RecyclerView.ViewHolder {
-		private TextView countryTextView;
-		private TextView addressTextView;
+		private FoundAddressItemBinding binding;
 
-		public ViewHolder(@NonNull @NotNull View itemView) {
-			super(itemView);
-			countryTextView = (TextView) itemView.findViewById(R.id.country);
-			addressTextView = (TextView) itemView.findViewById(R.id.address_name);
+		public ViewHolder(@NonNull @NotNull FoundAddressItemBinding binding) {
+			super(binding.getRoot());
+			this.binding = binding;
 
 			itemView.getRootView().setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					onClickedAddressListener.onClickedAddress(filteredAddressList.get(getAdapterPosition()));
+					onClickedAddressListener.onClickedAddress(filteredAddressList.get(getBindingAdapterPosition()));
 				}
 			});
 		}
 
 		public void onBind() {
-			Address address = filteredAddressList.get(getAdapterPosition());
+			Address address = filteredAddressList.get(getBindingAdapterPosition());
 
-			countryTextView.setText(address.getCountryName());
-			addressTextView.setText(address.getAddressLine(0));
+			binding.country.setText(address.getCountryName());
+			binding.addressName.setText(address.getAddressLine(0));
 		}
 	}
 

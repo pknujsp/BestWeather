@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <LinearLayout
         android:id="@+id/root_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/transparent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="74dp"
+            android:scrollbarSize="1dp"
+            android:scrollbars="horizontal"
+            app:tabGravity="center"
+            app:tabIndicator="@drawable/tabindicator"
+            app:tabIndicatorHeight="2dp"
+            app:tabMode="scrollable"
+            />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/detailForecastViewPager"
@@ -18,8 +33,9 @@
             android:orientation="horizontal"
             android:paddingLeft="36dp"
             android:paddingTop="48dp"
-            android:paddingRight="32dp"
-            android:paddingBottom="48dp" />
+            android:paddingRight="36dp"
+            android:paddingBottom="48dp"
+            />
 
     </LinearLayout>
 

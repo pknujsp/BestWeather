@@ -387,13 +387,13 @@
         <item>@string/flickr_snow</item>
         <item>@string/flickr_snow</item>
         <item>@string/flickr_snow</item>
-        <item>@string/flickr_rain</item>
-        <item>@string/flickr_rain</item>
-        <item>@string/flickr_rain</item>
-        <item>@string/flickr_rain</item>
-        <item>@string/flickr_rain</item>
-        <item>@string/flickr_rain</item>
-        <item>@string/flickr_rain</item>
+        <item>@string/flickr_overcast</item>
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_overcast</item>
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_overcast</item>
+        <item>@string/flickr_clear</item>
+        <item>@string/flickr_clear</item>
         <item>@string/flickr_rain</item>
         <item>@string/flickr_rain</item>
         <item>@string/flickr_rain</item>

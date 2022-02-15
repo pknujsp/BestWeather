@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_horizontal"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            >
 
             <TextView
                 android:id="@+id/date"
@@ -18,7 +22,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-light"
                 android:text="4.10 Fri"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                />
 
             <TextView
                 android:id="@+id/hours"
@@ -28,28 +33,55 @@
                 android:fontFamily="sans-serif-light"
                 android:text="10:00 PM"
                 android:textColor="@color/black"
-                android:textSize="21sp" />
+                android:textSize="21sp"
+                />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_marginBottom="16dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/weatherIcon"
-                    android:layout_width="110dp"
-                    android:layout_height="110dp"
-                    android:layout_marginRight="28dp"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/day_clear" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                >
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_marginRight="16dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    >
+
+                    <ImageView
+                        android:id="@+id/weatherIcon"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_marginBottom="6dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/day_clear"
+                        />
+
+
+                    <TextView
+                        android:id="@+id/weatherDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-light"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:text="Clear"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="16dp"
+                    android:orientation="vertical"
+                    >
 
                     <TextView
                         android:id="@id/temp"
@@ -58,18 +90,17 @@
                         android:fontFamily="sans-serif-light"
                         android:text="15°"
                         android:textColor="@color/black"
-                        android:textSize="50sp" />
+                        android:textSize="48sp"
+                        />
 
                     <TextView
-                        android:id="@+id/weatherDescription"
+                        android:id="@id/feelsLikeTemp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-light"
-                        android:text="Clear"
-                        android:textColor="@color/black"
-                        android:textSize="20sp" />
-
-
+                        android:text="15°"
+                        android:textSize="22sp"
+                        />
                 </LinearLayout>
 
             </LinearLayout>
@@ -82,7 +113,8 @@
                 app:alignmentMode="alignBounds"
                 app:columnCount="3"
                 app:rowOrderPreserved="false"
-                app:useDefaultMargins="false" />
+                app:useDefaultMargins="false"
+                />
 
         </LinearLayout>
 

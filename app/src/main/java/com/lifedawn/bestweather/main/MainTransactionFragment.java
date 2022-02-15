@@ -275,11 +275,15 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		createFavoriteLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				final boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), true);
+				final Boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), true);
 				final LocationType lastSelectedLocationType = LocationType.valueOf(
 						sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
 								LocationType.CurrentLocation.name()));
 				setCurrentLocationState(usingCurrentLocation);
+
+				Log.e(getClass().getName(), "createFavoriteLocationsList");
+				Log.e(getClass().getName(), usingCurrentLocation.toString());
+				Log.e(getClass().getName(), lastSelectedLocationType.name());
 
 				if (lastSelectedLocationType == LocationType.CurrentLocation) {
 					if (usingCurrentLocation) {
