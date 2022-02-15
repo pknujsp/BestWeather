@@ -466,7 +466,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	private void setFlickrImgInfo(FlickrImgObj flickrImgInfo) {
-		final String text = flickrImgInfo.getPhoto().getOwner();
+		final String text = flickrImgInfo.getPhoto().getOwner() + ": " + flickrImgInfo.getPhoto().getTitle();
 		binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
 				ContextCompat.getColor(getContext(), R.color.white)));
 		binding.flickrImageUrl.setTag(flickrImgInfo.getRealFlickrUrl());
@@ -518,7 +518,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 								binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
 										ContextCompat.getColor(getContext(), R.color.white)));
 
-								if(flickrImgObj != null){
+								if (flickrImgObj != null) {
 									setBackgroundWeatherView(flickrImgObj.getWeather(), flickrImgObj.getVolume());
 								}
 							}

@@ -14,7 +14,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 
-public interface Querys {
+public interface Queries {
 	// kma api xml-----------------------------------------------------------------------------------------
 	@GET("getUltraSrtNcst")
 	Call<String> getUltraSrtNcstByXml(@QueryMap(encoded = true) Map<String, String> queryMap);
@@ -96,4 +96,7 @@ public interface Querys {
 	//https://api.flickr.com/services/rest/?method=flickr.galleries.getPhotos&api_key=2c887b8d73b8334ddb3b0809c387de1b&gallery_id=72157719980390655&format=json&nojsoncallback=1
 	@GET("rest/")
 	Call<JsonElement> getPhotosFromGallery(@QueryMap(encoded = true) Map<String, String> queryMap);
+
+	@GET("rest/")
+	Call<JsonElement> getGetInfo(@QueryMap(encoded = true) Map<String, String> queryMap);
 }

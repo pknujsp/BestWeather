@@ -8,7 +8,7 @@ import androidx.preference.PreferenceManager;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
-import com.lifedawn.bestweather.retrofit.client.Querys;
+import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.CurrentConditionsParameter;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.FiveDaysOfDailyForecastsParameter;
@@ -43,9 +43,9 @@ public class AccuWeatherProcessing {
 	 * Current Conditions
 	 */
 	public static Call<JsonElement> getCurrentConditions(CurrentConditionsParameter currentConditionsParameter, JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS);
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS);
 
-		Call<JsonElement> call = querys.getAccuCurrentConditions(currentConditionsParameter.getLocationKey(),
+		Call<JsonElement> call = queries.getAccuCurrentConditions(currentConditionsParameter.getLocationKey(),
 				currentConditionsParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
@@ -77,9 +77,9 @@ public class AccuWeatherProcessing {
 	 */
 	public static Call<JsonElement> get5DaysOfDailyForecasts(FiveDaysOfDailyForecastsParameter fiveDaysOfDailyForecastsParameter,
 	                                                         JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST);
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST);
 
-		Call<JsonElement> call = querys.getAccuDailyForecast(fiveDaysOfDailyForecastsParameter.getLocationKey(),
+		Call<JsonElement> call = queries.getAccuDailyForecast(fiveDaysOfDailyForecastsParameter.getLocationKey(),
 				fiveDaysOfDailyForecastsParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
@@ -112,9 +112,9 @@ public class AccuWeatherProcessing {
 	 */
 	public static Call<JsonElement> get12HoursOfHourlyForecasts(TwelveHoursOfHourlyForecastsParameter twelveHoursOfHourlyForecastsParameter,
 	                                                            JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
 
-		Call<JsonElement> call = querys.getAccuHourlyForecast(twelveHoursOfHourlyForecastsParameter.getLocationKey(),
+		Call<JsonElement> call = queries.getAccuHourlyForecast(twelveHoursOfHourlyForecastsParameter.getLocationKey(),
 				twelveHoursOfHourlyForecastsParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
@@ -150,9 +150,9 @@ public class AccuWeatherProcessing {
 	 */
 	public static Call<JsonElement> getGeoPositionSearch(Context context, GeoPositionSearchParameter geoPositionSearchParameter,
 	                                                     JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH);
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH);
 
-		Call<JsonElement> call = querys.geoAccuPositionSearch(geoPositionSearchParameter.getMap());
+		Call<JsonElement> call = queries.geoAccuPositionSearch(geoPositionSearchParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {

@@ -50,14 +50,14 @@ public class RetrofitClient {
 	}
 
 
-	public static synchronized Querys getApiService(ServiceType serviceType) {
+	public static synchronized Queries getApiService(ServiceType serviceType) {
 
 		switch (serviceType) {
 			case KMA_WEB_CURRENT_CONDITIONS:
 			case KMA_WEB_FORECASTS:
 				Retrofit kmaHtmlInstance = new Retrofit.Builder().client(client).addConverterFactory(ScalarsConverterFactory.create())
 						.baseUrl(KMA_CURRENT_CONDITIONS_AND_HOURLY_AND_DAILY_FORECAST_URL).build();
-				return kmaHtmlInstance.create(Querys.class);
+				return kmaHtmlInstance.create(Queries.class);
 
 			case KMA_MID_LAND_FCST:
 			case KMA_MID_TA_FCST:
@@ -65,7 +65,7 @@ public class RetrofitClient {
 						.baseUrl(MID_FCST_INFO_SERVICE_URL)
 						.addConverterFactory(ScalarsConverterFactory.create())
 						.build();
-				return midFcstInstance.create(Querys.class);
+				return midFcstInstance.create(Queries.class);
 
 			case KMA_ULTRA_SRT_NCST:
 			case KMA_YESTERDAY_ULTRA_SRT_NCST:
@@ -74,7 +74,7 @@ public class RetrofitClient {
 				Retrofit vilageFcstInstance = new Retrofit.Builder().client(client).baseUrl(VILAGE_FCST_INFO_SERVICE_URL)
 						.addConverterFactory(ScalarsConverterFactory.create())
 						.build();
-				return vilageFcstInstance.create(Querys.class);
+				return vilageFcstInstance.create(Queries.class);
 
 			case ACCU_GEOPOSITION_SEARCH:
 			case ACCU_HOURLY_FORECAST:
@@ -83,19 +83,19 @@ public class RetrofitClient {
 				Retrofit accuWeatherInstance = new Retrofit.Builder().client(client).addConverterFactory(
 						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
 						ACCU_WEATHER_SERVICE_URL).build();
-				return accuWeatherInstance.create(Querys.class);
+				return accuWeatherInstance.create(Queries.class);
 
 			case MET_NORWAY_LOCATION_FORECAST:
 				Retrofit metNorwayLocationForecastsInstance = new Retrofit.Builder().client(client).addConverterFactory(
 						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
 						MET_NORWAY_LOCATION_FORECAST_SERVICE_URL).build();
-				return metNorwayLocationForecastsInstance.create(Querys.class);
+				return metNorwayLocationForecastsInstance.create(Queries.class);
 
 			case AQICN_GEOLOCALIZED_FEED:
 				Retrofit aqiCnGeolocalizedInstance = new Retrofit.Builder().client(client).addConverterFactory(
 						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
 						AQICN_GEOLOCALIZED_FEED_SERVICE_URL).build();
-				return aqiCnGeolocalizedInstance.create(Querys.class);
+				return aqiCnGeolocalizedInstance.create(Queries.class);
 
 			case OWM_CURRENT_CONDITIONS:
 			case OWM_DAILY_FORECAST:
@@ -103,19 +103,19 @@ public class RetrofitClient {
 				Retrofit owmBeginApiInstance = new Retrofit.Builder().client(client).addConverterFactory(
 						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
 						DEFAULT_OPEN_WEATHER_MAP_SERVICE_URL).build();
-				return owmBeginApiInstance.create(Querys.class);
+				return owmBeginApiInstance.create(Queries.class);
 
 			case OWM_HOURLY_FORECAST:
 				Retrofit owmBeginProInstance = new Retrofit.Builder().client(client).addConverterFactory(
 						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
 						PRO_OPEN_WEATHER_MAP_SERVICE_URL).build();
-				return owmBeginProInstance.create(Querys.class);
+				return owmBeginProInstance.create(Queries.class);
 
 			case FLICKR:
 				Retrofit flickrInstance = new Retrofit.Builder().client(client).addConverterFactory(
 						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
 						FLICKR_SERVICE_URL).build();
-				return flickrInstance.create(Querys.class);
+				return flickrInstance.create(Queries.class);
 
 			default:
 				return null;

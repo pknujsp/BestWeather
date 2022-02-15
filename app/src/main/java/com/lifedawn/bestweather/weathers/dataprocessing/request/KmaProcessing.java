@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
-import com.lifedawn.bestweather.retrofit.client.Querys;
+import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.kma.KmaCurrentConditionsParameters;
 import com.lifedawn.bestweather.retrofit.parameters.kma.KmaForecastsParameters;
@@ -51,8 +51,8 @@ public final class KmaProcessing {
 	 * 현재 날씨 web
 	 */
 	public static Call<String> getCurrentConditionsData(KmaCurrentConditionsParameters parameter, JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS);
-		Call<String> call = querys.getKmaCurrentConditions(parameter.getParametersMap());
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS);
+		Call<String> call = queries.getKmaCurrentConditions(parameter.getParametersMap());
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -82,8 +82,8 @@ public final class KmaProcessing {
 	 * 시간별, 일별 web
 	 */
 	public static Call<String> getForecastsData(KmaForecastsParameters parameter, JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
-		Call<String> call = querys.getKmaHourlyAndDailyForecast(parameter.getParametersMap());
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
+		Call<String> call = queries.getKmaHourlyAndDailyForecast(parameter.getParametersMap());
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -128,8 +128,8 @@ public final class KmaProcessing {
 		parameter.setBaseDate(dateTime.toLocalDate().format(yyyyMMdd));
 		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "00");
 
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
-		Call<String> call = querys.getUltraSrtNcstByXml(parameter.getMap());
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
+		Call<String> call = queries.getUltraSrtNcstByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -166,8 +166,8 @@ public final class KmaProcessing {
 		parameter.setBaseDate(dateTime.format(yyyyMMdd));
 		parameter.setBaseTime(dateTime.format(HH));
 
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
-		Call<String> call = querys.getUltraSrtNcstByXml(parameter.getMap());
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
+		Call<String> call = queries.getUltraSrtNcstByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -207,8 +207,8 @@ public final class KmaProcessing {
 		parameter.setBaseDate(dateTime.toLocalDate().format(yyyyMMdd));
 		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "30");
 
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
-		Call<String> xmlCall = Objects.requireNonNull(querys).getUltraSrtFcstByXml(parameter.getMap());
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
+		Call<String> xmlCall = Objects.requireNonNull(queries).getUltraSrtFcstByXml(parameter.getMap());
 		xmlCall.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -267,8 +267,8 @@ public final class KmaProcessing {
 		parameter.setBaseDate(dateTime.toLocalDate().format(yyyyMMdd));
 		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "00");
 
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
-		Call<String> call = Objects.requireNonNull(querys).getVilageFcstByXml(parameter.getMap());
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
+		Call<String> call = Objects.requireNonNull(queries).getVilageFcstByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -298,8 +298,8 @@ public final class KmaProcessing {
 	 * @param parameter
 	 */
 	public static Call<String> getMidLandFcstData(MidLandParameter parameter, JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_MID_LAND_FCST);
-		Call<String> call = Objects.requireNonNull(querys).getMidLandFcstByXml(parameter.getMap());
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_MID_LAND_FCST);
+		Call<String> call = Objects.requireNonNull(queries).getMidLandFcstByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -330,8 +330,8 @@ public final class KmaProcessing {
 	 * @param parameter
 	 */
 	public static Call<String> getMidTaData(MidTaParameter parameter, JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_MID_TA_FCST);
-		Call<String> call = Objects.requireNonNull(querys).getMidTaByXml(parameter.getMap());
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_MID_TA_FCST);
+		Call<String> call = Objects.requireNonNull(queries).getMidTaByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {

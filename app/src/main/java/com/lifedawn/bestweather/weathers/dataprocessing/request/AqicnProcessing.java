@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
-import com.lifedawn.bestweather.retrofit.client.Querys;
+import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.aqicn.AqicnParameter;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
@@ -18,9 +18,9 @@ import retrofit2.Response;
 
 public class AqicnProcessing {
 	public static Call<JsonElement> getLocalizedFeed(AqicnParameter aqicnParameter, JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 
-		Call<JsonElement> call = querys.getAqiCnGeolocalizedFeed(aqicnParameter.getLatitude(), aqicnParameter.getLongitude(),
+		Call<JsonElement> call = queries.getAqiCnGeolocalizedFeed(aqicnParameter.getLatitude(), aqicnParameter.getLongitude(),
 				aqicnParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override

@@ -7,7 +7,7 @@ import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
-import com.lifedawn.bestweather.retrofit.client.Querys;
+import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.individual.OwmCurrentWeatherParameter;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.individual.OwmDailyForecastParameter;
@@ -34,9 +34,9 @@ public class OpenWeatherMapProcessing {
 	 */
 	public static Call<JsonElement> getOneCall(OneCallParameter oneCallParameter,
 	                                           JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_ONE_CALL);
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
-		Call<JsonElement> call = querys.getOneCall(oneCallParameter.getMap());
+		Call<JsonElement> call = queries.getOneCall(oneCallParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
@@ -61,9 +61,9 @@ public class OpenWeatherMapProcessing {
 	 */
 	public static Call<JsonElement> getCurrentConditions(OwmCurrentWeatherParameter owmCurrentWeatherParameter,
 	                                                     JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS);
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS);
 
-		Call<JsonElement> call = querys.getOwmCurrentConditions(owmCurrentWeatherParameter.getMap());
+		Call<JsonElement> call = queries.getOwmCurrentConditions(owmCurrentWeatherParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
@@ -88,9 +88,9 @@ public class OpenWeatherMapProcessing {
 	 */
 	public static Call<JsonElement> getHourlyForecast(OwmHourlyForecastParameter owmHourlyForecastParameter,
 	                                                  JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
 
-		Call<JsonElement> call = querys.getOwmHourlyForecast(owmHourlyForecastParameter.getMap());
+		Call<JsonElement> call = queries.getOwmHourlyForecast(owmHourlyForecastParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
@@ -115,9 +115,9 @@ public class OpenWeatherMapProcessing {
 	 */
 	public static Call<JsonElement> getDailyForecast(OwmDailyForecastParameter owmDailyForecastParameter,
 	                                                 JsonDownloader callback) {
-		Querys querys = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
+		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
 
-		Call<JsonElement> call = querys.getOwmDailyForecast(owmDailyForecastParameter.getMap());
+		Call<JsonElement> call = queries.getOwmDailyForecast(owmDailyForecastParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
