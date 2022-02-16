@@ -42,8 +42,8 @@ public class DetailSingleTemperatureView extends View {
 		linePaint = new Paint();
 		linePaint.setAntiAlias(true);
 		linePaint.setStyle(Paint.Style.STROKE);
-		linePaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.4f, getResources().getDisplayMetrics()));
-		linePaint.setColor(Color.WHITE);
+		linePaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.3f, getResources().getDisplayMetrics()));
+		linePaint.setColor(Color.DKGRAY);
 
 		circlePaint = new Paint();
 		circlePaint.setAntiAlias(true);

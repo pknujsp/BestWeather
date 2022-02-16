@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        >
 
         <ImageView
             android:id="@+id/alertImageView"
@@ -15,7 +17,8 @@
             android:layout_height="52dp"
             android:layout_marginBottom="12dp"
             android:src="@drawable/error"
-            app:tint="@color/blue" />
+            app:tint="@color/blue"
+            />
 
         <TextView
             android:id="@+id/textView"
@@ -23,15 +26,17 @@
             android:layout_height="wrap_content"
             android:text="Message"
             android:textAlignment="center"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:layout_marginBottom="12dp"
+            />
 
-        <Button
-            android:id="@+id/btn"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/btnList"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/rounded_btn_background"
-            android:text="Button" />
+            android:gravity="center"
+            android:orientation="vertical"
+            />
 
     </LinearLayout>
 </layout>

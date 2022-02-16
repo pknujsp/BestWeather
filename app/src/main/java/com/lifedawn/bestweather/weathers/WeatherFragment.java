@@ -156,8 +156,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private MultipleRestApiDownloader multipleRestApiDownloader;
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
-	private AlertDialog dialog;
-
+	private AlertDialog loadingDialog;
 
 	public WeatherFragment() {
 	}
@@ -187,17 +186,26 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		@Override
 		public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
 			super.onFragmentViewCreated(fm, f, v, savedInstanceState);
-			if (f instanceof SimpleCurrentConditionsFragment) {
-				binding.adViewBelowAirQuality.setVisibility(View.VISIBLE);
-				binding.adViewBottom.setVisibility(View.VISIBLE);
-				binding.scrollView.setVisibility(View.VISIBLE);
-			}
+
 		}
 
 		@Override
 		public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
 			super.onFragmentStarted(fm, f);
+		}
 
+		@Override
+		public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+			super.onFragmentResumed(fm, f);
+			if (f instanceof SimpleCurrentConditionsFragment) {
+				binding.adViewBelowAirQuality.setVisibility(View.VISIBLE);
+				binding.adViewBottom.setVisibility(View.VISIBLE);
+				binding.scrollView.setVisibility(View.VISIBLE);
+				if (loadingDialog != null) {
+					loadingDialog.dismiss();
+					loadingDialog = null;
+				}
+			}
 		}
 
 		@Override
@@ -262,8 +270,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
-					dialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
-					fusedLocation.findCurrentLocation(myLocationCallback, false);
+					if (loadingDialog == null) {
+						loadingDialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
+					} else {
+						loadingDialog.setMessage(getString(R.string.msg_finding_current_location));
+					}
+					fusedLocation.findCurrentLocation(MY_LOCATION_CALLBACK, false);
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
 				}
@@ -304,6 +316,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
+					loadingDialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
 					requestNewData();
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
@@ -378,6 +391,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	public void load(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
+		loadingDialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		binding.mainToolbar.gps.setVisibility(locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
 		binding.mainToolbar.find.setVisibility(locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
@@ -529,7 +543,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		}, ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader.getRequestDateTime().toString()));
 	}
 
-	private final FusedLocation.MyLocationCallback myLocationCallback = new FusedLocation.MyLocationCallback() {
+	private final FusedLocation.MyLocationCallback MY_LOCATION_CALLBACK = new FusedLocation.MyLocationCallback() {
 		@Override
 		public void onSuccessful(LocationResult locationResult) {
 			//현재 위치 파악 성공
@@ -537,7 +551,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			//날씨 데이터 요청
 			final Location location = getBestLocation(locationResult);
 
-			SharedPreferences.Editor editor = sharedPreferences.edit();
+			final SharedPreferences.Editor editor = sharedPreferences.edit();
 			editor.putString(getString(R.string.pref_key_last_current_location_latitude), String.valueOf(location.getLatitude())).putString(
 					getString(R.string.pref_key_last_current_location_longitude), String.valueOf(location.getLongitude())).commit();
 
@@ -547,7 +561,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		@Override
 		public void onFailed(Fail fail) {
-			dialog.dismiss();
+			loadingDialog.dismiss();
+			loadingDialog = null;
+
 			locationCallbackInMainFragment.onFailed(fail);
 
 			if (fail == Fail.DISABLED_GPS) {
@@ -583,7 +599,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				});
 
 			} else if (fail == Fail.FAILED_FIND_LOCATION) {
-				Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
+				List<AlertFragment.BtnObj> btnObjList = new ArrayList<>();
+				btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						binding.mainToolbar.gps.callOnClick();
+					}
+				}, getString(R.string.again)));
+				setFailFragment(btnObjList);
 			}
 		}
 	};
@@ -661,6 +684,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void reDraw() {
 		//날씨 프래그먼트 다시 그림
 		if (FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString())) {
+			if (loadingDialog == null) {
+				loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
+			}
 			Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
 			weatherDataSourceTypeSet.add(mainWeatherDataSourceType);
 			weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
@@ -673,15 +699,15 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		this.latitude = currentLocation.getLatitude();
 		this.longitude = currentLocation.getLongitude();
 		FINAL_RESPONSE_MAP.remove(latitude.toString() + longitude.toString());
-		dialog.dismiss();
-
 		requestAddressOfLocation(latitude, longitude, true);
 	}
 
 
 	public void requestNewData() {
 		binding.scrollView.setVisibility(View.INVISIBLE);
-		AlertDialog loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
+		if (loadingDialog != null) {
+			loadingDialog.setMessage(getString(R.string.msg_refreshing_weather_data));
+		}
 
 		executorService.execute(new Runnable() {
 			@Override
@@ -716,7 +742,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private void requestNewDataWithAnotherWeatherSource(WeatherDataSourceType newWeatherDataSourceType, WeatherDataSourceType lastWeatherDataSourceType) {
 		binding.scrollView.setVisibility(View.INVISIBLE);
-		AlertDialog loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
+		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		executorService.execute(new Runnable() {
 			@Override
@@ -765,85 +791,71 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 					if (getActivity() != null) {
 						//다시시도, 취소 중 택1
-						responseResultObj.multipleRestApiDownloader.getLoadingDialog().dismiss();
+						List<AlertFragment.BtnObj> btnObjList = new ArrayList<>();
+
 						Set<WeatherDataSourceType> otherTypes = getOtherWeatherSourceTypes(weatherDataSourceType,
 								mainWeatherDataSourceType);
 
-						final String[] failedDialogItems = new String[otherTypes.size() + 2];
-						failedDialogItems[0] = getString(R.string.cancel);
-						failedDialogItems[1] = getString(R.string.again);
-
+						final String[] failedDialogItems = new String[otherTypes.size()];
 						final WeatherDataSourceType[] weatherDataSourceTypeArr = new WeatherDataSourceType[otherTypes.size()];
-						int arrIndex = 2;
+						int arrIndex = 0;
 
 						if (otherTypes.contains(WeatherDataSourceType.KMA_WEB)) {
-							weatherDataSourceTypeArr[arrIndex - 2] = WeatherDataSourceType.KMA_WEB;
+							weatherDataSourceTypeArr[arrIndex] = WeatherDataSourceType.KMA_WEB;
 							failedDialogItems[arrIndex++] = getString(R.string.kma) + ", " + getString(
 									R.string.rerequest_another_weather_datasource);
 						}
 						if (otherTypes.contains(WeatherDataSourceType.ACCU_WEATHER)) {
-							weatherDataSourceTypeArr[arrIndex - 2] = WeatherDataSourceType.ACCU_WEATHER;
+							weatherDataSourceTypeArr[arrIndex] = WeatherDataSourceType.ACCU_WEATHER;
 							failedDialogItems[arrIndex++] = getString(R.string.accu_weather) + ", " + getString(
 									R.string.rerequest_another_weather_datasource);
 						}
 						if (otherTypes.contains(WeatherDataSourceType.OWM_ONECALL)) {
-							weatherDataSourceTypeArr[arrIndex - 2] = WeatherDataSourceType.OWM_ONECALL;
-							failedDialogItems[arrIndex] = getString(R.string.owm) + ", " + getString(
+							weatherDataSourceTypeArr[arrIndex] = WeatherDataSourceType.OWM_ONECALL;
+							failedDialogItems[arrIndex++] = getString(R.string.owm) + ", " + getString(
 									R.string.rerequest_another_weather_datasource);
 						}
-
-						final AlertDialog failedDialog = new AlertDialog.Builder(getActivity()).setCancelable(false).setTitle(
-								R.string.update_failed).setItems(failedDialogItems, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								if (which == 1) {
-									//다시 시도
-									responseResultObj.multipleRestApiDownloader.setLoadingDialog(
-											reRefreshBySameWeatherSource(responseResultObj));
-								} else if (which == 0) {
-									//취소
-									if (!containWeatherData(latitude, longitude)) {
-										AlertFragment alertFragment = new AlertFragment();
-										alertFragment.setBtnOnClickListener(new View.OnClickListener() {
-											@Override
-											public void onClick(View v) {
-												getChildFragmentManager().popBackStackImmediate();
-												responseResultObj.multipleRestApiDownloader.setLoadingDialog(
-														reRefreshBySameWeatherSource(responseResultObj));
-											}
-										});
-
-										Bundle bundle = new Bundle();
-										bundle.putInt(AlertFragment.Constant.DRAWABLE_ID.name(), R.drawable.error);
-										bundle.putString(AlertFragment.Constant.MESSAGE_TEXT.name(), getString(R.string.update_failed));
-										bundle.putString(AlertFragment.Constant.BTN_TEXT.name(), getString(R.string.again));
-
-										alertFragment.setArguments(bundle);
-
-										FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-										binding.scrollView.setVisibility(View.GONE);
-										fragmentTransaction.add(R.id.fragment_container, alertFragment,
-												AlertFragment.class.getName()).addToBackStack(AlertFragment.class.getName()).commit();
-									} else {
-										binding.scrollView.setVisibility(View.VISIBLE);
-									}
-								} else if (which >= 2) {
-									//다른 제공사로 요청
-									responseResultObj.mainWeatherDataSourceType = weatherDataSourceTypeArr[which - 2];
-									responseResultObj.weatherDataSourceTypeSet.clear();
-									responseResultObj.weatherDataSourceTypeSet.add(responseResultObj.mainWeatherDataSourceType);
-									responseResultObj.weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
-									responseResultObj.multipleRestApiDownloader.setLoadingDialog(
-											reRefreshByAnotherWeatherSource(responseResultObj));
-								}
-								dialog.dismiss();
-							}
-						}).create();
 
 						MainThreadWorker.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								failedDialog.show();
+								loadingDialog.dismiss();
+								loadingDialog = null;
+
+								if (containWeatherData(latitude, longitude)) {
+									binding.scrollView.setVisibility(View.VISIBLE);
+									Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
+								} else {
+									btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
+										@Override
+										public void onClick(View v) {
+											getChildFragmentManager().popBackStackImmediate();
+
+											responseResultObj.multipleRestApiDownloader.setLoadingDialog(
+													reRefreshBySameWeatherSource(responseResultObj));
+										}
+									}, getString(R.string.again)));
+
+									int index = 0;
+									for (WeatherDataSourceType anotherProvider : weatherDataSourceTypeArr) {
+										btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
+											@Override
+											public void onClick(View v) {
+												getChildFragmentManager().popBackStackImmediate();
+
+												responseResultObj.mainWeatherDataSourceType = anotherProvider;
+												responseResultObj.weatherDataSourceTypeSet.clear();
+												responseResultObj.weatherDataSourceTypeSet.add(responseResultObj.mainWeatherDataSourceType);
+												responseResultObj.weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
+												responseResultObj.multipleRestApiDownloader.setLoadingDialog(
+														reRefreshByAnotherWeatherSource(responseResultObj));
+											}
+										}, failedDialogItems[index]));
+										index++;
+									}
+
+									setFailFragment(btnObjList);
+								}
 							}
 						});
 					}
@@ -860,6 +872,20 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
 		setWeatherFragments(responseResultObj.weatherDataSourceTypeSet, responseResultObj.multipleRestApiDownloader, latitude, longitude,
 				responseResultObj.multipleRestApiDownloader.getLoadingDialog());
+	}
+
+	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
+		final Bundle bundle = new Bundle();
+		bundle.putInt(AlertFragment.Constant.DRAWABLE_ID.name(), R.drawable.error);
+
+		AlertFragment alertFragment = new AlertFragment();
+		alertFragment.setBtnObjList(btnObjList);
+		alertFragment.setArguments(bundle);
+
+		FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+		fragmentTransaction.add(R.id.fragment_container, alertFragment,
+				AlertFragment.class.getName()).addToBackStack(AlertFragment.class.getName()).commit();
+		binding.scrollView.setVisibility(View.GONE);
 	}
 
 	/**
@@ -959,7 +985,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private AlertDialog reRefreshBySameWeatherSource(ResponseResultObj responseResultObj) {
 		binding.scrollView.setVisibility(View.INVISIBLE);
-		final AlertDialog loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
+		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		final WeatherDataSourceType requestWeatherSource = responseResultObj.mainWeatherDataSourceType;
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> result = responseResultObj.multipleRestApiDownloader.getResponseMap().get(
@@ -991,7 +1017,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private AlertDialog reRefreshByAnotherWeatherSource(ResponseResultObj responseResultObj) {
 		binding.scrollView.setVisibility(View.INVISIBLE);
-		final AlertDialog loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
+		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		ArrayMap<WeatherDataSourceType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
 		setRequestWeatherSourceWithSourceTypes(responseResultObj.weatherDataSourceTypeSet, newRequestWeatherSources);
@@ -1302,9 +1328,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment)).replace(
 							binding.sunSetRise.getId(), sunSetRiseFragment, getString(R.string.tag_sun_set_rise_fragment)).commit();
 
-					if (loadingDialog != null) {
-						loadingDialog.dismiss();
-					}
 				}
 			});
 

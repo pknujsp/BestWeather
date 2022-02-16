@@ -139,7 +139,6 @@ public class FavoritesFragment extends Fragment {
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 
 		binding.adViewBottom.loadAd(new AdRequest.Builder().build());
-
 		binding.progressResultView.setContentView(binding.favoriteAddressList);
 
 		binding.toolbar.fragmentTitle.setText(R.string.favorite);
@@ -200,6 +199,7 @@ public class FavoritesFragment extends Fragment {
 				}
 			}
 		});
+
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
@@ -307,12 +307,6 @@ public class FavoritesFragment extends Fragment {
 			getParentFragmentManager().popBackStack();
 		} else {
 			if (checkPermissionAndGpsOn()) {
-				if (PreferenceManager.getDefaultSharedPreferences(getContext()).getString(getString(R.string.pref_key_last_current_location_latitude), "0.0").equals("0.0")) {
-					refresh = true;
-					bundle.putBoolean(BundleKey.ChangedUseCurrentLocation.name(), enableCurrentLocation);
-					bundle.putBoolean(BundleKey.Refresh.name(), refresh);
-				}
-				onResultFragmentListener.onResultFragment(bundle);
 				getParentFragmentManager().popBackStack();
 			}
 		}

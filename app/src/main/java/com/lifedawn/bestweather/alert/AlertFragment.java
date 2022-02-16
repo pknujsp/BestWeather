@@ -4,26 +4,33 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.FragmentAlertBinding;
 
+import java.util.List;
+
 public class AlertFragment extends Fragment {
 	private FragmentAlertBinding binding;
-	private View.OnClickListener btnOnClickListener;
+	private List<BtnObj> btnObjList;
 
 	public enum Constant {
-		DRAWABLE_ID, MESSAGE_TEXT, BTN_TEXT
+		DRAWABLE_ID
 	}
 
-	public void setBtnOnClickListener(View.OnClickListener btnOnClickListener) {
-		this.btnOnClickListener = btnOnClickListener;
+	public void setBtnObjList(List<BtnObj> btnObjList) {
+		this.btnObjList = btnObjList;
 	}
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -41,27 +48,38 @@ public class AlertFragment extends Fragment {
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		binding.btn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (btnOnClickListener != null) {
-					btnOnClickListener.onClick(v);
-				}
-			}
-		});
-
 		Bundle bundle = getArguments();
 		final int drawableId = bundle.getInt(Constant.DRAWABLE_ID.name());
-		final String messageText = bundle.getString(Constant.MESSAGE_TEXT.name());
-		final String btnText = bundle.getString(Constant.BTN_TEXT.name());
 
 		binding.alertImageView.setImageResource(drawableId);
-		binding.textView.setText(messageText);
-		binding.btn.setText(btnText);
+
+		LayoutInflater layoutInflater = getLayoutInflater();
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		layoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
+		for (BtnObj btnObj : btnObjList) {
+			Button button = new Button(getContext());
+			button.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rounded_btn_background));
+			button.setLayoutParams(layoutParams);
+			button.setText(btnObj.text);
+			button.setOnClickListener(btnObj.onClickListener);
+
+			binding.btnList.addView(button);
+		}
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+	}
+
+	public static class BtnObj {
+		final View.OnClickListener onClickListener;
+		final String text;
+
+		public BtnObj(View.OnClickListener onClickListener, String text) {
+			this.onClickListener = onClickListener;
+			this.text = text;
+		}
 	}
 }

@@ -46,7 +46,7 @@ public class DetailDoubleTemperatureViewForRemoteViews extends View {
 		linePaint = new Paint();
 		linePaint.setAntiAlias(true);
 		linePaint.setStyle(Paint.Style.STROKE);
-		linePaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.4f, getResources().getDisplayMetrics()));
+		linePaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.3f, getResources().getDisplayMetrics()));
 		linePaint.setColor(Color.DKGRAY);
 
 		maxCirclePaint = new Paint();
@@ -98,7 +98,7 @@ public class DetailDoubleTemperatureViewForRemoteViews extends View {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		String test = "20";
+		String test = "20°";
 		tempPaint.getTextBounds(test, 0, test.length(), textRect);
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 	}

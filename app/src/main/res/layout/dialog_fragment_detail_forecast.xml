@@ -15,7 +15,7 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="76dp"
             app:tabGravity="center"
             app:tabIndicator="@drawable/tabindicator"
             app:tabIndicatorHeight="2dp"
@@ -30,9 +30,9 @@
             android:clipToPadding="false"
             android:orientation="horizontal"
             android:paddingLeft="36dp"
-            android:paddingTop="48dp"
+            android:paddingTop="42dp"
             android:paddingRight="36dp"
-            android:paddingBottom="48dp"
+            android:paddingBottom="42dp"
             />
 
     </LinearLayout>

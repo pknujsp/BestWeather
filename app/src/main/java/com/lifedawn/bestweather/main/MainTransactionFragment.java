@@ -27,6 +27,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.ads.nativetemplates.NativeTemplateStyle;
 import com.google.android.ads.nativetemplates.TemplateView;
@@ -232,6 +233,8 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			public void onFailed(Fail fail) {
 				if (fail == Fail.FAILED_FIND_LOCATION) {
 					//기존의 현재 위치 값이 없으면 즐겨찾기로 이동
+					Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
+
 					double latitude = Double.parseDouble(
 							sharedPreferences.getString(getString(R.string.pref_key_last_current_location_latitude), "0.0"));
 					double longitude = Double.parseDouble(
@@ -280,10 +283,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 						sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
 								LocationType.CurrentLocation.name()));
 				setCurrentLocationState(usingCurrentLocation);
-
-				Log.e(getClass().getName(), "createFavoriteLocationsList");
-				Log.e(getClass().getName(), usingCurrentLocation.toString());
-				Log.e(getClass().getName(), lastSelectedLocationType.name());
 
 				if (lastSelectedLocationType == LocationType.CurrentLocation) {
 					if (usingCurrentLocation) {
@@ -408,13 +407,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			}
 		} else {
 			//현재 위치
-			boolean enabledUseCurrentLocation = bundle.getBoolean(BundleKey.ChangedUseCurrentLocation.name());
-			boolean refresh = bundle.getBoolean(BundleKey.Refresh.name());
 
-			if (enabledUseCurrentLocation || refresh) {
-				setCurrentLocationState(true);
-				binding.sideNavMenu.currentLocationLayout.callOnClick();
-			}
 		}
 	}
 
@@ -510,7 +503,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 						}
 					});
 
-					String tag = FavoritesFragment.class.getName();
+					final String tag = FavoritesFragment.class.getName();
 
 					getChildFragmentManager().beginTransaction().hide(
 							getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName())).add(
