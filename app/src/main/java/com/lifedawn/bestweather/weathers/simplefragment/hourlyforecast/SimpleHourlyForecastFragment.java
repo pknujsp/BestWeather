@@ -229,10 +229,8 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 			binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
 		}
 
-		final int tempRowHeight = (int) context.getResources().getDimension(R.dimen.singleTemperatureRowHeightInCOMMON);
-
 		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				tempRowHeight);
+				(int) context.getResources().getDimension(R.dimen.singleTemperatureRowHeightInCOMMON));
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
 		createValueUnitsDescription(mainWeatherDataSourceType, haveRain, haveSnow);

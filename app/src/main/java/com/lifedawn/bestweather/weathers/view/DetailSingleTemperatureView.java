@@ -43,7 +43,7 @@ public class DetailSingleTemperatureView extends View {
 		linePaint.setAntiAlias(true);
 		linePaint.setStyle(Paint.Style.STROKE);
 		linePaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.4f, getResources().getDisplayMetrics()));
-		linePaint.setColor(Color.DKGRAY);
+		linePaint.setColor(Color.WHITE);
 
 		circlePaint = new Paint();
 		circlePaint.setAntiAlias(true);
@@ -95,7 +95,7 @@ public class DetailSingleTemperatureView extends View {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		String test = "20";
+		String test = "20°";
 		tempPaint.getTextBounds(test, 0, test.length(), textRect);
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 	}
@@ -146,6 +146,8 @@ public class DetailSingleTemperatureView extends View {
 
 			linePointList.add(new PointF(lastColumnPoint.x, lastColumnPoint.y));
 		}
+		Path path = new Path();
+		path.moveTo(linePointList.get(0).x, linePointList.get(0).y);
 
 		PointF[] points1 = new PointF[tempsCount];
 		PointF[] points2 = new PointF[tempsCount];
@@ -153,18 +155,12 @@ public class DetailSingleTemperatureView extends View {
 		for (int i = 1; i < tempsCount; i++) {
 			points1[i] = new PointF((linePointList.get(i).x + linePointList.get(i - 1).x) / 2, linePointList.get(i - 1).y);
 			points2[i] = new PointF((linePointList.get(i).x + linePointList.get(i - 1).x) / 2, linePointList.get(i).y);
-		}
 
-		Path maxPath = new Path();
-		maxPath.moveTo(linePointList.get(0).x, linePointList.get(0).y);
-
-		//곡선 그리기
-		for (int i = 1; i < tempsCount; i++) {
-			maxPath.cubicTo(points1[i].x, points1[i].y, points2[i].x, points2[i].y, linePointList.get(i).x,
+			path.cubicTo(points1[i].x, points1[i].y, points2[i].x, points2[i].y, linePointList.get(i).x,
 					linePointList.get(i).y);
 		}
 
-		canvas.drawPath(maxPath, linePaint);
+		canvas.drawPath(path, linePaint);
 
 		for (int i = 0; i < circleXArr.length; i++) {
 			canvas.drawCircle(circleXArr[i], circleYArr[i], circleRadius, circlePaint);

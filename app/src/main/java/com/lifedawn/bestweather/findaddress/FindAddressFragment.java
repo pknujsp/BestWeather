@@ -111,7 +111,7 @@ public class FindAddressFragment extends Fragment {
 					loadingDialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
-							loadingDialog.dismiss();
+							fusedLocation.cancel(myLocationCallback);
 							loadingDialog = null;
 						}
 					});

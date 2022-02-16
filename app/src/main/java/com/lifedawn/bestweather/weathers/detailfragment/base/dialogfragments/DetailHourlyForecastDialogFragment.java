@@ -32,10 +32,7 @@ public class DetailHourlyForecastDialogFragment extends BaseDetailDialogFragment
 		this.hourlyForecastDtoList = hourlyForecastDtoList;
 	}
 
-	@Override
-	public void setFirstSelectedPosition(int firstSelectedPosition) {
-		this.firstSelectedPosition = firstSelectedPosition;
-	}
+
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -69,6 +66,7 @@ public class DetailHourlyForecastDialogFragment extends BaseDetailDialogFragment
 	@Override
 	protected void setTabCustomView() {
 		super.setTabCustomView();
+
 		layoutInflater = getLayoutInflater();
 		ImageView weatherIcon = null;
 		TextView temp = null;
@@ -89,5 +87,7 @@ public class DetailHourlyForecastDialogFragment extends BaseDetailDialogFragment
 
 			binding.tabLayout.getTabAt(index++).setCustomView(itemView);
 		}
+		binding.tabLayout.selectTab(binding.tabLayout.getTabAt(firstSelectedPosition));
+
 	}
 }

@@ -13,7 +13,7 @@
             android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginBottom="16dp" />
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -21,7 +21,8 @@
             android:layout_below="@id/header"
             android:layout_alignParentBottom="true"
             android:overScrollMode="never"
-            android:scrollbars="none">
+            android:scrollbars="none"
+            >
 
             <androidx.gridlayout.widget.GridLayout
                 android:id="@+id/detailGridView"
@@ -31,7 +32,8 @@
                 app:columnCount="3"
                 app:orientation="horizontal"
                 app:rowOrderPreserved="false"
-                app:useDefaultMargins="false" />
+                app:useDefaultMargins="false"
+                />
 
         </androidx.core.widget.NestedScrollView>
 

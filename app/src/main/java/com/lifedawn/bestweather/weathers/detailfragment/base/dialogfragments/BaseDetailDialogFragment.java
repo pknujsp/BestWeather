@@ -57,12 +57,12 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
 
 		binding.detailForecastViewPager.setOffscreenPageLimit(2);
 		binding.detailForecastViewPager.getChildAt(0).setOverScrollMode(View.OVER_SCROLL_NEVER);
 
 		compositePageTransformer = new CompositePageTransformer();
-		final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
 		compositePageTransformer.addTransformer(new MarginPageTransformer(margin));
 		compositePageTransformer.addTransformer(new ViewPager2.PageTransformer() {
 			@Override
@@ -89,7 +89,6 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 				}
 		);
 		tabLayoutMediator.attach();
-		binding.tabLayout.selectTab(binding.tabLayout.getTabAt(firstSelectedPosition));
 	}
 
 	@Override
@@ -104,7 +103,7 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	public void onDestroy() {
 		super.onDestroy();
 	}
-
-	public abstract void setFirstSelectedPosition(int position);
-
+	public void setFirstSelectedPosition(int firstSelectedPosition) {
+		this.firstSelectedPosition = firstSelectedPosition;
+	}
 }

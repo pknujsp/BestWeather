@@ -39,10 +39,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 
 import org.jetbrains.annotations.NotNull;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -51,6 +54,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 	private FusedLocationProviderClient fusedLocationClient;
 	private LocationManager locationManager;
 	private Context context;
+	private Map<MyLocationCallback, LocationRequestObj> locationRequestObjMap = new HashMap<>();
 
 	public static FusedLocation getInstance(Context context) {
 		if (instance == null) {
@@ -103,6 +107,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 					@Override
 					public void onLocationResult(@NonNull @NotNull LocationResult locationResult) {
 						timer.cancel();
+						locationRequestObjMap.remove(myLocationCallback);
 						fusedLocationClient.removeLocationUpdates(this);
 
 						if (locationResult != null) {
@@ -127,23 +132,32 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
 
+				final LocationRequestObj locationRequestObj = new LocationRequestObj();
+				locationRequestObjMap.put(myLocationCallback, locationRequestObj);
+
 				timer.schedule(new TimerTask() {
 					@Override
 					public void run() {
+						locationRequestObjMap.remove(myLocationCallback);
 						cancellationTokenSource.cancel();
-						myLocationCallback.onFailed(MyLocationCallback.Fail.TIME_OUT);
 						fusedLocationClient.removeLocationUpdates(locationCallback);
+						myLocationCallback.onFailed(MyLocationCallback.Fail.TIME_OUT);
 					}
-				}, 4000L);
+				}, 4500L);
 
 				Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
 						cancellationTokenSource.getToken());
+
+				locationRequestObj.currentLocationTask = currentLocationTask;
+				locationRequestObj.cancellationTokenSource = cancellationTokenSource;
+				locationRequestObj.timer = timer;
 
 				currentLocationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
 					@Override
 					public void onSuccess(@NonNull @NotNull Location location) {
 						if (!currentLocationTask.isCanceled()) {
 							if (location == null) {
+								locationRequestObj.locationCallback = locationCallback;
 								ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 								ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
 								fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper());
@@ -219,6 +233,22 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
 	}
 
+	public void cancel(MyLocationCallback myLocationCallback) {
+		if (locationRequestObjMap.containsKey(myLocationCallback)) {
+			LocationRequestObj locationRequestObj = locationRequestObjMap.get(myLocationCallback);
+			Objects.requireNonNull(locationRequestObj).timer.cancel();
+
+			if (Objects.requireNonNull(locationRequestObj).locationCallback != null) {
+				fusedLocationClient.removeLocationUpdates(locationRequestObj.locationCallback);
+			}
+			if (Objects.requireNonNull(locationRequestObj).currentLocationTask != null) {
+				Objects.requireNonNull(locationRequestObj).cancellationTokenSource.cancel();
+			}
+
+			locationRequestObjMap.remove(myLocationCallback);
+		}
+	}
+
 	public interface MyLocationCallback {
 		enum Fail {
 			DISABLED_GPS, DENIED_LOCATION_PERMISSIONS, FAILED_FIND_LOCATION, DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION, TIME_OUT
@@ -241,5 +271,12 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 			}
 			return locations.get(bestIndex);
 		}
+	}
+
+	private static class LocationRequestObj {
+		LocationCallback locationCallback;
+		Task<Location> currentLocationTask;
+		CancellationTokenSource cancellationTokenSource;
+		Timer timer;
 	}
 }

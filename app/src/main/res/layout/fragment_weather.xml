@@ -168,6 +168,18 @@
                         android:paddingRight="24dp"
                         >
 
+                        <TextView
+                            android:id="@+id/flickrImageUrl"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:ellipsize="end"
+                            android:fontFamily="sans-serif-light"
+                            android:maxLines="1"
+                            android:textSize="10dp"
+                            android:includeFontPadding="false"
+                            />
+
                         <com.airbnb.lottie.LottieAnimationView
                             android:id="@+id/loadingAnimation"
                             android:layout_width="34dp"
@@ -177,19 +189,10 @@
                             app:lottie_rawRes="@raw/bluedottedprogress"
                             />
 
-                        <TextView
-                            android:id="@+id/flickrImageUrl"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:clickable="true"
-                            android:fontFamily="sans-serif-light"
-                            android:textSize="10dp"
-                            />
-
                         <ImageView
                             android:layout_width="34dp"
                             android:layout_height="match_parent"
-                            android:layout_marginLeft="8dp"
+                            android:layout_marginLeft="6dp"
                             android:adjustViewBounds="true"
                             android:scaleType="fitCenter"
                             android:src="@drawable/flickrlogo"

@@ -115,7 +115,6 @@ public class DetailDoubleTemperatureView extends View {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
 		drawGraph(canvas);
 	}
 
@@ -144,19 +143,16 @@ public class DetailDoubleTemperatureView extends View {
 		List<PointF> minLinePointList = new ArrayList<>();
 		List<PointF> maxLinePointList = new ArrayList<>();
 
-		for (int index = 0; index < maxTempList.size(); index++) {
+		final int tempsCount = minTempList.size();
+
+
+		for (int index = 0; index < tempsCount; index++) {
 			min = minTempList.get(index);
 			max = maxTempList.get(index);
 
 			x = columnWidth / 2f + columnWidth * index;
 			minY = (10f * (maxTemp - min)) * SPACING + TEXT_HEIGHT + circleRadius;
 			maxY = (10f * (maxTemp - max)) * SPACING + TEXT_HEIGHT + circleRadius;
-
-
-			if (index != 0) {
-				//canvas.drawLine(lastMinColumnPoint.x, lastMinColumnPoint.y, x, minY, linePaint);
-				//canvas.drawLine(lastMaxColumnPoint.x, lastMaxColumnPoint.y, x, maxY, linePaint);
-			}
 
 			canvas.drawText(minTempList.get(index).toString() + tempUnit, x, minY + circleRadius + TEXT_HEIGHT, tempPaint);
 			canvas.drawText(maxTempList.get(index).toString() + tempUnit, x, maxY - circleRadius - TEXT_HEIGHT + TEXT_ASCENT, tempPaint);
@@ -173,12 +169,16 @@ public class DetailDoubleTemperatureView extends View {
 			maxLinePointList.add(new PointF(lastMaxColumnPoint.x, lastMaxColumnPoint.y));
 		}
 
-		final int tempsCount = minTempList.size();
 		PointF[] minPoints1 = new PointF[tempsCount];
 		PointF[] minPoints2 = new PointF[tempsCount];
 
 		PointF[] maxPoints1 = new PointF[tempsCount];
 		PointF[] maxPoints2 = new PointF[tempsCount];
+
+		Path minPath = new Path();
+		Path maxPath = new Path();
+		minPath.moveTo(minLinePointList.get(0).x, minLinePointList.get(0).y);
+		maxPath.moveTo(maxLinePointList.get(0).x, maxLinePointList.get(0).y);
 
 		for (int i = 1; i < tempsCount; i++) {
 			minPoints1[i] = new PointF((minLinePointList.get(i).x + minLinePointList.get(i - 1).x) / 2, minLinePointList.get(i - 1).y);
@@ -186,15 +186,7 @@ public class DetailDoubleTemperatureView extends View {
 
 			maxPoints1[i] = new PointF((maxLinePointList.get(i).x + maxLinePointList.get(i - 1).x) / 2, maxLinePointList.get(i - 1).y);
 			maxPoints2[i] = new PointF((maxLinePointList.get(i).x + maxLinePointList.get(i - 1).x) / 2, maxLinePointList.get(i).y);
-		}
 
-		Path minPath = new Path();
-		Path maxPath = new Path();
-		minPath.moveTo(minLinePointList.get(0).x, minLinePointList.get(0).y);
-		maxPath.moveTo(maxLinePointList.get(0).x, maxLinePointList.get(0).y);
-
-		//곡선 그리기
-		for (int i = 1; i < tempsCount; i++) {
 			minPath.cubicTo(minPoints1[i].x, minPoints1[i].y, minPoints2[i].x, minPoints2[i].y, minLinePointList.get(i).x,
 					minLinePointList.get(i).y);
 			maxPath.cubicTo(maxPoints1[i].x, maxPoints1[i].y, maxPoints2[i].x, maxPoints2[i].y, maxLinePointList.get(i).x,

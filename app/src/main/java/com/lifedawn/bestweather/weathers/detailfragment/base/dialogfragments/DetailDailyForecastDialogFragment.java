@@ -59,11 +59,6 @@ public class DetailDailyForecastDialogFragment extends BaseDetailDialogFragment 
 	}
 
 	@Override
-	public void setFirstSelectedPosition(int firstSelectedPosition) {
-		this.firstSelectedPosition = firstSelectedPosition;
-	}
-
-	@Override
 	protected void setTabCustomView() {
 		super.setTabCustomView();
 
@@ -97,5 +92,8 @@ public class DetailDailyForecastDialogFragment extends BaseDetailDialogFragment 
 
 			binding.tabLayout.getTabAt(index++).setCustomView(itemView);
 		}
+		binding.tabLayout.selectTab(binding.tabLayout.getTabAt(firstSelectedPosition));
+
+
 	}
 }

@@ -108,10 +108,6 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			//공통 - 날씨, 기온, 강수량, 강수확률, 풍향, 풍속, 바람세기, 습도
 			List<GridItemDto> gridItemDtos = new ArrayList<>();
 
-			if (hourlyForecastDto.getFeelsLikeTemp() != null) {
-				gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_chill_temperature_of_grid), hourlyForecastDto.getFeelsLikeTemp(),
-						null));
-			}
 			if (hourlyForecastDto.getPrecipitationType() != null) {
 				gridItemDtos.add(new GridItemDto(context.getString(R.string.precipitation_type),
 						hourlyForecastDto.getPrecipitationType(),
