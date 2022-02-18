@@ -7,13 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
-import android.os.Handler;
-import android.os.Message;
 import android.os.PersistableBundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.work.Configuration;
 
@@ -23,7 +20,7 @@ import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
@@ -299,7 +296,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 
 
 	public void loadWeatherData(Context context, RemoteViews remoteViews, int appWidgetId, WidgetDto widgetDto, int jobId) {
-		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
+		final Set<WeatherDataType> weatherDataTypeSet = getRequestWeatherDataTypeSet();
 		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = widgetDto.getWeatherSourceTypeSet();
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
@@ -309,15 +306,15 @@ public abstract class AbstractWidgetJobService extends JobService {
 			weatherDataSourceTypeSet.add(WeatherDataSourceType.KMA_WEB);
 		}
 
-		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
+		if (weatherDataTypeSet.contains(WeatherDataType.airQuality)) {
 			weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
 		}
 		WeatherRequestUtil.loadWeatherData(context, executorService, widgetDto.getCountryCode(), widgetDto.getLatitude(),
-				widgetDto.getLongitude(), requestWeatherDataTypeSet, new MultipleRestApiDownloader() {
+				widgetDto.getLongitude(), weatherDataTypeSet, new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {
 						setResultViews(context, appWidgetId, remoteViews, widgetDto, weatherDataSourceTypeSet, this,
-								requestWeatherDataTypeSet, jobId);
+								weatherDataTypeSet, jobId);
 					}
 
 					@Override
@@ -358,11 +355,11 @@ public abstract class AbstractWidgetJobService extends JobService {
 
 	abstract AbstractWidgetCreator createWidgetViewCreator(int appWidgetId, int jobId);
 
-	abstract Set<RequestWeatherDataType> getRequestWeatherDataTypeSet();
+	abstract Set<WeatherDataType> getRequestWeatherDataTypeSet();
 
 	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews,
 	                              WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
-	                              Set<RequestWeatherDataType> requestWeatherDataTypeSet, int jobId) {
+	                              Set<WeatherDataType> weatherDataTypeSet, int jobId) {
 		if (!widgetDto.isInitialized()) {
 			widgetDto.setInitialized(true);
 		}

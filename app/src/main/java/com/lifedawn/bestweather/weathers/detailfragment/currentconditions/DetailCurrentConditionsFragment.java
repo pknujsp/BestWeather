@@ -8,7 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
+import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +27,15 @@ public class DetailCurrentConditionsFragment extends BaseDetailCurrentConditions
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		Bundle arguments = savedInstanceState != null ? savedInstanceState : getArguments();
+		currentConditionsDto = (CurrentConditionsDto) arguments.getSerializable(WeatherDataType.currentConditions.name());
 		setValuesToViews();
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(getArguments());
 	}
 
 	@Override

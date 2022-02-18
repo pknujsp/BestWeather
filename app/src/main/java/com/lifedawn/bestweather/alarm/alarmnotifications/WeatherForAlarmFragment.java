@@ -17,14 +17,13 @@ import android.view.ViewGroup;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.databinding.FragmentWeatherForAlarmBinding;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
@@ -89,14 +88,14 @@ public class WeatherForAlarmFragment extends Fragment {
 
 		binding.addressName.setText(alarmDto.getLocationAddressName());
 
-		Set<RequestWeatherDataType> requestWeatherDataTypeSet = new HashSet<>();
-		requestWeatherDataTypeSet.add(RequestWeatherDataType.currentConditions);
-		requestWeatherDataTypeSet.add(RequestWeatherDataType.hourlyForecast);
-		requestWeatherDataTypeSet.add(RequestWeatherDataType.airQuality);
+		Set<WeatherDataType> weatherDataTypeSet = new HashSet<>();
+		weatherDataTypeSet.add(WeatherDataType.currentConditions);
+		weatherDataTypeSet.add(WeatherDataType.hourlyForecast);
+		weatherDataTypeSet.add(WeatherDataType.airQuality);
 
 		WeatherRequestUtil.loadWeatherData(getContext(), executorService, alarmDto.getLocationCountryCode(),
 				Double.parseDouble(alarmDto.getLocationLatitude()),
-				Double.parseDouble(alarmDto.getLocationLongitude()), requestWeatherDataTypeSet,
+				Double.parseDouble(alarmDto.getLocationLongitude()), weatherDataTypeSet,
 				new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {

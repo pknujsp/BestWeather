@@ -66,20 +66,19 @@ public class MainActivity extends AppCompatActivity {
 		window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
 				View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 
-		final AlertDialog alertDialog = new AlertDialog.Builder(this).setTitle(R.string.networkProblem)
-				.setMessage(R.string.need_to_connect_network).setPositiveButton(R.string.check, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.dismiss();
-						finish();
-					}
-				}).setCancelable(false).create();
 		networkStatus = NetworkStatus.getInstance(getApplicationContext());
 
 		if (networkStatus.networkAvailable()) {
 			processNextStep();
 		} else {
-			alertDialog.show();
+			new AlertDialog.Builder(this).setTitle(R.string.networkProblem)
+					.setMessage(R.string.need_to_connect_network).setPositiveButton(R.string.check, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+					finish();
+				}
+			}).setCancelable(false).create().show();
 		}
 	}
 
@@ -106,14 +105,14 @@ public class MainActivity extends AppCompatActivity {
 		if (sharedPreferences.getBoolean(getString(R.string.pref_key_show_intro), true)) {
 			IntroTransactionFragment introTransactionFragment = new IntroTransactionFragment();
 			fragmentTransaction.replace(binding.fragmentContainer.getId(), introTransactionFragment,
-					introTransactionFragment.getTag()).commit();
+					IntroTransactionFragment.class.getName()).commit();
 		} else {
 			initOngoingNotifications();
 			initDailyNotifications();
 			initWidgets();
 
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-			fragmentTransaction.replace(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commit();
+			fragmentTransaction.replace(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commitAllowingStateLoss();
 		}
 	}
 

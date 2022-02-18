@@ -10,6 +10,8 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
@@ -36,17 +38,19 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		Bundle arguments = savedInstanceState != null ? savedInstanceState : getArguments();
+		currentConditionsDto = (CurrentConditionsDto) arguments.getSerializable(WeatherDataType.currentConditions.name());
+		airQualityDto = (AirQualityDto) arguments.getSerializable(WeatherDataType.airQuality.name());
+
 		setValuesToViews();
 	}
 
-	public void setCurrentConditionsDto(CurrentConditionsDto currentConditionsDto) {
-		this.currentConditionsDto = currentConditionsDto;
-	}
 
-	public void setAirQualityDto(AirQualityDto airQualityDto) {
-		this.airQualityDto = airQualityDto;
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(getArguments());
 	}
-
 
 	@Override
 	public void setValuesToViews() {

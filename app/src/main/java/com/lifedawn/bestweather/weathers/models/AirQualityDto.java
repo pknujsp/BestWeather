@@ -1,9 +1,10 @@
 package com.lifedawn.bestweather.weathers.models;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-public class AirQualityDto {
+public class AirQualityDto implements Serializable {
 	private Integer aqi;
 	private Integer idx;
 	private Double latitude;
@@ -16,7 +17,7 @@ public class AirQualityDto {
 	private List<DailyForecast> dailyForecastList;
 	private boolean successful;
 
-	public static class Current {
+	public static class Current implements Serializable {
 		private Integer co;
 		private boolean hasCo;
 
@@ -172,7 +173,7 @@ public class AirQualityDto {
 		}
 	}
 
-	public static class DailyForecast {
+	public static class DailyForecast implements Serializable {
 		private ZonedDateTime date;
 		private boolean hasO3;
 		private boolean hasPm10;
@@ -184,7 +185,7 @@ public class AirQualityDto {
 		private Val pm25;
 		private Val uvi;
 
-		public static class Val {
+		public static class Val implements Serializable {
 			private Integer max;
 			private Integer min;
 			private Integer avg;
@@ -303,7 +304,7 @@ public class AirQualityDto {
 		}
 	}
 
-	public static class Time {
+	public static class Time implements Serializable {
 		private String v;
 		private String s;
 		private String tz;

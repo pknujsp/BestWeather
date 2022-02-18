@@ -209,20 +209,9 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
-
-		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-		weatherViewModel.getCurrentLocationLiveData().observe(this, new Observer<String>() {
-			@Override
-			public void onChanged(String addressName) {
-				if (addressName != null) {
-					binding.sideNavMenu.addressName.setText(addressName);
-				}
-
-			}
-		});
-
+		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
 		weatherViewModel.setLocationCallback(new FusedLocation.MyLocationCallback() {
 			@Override
 			public void onSuccessful(LocationResult locationResult) {
@@ -272,6 +261,18 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			public void onClick(View view) {
 				addWeatherFragment(LocationType.CurrentLocation, null);
 				binding.drawerLayout.closeDrawer(binding.sideNavigation, false);
+			}
+		});
+
+		weatherViewModel.getCurrentLocationLiveData().observe(getViewLifecycleOwner(), new Observer<String>() {
+			@Override
+			public void onChanged(String addressName) {
+				if (!initializing) {
+					if (addressName != null) {
+						binding.sideNavMenu.addressName.setText(addressName);
+					}
+				}
+
 			}
 		});
 
@@ -326,17 +327,14 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 						@Override
 						public void run() {
 							favoriteAddressDtoList = result;
+							binding.sideNavMenu.favoriteAddressLayout.setVisibility(favoriteAddressDtoList.size() > 0 ? View.VISIBLE :
+									View.GONE);
 							binding.sideNavMenu.favoriteAddressLayout.removeAllViews();
 
 							for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
 								addFavoriteLocationItemView(LocationType.SelectedAddress, favoriteAddressDto);
 							}
 
-							if (favoriteAddressDtoList.size() > 0) {
-								binding.sideNavMenu.favoriteAddressLayout.setVisibility(View.VISIBLE);
-							} else {
-								binding.sideNavMenu.favoriteAddressLayout.setVisibility(View.GONE);
-							}
 							callback.onResultSuccessful(result);
 						}
 					});
@@ -412,12 +410,10 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	}
 
 	private boolean clickLocationViewWithId(int id) {
-		View view = null;
 		FavoriteAddressDto favoriteAddressDto = null;
 
 		for (int childIdx = 0; childIdx < binding.sideNavMenu.favoriteAddressLayout.getChildCount(); childIdx++) {
-			view = binding.sideNavMenu.favoriteAddressLayout.getChildAt(childIdx);
-			favoriteAddressDto = (FavoriteAddressDto) view.getTag(favDtoTagInFavLocItemView);
+			favoriteAddressDto = (FavoriteAddressDto) binding.sideNavMenu.favoriteAddressLayout.getChildAt(childIdx).getTag(favDtoTagInFavLocItemView);
 
 			if (favoriteAddressDto.getId() == id) {
 				binding.sideNavMenu.favoriteAddressLayout.getChildAt(childIdx).callOnClick();
@@ -546,7 +542,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			@Override
 			public void onClick(View v) {
 				binding.drawerLayout.openDrawer(binding.sideNavigation);
-
 			}
 		});
 		newWeatherFragment.setiRefreshFavoriteLocationListOnSideNav((IRefreshFavoriteLocationListOnSideNav) this);

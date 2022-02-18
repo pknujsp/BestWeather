@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
@@ -45,13 +46,13 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		needCompare = true;
 	}
 
-	public void setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
-		this.dailyForecastDtoList = dailyForecastDtoList;
-	}
 
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		Bundle arguments = savedInstanceState != null ? savedInstanceState : getArguments();
+		dailyForecastDtoList = (ArrayList<DailyForecastDto>) arguments.getSerializable(WeatherDataType.dailyForecast.name());
+
 		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -95,6 +96,11 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		setValuesToViews();
 	}
 
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(getArguments());
+	}
 
 	@Override
 	public void setValuesToViews() {

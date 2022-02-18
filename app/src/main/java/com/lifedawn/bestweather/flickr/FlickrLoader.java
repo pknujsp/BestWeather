@@ -30,8 +30,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +43,7 @@ import retrofit2.Response;
 
 public class FlickrLoader {
 	public static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
+	private static final Set<ImgRequestObj> IMG_REQUEST_OBJ_SET = new HashSet<>();
 
 	private FlickrLoader() {
 	}
@@ -50,6 +53,7 @@ public class FlickrLoader {
 		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
+				cancelAllRequest(activity);
 				final ZonedDateTime lastRefreshDateTime = refreshDateTime.withZoneSameInstant(zoneId);
 
 				SimpleTimeZone timeZone = new SimpleTimeZone(lastRefreshDateTime.getOffset().getTotalSeconds() * 1000, "");
@@ -126,6 +130,11 @@ public class FlickrLoader {
 
 					Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
 					Call<JsonElement> call = queries.getPhotosFromGallery(photosFromGalleryParameter.getMap());
+
+					ImgRequestObj imgRequestObj = new ImgRequestObj();
+					IMG_REQUEST_OBJ_SET.add(imgRequestObj);
+					imgRequestObj.galleryCall = call;
+
 					String finalTime = time;
 					String finalWeather = weather;
 
@@ -154,9 +163,10 @@ public class FlickrLoader {
 									getInfoParameter.setPhotoId(photo.getId());
 
 									Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
-									Call<JsonElement> queriesGetInfo = queries.getGetInfo(getInfoParameter.getMap());
+									Call<JsonElement> getPhotoInfoCall = queries.getGetInfo(getInfoParameter.getMap());
+									imgRequestObj.getPhotoInfoCall = getPhotoInfoCall;
 
-									queriesGetInfo.enqueue(new Callback<JsonElement>() {
+									getPhotoInfoCall.enqueue(new Callback<JsonElement>() {
 										@Override
 										public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
 											final GetInfoPhotoResponse getInfoPhotoResponse = gson.fromJson(response.body().toString(),
@@ -176,7 +186,7 @@ public class FlickrLoader {
 											flickrImgObj.setWeather(finalWeather);
 											BACKGROUND_IMG_MAP.put(galleryName, flickrImgObj);
 
-											GlideApp.with(activity).asBitmap().load(backgroundImgUrl).into(new CustomTarget<Bitmap>() {
+											CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {
 												@Override
 												public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
 													BACKGROUND_IMG_MAP.get(galleryName).setImg(resource);
@@ -185,16 +195,16 @@ public class FlickrLoader {
 
 												@Override
 												public void onLoadCleared(@Nullable Drawable placeholder) {
-													glideImgCallback.onLoadedImg(null, BACKGROUND_IMG_MAP.get(galleryName), false);
 												}
 
 												@Override
 												public void onLoadFailed(@Nullable Drawable errorDrawable) {
 													super.onLoadFailed(errorDrawable);
-
 													glideImgCallback.onLoadedImg(null, BACKGROUND_IMG_MAP.get(galleryName), false);
 												}
-											});
+											};
+											imgRequestObj.glideTarget = target;
+											GlideApp.with(activity).asBitmap().load(backgroundImgUrl).into(target);
 										}
 
 										@Override
@@ -223,7 +233,29 @@ public class FlickrLoader {
 
 	}
 
+	public static void cancelAllRequest(Activity activity) {
+		GlideApp.with(activity).pauseAllRequests();
+
+		for (ImgRequestObj imgRequestObj : IMG_REQUEST_OBJ_SET) {
+			if (imgRequestObj.glideTarget != null) {
+				GlideApp.with(activity).clear(imgRequestObj.glideTarget);
+			} else if (imgRequestObj.getPhotoInfoCall != null) {
+				imgRequestObj.getPhotoInfoCall.cancel();
+			} else if (imgRequestObj.galleryCall != null) {
+				imgRequestObj.galleryCall.cancel();
+			}
+		}
+
+		IMG_REQUEST_OBJ_SET.clear();
+	}
+
 	public interface GlideImgCallback {
 		void onLoadedImg(Bitmap bitmap, FlickrImgObj flickrImgObj, boolean successful);
+	}
+
+	private static class ImgRequestObj {
+		Call<JsonElement> galleryCall;
+		Call<JsonElement> getPhotoInfoCall;
+		CustomTarget<Bitmap> glideTarget;
 	}
 }

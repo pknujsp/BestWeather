@@ -1,8 +1,9 @@
 package com.lifedawn.bestweather.weathers.models;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 
-public class HourlyForecastDto {
+public class HourlyForecastDto implements Serializable {
 	private ZonedDateTime hours;
 	private int weatherIcon;
 	private String weatherDescription;

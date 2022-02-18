@@ -16,7 +16,7 @@ import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
@@ -81,16 +81,16 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	}
 
 	@Override
-	protected Set<RequestWeatherDataType> getRequestWeatherDataTypeSet() {
-		Set<RequestWeatherDataType> set = new HashSet<>();
-		set.add(RequestWeatherDataType.currentConditions);
-		set.add(RequestWeatherDataType.airQuality);
-		set.add(RequestWeatherDataType.hourlyForecast);
+	protected Set<WeatherDataType> getRequestWeatherDataTypeSet() {
+		Set<WeatherDataType> set = new HashSet<>();
+		set.add(WeatherDataType.currentConditions);
+		set.add(WeatherDataType.airQuality);
+		set.add(WeatherDataType.hourlyForecast);
 		return set;
 	}
 
 	@Override
-	protected void setResultViews(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherDataSourceType requestWeatherDataSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<RequestWeatherDataType> requestWeatherDataTypeSet) {
+	protected void setResultViews(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherDataSourceType requestWeatherDataSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
 		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());

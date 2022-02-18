@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
 
 public class MyApplication extends Application {
 	private SharedPreferences sharedPreferences;
-	private static final ExecutorService executorService = Executors.newFixedThreadPool(3);
+	private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
 	private static int statusBarHeight;
 	private static String localeCountryCode;
 
@@ -33,9 +33,9 @@ public class MyApplication extends Application {
 		super.onCreate();
 		Context context = getApplicationContext();
 
-		int id = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+		final int id = getResources().getIdentifier("status_bar_height", "dimen", "android");
 		if (id > 0) {
-			statusBarHeight = context.getResources().getDimensionPixelSize(id);
+			statusBarHeight = getResources().getDimensionPixelSize(id);
 		}
 
 		Locale locale = null;

@@ -17,6 +17,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
@@ -55,8 +56,10 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		binding.weatherCardViewHeader.forecastName.setText(R.string.hourly_forecast);
+		Bundle arguments = savedInstanceState != null ? savedInstanceState : getArguments();
+		hourlyForecastDtoList = (ArrayList<HourlyForecastDto>) arguments.getSerializable(WeatherDataType.hourlyForecast.name());
 
+		binding.weatherCardViewHeader.forecastName.setText(R.string.hourly_forecast);
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -99,6 +102,12 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 		});
 
 		setValuesToViews();
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(getArguments());
 	}
 
 	@SuppressLint("ClickableViewAccessibility")

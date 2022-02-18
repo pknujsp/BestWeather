@@ -44,17 +44,6 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		Bundle bundle = getArguments();
-		latitude = bundle.getDouble(BundleKey.Latitude.name());
-		longitude = bundle.getDouble(BundleKey.Longitude.name());
-		addressName = bundle.getString(BundleKey.AddressName.name());
-		countryCode = bundle.getString(BundleKey.CountryCode.name());
-		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
-				BundleKey.WeatherDataSource.name());
-		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
-
-		location = new Location(latitude, longitude);
 	}
 
 	@Nullable
@@ -69,6 +58,17 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
+		Bundle bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+		latitude = bundle.getDouble(BundleKey.Latitude.name());
+		longitude = bundle.getDouble(BundleKey.Longitude.name());
+		addressName = bundle.getString(BundleKey.AddressName.name());
+		countryCode = bundle.getString(BundleKey.CountryCode.name());
+		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
+				BundleKey.WeatherDataSource.name());
+		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
+
+		location = new Location(latitude, longitude);
 
 		binding.weatherCardViewHeader.detailForecast.setVisibility(View.VISIBLE);
 		binding.weatherCardViewHeader.compareForecast.setVisibility(View.INVISIBLE);
@@ -104,6 +104,12 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 		intentFilter.addAction(Intent.ACTION_TIME_TICK);
 
 		requireActivity().registerReceiver(broadcastReceiver, intentFilter);
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(getArguments());
 	}
 
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {

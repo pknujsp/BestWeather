@@ -17,7 +17,7 @@ import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.enums.RequestWeatherDataType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
@@ -126,7 +126,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 		RemoteViewsUtil.onBeginProcess(expandedRemoteViews);
 		makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_round, false);
 
-		final Set<RequestWeatherDataType> requestWeatherDataTypeSet = getRequestWeatherDataTypeSet();
+		final Set<WeatherDataType> weatherDataTypeSet = getRequestWeatherDataTypeSet();
 		WeatherDataSourceType weatherDataSourceType = notificationDataObj.getWeatherSourceType();
 
 		if (notificationDataObj.isTopPriorityKma() && notificationDataObj.getCountryCode().equals("KR")) {
@@ -135,18 +135,18 @@ public abstract class AbstractOngoingNotiViewCreator {
 
 		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
 		weatherDataSourceTypeSet.add(weatherDataSourceType);
-		if (requestWeatherDataTypeSet.contains(RequestWeatherDataType.airQuality)) {
+		if (weatherDataTypeSet.contains(WeatherDataType.airQuality)) {
 			weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
 		}
 
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		WeatherDataSourceType finalWeatherDataSourceType = weatherDataSourceType;
 		WeatherRequestUtil.loadWeatherData(context, executorService, notificationDataObj.getCountryCode(),
-				notificationDataObj.getLatitude(), notificationDataObj.getLongitude(), requestWeatherDataTypeSet,
+				notificationDataObj.getLatitude(), notificationDataObj.getLongitude(), weatherDataTypeSet,
 				new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {
-						setResultViews(context, collapsedRemoteViews, expandedRemoteViews, finalWeatherDataSourceType, this, requestWeatherDataTypeSet);
+						setResultViews(context, collapsedRemoteViews, expandedRemoteViews, finalWeatherDataSourceType, this, weatherDataTypeSet);
 					}
 
 					@Override
@@ -171,11 +171,11 @@ public abstract class AbstractOngoingNotiViewCreator {
 		return pendingIntent;
 	}
 
-	abstract protected Set<RequestWeatherDataType> getRequestWeatherDataTypeSet();
+	abstract protected Set<WeatherDataType> getRequestWeatherDataTypeSet();
 
 	abstract protected void setResultViews(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews,
 	                                       WeatherDataSourceType requestWeatherDataSourceType, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
-	                                       Set<RequestWeatherDataType> requestWeatherDataTypeSet);
+	                                       Set<WeatherDataType> weatherDataTypeSet);
 
 	abstract protected void makeNotification(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, int icon, boolean isFinished);
 

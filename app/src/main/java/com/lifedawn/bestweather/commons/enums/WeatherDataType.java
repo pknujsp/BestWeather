@@ -1,5 +1,5 @@
 package com.lifedawn.bestweather.commons.enums;
 
-public enum RequestWeatherDataType {
+public enum WeatherDataType {
 	currentConditions, hourlyForecast, dailyForecast, airQuality
 }

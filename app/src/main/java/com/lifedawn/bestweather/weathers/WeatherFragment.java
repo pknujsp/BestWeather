@@ -64,6 +64,7 @@ import com.lifedawn.bestweather.commons.enums.Flickr;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
@@ -258,6 +259,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		binding.scrollView.setVisibility(View.INVISIBLE);
+		binding.adViewBelowAirQuality.setVisibility(View.GONE);
+		binding.adViewBottom.setVisibility(View.GONE);
+		binding.flickrImageUrl.setVisibility(View.GONE);
+
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.mainToolbar.getRoot().getLayoutParams();
+		layoutParams.topMargin = MyApplication.getStatusBarHeight();
+		binding.mainToolbar.getRoot().setLayoutParams(layoutParams);
 
 		binding.loadingAnimation.setVisibility(View.GONE);
 		binding.flickrImageUrl.setVisibility(View.GONE);
@@ -337,11 +346,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			}
 		});
 
-		binding.scrollView.setVisibility(View.INVISIBLE);
-
-		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.mainToolbar.getRoot().getLayoutParams();
-		layoutParams.topMargin = MyApplication.getStatusBarHeight();
-		binding.mainToolbar.getRoot().setLayoutParams(layoutParams);
 
 		AdRequest adRequest = new AdRequest.Builder().build();
 		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_testUnitId))
@@ -374,10 +378,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				super.onAdFailedToLoad(loadAdError);
 			}
 		});
-
-		binding.adViewBelowAirQuality.setVisibility(View.GONE);
-		binding.adViewBottom.setVisibility(View.GONE);
-		binding.flickrImageUrl.setVisibility(View.GONE);
 
 		final Bundle arguments = getArguments();
 		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
@@ -517,7 +517,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		FlickrLoader.loadImg(requireActivity(), weatherDataSourceType, val, latitude, longitude, zoneId, volume, new FlickrLoader.GlideImgCallback() {
 			@Override
 			public void onLoadedImg(Bitmap bitmap, FlickrImgObj flickrImgObj, boolean successful) {
-				if (getActivity() != null) {
+				if (getActivity() != null && isAdded()) {
 					requireActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -1254,22 +1254,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			airQualityResponse = (AqiCnGeolocalizedFeedResponse) aqicnResponse.getResponseObj();
 		}
 
-		simpleAirQualityFragment.setGeolocalizedFeedResponse(airQualityResponse);
 		airQualityDto = AqicnResponseProcessor.makeAirQualityDto(getContext(), airQualityResponse,
 				ZonedDateTime.now(zoneId).getOffset());
-
-		// simple current conditions ------------------------------------------------------------------------------------------------------
-		simpleCurrentConditionsFragment.setCurrentConditionsDto(currentConditionsDto);
-		simpleCurrentConditionsFragment.setAirQualityDto(airQualityDto);
-
-		// hourly forecasts ----------------------------------------------------------------------------------------------------------------
-		simpleHourlyForecastFragment.setHourlyForecastDtoList(hourlyForecastDtoList);
-
-		// daily forecasts ----------------------------------------------------------------------------------------------------------------
-		simpleDailyForecastFragment.setDailyForecastDtoList(dailyForecastDtoList);
-
-		// detail current conditions ----------------------------------------------
-		detailCurrentConditionsFragment.setCurrentConditionsDto(currentConditionsDto);
 
 		final Bundle defaultBundle = new Bundle();
 		defaultBundle.putDouble(BundleKey.Latitude.name(), this.latitude);
@@ -1279,12 +1265,39 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		defaultBundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
 		defaultBundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 
-		simpleAirQualityFragment.setArguments(defaultBundle);
+		// simple current conditions ------------------------------------------------------------------------------------------------------
+		final Bundle simpleCurrentConditionsBundle = new Bundle();
+		simpleCurrentConditionsBundle.putAll(defaultBundle);
+		simpleCurrentConditionsBundle.putSerializable(WeatherDataType.currentConditions.name(), currentConditionsDto);
+		simpleCurrentConditionsBundle.putSerializable(WeatherDataType.airQuality.name(), airQualityDto);
+
+		// hourly forecasts ----------------------------------------------------------------------------------------------------------------
+		final Bundle hourlyForecastBundle = new Bundle();
+		hourlyForecastBundle.putAll(defaultBundle);
+		hourlyForecastBundle.putSerializable(WeatherDataType.hourlyForecast.name(), (Serializable) hourlyForecastDtoList);
+
+		// daily forecasts ----------------------------------------------------------------------------------------------------------------
+		final Bundle dailyForecastBundle = new Bundle();
+		dailyForecastBundle.putAll(defaultBundle);
+		dailyForecastBundle.putSerializable(WeatherDataType.dailyForecast.name(), (Serializable) dailyForecastDtoList);
+
+		// detail current conditions ----------------------------------------------
+		final Bundle detailCurrentConditionsBundle = new Bundle();
+		detailCurrentConditionsBundle.putAll(defaultBundle);
+		detailCurrentConditionsBundle.putSerializable(WeatherDataType.currentConditions.name(), currentConditionsDto);
+
+		// air quality  ----------------------------------------------
+		final Bundle airQualityBundle = new Bundle();
+		airQualityBundle.putAll(defaultBundle);
+		airQualityBundle.putSerializable("AqiCnGeolocalizedFeedResponse", airQualityResponse);
+		airQualityBundle.putSerializable(WeatherDataType.airQuality.name(), airQualityDto);
+
+		simpleAirQualityFragment.setArguments(airQualityBundle);
 		sunSetRiseFragment.setArguments(defaultBundle);
-		simpleHourlyForecastFragment.setArguments(defaultBundle);
-		simpleDailyForecastFragment.setArguments(defaultBundle);
-		simpleCurrentConditionsFragment.setArguments(defaultBundle);
-		detailCurrentConditionsFragment.setArguments(defaultBundle);
+		simpleHourlyForecastFragment.setArguments(hourlyForecastBundle);
+		simpleDailyForecastFragment.setArguments(dailyForecastBundle);
+		simpleCurrentConditionsFragment.setArguments(simpleCurrentConditionsBundle);
+		detailCurrentConditionsFragment.setArguments(detailCurrentConditionsBundle);
 
 		final String finalCurrentConditionsWeatherVal = currentConditionsWeatherVal;
 		final ZoneId finalZoneId = zoneId;
@@ -1300,17 +1313,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		final String finalPrecipitationVolume = precipitationVolume;
 
 		if (getActivity() != null) {
+			loadImgOfCurrentConditions(mainWeatherDataSourceType, finalCurrentConditionsWeatherVal, latitude, longitude,
+					finalZoneId, finalPrecipitationVolume);
+
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					FragmentManager fragmentManager = getChildFragmentManager();
-					if (fragmentManager.findFragmentByTag(AlertFragment.class.getName()) != null) {
-						fragmentManager.beginTransaction().remove(Objects.requireNonNull(fragmentManager.findFragmentByTag(AlertFragment.class.getName()))).commit();
-					}
-
-					loadImgOfCurrentConditions(mainWeatherDataSourceType, finalCurrentConditionsWeatherVal, latitude, longitude,
-							finalZoneId, finalPrecipitationVolume);
-
 					changeWeatherDataSourcePicker(countryCode);
 					ZonedDateTime dateTime = multipleRestApiDownloader.getRequestDateTime();
 					dateTimeFormatter = DateTimeFormatter.ofPattern(
@@ -1318,16 +1326,18 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 									getString(R.string.datetime_pattern_clock24), Locale.getDefault());
 					binding.updatedDatetime.setText(dateTime.format(dateTimeFormatter));
 
-					getChildFragmentManager().beginTransaction().replace(binding.simpleCurrentConditions.getId(),
-							simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment)).replace(
-							binding.simpleHourlyForecast.getId(), simpleHourlyForecastFragment,
-							getString(R.string.tag_simple_hourly_forecast_fragment)).replace(binding.simpleDailyForecast.getId(),
-							simpleDailyForecastFragment, getString(R.string.tag_simple_daily_forecast_fragment)).replace(
-							binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
-							getString(R.string.tag_detail_current_conditions_fragment)).replace(binding.simpleAirQuality.getId(),
-							simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment)).replace(
-							binding.sunSetRise.getId(), sunSetRiseFragment, getString(R.string.tag_sun_set_rise_fragment)).commit();
+					FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
 
+					fragmentTransaction.replace(binding.simpleCurrentConditions.getId(),
+							simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment));
+					fragmentTransaction.replace(binding.simpleHourlyForecast.getId(), simpleHourlyForecastFragment,
+							getString(R.string.tag_simple_hourly_forecast_fragment));
+					fragmentTransaction.replace(binding.simpleDailyForecast.getId(), simpleDailyForecastFragment, getString(R.string.tag_simple_daily_forecast_fragment));
+					fragmentTransaction.replace(binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
+							getString(R.string.tag_detail_current_conditions_fragment));
+					fragmentTransaction.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment));
+					fragmentTransaction.replace(binding.sunSetRise.getId(), sunSetRiseFragment, getString(R.string.tag_sun_set_rise_fragment));
+					fragmentTransaction.commitNowAllowingStateLoss();
 				}
 			});
 
@@ -1391,28 +1401,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		});
 	}
 
-	private void setWeatherDataInfo(ZonedDateTime currentConditions, ZonedDateTime hourlyForecast, ZonedDateTime dailyForecast,
-	                                ZonedDateTime airQuality) {
-		if (currentConditions != null) {
-			binding.weatherDataInfo.currentConditionsUpdatedTime.setText(currentConditions.format(dateTimeFormatter));
-		}
-		if (hourlyForecast != null) {
-			binding.weatherDataInfo.hourlyForecastUpdatedTime.setText(hourlyForecast.format(dateTimeFormatter));
-		}
-		if (dailyForecast != null) {
-			binding.weatherDataInfo.dailyForecastUpdatedTime.setText(dailyForecast.format(dateTimeFormatter));
-		}
-		if (airQuality != null) {
-			binding.weatherDataInfo.airQualityUpdatedTime.setText(airQuality.format(dateTimeFormatter));
-		}
-	}
 
 	public LocationType getLocationType() {
 		return locationType;
 	}
 
 
-	private static class ResponseResultObj implements Serializable {
+	private final static class ResponseResultObj implements Serializable {
 		MultipleRestApiDownloader multipleRestApiDownloader;
 		Set<WeatherDataSourceType> weatherDataSourceTypeSet;
 		WeatherDataSourceType mainWeatherDataSourceType;

@@ -1,8 +1,9 @@
 package com.lifedawn.bestweather.weathers.models;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 
-public class DailyForecastDto {
+public class DailyForecastDto implements Serializable {
 	private ZonedDateTime date;
 	private boolean isSingle;
 
@@ -15,7 +16,7 @@ public class DailyForecastDto {
 	private String minFeelsLikeTemp;
 	private String maxFeelsLikeTemp;
 
-	public final static class Values {
+	public final static class Values implements Serializable {
 		private int weatherIcon;
 		private String weatherDescription;
 

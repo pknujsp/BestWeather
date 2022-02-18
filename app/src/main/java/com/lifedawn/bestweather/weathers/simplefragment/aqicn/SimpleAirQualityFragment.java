@@ -22,6 +22,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.theme.AppTheme;
@@ -59,7 +60,8 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Bundle bundle = getArguments();
+		Bundle bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		addressName = bundle.getString(BundleKey.AddressName.name());
@@ -80,8 +82,18 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	}
 
 	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(getArguments());
+	}
+
+	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		Bundle arguments = savedInstanceState != null ? savedInstanceState : getArguments();
+		airQualityDto = (AirQualityDto) arguments.getSerializable(WeatherDataType.airQuality.name());
+		aqiCnGeolocalizedFeedResponse = (AqiCnGeolocalizedFeedResponse) arguments.getSerializable("AqiCnGeolocalizedFeedResponse");
+
 		binding.progressResultView.setContentView(binding.contentContainer);
 		binding.progressResultView.setTextColor(Color.WHITE);
 
@@ -111,16 +123,10 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		setValuesToViews();
 	}
 
-	public SimpleAirQualityFragment setGeolocalizedFeedResponse(AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse) {
-		this.aqiCnGeolocalizedFeedResponse = aqiCnGeolocalizedFeedResponse;
-		return this;
-	}
-
 
 	@Override
 	public void setValuesToViews() {
 		//응답 실패한 경우
-		airQualityDto = AqicnResponseProcessor.makeAirQualityDto(getContext(), aqiCnGeolocalizedFeedResponse, zoneOffset);
 		if (!airQualityDto.isSuccessful()) {
 			binding.progressResultView.onFailed(getString(R.string.error));
 			binding.weatherCardViewHeader.detailForecast.setVisibility(View.GONE);

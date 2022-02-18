@@ -1,8 +1,9 @@
 package com.lifedawn.bestweather.weathers.models;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 
-public class CurrentConditionsDto {
+public class CurrentConditionsDto implements Serializable {
 	private String temp;
 	private String minTemp;
 	private String maxTemp;

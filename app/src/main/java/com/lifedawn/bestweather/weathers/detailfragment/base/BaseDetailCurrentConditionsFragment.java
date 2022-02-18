@@ -45,7 +45,8 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-		Bundle bundle = getArguments();
+		Bundle bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
