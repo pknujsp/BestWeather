@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.detailfragment.adapters.DetailDailyForecastViewPagerAdapter;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
@@ -19,6 +20,7 @@ import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DetailDailyForecastDialogFragment extends BaseDetailDialogFragment {
@@ -28,6 +30,8 @@ public class DetailDailyForecastDialogFragment extends BaseDetailDialogFragment 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		dailyForecastDtoList = (ArrayList<DailyForecastDto>) bundle.getSerializable(WeatherDataType.dailyForecast.name());
 	}
 
 	@Override
@@ -54,9 +58,6 @@ public class DetailDailyForecastDialogFragment extends BaseDetailDialogFragment 
 		super.onDestroy();
 	}
 
-	public void setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
-		this.dailyForecastDtoList = dailyForecastDtoList;
-	}
 
 	@Override
 	protected void setTabCustomView() {

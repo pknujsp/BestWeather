@@ -16,27 +16,25 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.detailfragment.adapters.DetailHourlyForecastViewPagerAdapter;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DetailHourlyForecastDialogFragment extends BaseDetailDialogFragment {
 	private List<HourlyForecastDto> hourlyForecastDtoList;
 	private LayoutInflater layoutInflater;
 
-	public void setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
-		this.hourlyForecastDtoList = hourlyForecastDtoList;
-	}
-
-
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		hourlyForecastDtoList = (ArrayList<HourlyForecastDto>) bundle.getSerializable(WeatherDataType.hourlyForecast.name());
 	}
 
 	@Override

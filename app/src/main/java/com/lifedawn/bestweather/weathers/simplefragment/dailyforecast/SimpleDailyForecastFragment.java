@@ -31,6 +31,7 @@ import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,14 +74,13 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				DetailDailyForecastFragment detailDailyForecastFragment = new DetailDailyForecastFragment();
-				detailDailyForecastFragment.setDailyForecastDtoList(dailyForecastDtoList);
-
 				Bundle bundle = new Bundle();
+				bundle.putSerializable(WeatherDataType.dailyForecast.name(), (Serializable) dailyForecastDtoList);
 				bundle.putString(BundleKey.AddressName.name(), addressName);
 				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
 
+				DetailDailyForecastFragment detailDailyForecastFragment = new DetailDailyForecastFragment();
 				detailDailyForecastFragment.setArguments(bundle);
 
 				String tag = getString(R.string.tag_detail_daily_forecast_fragment);

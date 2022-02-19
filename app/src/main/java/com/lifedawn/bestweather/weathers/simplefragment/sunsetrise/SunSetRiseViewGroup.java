@@ -227,21 +227,12 @@ public class SunSetRiseViewGroup extends FrameLayout {
 			canvas.drawRoundRect(fullLineRect, roundedRectRadius, roundedRectRadius, fullLinePaint);
 			canvas.drawRoundRect(currentLineRect, roundedRectRadius, roundedRectRadius, currentLinePaint);
 
-			canvas.drawLine(fullLineRect.left, fullLineRect.top, fullLineRect.right + fullLineMargin / 2f, fullLineRect.top + dividerHeight, dividerPaint);
-			canvas.drawLine(fullLineRect.left, type2PointOnLine.y, fullLineRect.right + fullLineMargin / 2f,
-					type2PointOnLine.y + dividerHeight,
-					dividerPaint);
-
 			canvas.drawRect(fullLineRect.right, fullLineRect.top, fullLineRect.right + fullLineMargin / 2f,
 					fullLineRect.top + dividerHeight, dividerPaint);
 			canvas.drawRect(fullLineRect.right, type2PointOnLine.y, fullLineRect.right + fullLineMargin / 2f,
 					type2PointOnLine.y + dividerHeight,
 					dividerPaint);
 
-			/*
-			img.setBounds(imgRect);
-			img.draw(canvas);
-			 */
 
 			drawCurrent(now.format(dateTimeFormatter), canvas);
 		}
@@ -256,7 +247,7 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		StaticLayout sl = builder.build();
 		canvas.save();
 
-		int criteriaX = timeCirclePoint.x - fullLineMargin - timeTextRect.width() / 2 - fullLineWidth / 2;
+		int criteriaX = (int) (fullLineRect.left - fullLineMargin - timeTextRect.width() / 2);
 		int criteriaY = timeCirclePoint.y;
 
 		float textHeight = timeTextRect.height();
@@ -358,7 +349,6 @@ public class SunSetRiseViewGroup extends FrameLayout {
 			type3 = SunRiseSetType.SET;
 		}
 		setImg(type1);
-		onSunRiseSetListener.onCalcResult(true);
 
 		ZonedDateTime type1ZonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(type1Calendar.getTimeInMillis()),
 				zoneId);
@@ -374,6 +364,8 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		addView(type1View);
 		addView(type2View);
 		addView(type3View);
+
+		onSunRiseSetListener.onCalcResult(true);
 	}
 
 }

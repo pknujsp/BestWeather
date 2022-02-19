@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
@@ -17,17 +18,16 @@ import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment {
 
-	public void setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
-		this.dailyForecastDtoList = dailyForecastDtoList;
-	}
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		dailyForecastDtoList = (ArrayList<DailyForecastDto>) bundle.getSerializable(WeatherDataType.dailyForecast.name());
 	}
 
 	@Override

@@ -331,8 +331,9 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 									View.GONE);
 							binding.sideNavMenu.favoriteAddressLayout.removeAllViews();
 
+							LayoutInflater layoutInflater = getLayoutInflater();
 							for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
-								addFavoriteLocationItemView(LocationType.SelectedAddress, favoriteAddressDto);
+								addFavoriteLocationItemView(layoutInflater, LocationType.SelectedAddress, favoriteAddressDto);
 							}
 
 							callback.onResultSuccessful(result);
@@ -424,8 +425,10 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	}
 
 
-	private void addFavoriteLocationItemView(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
-		TextView locationItemView = (TextView) getLayoutInflater().inflate(R.layout.favorite_address_item_in_side_nav, null);
+	// onGetLayoutInflater() cannot be executed until the Fragment is attached to the FragmentManager. 오류 발생
+	private void addFavoriteLocationItemView(LayoutInflater layoutInflater, LocationType locationType,
+	                                         @Nullable FavoriteAddressDto favoriteAddressDto) {
+		TextView locationItemView = (TextView) layoutInflater.inflate(R.layout.favorite_address_item_in_side_nav, null);
 		locationItemView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -441,9 +444,9 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 
-		int dp12 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
+		int dp8 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
 		int dp16 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, getResources().getDisplayMetrics());
-		layoutParams.setMargins(dp16, 0, dp16, dp12);
+		layoutParams.setMargins(dp16, dp8, dp16, dp8);
 
 		binding.sideNavMenu.favoriteAddressLayout.addView(locationItemView, layoutParams);
 	}

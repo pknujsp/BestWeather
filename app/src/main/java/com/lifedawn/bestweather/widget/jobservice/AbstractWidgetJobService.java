@@ -62,7 +62,6 @@ public abstract class AbstractWidgetJobService extends JobService {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
 		if (widgetRepository == null) {
 			widgetRepository = new WidgetRepository(getApplicationContext());
 		}
@@ -103,7 +102,6 @@ public abstract class AbstractWidgetJobService extends JobService {
 				if (action.equals(getString(R.string.com_lifedawn_bestweather_action_INIT))) {
 					addBackgroundCallback(params);
 					final AbstractWidgetCreator widgetViewCreator = createWidgetViewCreator(appWidgetId, jobId);
-
 					widgetViewCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 						@Override
 						public void onResultSuccessful(WidgetDto widgetDto) {

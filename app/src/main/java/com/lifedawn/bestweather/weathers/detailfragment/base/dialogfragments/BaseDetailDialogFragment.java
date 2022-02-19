@@ -19,14 +19,18 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.databinding.DialogFragmentDetailForecastBinding;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.io.Serializable;
 
 public abstract class BaseDetailDialogFragment extends DialogFragment {
 	protected DialogFragmentDetailForecastBinding binding;
 	protected CompositePageTransformer compositePageTransformer;
 	protected int firstSelectedPosition;
+	protected Bundle bundle;
 
 	@Override
 	public void onAttach(@NonNull @NotNull Context context) {
@@ -36,15 +40,22 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+		firstSelectedPosition = bundle.getInt("FirstSelectedPosition");
 	}
 
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
+	}
 
 	@NonNull
 	@Override
 	public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 		return new Dialog(getContext(), R.style.DialogTransparent);
 	}
-
 
 	@Nullable
 	@org.jetbrains.annotations.Nullable
@@ -103,7 +114,5 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	public void onDestroy() {
 		super.onDestroy();
 	}
-	public void setFirstSelectedPosition(int firstSelectedPosition) {
-		this.firstSelectedPosition = firstSelectedPosition;
-	}
+
 }

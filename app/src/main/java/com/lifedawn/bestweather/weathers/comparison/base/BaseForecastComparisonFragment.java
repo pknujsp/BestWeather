@@ -45,7 +45,7 @@ public class BaseForecastComparisonFragment extends Fragment {
 	protected ValueUnits visibilityUnit;
 	protected ValueUnits clockUnit;
 	protected String tempUnitStr;
-
+	protected Bundle bundle;
 	protected Double latitude;
 	protected Double longitude;
 	protected String addressName;
@@ -66,7 +66,7 @@ public class BaseForecastComparisonFragment extends Fragment {
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
 		tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
 
-		Bundle bundle = getArguments();
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		addressName = bundle.getString(BundleKey.AddressName.name());
@@ -83,8 +83,15 @@ public class BaseForecastComparisonFragment extends Fragment {
 	}
 
 	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
+	}
+
+	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
 		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
@@ -119,6 +126,7 @@ public class BaseForecastComparisonFragment extends Fragment {
 				}
 			}
 		});
+
 	}
 
 

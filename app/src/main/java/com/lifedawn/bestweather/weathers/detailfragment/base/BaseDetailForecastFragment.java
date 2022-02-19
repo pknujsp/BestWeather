@@ -55,6 +55,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	protected ForecastViewType forecastViewType;
 	protected ExecutorService executorService = MyApplication.getExecutorService();
 	protected WeatherDataSourceType mainWeatherDataSourceType;
+	protected Bundle bundle;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -68,7 +69,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		forecastViewType = ForecastViewType.valueOf(sharedPreferences.getString(getString(R.string.pref_key_forecast_view_type),
 				ForecastViewType.List.name()));
 
-		Bundle bundle = getArguments();
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
@@ -104,6 +105,12 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		});
 
 		setDataViewsByList();
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
 	}
 
 	abstract protected void setDataViewsByList();

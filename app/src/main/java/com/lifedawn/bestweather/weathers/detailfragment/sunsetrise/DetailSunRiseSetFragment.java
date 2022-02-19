@@ -62,6 +62,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 	private ZoneId zoneId;
 	private Double latitude;
 	private Double longitude;
+	private Bundle bundle;
 
 	private int minusWeeks = 1;
 	private int plusWeeks = 20;
@@ -72,7 +73,7 @@ public class DetailSunRiseSetFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Bundle bundle = getArguments();
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
@@ -84,6 +85,12 @@ public class DetailSunRiseSetFragment extends Fragment {
 	                         Bundle savedInstanceState) {
 		binding = FragmentDetailSunRiseSetBinding.inflate(inflater);
 		return binding.getRoot();
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
 	}
 
 	@SuppressLint("ClickableViewAccessibility")

@@ -143,7 +143,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 						fusedLocationClient.removeLocationUpdates(locationCallback);
 						myLocationCallback.onFailed(MyLocationCallback.Fail.TIME_OUT);
 					}
-				}, 4500L);
+				}, 5000L);
 
 				Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
 						cancellationTokenSource.getToken());

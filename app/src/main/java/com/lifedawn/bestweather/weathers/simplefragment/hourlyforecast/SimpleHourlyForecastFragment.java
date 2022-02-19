@@ -36,6 +36,7 @@ import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,6 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 			@Override
 			public void onClick(View v) {
 				DetailHourlyForecastFragment detailHourlyForecastFragment = new DetailHourlyForecastFragment();
-				detailHourlyForecastFragment.setHourlyForecastDtoList(hourlyForecastDtoList);
 
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.AddressName.name(), addressName);
@@ -88,6 +88,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 				bundle.putDouble(BundleKey.Latitude.name(), latitude);
 				bundle.putDouble(BundleKey.Longitude.name(), longitude);
 				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
+				bundle.putSerializable(WeatherDataType.hourlyForecast.name(), (Serializable) hourlyForecastDtoList);
 
 				detailHourlyForecastFragment.setArguments(bundle);
 

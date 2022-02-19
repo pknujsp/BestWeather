@@ -61,7 +61,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		 bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
@@ -104,12 +104,12 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			@Override
 			public void onClick(View view) {
 				DetailAirQualityFragment detailAirQualityFragment = new DetailAirQualityFragment();
-				detailAirQualityFragment.setResponse(aqiCnGeolocalizedFeedResponse);
 
 				Bundle bundle = new Bundle();
 				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 				bundle.putDouble(BundleKey.Latitude.name(), latitude);
 				bundle.putDouble(BundleKey.Longitude.name(), longitude);
+				bundle.putSerializable("AqiCnGeolocalizedFeedResponse", aqiCnGeolocalizedFeedResponse);
 				detailAirQualityFragment.setArguments(bundle);
 
 				String tag = getString(R.string.tag_detail_air_quality_fragment);

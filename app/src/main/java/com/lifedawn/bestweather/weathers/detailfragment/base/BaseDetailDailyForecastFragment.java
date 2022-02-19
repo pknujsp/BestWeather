@@ -1,10 +1,14 @@
 package com.lifedawn.bestweather.weathers.detailfragment.base;
 
+import android.os.Bundle;
+
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.detailfragment.base.dialogfragments.DetailDailyForecastDialogFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.base.dialogfragments.DetailHourlyForecastDialogFragment;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class BaseDetailDailyForecastFragment extends BaseDetailForecastFragment {
@@ -12,10 +16,13 @@ public class BaseDetailDailyForecastFragment extends BaseDetailForecastFragment 
 
 	@Override
 	public void onClickedItem(Integer position) {
+		Bundle bundle = new Bundle();
+		bundle.putSerializable(WeatherDataType.dailyForecast.name(), (Serializable) dailyForecastDtoList);
+		bundle.putInt("FirstSelectedPosition", position);
+
 		DetailDailyForecastDialogFragment detailHourlyForecastDialogFragment =
 				new DetailDailyForecastDialogFragment();
-		detailHourlyForecastDialogFragment.setDailyForecastDtoList(dailyForecastDtoList);
-		detailHourlyForecastDialogFragment.setFirstSelectedPosition(position);
+		detailHourlyForecastDialogFragment.setArguments(bundle);
 
 		detailHourlyForecastDialogFragment.show(getChildFragmentManager(),
 				DetailHourlyForecastDialogFragment.class.getName());

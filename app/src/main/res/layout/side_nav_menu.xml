@@ -16,6 +16,7 @@
         android:paddingLeft="16dp"
         android:paddingTop="12dp"
         android:paddingRight="16dp"
+        android:layout_marginBottom="12dp"
         android:paddingBottom="12dp">
 
         <TextView
@@ -44,8 +45,8 @@
         android:id="@+id/favorite_address_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         android:clipChildren="false"
+        android:layout_marginBottom="12dp"
         android:clipToPadding="false"
         android:orientation="vertical" />
 

@@ -86,22 +86,22 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	private Double longitude;
 	private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("E");
 
+	private Bundle bundle;
+
 	private int pm10LineColor;
 	private int pm25LineColor;
 	private int o3LineColor;
 
-	public void setResponse(AqiCnGeolocalizedFeedResponse response) {
-		this.response = response;
-	}
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Bundle bundle = getArguments();
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
+		response = (AqiCnGeolocalizedFeedResponse) bundle.getSerializable("AqiCnGeolocalizedFeedResponse");
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
@@ -109,6 +109,12 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		pm10LineColor = ContextCompat.getColor(getContext(), R.color.pm10LineColor);
 		pm25LineColor = ContextCompat.getColor(getContext(), R.color.pm25LineColor);
 		o3LineColor = ContextCompat.getColor(getContext(), R.color.o3LineColor);
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
 	}
 
 	@Nullable

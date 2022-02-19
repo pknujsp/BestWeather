@@ -40,10 +40,22 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	private WeatherDataSourceType mainWeatherDataSourceType;
 	private ZoneId zoneId;
 	private Bundle bundle;
+	private boolean registeredReceiver = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+		latitude = bundle.getDouble(BundleKey.Latitude.name());
+		longitude = bundle.getDouble(BundleKey.Longitude.name());
+		addressName = bundle.getString(BundleKey.AddressName.name());
+		countryCode = bundle.getString(BundleKey.CountryCode.name());
+		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
+				BundleKey.WeatherDataSource.name());
+		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
+
+		location = new Location(latitude, longitude);
 	}
 
 	@Nullable
@@ -59,17 +71,6 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
-		latitude = bundle.getDouble(BundleKey.Latitude.name());
-		longitude = bundle.getDouble(BundleKey.Longitude.name());
-		addressName = bundle.getString(BundleKey.AddressName.name());
-		countryCode = bundle.getString(BundleKey.CountryCode.name());
-		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
-				BundleKey.WeatherDataSource.name());
-		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
-
-		location = new Location(latitude, longitude);
-
 		binding.weatherCardViewHeader.detailForecast.setVisibility(View.VISIBLE);
 		binding.weatherCardViewHeader.compareForecast.setVisibility(View.INVISIBLE);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.sun_set_rise);
@@ -77,7 +78,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 			@Override
 			public void onClick(View v) {
 				DetailSunRiseSetFragment detailSunRiseSetFragment = new DetailSunRiseSetFragment();
-				detailSunRiseSetFragment.setArguments(getArguments());
+				detailSunRiseSetFragment.setArguments(bundle);
 				String tag = DetailSunRiseSetFragment.class.getName();
 
 				FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
@@ -92,18 +93,25 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 			@Override
 			public void onCalcResult(boolean calcSuccessful) {
 				if (calcSuccessful) {
-					binding.weatherCardViewHeader.detailForecast.setVisibility(View.VISIBLE);
+					if (!registeredReceiver) {
+						IntentFilter intentFilter = new IntentFilter();
+						intentFilter.addAction(Intent.ACTION_TIME_TICK);
+						requireActivity().registerReceiver(broadcastReceiver, intentFilter);
+						binding.weatherCardViewHeader.detailForecast.setVisibility(View.VISIBLE);
+					}
+					registeredReceiver = true;
 				} else {
+					if (registeredReceiver) {
+						requireActivity().unregisterReceiver(broadcastReceiver);
+						registeredReceiver = false;
+					}
 					binding.weatherCardViewHeader.detailForecast.setVisibility(View.GONE);
 				}
 			}
 		});
 		binding.rootLayout.addView(sunSetRiseViewGroup, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(Intent.ACTION_TIME_TICK);
 
-		requireActivity().registerReceiver(broadcastReceiver, intentFilter);
 	}
 
 	@Override
@@ -112,10 +120,10 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 		outState.putAll(bundle);
 	}
 
-	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+	private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction() != null) {
+			if (isAdded() && intent.getAction() != null) {
 				if (Intent.ACTION_TIME_TICK.equals(intent.getAction())) {
 					sunSetRiseViewGroup.refresh();
 				}
@@ -130,6 +138,8 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		requireActivity().unregisterReceiver(broadcastReceiver);
+		if (registeredReceiver) {
+			requireActivity().unregisterReceiver(broadcastReceiver);
+		}
 	}
 }
