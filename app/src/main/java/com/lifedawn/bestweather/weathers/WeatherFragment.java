@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import android.util.ArrayMap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -517,6 +518,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		FlickrLoader.loadImg(requireActivity(), weatherDataSourceType, val, latitude, longitude, zoneId, volume, new FlickrLoader.GlideImgCallback() {
 			@Override
 			public void onLoadedImg(Bitmap bitmap, FlickrImgObj flickrImgObj, boolean successful) {
+				Log.e("FLICKR", "fragment isAdded: " + (isAdded() ? 1 : 0));
 				if (getActivity() != null && isAdded()) {
 					requireActivity().runOnUiThread(new Runnable() {
 						@Override

@@ -38,19 +38,12 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		Bundle arguments = savedInstanceState != null ? savedInstanceState : getArguments();
-		currentConditionsDto = (CurrentConditionsDto) arguments.getSerializable(WeatherDataType.currentConditions.name());
-		airQualityDto = (AirQualityDto) arguments.getSerializable(WeatherDataType.airQuality.name());
+		currentConditionsDto = (CurrentConditionsDto) bundle.getSerializable(WeatherDataType.currentConditions.name());
+		airQualityDto = (AirQualityDto) bundle.getSerializable(WeatherDataType.airQuality.name());
 
 		setValuesToViews();
 	}
 
-
-	@Override
-	public void onSaveInstanceState(@NonNull Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putAll(getArguments());
-	}
 
 	@Override
 	public void setValuesToViews() {

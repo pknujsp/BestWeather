@@ -56,8 +56,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		Bundle arguments = savedInstanceState != null ? savedInstanceState : getArguments();
-		hourlyForecastDtoList = (ArrayList<HourlyForecastDto>) arguments.getSerializable(WeatherDataType.hourlyForecast.name());
+		hourlyForecastDtoList = (ArrayList<HourlyForecastDto>) bundle.getSerializable(WeatherDataType.hourlyForecast.name());
 
 		binding.weatherCardViewHeader.forecastName.setText(R.string.hourly_forecast);
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
@@ -104,11 +103,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 		setValuesToViews();
 	}
 
-	@Override
-	public void onSaveInstanceState(@NonNull Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putAll(getArguments());
-	}
+
 
 	@SuppressLint("ClickableViewAccessibility")
 	@Override

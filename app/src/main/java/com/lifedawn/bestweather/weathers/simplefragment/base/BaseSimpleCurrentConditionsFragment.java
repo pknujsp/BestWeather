@@ -47,6 +47,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	protected WeatherDataSourceType mainWeatherDataSourceType;
 	protected ZoneId zoneId;
 	protected ZoneOffset zoneOffset;
+	protected Bundle bundle;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
 
-		Bundle bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
@@ -69,6 +70,12 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
 		zoneOffset = ZonedDateTime.now(zoneId).getOffset();
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
 	}
 
 	@Override

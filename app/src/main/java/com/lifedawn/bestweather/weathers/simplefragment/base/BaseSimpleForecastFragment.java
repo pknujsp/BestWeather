@@ -52,6 +52,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	protected Map<WeatherValueType, Integer> textColorMap = new HashMap<>();
 	protected Integer cardBackgroundColor;
 	protected NetworkStatus networkStatus;
+	protected Bundle bundle;
 
 	protected int headerVisibility = View.VISIBLE;
 
@@ -81,7 +82,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
 		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
 
-		Bundle bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+		 bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
@@ -123,6 +124,12 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 			}
 		});
 
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
 	}
 
 	@Override

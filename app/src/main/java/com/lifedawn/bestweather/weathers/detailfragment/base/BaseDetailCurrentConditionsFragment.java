@@ -39,13 +39,14 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	protected Double longitude;
 	protected ZoneId zoneId;
 	protected WeatherDataSourceType mainWeatherDataSourceType;
+	protected Bundle bundle;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-		Bundle bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
@@ -77,6 +78,12 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	@Override
 	public void setValuesToViews() {
 
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
 	}
 
 	protected final View addGridItem(int labelDescriptionId, String value, @Nullable Integer labelIconId) {

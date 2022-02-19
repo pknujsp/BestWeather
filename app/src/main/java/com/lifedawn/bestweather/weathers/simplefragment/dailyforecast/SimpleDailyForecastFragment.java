@@ -50,8 +50,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		Bundle arguments = savedInstanceState != null ? savedInstanceState : getArguments();
-		dailyForecastDtoList = (ArrayList<DailyForecastDto>) arguments.getSerializable(WeatherDataType.dailyForecast.name());
+		dailyForecastDtoList = (ArrayList<DailyForecastDto>) bundle.getSerializable(WeatherDataType.dailyForecast.name());
 
 		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {
@@ -94,12 +93,6 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		});
 
 		setValuesToViews();
-	}
-
-	@Override
-	public void onSaveInstanceState(@NonNull Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putAll(getArguments());
 	}
 
 	@Override

@@ -39,7 +39,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	private String countryCode;
 	private WeatherDataSourceType mainWeatherDataSourceType;
 	private ZoneId zoneId;
-
+	private Bundle bundle;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -59,7 +59,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		Bundle bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		addressName = bundle.getString(BundleKey.AddressName.name());
@@ -109,7 +109,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	@Override
 	public void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putAll(getArguments());
+		outState.putAll(bundle);
 	}
 
 	private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {

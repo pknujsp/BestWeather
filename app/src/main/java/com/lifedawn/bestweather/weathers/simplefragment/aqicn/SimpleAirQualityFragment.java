@@ -56,11 +56,12 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	private ZoneId zoneId;
 	private ZoneOffset zoneOffset;
 	private ValueUnits clockUnit;
+	private Bundle bundle;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Bundle bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+		 bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
@@ -84,7 +85,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putAll(getArguments());
+		outState.putAll(bundle);
 	}
 
 	@Override
