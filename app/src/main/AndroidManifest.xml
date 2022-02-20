@@ -24,7 +24,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Black"
         android:usesCleartextTraffic="true">
-
+        <service
+            android:name=".widget.foreground.AbstractWidgetForegroundService"
+            android:enabled="true"
+            android:exported="true"></service>
 
         <activity
             android:name=".alarm.AlarmActivity"
@@ -32,7 +35,6 @@
             android:screenOrientation="portrait"
             android:showForAllUsers="true"
             android:showOnLockScreen="true"
-
             android:showWhenLocked="true"
             android:theme="@style/AppTheme.Black"
             android:turnScreenOn="true" />
@@ -40,7 +42,6 @@
             android:name=".widget.ConfigureWidgetActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-
             android:theme="@style/AppTheme.Black">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
@@ -51,7 +52,6 @@
             android:excludeFromRecents="true"
             android:exported="false"
             android:noHistory="true"
-
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".main.MainActivity"
@@ -309,7 +309,6 @@
             android:name=".widget.jobservice.EleventhWidgetJobService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".alarm.alarmnotifications.AlarmService"
             android:enabled="true"

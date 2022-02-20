@@ -18,6 +18,7 @@ import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
@@ -77,9 +78,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 
 	@Override
 	public boolean onStartJob(JobParameters params) {
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
+
 				PersistableBundle bundle = params.getExtras();
 				final int jobId = params.getJobId();
 				final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
@@ -165,7 +164,12 @@ public abstract class AbstractWidgetJobService extends JobService {
 								appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 
 								if (result.getLocationType() == LocationType.CurrentLocation) {
-									loadCurrentLocation(getApplicationContext(), appWidgetId, remoteViews, jobId);
+									MainThreadWorker.runOnUiThread(new Runnable() {
+										@Override
+										public void run() {
+											loadCurrentLocation(getApplicationContext(), appWidgetId, remoteViews, jobId);
+										}
+									});
 								} else {
 									loadWeatherData(getApplicationContext(), remoteViews, appWidgetId, result, jobId);
 								}
@@ -181,8 +185,6 @@ public abstract class AbstractWidgetJobService extends JobService {
 					onActionBootCompleted(params);
 				}
 
-			}
-		});
 
 		return true;
 	}
