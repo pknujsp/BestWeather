@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -21,6 +20,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
@@ -65,10 +65,9 @@ public abstract class AbstractOngoingNotiViewCreator {
 
 	abstract public RemoteViews[] createRemoteViews(boolean temp);
 
-	abstract public void initNotification(Handler handler);
+	abstract public void initNotification(BackgroundCallback backgroundCallback);
 
 	public void loadCurrentLocation(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
-
 		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
 			public void onSuccessful(LocationResult locationResult) {
@@ -109,16 +108,14 @@ public abstract class AbstractOngoingNotiViewCreator {
 					errorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA;
 				}
 
-				collapsedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 				expandedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
-				RemoteViewsUtil.onErrorProcess(collapsedRemoteViews, context, errorType);
 				RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, errorType);
 
 				makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_round, true);
 			}
 		};
 
-		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, true);
+		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, false);
 	}
 
 
@@ -154,8 +151,6 @@ public abstract class AbstractOngoingNotiViewCreator {
 
 					}
 				}, weatherDataSourceTypeSet);
-
-
 	}
 
 	protected PendingIntent getRefreshPendingIntent() {

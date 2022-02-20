@@ -1,17 +1,17 @@
 package com.lifedawn.bestweather.notification.daily;
 
-import android.app.job.JobParameters;
-import android.app.job.JobService;
+import android.app.Notification;
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
-import android.os.Handler;
-import android.os.Message;
-import android.os.PersistableBundle;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.IBinder;
 import android.widget.RemoteViews;
 
-import androidx.annotation.NonNull;
-import androidx.work.Configuration;
+import androidx.core.app.NotificationCompat;
 
 import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
@@ -19,8 +19,11 @@ import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
+import com.lifedawn.bestweather.notification.NotificationHelper;
+import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FifthDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FirstDailyNotificationViewCreator;
@@ -38,60 +41,58 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class DailyPushNotificationJobService extends JobService {
+public class DailyNotificationForegroundService extends Service {
 	private DailyPushNotificationRepository repository;
-	private AbstractDailyNotiViewCreator viewCreator = null;
-	private Handler handler;
+	private AbstractDailyNotiViewCreator viewCreator;
 
-	public DailyPushNotificationJobService() {
-		Configuration.Builder builder = new Configuration.Builder();
-		builder.setJobSchedulerJobIdRange(0, Integer.MAX_VALUE);
+	public DailyNotificationForegroundService() {
 	}
 
 	@Override
-	public boolean onStartJob(JobParameters params) {
-		PersistableBundle bundle = params.getExtras();
-		final String action = bundle.getString("action");
-		repository = new DailyPushNotificationRepository(getApplicationContext());
+	public IBinder onBind(Intent intent) {
+		return null;
+	}
 
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		repository = new DailyPushNotificationRepository(getApplicationContext());
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
+	private void showNotification() {
+		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.DailyNotificationForegroundService);
+
+		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
+		builder.setSmallIcon(R.mipmap.ic_launcher_round).setContentText(getString(R.string.msg_refreshing_weather_data)).setContentTitle(getString(R.string.msg_refreshing_weather_data))
+				.setOnlyAlertOnce(true).setWhen(0).setOngoing(true);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			builder.setPriority(NotificationCompat.PRIORITY_LOW).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+		}
+
+		Notification notification = notificationObj.getNotificationBuilder().build();
+		startForeground(notificationObj.getNotificationId(), notification);
+	}
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		showNotification();
+		final String action = intent.getAction();
 		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
+			Bundle bundle = intent.getExtras();
 			final Integer id = bundle.getInt(BundleKey.dtoId.name());
 			final DailyPushNotificationType dailyPushNotificationType = DailyPushNotificationType.valueOf(bundle.getString(
 					"DailyPushNotificationType"));
 
-			repository.get(id, new DbQueryCallback<DailyPushNotificationDto>() {
-				@Override
-				public void onResultSuccessful(DailyPushNotificationDto result) {
-					//dailyNotificationHelper.enablePushNotification(result);
-				}
-
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
-
-			handler = new Handler(new Handler.Callback() {
-				@Override
-				public boolean handleMessage(@NonNull Message msg) {
-					if (msg.obj != null) {
-						if (((String) msg.obj).equals("finished")) {
-							jobFinished(params, false);
-							return true;
-						}
-					}
-					return false;
-				}
-			});
-
 			workNotification(getApplicationContext(), Executors.newSingleThreadExecutor(), id, dailyPushNotificationType);
 		}
-		return true;
-	}
-
-	@Override
-	public boolean onStopJob(JobParameters params) {
-		return false;
+		return START_NOT_STICKY;
 	}
 
 	public void loadCurrentLocation(Context context, ExecutorService executorService, RemoteViews remoteViews,
@@ -134,7 +135,7 @@ public class DailyPushNotificationJobService extends JobService {
 			}
 		};
 
-		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, true);
+		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, false);
 	}
 
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,
@@ -184,7 +185,13 @@ public class DailyPushNotificationJobService extends JobService {
 					default:
 						viewCreator = new FifthDailyNotificationViewCreator(context);
 				}
-
+				viewCreator.setBackgroundCallback(new BackgroundCallback() {
+					@Override
+					public void onResult() {
+						stopForeground(true);
+						stopSelf();
+					}
+				});
 
 				RemoteViews remoteViews = viewCreator.createRemoteViews(false);
 				if (dto.getLocationType() == LocationType.CurrentLocation) {

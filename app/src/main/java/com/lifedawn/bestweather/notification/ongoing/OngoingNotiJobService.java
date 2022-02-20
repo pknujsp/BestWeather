@@ -30,19 +30,6 @@ public class OngoingNotiJobService extends JobService {
 		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
 			final OngoingNotiViewCreator alwaysNotiViewCreator = new OngoingNotiViewCreator(this, null);
 			alwaysNotiViewCreator.loadSavedPreferences();
-			alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
-				@Override
-				public boolean handleMessage(@NonNull Message msg) {
-					if (msg.obj != null) {
-						String status = (String) msg.obj;
-						if (status.equals("finished")) {
-							jobFinished(params, false);
-							return true;
-						}
-					}
-					return false;
-				}
-			}));
 
 		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 			SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -57,20 +44,6 @@ public class OngoingNotiJobService extends JobService {
 					OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
 					ongoingNotificationHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
 				}
-
-				alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
-					@Override
-					public boolean handleMessage(@NonNull Message msg) {
-						if (msg.obj != null) {
-							String status = (String) msg.obj;
-							if (status.equals("finished")) {
-								jobFinished(params, false);
-								return true;
-							}
-						}
-						return false;
-					}
-				}));
 
 
 			}

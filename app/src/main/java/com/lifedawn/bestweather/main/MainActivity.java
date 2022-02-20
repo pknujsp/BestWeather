@@ -27,6 +27,7 @@ import com.google.android.gms.ads.initialization.OnInitializationCompleteListene
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
 import com.lifedawn.bestweather.intro.IntroTransactionFragment;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
@@ -119,7 +120,12 @@ public class MainActivity extends AppCompatActivity {
 	private void initOngoingNotifications() {
 		//ongoing notification
 		OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
-		ongoingNotificationHelper.reStartNotification();
+		ongoingNotificationHelper.reStartNotification(new BackgroundCallback() {
+			@Override
+			public void onResult() {
+
+			}
+		});
 	}
 
 	public void initDailyNotifications() {

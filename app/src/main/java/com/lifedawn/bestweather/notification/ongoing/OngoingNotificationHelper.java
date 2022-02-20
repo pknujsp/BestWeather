@@ -15,9 +15,11 @@ import android.os.SystemClock;
 import android.service.notification.StatusBarNotification;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
 import com.lifedawn.bestweather.notification.NotificationType;
 
 public class OngoingNotificationHelper {
@@ -65,7 +67,7 @@ public class OngoingNotificationHelper {
 		}
 	}
 
-	public void reStartNotification() {
+	public void reStartNotification(BackgroundCallback backgroundCallback) {
 		SharedPreferences sharedPreferences =
 				PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -82,25 +84,22 @@ public class OngoingNotificationHelper {
 				}
 			}
 
-			OngoingNotiViewCreator alwaysNotiViewCreator = new OngoingNotiViewCreator(context, null);
-			alwaysNotiViewCreator.loadPreferences();
+			OngoingNotiViewCreator ongoingNotiViewCreator = new OngoingNotiViewCreator(context, null);
+			ongoingNotiViewCreator.loadPreferences();
 
 			if (active) {
-				if (alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
+				if (ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
 					if (!isRepeating()) {
-						onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
+						onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
 					}
 				}
+				backgroundCallback.onResult();
 			} else {
-
-				alwaysNotiViewCreator.initNotification(new Handler(new Handler.Callback() {
-					@Override
-					public boolean handleMessage(@NonNull Message msg) {
-						return false;
-					}
-				}));
-				onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
+				onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
+				ongoingNotiViewCreator.initNotification(backgroundCallback);
 			}
+		} else {
+			backgroundCallback.onResult();
 		}
 	}
 

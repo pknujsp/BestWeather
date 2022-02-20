@@ -25,7 +25,6 @@
         android:theme="@style/AppTheme.Black"
         android:usesCleartextTraffic="true">
 
-
         <activity
             android:name=".alarm.AlarmActivity"
             android:exported="false"
@@ -312,6 +311,14 @@
             android:exported="true" />
         <service
             android:name=".widget.foreground.WidgetForegroundService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".notification.ongoing.OngoingNotificationForegroundService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".notification.daily.DailyNotificationForegroundService"
             android:enabled="true"
             android:exported="true" />
 

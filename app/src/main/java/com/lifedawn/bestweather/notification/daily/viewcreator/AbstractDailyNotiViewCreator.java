@@ -16,6 +16,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.IntentUtil;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
@@ -27,7 +28,7 @@ import java.util.Set;
 public abstract class AbstractDailyNotiViewCreator {
 	protected final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	protected Context context;
-	protected Handler handler;
+	protected BackgroundCallback backgroundCallback;
 
 	public AbstractDailyNotiViewCreator(Context context) {
 		this.context = context;
@@ -37,8 +38,8 @@ public abstract class AbstractDailyNotiViewCreator {
 
 	abstract public RemoteViews createRemoteViews(boolean needTempData);
 
-	public void setHandler(Handler handler) {
-		this.handler = handler;
+	public void setBackgroundCallback(BackgroundCallback backgroundCallback) {
+		this.backgroundCallback = backgroundCallback;
 	}
 
 	public void makeNotification(RemoteViews remoteViews, int notificationDtoId) {
@@ -59,10 +60,8 @@ public abstract class AbstractDailyNotiViewCreator {
 		Notification notification = notificationObj.getNotificationBuilder().build();
 		notificationManager.notify(notificationObj.getNotificationId() + notificationDtoId, notification);
 
-		if (handler != null) {
-			Message message = handler.obtainMessage();
-			message.obj = "finished";
-			handler.sendMessage(message);
+		if (backgroundCallback != null) {
+			backgroundCallback.onResult();
 		}
 	}
 
@@ -81,10 +80,8 @@ public abstract class AbstractDailyNotiViewCreator {
 		Notification notification = notificationObj.getNotificationBuilder().build();
 		notificationManager.notify(notificationObj.getNotificationId() + notificationDtoId, notification);
 
-		if (handler != null) {
-			Message message = handler.obtainMessage();
-			message.obj = "finished";
-			handler.sendMessage(message);
+		if (backgroundCallback != null) {
+			backgroundCallback.onResult();
 		}
 	}
 
