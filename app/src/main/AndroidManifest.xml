@@ -24,10 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Black"
         android:usesCleartextTraffic="true">
-        <service
-            android:name=".widget.foreground.AbstractWidgetForegroundService"
-            android:enabled="true"
-            android:exported="true"></service>
+
 
         <activity
             android:name=".alarm.AlarmActivity"
@@ -311,6 +308,10 @@
             android:permission="android.permission.BIND_JOB_SERVICE" />
         <service
             android:name=".alarm.alarmnotifications.AlarmService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".widget.foreground.WidgetForegroundService"
             android:enabled="true"
             android:exported="true" />
 

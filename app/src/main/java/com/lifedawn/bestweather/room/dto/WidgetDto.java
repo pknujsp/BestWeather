@@ -1,8 +1,6 @@
 package com.lifedawn.bestweather.room.dto;
 
 
-import android.graphics.Bitmap;
-
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -79,6 +77,17 @@ public class WidgetDto {
 
 	@ColumnInfo(name = "multipleWeatherDataSource")
 	private boolean multipleWeatherDataSource;
+
+	@ColumnInfo(name = "widgetProviderClassName")
+	private String widgetProviderClassName;
+
+	public String getWidgetProviderClassName() {
+		return widgetProviderClassName;
+	}
+
+	public void setWidgetProviderClassName(String widgetProviderClassName) {
+		this.widgetProviderClassName = widgetProviderClassName;
+	}
 
 	public boolean isMultipleWeatherDataSource() {
 		return multipleWeatherDataSource;
@@ -257,10 +266,26 @@ public class WidgetDto {
 	}
 
 	public Set<WeatherDataSourceType> getWeatherSourceTypeSet() {
+		if (countryCode != null) {
+			if (isTopPriorityKma() && getCountryCode().equals("KR")) {
+				if (!isMultipleWeatherDataSource()) {
+					weatherDataSourceTypeSet.remove(WeatherDataSourceType.OWM_ONECALL);
+				}
+				weatherDataSourceTypeSet.add(WeatherDataSourceType.KMA_WEB);
+			}
+		}
 		return weatherDataSourceTypeSet;
 	}
 
 	public Set<WeatherDataSourceType> getWeatherDataSourceTypeSet() {
+		if (countryCode != null) {
+			if (isTopPriorityKma() && getCountryCode().equals("KR")) {
+				if (!isMultipleWeatherDataSource()) {
+					weatherDataSourceTypeSet.remove(WeatherDataSourceType.OWM_ONECALL);
+				}
+				weatherDataSourceTypeSet.add(WeatherDataSourceType.KMA_WEB);
+			}
+		}
 		return weatherDataSourceTypeSet;
 	}
 

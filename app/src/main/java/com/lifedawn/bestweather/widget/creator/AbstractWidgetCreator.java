@@ -22,6 +22,7 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -48,6 +49,7 @@ public abstract class AbstractWidgetCreator {
 	protected WidgetUpdateCallback widgetUpdateCallback;
 	protected WidgetDto widgetDto;
 	protected WidgetRepository widgetRepository;
+	protected AppWidgetManager appWidgetManager;
 
 	public AbstractWidgetCreator setWidgetDto(WidgetDto widgetDto) {
 		this.widgetDto = widgetDto;
@@ -74,6 +76,7 @@ public abstract class AbstractWidgetCreator {
 		tempDegree = ValueUnits.convertToStr(null, tempUnit);
 
 		widgetRepository = new WidgetRepository(context);
+		appWidgetManager = AppWidgetManager.getInstance(context);
 	}
 
 
@@ -92,6 +95,7 @@ public abstract class AbstractWidgetCreator {
 		widgetDto = new WidgetDto();
 		widgetDto.setAppWidgetId(appWidgetId);
 		widgetDto.setMultipleWeatherDataSource(false);
+		widgetDto.setWidgetProviderClassName(widgetProviderClass().getName());
 		widgetDto.setBackgroundAlpha(100);
 		widgetDto.setDisplayClock(true);
 		widgetDto.setDisplayLocalClock(false);
@@ -100,6 +104,10 @@ public abstract class AbstractWidgetCreator {
 		widgetDto.setTextSizeAmount(0);
 		widgetDto.setTopPriorityKma(true);
 		widgetDto.setUpdateIntervalMillis(0);
+
+		if (getRequestWeatherDataTypeSet().contains(WeatherDataType.airQuality)) {
+			widgetDto.getWeatherSourceTypeSet().add(WeatherDataSourceType.AQICN);
+		}
 
 		setTextSize(widgetDto.getTextSizeAmount());
 		return widgetDto;
@@ -399,7 +407,25 @@ public abstract class AbstractWidgetCreator {
 		return new RemoteViews(context.getPackageName(), layoutId);
 	}
 
+	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
+		if (!widgetDto.isInitialized()) {
+			widgetDto.setInitialized(true);
+		}
+
+		if (widgetDto.isLoadSuccessful()) {
+			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+		} else {
+			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			setRefreshPendingIntent(widgetProviderClass(), remoteViews, appWidgetId);
+		}
+
+		widgetRepository.update(widgetDto, null);
+		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+	}
+
 	abstract public RemoteViews createRemoteViews();
+
+	abstract public Class<?> widgetProviderClass();
 
 	abstract public void setTextSize(int amount);
 
@@ -407,6 +433,7 @@ public abstract class AbstractWidgetCreator {
 
 	abstract public void setDataViewsOfSavedData();
 
+	abstract public Set<WeatherDataType> getRequestWeatherDataTypeSet();
 
 	public WidgetDto getWidgetDto() {
 		return widgetDto;

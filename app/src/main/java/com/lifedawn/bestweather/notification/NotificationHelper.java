@@ -32,7 +32,8 @@ public class NotificationHelper {
 			channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
 
 			if (notificationObj.getNotificationType() == NotificationType.Always ||
-					notificationObj.getNotificationType() == NotificationType.Location) {
+					notificationObj.getNotificationType() == NotificationType.Location ||
+					notificationObj.getNotificationType() == NotificationType.WidgetForegroundService) {
 				channel.enableVibration(false);
 				channel.setVibrationPattern(null);
 				channel.enableLights(false);

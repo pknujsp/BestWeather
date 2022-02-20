@@ -149,7 +149,7 @@ public class DailyPushNotificationJobService extends JobService {
 			}
 		}
 
-		WeatherRequestUtil.loadWeatherData(context, executorService, dailyPushNotificationDto.getCountryCode(),
+		WeatherRequestUtil.loadWeatherData(context, executorService,
 				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), weatherDataTypeSet, new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {

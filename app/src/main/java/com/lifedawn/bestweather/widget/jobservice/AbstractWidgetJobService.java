@@ -187,7 +187,6 @@ public abstract class AbstractWidgetJobService extends JobService {
 					onActionBootCompleted(params);
 				}
 
-
 			}
 		});
 
@@ -314,7 +313,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 		if (weatherDataTypeSet.contains(WeatherDataType.airQuality)) {
 			weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
 		}
-		WeatherRequestUtil.loadWeatherData(context, executorService, widgetDto.getCountryCode(), widgetDto.getLatitude(),
+		WeatherRequestUtil.loadWeatherData(context, executorService, widgetDto.getLatitude(),
 				widgetDto.getLongitude(), weatherDataTypeSet, new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {

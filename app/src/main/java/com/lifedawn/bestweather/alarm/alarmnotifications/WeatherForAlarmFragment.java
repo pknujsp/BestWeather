@@ -93,7 +93,7 @@ public class WeatherForAlarmFragment extends Fragment {
 		weatherDataTypeSet.add(WeatherDataType.hourlyForecast);
 		weatherDataTypeSet.add(WeatherDataType.airQuality);
 
-		WeatherRequestUtil.loadWeatherData(getContext(), executorService, alarmDto.getLocationCountryCode(),
+		WeatherRequestUtil.loadWeatherData(getContext(), executorService,
 				Double.parseDouble(alarmDto.getLocationLatitude()),
 				Double.parseDouble(alarmDto.getLocationLongitude()), weatherDataTypeSet,
 				new MultipleRestApiDownloader() {

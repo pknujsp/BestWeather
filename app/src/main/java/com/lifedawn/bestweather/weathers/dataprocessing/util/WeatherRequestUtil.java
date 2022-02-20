@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 public class WeatherRequestUtil {
-	public static void loadWeatherData(Context context, ExecutorService executorService, String countryCode, Double latitude, Double longitude,
+	public static void loadWeatherData(Context context, ExecutorService executorService, Double latitude, Double longitude,
 	                                   Set<WeatherDataType> weatherDataTypeSet,
 	                                   MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataSourceType> weatherDataSourceTypeSet) {
 		final ArrayMap<WeatherDataSourceType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();

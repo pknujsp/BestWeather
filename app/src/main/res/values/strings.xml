@@ -517,5 +517,7 @@
     <string name="temp_airQuality2">current air quality\nGood</string>
     <string name="unregisteredDailyNotification">Daily notification unregistered</string>
     <string name="temp_humidity_str">humidity: 50%</string>
+    <string name="updatingWidgets">updating widgets...</string>
+    <string name="runningUpdateService">running updates...</string>
 
 </resources>

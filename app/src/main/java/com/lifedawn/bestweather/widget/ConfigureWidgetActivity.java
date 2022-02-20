@@ -19,7 +19,6 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -70,8 +69,6 @@ import com.lifedawn.bestweather.widget.widgetprovider.FourthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FifthWidgetProvider;
 
 import org.jetbrains.annotations.NotNull;
-
-import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
 public class ConfigureWidgetActivity extends AppCompatActivity implements AbstractWidgetCreator.WidgetUpdateCallback {
 	private ActivityConfigureWidgetBinding binding;
@@ -165,30 +162,30 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		final AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId);
 		layoutId = appWidgetProviderInfo.initialLayout;
 		ComponentName componentName = appWidgetProviderInfo.provider;
-		final String providerClassName = componentName.getClassName();
+		final String widgetProviderClassName = componentName.getClassName();
 
-		if (providerClassName.equals(FirstWidgetProvider.class.getName())) {
+		if (widgetProviderClassName.equals(FirstWidgetProvider.class.getName())) {
 			widgetCreator = new FirstWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (providerClassName.equals(SecondWidgetProvider.class.getName())) {
+		} else if (widgetProviderClassName.equals(SecondWidgetProvider.class.getName())) {
 			widgetCreator = new SecondWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (providerClassName.equals(ThirdWidgetProvider.class.getName())) {
+		} else if (widgetProviderClassName.equals(ThirdWidgetProvider.class.getName())) {
 			widgetCreator = new ThirdWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (providerClassName.equals(FourthWidgetProvider.class.getName())) {
+		} else if (widgetProviderClassName.equals(FourthWidgetProvider.class.getName())) {
 			widgetCreator = new FourthWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (providerClassName.equals(FifthWidgetProvider.class.getName())) {
+		} else if (widgetProviderClassName.equals(FifthWidgetProvider.class.getName())) {
 			widgetCreator = new FifthWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (providerClassName.equals(SixthWidgetProvider.class.getName())) {
+		} else if (widgetProviderClassName.equals(SixthWidgetProvider.class.getName())) {
 			widgetCreator = new SixthWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (providerClassName.equals(SeventhWidgetProvider.class.getName())) {
+		} else if (widgetProviderClassName.equals(SeventhWidgetProvider.class.getName())) {
 			widgetCreator = new SeventhWidgetCreator(getApplicationContext(), this, appWidgetId);
 			binding.weatherDataSourceLayout.setVisibility(View.GONE);
-		} else if (providerClassName.equals(EighthWidgetProvider.class.getName())) {
+		} else if (widgetProviderClassName.equals(EighthWidgetProvider.class.getName())) {
 			widgetCreator = new EighthWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (providerClassName.equals(NinthWidgetProvider.class.getName())) {
+		} else if (widgetProviderClassName.equals(NinthWidgetProvider.class.getName())) {
 			widgetCreator = new NinthWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (providerClassName.equals(TenthWidgetProvider.class.getName())) {
+		} else if (widgetProviderClassName.equals(TenthWidgetProvider.class.getName())) {
 			widgetCreator = new TenthWidgetCreator(getApplicationContext(), this, appWidgetId);
-		} else if (providerClassName.equals(EleventhWidgetProvider.class.getName())) {
+		} else if (widgetProviderClassName.equals(EleventhWidgetProvider.class.getName())) {
 			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), this, appWidgetId);
 			binding.kmaTopPrioritySwitch.setText(R.string.containsKma);
 		}
@@ -201,7 +198,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		//위치, 날씨제공사, 대한민국 최우선, 자동 업데이트 간격, 날짜와 시각표시,
 		//현지 시각으로 표시, 글자크기, 배경 투명도
 		initLocation();
-		initWeatherDataSource();
+		initWeatherProvider();
 		initAutoRefreshInterval();
 		initDisplayDateTime();
 		initTextSize();
@@ -212,21 +209,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		binding.check.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Class<?> widgetProviderClass = null;
-				try {
-					widgetProviderClass = Class.forName(providerClassName);
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
-
-				if (binding.selectedLocationRadio.isChecked()) {
-					widgetDto.setAddressName(newSelectedAddressDto.getAddress());
-					widgetDto.setCountryCode(newSelectedAddressDto.getCountryCode());
-					widgetDto.setLatitude(Double.parseDouble(newSelectedAddressDto.getLatitude()));
-					widgetDto.setLongitude(Double.parseDouble(newSelectedAddressDto.getLongitude()));
-				}
-				final Class<?> finalWidgetProviderClass = widgetProviderClass;
-
 				widgetCreator.saveSettings(widgetDto, new DbQueryCallback<WidgetDto>() {
 					@Override
 					public void onResultSuccessful(WidgetDto result) {
@@ -237,11 +219,11 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 								resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 								setResult(RESULT_OK, resultValue);
 
-								Intent intent = new Intent(getApplicationContext(), finalWidgetProviderClass);
-								intent.setAction(getString(R.string.com_lifedawn_bestweather_action_INIT));
 								Bundle initBundle = new Bundle();
-
 								initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+
+								Intent intent = new Intent(getApplicationContext(), widgetCreator.widgetProviderClass());
+								intent.setAction(getString(R.string.com_lifedawn_bestweather_action_INIT));
 								intent.putExtras(initBundle);
 
 								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent,
@@ -364,10 +346,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 	}
 
-	private void initWeatherDataSource() {
-		//기본 날씨 제공사 확인
-		WeatherDataSourceType weatherDataSourceType = WeatherDataSourceType.OWM_ONECALL;
-
+	private void initWeatherProvider() {
 		binding.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {

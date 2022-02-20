@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
 							refreshIntent.putExtras(bundle);
 
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode++, refreshIntent,
-									PendingIntent.FLAG_UPDATE_CURRENT);
+									PendingIntent.FLAG_ONE_SHOT);
 							pendingIntent.send();
 
 						} catch (PendingIntent.CanceledException e) {

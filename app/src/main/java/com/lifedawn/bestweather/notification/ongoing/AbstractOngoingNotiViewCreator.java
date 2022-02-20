@@ -141,7 +141,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		WeatherDataSourceType finalWeatherDataSourceType = weatherDataSourceType;
-		WeatherRequestUtil.loadWeatherData(context, executorService, notificationDataObj.getCountryCode(),
+		WeatherRequestUtil.loadWeatherData(context, executorService,
 				notificationDataObj.getLatitude(), notificationDataObj.getLongitude(), weatherDataTypeSet,
 				new MultipleRestApiDownloader() {
 					@Override

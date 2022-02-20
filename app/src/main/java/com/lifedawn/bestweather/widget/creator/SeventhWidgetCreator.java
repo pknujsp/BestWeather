@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,15 +18,21 @@ import androidx.gridlayout.widget.GridLayout;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
+import com.lifedawn.bestweather.widget.widgetprovider.SeventhWidgetProvider;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SeventhWidgetCreator extends AbstractWidgetCreator {
 	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
@@ -46,6 +53,15 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		super(context, widgetUpdateCallback, appWidgetId);
 	}
 
+
+	@Override
+	public Set<WeatherDataType> getRequestWeatherDataTypeSet() {
+		Set<WeatherDataType> set = new HashSet<>();
+		set.add(WeatherDataType.airQuality);
+
+		return set;
+	}
+
 	@Override
 	public RemoteViews createTempViews(Integer parentWidth, Integer parentHeight) {
 		RemoteViews remoteViews = createBaseRemoteViews();
@@ -60,6 +76,11 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 
 		return remoteViews;
+	}
+
+	@Override
+	public Class<?> widgetProviderClass() {
+		return SeventhWidgetProvider.class;
 	}
 
 	@Override
@@ -277,4 +298,27 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 				remoteViews);
 	}
 
+	@Override
+	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
+		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
+
+		final AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader, null);
+		final boolean successful = airQualityDto.isSuccessful();
+
+		if (successful) {
+			ZoneOffset zoneOffset = ZoneOffset.of(airQualityDto.getTimeInfo().getTz());
+			widgetDto.setTimeZoneId(zoneOffset.getId());
+			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
+					airQualityDto, new OnDrawBitmapCallback() {
+						@Override
+						public void onCreatedBitmap(Bitmap bitmap) {
+
+						}
+					});
+			makeResponseTextToJson(multipleRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherDataSourceTypeSet(), widgetDto, zoneOffset);
+		}
+
+		widgetDto.setLoadSuccessful(successful);
+		super.setResultViews(appWidgetId, remoteViews, multipleRestApiDownloader);
+	}
 }

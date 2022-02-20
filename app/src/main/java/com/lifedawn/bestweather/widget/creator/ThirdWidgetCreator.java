@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -19,6 +20,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
@@ -27,11 +30,15 @@ import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
+import com.lifedawn.bestweather.widget.widgetprovider.ThirdWidgetProvider;
 
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ThirdWidgetCreator extends AbstractWidgetCreator {
 	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
@@ -65,11 +72,27 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	@Override
+	public Set<WeatherDataType> getRequestWeatherDataTypeSet() {
+		Set<WeatherDataType> set = new HashSet<>();
+		set.add(WeatherDataType.currentConditions);
+		set.add(WeatherDataType.hourlyForecast);
+		set.add(WeatherDataType.dailyForecast);
+		set.add(WeatherDataType.airQuality);
+
+		return set;
+	}
+
+	@Override
 	public RemoteViews createRemoteViews() {
 		RemoteViews remoteViews = createBaseRemoteViews();
 		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 
 		return remoteViews;
+	}
+
+	@Override
+	public Class<?> widgetProviderClass() {
+		return ThirdWidgetProvider.class;
 	}
 
 	@Override
@@ -292,5 +315,48 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		appWidgetManager.updateAppWidget(appWidgetId,
 				remoteViews);
+	}
+
+	@Override
+	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
+		ZoneId zoneId = null;
+		ZoneOffset zoneOffset = null;
+		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
+
+		final WeatherDataSourceType weatherDataSourceType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherDataSourceTypeSet());
+
+		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
+				weatherDataSourceType);
+		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
+				weatherDataSourceType);
+		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleRestApiDownloader,
+				weatherDataSourceType);
+		AirQualityDto airQualityDto = null;
+
+		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty()
+				&& !dailyForecastDtoList.isEmpty();
+
+		if (successful) {
+			zoneId = currentConditionsDto.getCurrentTime().getZone();
+			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
+			widgetDto.setTimeZoneId(zoneId.getId());
+
+			setClockTimeZone(remoteViews);
+
+			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
+					zoneOffset);
+
+			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto,
+					currentConditionsDto, hourlyForecastDtoList, dailyForecastDtoList, new OnDrawBitmapCallback() {
+						@Override
+						public void onCreatedBitmap(Bitmap bitmap) {
+
+						}
+					});
+			makeResponseTextToJson(multipleRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherDataSourceTypeSet(), widgetDto, zoneOffset);
+		}
+
+		widgetDto.setLoadSuccessful(successful);
+		super.setResultViews(appWidgetId, remoteViews, multipleRestApiDownloader);
 	}
 }

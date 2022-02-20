@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.widget.widgetprovider;
 
+import android.app.ActivityManager;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.appwidget.AppWidgetHost;
@@ -14,6 +15,7 @@ import android.os.PersistableBundle;
 import android.util.ArraySet;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -24,15 +26,12 @@ import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
+import com.lifedawn.bestweather.widget.foreground.WidgetForegroundService;
 
 import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
-	protected static final int JOB_REFRESH = 10000;
-	protected static final int JOB_ACTION_BOOT_COMPLETED = 20000;
-	protected static final int JOB_INIT = 40000;
-	private static final String TAG = "AbstractAppWidgetProvider";
 	protected AppWidgetManager appWidgetManager;
 
 	protected abstract Class<?> getJobServiceClass();
@@ -123,81 +122,47 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 		Bundle bundle = intent.getExtras();
 		final String action = intent.getAction();
 
-		int jobBeginId = 0;
-
 		if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_INIT))) {
-			jobBeginId = JOB_INIT;
+			Bundle argument = new Bundle();
+			argument.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID));
+			startService(context, action, argument);
 		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			jobBeginId = JOB_REFRESH;
+			startService(context, action, null);
 		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
-			jobBeginId = JOB_ACTION_BOOT_COMPLETED;
+
 		} else if (action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-			int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-			reDraw(context, new int[]{appWidgetId});
-		}
-
-		if (jobBeginId != 0) {
-			final int appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-			scheduleJob(context, action, jobBeginId, appWidgetId, null);
 		}
 
 	}
 
-
-	protected final void scheduleJob(Context context, String action, int jobIdBegin, int appWidgetId, @Nullable PersistableBundle extras) {
-		if (appWidgetManager == null) {
-			appWidgetManager = AppWidgetManager.getInstance(context);
+	protected boolean isServiceRunning(Context context) {
+		final String serviceName = WidgetForegroundService.class.getName();
+		ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if (serviceName.equals(service.service.getClassName())) {
+				return true;
+			}
 		}
+		return false;
+	}
 
-		if (appWidgetManager.getAppWidgetInfo(appWidgetId) != null) {
-			JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-
-			final PersistableBundle persistableBundle = new PersistableBundle();
-			if (extras != null) {
-				persistableBundle.putAll(extras);
-			}
-			persistableBundle.putString("action", action);
-			persistableBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-			persistableBundle.putString("widgetProviderClassName", getClass().getName());
-
-			final int newJobId = jobIdBegin + appWidgetId;
-			JobInfo newJobInfo = new JobInfo.Builder(newJobId, new ComponentName(context, getJobServiceClass()))
-					.setMinimumLatency(0).setOverrideDeadline(1000).setExtras(persistableBundle).build();
-
-		/*
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			JobInfo existingJobInfo = jobScheduler.getPendingJob(newJobId);
-			if (existingJobInfo != null) {
-				jobScheduler.cancel(existingJobInfo.getId());
-			}
+	protected void startService(Context context, String action, @Nullable Bundle bundle) {
+		if (isServiceRunning(context)) {
+			Toast.makeText(context, R.string.runningUpdateService, Toast.LENGTH_SHORT).show();
 		} else {
-			List<JobInfo> pendingJobs = jobScheduler.getAllPendingJobs();
-			if (jobIdBegin == JOB_REFRESH && pendingJobs.size() > 0) {
-				Set<Integer> closeJobIdSet = new ArraySet<>();
-				closeJobIdSet.add(JOB_ID_ON_APP_WIDGET_OPTIONS_CHANGED + appWidgetId);
-				closeJobIdSet.add(JOB_ACTION_BOOT_COMPLETED + appWidgetId);
-				closeJobIdSet.add(JOB_REDRAW + appWidgetId);
+			Intent intent = new Intent(context, WidgetForegroundService.class);
+			intent.setAction(action);
+			if (bundle != null) {
+				intent.putExtras(bundle);
+			}
 
-				for (JobInfo jobInfo : pendingJobs) {
-					if (closeJobIdSet.contains(jobInfo.getId())) {
-						jobScheduler.cancel(jobInfo.getId());
-						jobScheduler.
-					}
-				}
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+				context.startForegroundService(intent);
+			} else {
+				context.startService(intent);
 			}
 		}
-
-		 */
-			Log.e(TAG,
-					"jobId: " + newJobId + ", appWidgetId: " + appWidgetId + ", jobService: " + getJobServiceClass() + ", " +
-							"widgetProvider" + ": " + getClass());
-
-
-			jobScheduler.schedule(newJobInfo);
-
-		}
-
-
 	}
+
 
 }
