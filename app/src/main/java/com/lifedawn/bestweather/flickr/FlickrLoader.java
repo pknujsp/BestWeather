@@ -141,11 +141,6 @@ public class FlickrLoader {
 					call.enqueue(new Callback<JsonElement>() {
 						@Override
 						public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-							if (activity == null) {
-								glideImgCallback.onLoadedImg(null, null, false);
-								return;
-							}
-
 							Gson gson = new Gson();
 							final PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
 									PhotosFromGalleryResponse.class);

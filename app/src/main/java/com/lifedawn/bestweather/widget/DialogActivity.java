@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.widget;
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -11,20 +10,15 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RemoteViews;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
-import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.databinding.ActivityDialogBinding;
 import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -55,7 +49,7 @@ import com.lifedawn.bestweather.widget.widgetprovider.FifthWidgetProvider;
 
 public class DialogActivity extends Activity {
 	private ActivityDialogBinding binding;
-	private Class<?> widgetClass;
+	private Class<?> widgetProviderClass;
 	private int appWidgetId;
 	private AbstractWidgetCreator widgetCreator;
 	private AlertDialog alertDialog;
@@ -98,25 +92,17 @@ public class DialogActivity extends Activity {
 			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), null, appWidgetId);
 		}
 
-		try {
-			widgetClass = Class.forName(providerClassName);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-
+		widgetProviderClass = widgetCreator.widgetProviderClass();
 		final View dialogView = getLayoutInflater().inflate(R.layout.view_widget_dialog, null);
 
 		((Button) dialogView.findViewById(R.id.openAppBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-				//intent.setAction(Intent.ACTION_MAIN);
-				//intent.addCategory(Intent.CATEGORY_LAUNCHER);
 				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-				startActivity(intent);
 				alertDialog.dismiss();
 
+				startActivity(intent);
 				finish();
 			}
 		});
@@ -124,21 +110,22 @@ public class DialogActivity extends Activity {
 		((Button) dialogView.findViewById(R.id.updateBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent refreshIntent = new Intent(getApplicationContext(), widgetClass);
+				Intent refreshIntent = new Intent(getApplicationContext(), widgetProviderClass);
 				refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
 				Bundle bundle = new Bundle();
 				bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 				refreshIntent.putExtras(bundle);
 
-				PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, refreshIntent,
+				PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), (int) System.currentTimeMillis(), refreshIntent,
 						PendingIntent.FLAG_UPDATE_CURRENT);
+				alertDialog.dismiss();
+
 				try {
 					pendingIntent.send();
 				} catch (PendingIntent.CanceledException e) {
 					e.printStackTrace();
 				}
-				alertDialog.dismiss();
 				finish();
 			}
 		});
@@ -160,7 +147,14 @@ public class DialogActivity extends Activity {
 					public void run() {
 						alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(DialogActivity.this,
 								R.style.Theme_AppCompat_Light_Dialog))
-								.setCancelable(false)
+								.setCancelable(true)
+								.setOnCancelListener(new DialogInterface.OnCancelListener() {
+									@Override
+									public void onCancel(DialogInterface dialog) {
+										dialog.dismiss();
+										finish();
+									}
+								})
 								.setView(dialogView)
 								.create();
 

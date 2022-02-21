@@ -163,8 +163,9 @@ public class WidgetForegroundService extends Service {
 						currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
 					} else {
 						selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
+						final String addressName = widgetDto.getAddressName();
 
-						if (!weatherRequestMap.containsKey(widgetDto.getAddressName())) {
+						if (!weatherRequestMap.containsKey(addressName)) {
 							Address address = new Address(Locale.getDefault());
 
 							address.setLatitude(widgetDto.getLatitude());
@@ -177,9 +178,9 @@ public class WidgetForegroundService extends Service {
 							weatherRequestMap.put(widgetDto.getAddressName(), requestObj);
 							addressList.add(widgetDto.getAddressName());
 						}
-						weatherRequestMap.get(widgetDto.getAddressName()).weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
-						weatherRequestMap.get(widgetDto.getAddressName()).weatherDataSourceTypeSet.addAll(widgetDto.getWeatherSourceTypeSet());
-						weatherRequestMap.get(widgetDto.getAddressName()).appWidgetSet.add(widgetDto.getAppWidgetId());
+						weatherRequestMap.get(addressName).weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
+						weatherRequestMap.get(addressName).weatherDataSourceTypeSet.addAll(widgetDto.getWeatherSourceTypeSet());
+						weatherRequestMap.get(addressName).appWidgetSet.add(widgetDto.getAppWidgetId());
 					}
 
 					allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);

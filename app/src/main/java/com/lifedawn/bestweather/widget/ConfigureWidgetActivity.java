@@ -22,6 +22,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.Window;
@@ -29,9 +30,8 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.SpinnerAdapter;
@@ -83,8 +83,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	private Integer layoutId;
 	private WidgetDto widgetDto;
 
-	private Integer previewContainerWidth;
-	private Integer previewContainerHeight;
+	private int widgetHeight;
+	private int widgetWidth;
 
 	private FavoriteAddressDto newSelectedAddressDto;
 
@@ -110,8 +110,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			if (f instanceof FavoritesFragment) {
 				binding.widgetSettingsContainer.setVisibility(View.GONE);
 				binding.fragmentContainer.setVisibility(View.VISIBLE);
-				getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-						View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 			}
 		}
 
@@ -130,8 +128,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			if (f instanceof FavoritesFragment) {
 				binding.widgetSettingsContainer.setVisibility(View.VISIBLE);
 				binding.fragmentContainer.setVisibility(View.GONE);
-				getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-						View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
 			}
 		}
 	};
@@ -150,7 +147,18 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		setBackgroundImg();
+		boolean denied = false;
+		for (int result : grantResults) {
+			if (result == PackageManager.PERMISSION_DENIED) {
+				denied = true;
+				break;
+			}
+		}
+		if (denied) {
+			binding.loadingAnimation.setVisibility(View.GONE);
+		} else {
+			setBackgroundImg();
+		}
 	}
 
 	private void setBackgroundImg() {
@@ -158,7 +166,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			MyApplication.getExecutorService().execute(new Runnable() {
 				@Override
 				public void run() {
-					checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
 					WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
 					Drawable wallpaperDrawable = wallpaperManager.getDrawable();
 					MainThreadWorker.runOnUiThread(new Runnable() {
@@ -170,7 +177,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 					});
 				}
 			});
-
 		}
 	}
 
@@ -178,22 +184,20 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_configure_widget);
-
 		final Window window = getWindow();
 
 		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 		window.setStatusBarColor(Color.TRANSPARENT);
 		window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.widgetSettingsContainer.getLayoutParams();
-		layoutParams.topMargin = MyApplication.getStatusBarHeight();
-		binding.widgetSettingsContainer.setLayoutParams(layoutParams);
+
+		binding.displayDatetimeSwitch.setVisibility(View.GONE);
+		binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
 
 		getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
-		setBackgroundImg();
 
 		Bundle bundle = getIntent().getExtras();
 
@@ -235,10 +239,14 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			binding.kmaTopPrioritySwitch.setText(R.string.containsKma);
 		}
 
-		binding.displayDatetimeSwitch.setVisibility(View.GONE);
-		binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
-
 		widgetDto = widgetCreator.loadDefaultSettings();
+		widgetHeight = (int) (appWidgetProviderInfo.minHeight * 1.9);
+
+		FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.previewLayout.getLayoutParams();
+		layoutParams.topMargin = MyApplication.getStatusBarHeight() + (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
+		layoutParams.height = widgetHeight;
+
+		binding.previewLayout.setLayoutParams(layoutParams);
 
 		//위치, 날씨제공사, 대한민국 최우선, 자동 업데이트 간격, 날짜와 시각표시,
 		//현지 시각으로 표시, 글자크기, 배경 투명도
@@ -248,6 +256,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		initDisplayDateTime();
 		initTextSize();
 		initBackground();
+		setBackgroundImg();
 
 		binding.currentLocationRadio.setChecked(true);
 
@@ -293,21 +302,16 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			}
 		});
 
-		binding.previewLayout.getViewTreeObserver().addOnDrawListener(
-				new ViewTreeObserver.OnDrawListener() {
-					boolean initializing = true;
 
-					@Override
-					public void onDraw() {
-						if (initializing) {
-							initializing = false;
-							previewContainerWidth = binding.previewLayout.getWidth();
-							previewContainerHeight = binding.previewLayout.getHeight();
-							updatePreview();
-						}
-					}
-				}
-		);
+		binding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+			@Override
+			public void onGlobalLayout() {
+				binding.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				widgetWidth = binding.previewLayout.getWidth();
+				updatePreview();
+			}
+		});
 	}
 
 
@@ -456,6 +460,13 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 				} else {
 					selectedFavoriteLocation = true;
 					newSelectedAddressDto = (FavoriteAddressDto) result.getSerializable(BundleKey.SelectedAddressDto.name());
+
+					WidgetDto widgetDto = widgetCreator.getWidgetDto();
+					widgetDto.setAddressName(newSelectedAddressDto.getAddress());
+					widgetDto.setCountryCode(newSelectedAddressDto.getCountryCode());
+					widgetDto.setLatitude(Double.parseDouble(newSelectedAddressDto.getLatitude()));
+					widgetDto.setLongitude(Double.parseDouble(newSelectedAddressDto.getLongitude()));
+
 					binding.selectedAddressName.setText(newSelectedAddressDto.getAddress());
 				}
 			}
@@ -480,12 +491,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	@Override
 	public void updatePreview() {
 		binding.previewLayout.removeAllViews();
-
-		RemoteViews removeViews = widgetCreator.createTempViews(previewContainerWidth, previewContainerHeight);
-		View previewWidgetView = removeViews.apply(getApplicationContext(), binding.previewLayout);
-
-		binding.previewLayout.setMinimumHeight(appWidgetManager.getAppWidgetInfo(appWidgetId).minHeight);
-		binding.previewLayout.addView(previewWidgetView);
+		RemoteViews removeViews = widgetCreator.createTempViews(widgetWidth, widgetHeight);
+		View view = removeViews.apply(getApplicationContext(), binding.previewLayout);
+		binding.previewLayout.addView(view);
 	}
 
 }

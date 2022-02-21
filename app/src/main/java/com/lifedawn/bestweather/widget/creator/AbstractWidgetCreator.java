@@ -195,7 +195,7 @@ public abstract class AbstractWidgetCreator {
 	 * @param
 	 * @return {widgetWidthPx, widgetHeightPx} 반환
 	 */
-	protected int[] getWidgetExactSizeInPx(AppWidgetManager appWidgetManager) {
+	public int[] getWidgetExactSizeInPx(AppWidgetManager appWidgetManager) {
 		int widgetWidth = 0;
 		int widgetHeight = 0;
 
@@ -208,9 +208,9 @@ public abstract class AbstractWidgetCreator {
 			widgetHeight = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT);
 		}
 
-		final float density = context.getResources().getDisplayMetrics().density;
-		final float widgetWidthPx = widgetWidth * density;
-		final float widgetHeightPx = widgetHeight * density;
+		float density = context.getResources().getDisplayMetrics().density;
+		float widgetWidthPx = widgetWidth * density;
+		float widgetHeightPx = widgetHeight * density;
 
 		return new int[]{(int) widgetWidthPx, (int) widgetHeightPx};
 	}

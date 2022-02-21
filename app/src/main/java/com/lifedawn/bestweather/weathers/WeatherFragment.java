@@ -481,7 +481,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	private void setFlickrImgInfo(FlickrImgObj flickrImgInfo) {
-		final String text = flickrImgInfo.getPhoto().getOwner() + ": " + flickrImgInfo.getPhoto().getTitle();
+		final String text = flickrImgInfo.getPhoto().getOwner() + "-" + flickrImgInfo.getPhoto().getTitle();
 		binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
 				ContextCompat.getColor(getContext(), R.color.white)));
 		binding.flickrImageUrl.setTag(flickrImgInfo.getRealFlickrUrl());
@@ -508,7 +508,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					GlideApp.with(WeatherFragment.this).clear(binding.currentConditionsImg);
 					binding.loadingAnimation.setVisibility(View.VISIBLE);
 					binding.flickrImageUrl.setVisibility(View.GONE);
 				}
@@ -528,6 +527,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 										DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
 								setFlickrImgInfo(flickrImgObj);
 							} else {
+								GlideApp.with(WeatherFragment.this).clear(binding.currentConditionsImg);
 								binding.loadingAnimation.setVisibility(View.GONE);
 								binding.flickrImageUrl.setVisibility(View.VISIBLE);
 								final String text = getString(R.string.error);
