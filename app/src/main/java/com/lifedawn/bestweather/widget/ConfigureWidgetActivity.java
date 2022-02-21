@@ -16,16 +16,22 @@ import android.app.WallpaperManager;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.SpinnerAdapter;
@@ -41,6 +47,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.ActivityConfigureWidgetBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
@@ -97,20 +104,34 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
 		@Override
-		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-			super.onFragmentCreated(fm, f, savedInstanceState);
+		public void onFragmentAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
+			super.onFragmentAttached(fm, f, context);
+
 			if (f instanceof FavoritesFragment) {
 				binding.widgetSettingsContainer.setVisibility(View.GONE);
 				binding.fragmentContainer.setVisibility(View.VISIBLE);
+				getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+						View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+			}
+		}
+
+		@Override
+		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+			super.onFragmentCreated(fm, f, savedInstanceState);
+			if (f instanceof FavoritesFragment) {
+
 			}
 		}
 
 		@Override
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
+
 			if (f instanceof FavoritesFragment) {
 				binding.widgetSettingsContainer.setVisibility(View.VISIBLE);
 				binding.fragmentContainer.setVisibility(View.GONE);
+				getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+						View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 			}
 		}
 	};
@@ -134,10 +155,22 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 	private void setBackgroundImg() {
 		if (isReadStoragePermissionGranted()) {
-			checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
-			WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
-			Drawable wallpaperDrawable = wallpaperManager.getDrawable();
-			Glide.with(this).load(wallpaperDrawable).into(binding.wallpaper);
+			MyApplication.getExecutorService().execute(new Runnable() {
+				@Override
+				public void run() {
+					checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE);
+					WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
+					Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+					MainThreadWorker.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							Glide.with(getApplicationContext()).load(wallpaperDrawable).into(binding.wallpaper);
+							binding.loadingAnimation.setVisibility(View.GONE);
+						}
+					});
+				}
+			});
+
 		}
 	}
 
@@ -145,6 +178,18 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_configure_widget);
+
+		final Window window = getWindow();
+
+		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		window.setStatusBarColor(Color.TRANSPARENT);
+		window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+				View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.widgetSettingsContainer.getLayoutParams();
+		layoutParams.topMargin = MyApplication.getStatusBarHeight();
+		binding.widgetSettingsContainer.setLayoutParams(layoutParams);
 
 		getSupportFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);

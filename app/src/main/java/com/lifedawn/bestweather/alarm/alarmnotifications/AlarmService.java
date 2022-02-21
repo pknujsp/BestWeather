@@ -76,7 +76,8 @@ public class AlarmService extends Service {
 		notificationObj.getNotificationBuilder().setContentIntent(PendingIntent.getActivity(getApplicationContext(), 32323, alarmIntent, 0));
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			startForeground(notificationObj.getNotificationId(), notificationObj.getNotificationBuilder().build());
+			startForeground((int) System.currentTimeMillis(), notificationObj.getNotificationBuilder().build());
+
 		} else {
 			NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 			notificationManager.notify(notificationObj.getNotificationId(), notificationObj.getNotificationBuilder().build());

@@ -3,9 +3,8 @@ package com.lifedawn.bestweather.notification;
 import java.io.Serializable;
 
 public enum NotificationType implements Serializable {
-	Always("ALWAYS_NOTI_SHARED_PREFERENCES", 1000, "1001"), Daily("DAILY_NOTI_SHARED_PREFERENCES", 2000, "2001"), Alarm("", 3000, "3001"),
-	Location("", 4000, "4001"), WidgetForegroundService("", 5000, "5001"), OngoingNotificationForegroundService("", 6000, "6001"),
-	DailyNotificationForegroundService("", 7000, "7001");
+	Ongoing("ALWAYS_NOTI_SHARED_PREFERENCES", 1000, "1001"), Daily("DAILY_NOTI_SHARED_PREFERENCES", 2000, "2001"), Alarm("", 3000, "3001"),
+	Location("", 4000, "4001"), ForegroundService("", 5000, "5001");
 
 	private final String preferenceName;
 	private final int notificationId;

@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.service.notification.StatusBarNotification;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import com.lifedawn.bestweather.R;
@@ -31,9 +30,9 @@ public class NotificationHelper {
 			channel.setDescription(notificationObj.channelDescription);
 			channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
 
-			if (notificationObj.getNotificationType() == NotificationType.Always ||
+			if (notificationObj.getNotificationType() == NotificationType.Ongoing ||
 					notificationObj.getNotificationType() == NotificationType.Location ||
-					notificationObj.getNotificationType() == NotificationType.WidgetForegroundService) {
+					notificationObj.getNotificationType() == NotificationType.ForegroundService) {
 				channel.enableVibration(false);
 				channel.setVibrationPattern(null);
 				channel.enableLights(false);
@@ -59,7 +58,7 @@ public class NotificationHelper {
 		Intent clickIntent = new Intent(context, MainActivity.class);
 		clickIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationType.getNotificationId(), clickIntent,
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), clickIntent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationObj.channelId);
@@ -83,7 +82,7 @@ public class NotificationHelper {
 	}
 
 	private NotificationObj getNotificationObj(NotificationType notificationType) {
-		if (notificationType == NotificationType.Always) {
+		if (notificationType == NotificationType.Ongoing) {
 			return new NotificationObj(context.getString(R.string.notificationAlwaysChannelName),
 					context.getString(R.string.notificationAlwaysChannelDescription), notificationType);
 		} else if (notificationType == NotificationType.Daily) {
@@ -92,6 +91,9 @@ public class NotificationHelper {
 		} else if (notificationType == NotificationType.Alarm) {
 			return new NotificationObj(context.getString(R.string.notificationAlarmChannelName),
 					context.getString(R.string.notificationAlarmChannelDescription), notificationType);
+		} else if (notificationType == NotificationType.ForegroundService) {
+			return new NotificationObj(context.getString(R.string.notificationForegroundServiceChannelName),
+					context.getString(R.string.notificationForegroundServiceChannelDescription), notificationType);
 		} else {
 			return new NotificationObj(context.getString(R.string.notificationLocationChannelName),
 					context.getString(R.string.notificationLocationChannelDescription), notificationType);

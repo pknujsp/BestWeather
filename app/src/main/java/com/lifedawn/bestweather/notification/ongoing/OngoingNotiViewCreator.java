@@ -3,8 +3,6 @@ package com.lifedawn.bestweather.notification.ongoing;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -19,7 +17,7 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
-import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
+import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 
 import com.lifedawn.bestweather.notification.NotificationHelper;
@@ -44,10 +42,10 @@ import java.util.Set;
 
 public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	private final int hourlyForecastCount = 8;
-	private BackgroundCallback backgroundCallback;
+	private Callback callback;
 
 	public OngoingNotiViewCreator(Context context, NotificationUpdateCallback notificationUpdateCallback) {
-		super(context, NotificationType.Always, notificationUpdateCallback);
+		super(context, NotificationType.Ongoing, notificationUpdateCallback);
 	}
 
 	@Override
@@ -58,7 +56,6 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		if (temp) {
 			setHourlyForecastViews(expandedRemoteViews, WeatherResponseProcessor.getTempHourlyForecastDtoList(context, hourlyForecastCount));
 		} else {
-			collapsedRemoteViews.setOnClickPendingIntent(R.id.refreshLayout, getRefreshPendingIntent());
 			expandedRemoteViews.setOnClickPendingIntent(R.id.refreshLayout, getRefreshPendingIntent());
 		}
 
@@ -67,8 +64,8 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 
 
 	@Override
-	public void initNotification(BackgroundCallback backgroundCallback) {
-		this.backgroundCallback = backgroundCallback;
+	public void initNotification(Callback callback) {
+		this.callback = callback;
 		RemoteViews[] remoteViewsArr = createRemoteViews(false);
 		RemoteViewsUtil.onBeginProcess(remoteViewsArr[0]);
 		RemoteViewsUtil.onBeginProcess(remoteViewsArr[1]);
@@ -129,8 +126,8 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		if (successful) {
 			RemoteViewsUtil.onSuccessfulProcess(expandedRemoteViews);
 		} else {
-			RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 			expandedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+			RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 		}
 
 		makeNotification(collapsedRemoteViews, expandedRemoteViews, icon, true);
@@ -257,8 +254,8 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 			notificationHelper.cancelNotification(notificationType.getNotificationId());
 		}
 
-		if (isFinished && backgroundCallback != null) {
-			backgroundCallback.onResult();
+		if (isFinished && callback != null) {
+			callback.onResult();
 		}
 	}
 

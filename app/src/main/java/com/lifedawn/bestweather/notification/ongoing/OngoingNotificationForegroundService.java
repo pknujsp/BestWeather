@@ -4,17 +4,17 @@ import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 
-import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
+import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
+
+import java.util.concurrent.TimeUnit;
 
 public class OngoingNotificationForegroundService extends Service {
 	public OngoingNotificationForegroundService() {
@@ -28,6 +28,7 @@ public class OngoingNotificationForegroundService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		showNotification();
 	}
 
 	@Override
@@ -37,7 +38,7 @@ public class OngoingNotificationForegroundService extends Service {
 
 	private void showNotification() {
 		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.OngoingNotificationForegroundService);
+		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.ForegroundService);
 
 		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
 		builder.setSmallIcon(R.mipmap.ic_launcher_round).setContentText(getString(R.string.msg_refreshing_weather_data)).setContentTitle(getString(R.string.msg_refreshing_weather_data))
@@ -48,24 +49,23 @@ public class OngoingNotificationForegroundService extends Service {
 		}
 
 		Notification notification = notificationObj.getNotificationBuilder().build();
-		startForeground(notificationObj.getNotificationId(), notification);
+		startForeground((int) System.currentTimeMillis(), notification);
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		showNotification();
 		final String action = intent.getAction();
 
 		if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 			OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
-			ongoingNotificationHelper.reStartNotification(new BackgroundCallback() {
+			ongoingNotificationHelper.reStartNotification(new Callback() {
 				@Override
 				public void onResult() {
 					stopService();
 				}
 			});
 		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			OngoingNotiViewCreator ongoingNotiViewCreator = new OngoingNotiViewCreator(this, null);
+			OngoingNotiViewCreator ongoingNotiViewCreator = new OngoingNotiViewCreator(getApplicationContext(), null);
 			ongoingNotiViewCreator.loadSavedPreferences();
 
 			if (ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
@@ -75,14 +75,13 @@ public class OngoingNotificationForegroundService extends Service {
 				}
 			}
 
-			ongoingNotiViewCreator.initNotification(new BackgroundCallback() {
+			ongoingNotiViewCreator.initNotification(new Callback() {
 				@Override
 				public void onResult() {
 					stopService();
 				}
 			});
 		}
-
 		return START_NOT_STICKY;
 	}
 

@@ -404,15 +404,7 @@
     <string name="daily_notification">daily notification</string>
     <string name="use_always_notification">enable ongoing notification</string>
 
-    <!-- notification -->
-    <string name="notificationAlwaysChannelName">Ongoing notification</string>
-    <string name="notificationAlwaysChannelDescription">Always display weather information</string>
 
-    <string name="notificationDailyChannelName">Daily notification</string>
-    <string name="notificationDailyChannelDescription">We notify you of weather information at a set time every day</string>
-
-    <string name="notificationAlarmChannelName">Alarm</string>
-    <string name="notificationAlarmChannelDescription">Alarm display on set day and time</string>
 
     <string name="use_daily_notification">enable daily notification</string>
     <string name="alarmClock">notification time</string>
@@ -519,5 +511,6 @@
     <string name="temp_humidity_str">humidity: 50%</string>
     <string name="updatingWidgets">updating widgets...</string>
     <string name="runningUpdateService">running updates...</string>
+
 
 </resources>

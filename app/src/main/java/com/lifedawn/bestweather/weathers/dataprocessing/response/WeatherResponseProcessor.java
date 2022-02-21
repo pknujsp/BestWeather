@@ -183,7 +183,7 @@ public class WeatherResponseProcessor {
 			MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponseResult =
 					multipleRestApiDownloader.getResponseMap().get(WeatherDataSourceType.KMA_API).get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
 
-			if (ultraSrtNcstResponseResult.isSuccessful()) {
+			if (ultraSrtNcstResponseResult != null && ultraSrtFcstResponseResult != null && ultraSrtNcstResponseResult.isSuccessful()) {
 				FinalCurrentConditions finalCurrentConditions =
 						KmaResponseProcessor.getFinalCurrentConditionsByXML((VilageFcstResponse) ultraSrtNcstResponseResult.getResponseObj());
 				List<FinalHourlyForecast> finalHourlyForecastList =
@@ -200,7 +200,8 @@ public class WeatherResponseProcessor {
 			MultipleRestApiDownloader.ResponseResult hourlyForecastsResponseResult =
 					multipleRestApiDownloader.getResponseMap().get(WeatherDataSourceType.KMA_WEB).get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 
-			if (currentConditionsResponseResult.isSuccessful() && hourlyForecastsResponseResult.isSuccessful()) {
+			if (currentConditionsResponseResult != null && hourlyForecastsResponseResult != null &&
+					currentConditionsResponseResult.isSuccessful() && hourlyForecastsResponseResult.isSuccessful()) {
 				KmaCurrentConditions kmaCurrentConditions = (KmaCurrentConditions) currentConditionsResponseResult.getResponseObj();
 				Object[] forecasts = (Object[]) hourlyForecastsResponseResult.getResponseObj();
 
@@ -215,7 +216,7 @@ public class WeatherResponseProcessor {
 			MultipleRestApiDownloader.ResponseResult currentConditionsResponseResult = multipleRestApiDownloader.getResponseMap().get(WeatherDataSourceType.ACCU_WEATHER)
 					.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS);
 
-			if (currentConditionsResponseResult.isSuccessful()) {
+			if (currentConditionsResponseResult != null && currentConditionsResponseResult.isSuccessful()) {
 				AccuCurrentConditionsResponse accuCurrentConditionsResponse =
 						(AccuCurrentConditionsResponse) currentConditionsResponseResult.getResponseObj();
 
@@ -226,7 +227,7 @@ public class WeatherResponseProcessor {
 			MultipleRestApiDownloader.ResponseResult owmResponseResult = multipleRestApiDownloader.getResponseMap().get(WeatherDataSourceType.OWM_ONECALL)
 					.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
-			if (owmResponseResult.isSuccessful()) {
+			if (owmResponseResult != null && owmResponseResult.isSuccessful()) {
 				OwmOneCallResponse owmOneCallResponse =
 						(OwmOneCallResponse) owmResponseResult.getResponseObj();
 
@@ -238,7 +239,7 @@ public class WeatherResponseProcessor {
 					multipleRestApiDownloader.getResponseMap().get(weatherDataSourceType)
 							.get(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS);
 
-			if (owmCurrentConditionsResponseResult.isSuccessful()) {
+			if (owmCurrentConditionsResponseResult != null && owmCurrentConditionsResponseResult.isSuccessful()) {
 				OwmCurrentConditionsResponse owmCurrentConditionsResponse =
 						(OwmCurrentConditionsResponse) owmCurrentConditionsResponseResult.getResponseObj();
 
@@ -339,7 +340,8 @@ public class WeatherResponseProcessor {
 			MultipleRestApiDownloader.ResponseResult vilageFcstResponseResult = responseMap.get(WeatherDataSourceType.KMA_API).get(
 					RetrofitClient.ServiceType.KMA_VILAGE_FCST);
 
-			if (ultraSrtFcstResponseResult.isSuccessful() && vilageFcstResponseResult.isSuccessful()) {
+			if (ultraSrtFcstResponseResult != null && vilageFcstResponseResult != null
+					&& ultraSrtFcstResponseResult.isSuccessful() && vilageFcstResponseResult.isSuccessful()) {
 				VilageFcstResponse ultraSrtFcstRoot =
 						(VilageFcstResponse) ultraSrtFcstResponseResult.getResponseObj();
 				VilageFcstResponse vilageFcstRoot =
@@ -356,7 +358,7 @@ public class WeatherResponseProcessor {
 			MultipleRestApiDownloader.ResponseResult hourlyForecastsResponseResult =
 					multipleRestApiDownloader.getResponseMap().get(weatherDataSourceType).get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 
-			if (hourlyForecastsResponseResult.isSuccessful()) {
+			if (hourlyForecastsResponseResult != null && hourlyForecastsResponseResult.isSuccessful()) {
 				Object[] forecasts = (Object[]) hourlyForecastsResponseResult.getResponseObj();
 
 				ArrayList<KmaHourlyForecast> kmaHourlyForecasts = (ArrayList<KmaHourlyForecast>) forecasts[0];
@@ -369,7 +371,7 @@ public class WeatherResponseProcessor {
 			MultipleRestApiDownloader.ResponseResult hourlyForecastResponseResult = responseMap.get(weatherDataSourceType).get(
 					RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
 
-			if (hourlyForecastResponseResult.isSuccessful()) {
+			if (hourlyForecastResponseResult != null && hourlyForecastResponseResult.isSuccessful()) {
 				AccuHourlyForecastsResponse hourlyForecastsResponse =
 						(AccuHourlyForecastsResponse) hourlyForecastResponseResult.getResponseObj();
 
@@ -379,7 +381,7 @@ public class WeatherResponseProcessor {
 		} else if (weatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
 			MultipleRestApiDownloader.ResponseResult responseResult = responseMap.get(weatherDataSourceType).get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
-			if (responseResult.isSuccessful()) {
+			if (responseResult != null && responseResult.isSuccessful()) {
 				OwmOneCallResponse owmOneCallResponse =
 						(OwmOneCallResponse) responseResult.getResponseObj();
 
@@ -391,7 +393,7 @@ public class WeatherResponseProcessor {
 					multipleRestApiDownloader.getResponseMap().get(weatherDataSourceType)
 							.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
 
-			if (owmHourlyForecastResponseResult.isSuccessful()) {
+			if (owmHourlyForecastResponseResult != null && owmHourlyForecastResponseResult.isSuccessful()) {
 				OwmHourlyForecastResponse owmHourlyForecastResponse =
 						(OwmHourlyForecastResponse) owmHourlyForecastResponseResult.getResponseObj();
 

@@ -310,8 +310,7 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 			forecastTable.addView(row);
 		}
 
-		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
+		RelativeLayout.LayoutParams headerViewLayoutParams = getHeaderViewLayoutParams();
 		RelativeLayout.LayoutParams hoursRowLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		RelativeLayout.LayoutParams forecastViewsLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

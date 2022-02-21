@@ -4,34 +4,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp">
+        android:layout_marginBottom="4dp"
+        >
 
         <TextView
             android:id="@+id/measuring_station_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_marginRight="8dp"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="6dp"
             android:layout_toLeftOf="@id/airQuality"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="@string/temp_measuringStation"
             android:textColor="@color/widgetTextColor"
-            android:textSize="@dimen/stationNameTextSizeInSeventhWidget" />
+            android:textSize="@dimen/stationNameTextSizeInSeventhWidget"
+            />
 
         <TextView
             android:id="@+id/airQuality"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:text="@string/temp_airQuality"
             android:textColor="@color/widgetTextColor"
-            android:textSize="@dimen/airQualityTextSizeInSeventhWidget" />
+            android:textSize="@dimen/airQualityTextSizeInSeventhWidget"
+            />
     </RelativeLayout>
 
     <androidx.gridlayout.widget.GridLayout
@@ -42,7 +48,8 @@
         app:columnCount="3"
         app:orientation="horizontal"
         app:rowOrderPreserved="false"
-        app:useDefaultMargins="false" />
+        app:useDefaultMargins="false"
+        />
 
 
     <LinearLayout
@@ -52,6 +59,7 @@
         android:layout_gravity="center"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:weightSum="1.0" />
+        android:weightSum="1.0"
+        />
 
 </LinearLayout>

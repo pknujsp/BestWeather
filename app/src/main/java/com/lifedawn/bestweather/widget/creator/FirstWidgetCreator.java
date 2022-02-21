@@ -183,8 +183,7 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 		View currentConditionsView = makeCurrentConditionsViews(layoutInflater, currentConditionsDto, airQualityDto);
 		currentConditionsView.setId(R.id.currentConditions);
 
-		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
+		RelativeLayout.LayoutParams headerViewLayoutParams = getHeaderViewLayoutParams();
 		RelativeLayout.LayoutParams currentConditionsViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.MATCH_PARENT);
 

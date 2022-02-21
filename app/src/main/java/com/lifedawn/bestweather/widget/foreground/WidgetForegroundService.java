@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.ArrayMap;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -52,6 +51,7 @@ import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FourthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.NinthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.SecondWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SeventhWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.SixthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.TenthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.ThirdWidgetProvider;
@@ -94,6 +94,8 @@ public class WidgetForegroundService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		showNotification();
+
 		if (widgetRepository == null) {
 			widgetRepository = new WidgetRepository(getApplicationContext());
 		}
@@ -104,7 +106,7 @@ public class WidgetForegroundService extends Service {
 
 	private void showNotification() {
 		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.WidgetForegroundService);
+		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.ForegroundService);
 
 		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
 		builder.setSmallIcon(R.mipmap.ic_launcher_round).setContentText(getString(R.string.updatingWidgets)).setContentTitle(getString(R.string.updatingWidgets))
@@ -115,7 +117,8 @@ public class WidgetForegroundService extends Service {
 		}
 
 		Notification notification = notificationObj.getNotificationBuilder().build();
-		startForeground(notificationObj.getNotificationId(), notification);
+		startForeground((int) System.currentTimeMillis(), notification);
+
 	}
 
 	@Override
@@ -135,7 +138,6 @@ public class WidgetForegroundService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		showNotification();
 		final String action = intent.getAction();
 
 		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_INIT))) {
@@ -184,6 +186,13 @@ public class WidgetForegroundService extends Service {
 					allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
 					requestCount = 1;
 					responseCount = 0;
+
+					final Set<Integer> appWidgetIdSet = allWidgetDtoArrayMap.keySet();
+					for (Integer appWidgetId : appWidgetIdSet) {
+						RemoteViews remoteViews = remoteViewsArrayMap.get(appWidgetId);
+						RemoteViewsUtil.onBeginProcess(remoteViews);
+						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+					}
 
 					if (!currentLocationWidgetDtoArrayMap.isEmpty()) {
 						loadCurrentLocation();
@@ -288,7 +297,7 @@ public class WidgetForegroundService extends Service {
 			widgetCreator = new FifthWidgetCreator(getApplicationContext(), null, appWidgetId);
 		} else if (widgetProviderClassName.equals(SixthWidgetProvider.class.getName())) {
 			widgetCreator = new SixthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (widgetProviderClassName.equals(SecondWidgetProvider.class.getName())) {
+		} else if (widgetProviderClassName.equals(SeventhWidgetProvider.class.getName())) {
 			widgetCreator = new SeventhWidgetCreator(getApplicationContext(), null, appWidgetId);
 		} else if (widgetProviderClassName.equals(EighthWidgetProvider.class.getName())) {
 			widgetCreator = new EighthWidgetCreator(getApplicationContext(), null, appWidgetId);
@@ -382,7 +391,7 @@ public class WidgetForegroundService extends Service {
 		MainThreadWorker.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				FusedLocation.getInstance(getApplicationContext()).findCurrentLocation(locationCallback, false);
+				FusedLocation.getInstance(getApplicationContext()).findCurrentLocation(locationCallback, true);
 			}
 		});
 	}

@@ -5,11 +5,8 @@ import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Handler;
-import android.os.Message;
 import android.os.PersistableBundle;
 
-import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 import androidx.work.Configuration;
 
@@ -35,7 +32,7 @@ public class OngoingNotiJobService extends JobService {
 			SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 			final boolean enabledAlwaysNotification =
-					defaultSharedPreferences.getBoolean(NotificationType.Always.getPreferenceName(), false);
+					defaultSharedPreferences.getBoolean(NotificationType.Ongoing.getPreferenceName(), false);
 
 			if (enabledAlwaysNotification) {
 				OngoingNotiViewCreator alwaysNotiViewCreator = new OngoingNotiViewCreator(this, null);

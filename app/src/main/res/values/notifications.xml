@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>    <!-- notification -->
+    <string name="notificationAlwaysChannelName">Ongoing notification</string>
+    <string name="notificationAlwaysChannelDescription">Always display weather information</string>
+
+    <string name="notificationDailyChannelName">Daily notification</string>
+    <string name="notificationDailyChannelDescription">We notify you of weather information at a set time every day</string>
+
+    <string name="notificationAlarmChannelName">Alarm</string>
+    <string name="notificationAlarmChannelDescription">Alarm display on set day and time</string>
+
+    <string name="notificationForegroundServiceChannelName">Foreground</string>
+    <string name="notificationForegroundServiceChannelDescription">Displayed when updating widget/notification data</string>
+
+
+</resources>

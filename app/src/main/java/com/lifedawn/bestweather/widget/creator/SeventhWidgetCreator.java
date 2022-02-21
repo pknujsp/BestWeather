@@ -18,8 +18,10 @@ import androidx.gridlayout.widget.GridLayout;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
@@ -53,6 +55,13 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		super(context, widgetUpdateCallback, appWidgetId);
 	}
 
+	@Override
+	public WidgetDto loadDefaultSettings() {
+		widgetDto = super.loadDefaultSettings();
+		widgetDto.getWeatherSourceTypeSet().clear();
+		widgetDto.getWeatherSourceTypeSet().add(WeatherDataSourceType.AQICN);
+		return widgetDto;
+	}
 
 	@Override
 	public Set<WeatherDataType> getRequestWeatherDataTypeSet() {
@@ -138,6 +147,7 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		((TextView) seventhView.findViewById(R.id.measuring_station_name)).setTextSize(TypedValue.COMPLEX_UNIT_PX, stationNameTextSize);
 
 		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+
 		((TextView) seventhView.findViewById(R.id.airQuality)).setText(airQuality);
 
 		((TextView) seventhView.findViewById(R.id.airQuality)).setTextSize(TypedValue.COMPLEX_UNIT_PX, simpleAirQualityTextSize);
@@ -147,7 +157,6 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		//co, so2, no2 순서로
 		final String[] particleNames = {context.getString(R.string.co_str), context.getString(R.string.so2_str),
 				context.getString(R.string.no2_str)};
-		final int[] iconIds = {R.drawable.co, R.drawable.so2, R.drawable.no2};
 
 		List<String> gradeValueList = new ArrayList<>();
 		List<String> gradeDescriptionList = new ArrayList<>();
@@ -236,8 +245,7 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 			forecastLayout.addView(forecastItemView, forecastItemLayoutParams);
 		}
 
-		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
+		RelativeLayout.LayoutParams headerViewLayoutParams = getHeaderViewLayoutParams();
 		RelativeLayout.LayoutParams seventhWidgetViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.MATCH_PARENT);
 

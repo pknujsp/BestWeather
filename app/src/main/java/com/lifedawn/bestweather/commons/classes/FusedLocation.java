@@ -63,6 +63,10 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		return instance;
 	}
 
+	public static void close() {
+		instance = null;
+	}
+
 	private FusedLocation(Context context) {
 		this.context = context;
 		fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);

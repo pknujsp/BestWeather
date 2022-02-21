@@ -36,14 +36,13 @@ import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
-import com.lifedawn.bestweather.notification.model.AlwaysNotiDataObj;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
 
 
 public class OngoingNotificationSettingsFragment extends Fragment implements NotificationUpdateCallback {
-	private final NotificationType notificationType = NotificationType.Always;
+	private final NotificationType notificationType = NotificationType.Ongoing;
 	private FragmentBaseNotificationSettingsBinding binding;
 
 	private OngoingNotiViewCreator alwaysNotiViewCreator;

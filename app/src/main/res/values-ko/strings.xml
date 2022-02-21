@@ -445,4 +445,6 @@
     <string name="updatingWidgets">위젯 업데이트 중...</string>
     <string name="runningUpdateService">이미 업데이트 중입니다...</string>
 
+    <string name="notificationForegroundServiceChannelName">포그라운드</string>
+    <string name="notificationForegroundServiceChannelDescription">위젯/알림 데이터를 가져올 때 표시됩니다</string>
 </resources>

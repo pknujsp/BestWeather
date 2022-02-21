@@ -9,8 +9,11 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.ArrayMap;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -421,6 +424,14 @@ public abstract class AbstractWidgetCreator {
 
 		widgetRepository.update(widgetDto, null);
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+	}
+
+	public RelativeLayout.LayoutParams getHeaderViewLayoutParams() {
+		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT);
+		layoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f,
+				context.getResources().getDisplayMetrics());
+		return layoutParams;
 	}
 
 	abstract public RemoteViews createRemoteViews();

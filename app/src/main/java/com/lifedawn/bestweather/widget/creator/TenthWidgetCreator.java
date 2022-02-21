@@ -110,7 +110,6 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                         List<DailyForecastDto> dailyForecastDtoList, OnDrawBitmapCallback onDrawBitmapCallback) {
-
 		drawViews(remoteViews, addressName, lastRefreshDateTime, dailyForecastDtoList, onDrawBitmapCallback, null, null);
 	}
 
@@ -156,8 +155,7 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 			hourAndIconLinearLayout.addView(view, hourAndIconCellLayoutParams);
 		}
 
-		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
+		RelativeLayout.LayoutParams headerViewLayoutParams = getHeaderViewLayoutParams();
 		RelativeLayout.LayoutParams hourAndIconRowLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		RelativeLayout.LayoutParams tempRowLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,

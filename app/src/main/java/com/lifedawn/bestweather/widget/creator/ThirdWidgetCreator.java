@@ -268,8 +268,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		setHourlyForecastViews(valuesView, layoutInflater, hourlyForecastDtoList);
 		setDailyForecastViews(valuesView, layoutInflater, dailyForecastDtoList);
 
-		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
+		RelativeLayout.LayoutParams headerViewLayoutParams = getHeaderViewLayoutParams();
 		RelativeLayout.LayoutParams valuesViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.MATCH_PARENT);
 

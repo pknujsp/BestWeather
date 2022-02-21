@@ -16,11 +16,12 @@ import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
-import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
+import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
@@ -65,13 +66,13 @@ public abstract class AbstractOngoingNotiViewCreator {
 
 	abstract public RemoteViews[] createRemoteViews(boolean temp);
 
-	abstract public void initNotification(BackgroundCallback backgroundCallback);
+	abstract public void initNotification(Callback callback);
 
 	public void loadCurrentLocation(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
-		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
+		final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
 			public void onSuccessful(LocationResult locationResult) {
-				final Location location = locationResult.getLocations().get(0);
+				final Location location = getBestLocation(locationResult);
 				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
 					public void onGeocodingResult(List<Address> addressList) {
@@ -114,8 +115,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 				makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_round, true);
 			}
 		};
-
-		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, false);
+		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, true);
 	}
 
 
@@ -148,7 +148,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 
 					@Override
 					public void onCanceled() {
-
+						setResultViews(context, collapsedRemoteViews, expandedRemoteViews, finalWeatherDataSourceType, this, weatherDataTypeSet);
 					}
 				}, weatherDataSourceTypeSet);
 	}
@@ -156,12 +156,8 @@ public abstract class AbstractOngoingNotiViewCreator {
 	protected PendingIntent getRefreshPendingIntent() {
 		Intent refreshIntent = new Intent(context, OngoingNotificationReceiver.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-		Bundle bundle = new Bundle();
-		bundle.putString(NotificationType.class.getName(), notificationType.name());
 
-		refreshIntent.putExtras(bundle);
-
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 10551, refreshIntent,
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) System.currentTimeMillis(), refreshIntent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
 	}

@@ -1,5 +1,5 @@
 package com.lifedawn.bestweather.commons.interfaces;
 
-public interface BackgroundCallback {
+public interface Callback {
 	void onResult();
 }

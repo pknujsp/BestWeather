@@ -1,35 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <RelativeLayout
         android:id="@+id/root_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone" />
+            android:visibility="gone"
+            />
 
         <LinearLayout
             android:id="@+id/widget_settings_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            >
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:clickable="false"
-                android:focusable="false">
+                android:focusable="false"
+                >
 
                 <ImageView
                     android:id="@+id/wallpaper"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerCrop"
+                    />
 
                 <FrameLayout
                     android:id="@+id/preview_layout"
@@ -41,7 +48,18 @@
                     android:layout_marginBottom="8dp"
                     android:clickable="false"
                     android:focusable="false"
-                    android:minHeight="40dp" />
+                    android:minHeight="40dp"
+                    />
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/loadingAnimation"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_rawRes="@raw/bluedottedprogress"
+                    />
 
             </FrameLayout>
 
@@ -51,21 +69,25 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:overScrollMode="never"
-                android:scrollbars="none">
+                android:scrollbars="none"
+                >
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    tools:context=".widget.ConfigureWidgetActivity">
+                    tools:context=".widget.ConfigureWidgetActivity"
+                    >
 
                     <LinearLayout
                         style="@style/SettingsLayout"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        >
 
                         <TextView
                             style="@style/SettingsLabel"
-                            android:text="@string/text_size" />
+                            android:text="@string/text_size"
+                            />
 
                         <com.google.android.material.slider.Slider
                             android:id="@+id/text_size_slider"
@@ -75,64 +97,74 @@
                             android:stepSize="1"
                             android:value="0"
                             android:valueFrom="-5"
-                            android:valueTo="5" />
+                            android:valueTo="5"
+                            />
                     </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/backgroundAlphaLayout"
                         style="@style/SettingsLayout"
                         android:orientation="vertical"
-                        android:visibility="gone">
+                        android:visibility="gone"
+                        >
 
                         <TextView
                             style="@style/SettingsLabel"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/background_transparency" />
+                            android:text="@string/background_transparency"
+                            />
 
                         <SeekBar
                             android:id="@+id/background_transparency_slider"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:max="100" />
+                            android:max="100"
+                            />
 
                     </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/locationLayout"
                         style="@style/SettingsLayout"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        >
 
                         <TextView
                             style="@style/SettingsLabel"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/location" />
+                            android:text="@string/location"
+                            />
 
                         <RadioGroup
                             android:id="@+id/location_radio_group"
                             style="@style/WidgetConfigureConfig"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            >
 
                             <RadioButton
                                 android:id="@+id/current_location_radio"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:checked="false"
-                                android:text="@string/current_location" />
+                                android:text="@string/current_location"
+                                />
 
                             <RadioButton
                                 android:id="@+id/selected_location_radio"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/selected_location" />
+                                android:text="@string/selected_location"
+                                />
 
                             <LinearLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
-                                android:orientation="horizontal">
+                                android:orientation="horizontal"
+                                >
 
                                 <Button
                                     android:id="@+id/change_address_btn"
@@ -140,7 +172,8 @@
                                     android:layout_height="wrap_content"
                                     android:background="@drawable/rounded_btn_background"
                                     android:text="@string/change_address"
-                                    android:visibility="visible" />
+                                    android:visibility="visible"
+                                    />
 
                                 <TextView
                                     android:id="@+id/selectedAddressName"
@@ -149,7 +182,8 @@
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
                                     android:layout_marginLeft="16dp"
-                                    android:text="selectedAddressName" />
+                                    android:text="selectedAddressName"
+                                    />
 
                             </LinearLayout>
 
@@ -159,26 +193,30 @@
                     <LinearLayout
                         android:id="@+id/weatherDataSourceLayout"
                         style="@style/SettingsLayout"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        >
 
                         <TextView
                             style="@style/SettingsLabel"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/pref_title_weather_data_sources" />
+                            android:text="@string/pref_title_weather_data_sources"
+                            />
 
                         <RadioGroup
                             android:id="@+id/weather_data_source_radio_group"
                             style="@style/WidgetConfigureConfig"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            >
 
                             <RadioButton
                                 android:id="@+id/owm_radio"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:checked="true"
-                                android:text="@string/owm" />
+                                android:text="@string/owm"
+                                />
 
                         </RadioGroup>
 
@@ -188,23 +226,27 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:checked="true"
-                            android:text="@string/pref_title_kma_top_priority" />
+                            android:text="@string/pref_title_kma_top_priority"
+                            />
                     </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/refreshIntervalLayout"
-                        style="@style/SettingsLayout">
+                        style="@style/SettingsLayout"
+                        >
 
                         <TextView
                             style="@style/SettingsLabel"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/auto_refresh_interval" />
+                            android:text="@string/auto_refresh_interval"
+                            />
 
                         <Spinner
                             android:id="@+id/auto_refresh_interval_spinner"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            />
                     </LinearLayout>
 
                     <androidx.appcompat.widget.SwitchCompat
@@ -214,7 +256,8 @@
                         android:layout_height="wrap_content"
                         android:checked="true"
                         android:text="@string/display_datetime"
-                        android:visibility="gone" />
+                        android:visibility="gone"
+                        />
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/display_local_datetime_switch"
@@ -222,7 +265,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/display_local_datetime"
-                        android:visibility="gone" />
+                        android:visibility="gone"
+                        />
 
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
@@ -234,7 +278,8 @@
                 android:layout_alignParentBottom="true"
                 android:background="?attr/selectableItemBackground"
                 android:text="@string/create_widget"
-                android:textColor="@color/black" />
+                android:textColor="@color/black"
+                />
 
         </LinearLayout>
 

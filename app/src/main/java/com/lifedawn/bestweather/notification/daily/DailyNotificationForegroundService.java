@@ -21,7 +21,7 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
+import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
@@ -66,7 +66,7 @@ public class DailyNotificationForegroundService extends Service {
 
 	private void showNotification() {
 		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.DailyNotificationForegroundService);
+		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.ForegroundService);
 
 		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
 		builder.setSmallIcon(R.mipmap.ic_launcher_round).setContentText(getString(R.string.msg_refreshing_weather_data)).setContentTitle(getString(R.string.msg_refreshing_weather_data))
@@ -77,7 +77,7 @@ public class DailyNotificationForegroundService extends Service {
 		}
 
 		Notification notification = notificationObj.getNotificationBuilder().build();
-		startForeground(notificationObj.getNotificationId(), notification);
+		startForeground((int) System.currentTimeMillis(), notification);
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class DailyNotificationForegroundService extends Service {
 			}
 		};
 
-		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, false);
+		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, true);
 	}
 
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,
@@ -185,7 +185,7 @@ public class DailyNotificationForegroundService extends Service {
 					default:
 						viewCreator = new FifthDailyNotificationViewCreator(context);
 				}
-				viewCreator.setBackgroundCallback(new BackgroundCallback() {
+				viewCreator.setBackgroundCallback(new Callback() {
 					@Override
 					public void onResult() {
 						stopForeground(true);

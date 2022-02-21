@@ -163,8 +163,7 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 		}
 
 		((TextView) sixWidgetView.findViewById(R.id.precipitation)).setText(precipitation);
-		String simpleAirQuality = context.getString(R.string.air_quality) + ": " + airQualityDto.getAqi() + ", " +
-				AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+		String simpleAirQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
 		((TextView) sixWidgetView.findViewById(R.id.airQuality)).setText(simpleAirQuality);
 
 		GridLayout airQualityGridLayout = sixWidgetView.findViewById(R.id.airQualityGrid);
@@ -201,8 +200,7 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 					iconIds[i]);
 		}
 
-		RelativeLayout.LayoutParams headerViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
+		RelativeLayout.LayoutParams headerViewLayoutParams = getHeaderViewLayoutParams();
 		RelativeLayout.LayoutParams sixWidgetViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.MATCH_PARENT);
 

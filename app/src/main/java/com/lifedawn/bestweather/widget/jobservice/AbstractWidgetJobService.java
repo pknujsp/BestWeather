@@ -23,7 +23,7 @@ import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
-import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
+import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -44,7 +44,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 	protected static WidgetRepository widgetRepository;
 	protected static AppWidgetManager appWidgetManager;
 	protected static Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
-	protected static Map<Integer, BackgroundCallback> backgroundCallbackMap = new HashMap<>();
+	protected static Map<Integer, Callback> backgroundCallbackMap = new HashMap<>();
 	protected static Map<Integer, Class<?>> widgetClassMap = new HashMap<>();
 	protected static ExecutorService executorService = Executors.newFixedThreadPool(3);
 
@@ -381,15 +381,15 @@ public abstract class AbstractWidgetJobService extends JobService {
 		backgroundCallbackMap.get(jobId).onResult();
 	}
 
-	protected final BackgroundCallback addBackgroundCallback(JobParameters jobParameters) {
-		BackgroundCallback backgroundCallback = new BackgroundCallback() {
+	protected final Callback addBackgroundCallback(JobParameters jobParameters) {
+		Callback callback = new Callback() {
 			@Override
 			public void onResult() {
 				jobFinished(jobParameters, false);
 			}
 		};
 
-		backgroundCallbackMap.put(jobParameters.getJobId(), backgroundCallback);
-		return backgroundCallback;
+		backgroundCallbackMap.put(jobParameters.getJobId(), callback);
+		return callback;
 	}
 }

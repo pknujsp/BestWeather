@@ -5,8 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Message;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -16,7 +14,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.IntentUtil;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
-import com.lifedawn.bestweather.commons.interfaces.BackgroundCallback;
+import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
@@ -28,7 +26,7 @@ import java.util.Set;
 public abstract class AbstractDailyNotiViewCreator {
 	protected final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	protected Context context;
-	protected BackgroundCallback backgroundCallback;
+	protected Callback callback;
 
 	public AbstractDailyNotiViewCreator(Context context) {
 		this.context = context;
@@ -38,8 +36,8 @@ public abstract class AbstractDailyNotiViewCreator {
 
 	abstract public RemoteViews createRemoteViews(boolean needTempData);
 
-	public void setBackgroundCallback(BackgroundCallback backgroundCallback) {
-		this.backgroundCallback = backgroundCallback;
+	public void setBackgroundCallback(Callback callback) {
+		this.callback = callback;
 	}
 
 	public void makeNotification(RemoteViews remoteViews, int notificationDtoId) {
@@ -60,8 +58,8 @@ public abstract class AbstractDailyNotiViewCreator {
 		Notification notification = notificationObj.getNotificationBuilder().build();
 		notificationManager.notify(notificationObj.getNotificationId() + notificationDtoId, notification);
 
-		if (backgroundCallback != null) {
-			backgroundCallback.onResult();
+		if (callback != null) {
+			callback.onResult();
 		}
 	}
 
@@ -80,8 +78,8 @@ public abstract class AbstractDailyNotiViewCreator {
 		Notification notification = notificationObj.getNotificationBuilder().build();
 		notificationManager.notify(notificationObj.getNotificationId() + notificationDtoId, notification);
 
-		if (backgroundCallback != null) {
-			backgroundCallback.onResult();
+		if (callback != null) {
+			callback.onResult();
 		}
 	}
 
