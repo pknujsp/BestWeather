@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.notification.daily.fragment;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,8 @@ import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentDailyPushNotificationSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.notification.NotificationHelper;
+import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
@@ -176,6 +179,11 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				if (newNotificationSession) {
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+						NotificationHelper notificationHelper = new NotificationHelper(getContext());
+						NotificationHelper.NotificationObj notificationObj = notificationHelper.getNotificationObj(NotificationType.Daily);
+						notificationHelper.createNotificationChannel(notificationObj);
+					}
 					repository.add(newNotificationDto, new DbQueryCallback<DailyPushNotificationDto>() {
 						@Override
 						public void onResultSuccessful(DailyPushNotificationDto result) {

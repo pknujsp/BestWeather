@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
@@ -42,7 +43,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class FlickrLoader {
-	public static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
+	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
 	private static final Set<ImgRequestObj> IMG_REQUEST_OBJ_SET = new HashSet<>();
 
 	private FlickrLoader() {
@@ -68,7 +69,7 @@ public class FlickrLoader {
 				Calendar sunSetCalendar = sunRiseSunsetCalculator.getOfficialSunsetCalendarForDate(currentCalendar);
 
 				if (sunRiseCalendar == null || sunSetCalendar == null) {
-					glideImgCallback.onLoadedImg(null, null, false);
+					glideImgCallback.onLoadedImg(null, false);
 					return;
 				}
 
@@ -122,8 +123,8 @@ public class FlickrLoader {
 
 
 				//이미 다운로드 된 이미지가 있으면 다운로드 하지 않음
-				if (BACKGROUND_IMG_MAP.containsKey(galleryName)) {
-					glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName).getImg(), BACKGROUND_IMG_MAP.get(galleryName), true);
+				if (BACKGROUND_IMG_MAP.containsKey(galleryName) && BACKGROUND_IMG_MAP.get(galleryName).getImg() != null) {
+					glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), true);
 				} else {
 					FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
 					photosFromGalleryParameter.setGalleryId(FlickrUtil.getWeatherGalleryId(galleryName));
@@ -135,8 +136,8 @@ public class FlickrLoader {
 					IMG_REQUEST_OBJ_SET.add(imgRequestObj);
 					imgRequestObj.galleryCall = call;
 
-					String finalTime = time;
-					String finalWeather = weather;
+					final String finalTime = time;
+					final String finalWeather = weather;
 
 					call.enqueue(new Callback<JsonElement>() {
 						@Override
@@ -181,11 +182,11 @@ public class FlickrLoader {
 											flickrImgObj.setWeather(finalWeather);
 											BACKGROUND_IMG_MAP.put(galleryName, flickrImgObj);
 
-											CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {
+											final CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {
 												@Override
 												public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-													BACKGROUND_IMG_MAP.get(galleryName).setImg(resource);
-													glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName).getImg(), BACKGROUND_IMG_MAP.get(galleryName), true);
+													BACKGROUND_IMG_MAP.get(galleryName).setImg(resource.copy(Bitmap.Config.RGB_565, true));
+													glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), true);
 												}
 
 												@Override
@@ -195,31 +196,31 @@ public class FlickrLoader {
 												@Override
 												public void onLoadFailed(@Nullable Drawable errorDrawable) {
 													super.onLoadFailed(errorDrawable);
-													glideImgCallback.onLoadedImg(null, BACKGROUND_IMG_MAP.get(galleryName), false);
+													glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
 												}
 											};
 											imgRequestObj.glideTarget = target;
-											GlideApp.with(activity).asBitmap().load(backgroundImgUrl).into(target);
+											GlideApp.with(activity).asBitmap().load(backgroundImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(target);
 										}
 
 										@Override
 										public void onFailure(Call<JsonElement> call, Throwable t) {
-											glideImgCallback.onLoadedImg(null, BACKGROUND_IMG_MAP.get(galleryName), false);
+											glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
 										}
 									});
 
 
 								} else {
-									glideImgCallback.onLoadedImg(null, BACKGROUND_IMG_MAP.get(galleryName), false);
+									glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
 								}
 							} else {
-								glideImgCallback.onLoadedImg(null, BACKGROUND_IMG_MAP.get(galleryName), false);
+								glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
 							}
 						}
 
 						@Override
 						public void onFailure(Call<JsonElement> call, Throwable t) {
-							glideImgCallback.onLoadedImg(null, null, false);
+							glideImgCallback.onLoadedImg(null, false);
 						}
 					});
 				}
@@ -245,7 +246,7 @@ public class FlickrLoader {
 	}
 
 	public interface GlideImgCallback {
-		void onLoadedImg(Bitmap bitmap, FlickrImgObj flickrImgObj, boolean successful);
+		void onLoadedImg(FlickrImgObj flickrImgObj, boolean successful);
 	}
 
 	private static class ImgRequestObj {

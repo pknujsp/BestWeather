@@ -316,22 +316,6 @@ public class WidgetForegroundService extends Service {
 		return widgetCreator;
 	}
 
-	private void onResponseResult(@Nullable String addressName) {
-		if (addressName != null) {
-			RequestObj requestObj = weatherRequestMap.get(addressName);
-			Set<Integer> appWidgetIdSet = requestObj.appWidgetSet;
-
-			for (Integer appWidgetId : appWidgetIdSet) {
-				AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);
-				widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
-				widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId), weatherResponseMap.get(addressName));
-			}
-		}
-
-		if (++responseCount == requestCount) {
-			stopService();
-		}
-	}
 
 	private void stopService() {
 		stopForeground(true);
@@ -435,10 +419,10 @@ public class WidgetForegroundService extends Service {
 				continue;
 			}
 
-			final RequestObj requestObj = weatherRequestMap.get(addressName);
-			final Set<WeatherDataType> weatherDataTypeSet = requestObj.weatherDataTypeSet;
-			final Set<WeatherDataSourceType> weatherDataSourceTypeSet = requestObj.weatherDataSourceTypeSet;
-			final Address address = requestObj.address;
+			RequestObj requestObj = weatherRequestMap.get(addressName);
+			Set<WeatherDataType> weatherDataTypeSet = requestObj.weatherDataTypeSet;
+			Set<WeatherDataSourceType> weatherDataSourceTypeSet = requestObj.weatherDataSourceTypeSet;
+			Address address = requestObj.address;
 
 			MultipleRestApiDownloader multipleRestApiDownloader = new MultipleRestApiDownloader() {
 				@Override
@@ -457,6 +441,23 @@ public class WidgetForegroundService extends Service {
 					address.getLongitude(), weatherDataTypeSet, multipleRestApiDownloader, weatherDataSourceTypeSet);
 		}
 
+	}
+
+	private void onResponseResult(@Nullable String addressName) {
+		if (addressName != null) {
+			RequestObj requestObj = weatherRequestMap.get(addressName);
+			Set<Integer> appWidgetIdSet = requestObj.appWidgetSet;
+
+			for (Integer appWidgetId : appWidgetIdSet) {
+				AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);
+				widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
+				widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId), weatherResponseMap.get(addressName));
+			}
+		}
+
+		if (++responseCount == requestCount) {
+			stopService();
+		}
 	}
 
 	private static class RequestObj {

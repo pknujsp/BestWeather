@@ -23,28 +23,30 @@ public class NotificationHelper {
 		this.notificationManager = context.getSystemService(NotificationManager.class);
 	}
 
-	private void createNotificationChannel(NotificationObj notificationObj) {
+	public void createNotificationChannel(NotificationObj notificationObj) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-			NotificationChannel channel = new NotificationChannel(notificationObj.channelId, notificationObj.channelName,
-					NotificationManager.IMPORTANCE_DEFAULT);
-			channel.setDescription(notificationObj.channelDescription);
-			channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+			if (notificationManager.getNotificationChannel(notificationObj.channelId) == null) {
+				NotificationChannel channel = new NotificationChannel(notificationObj.channelId, notificationObj.channelName,
+						NotificationManager.IMPORTANCE_DEFAULT);
+				channel.setDescription(notificationObj.channelDescription);
+				channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
 
-			if (notificationObj.getNotificationType() == NotificationType.Ongoing ||
-					notificationObj.getNotificationType() == NotificationType.Location ||
-					notificationObj.getNotificationType() == NotificationType.ForegroundService) {
-				channel.enableVibration(false);
-				channel.setVibrationPattern(null);
-				channel.enableLights(false);
-				channel.setShowBadge(false);
+				if (notificationObj.getNotificationType() == NotificationType.Ongoing ||
+						notificationObj.getNotificationType() == NotificationType.Location ||
+						notificationObj.getNotificationType() == NotificationType.ForegroundService) {
+					channel.enableVibration(false);
+					channel.setVibrationPattern(null);
+					channel.enableLights(false);
+					channel.setShowBadge(false);
 
-				channel.setSound(null, null);
-				channel.setImportance(NotificationManager.IMPORTANCE_LOW);
-			} else if (notificationObj.getNotificationType() == NotificationType.Daily) {
-				channel.setImportance(NotificationManager.IMPORTANCE_HIGH);
+					channel.setSound(null, null);
+					channel.setImportance(NotificationManager.IMPORTANCE_LOW);
+				} else if (notificationObj.getNotificationType() == NotificationType.Daily) {
+					channel.setImportance(NotificationManager.IMPORTANCE_HIGH);
+				}
+
+				notificationManager.createNotificationChannel(channel);
 			}
-
-			notificationManager.createNotificationChannel(channel);
 		}
 	}
 
@@ -81,7 +83,7 @@ public class NotificationHelper {
 		}
 	}
 
-	private NotificationObj getNotificationObj(NotificationType notificationType) {
+	public NotificationObj getNotificationObj(NotificationType notificationType) {
 		if (notificationType == NotificationType.Ongoing) {
 			return new NotificationObj(context.getString(R.string.notificationAlwaysChannelName),
 					context.getString(R.string.notificationAlwaysChannelDescription), notificationType);

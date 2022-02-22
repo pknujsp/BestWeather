@@ -10,15 +10,15 @@
         <item name="android:shadowColor">@color/black</item>
         <item name="android:shadowDx">0</item>
         <item name="android:shadowDy">0</item>
-        <item name="android:shadowRadius">2.5</item>
-        <item name="android:textColor">#E8E7ED</item>
+        <item name="android:shadowRadius">2.6</item>
+        <item name="android:textColor">#FAFAFA</item>
     </style>
 
     <style name="img_shadow">
         <item name="android:shadowColor">@color/black</item>
         <item name="android:shadowDx">0</item>
         <item name="android:shadowDy">0</item>
-        <item name="android:shadowRadius">2.5</item>
+        <item name="android:shadowRadius">2.6</item>
     </style>
 
     <style name="text_shadow_black">

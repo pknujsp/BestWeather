@@ -106,14 +106,15 @@ public class MainActivity extends AppCompatActivity {
 		if (sharedPreferences.getBoolean(getString(R.string.pref_key_show_intro), true)) {
 			IntroTransactionFragment introTransactionFragment = new IntroTransactionFragment();
 			fragmentTransaction.replace(binding.fragmentContainer.getId(), introTransactionFragment,
-					IntroTransactionFragment.class.getName()).commit();
+					IntroTransactionFragment.class.getName()).commitAllowingStateLoss();
 		} else {
 			initOngoingNotifications();
 			initDailyNotifications();
 			initWidgets();
 
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-			fragmentTransaction.replace(binding.fragmentContainer.getId(), mainTransactionFragment, MainTransactionFragment.class.getName()).commitAllowingStateLoss();
+			fragmentTransaction.replace(binding.fragmentContainer.getId(), mainTransactionFragment,
+					MainTransactionFragment.class.getName()).commitNowAllowingStateLoss();
 		}
 	}
 

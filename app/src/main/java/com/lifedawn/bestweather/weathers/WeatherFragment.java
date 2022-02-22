@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.weathers;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
@@ -32,6 +31,7 @@ import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.github.matteobattilana.weather.PrecipType;
 import com.google.android.ads.nativetemplates.NativeTemplateStyle;
@@ -126,7 +126,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -199,9 +198,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		@Override
 		public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
 			super.onFragmentResumed(fm, f);
-			if (f instanceof SimpleCurrentConditionsFragment) {
-				binding.adViewBelowAirQuality.setVisibility(View.VISIBLE);
-				binding.adViewBottom.setVisibility(View.VISIBLE);
+			if (f instanceof SunsetriseFragment) {
 				binding.scrollView.setVisibility(View.VISIBLE);
 				if (loadingDialog != null) {
 					loadingDialog.dismiss();
@@ -260,17 +257,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		binding.scrollView.setVisibility(View.INVISIBLE);
-		binding.adViewBelowAirQuality.setVisibility(View.GONE);
-		binding.adViewBottom.setVisibility(View.GONE);
+		binding.scrollView.setVisibility(View.GONE);
 		binding.flickrImageUrl.setVisibility(View.GONE);
+		binding.loadingAnimation.setVisibility(View.GONE);
 
 		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.mainToolbar.getRoot().getLayoutParams();
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.mainToolbar.getRoot().setLayoutParams(layoutParams);
 
-		binding.loadingAnimation.setVisibility(View.GONE);
-		binding.flickrImageUrl.setVisibility(View.GONE);
 
 		weatherViewController = new WeatherViewController(binding.rootLayout);
 		weatherViewController.setWeatherView(PrecipType.CLEAR, null);
@@ -516,18 +510,17 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		FlickrLoader.loadImg(requireActivity(), weatherDataSourceType, val, latitude, longitude, zoneId, volume, new FlickrLoader.GlideImgCallback() {
 			@Override
-			public void onLoadedImg(Bitmap bitmap, FlickrImgObj flickrImgObj, boolean successful) {
+			public void onLoadedImg(FlickrImgObj flickrImgObj, boolean successful) {
 				Log.e("FLICKR", "fragment isAdded: " + (isAdded() ? 1 : 0));
 				if (getActivity() != null && isAdded()) {
 					requireActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
 							if (successful) {
-								GlideApp.with(WeatherFragment.this).load(bitmap).transition(
-										DrawableTransitionOptions.withCrossFade(400)).into(binding.currentConditionsImg);
+								GlideApp.with(getContext()).load(flickrImgObj.getImg()).diskCacheStrategy(DiskCacheStrategy.ALL).into(binding.currentConditionsImg);
 								setFlickrImgInfo(flickrImgObj);
 							} else {
-								GlideApp.with(WeatherFragment.this).clear(binding.currentConditionsImg);
+								GlideApp.with(getContext()).clear(binding.currentConditionsImg);
 								binding.loadingAnimation.setVisibility(View.GONE);
 								binding.flickrImageUrl.setVisibility(View.VISIBLE);
 								final String text = getString(R.string.error);
@@ -626,7 +619,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	private void requestAddressOfLocation(Double latitude, Double longitude, boolean refresh) {
-		binding.scrollView.setVisibility(View.INVISIBLE);
+		binding.scrollView.setVisibility(View.GONE);
 
 		Geocoding.geocoding(getContext(), latitude, longitude, new Geocoding.GeocodingCallback() {
 			@Override
@@ -706,7 +699,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	public void requestNewData() {
-		binding.scrollView.setVisibility(View.INVISIBLE);
+		binding.scrollView.setVisibility(View.GONE);
 		if (loadingDialog != null) {
 			loadingDialog.setMessage(getString(R.string.msg_refreshing_weather_data));
 		}
@@ -743,7 +736,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private void requestNewDataWithAnotherWeatherSource(WeatherDataSourceType newWeatherDataSourceType, WeatherDataSourceType lastWeatherDataSourceType) {
-		binding.scrollView.setVisibility(View.INVISIBLE);
+		binding.scrollView.setVisibility(View.GONE);
 		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		executorService.execute(new Runnable() {
@@ -986,7 +979,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private AlertDialog reRefreshBySameWeatherSource(ResponseResultObj responseResultObj) {
-		binding.scrollView.setVisibility(View.INVISIBLE);
+		binding.scrollView.setVisibility(View.GONE);
 		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		final WeatherDataSourceType requestWeatherSource = responseResultObj.mainWeatherDataSourceType;
@@ -1018,7 +1011,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private AlertDialog reRefreshByAnotherWeatherSource(ResponseResultObj responseResultObj) {
-		binding.scrollView.setVisibility(View.INVISIBLE);
+		binding.scrollView.setVisibility(View.GONE);
 		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		ArrayMap<WeatherDataSourceType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
@@ -1339,7 +1332,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							getString(R.string.tag_detail_current_conditions_fragment));
 					fragmentTransaction.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment));
 					fragmentTransaction.replace(binding.sunSetRise.getId(), sunSetRiseFragment, getString(R.string.tag_sun_set_rise_fragment));
-					fragmentTransaction.commitNowAllowingStateLoss();
+					fragmentTransaction.commitAllowingStateLoss();
 				}
 			});
 

@@ -259,8 +259,8 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		binding.sideNavMenu.currentLocationLayout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				addWeatherFragment(LocationType.CurrentLocation, null);
 				binding.drawerLayout.closeDrawer(binding.sideNavigation, false);
+				addWeatherFragment(LocationType.CurrentLocation, null);
 			}
 		});
 

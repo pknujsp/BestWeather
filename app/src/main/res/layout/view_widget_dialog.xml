@@ -23,13 +23,7 @@
             android:orientation="horizontal"
             >
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginRight="8dp"
-                android:scaleType="centerInside"
-                android:src="@mipmap/ic_launcher_round"
-                />
+
 
             <TextView
                 android:layout_width="wrap_content"

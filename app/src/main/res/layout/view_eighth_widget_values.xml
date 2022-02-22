@@ -3,17 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <include
         layout="@layout/header_view_in_widget"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp" />
+        android:layout_marginBottom="4dp"
+        />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
         <LinearLayout
             android:id="@+id/clockLayout"
@@ -24,7 +27,8 @@
             android:layout_marginLeft="12dp"
             android:layout_marginTop="4dp"
             android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            >
 
             <TextClock
                 android:id="@+id/dateClock"
@@ -36,7 +40,8 @@
                 android:includeFontPadding="false"
                 android:text="@string/temp_date"
                 android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/dateClockTextSizeInEighthWidget" />
+                android:textSize="@dimen/dateClockTextSizeInEighthWidget"
+                />
 
             <TextClock
                 android:id="@+id/timeClock"
@@ -48,19 +53,22 @@
                 android:includeFontPadding="false"
                 android:text="@string/temp_time"
                 android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/timeClockTextSizeInEighthWidget" />
+                android:textSize="@dimen/timeClockTextSizeInEighthWidget"
+                />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/extraInfoLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@id/clockLayout"
-            android:layout_alignBottom="@id/clockLayout"
-            android:layout_toLeftOf="@id/weatherIcon"
-            android:layout_toRightOf="@id/clockLayout"
+            android:layout_below="@id/weatherIcon"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="12dp"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            >
 
             <TextView
                 android:id="@+id/precipitation"
@@ -70,7 +78,8 @@
                 android:includeFontPadding="false"
                 android:text="@string/temp_noPrecipitation"
                 android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/precipitationTextSizeInEighthWidget" />
+                android:textSize="@dimen/precipitationTextSizeInEighthWidget"
+                />
 
             <TextView
                 android:id="@+id/airQuality"
@@ -79,49 +88,54 @@
                 android:includeFontPadding="false"
                 android:text="@string/temp_airQuality"
                 android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/airQualityTextSizeInEighthWidget" />
+                android:textSize="@dimen/airQualityTextSizeInEighthWidget"
+                />
         </LinearLayout>
 
 
         <ImageView
             android:id="@+id/weatherIcon"
-            android:layout_width="66dp"
-            android:layout_height="66dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentRight="true"
+            android:layout_marginLeft="4dp"
             android:layout_marginTop="16dp"
             android:layout_marginRight="24dp"
             android:layout_marginBottom="12dp"
             android:scaleType="centerInside"
-            android:src="@drawable/day_clear" />
+            android:src="@drawable/day_clear"
+            />
 
 
         <LinearLayout
             android:id="@+id/currentConditionsLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/weatherIcon"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="12dp"
+            android:layout_alignTop="@id/clockLayout"
+            android:layout_alignBottom="@id/clockLayout"
+            android:layout_toLeftOf="@id/weatherIcon"
+
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            >
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                >
 
                 <TextView
                     android:id="@+id/temperature"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
                     android:includeFontPadding="false"
                     android:text="@string/temp_temperature"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/tempTextSizeInEighthWidget" />
+                    android:textSize="@dimen/tempTextSizeInEighthWidget"
+                    />
 
                 <TextView
                     android:id="@+id/feelsLikeTemp"
@@ -130,7 +144,8 @@
                     android:includeFontPadding="false"
                     android:text="@string/temp_feelsLikeTemperature"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/feelsLikeTempTextSizeInEighthWidget" />
+                    android:textSize="@dimen/feelsLikeTempTextSizeInEighthWidget"
+                    />
             </LinearLayout>
 
 
@@ -144,9 +159,10 @@
             android:layout_below="@id/clockLayout"
             android:layout_alignParentLeft="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="36dp"
-            android:layout_toLeftOf="@id/currentConditionsLayout"
-            android:orientation="horizontal" />
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="48dp"
+            android:layout_toLeftOf="@id/extraInfoLayout"
+            android:orientation="horizontal"
+            />
     </RelativeLayout>
 </LinearLayout>

@@ -189,7 +189,7 @@
     <dimen name="airQualityTextSizeInSeventhWidget">16sp</dimen>
     <dimen name="dateClockTextSizeInEighthWidget">18sp</dimen>
     <dimen name="timeClockTextSizeInEighthWidget">44sp</dimen>
-    <dimen name="tempTextSizeInEighthWidget">42sp</dimen>
+    <dimen name="tempTextSizeInEighthWidget">38sp</dimen>
     <dimen name="precipitationTextSizeInEighthWidget">13sp</dimen>
     <dimen name="airQualityTextSizeInEighthWidget">13sp</dimen>
     <dimen name="labelTextSizeInAirQualityItem">13sp</dimen>
@@ -205,7 +205,7 @@
     <dimen name="weatherSourceNameTextSizeInWidget">11sp</dimen>
     <dimen name="weatherSourceNameTextSizeInSourceView">12sp</dimen>
     <dimen name="windDirectionTextSizeInEighthWidget">13sp</dimen>
-    <dimen name="feelsLikeTempTextSizeInEighthWidget">20sp</dimen>
+    <dimen name="feelsLikeTempTextSizeInEighthWidget">18sp</dimen>
     <dimen name="windSpeedTextSizeInEighthWidget">13sp</dimen>
     <dimen name="notificationPadding">8dp</dimen>
     <dimen name="dialogPadding">24dp</dimen>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BestWeather</string>
+    <string name="app_name">Weather날씨</string>
 
     <!-- 날씨 제공사 -->
     <string name="kma">KoreaMA</string>
@@ -492,7 +492,7 @@
     <string name="containsKma">Including Korea MA</string>
     <string name="networkProblem">network problem</string>
     <string name="failedFindingLocation">Failed to determine current location</string>
-    <string name="notificationLocationChannelName">location search</string>
+    <string name="notificationLocationChannelName">Location search</string>
     <string name="notificationLocationChannelDescription">Search current location</string>
     <string name="findingCurrentLocationTitle">Search current location</string>
     <string name="uncheckedAllowAllTheTime">Please select \'Allow all the time\' for Location Permissions</string>

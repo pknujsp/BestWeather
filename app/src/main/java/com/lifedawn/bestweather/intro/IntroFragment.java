@@ -142,7 +142,7 @@ public class IntroFragment extends Fragment {
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 			getParentFragment().getParentFragmentManager().beginTransaction()
 					.replace(R.id.fragment_container, mainTransactionFragment,
-							mainTransactionFragment.getTag()).commitNowAllowingStateLoss();
+							mainTransactionFragment.getTag()).commitAllowingStateLoss();
 		}
 
 		@Override
