@@ -6,7 +6,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +33,7 @@ public class WidgetDto {
 	private LocationType locationType;
 
 	@ColumnInfo(name = "weatherSourceTypes")
-	private Set<WeatherDataSourceType> weatherDataSourceTypeSet;
+	private Set<WeatherProviderType> weatherProviderTypeSet;
 
 	@ColumnInfo(name = "topPriorityKma")
 	private boolean topPriorityKma;
@@ -250,46 +250,32 @@ public class WidgetDto {
 		this.loadSuccessful = loadSuccessful;
 	}
 
-	public void addWeatherSourceType(WeatherDataSourceType newType) {
-		if (weatherDataSourceTypeSet == null) {
-			weatherDataSourceTypeSet = new HashSet<>();
+	public void addWeatherProviderType(WeatherProviderType newType) {
+		if (weatherProviderTypeSet == null) {
+			weatherProviderTypeSet = new HashSet<>();
 		}
-		weatherDataSourceTypeSet.add(newType);
+		weatherProviderTypeSet.add(newType);
 	}
 
-	public void removeWeatherSourceType(WeatherDataSourceType removeType) {
-		weatherDataSourceTypeSet.remove(removeType);
+	public void removeWeatherSourceType(WeatherProviderType removeType) {
+		weatherProviderTypeSet.remove(removeType);
 	}
 
-	public void setWeatherSourceTypeSet(Set<WeatherDataSourceType> weatherDataSourceTypeSet) {
-		this.weatherDataSourceTypeSet = weatherDataSourceTypeSet;
-	}
 
-	public Set<WeatherDataSourceType> getWeatherSourceTypeSet() {
+	public Set<WeatherProviderType> getWeatherProviderTypeSet() {
 		if (countryCode != null) {
 			if (isTopPriorityKma() && getCountryCode().equals("KR")) {
 				if (!isMultipleWeatherDataSource()) {
-					weatherDataSourceTypeSet.remove(WeatherDataSourceType.OWM_ONECALL);
+					weatherProviderTypeSet.remove(WeatherProviderType.OWM_ONECALL);
 				}
-				weatherDataSourceTypeSet.add(WeatherDataSourceType.KMA_WEB);
+				weatherProviderTypeSet.add(WeatherProviderType.KMA_WEB);
 			}
 		}
-		return weatherDataSourceTypeSet;
+		return weatherProviderTypeSet;
 	}
 
-	public Set<WeatherDataSourceType> getWeatherDataSourceTypeSet() {
-		if (countryCode != null) {
-			if (isTopPriorityKma() && getCountryCode().equals("KR")) {
-				if (!isMultipleWeatherDataSource()) {
-					weatherDataSourceTypeSet.remove(WeatherDataSourceType.OWM_ONECALL);
-				}
-				weatherDataSourceTypeSet.add(WeatherDataSourceType.KMA_WEB);
-			}
-		}
-		return weatherDataSourceTypeSet;
-	}
 
-	public void setWeatherDataSourceTypeSet(Set<WeatherDataSourceType> weatherDataSourceTypeSet) {
-		this.weatherDataSourceTypeSet = weatherDataSourceTypeSet;
+	public void setWeatherProviderTypeSet(Set<WeatherProviderType> weatherProviderTypeSet) {
+		this.weatherProviderTypeSet = weatherProviderTypeSet;
 	}
 }

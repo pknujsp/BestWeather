@@ -5,7 +5,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 
 import java.io.Serializable;
@@ -25,7 +25,7 @@ public class DailyPushNotificationDto implements Serializable {
 	private DailyPushNotificationType notificationType;
 
 	@ColumnInfo(name = "weatherSourceTypeSet")
-	private Set<WeatherDataSourceType> weatherDataSourceTypeSet;
+	private Set<WeatherProviderType> weatherProviderTypeSet;
 
 	@ColumnInfo(name = "topPriorityKma")
 	private boolean topPriorityKma;
@@ -72,8 +72,8 @@ public class DailyPushNotificationDto implements Serializable {
 		this.locationType = locationType;
 	}
 
-	public void setWeatherSourceTypeSet(Set<WeatherDataSourceType> weatherDataSourceTypeSet) {
-		this.weatherDataSourceTypeSet = weatherDataSourceTypeSet;
+	public void setWeatherSourceTypeSet(Set<WeatherProviderType> weatherProviderTypeSet) {
+		this.weatherProviderTypeSet = weatherProviderTypeSet;
 	}
 
 
@@ -133,22 +133,22 @@ public class DailyPushNotificationDto implements Serializable {
 		this.notificationType = notificationType;
 	}
 
-	public void addWeatherSourceType(WeatherDataSourceType newType) {
-		if (weatherDataSourceTypeSet == null) {
-			weatherDataSourceTypeSet = new HashSet<>();
+	public void addWeatherSourceType(WeatherProviderType newType) {
+		if (weatherProviderTypeSet == null) {
+			weatherProviderTypeSet = new HashSet<>();
 		}
-		weatherDataSourceTypeSet.add(newType);
+		weatherProviderTypeSet.add(newType);
 	}
 
-	public void removeWeatherSourceType(WeatherDataSourceType removeType) {
-		weatherDataSourceTypeSet.remove(removeType);
+	public void removeWeatherSourceType(WeatherProviderType removeType) {
+		weatherProviderTypeSet.remove(removeType);
+	}
+	
+	public Set<WeatherProviderType> getWeatherProviderTypeSet() {
+		return weatherProviderTypeSet;
 	}
 
-	public void setWeatherDataSourceTypeSet(Set<WeatherDataSourceType> weatherDataSourceTypeSet) {
-		this.weatherDataSourceTypeSet = weatherDataSourceTypeSet;
-	}
-
-	public Set<WeatherDataSourceType> getWeatherDataSourceTypeSet() {
-		return weatherDataSourceTypeSet;
+	public void setWeatherProviderTypeSet(Set<WeatherProviderType> weatherProviderTypeSet) {
+		this.weatherProviderTypeSet = weatherProviderTypeSet;
 	}
 }

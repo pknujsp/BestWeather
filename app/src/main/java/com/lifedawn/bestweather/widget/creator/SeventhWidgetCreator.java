@@ -18,7 +18,7 @@ import androidx.gridlayout.widget.GridLayout;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
@@ -58,8 +58,8 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 	@Override
 	public WidgetDto loadDefaultSettings() {
 		widgetDto = super.loadDefaultSettings();
-		widgetDto.getWeatherSourceTypeSet().clear();
-		widgetDto.getWeatherSourceTypeSet().add(WeatherDataSourceType.AQICN);
+		widgetDto.getWeatherProviderTypeSet().clear();
+		widgetDto.getWeatherProviderTypeSet().add(WeatherProviderType.AQICN);
 		return widgetDto;
 	}
 
@@ -323,7 +323,7 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 
 						}
 					});
-			makeResponseTextToJson(multipleRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherDataSourceTypeSet(), widgetDto, zoneOffset);
+			makeResponseTextToJson(multipleRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherProviderTypeSet(), widgetDto, zoneOffset);
 		}
 
 		widgetDto.setLoadSuccessful(successful);

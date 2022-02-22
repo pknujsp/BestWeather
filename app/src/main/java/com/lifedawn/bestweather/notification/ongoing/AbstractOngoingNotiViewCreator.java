@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
-import android.os.Bundle;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -16,10 +15,9 @@ import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
@@ -124,33 +122,33 @@ public abstract class AbstractOngoingNotiViewCreator {
 		makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_round, false);
 
 		final Set<WeatherDataType> weatherDataTypeSet = getRequestWeatherDataTypeSet();
-		WeatherDataSourceType weatherDataSourceType = notificationDataObj.getWeatherSourceType();
+		WeatherProviderType weatherProviderType = notificationDataObj.getWeatherSourceType();
 
 		if (notificationDataObj.isTopPriorityKma() && notificationDataObj.getCountryCode().equals("KR")) {
-			weatherDataSourceType = WeatherDataSourceType.KMA_WEB;
+			weatherProviderType = WeatherProviderType.KMA_WEB;
 		}
 
-		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
-		weatherDataSourceTypeSet.add(weatherDataSourceType);
+		final Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
+		weatherProviderTypeSet.add(weatherProviderType);
 		if (weatherDataTypeSet.contains(WeatherDataType.airQuality)) {
-			weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
+			weatherProviderTypeSet.add(WeatherProviderType.AQICN);
 		}
 
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
-		WeatherDataSourceType finalWeatherDataSourceType = weatherDataSourceType;
+		WeatherProviderType finalWeatherProviderType = weatherProviderType;
 		WeatherRequestUtil.loadWeatherData(context, executorService,
 				notificationDataObj.getLatitude(), notificationDataObj.getLongitude(), weatherDataTypeSet,
 				new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {
-						setResultViews(context, collapsedRemoteViews, expandedRemoteViews, finalWeatherDataSourceType, this, weatherDataTypeSet);
+						setResultViews(context, collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this, weatherDataTypeSet);
 					}
 
 					@Override
 					public void onCanceled() {
-						setResultViews(context, collapsedRemoteViews, expandedRemoteViews, finalWeatherDataSourceType, this, weatherDataTypeSet);
+						setResultViews(context, collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this, weatherDataTypeSet);
 					}
-				}, weatherDataSourceTypeSet);
+				}, weatherProviderTypeSet);
 	}
 
 	protected PendingIntent getRefreshPendingIntent() {
@@ -165,7 +163,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 	abstract protected Set<WeatherDataType> getRequestWeatherDataTypeSet();
 
 	abstract protected void setResultViews(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews,
-	                                       WeatherDataSourceType requestWeatherDataSourceType, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
+	                                       WeatherProviderType requestWeatherProviderType, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                                       Set<WeatherDataType> weatherDataTypeSet);
 
 	abstract protected void makeNotification(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, int icon, boolean isFinished);

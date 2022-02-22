@@ -21,7 +21,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleForecastBinding;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
@@ -45,7 +45,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	protected Double longitude;
 	protected String addressName;
 	protected String countryCode;
-	protected WeatherDataSourceType mainWeatherDataSourceType;
+	protected WeatherProviderType mainWeatherProviderType;
 	protected ZoneId zoneId;
 	protected boolean needCompare;
 	protected Map<WeatherValueType, Integer> textSizeMap = new HashMap<>();
@@ -88,7 +88,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
-		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(BundleKey.WeatherDataSource.name());
+		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(BundleKey.WeatherDataSource.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
 		networkStatus = NetworkStatus.getInstance(getContext());
@@ -146,14 +146,14 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 		}
 	}
 
-	protected void createValueUnitsDescription(WeatherDataSourceType weatherDataSourceType, boolean haveRain, boolean haveSnow) {
+	protected void createValueUnitsDescription(WeatherProviderType weatherProviderType, boolean haveRain, boolean haveSnow) {
 		binding.extraView.removeAllViews();
 
 		if (haveRain || haveSnow) {
 			String rainUnit = "mm";
 			String snowUnit = null;
 
-			if (weatherDataSourceType == WeatherDataSourceType.OWM_ONECALL) {
+			if (weatherProviderType == WeatherProviderType.OWM_ONECALL) {
 				snowUnit = "mm";
 			} else {
 				snowUnit = "cm";

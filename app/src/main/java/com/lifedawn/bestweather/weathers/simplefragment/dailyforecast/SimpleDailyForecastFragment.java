@@ -78,7 +78,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				bundle.putSerializable(WeatherDataType.dailyForecast.name(), (Serializable) dailyForecastDtoList);
 				bundle.putString(BundleKey.AddressName.name(), addressName);
 				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
-				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
+				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherProviderType);
 
 				DetailDailyForecastFragment detailDailyForecastFragment = new DetailDailyForecastFragment();
 				detailDailyForecastFragment.setArguments(bundle);
@@ -256,7 +256,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
-		createValueUnitsDescription(mainWeatherDataSourceType, haveRain, haveSnow);
+		createValueUnitsDescription(mainWeatherProviderType, haveRain, haveSnow);
 
 	}
 

@@ -3,7 +3,7 @@ package com.lifedawn.bestweather.weathers.dataprocessing.request;
 import android.util.Log;
 
 import com.google.gson.JsonElement;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.aqicn.AqicnParameter;
@@ -47,13 +47,13 @@ public class AqicnProcessing {
 		Call<JsonElement> localizedFeedCall = getLocalizedFeed(aqicnParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-				multipleRestApiDownloader.processResult(WeatherDataSourceType.AQICN, aqicnParameter,
+				multipleRestApiDownloader.processResult(WeatherProviderType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, response, responseObj, responseText);
 			}
 
 			@Override
 			public void onResponseResult(Throwable t) {
-				multipleRestApiDownloader.processResult(WeatherDataSourceType.AQICN, aqicnParameter,
+				multipleRestApiDownloader.processResult(WeatherProviderType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, t);
 			}
 

@@ -19,7 +19,7 @@ import androidx.preference.PreferenceManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailCurrentConditionsBinding;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
@@ -38,7 +38,7 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	protected Double latitude;
 	protected Double longitude;
 	protected ZoneId zoneId;
-	protected WeatherDataSourceType mainWeatherDataSourceType;
+	protected WeatherProviderType mainWeatherProviderType;
 	protected Bundle bundle;
 
 	@Override
@@ -51,7 +51,7 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
-		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
+		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(
 				BundleKey.WeatherDataSource.name());
 
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));

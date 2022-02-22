@@ -18,7 +18,7 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.FragmentSunsetriseBinding;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.sunsetrise.DetailSunRiseSetFragment;
@@ -37,7 +37,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	private Double longitude;
 	private String addressName;
 	private String countryCode;
-	private WeatherDataSourceType mainWeatherDataSourceType;
+	private WeatherProviderType mainWeatherProviderType;
 	private ZoneId zoneId;
 	private Bundle bundle;
 	private boolean registeredReceiver = false;
@@ -51,7 +51,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
-		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
+		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(
 				BundleKey.WeatherDataSource.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 

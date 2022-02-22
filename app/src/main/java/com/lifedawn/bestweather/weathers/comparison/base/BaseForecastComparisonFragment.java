@@ -20,14 +20,12 @@ import android.widget.TextView;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.MobileAds;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.NotScrolledView;
 
@@ -50,7 +48,7 @@ public class BaseForecastComparisonFragment extends Fragment {
 	protected Double longitude;
 	protected String addressName;
 	protected String countryCode;
-	protected WeatherDataSourceType mainWeatherDataSourceType;
+	protected WeatherProviderType mainWeatherProviderType;
 	protected ZoneId zoneId;
 
 	protected NotScrolledView[] notScrolledViews;
@@ -72,7 +70,7 @@ public class BaseForecastComparisonFragment extends Fragment {
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
-		mainWeatherDataSourceType = (WeatherDataSourceType) bundle.getSerializable(
+		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(
 				BundleKey.WeatherDataSource.name());
 	}
 
@@ -139,7 +137,7 @@ public class BaseForecastComparisonFragment extends Fragment {
 				String snowUnit = null;
 				String weatherSourceTypeName = null;
 
-				switch (weatherSourceTypeObj.weatherDataSourceType) {
+				switch (weatherSourceTypeObj.weatherProviderType) {
 					case ACCU_WEATHER:
 						weatherSourceTypeName = getString(R.string.accu_weather);
 						snowUnit = "cm";
@@ -191,12 +189,12 @@ public class BaseForecastComparisonFragment extends Fragment {
 	}
 
 	protected static class WeatherSourceUnitObj {
-		final WeatherDataSourceType weatherDataSourceType;
+		final WeatherProviderType weatherProviderType;
 		final boolean haveRain;
 		final boolean haveSnow;
 
-		public WeatherSourceUnitObj(WeatherDataSourceType weatherDataSourceType, boolean haveRain, boolean haveSnow) {
-			this.weatherDataSourceType = weatherDataSourceType;
+		public WeatherSourceUnitObj(WeatherProviderType weatherProviderType, boolean haveRain, boolean haveSnow) {
+			this.weatherProviderType = weatherProviderType;
 			this.haveRain = haveRain;
 			this.haveSnow = haveSnow;
 		}

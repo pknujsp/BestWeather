@@ -1,7 +1,7 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.request;
 
 import com.google.gson.JsonElement;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.metnorway.LocationForecastParameter;
@@ -41,13 +41,13 @@ public class MetNorwayProcessing {
 		Call<JsonElement> locationForecastCall = getLocationForecast(locationForecastParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-				multipleRestApiDownloader.processResult(WeatherDataSourceType.MET_NORWAY, locationForecastParameter,
+				multipleRestApiDownloader.processResult(WeatherProviderType.MET_NORWAY, locationForecastParameter,
 						RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST, response, null, response.body().toString());
 			}
 
 			@Override
 			public void onResponseResult(Throwable t) {
-				multipleRestApiDownloader.processResult(WeatherDataSourceType.MET_NORWAY, locationForecastParameter,
+				multipleRestApiDownloader.processResult(WeatherProviderType.MET_NORWAY, locationForecastParameter,
 						RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST, t);
 			}
 

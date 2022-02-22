@@ -5,26 +5,30 @@
     android:layout_width="match_parent"
     android:layout_height="200dp"
     android:padding="8dp"
-    tools:layout_height="200dp">
+    tools:layout_height="200dp"
+    >
 
     <LinearLayout
         android:id="@+id/valuesLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            >
 
             <ImageView
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/location" />
+                android:src="@drawable/location"
+                />
 
             <TextView
                 android:id="@+id/address"
@@ -36,7 +40,8 @@
                 android:minLines="1"
                 android:text="@string/temp_address"
                 android:textColor="@color/textColorInNotification"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                />
 
             <LinearLayout
                 android:id="@+id/refreshLayout"
@@ -44,7 +49,8 @@
                 android:layout_height="wrap_content"
                 android:clickable="true"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                >
 
                 <TextView
                     android:id="@+id/refresh"
@@ -54,13 +60,15 @@
                     android:gravity="center_vertical"
                     android:text="@string/updated_time"
                     android:textColor="@color/textColorInNotification"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    />
 
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:scaleType="centerInside"
-                    android:src="@drawable/refresh" />
+                    android:src="@drawable/refresh"
+                    />
 
             </LinearLayout>
         </LinearLayout>
@@ -69,7 +77,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            >
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -77,7 +86,8 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                >
 
 
                 <ImageView
@@ -86,12 +96,14 @@
                     android:layout_height="42dp"
                     android:layout_marginRight="6dp"
                     android:scaleType="centerInside"
-                    android:src="@drawable/day_clear" />
+                    android:src="@drawable/day_clear"
+                    />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical">
+                    android:layout_gravity="center_vertical"
+                    >
 
                     <TextView
                         android:id="@+id/temperature"
@@ -101,7 +113,8 @@
                         android:includeFontPadding="false"
                         android:text="@string/temp_temperature"
                         android:textColor="@color/widgetTextColor"
-                        android:textSize="26sp" />
+                        android:textSize="26sp"
+                        />
 
                     <TextView
                         android:id="@+id/feelsLikeTemp"
@@ -113,7 +126,8 @@
                         android:includeFontPadding="false"
                         android:text="@string/temp_feelsLikeTemperature"
                         android:textColor="@color/widgetTextColor"
-                        android:textSize="17sp" />
+                        android:textSize="17sp"
+                        />
 
 
                     <TextView
@@ -124,7 +138,8 @@
                         android:includeFontPadding="false"
                         android:text="@string/temp_yesterdayTemperature"
                         android:textColor="@color/widgetTextColor"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        />
                 </RelativeLayout>
             </LinearLayout>
 
@@ -134,7 +149,8 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                >
 
                 <TextView
                     android:id="@+id/airQuality"
@@ -142,7 +158,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/temp_airQuality"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/airQualityTextSizeInFullWidget" />
+                    android:textSize="@dimen/airQualityTextSizeInFullWidget"
+                    />
 
                 <TextView
                     android:id="@+id/precipitation"
@@ -150,26 +167,23 @@
                     android:layout_height="wrap_content"
                     android:text="@string/temp_noPrecipitation"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/precipitationTextSizeInFullWidget" />
+                    android:textSize="@dimen/precipitationTextSizeInFullWidget"
+                    />
 
             </LinearLayout>
 
         </RelativeLayout>
 
         <LinearLayout
+            android:id="@+id/hourlyForecast"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            />
 
-            <LinearLayout
-                android:id="@+id/hourlyForecast"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:orientation="horizontal" />
-
-        </LinearLayout>
     </LinearLayout>
 
     <ProgressBar
@@ -180,12 +194,14 @@
         android:layout_gravity="center"
         android:indeterminate="true"
         android:indeterminateTint="@color/iconGray"
-        android:visibility="gone" />
+        android:visibility="gone"
+        />
 
     <include
         layout="@layout/layout_warning_for_remoteviews"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:visibility="gone" />
+        android:visibility="gone"
+        />
 </RelativeLayout>

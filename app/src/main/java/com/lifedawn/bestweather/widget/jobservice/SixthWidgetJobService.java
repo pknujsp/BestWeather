@@ -10,7 +10,7 @@ import android.widget.RemoteViews;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -50,7 +50,7 @@ public class SixthWidgetJobService extends AbstractWidgetJobService {
 	}
 
 	@Override
-	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet, int jobId) {
+	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews, WidgetDto widgetDto, Set<WeatherProviderType> requestWeatherProviderTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet, int jobId) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
 		SixthWidgetCreator widgetCreator = (SixthWidgetCreator) widgetCreatorMap.get(jobId);
@@ -58,7 +58,7 @@ public class SixthWidgetJobService extends AbstractWidgetJobService {
 		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
-				WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherDataSourceTypeSet));
+				WeatherResponseProcessor.getMainWeatherSourceType(requestWeatherProviderTypeSet));
 		final AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader, null);
 		final boolean successful = currentConditionsDto != null && airQualityDto.isSuccessful();
 
@@ -72,13 +72,13 @@ public class SixthWidgetJobService extends AbstractWidgetJobService {
 						public void onCreatedBitmap(Bitmap bitmap) {
 						}
 					});
-			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, weatherDataTypeSet, requestWeatherDataSourceTypeSet, widgetDto, zoneOffset);
+			widgetCreator.makeResponseTextToJson(multipleRestApiDownloader, weatherDataTypeSet, requestWeatherProviderTypeSet, widgetDto, zoneOffset);
 		}
 
 		widgetDto.setLoadSuccessful(successful);
 
 
-		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherDataSourceTypeSet, multipleRestApiDownloader, weatherDataTypeSet, jobId);
+		super.setResultViews(context, appWidgetId, remoteViews, widgetDto, requestWeatherProviderTypeSet, multipleRestApiDownloader, weatherDataTypeSet, jobId);
 	}
 
 	@Override

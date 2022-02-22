@@ -19,7 +19,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.databinding.FragmentWeatherForAlarmBinding;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
@@ -111,16 +111,16 @@ public class WeatherForAlarmFragment extends Fragment {
 
 
 	private void setWeatherFragments(MultipleRestApiDownloader multipleRestApiDownloader) {
-		final WeatherDataSourceType requestWeatherDataSourceType = WeatherRequestUtil.getMainWeatherSourceType(getContext(),
+		final WeatherProviderType requestWeatherProviderType = WeatherRequestUtil.getMainWeatherSourceType(getContext(),
 				alarmDto.getLocationCountryCode());
-		Map<WeatherDataSourceType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
+		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap = responseMap.get(
-				requestWeatherDataSourceType);
+				requestWeatherProviderType);
 
 		boolean successful = false;
 
-		switch (requestWeatherDataSourceType) {
+		switch (requestWeatherProviderType) {
 			case KMA_WEB:
 				MultipleRestApiDownloader.ResponseResult ultraSrtNcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
 				MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
@@ -151,8 +151,8 @@ public class WeatherForAlarmFragment extends Fragment {
 		}
 
 		if (successful) {
-			setCurrentConditions(multipleRestApiDownloader, requestWeatherDataSourceType);
-			setHourlyForecast(multipleRestApiDownloader, requestWeatherDataSourceType);
+			setCurrentConditions(multipleRestApiDownloader, requestWeatherProviderType);
+			setHourlyForecast(multipleRestApiDownloader, requestWeatherProviderType);
 		} else {
 			if (getActivity() != null) {
 				getActivity().runOnUiThread(new Runnable() {
@@ -168,10 +168,10 @@ public class WeatherForAlarmFragment extends Fragment {
 
 
 	private void setCurrentConditions(MultipleRestApiDownloader multipleRestApiDownloader,
-	                                  WeatherDataSourceType weatherDataSourceType) {
+	                                  WeatherProviderType weatherProviderType) {
 		ZoneId zoneId = null;
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap = multipleRestApiDownloader.getResponseMap().get(
-				weatherDataSourceType);
+				weatherProviderType);
 
 		int weatherIcon = 0;
 		String temp = null;
@@ -181,7 +181,7 @@ public class WeatherForAlarmFragment extends Fragment {
 		final Double latitude = Double.parseDouble(alarmDto.getLocationLatitude());
 		final Double longitude = Double.parseDouble(alarmDto.getLocationLongitude());
 
-		MultipleRestApiDownloader.ResponseResult aqicnResponse = multipleRestApiDownloader.getResponseMap().get(WeatherDataSourceType.AQICN).get(
+		MultipleRestApiDownloader.ResponseResult aqicnResponse = multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.AQICN).get(
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 
 		if (aqicnResponse.isSuccessful()) {
@@ -227,7 +227,7 @@ public class WeatherForAlarmFragment extends Fragment {
 			}
 		}
 
-		switch (weatherDataSourceType) {
+		switch (weatherProviderType) {
 			case KMA_WEB:
 				MultipleRestApiDownloader.ResponseResult ultraSrtNcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
 				MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
@@ -329,13 +329,13 @@ public class WeatherForAlarmFragment extends Fragment {
 	}
 
 	private void setHourlyForecast(MultipleRestApiDownloader multipleRestApiDownloader,
-	                               WeatherDataSourceType weatherDataSourceType) {
+	                               WeatherProviderType weatherProviderType) {
 		ZoneId zoneId = null;
 		final Double latitude = Double.parseDouble(alarmDto.getLocationLatitude());
 		final Double longitude = Double.parseDouble(alarmDto.getLocationLongitude());
 
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap = multipleRestApiDownloader.getResponseMap().get(
-				weatherDataSourceType);
+				weatherProviderType);
 
 		BaseSimpleForecastFragment hourlyForecastFragment = null;
 
@@ -345,7 +345,7 @@ public class WeatherForAlarmFragment extends Fragment {
 		defaultBundle.putDouble(BundleKey.Longitude.name(), longitude);
 		defaultBundle.putString(BundleKey.AddressName.name(), alarmDto.getLocationAddressName());
 		defaultBundle.putString(BundleKey.CountryCode.name(), alarmDto.getLocationCountryCode());
-		defaultBundle.putSerializable(BundleKey.WeatherDataSource.name(), weatherDataSourceType);
+		defaultBundle.putSerializable(BundleKey.WeatherDataSource.name(), weatherProviderType);
 		defaultBundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 
 		hourlyForecastFragment.setArguments(defaultBundle);

@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.ArrayMap;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -21,7 +22,7 @@ import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.NotificationHelper;
@@ -72,16 +73,22 @@ public class WidgetForegroundService extends Service {
 	private final ArrayMap<Integer, WidgetDto> allWidgetDtoArrayMap = new ArrayMap<>();
 	private final ArrayMap<Integer, Class<?>> allWidgetProviderClassArrayMap = new ArrayMap<>();
 	private final ArrayMap<Integer, RemoteViews> remoteViewsArrayMap = new ArrayMap<>();
-	private final Map<String, MultipleRestApiDownloader> weatherResponseMap = new HashMap<>();
-	private final Map<String, RequestObj> weatherRequestMap = new HashMap<>();
+	private Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
+
+	private final Map<String, MultipleRestApiDownloader> currentLocationResponseMap = new HashMap<>();
+	private final Map<String, MultipleRestApiDownloader> selectedLocationResponseMap = new HashMap<>();
+
+	private final Map<String, RequestObj> currentLocationRequestMap = new HashMap<>();
+	private final Map<String, RequestObj> selectedLocationRequestMap = new HashMap<>();
 
 	private WidgetRepository widgetRepository;
 	private AppWidgetManager appWidgetManager;
-	private Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
 	private ExecutorService executorService = Executors.newFixedThreadPool(3);
 
 	private int requestCount;
 	private int responseCount;
+
+	private final String TAG = "WidgetForeground";
 
 	public WidgetForegroundService() {
 	}
@@ -126,11 +133,15 @@ public class WidgetForegroundService extends Service {
 		super.onDestroy();
 		currentLocationWidgetDtoArrayMap.clear();
 		selectedLocationWidgetDtoArrayMap.clear();
-
 		allWidgetDtoArrayMap.clear();
+
 		remoteViewsArrayMap.clear();
-		weatherRequestMap.clear();
-		weatherResponseMap.clear();
+
+		currentLocationRequestMap.clear();
+		currentLocationResponseMap.clear();
+
+		selectedLocationRequestMap.clear();
+		selectedLocationResponseMap.clear();
 
 		allWidgetProviderClassArrayMap.clear();
 		widgetCreatorMap.clear();
@@ -154,53 +165,39 @@ public class WidgetForegroundService extends Service {
 								allWidgetProviderClassArrayMap.get(appWidgetId));
 					}
 
-					List<String> addressList = new ArrayList<>();
-
 					remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),
 							widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
 
-					if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
-						currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
-					} else {
-						selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
-						final String addressName = widgetDto.getAddressName();
-
-						if (!weatherRequestMap.containsKey(addressName)) {
-							Address address = new Address(Locale.getDefault());
-
-							address.setLatitude(widgetDto.getLatitude());
-							address.setLongitude(widgetDto.getLongitude());
-							address.setAddressLine(0, widgetDto.getAddressName());
-							address.setCountryCode(widgetDto.getCountryCode());
-
-							RequestObj requestObj = new RequestObj(address);
-
-							weatherRequestMap.put(widgetDto.getAddressName(), requestObj);
-							addressList.add(widgetDto.getAddressName());
-						}
-						weatherRequestMap.get(addressName).weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
-						weatherRequestMap.get(addressName).weatherDataSourceTypeSet.addAll(widgetDto.getWeatherSourceTypeSet());
-						weatherRequestMap.get(addressName).appWidgetSet.add(widgetDto.getAppWidgetId());
-					}
-
-					allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
-					allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
 					requestCount = 1;
 					responseCount = 0;
 
-					final Set<Integer> appWidgetIdSet = allWidgetDtoArrayMap.keySet();
-					for (Integer appWidgetId : appWidgetIdSet) {
-						RemoteViews remoteViews = remoteViewsArrayMap.get(appWidgetId);
-						RemoteViewsUtil.onBeginProcess(remoteViews);
-						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+					if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
+						currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
+						allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
+						showProgressBar();
+						loadCurrentLocation();
+					} else {
+						selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
+						Address address = new Address(Locale.getDefault());
+
+						address.setLatitude(widgetDto.getLatitude());
+						address.setLongitude(widgetDto.getLongitude());
+						address.setAddressLine(0, widgetDto.getAddressName());
+						address.setCountryCode(widgetDto.getCountryCode());
+
+						final RequestObj requestObj = new RequestObj(address);
+						requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
+						requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet());
+						requestObj.appWidgetSet.add(widgetDto.getAppWidgetId());
+
+						selectedLocationRequestMap.put(widgetDto.getAddressName(), requestObj);
+						List<String> addressList = new ArrayList<>();
+						addressList.add(widgetDto.getAddressName());
+						allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
+						showProgressBar();
+						loadWeatherData(LocationType.SelectedAddress, addressList);
 					}
 
-					if (!currentLocationWidgetDtoArrayMap.isEmpty()) {
-						loadCurrentLocation();
-					}
-					if (!selectedLocationWidgetDtoArrayMap.isEmpty()) {
-						loadWeatherData(addressList);
-					}
 				}
 
 				@Override
@@ -226,7 +223,8 @@ public class WidgetForegroundService extends Service {
 						} else {
 							selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
 
-							if (!weatherRequestMap.containsKey(widgetDto.getAddressName())) {
+							RequestObj requestObj = selectedLocationRequestMap.get(widgetDto.getAddressName());
+							if (requestObj == null) {
 								Address address = new Address(Locale.getDefault());
 
 								address.setLatitude(widgetDto.getLatitude());
@@ -234,14 +232,14 @@ public class WidgetForegroundService extends Service {
 								address.setAddressLine(0, widgetDto.getAddressName());
 								address.setCountryCode(widgetDto.getCountryCode());
 
-								RequestObj requestObj = new RequestObj(address);
+								requestObj = new RequestObj(address);
 
-								weatherRequestMap.put(widgetDto.getAddressName(), requestObj);
+								selectedLocationRequestMap.put(widgetDto.getAddressName(), requestObj);
 								addressList.add(widgetDto.getAddressName());
 							}
-							weatherRequestMap.get(widgetDto.getAddressName()).weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
-							weatherRequestMap.get(widgetDto.getAddressName()).weatherDataSourceTypeSet.addAll(widgetDto.getWeatherSourceTypeSet());
-							weatherRequestMap.get(widgetDto.getAddressName()).appWidgetSet.add(widgetDto.getAppWidgetId());
+							requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
+							requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet());
+							requestObj.appWidgetSet.add(widgetDto.getAppWidgetId());
 						}
 
 					}
@@ -249,12 +247,7 @@ public class WidgetForegroundService extends Service {
 					allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
 					allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
 
-					final Set<Integer> appWidgetIdSet = allWidgetDtoArrayMap.keySet();
-					for (Integer appWidgetId : appWidgetIdSet) {
-						RemoteViews remoteViews = remoteViewsArrayMap.get(appWidgetId);
-						RemoteViewsUtil.onBeginProcess(remoteViews);
-						appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-					}
+					showProgressBar();
 
 					requestCount = 0;
 					responseCount = 0;
@@ -265,7 +258,7 @@ public class WidgetForegroundService extends Service {
 					}
 					if (!selectedLocationWidgetDtoArrayMap.isEmpty()) {
 						requestCount += addressList.size();
-						loadWeatherData(addressList);
+						loadWeatherData(LocationType.SelectedAddress, addressList);
 					}
 				}
 
@@ -280,6 +273,15 @@ public class WidgetForegroundService extends Service {
 		}
 
 		return START_NOT_STICKY;
+	}
+
+	private void showProgressBar() {
+		final Set<Integer> appWidgetIdSet = allWidgetDtoArrayMap.keySet();
+		for (Integer appWidgetId : appWidgetIdSet) {
+			RemoteViews remoteViews = remoteViewsArrayMap.get(appWidgetId);
+			RemoteViewsUtil.onBeginProcess(remoteViews);
+			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+		}
 	}
 
 
@@ -318,6 +320,7 @@ public class WidgetForegroundService extends Service {
 
 
 	private void stopService() {
+		Log.d(TAG, "stopService");
 		stopForeground(true);
 		stopSelf();
 	}
@@ -337,31 +340,33 @@ public class WidgetForegroundService extends Service {
 					@Override
 					public void onGeocodingResult(List<Address> addressList) {
 						if (addressList.isEmpty()) {
-							onLocationResult(Fail.FAILED_FIND_LOCATION, null);
+							onLocationResponse(Fail.FAILED_FIND_LOCATION, null);
 						} else {
 							final Set<Integer> appWidgetIdSet = currentLocationWidgetDtoArrayMap.keySet();
-							final Address address = addressList.get(0);
-							final String addressName = address.getAddressLine(0);
+							final Address newAddress = addressList.get(0);
+							final String newAddressName = newAddress.getAddressLine(0);
 
-							if (!weatherRequestMap.containsKey(addressName)) {
-								weatherRequestMap.put(addressName, new RequestObj(address));
+							if (!currentLocationRequestMap.containsKey(newAddressName)) {
+								currentLocationRequestMap.put(newAddressName, new RequestObj(newAddress));
 							}
+
+							final RequestObj requestObj = currentLocationRequestMap.get(newAddressName);
 
 							for (Integer appWidgetId : appWidgetIdSet) {
 								WidgetDto widgetDto = currentLocationWidgetDtoArrayMap.get(appWidgetId);
 
-								widgetDto.setAddressName(address.getAddressLine(0));
-								widgetDto.setCountryCode(address.getCountryCode());
-								widgetDto.setLatitude(address.getLatitude());
-								widgetDto.setLongitude(address.getLongitude());
+								widgetDto.setAddressName(newAddressName);
+								widgetDto.setCountryCode(newAddress.getCountryCode());
+								widgetDto.setLatitude(newAddress.getLatitude());
+								widgetDto.setLongitude(newAddress.getLongitude());
 								widgetRepository.update(widgetDto, null);
 
-								weatherRequestMap.get(addressName).weatherDataTypeSet.addAll(widgetCreatorMap.get(appWidgetId).getRequestWeatherDataTypeSet());
-								weatherRequestMap.get(addressName).weatherDataSourceTypeSet.addAll(widgetDto.getWeatherSourceTypeSet());
-								weatherRequestMap.get(addressName).appWidgetSet.add(appWidgetId);
+								requestObj.weatherDataTypeSet.addAll(widgetCreatorMap.get(appWidgetId).getRequestWeatherDataTypeSet());
+								requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet());
+								requestObj.appWidgetSet.add(appWidgetId);
 							}
 
-							onLocationResult(null, addressName);
+							onLocationResponse(null, newAddressName);
 						}
 					}
 				});
@@ -369,7 +374,7 @@ public class WidgetForegroundService extends Service {
 
 			@Override
 			public void onFailed(Fail fail) {
-				onLocationResult(fail, null);
+				onLocationResponse(fail, null);
 			}
 		};
 
@@ -381,11 +386,12 @@ public class WidgetForegroundService extends Service {
 		});
 	}
 
-	private void onLocationResult(@Nullable FusedLocation.MyLocationCallback.Fail fail, @Nullable String addressName) {
+	private void onLocationResponse(@Nullable FusedLocation.MyLocationCallback.Fail fail, @Nullable String addressName) {
 		if (fail == null) {
 			List<String> addressesList = new ArrayList<>();
 			addressesList.add(addressName);
-			loadWeatherData(addressesList);
+			loadWeatherData(LocationType.CurrentLocation, addressesList);
+			Log.d(TAG, "response CurrentLocation : " + addressName);
 		} else {
 			RemoteViewsUtil.ErrorType errorType = null;
 
@@ -406,57 +412,69 @@ public class WidgetForegroundService extends Service {
 				RemoteViewsUtil.onErrorProcess(remoteViews, getApplicationContext(), errorType);
 				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 			}
-
-			onResponseResult(null);
+			Log.d(TAG, "requestCurrentLocation Failed : " + errorType.name());
+			onResponseResult(LocationType.CurrentLocation, null);
 		}
 
 	}
 
 
-	private void loadWeatherData(List<String> addressList) {
+	private void loadWeatherData(LocationType locationType, List<String> addressList) {
 		for (String addressName : addressList) {
-			if (weatherResponseMap.containsKey(addressName)) {
-				continue;
-			}
-
-			RequestObj requestObj = weatherRequestMap.get(addressName);
-			Set<WeatherDataType> weatherDataTypeSet = requestObj.weatherDataTypeSet;
-			Set<WeatherDataSourceType> weatherDataSourceTypeSet = requestObj.weatherDataSourceTypeSet;
-			Address address = requestObj.address;
-
 			MultipleRestApiDownloader multipleRestApiDownloader = new MultipleRestApiDownloader() {
 				@Override
 				public void onResult() {
-					onResponseResult(addressName);
+					onResponseResult(locationType, addressName);
 				}
 
 				@Override
 				public void onCanceled() {
-					onResponseResult(addressName);
+					onResponseResult(locationType, addressName);
 				}
 			};
 
-			weatherResponseMap.put(addressName, multipleRestApiDownloader);
-			WeatherRequestUtil.loadWeatherData(getApplicationContext(), executorService, address.getLatitude(),
-					address.getLongitude(), weatherDataTypeSet, multipleRestApiDownloader, weatherDataSourceTypeSet);
+			Log.d(TAG, "request weather data");
+			RequestObj requestObj = null;
+
+			if (locationType == LocationType.SelectedAddress) {
+				requestObj = selectedLocationRequestMap.get(addressName);
+				selectedLocationResponseMap.put(addressName, multipleRestApiDownloader);
+			} else {
+				requestObj = currentLocationRequestMap.get(addressName);
+				currentLocationResponseMap.put(addressName, multipleRestApiDownloader);
+			}
+
+			WeatherRequestUtil.loadWeatherData(getApplicationContext(), executorService, requestObj.address.getLatitude(),
+					requestObj.address.getLongitude(), requestObj.weatherDataTypeSet, multipleRestApiDownloader,
+					requestObj.weatherProviderTypeSet);
 		}
 
 	}
 
-	private void onResponseResult(@Nullable String addressName) {
+	private void onResponseResult(LocationType locationType, @Nullable String addressName) {
 		if (addressName != null) {
-			RequestObj requestObj = weatherRequestMap.get(addressName);
+			RequestObj requestObj = null;
+			Map<String, MultipleRestApiDownloader> responseMap = null;
+
+			if (locationType == LocationType.SelectedAddress) {
+				requestObj = selectedLocationRequestMap.get(addressName);
+				responseMap = selectedLocationResponseMap;
+			} else {
+				requestObj = currentLocationRequestMap.get(addressName);
+				responseMap = currentLocationResponseMap;
+			}
 			Set<Integer> appWidgetIdSet = requestObj.appWidgetSet;
 
 			for (Integer appWidgetId : appWidgetIdSet) {
 				AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);
 				widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
-				widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId), weatherResponseMap.get(addressName));
+				widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId), responseMap.get(addressName));
 			}
 		}
 
 		if (++responseCount == requestCount) {
 			stopService();
+			Log.d(TAG, "response Count : " + responseCount + " requestCount : " + requestCount);
 		}
 	}
 
@@ -464,7 +482,7 @@ public class WidgetForegroundService extends Service {
 		final Address address;
 		Set<Integer> appWidgetSet = new HashSet<>();
 		Set<WeatherDataType> weatherDataTypeSet = new HashSet<>();
-		Set<WeatherDataSourceType> weatherDataSourceTypeSet = new HashSet<>();
+		Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
 
 		public RequestObj(Address address) {
 			this.address = address;

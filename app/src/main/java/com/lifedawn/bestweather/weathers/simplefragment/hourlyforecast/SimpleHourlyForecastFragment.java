@@ -16,7 +16,6 @@ import androidx.fragment.app.FragmentManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.weathers.FragmentType;
@@ -87,7 +86,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 				bundle.putDouble(BundleKey.Latitude.name(), latitude);
 				bundle.putDouble(BundleKey.Longitude.name(), longitude);
-				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherDataSourceType);
+				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherProviderType);
 				bundle.putSerializable(WeatherDataType.hourlyForecast.name(), (Serializable) hourlyForecastDtoList);
 
 				detailHourlyForecastFragment.setArguments(bundle);
@@ -238,7 +237,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 				(int) context.getResources().getDimension(R.dimen.singleTemperatureRowHeightInCOMMON));
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
-		createValueUnitsDescription(mainWeatherDataSourceType, haveRain, haveSnow);
+		createValueUnitsDescription(mainWeatherProviderType, haveRain, haveSnow);
 	}
 
 }

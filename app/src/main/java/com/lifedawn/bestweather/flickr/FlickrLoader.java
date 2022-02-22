@@ -7,13 +7,13 @@ import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.lifedawn.bestweather.commons.classes.GlideApp;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
@@ -49,7 +49,7 @@ public class FlickrLoader {
 	private FlickrLoader() {
 	}
 
-	public static void loadImg(Activity activity, WeatherDataSourceType weatherDataSourceType, String val, Double latitude, Double longitude,
+	public static void loadImg(Activity activity, WeatherProviderType weatherProviderType, String val, Double latitude, Double longitude,
 	                           ZoneId zoneId, String volume, GlideImgCallback glideImgCallback, ZonedDateTime refreshDateTime) {
 		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
@@ -97,7 +97,7 @@ public class FlickrLoader {
 				}
 
 				String weather = null;
-				switch (weatherDataSourceType) {
+				switch (weatherProviderType) {
 					case KMA_WEB:
 						String pty = KmaResponseProcessor.convertPtyTextToCode(val);
 						String sky = KmaResponseProcessor.convertSkyTextToCode(val);
@@ -200,7 +200,7 @@ public class FlickrLoader {
 												}
 											};
 											imgRequestObj.glideTarget = target;
-											GlideApp.with(activity).asBitmap().load(backgroundImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(target);
+											Glide.with(activity).asBitmap().load(backgroundImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(target);
 										}
 
 										@Override
@@ -230,11 +230,11 @@ public class FlickrLoader {
 	}
 
 	public static void cancelAllRequest(Activity activity) {
-		GlideApp.with(activity).pauseAllRequests();
+		Glide.with(activity).pauseAllRequests();
 
 		for (ImgRequestObj imgRequestObj : IMG_REQUEST_OBJ_SET) {
 			if (imgRequestObj.glideTarget != null) {
-				GlideApp.with(activity).clear(imgRequestObj.glideTarget);
+				Glide.with(activity).clear(imgRequestObj.glideTarget);
 			} else if (imgRequestObj.getPhotoInfoCall != null) {
 				imgRequestObj.getPhotoInfoCall.cancel();
 			} else if (imgRequestObj.galleryCall != null) {

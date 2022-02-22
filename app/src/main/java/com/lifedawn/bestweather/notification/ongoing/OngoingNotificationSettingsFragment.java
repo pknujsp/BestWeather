@@ -27,7 +27,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.IntentUtil;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentBaseNotificationSettingsBinding;
@@ -215,7 +215,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				WeatherDataSourceType checked = WeatherDataSourceType.OWM_ONECALL;
+				WeatherProviderType checked = WeatherProviderType.OWM_ONECALL;
 				onCheckedWeatherProvider(checked);
 			}
 		});
@@ -340,11 +340,11 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		}
 	}
 
-	public void onCheckedWeatherProvider(WeatherDataSourceType weatherDataSourceType) {
+	public void onCheckedWeatherProvider(WeatherProviderType weatherProviderType) {
 		if (!initializing) {
-			if (alwaysNotiViewCreator.getNotificationDataObj().getWeatherSourceType() != weatherDataSourceType) {
+			if (alwaysNotiViewCreator.getNotificationDataObj().getWeatherSourceType() != weatherProviderType) {
 
-				alwaysNotiViewCreator.getNotificationDataObj().setWeatherSourceType(weatherDataSourceType);
+				alwaysNotiViewCreator.getNotificationDataObj().setWeatherSourceType(weatherProviderType);
 				alwaysNotiViewCreator.savePreferences();
 
 				alwaysNotiViewCreator.initNotification(null);

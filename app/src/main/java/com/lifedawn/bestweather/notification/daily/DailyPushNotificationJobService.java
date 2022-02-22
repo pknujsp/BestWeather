@@ -20,7 +20,7 @@ import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FifthDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FirstDailyNotificationViewCreator;
@@ -140,12 +140,12 @@ public class DailyPushNotificationJobService extends JobService {
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,
 	                            DailyPushNotificationDto dailyPushNotificationDto) {
 		final Set<WeatherDataType> weatherDataTypeSet = viewCreator.getRequestWeatherDataTypeSet();
-		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = dailyPushNotificationDto.getWeatherDataSourceTypeSet();
+		final Set<WeatherProviderType> weatherProviderTypeSet = dailyPushNotificationDto.getWeatherProviderTypeSet();
 
 		if (dailyPushNotificationDto.isTopPriorityKma() && dailyPushNotificationDto.getCountryCode().equals("KR")) {
-			if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_ONECALL)) {
-				weatherDataSourceTypeSet.remove(WeatherDataSourceType.OWM_ONECALL);
-				weatherDataSourceTypeSet.add(WeatherDataSourceType.KMA_WEB);
+			if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_ONECALL)) {
+				weatherProviderTypeSet.remove(WeatherProviderType.OWM_ONECALL);
+				weatherProviderTypeSet.add(WeatherProviderType.KMA_WEB);
 			}
 		}
 
@@ -153,13 +153,13 @@ public class DailyPushNotificationJobService extends JobService {
 				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), weatherDataTypeSet, new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {
-						viewCreator.setResultViews(remoteViews, dailyPushNotificationDto, weatherDataSourceTypeSet, this, weatherDataTypeSet);
+						viewCreator.setResultViews(remoteViews, dailyPushNotificationDto, weatherProviderTypeSet, this, weatherDataTypeSet);
 					}
 
 					@Override
 					public void onCanceled() {
 					}
-				}, weatherDataSourceTypeSet);
+				}, weatherProviderTypeSet);
 
 	}
 

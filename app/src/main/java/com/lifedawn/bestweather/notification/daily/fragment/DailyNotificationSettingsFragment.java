@@ -26,7 +26,7 @@ import com.google.android.material.timepicker.TimeFormat;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentDailyPushNotificationSettingsBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
@@ -68,7 +68,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 	private boolean selectedFavoriteLocation = false;
 	private boolean initializing = true;
 
-	private WeatherDataSourceType mainWeatherDataSourceType;
+	private WeatherProviderType mainWeatherProviderType;
 	private FavoriteAddressDto selectedFavoriteAddressDto;
 
 	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
@@ -91,7 +91,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 
 		dailyNotificationHelper = new DailyNotificationHelper(getActivity().getApplicationContext());
 		repository = new DailyPushNotificationRepository(getContext());
-		mainWeatherDataSourceType = WeatherRequestUtil.getMainWeatherSourceType(getContext(), null);
+		mainWeatherProviderType = WeatherRequestUtil.getMainWeatherSourceType(getContext(), null);
 
 		Bundle bundle = getArguments();
 		newNotificationSession = bundle.getBoolean(BundleKey.NewSession.name());
@@ -100,7 +100,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			newNotificationDto = new DailyPushNotificationDto();
 			newNotificationDto.setEnabled(true);
 			newNotificationDto.setAlarmClock(LocalTime.of(8, 0).toString());
-			newNotificationDto.addWeatherSourceType(mainWeatherDataSourceType);
+			newNotificationDto.addWeatherSourceType(mainWeatherProviderType);
 			newNotificationDto.setNotificationType(DailyPushNotificationType.First);
 
 			editingNotificationDto = newNotificationDto;
@@ -255,8 +255,8 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		LocalTime localTime = LocalTime.parse(editingNotificationDto.getAlarmClock());
 		binding.hours.setText(localTime.format(hoursFormatter));
 
-		Set<WeatherDataSourceType> weatherDataSourceTypeSet = editingNotificationDto.getWeatherDataSourceTypeSet();
-		if (weatherDataSourceTypeSet.contains(WeatherDataSourceType.OWM_ONECALL)) {
+		Set<WeatherProviderType> weatherProviderTypeSet = editingNotificationDto.getWeatherProviderTypeSet();
+		if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_ONECALL)) {
 			binding.commons.owmRadio.setChecked(true);
 		}
 
@@ -300,36 +300,36 @@ public class DailyNotificationSettingsFragment extends Fragment {
 				//시간별 예보
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new FirstDailyNotificationViewCreator(context);
-				editingNotificationDto.removeWeatherSourceType(WeatherDataSourceType.AQICN);
-				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.OWM_ONECALL);
+				editingNotificationDto.removeWeatherSourceType(WeatherProviderType.AQICN);
+				editingNotificationDto.addWeatherSourceType(WeatherProviderType.OWM_ONECALL);
 				break;
 			case Second:
 				//현재날씨
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new SecondDailyNotificationViewCreator(context);
-				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.AQICN);
-				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.OWM_ONECALL);
+				editingNotificationDto.addWeatherSourceType(WeatherProviderType.AQICN);
+				editingNotificationDto.addWeatherSourceType(WeatherProviderType.OWM_ONECALL);
 				break;
 			case Third:
 				//일별 예보
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new ThirdDailyNotificationViewCreator(context);
-				editingNotificationDto.removeWeatherSourceType(WeatherDataSourceType.AQICN);
-				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.OWM_ONECALL);
+				editingNotificationDto.removeWeatherSourceType(WeatherProviderType.AQICN);
+				editingNotificationDto.addWeatherSourceType(WeatherProviderType.OWM_ONECALL);
 				break;
 			case Fourth:
 				//현재 대기질
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.GONE);
 				viewCreator = new FourthDailyNotificationViewCreator(context);
-				editingNotificationDto.getWeatherDataSourceTypeSet().clear();
-				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.AQICN);
+				editingNotificationDto.getWeatherProviderTypeSet().clear();
+				editingNotificationDto.addWeatherSourceType(WeatherProviderType.AQICN);
 				break;
 			default:
 				//대기질 예보
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.GONE);
 				viewCreator = new FifthDailyNotificationViewCreator(context);
-				editingNotificationDto.getWeatherDataSourceTypeSet().clear();
-				editingNotificationDto.addWeatherSourceType(WeatherDataSourceType.AQICN);
+				editingNotificationDto.getWeatherProviderTypeSet().clear();
+				editingNotificationDto.addWeatherSourceType(WeatherProviderType.AQICN);
 				break;
 		}
 
@@ -344,7 +344,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				WeatherDataSourceType checked = WeatherDataSourceType.OWM_ONECALL;
+				WeatherProviderType checked = WeatherProviderType.OWM_ONECALL;
 				editingNotificationDto.addWeatherSourceType(checked);
 			}
 		});

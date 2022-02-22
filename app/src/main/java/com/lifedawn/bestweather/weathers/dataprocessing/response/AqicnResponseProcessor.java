@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
@@ -380,8 +380,8 @@ public class AqicnResponseProcessor {
 	}
 
 	public static AirQualityDto parseTextToAirQualityDto(Context context, JsonObject jsonObject) {
-		if (jsonObject.get(WeatherDataSourceType.AQICN.name()) != null) {
-			JsonObject aqiCnObject = jsonObject.getAsJsonObject(WeatherDataSourceType.AQICN.name());
+		if (jsonObject.get(WeatherProviderType.AQICN.name()) != null) {
+			JsonObject aqiCnObject = jsonObject.getAsJsonObject(WeatherProviderType.AQICN.name());
 			AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse =
 					getAirQualityObjFromJson(aqiCnObject.get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name()).getAsString());
 			AirQualityDto airQualityDto = makeAirQualityDto(context, aqiCnGeolocalizedFeedResponse,

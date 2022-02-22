@@ -22,7 +22,7 @@ import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
@@ -301,23 +301,23 @@ public abstract class AbstractWidgetJobService extends JobService {
 
 	public void loadWeatherData(Context context, RemoteViews remoteViews, int appWidgetId, WidgetDto widgetDto, int jobId) {
 		final Set<WeatherDataType> weatherDataTypeSet = getRequestWeatherDataTypeSet();
-		final Set<WeatherDataSourceType> weatherDataSourceTypeSet = widgetDto.getWeatherSourceTypeSet();
+		final Set<WeatherProviderType> weatherProviderTypeSet = widgetDto.getWeatherProviderTypeSet();
 
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			if (!widgetDto.isMultipleWeatherDataSource()) {
-				weatherDataSourceTypeSet.remove(WeatherDataSourceType.OWM_ONECALL);
+				weatherProviderTypeSet.remove(WeatherProviderType.OWM_ONECALL);
 			}
-			weatherDataSourceTypeSet.add(WeatherDataSourceType.KMA_WEB);
+			weatherProviderTypeSet.add(WeatherProviderType.KMA_WEB);
 		}
 
 		if (weatherDataTypeSet.contains(WeatherDataType.airQuality)) {
-			weatherDataSourceTypeSet.add(WeatherDataSourceType.AQICN);
+			weatherProviderTypeSet.add(WeatherProviderType.AQICN);
 		}
 		WeatherRequestUtil.loadWeatherData(context, executorService, widgetDto.getLatitude(),
 				widgetDto.getLongitude(), weatherDataTypeSet, new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {
-						setResultViews(context, appWidgetId, remoteViews, widgetDto, weatherDataSourceTypeSet, this,
+						setResultViews(context, appWidgetId, remoteViews, widgetDto, weatherProviderTypeSet, this,
 								weatherDataTypeSet, jobId);
 					}
 
@@ -330,7 +330,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 						backgroundCallbackMap.get(jobId).onResult();
 
 					}
-				}, weatherDataSourceTypeSet);
+				}, weatherProviderTypeSet);
 	}
 
 	protected void onActionBootCompleted(JobParameters jobParameters) {
@@ -362,7 +362,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 	abstract Set<WeatherDataType> getRequestWeatherDataTypeSet();
 
 	protected void setResultViews(Context context, int appWidgetId, RemoteViews remoteViews,
-	                              WidgetDto widgetDto, Set<WeatherDataSourceType> requestWeatherDataSourceTypeSet, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
+	                              WidgetDto widgetDto, Set<WeatherProviderType> requestWeatherProviderTypeSet, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                              Set<WeatherDataType> weatherDataTypeSet, int jobId) {
 		if (!widgetDto.isInitialized()) {
 			widgetDto.setInitialized(true);

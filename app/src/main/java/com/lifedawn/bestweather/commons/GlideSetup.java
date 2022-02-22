@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.commons.classes;
+package com.lifedawn.bestweather.commons;
 
 import android.content.Context;
 

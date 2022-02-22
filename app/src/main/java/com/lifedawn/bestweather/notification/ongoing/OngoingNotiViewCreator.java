@@ -15,7 +15,7 @@ import androidx.preference.PreferenceManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
@@ -88,14 +88,14 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	}
 
 	@Override
-	protected void setResultViews(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherDataSourceType requestWeatherDataSourceType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
+	protected void setResultViews(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
 		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		int icon = R.mipmap.ic_launcher_round;
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
-				requestWeatherDataSourceType);
+				requestWeatherProviderType);
 		if (currentConditionsDto != null) {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
@@ -104,7 +104,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		}
 
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
-				requestWeatherDataSourceType);
+				requestWeatherProviderType);
 		if (!hourlyForecastDtoList.isEmpty()) {
 			setHourlyForecastViews(expandedRemoteViews, hourlyForecastDtoList);
 		}
@@ -297,8 +297,8 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 
 		notificationDataObj = new AlwaysNotiDataObj();
 		notificationDataObj.setLocationType(LocationType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), LocationType.CurrentLocation.name())));
-		notificationDataObj.setWeatherSourceType(WeatherDataSourceType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
-				WeatherDataSourceType.OWM_ONECALL.name())));
+		notificationDataObj.setWeatherSourceType(WeatherProviderType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
+				WeatherProviderType.OWM_ONECALL.name())));
 		notificationDataObj.setTopPriorityKma(notiPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false));
 		notificationDataObj.setUpdateIntervalMillis(notiPreferences.getLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L));
 		notificationDataObj.setSelectedAddressDtoId(notiPreferences.getInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0));
@@ -313,7 +313,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	public void loadDefaultPreferences() {
 		notificationDataObj = new AlwaysNotiDataObj();
 		notificationDataObj.setLocationType(LocationType.CurrentLocation);
-		notificationDataObj.setWeatherSourceType(WeatherDataSourceType.OWM_ONECALL);
+		notificationDataObj.setWeatherSourceType(WeatherProviderType.OWM_ONECALL);
 		notificationDataObj.setTopPriorityKma(false);
 		notificationDataObj.setUpdateIntervalMillis(0);
 		notificationDataObj.setSelectedAddressDtoId(0);

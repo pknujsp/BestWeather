@@ -6,7 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
-import com.lifedawn.bestweather.commons.enums.WeatherDataSourceType;
+import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 
@@ -24,12 +24,13 @@ public abstract class MultipleRestApiDownloader {
 	private final ZonedDateTime requestDateTime = ZonedDateTime.now();
 	private volatile int requestCount;
 	private volatile int responseCount;
+	private boolean responseCompleted;
 
 	private AlertDialog loadingDialog;
 	private Map<String, String> valueMap = new HashMap<>();
 	private Map<RetrofitClient.ServiceType, Call<?>> callMap = new HashMap<>();
 
-	protected Map<WeatherDataSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ArrayMap<>();
+	protected Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ArrayMap<>();
 
 	public MultipleRestApiDownloader() {
 	}
@@ -38,7 +39,7 @@ public abstract class MultipleRestApiDownloader {
 		return callMap;
 	}
 
-	public Map<WeatherDataSourceType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> getResponseMap() {
+	public Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> getResponseMap() {
 		return responseMap;
 	}
 
@@ -83,6 +84,9 @@ public abstract class MultipleRestApiDownloader {
 		valueMap.put(key, value);
 	}
 
+	public boolean isResponseCompleted() {
+		return responseCompleted;
+	}
 
 	public Map<String, String> getValueMap() {
 		return valueMap;
@@ -103,38 +107,40 @@ public abstract class MultipleRestApiDownloader {
 
 	}
 
-	public void processResult(WeatherDataSourceType weatherDataSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
+	public void processResult(WeatherProviderType weatherProviderType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
 	                          Response<?> response, Object responseObj, String responseText) {
 		responseCount++;
 
-		if (!responseMap.containsKey(weatherDataSourceType)) {
-			responseMap.put(weatherDataSourceType, new ArrayMap<>());
+		if (!responseMap.containsKey(weatherProviderType)) {
+			responseMap.put(weatherProviderType, new ArrayMap<>());
 		}
-		responseMap.get(weatherDataSourceType).put(serviceType, new ResponseResult(requestParameter, response, responseObj, responseText));
+		responseMap.get(weatherProviderType).put(serviceType, new ResponseResult(requestParameter, response, responseObj, responseText));
 		Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 
 		if (requestCount == responseCount) {
+			responseCompleted = true;
 			onResult();
 		}
 	}
 
-	public void processResult(WeatherDataSourceType weatherDataSourceType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType, Throwable t) {
+	public void processResult(WeatherProviderType weatherProviderType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType, Throwable t) {
 		responseCount++;
 
-		if (!responseMap.containsKey(weatherDataSourceType)) {
-			responseMap.put(weatherDataSourceType, new ArrayMap<>());
+		if (!responseMap.containsKey(weatherProviderType)) {
+			responseMap.put(weatherProviderType, new ArrayMap<>());
 		}
 
-		responseMap.get(weatherDataSourceType).put(serviceType, new ResponseResult(requestParameter, t));
+		responseMap.get(weatherProviderType).put(serviceType, new ResponseResult(requestParameter, t));
 		Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 
 		if (requestCount == responseCount) {
+			responseCompleted = true;
 			onResult();
 		}
 	}
 
-	public RequestParameter getRequestParameter(WeatherDataSourceType weatherDataSourceType, RetrofitClient.ServiceType serviceType) {
-		return responseMap.get(weatherDataSourceType).get(serviceType).getRequestParameter();
+	public RequestParameter getRequestParameter(WeatherProviderType weatherProviderType, RetrofitClient.ServiceType serviceType) {
+		return responseMap.get(weatherProviderType).get(serviceType).getRequestParameter();
 	}
 
 	public static class ResponseResult {
