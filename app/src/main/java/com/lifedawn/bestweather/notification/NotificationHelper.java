@@ -83,6 +83,17 @@ public class NotificationHelper {
 		}
 	}
 
+	public boolean activeNotification(int notificationId) {
+		StatusBarNotification[] activeNotifications = notificationManager.getActiveNotifications();
+
+		for (StatusBarNotification activeNotification : activeNotifications) {
+			if (activeNotification.getId() == notificationId) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public NotificationObj getNotificationObj(NotificationType notificationType) {
 		if (notificationType == NotificationType.Ongoing) {
 			return new NotificationObj(context.getString(R.string.notificationAlwaysChannelName),

@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.alert;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -22,9 +23,10 @@ import java.util.List;
 public class AlertFragment extends Fragment {
 	private FragmentAlertBinding binding;
 	private List<BtnObj> btnObjList;
+	private Bundle bundle;
 
 	public enum Constant {
-		DRAWABLE_ID
+		DRAWABLE_ID, MESSAGE
 	}
 
 	public void setBtnObjList(List<BtnObj> btnObjList) {
@@ -45,21 +47,29 @@ public class AlertFragment extends Fragment {
 	}
 
 	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
+	}
+
+	@Override
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		Bundle bundle = getArguments();
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 		final int drawableId = bundle.getInt(Constant.DRAWABLE_ID.name());
+		final String message = bundle.getString(Constant.MESSAGE.name());
 
 		binding.alertImageView.setImageResource(drawableId);
+		binding.textView.setText(message);
 
-		LayoutInflater layoutInflater = getLayoutInflater();
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		layoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
 		for (BtnObj btnObj : btnObjList) {
 			Button button = new Button(getContext());
 			button.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rounded_btn_background));
+			button.setTextColor(Color.WHITE);
 			button.setLayoutParams(layoutParams);
 			button.setText(btnObj.text);
 			button.setOnClickListener(btnObj.onClickListener);

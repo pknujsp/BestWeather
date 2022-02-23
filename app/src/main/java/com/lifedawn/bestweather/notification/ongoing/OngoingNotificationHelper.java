@@ -16,6 +16,7 @@ import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
+import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 
 public class OngoingNotificationHelper {
@@ -30,13 +31,9 @@ public class OngoingNotificationHelper {
 	public void onSelectedAutoRefreshInterval(long millis) {
 		cancelAutoRefresh();
 
-		if (millis != 0) {
+		if (millis > 0) {
 			Intent refreshIntent = new Intent(context, OngoingNotificationReceiver.class);
 			refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-			Bundle bundle = new Bundle();
-			bundle.putString(NotificationType.class.getName(), NotificationType.Ongoing.name());
-
-			refreshIntent.putExtras(bundle);
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), refreshIntent,
 					PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -46,15 +43,20 @@ public class OngoingNotificationHelper {
 	}
 
 	public void cancelAutoRefresh() {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), new Intent(context, OngoingNotificationReceiver.class)
+		Intent refreshIntent = new Intent(context, OngoingNotificationReceiver.class);
+		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), refreshIntent
 				, PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
+			pendingIntent.cancel();
 		}
 	}
 
 	public boolean isRepeating() {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), new Intent(context, OngoingNotificationReceiver.class)
+		Intent refreshIntent = new Intent(context, OngoingNotificationReceiver.class);
+		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), refreshIntent
 				, PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			return true;
@@ -70,28 +72,19 @@ public class OngoingNotificationHelper {
 		final boolean enabledOngoingNotification = sharedPreferences.getBoolean(NotificationType.Ongoing.getPreferenceName(), false);
 
 		if (enabledOngoingNotification) {
-			final NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-			StatusBarNotification[] statusBarNotifications = notificationManager.getActiveNotifications();
-			Boolean active = false;
-			for (StatusBarNotification statusBarNotification : statusBarNotifications) {
-				if (statusBarNotification.getId() == NotificationType.Ongoing.getNotificationId()) {
-					active = true;
-					break;
-				}
-			}
+			NotificationHelper notificationHelper = new NotificationHelper(context);
+			final boolean active = notificationHelper.activeNotification(NotificationType.Ongoing.getNotificationId());
 
 			OngoingNotiViewCreator ongoingNotiViewCreator = new OngoingNotiViewCreator(context, null);
 			ongoingNotiViewCreator.loadPreferences();
 
+			if (ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0 && !isRepeating()) {
+				onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
+			}
+
 			if (active) {
-				if (ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
-					if (!isRepeating()) {
-						onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
-					}
-				}
 				callback.onResult();
 			} else {
-				onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
 				ongoingNotiViewCreator.initNotification(callback);
 			}
 		} else {

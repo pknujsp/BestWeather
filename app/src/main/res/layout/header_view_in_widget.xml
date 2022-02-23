@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    >
 
 
     <ImageView
@@ -12,7 +13,8 @@
         android:layout_alignBottom="@id/address"
         android:layout_alignParentLeft="true"
         android:scaleType="centerInside"
-        android:src="@drawable/location" />
+        android:src="@drawable/location"
+        />
 
     <TextView
         android:id="@+id/address"
@@ -26,18 +28,21 @@
         android:minLines="1"
         android:text="@string/temp_address"
         android:textColor="@color/widgetTextColor"
-        android:textSize="@dimen/addressTextSizeInCommonWidgetHeader" />
+        android:textSize="@dimen/addressTextSizeInCommonWidgetHeader"
+        />
 
     <TextView
         android:id="@+id/refresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:layout_marginLeft="6dp"
         android:layout_toLeftOf="@id/icon"
         android:gravity="center_vertical"
         android:text="@string/updated_time"
         android:textColor="@color/widgetTextColor"
-        android:textSize="@dimen/refreshDateTimeTextSizeInCommonWidgetHeader" />
+        android:textSize="@dimen/refreshDateTimeTextSizeInCommonWidgetHeader"
+        />
 
     <ImageView
         android:id="@+id/icon"
@@ -48,6 +53,7 @@
         android:layout_alignBottom="@id/refresh"
         android:layout_alignParentRight="true"
         android:scaleType="centerInside"
-        android:src="@drawable/refresh" />
+        android:src="@drawable/refresh"
+        />
 
 </RelativeLayout>

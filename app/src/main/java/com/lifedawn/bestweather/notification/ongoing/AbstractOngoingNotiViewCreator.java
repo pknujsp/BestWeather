@@ -155,7 +155,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 		Intent refreshIntent = new Intent(context, OngoingNotificationReceiver.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, (int) System.currentTimeMillis(), refreshIntent,
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), refreshIntent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
 		return pendingIntent;
 	}

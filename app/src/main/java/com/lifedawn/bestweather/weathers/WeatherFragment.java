@@ -871,6 +871,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
 		final Bundle bundle = new Bundle();
 		bundle.putInt(AlertFragment.Constant.DRAWABLE_ID.name(), R.drawable.error);
+		bundle.putString(AlertFragment.Constant.MESSAGE.name(), getString(R.string.update_failed));
 
 		AlertFragment alertFragment = new AlertFragment();
 		alertFragment.setBtnObjList(btnObjList);

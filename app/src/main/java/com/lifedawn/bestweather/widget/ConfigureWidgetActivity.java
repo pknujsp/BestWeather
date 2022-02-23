@@ -171,7 +171,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 					MainThreadWorker.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							Glide.with(getApplicationContext()).load(wallpaperDrawable).into(binding.wallpaper);
+							Glide.with(ConfigureWidgetActivity.this).load(wallpaperDrawable).into(binding.wallpaper);
 							binding.loadingAnimation.setVisibility(View.GONE);
 						}
 					});
@@ -243,7 +243,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		widgetHeight = (int) (appWidgetProviderInfo.minHeight * 1.9);
 
 		FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.previewLayout.getLayoutParams();
-		layoutParams.topMargin = MyApplication.getStatusBarHeight() + (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
+		layoutParams.topMargin = MyApplication.getStatusBarHeight() + (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f,
+				getResources().getDisplayMetrics());
 		layoutParams.height = widgetHeight;
 
 		binding.previewLayout.setLayoutParams(layoutParams);

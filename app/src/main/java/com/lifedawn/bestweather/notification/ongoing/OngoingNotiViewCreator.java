@@ -236,6 +236,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	public void makeNotification(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, int icon, boolean isFinished) {
 		boolean enabled =
 				PreferenceManager.getDefaultSharedPreferences(context).getBoolean(notificationType.getPreferenceName(), false);
+
 		if (enabled) {
 			NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(notificationType);
 

@@ -147,8 +147,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 
 
 					} else {
-						notificationHelper.cancelNotification(notificationType.getNotificationId());
 						ongoingNotificationHelper.cancelAutoRefresh();
+						notificationHelper.cancelNotification(notificationType.getNotificationId());
 					}
 				}
 

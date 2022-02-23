@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.weathers.dataprocessing.response;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.util.ArrayMap;
 
 import androidx.annotation.Nullable;
 
@@ -30,13 +29,7 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 import com.tickaroo.tikxml.TikXml;
 
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -53,18 +46,16 @@ import okio.Buffer;
 import retrofit2.Response;
 
 public class KmaResponseProcessor extends WeatherResponseProcessor {
-	private static final Map<String, String> WEATHER_SKY_ICON_DESCRIPTION_MAP = new HashMap<>();
-	private static final Map<String, String> WEATHER_PTY_ICON_DESCRIPTION_MAP = new HashMap<>();
 	private static final Map<String, String> WEATHER_MID_ICON_DESCRIPTION_MAP = new HashMap<>();
 	private static final Map<String, String> WEATHER_WEB_ICON_DESCRIPTION_MAP = new HashMap<>();
 
-	private static final Map<String, Integer> WEATHER_SKY_ICON_ID_MAP = new HashMap<>();
-	private static final Map<String, Integer> WEATHER_PTY_ICON_ID_MAP = new HashMap<>();
 	private static final Map<String, Integer> WEATHER_MID_ICON_ID_MAP = new HashMap<>();
 	private static final Map<String, Integer> WEATHER_WEB_ICON_ID_MAP = new HashMap<>();
 
 	private static final Map<String, String> PTY_FLICKR_MAP = new HashMap<>();
 	private static final Map<String, String> SKY_FLICKR_MAP = new HashMap<>();
+
+	private static final Map<String, String> HOURLY_TO_DAILY_DESCRIPTION_MAP = new HashMap<>();
 
 	private static final String POP = "POP";
 	private static final String PTY = "PTY";
@@ -75,9 +66,6 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	private static final String TMP = "TMP";
 	private static final String TMN = "TMN";
 	private static final String TMX = "TMX";
-	private static final String UUU = "UUU";
-	private static final String VVV = "VVV";
-	private static final String WAV = "WAV";
 	private static final String VEC = "VEC";
 	private static final String WSD = "WSD";
 	private static final String T1H = "T1H";
@@ -88,33 +76,17 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static void init(Context context) {
-		if (WEATHER_SKY_ICON_DESCRIPTION_MAP.isEmpty() || WEATHER_PTY_ICON_DESCRIPTION_MAP.isEmpty() || WEATHER_MID_ICON_DESCRIPTION_MAP.isEmpty()
-				|| WEATHER_SKY_ICON_ID_MAP.isEmpty() || WEATHER_PTY_ICON_ID_MAP.isEmpty() || WEATHER_MID_ICON_ID_MAP.isEmpty() || PTY_FLICKR_MAP.isEmpty() ||
-				SKY_FLICKR_MAP.isEmpty()) {
-			String[] skyCodes = context.getResources().getStringArray(R.array.KmaSkyIconCodes);
-			String[] ptyCodes = context.getResources().getStringArray(R.array.KmaPtyIconCodes);
+		if (WEATHER_MID_ICON_DESCRIPTION_MAP.isEmpty()
+				|| WEATHER_MID_ICON_ID_MAP.isEmpty() || PTY_FLICKR_MAP.isEmpty() ||
+				SKY_FLICKR_MAP.isEmpty() || HOURLY_TO_DAILY_DESCRIPTION_MAP.isEmpty()) {
+
 			String[] midCodes = context.getResources().getStringArray(R.array.KmaMidIconCodes);
 			String[] webIconCodes = context.getResources().getStringArray(R.array.KmaWeatherDescriptionCodes);
-			String[] skyDescriptions = context.getResources().getStringArray(R.array.KmaSkyIconDescriptionsForCode);
-			String[] ptyDescriptions = context.getResources().getStringArray(R.array.KmaPtyIconDescriptionsForCode);
 			String[] midDescriptions = context.getResources().getStringArray(R.array.KmaMidIconDescriptionsForCode);
 			String[] webIconDescriptions = context.getResources().getStringArray(R.array.KmaWeatherDescriptions);
-			TypedArray ptyIconIds = context.getResources().obtainTypedArray(R.array.KmaPtyWeatherIconForCode);
-			TypedArray skyIconIds = context.getResources().obtainTypedArray(R.array.KmaSkyWeatherIconForCode);
+
 			TypedArray midIconIds = context.getResources().obtainTypedArray(R.array.KmaMidWeatherIconForCode);
 			TypedArray webIconIds = context.getResources().obtainTypedArray(R.array.KmaWeatherIconForDescriptionCode);
-
-			WEATHER_SKY_ICON_DESCRIPTION_MAP.clear();
-			for (int i = 0; i < skyCodes.length; i++) {
-				WEATHER_SKY_ICON_DESCRIPTION_MAP.put(skyCodes[i], skyDescriptions[i]);
-				WEATHER_SKY_ICON_ID_MAP.put(skyCodes[i], skyIconIds.getResourceId(i, R.drawable.temp_icon));
-			}
-
-			WEATHER_PTY_ICON_DESCRIPTION_MAP.clear();
-			for (int i = 0; i < ptyCodes.length; i++) {
-				WEATHER_PTY_ICON_DESCRIPTION_MAP.put(ptyCodes[i], ptyDescriptions[i]);
-				WEATHER_PTY_ICON_ID_MAP.put(ptyCodes[i], ptyIconIds.getResourceId(i, R.drawable.temp_icon));
-			}
 
 			WEATHER_MID_ICON_DESCRIPTION_MAP.clear();
 			for (int i = 0; i < midCodes.length; i++) {
@@ -131,6 +103,9 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 			String[] ptyFlickrGalleryNames = context.getResources().getStringArray(R.array.KmaPtyFlickrGalleryNames);
 			String[] skyFlickrGalleryNames = context.getResources().getStringArray(R.array.KmaSkyFlickrGalleryNames);
 
+			String[] skyCodes = context.getResources().getStringArray(R.array.KmaSkyIconCodes);
+			String[] ptyCodes = context.getResources().getStringArray(R.array.KmaPtyIconCodes);
+
 			PTY_FLICKR_MAP.clear();
 			for (int i = 0; i < ptyCodes.length; i++) {
 				PTY_FLICKR_MAP.put(ptyCodes[i], ptyFlickrGalleryNames[i]);
@@ -140,6 +115,14 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 			for (int i = 0; i < skyCodes.length; i++) {
 				SKY_FLICKR_MAP.put(skyCodes[i], skyFlickrGalleryNames[i]);
 			}
+
+			HOURLY_TO_DAILY_DESCRIPTION_MAP.put("비", "흐리고 비");
+			HOURLY_TO_DAILY_DESCRIPTION_MAP.put("비/눈", "흐리고 비/눈");
+			HOURLY_TO_DAILY_DESCRIPTION_MAP.put("눈", "흐리고 눈");
+			HOURLY_TO_DAILY_DESCRIPTION_MAP.put("빗방울", "흐리고 비");
+			HOURLY_TO_DAILY_DESCRIPTION_MAP.put("빗방울/눈날림", "흐리고 비/눈");
+			HOURLY_TO_DAILY_DESCRIPTION_MAP.put("눈날림", "흐리고 눈");
+			HOURLY_TO_DAILY_DESCRIPTION_MAP.put("구름 많음", "구름많음");
 		}
 	}
 
@@ -196,6 +179,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static int getWeatherSkyIconImg(String code, boolean night) {
+		/*
 		if (night) {
 			if (code.equals("1")) {
 				return R.drawable.night_clear;
@@ -206,14 +190,18 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 			}
 		}
 		return WEATHER_SKY_ICON_ID_MAP.get(code);
+		*/
+		return 1;
 
 	}
 
 	public static String getWeatherSkyIconDescription(String code) {
-		return WEATHER_SKY_ICON_DESCRIPTION_MAP.get(code);
+		//return WEATHER_SKY_ICON_DESCRIPTION_MAP.get(code);
+		return null;
 	}
 
 	public static int getWeatherPtyIconImg(String code, boolean night) {
+		/*
 		if (night) {
 			if (code.equals("0")) {
 				return R.drawable.night_clear;
@@ -223,14 +211,21 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		}
 		return WEATHER_PTY_ICON_ID_MAP.get(code);
 
+		 */
+		return 1;
+
 	}
 
 	public static int getWeatherSkyAndPtyIconImg(String pty, String sky, boolean night) {
+		/*
 		if (pty.equals("0")) {
 			return getWeatherSkyIconImg(sky, night);
 		} else {
 			return WEATHER_PTY_ICON_ID_MAP.get(pty);
 		}
+
+		 */
+		return 1;
 	}
 
 	public static String getWeatherDescription(String pty, String sky) {
@@ -278,7 +273,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static String getWeatherPtyIconDescription(String code) {
-		return WEATHER_PTY_ICON_DESCRIPTION_MAP.get(code);
+		//return WEATHER_PTY_ICON_DESCRIPTION_MAP.get(code);
+		return null;
 	}
 
 	public static String convertSkyPtyToMid(String sky, String pty) {
@@ -314,6 +310,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		<item>맑음</item>
         <item>구름 많음</item>
         <item>흐림</item>
+
         <item>비</item>
         <item>비/눈</item>
         <item>눈</item>
@@ -337,27 +334,13 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
         <item>소나기</item>
 		 */
 
-		if (WEATHER_PTY_ICON_DESCRIPTION_MAP.containsValue(description)) {
-			if (description.equals("비")) {
-				return "흐리고 비";
-			} else if (description.equals("비/눈")) {
-				return "흐리고 비/눈";
-			} else if (description.equals("눈")) {
-				return "흐리고 눈";
-			} else if (description.equals("소나기")) {
-				return "소나기";
-			} else if (description.equals("빗방울")) {
-				return "흐리고 비";
-			} else if (description.equals("빗방울/눈날림")) {
-				return "흐리고 비/눈";
-			} else {
-				return "흐리고 눈";
-			}
-		} else if (description.equals("구름 많음")) {
-			return "구름많음";
+		if (HOURLY_TO_DAILY_DESCRIPTION_MAP.containsKey(description)) {
+			return HOURLY_TO_DAILY_DESCRIPTION_MAP.get(description);
 		} else {
 			return description;
 		}
+
+
 	}
 
 	public static String getPtyFlickrGalleryName(String code) {
@@ -865,9 +848,9 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 					.setHasSnow(hasSnow)
 					.setSnowVolume(snowVolume)
 					.setPrecipitationVolume(zeroPrecipitationVolume)
-					.setWeatherIcon(KmaResponseProcessor.getWeatherIconImgWeb(finalHourlyForecast.getWeatherDescription(),
+					.setWeatherIcon(getWeatherIconImgWeb(finalHourlyForecast.getWeatherDescription(),
 							isNight))
-					.setWeatherDescription(KmaResponseProcessor.getWeatherDescriptionWeb(finalHourlyForecast.getWeatherDescription()))
+					.setWeatherDescription(getWeatherDescriptionWeb(finalHourlyForecast.getWeatherDescription()))
 					.setHumidity(finalHourlyForecast.getHumidity()).setPop(!finalHourlyForecast.getPop().contains("%") ?
 					"-" : finalHourlyForecast.getPop());
 
