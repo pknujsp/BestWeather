@@ -14,6 +14,8 @@ import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class OngoingNotificationForegroundService extends Service {
@@ -55,6 +57,7 @@ public class OngoingNotificationForegroundService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		final String action = intent.getAction();
+		final Timer timer = new Timer();
 
 		if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 			OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());

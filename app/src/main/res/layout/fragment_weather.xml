@@ -164,7 +164,7 @@
                         android:layout_marginBottom="8dp"
                         android:gravity="center_vertical|right"
                         android:orientation="horizontal"
-                        android:paddingLeft="24dp"
+                        android:paddingLeft="72dp"
                         android:paddingRight="24dp"
                         >
 
@@ -175,9 +175,9 @@
                             android:clickable="true"
                             android:ellipsize="end"
                             android:fontFamily="sans-serif-light"
+                            android:includeFontPadding="false"
                             android:maxLines="1"
                             android:textSize="10dp"
-                            android:includeFontPadding="false"
                             />
 
                         <com.airbnb.lottie.LottieAnimationView

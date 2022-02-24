@@ -307,7 +307,6 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
 		ZoneId zoneId = null;
 		ZoneOffset zoneOffset = null;
-		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
 		final WeatherProviderType weatherProviderType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet());
 
@@ -322,10 +321,9 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 			zoneId = currentConditionsDto.getCurrentTime().getZone();
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			widgetDto.setTimeZoneId(zoneId.getId());
+			widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
-			AirQualityDto airQualityDto = null;
-
-			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
+			AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
 					zoneOffset);
 
 			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto,

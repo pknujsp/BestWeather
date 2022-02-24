@@ -308,14 +308,15 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
-		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
 		final AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader, null);
-		final boolean successful = airQualityDto.isSuccessful();
+		final boolean successful = airQualityDto != null && airQualityDto.isSuccessful();
 
 		if (successful) {
 			ZoneOffset zoneOffset = ZoneOffset.of(airQualityDto.getTimeInfo().getTz());
 			widgetDto.setTimeZoneId(zoneOffset.getId());
+			widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
+
 			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 					airQualityDto, new OnDrawBitmapCallback() {
 						@Override

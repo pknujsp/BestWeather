@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">웨더날씨</string>
+    <string name="app_name">날씨타워</string>
     <string name="kma">대한민국 기상청</string>
     <string name="pm10_str">미세먼지</string>
     <string name="pm25_str">초미세먼지</string>

@@ -32,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Timer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -46,6 +47,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 	protected Context context;
 	protected NotificationHelper notificationHelper;
 	protected NotificationDataObj notificationDataObj;
+	protected Timer timer;
 
 	public AbstractOngoingNotiViewCreator(Context context, NotificationType notificationType, NotificationUpdateCallback notificationUpdateCallback) {
 		this.context = context;
@@ -62,11 +64,11 @@ public abstract class AbstractOngoingNotiViewCreator {
 	}
 
 
-	abstract public RemoteViews[] createRemoteViews(boolean temp);
+	abstract public RemoteViews createRemoteViews(boolean temp);
 
 	abstract public void initNotification(Callback callback);
 
-	public void loadCurrentLocation(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
+	public void loadCurrentLocation(RemoteViews expandedRemoteViews) {
 		final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
 			public void onSuccessful(LocationResult locationResult) {
@@ -88,7 +90,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 								.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode())
 								.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getAddressName()).commit();
 
-						loadWeatherData(context, collapsedRemoteViews, expandedRemoteViews);
+						loadWeatherData( expandedRemoteViews);
 					}
 				});
 			}
@@ -110,16 +112,16 @@ public abstract class AbstractOngoingNotiViewCreator {
 				expandedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 				RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, errorType);
 
-				makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_round, true);
+				makeNotification(expandedRemoteViews, R.mipmap.ic_launcher_round, true);
 			}
 		};
 		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, true);
 	}
 
 
-	public void loadWeatherData(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
+	public void loadWeatherData(RemoteViews expandedRemoteViews) {
 		RemoteViewsUtil.onBeginProcess(expandedRemoteViews);
-		makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_round, false);
+		makeNotification(expandedRemoteViews, R.mipmap.ic_launcher_round, false);
 
 		final Set<WeatherDataType> weatherDataTypeSet = getRequestWeatherDataTypeSet();
 		WeatherProviderType weatherProviderType = notificationDataObj.getWeatherSourceType();
@@ -141,12 +143,12 @@ public abstract class AbstractOngoingNotiViewCreator {
 				new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {
-						setResultViews(context, collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this, weatherDataTypeSet);
+						setResultViews(expandedRemoteViews, finalWeatherProviderType, this, weatherDataTypeSet);
 					}
 
 					@Override
 					public void onCanceled() {
-						setResultViews(context, collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this, weatherDataTypeSet);
+						setResultViews(expandedRemoteViews, finalWeatherProviderType, this, weatherDataTypeSet);
 					}
 				}, weatherProviderTypeSet);
 	}
@@ -162,11 +164,11 @@ public abstract class AbstractOngoingNotiViewCreator {
 
 	abstract protected Set<WeatherDataType> getRequestWeatherDataTypeSet();
 
-	abstract protected void setResultViews(Context context, RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews,
+	abstract protected void setResultViews(RemoteViews expandedRemoteViews,
 	                                       WeatherProviderType requestWeatherProviderType, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                                       Set<WeatherDataType> weatherDataTypeSet);
 
-	abstract protected void makeNotification(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, int icon, boolean isFinished);
+	abstract protected void makeNotification(RemoteViews expandedRemoteViews, int icon, boolean isFinished);
 
 	abstract public void loadSavedPreferences();
 

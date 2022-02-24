@@ -77,6 +77,9 @@ public class WeatherResponseProcessor {
 
 	public static AirQualityDto getAirQualityDto(Context context, MultipleRestApiDownloader multipleRestApiDownloader,
 	                                             ZoneOffset zoneOffset) {
+		if (multipleRestApiDownloader == null) {
+			return null;
+		}
 		MultipleRestApiDownloader.ResponseResult aqiCnResponseResult = multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.AQICN).get(
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 
@@ -167,6 +170,9 @@ public class WeatherResponseProcessor {
 
 	public static CurrentConditionsDto getCurrentConditionsDto(Context context, MultipleRestApiDownloader multipleRestApiDownloader,
 	                                                           WeatherProviderType weatherProviderType) {
+		if (multipleRestApiDownloader == null) {
+			return null;
+		}
 		CurrentConditionsDto currentConditionsDto = null;
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -324,6 +330,9 @@ public class WeatherResponseProcessor {
 	public static List<HourlyForecastDto> getHourlyForecastDtoList(Context context, MultipleRestApiDownloader multipleRestApiDownloader,
 	                                                               WeatherProviderType weatherProviderType) {
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
+		if (multipleRestApiDownloader == null) {
+			return hourlyForecastDtoList;
+		}
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -491,6 +500,9 @@ public class WeatherResponseProcessor {
 	public static List<DailyForecastDto> getDailyForecastDtoList(Context context, MultipleRestApiDownloader multipleRestApiDownloader,
 	                                                             WeatherProviderType weatherProviderType) {
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
+		if (multipleRestApiDownloader == null) {
+			return dailyForecastDtoList;
+		}
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);

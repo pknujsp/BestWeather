@@ -364,12 +364,7 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
-		ZoneId zoneId = null;
-		ZoneOffset zoneOffset = null;
-		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
-
 		final WeatherProviderType weatherProviderType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet());
-
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
 				weatherProviderType);
@@ -377,14 +372,14 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 				weatherProviderType);
 
 		final boolean successful = currentConditionsDto != null && !dailyForecastDtoList.isEmpty();
-		AirQualityDto airQualityDto = null;
 
 		if (successful) {
-			zoneId = currentConditionsDto.getCurrentTime().getZone();
-			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
+			ZoneId zoneId = currentConditionsDto.getCurrentTime().getZone();
+			ZoneOffset zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			widgetDto.setTimeZoneId(zoneId.getId());
+			widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
-			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
+			AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
 					zoneOffset);
 
 
@@ -399,8 +394,6 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 		}
 
 		widgetDto.setLoadSuccessful(successful);
-
-
 		super.setResultViews(appWidgetId, remoteViews, multipleRestApiDownloader);
 	}
 }

@@ -357,9 +357,6 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
-		ZoneId zoneId = null;
-		ZoneOffset zoneOffset = null;
-		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
 		ArrayMap<WeatherProviderType, List<HourlyForecastDto>> weatherSourceTypeListArrayMap = new ArrayMap<>();
 		Set<WeatherProviderType> requestWeatherProviderTypeSet = widgetDto.getWeatherProviderTypeSet();
@@ -375,9 +372,11 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 		}
 
 		if (successful) {
-			zoneId = weatherSourceTypeListArrayMap.valueAt(0).get(0).getHours().getZone();
-			zoneOffset = weatherSourceTypeListArrayMap.valueAt(0).get(0).getHours().getOffset();
+			ZoneId zoneId = weatherSourceTypeListArrayMap.valueAt(0).get(0).getHours().getZone();
+			ZoneOffset zoneOffset = weatherSourceTypeListArrayMap.valueAt(0).get(0).getHours().getOffset();
 			widgetDto.setTimeZoneId(zoneId.getId());
+			widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
+
 			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), weatherSourceTypeListArrayMap,
 					new OnDrawBitmapCallback() {
 						@Override

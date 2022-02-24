@@ -70,6 +70,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	private boolean initializing = true;
 	private SharedPreferences sharedPreferences;
 	private List<FavoriteAddressDto> favoriteAddressDtoList = new ArrayList<>();
+	private String currentAddressName;
 
 	private final CloseWindow closeWindow = new CloseWindow(new CloseWindow.OnBackKeyDoubleClickedListener() {
 		@Override
@@ -245,8 +246,17 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	}
 
 	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString("currentAddressName", currentAddressName);
+	}
+
+	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		if (savedInstanceState != null) {
+			currentAddressName = savedInstanceState.getString("currentAddressName");
+		}
 		binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
 		binding.sideNavMenu.favorites.setOnClickListener(sideNavOnClickListener);
@@ -268,8 +278,10 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			@Override
 			public void onChanged(String addressName) {
 				if (!initializing) {
-					if (addressName != null) {
-						binding.sideNavMenu.addressName.setText(addressName);
+					currentAddressName = addressName;
+
+					if (currentAddressName != null) {
+						binding.sideNavMenu.addressName.setText(currentAddressName);
 					}
 				}
 
@@ -284,6 +296,10 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 						sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
 								LocationType.CurrentLocation.name()));
 				setCurrentLocationState(usingCurrentLocation);
+
+				if (currentAddressName != null) {
+					binding.sideNavMenu.addressName.setText(currentAddressName);
+				}
 
 				if (lastSelectedLocationType == LocationType.CurrentLocation) {
 					if (usingCurrentLocation) {
@@ -539,7 +555,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			bundle.putSerializable("FavoriteAddressDto", favoriteAddressDto);
 		}
 
-		WeatherFragment newWeatherFragment = new WeatherFragment();
+		final WeatherFragment newWeatherFragment = new WeatherFragment();
 		newWeatherFragment.setArguments(bundle);
 		newWeatherFragment.setMenuOnClickListener(new View.OnClickListener() {
 			@Override

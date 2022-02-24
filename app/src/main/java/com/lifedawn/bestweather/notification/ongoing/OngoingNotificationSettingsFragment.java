@@ -156,8 +156,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		});
 
 
-		RemoteViews[] remoteViews = alwaysNotiViewCreator.createRemoteViews(true);
-		View previewWidgetView = remoteViews[1].apply(getActivity().getApplicationContext(), binding.previewLayout);
+		RemoteViews remoteViews = alwaysNotiViewCreator.createRemoteViews(true);
+		View previewWidgetView = remoteViews.apply(getActivity().getApplicationContext(), binding.previewLayout);
 		binding.previewLayout.addView(previewWidgetView);
 
 		binding.notificationSwitch.setChecked(originalEnabled);

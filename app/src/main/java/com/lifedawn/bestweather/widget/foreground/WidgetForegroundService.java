@@ -64,8 +64,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class WidgetForegroundService extends Service {
 	private final ArrayMap<Integer, WidgetDto> currentLocationWidgetDtoArrayMap = new ArrayMap<>();
@@ -87,6 +90,7 @@ public class WidgetForegroundService extends Service {
 
 	private int requestCount;
 	private int responseCount;
+	private Timer timer;
 
 	private final String TAG = "WidgetForeground";
 
@@ -150,6 +154,37 @@ public class WidgetForegroundService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		final String action = intent.getAction();
+
+		timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				timer = null;
+
+				Set<Integer> appWidgetIdSet = new HashSet<>();
+				Set<String> requestMapKeySet = new HashSet<>();
+
+				requestMapKeySet.addAll(currentLocationRequestMap.keySet());
+				requestMapKeySet.addAll(selectedLocationRequestMap.keySet());
+
+				for (String addressName : requestMapKeySet) {
+					if (selectedLocationRequestMap.containsKey(addressName)) {
+						appWidgetIdSet.addAll(selectedLocationRequestMap.get(addressName).appWidgetSet);
+					}
+					if (currentLocationRequestMap.containsKey(addressName)) {
+						appWidgetIdSet.addAll(currentLocationRequestMap.get(addressName).appWidgetSet);
+					}
+				}
+
+				for (Integer appWidgetId : appWidgetIdSet) {
+					AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);
+					widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
+					widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId), null);
+				}
+
+				stopService();
+			}
+		}, TimeUnit.SECONDS.toMillis(25L));
 
 		if (action.equals(getString(R.string.com_lifedawn_bestweather_action_INIT))) {
 			Bundle bundle = intent.getExtras();
@@ -321,6 +356,10 @@ public class WidgetForegroundService extends Service {
 
 	private void stopService() {
 		Log.d(TAG, "stopService");
+		if (timer != null) {
+			timer.cancel();
+			timer = null;
+		}
 		stopForeground(true);
 		stopSelf();
 	}
@@ -453,16 +492,18 @@ public class WidgetForegroundService extends Service {
 
 	private void onResponseResult(LocationType locationType, @Nullable String addressName) {
 		if (addressName != null) {
-			RequestObj requestObj = null;
 			Map<String, MultipleRestApiDownloader> responseMap = null;
+			Map<String, WidgetForegroundService.RequestObj> requestObjMap = null;
 
 			if (locationType == LocationType.SelectedAddress) {
-				requestObj = selectedLocationRequestMap.get(addressName);
+				requestObjMap = selectedLocationRequestMap;
 				responseMap = selectedLocationResponseMap;
 			} else {
-				requestObj = currentLocationRequestMap.get(addressName);
+				requestObjMap = currentLocationRequestMap;
 				responseMap = currentLocationResponseMap;
 			}
+			RequestObj requestObj = requestObjMap.get(addressName);
+
 			Set<Integer> appWidgetIdSet = requestObj.appWidgetSet;
 
 			for (Integer appWidgetId : appWidgetIdSet) {
@@ -470,6 +511,9 @@ public class WidgetForegroundService extends Service {
 				widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
 				widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId), responseMap.get(addressName));
 			}
+
+			//응답 처리가 끝난 요청객체는 제거
+			requestObjMap.remove(addressName);
 		}
 
 		if (++responseCount == requestCount) {

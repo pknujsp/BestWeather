@@ -238,18 +238,17 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 
 	@Override
 	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
-		ZoneId zoneId = null;
-		ZoneOffset zoneOffset = null;
-		widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
 
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
 				WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet()));
 		final boolean successful = !hourlyForecastDtoList.isEmpty();
 
 		if (successful) {
-			zoneId = hourlyForecastDtoList.get(0).getHours().getZone();
-			zoneOffset = hourlyForecastDtoList.get(0).getHours().getOffset();
+			ZoneId zoneId = hourlyForecastDtoList.get(0).getHours().getZone();
+			ZoneOffset zoneOffset = hourlyForecastDtoList.get(0).getHours().getOffset();
 			widgetDto.setTimeZoneId(zoneId.getId());
+			widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
+
 			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 					hourlyForecastDtoList, new OnDrawBitmapCallback() {
 						@Override
