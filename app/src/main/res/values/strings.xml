@@ -511,6 +511,7 @@
     <string name="temp_humidity_str">humidity: 50%</string>
     <string name="updatingWidgets">updating widgets...</string>
     <string name="runningUpdateService">running updates...</string>
+    <string name="updatingNotification">updating Notification...</string>
 
 
 </resources>

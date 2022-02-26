@@ -261,7 +261,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				for (ForecastObj<HourlyForecastDto> item : kmaFinalHourlyForecasts) {
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 							ContextCompat.getDrawable(context, item.e.getWeatherIcon()), item.e.getWeatherDescription()));
-					tempList.add(item.e.getTemp().replace(tempUnitStr,degree));
+					tempList.add(item.e.getTemp().replace(tempUnitText,degree));
 
 					popList.add(item.e.getPop());
 					rainVolumeList.add(item.e.getRainVolume().replace(mm, ""));
@@ -283,7 +283,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					dateTimeList.add(item.e.getHours());
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 							ContextCompat.getDrawable(context, item.e.getWeatherIcon()), item.e.getWeatherDescription()));
-					tempList.add(item.e.getTemp().replace(tempUnitStr,degree));
+					tempList.add(item.e.getTemp().replace(tempUnitText,degree));
 					popList.add(item.e.getPop());
 					rainVolumeList.add(item.e.getRainVolume().replace(mm, ""));
 
@@ -305,7 +305,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					dateTimeList.add(item.e.getHours());
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context, item.e.getWeatherIcon()),
 							item.e.getWeatherDescription()));
-					tempList.add(item.e.getTemp().replace(tempUnitStr,degree));
+					tempList.add(item.e.getTemp().replace(tempUnitText,degree));
 					popList.add(item.e.getPop());
 					rainVolumeList.add(item.e.getRainVolume().replace("mm", ""));
 
@@ -493,7 +493,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 				hourlyForecastResponse.kmaSuccessful = true;
 				hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.makeHourlyForecastDtoListOfXML(getContext(), KmaResponseProcessor.getFinalHourlyForecastListByXML(ultraSrtFcstRoot,
-						vilageFcstRoot), latitude, longitude, windUnit, tempUnit);
+						vilageFcstRoot), latitude, longitude);
 			} else {
 				if (!ultraSrtFcstResponse.isSuccessful()) {
 					hourlyForecastResponse.kmaThrowable = ultraSrtFcstResponse.getT();
@@ -514,7 +514,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 				hourlyForecastResponse.kmaSuccessful = true;
 				hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.makeHourlyForecastDtoListOfWEB(getContext(),
-						kmaHourlyForecasts, latitude, longitude, windUnit, tempUnit);
+						kmaHourlyForecasts, latitude, longitude);
 			} else {
 				hourlyForecastResponse.kmaThrowable = forecastsResponseResult.getT();
 			}
@@ -533,7 +533,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 				hourlyForecastResponse.accuSuccessful = true;
 				hourlyForecastResponse.accuHourlyForecastList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(),
-						hourlyForecastsResponse.getItems(), windUnit, tempUnit, visibilityUnit);
+						hourlyForecastsResponse.getItems());
 			} else {
 				hourlyForecastResponse.accuThrowable = accuHourlyForecastResponse.getT();
 			}
@@ -546,7 +546,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.owmSuccessful = true;
 				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(),
-						(OwmOneCallResponse) responseResult.getResponseObj(), windUnit, tempUnit, visibilityUnit);
+						(OwmOneCallResponse) responseResult.getResponseObj());
 			} else {
 				hourlyForecastResponse.owmThrowable = responseResult.getT();
 			}
@@ -559,7 +559,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.owmSuccessful = true;
 				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(getContext(),
-						(OwmHourlyForecastResponse) responseResult.getResponseObj(), windUnit, tempUnit, visibilityUnit);
+						(OwmHourlyForecastResponse) responseResult.getResponseObj());
 			} else {
 				hourlyForecastResponse.owmThrowable = responseResult.getT();
 			}

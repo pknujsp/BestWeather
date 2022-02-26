@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationForegroundService;
 
 public class DailyPushNotificationReceiver extends BroadcastReceiver {
@@ -24,6 +25,7 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		final String action = intent.getAction();
+		MyApplication.loadValueUnits(context);
 
 		if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 			DailyNotificationHelper notiHelper = new DailyNotificationHelper(context);

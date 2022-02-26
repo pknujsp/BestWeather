@@ -10,8 +10,8 @@
     <string name="kmPerHour" translatable="false">km/h</string>
     <string name="km" translatable="false">km</string>
     <string name="mile" translatable="false">mile</string>
-    <string name="clock12" translatable="false">12</string>
-    <string name="clock24" translatable="false">24</string>
+    <string name="clock12" translatable="false">1 PM</string>
+    <string name="clock24" translatable="false">13</string>
     <string name="percent" translatable="false">%</string>
     <string name="hpa" translatable="false">hpa</string>
     <string name="mm" translatable="false">mm</string>

@@ -72,7 +72,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(
-				BundleKey.WeatherDataSource.name());
+				BundleKey.WeatherProvider.name());
 	}
 
 	@Nullable
@@ -128,11 +128,10 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		private final String tempDegree;
 		private final String degree = "°";
 
-		public HourlyForecastListAdapter(Context context, @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem,
-		                                 ValueUnits tempUnit) {
+		public HourlyForecastListAdapter(Context context, @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
 			this.context = context;
 			this.onClickedForecastItem = onClickedForecastItem;
-			tempDegree = ValueUnits.convertToStr(null, tempUnit);
+			tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		}
 
 		public void setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
@@ -206,10 +205,10 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		private DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
 
 		public DailyForecastListAdapter(Context context,
-		                                @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem, ValueUnits tempUnit) {
+		                                @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
 			this.context = context;
 			this.onClickedForecastItem = onClickedForecastItem;
-			tempDegree = ValueUnits.convertToStr(null, tempUnit);
+			tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		}
 
 		public void setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {

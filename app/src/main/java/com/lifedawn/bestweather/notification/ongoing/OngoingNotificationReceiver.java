@@ -11,11 +11,14 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.main.MyApplication;
 
 public class OngoingNotificationReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		final String action = intent.getAction();
+		MyApplication.loadValueUnits(context);
+
 		startService(context, action, null);
 	}
 

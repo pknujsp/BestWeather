@@ -66,7 +66,7 @@ public class SimpleGraphSunRiseSetFragment extends Fragment implements IWeatherV
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
 		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(
-				BundleKey.WeatherDataSource.name());
+				BundleKey.WeatherProvider.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
 		location = new Location(latitude, longitude);

@@ -121,7 +121,6 @@ public class FlickrLoader {
 				// time : sunrise, sunset, day, night
 				// weather : clear, partly cloudy, mostly cloudy, overcast, rain, snow
 
-
 				//이미 다운로드 된 이미지가 있으면 다운로드 하지 않음
 				if (BACKGROUND_IMG_MAP.containsKey(galleryName) && BACKGROUND_IMG_MAP.get(galleryName).getImg() != null) {
 					glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), true);

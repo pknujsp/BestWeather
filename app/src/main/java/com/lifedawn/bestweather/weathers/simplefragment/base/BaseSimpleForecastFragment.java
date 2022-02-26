@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.weathers.simplefragment.base;
 
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -15,12 +14,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleForecastBinding;
@@ -29,24 +26,14 @@ import com.lifedawn.bestweather.weathers.view.DateView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BaseSimpleForecastFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutSimpleForecastBinding binding;
 	protected DateView dateRow;
-	protected SharedPreferences sharedPreferences;
-	protected ValueUnits tempUnit;
-	protected ValueUnits windUnit;
-	protected ValueUnits visibilityUnit;
-	protected ValueUnits clockUnit;
-	protected Double latitude;
-	protected Double longitude;
-	protected String addressName;
 	protected String countryCode;
 	protected WeatherProviderType mainWeatherProviderType;
-	protected ZoneId zoneId;
 	protected boolean needCompare;
 	protected Map<WeatherValueType, Integer> textSizeMap = new HashMap<>();
 	protected Map<WeatherValueType, Integer> textColorMap = new HashMap<>();
@@ -56,9 +43,6 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 
 	protected int headerVisibility = View.VISIBLE;
 
-	public void setHeaderVisibility(int headerVisibility) {
-		this.headerVisibility = headerVisibility;
-	}
 
 	public void setTextSizeMap(Map<WeatherValueType, Integer> textSizeMap) {
 		this.textSizeMap = textSizeMap;
@@ -75,21 +59,11 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
-		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));
-		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
-		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 
-		 bundle = savedInstanceState != null ? savedInstanceState : getArguments();
-
-		latitude = bundle.getDouble(BundleKey.Latitude.name());
-		longitude = bundle.getDouble(BundleKey.Longitude.name());
-		addressName = bundle.getString(BundleKey.AddressName.name());
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
-		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(BundleKey.WeatherDataSource.name());
-		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
+		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(BundleKey.WeatherProvider.name());
 
 		networkStatus = NetworkStatus.getInstance(getContext());
 	}

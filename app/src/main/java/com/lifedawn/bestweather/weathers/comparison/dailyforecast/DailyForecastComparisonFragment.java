@@ -78,7 +78,6 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 	@Override
 	public void onStart() {
 		super.onStart();
-
 	}
 
 	private void setValues(DailyForecastResponse dailyForecastResponse) {
@@ -268,7 +267,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			if (weatherProviderTypeList.get(i) == WeatherProviderType.KMA_WEB) {
 				for (ForecastObj<DailyForecastDto> item : kmaFinalDailyForecasts) {
-					temp = item.e.getMinTemp().replace(tempUnitStr,degree) + " / " + item.e.getMaxTemp().replace(tempUnitStr,degree);
+					temp = item.e.getMinTemp().replace(tempUnitText, degree) + " / " + item.e.getMaxTemp().replace(tempUnitText, degree);
 					tempList.add(temp);
 
 					if (item.e.isSingle()) {
@@ -289,7 +288,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			} else if (weatherProviderTypeList.get(i) == WeatherProviderType.ACCU_WEATHER) {
 				for (ForecastObj<DailyForecastDto> item : accuFinalDailyForecasts) {
-					temp = item.e.getMinTemp().replace(tempUnitStr,degree) + " / " + item.e.getMaxTemp().replace(tempUnitStr,degree);
+					temp = item.e.getMinTemp().replace(tempUnitText, degree) + " / " + item.e.getMaxTemp().replace(tempUnitText, degree);
 					tempList.add(temp);
 
 					pop = item.e.getAmValues().getPop() + " / " + item.e.getPmValues().getPop();
@@ -324,7 +323,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			} else if (weatherProviderTypeList.get(i) == WeatherProviderType.OWM_ONECALL) {
 				for (ForecastObj<DailyForecastDto> item : owmFinalDailyForecasts) {
-					temp = item.e.getMinTemp().replace(tempUnitStr,degree) + " / " + item.e.getMaxTemp().replace(tempUnitStr,degree);
+					temp = item.e.getMinTemp().replace(tempUnitText, degree) + " / " + item.e.getMaxTemp().replace(tempUnitText, degree);
 					tempList.add(temp);
 
 					pop = item.e.getSingleValues().getPop();
@@ -526,8 +525,8 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 						Long.parseLong(multipleRestApiDownloader.get("tmFc")));
 				KmaResponseProcessor.getDailyForecastListByXML(finalDailyForecasts, finalHourlyForecasts);
 
-				dailyForecastResponse.kmaDailyForecastList = KmaResponseProcessor.makeDailyForecastDtoListOfXML(finalDailyForecasts,
-						tempUnit);
+				dailyForecastResponse.kmaDailyForecastList = KmaResponseProcessor.makeDailyForecastDtoListOfXML(finalDailyForecasts
+				);
 			} else {
 				if (midLandFcstResponse.getT() != null) {
 					dailyForecastResponse.kmaThrowable = midLandFcstResponse.getT();
@@ -551,7 +550,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 				List<KmaDailyForecast> kmaDailyForecasts = (List<KmaDailyForecast>) objects[1];
 
 				dailyForecastResponse.kmaDailyForecastList = KmaResponseProcessor.makeDailyForecastDtoListOfWEB(
-						kmaDailyForecasts, tempUnit);
+						kmaDailyForecasts);
 			} else {
 				dailyForecastResponse.kmaThrowable = forecastsResponseResult.getT();
 			}
@@ -568,7 +567,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 				AccuDailyForecastsResponse dailyForecastsResponse =
 						(AccuDailyForecastsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST).getResponseObj();
 				dailyForecastResponse.accuDailyForecastList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(getContext(),
-						dailyForecastsResponse.getDailyForecasts(), windUnit, tempUnit);
+						dailyForecastsResponse.getDailyForecasts());
 				;
 			} else {
 				dailyForecastResponse.accuThrowable = accuDailyForecastResponse.getT();
@@ -583,7 +582,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			if (responseResult.isSuccessful()) {
 				dailyForecastResponse.owmDailyForecastList =
 						OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(getContext(),
-								(OwmOneCallResponse) responseResult.getResponseObj(), windUnit, tempUnit);
+								(OwmOneCallResponse) responseResult.getResponseObj());
 			} else {
 				dailyForecastResponse.owmThrowable = responseResult.getT();
 			}
@@ -597,7 +596,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			if (responseResult.isSuccessful()) {
 				dailyForecastResponse.owmDailyForecastList =
 						OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(getContext(),
-								(OwmDailyForecastResponse) responseResult.getResponseObj(), windUnit, tempUnit);
+								(OwmDailyForecastResponse) responseResult.getResponseObj());
 			} else {
 				dailyForecastResponse.owmThrowable = responseResult.getT();
 			}

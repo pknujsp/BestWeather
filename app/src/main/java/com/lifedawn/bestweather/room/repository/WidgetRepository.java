@@ -54,6 +54,15 @@ public class WidgetRepository {
 		});
 	}
 
+	public void getAll(String widgetProviderClassName, DbQueryCallback<List<WidgetDto>> callback) {
+		executorService.execute(new Runnable() {
+			@Override
+			public void run() {
+				callback.onResultSuccessful(widgetDao.getAll(widgetProviderClassName));
+			}
+		});
+	}
+
 	public void get(long widgetDtoId, DbQueryCallback<WidgetDto> callback) {
 		executorService.execute(new Runnable() {
 			@Override

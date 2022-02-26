@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
@@ -38,11 +39,10 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 
 	protected abstract AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId);
 
-	protected void reDraw(Context context, int[] appWidgetIds) {
+	protected void reDraw(Context context, int[] appWidgetIds, Class<?> widgetProviderClass) {
 		if (appWidgetManager == null) {
 			appWidgetManager = AppWidgetManager.getInstance(context);
 		}
-		final Class<?> widgetProviderClass = getClass();
 
 		for (int i = 0; i < appWidgetIds.length; i++) {
 			final int appWidgetId = appWidgetIds[i];
@@ -84,13 +84,13 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
 		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
-		reDraw(context, new int[]{appWidgetId});
+		reDraw(context, new int[]{appWidgetId}, getClass());
 	}
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
-		reDraw(context, appWidgetIds);
+		reDraw(context, appWidgetIds, getClass());
 	}
 
 	@Override
@@ -119,6 +119,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
+		MyApplication.loadValueUnits(context);
 		Bundle bundle = intent.getExtras();
 		final String action = intent.getAction();
 
@@ -128,11 +129,39 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 			startService(context, action, argument);
 		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
 			startService(context, action, null);
-		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
+			WidgetRepository widgetRepository = new WidgetRepository(context);
+			final String widgetProviderClassName = getClass().getName();
+			final Class<?> widgetProviderClass = getClass();
 
-		} else if (action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
+			widgetRepository.getAll(widgetProviderClassName, new DbQueryCallback<List<WidgetDto>>() {
+				@Override
+				public void onResultSuccessful(List<WidgetDto> result) {
+					appWidgetManager = AppWidgetManager.getInstance(context);
+					WidgetHelper widgetHelper = new WidgetHelper(context);
+					final int[] ids = new int[result.size()];
+
+					int index = 0;
+					for (WidgetDto widgetDto : result) {
+						ids[index++] = widgetDto.getAppWidgetId();
+						if (widgetDto.getUpdateIntervalMillis() > 0) {
+
+							if (!widgetHelper.isRepeating(widgetDto.getAppWidgetId(), widgetProviderClass)) {
+								widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId(),
+										widgetProviderClass);
+							}
+						}
+					}
+
+					reDraw(context, ids, widgetProviderClass);
+				}
+
+				@Override
+				public void onResultNoData() {
+
+				}
+			});
 		}
-
 	}
 
 	protected boolean isServiceRunning(Context context) {

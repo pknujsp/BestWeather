@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.geopositionsearch.AccuGeoPositionResponse;
@@ -128,9 +129,11 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoList(Context context,
-	                                                                List<AccuHourlyForecastsResponse.Item> hourlyForecastList,
-	                                                                ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
-		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
+	                                                                List<AccuHourlyForecastsResponse.Item> hourlyForecastList) {
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		ValueUnits visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
+		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String percent = "%";
 		final String mm = "mm";
 		final String cm = "cm";
@@ -139,8 +142,8 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		final String zeroSnowVolume = "0.0cm";
 		final String zeroRainVolume = "0.0mm";
 		final String zeroTotalRiquidVolume = "0.0mm";
-		final String visibilityUnitStr = ValueUnits.convertToStr(context, visibilityUnit);
-		final String windUnitStr = ValueUnits.convertToStr(context, windUnit);
+		final String visibilityUnitStr = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnitText();
+		final String windUnitStr = MyApplication.VALUE_UNIT_OBJ.getWindUnitText();
 
 		String totalRiquidVolume;
 		String snowVolume;
@@ -222,12 +225,14 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 
 
 	public static List<DailyForecastDto> makeDailyForecastDtoList(Context context,
-	                                                              List<AccuDailyForecastsResponse.DailyForecasts> dailyForecastList, ValueUnits windUnit, ValueUnits tempUnit) {
-		final String tempDegree = ValueUnits.convertToStr(context, tempUnit);
+	                                                              List<AccuDailyForecastsResponse.DailyForecasts> dailyForecastList) {
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String mm = "mm";
 		final String cm = "cm";
 		final String percent = "%";
-		final String windUnitStr = ValueUnits.convertToStr(context, windUnit);
+		final String windUnitStr = MyApplication.VALUE_UNIT_OBJ.getWindUnitText();
 		final String zero = "0.0";
 
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
@@ -350,9 +355,11 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static CurrentConditionsDto makeCurrentConditionsDto(Context context,
-	                                                            AccuCurrentConditionsResponse.Item item,
-	                                                            ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
-		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+	                                                            AccuCurrentConditionsResponse.Item item) {
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		ValueUnits visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
+		final String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String percent = "%";
 
 		CurrentConditionsDto currentConditionsDto = new CurrentConditionsDto();
@@ -367,15 +374,16 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 		currentConditionsDto.setDewPoint(ValueUnits.convertTemperature(item.getDewPoint().getMetric().getValue(), tempUnit) + tempUnitStr);
 		currentConditionsDto.setWindDirectionDegree(Integer.parseInt(item.getWind().getDirection().getDegrees()));
 		currentConditionsDto.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, item.getWind().getDirection().getDegrees()));
-		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeedForAccu(item.getWind().getSpeed().getMetric().getValue(), windUnit) + ValueUnits.convertToStr(context, windUnit));
+		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeedForAccu(item.getWind().getSpeed().getMetric().getValue(), windUnit) + MyApplication.VALUE_UNIT_OBJ.getWindUnitText())
+		;
 		currentConditionsDto.setWindGust(ValueUnits.convertWindSpeedForAccu(item.getWindGust().getSpeed().getMetric().getValue(),
-				windUnit) + ValueUnits.convertToStr(context, windUnit));
+				windUnit) + MyApplication.VALUE_UNIT_OBJ.getWindUnitText());
 		currentConditionsDto.setSimpleWindStrength(WindUtil.getSimpleWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()));
 		currentConditionsDto.setWindStrength(WindUtil.getWindSpeedDescription(item.getWind().getSpeed().getMetric().getValue()));
 		currentConditionsDto.setPressure(item.getPressure().getMetric().getValue() + "hpa");
 		currentConditionsDto.setUvIndex(item.getuVIndex());
 		currentConditionsDto.setVisibility(ValueUnits.convertVisibilityForAccu(item.getVisibility().getMetric().getValue(),
-				visibilityUnit) + ValueUnits.convertToStr(context, visibilityUnit));
+				visibilityUnit) + MyApplication.VALUE_UNIT_OBJ.getVisibilityUnitText());
 		currentConditionsDto.setCloudiness(item.getCloudCover() + percent);
 		currentConditionsDto.setPrecipitationType(AccuWeatherResponseProcessor.getPty(item.getPrecipitationType()));
 

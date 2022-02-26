@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaCurrentConditions;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaDailyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
@@ -698,9 +699,11 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoListOfXML(Context context,
-	                                                                     List<FinalHourlyForecast> hourlyForecastList, double latitude, double longitude,
-	                                                                     ValueUnits windUnit, ValueUnits tempUnit) {
-		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
+	                                                                     List<FinalHourlyForecast> hourlyForecastList, double latitude, double longitude) {
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+
+		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String percent = "%";
 		final String noSnow = "적설없음";
 		final String noRain = "강수없음";
@@ -767,7 +770,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 					.setWindDirectionVal(Integer.parseInt(finalHourlyForecast.getWindDirection()))
 					.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, finalHourlyForecast.getWindDirection()))
 					.setWindStrength(WindUtil.getSimpleWindSpeedDescription(finalHourlyForecast.getWindSpeed()))
-					.setWindSpeed(ValueUnits.convertWindSpeed(finalHourlyForecast.getWindSpeed(), windUnit) + ValueUnits.convertToStr(context, windUnit))
+					.setWindSpeed(ValueUnits.convertWindSpeed(finalHourlyForecast.getWindSpeed(), windUnit) + MyApplication.VALUE_UNIT_OBJ.getWindUnitText())
 					.setHumidity(finalHourlyForecast.getHumidity() + percent);
 
 			if (finalHourlyForecast.getProbabilityOfPrecipitation() != null) {
@@ -782,9 +785,10 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoListOfWEB(Context context,
-	                                                                     List<KmaHourlyForecast> hourlyForecastList, double latitude, double longitude,
-	                                                                     ValueUnits windUnit, ValueUnits tempUnit) {
-		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
+	                                                                     List<KmaHourlyForecast> hourlyForecastList, double latitude, double longitude) {
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String mPerSec = "m/s";
 
 		final String zeroRainVolume = "0.0mm";
@@ -863,7 +867,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 						.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, windDirectionInt.toString()))
 						.setWindStrength(WindUtil.getSimpleWindSpeedDescription(windSpeed))
 						.setWindSpeed(ValueUnits.convertWindSpeed(windSpeed, windUnit)
-								+ ValueUnits.convertToStr(context, windUnit));
+								+ MyApplication.VALUE_UNIT_OBJ.getWindUnitText());
 
 				feelsLikeTemp = WeatherUtil.calcFeelsLikeTemperature(Double.parseDouble(finalHourlyForecast.getTemp()),
 						ValueUnits.convertWindSpeed(windSpeed, ValueUnits.kmPerHour), humidity);
@@ -877,8 +881,9 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		return hourlyForecastDtoList;
 	}
 
-	public static List<DailyForecastDto> makeDailyForecastDtoListOfXML(List<FinalDailyForecast> dailyForecastList, ValueUnits tempUnit) {
-		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
+	public static List<DailyForecastDto> makeDailyForecastDtoListOfXML(List<FinalDailyForecast> dailyForecastList) {
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
 
@@ -916,8 +921,9 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		return dailyForecastDtoList;
 	}
 
-	public static List<DailyForecastDto> makeDailyForecastDtoListOfWEB(List<KmaDailyForecast> dailyForecastList, ValueUnits tempUnit) {
-		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
+	public static List<DailyForecastDto> makeDailyForecastDtoListOfWEB(List<KmaDailyForecast> dailyForecastList) {
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
 
@@ -956,9 +962,12 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 	public static CurrentConditionsDto makeCurrentConditionsDtoOfXML(Context context,
 	                                                                 FinalCurrentConditions item,
-	                                                                 FinalHourlyForecast finalHourlyForecast, ValueUnits windUnit, ValueUnits tempUnit, Double latitude,
+	                                                                 FinalHourlyForecast finalHourlyForecast, Double latitude,
 	                                                                 Double longitude) {
-		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+
+		final String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String percent = "%";
 		final TimeZone koreaTimeZone = TimeZone.getTimeZone("Asia/Seoul");
 		final ZoneId koreaZoneId = ZoneId.of("Asia/Seoul");
@@ -996,8 +1005,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		currentConditionsDto.setHumidity(item.getHumidity() + percent);
 		currentConditionsDto.setWindDirectionDegree(Integer.parseInt(item.getWindDirection()));
 		currentConditionsDto.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, item.getWindDirection()));
-		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(item.getWindSpeed(), windUnit) + ValueUnits.convertToStr(context,
-				windUnit));
+		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(item.getWindSpeed(), windUnit) + MyApplication.VALUE_UNIT_OBJ.getWindUnitText());
 
 		currentConditionsDto.setSimpleWindStrength(WindUtil.getSimpleWindSpeedDescription(item.getWindSpeed()));
 		currentConditionsDto.setWindStrength(WindUtil.getWindSpeedDescription(item.getWindSpeed()));
@@ -1012,11 +1020,12 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 	public static CurrentConditionsDto makeCurrentConditionsDtoOfWEB(Context context,
 	                                                                 KmaCurrentConditions kmaCurrentConditions,
-	                                                                 KmaHourlyForecast kmaHourlyForecast, ValueUnits windUnit,
-	                                                                 ValueUnits tempUnit,
+	                                                                 KmaHourlyForecast kmaHourlyForecast,
 	                                                                 Double latitude,
 	                                                                 Double longitude) {
-		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		final String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 
 		CurrentConditionsDto currentConditionsDto = new CurrentConditionsDto();
 		ZonedDateTime currentTime = ZonedDateTime.parse(kmaCurrentConditions.getBaseDateTime());
@@ -1050,8 +1059,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		}
 		if (kmaCurrentConditions.getWindSpeed() != null) {
 			Double windSpeed = Double.parseDouble(kmaCurrentConditions.getWindSpeed());
-			currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(windSpeed.toString(), windUnit) + ValueUnits.convertToStr(context,
-					windUnit));
+			currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(windSpeed.toString(), windUnit) + MyApplication.VALUE_UNIT_OBJ.getWindUnitText());
 
 			currentConditionsDto.setSimpleWindStrength(WindUtil.getSimpleWindSpeedDescription(windSpeed.toString()));
 			currentConditionsDto.setWindStrength(WindUtil.getWindSpeedDescription(windSpeed.toString()));

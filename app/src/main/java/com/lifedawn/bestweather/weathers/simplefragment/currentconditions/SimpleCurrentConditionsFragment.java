@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
@@ -59,7 +60,7 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		binding.wind.setText(currentConditionsDto.getWindStrength() != null ? currentConditionsDto.getWindStrength() :
 				getString(R.string.noWindData));
 
-		final String tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
+		final String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String currentTempText = currentConditionsDto.getTemp().replace(tempUnitStr, "");
 
 		binding.temperature.setText(currentTempText);

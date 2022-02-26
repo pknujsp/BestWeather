@@ -15,9 +15,9 @@ import androidx.fragment.app.FragmentManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
@@ -81,15 +81,15 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 			public void onClick(View v) {
 				DetailHourlyForecastFragment detailHourlyForecastFragment = new DetailHourlyForecastFragment();
 
-				Bundle bundle = new Bundle();
-				bundle.putString(BundleKey.AddressName.name(), addressName);
-				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
-				bundle.putDouble(BundleKey.Latitude.name(), latitude);
-				bundle.putDouble(BundleKey.Longitude.name(), longitude);
-				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherProviderType);
-				bundle.putSerializable(WeatherDataType.hourlyForecast.name(), (Serializable) hourlyForecastDtoList);
+				Bundle arguments = new Bundle();
+				arguments.putString(BundleKey.AddressName.name(), bundle.getString(BundleKey.AddressName.name()));
+				arguments.putSerializable(BundleKey.TimeZone.name(), bundle.getSerializable(BundleKey.TimeZone.name()));
+				arguments.putDouble(BundleKey.Latitude.name(), bundle.getDouble(BundleKey.Latitude.name()));
+				arguments.putDouble(BundleKey.Longitude.name(), bundle.getDouble(BundleKey.Longitude.name()));
+				arguments.putSerializable(BundleKey.WeatherProvider.name(), mainWeatherProviderType);
+				arguments.putSerializable(WeatherDataType.hourlyForecast.name(), (Serializable) hourlyForecastDtoList);
 
-				detailHourlyForecastFragment.setArguments(bundle);
+				detailHourlyForecastFragment.setArguments(arguments);
 
 				String tag = getString(R.string.tag_detail_hourly_forecast_fragment);
 				FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
@@ -102,7 +102,6 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 
 		setValuesToViews();
 	}
-
 
 
 	@SuppressLint("ClickableViewAccessibility")
@@ -137,7 +136,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 
 		final String mm = "mm";
 		final String cm = "cm";
-		final String degree = ValueUnits.convertToStr(null, tempUnit);
+		final String degree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 
 		boolean haveSnow = false;
 		boolean haveRain = false;

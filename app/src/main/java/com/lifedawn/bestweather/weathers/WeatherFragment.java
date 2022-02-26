@@ -1086,15 +1086,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap = null;
 
-		final ValueUnits tempUnit = ValueUnits.valueOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp),
-				ValueUnits.celsius.name()));
-		final ValueUnits windUnit = ValueUnits.valueOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind),
-				ValueUnits.mPerSec.name()));
-		final ValueUnits visibilityUnit = ValueUnits.valueOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility),
-				ValueUnits.km.name()));
-		final ValueUnits clockUnit = ValueUnits.valueOf(
-				sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
-
 		AirQualityDto airQualityDto = null;
 		CurrentConditionsDto currentConditionsDto = null;
 		List<HourlyForecastDto> hourlyForecastDtoList = null;
@@ -1130,14 +1121,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			finalDailyForecastList = KmaResponseProcessor.getDailyForecastListByXML(finalDailyForecastList, finalHourlyForecastList);
 
 			currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDtoOfXML(getContext(), finalCurrentConditions,
-					finalHourlyForecastList.get(0), windUnit, tempUnit, latitude, longitude);
+					finalHourlyForecastList.get(0), latitude, longitude);
 			currentConditionsDto.setYesterdayTemp(ValueUnits.convertTemperature(yesterDayFinalCurrentConditions.getTemperature(),
-					tempUnit) + ValueUnits.convertToStr(getContext(), tempUnit));
+					MyApplication.VALUE_UNIT_OBJ.getTempUnit()) + MyApplication.VALUE_UNIT_OBJ.getTempUnitText());
 
 			hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoListOfXML(getContext(),
-					finalHourlyForecastList, latitude, longitude, windUnit, tempUnit);
+					finalHourlyForecastList, latitude, longitude);
 
-			dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfXML(finalDailyForecastList, tempUnit);
+			dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfXML(finalDailyForecastList);
 
 			String sky = finalHourlyForecastList.get(0).getSky();
 			String pty = finalCurrentConditions.getPrecipitationType();
@@ -1156,12 +1147,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			ArrayList<KmaDailyForecast> kmaDailyForecasts = (ArrayList<KmaDailyForecast>) forecasts[1];
 
 			currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDtoOfWEB(getContext(),
-					kmaCurrentConditions, kmaHourlyForecasts.get(0), windUnit, tempUnit, latitude, longitude);
+					kmaCurrentConditions, kmaHourlyForecasts.get(0), latitude, longitude);
 
 			hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoListOfWEB(getContext(),
-					kmaHourlyForecasts, latitude, longitude, windUnit, tempUnit);
+					kmaHourlyForecasts, latitude, longitude);
 
-			dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfWEB(kmaDailyForecasts, tempUnit);
+			dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfWEB(kmaDailyForecasts);
 
 			String pty = kmaCurrentConditions.getPty();
 
@@ -1181,14 +1172,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			AccuDailyForecastsResponse accuDailyForecastsResponse =
 					(AccuDailyForecastsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST).getResponseObj();
 
-			currentConditionsDto = AccuWeatherResponseProcessor.makeCurrentConditionsDto(getContext(), accuCurrentConditionsResponse.getItems().get(0), windUnit,
-					tempUnit, visibilityUnit);
+			currentConditionsDto = AccuWeatherResponseProcessor.makeCurrentConditionsDto(getContext(), accuCurrentConditionsResponse.getItems().get(0)
+			);
 
-			hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(), accuHourlyForecastsResponse.getItems(),
-					windUnit, tempUnit, visibilityUnit);
+			hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(), accuHourlyForecastsResponse.getItems()
+			);
 
 			dailyForecastDtoList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(getContext(),
-					accuDailyForecastsResponse.getDailyForecasts(), windUnit, tempUnit);
+					accuDailyForecastsResponse.getDailyForecasts());
 
 			currentConditionsWeatherVal = accuCurrentConditionsResponse.getItems().get(0).getWeatherIcon();
 			zoneId = ZonedDateTime.parse(accuCurrentConditionsResponse.getItems().get(0).getLocalObservationDateTime()).getZone();
@@ -1201,13 +1192,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					(OwmOneCallResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponseObj();
 
 			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(getContext(), owmOneCallResponse
-					, windUnit, tempUnit, visibilityUnit);
+			);
 
-			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(), owmOneCallResponse,
-					windUnit, tempUnit, visibilityUnit);
+			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(), owmOneCallResponse
+			);
 
-			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(getContext(), owmOneCallResponse,
-					windUnit, tempUnit);
+			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(getContext(), owmOneCallResponse
+			);
 
 			currentConditionsWeatherVal = owmOneCallResponse.getCurrent().getWeather().get(0).getId();
 
@@ -1225,13 +1216,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					(OwmDailyForecastResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST).getResponseObj();
 
 			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(getContext(), owmCurrentConditionsResponse
-					, windUnit, tempUnit, visibilityUnit);
+			);
 
 			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(getContext(),
-					owmHourlyForecastResponse, windUnit, tempUnit, visibilityUnit);
+					owmHourlyForecastResponse);
 
 			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(getContext(),
-					owmDailyForecastResponse, windUnit, tempUnit);
+					owmDailyForecastResponse);
 
 			currentConditionsWeatherVal = owmCurrentConditionsResponse.getWeather().get(0).getId();
 
@@ -1257,7 +1248,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		defaultBundle.putDouble(BundleKey.Longitude.name(), this.longitude);
 		defaultBundle.putString(BundleKey.AddressName.name(), addressName);
 		defaultBundle.putString(BundleKey.CountryCode.name(), countryCode);
-		defaultBundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherProviderType);
+		defaultBundle.putSerializable(BundleKey.WeatherProvider.name(), mainWeatherProviderType);
 		defaultBundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 
 		// simple current conditions ------------------------------------------------------------------------------------------------------
@@ -1317,7 +1308,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					changeWeatherDataSourcePicker(countryCode);
 					ZonedDateTime dateTime = multipleRestApiDownloader.getRequestDateTime();
 					dateTimeFormatter = DateTimeFormatter.ofPattern(
-							clockUnit == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
+							MyApplication.VALUE_UNIT_OBJ.getClockUnit() == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
 									getString(R.string.datetime_pattern_clock24), Locale.getDefault());
 					binding.updatedDatetime.setText(dateTime.format(dateTimeFormatter));
 

@@ -37,18 +37,12 @@ import java.util.List;
 public class BaseForecastComparisonFragment extends Fragment {
 	protected BaseLayoutForecastComparisonBinding binding;
 	protected DateView dateRow;
-	protected SharedPreferences sharedPreferences;
-	protected ValueUnits tempUnit;
-	protected ValueUnits windUnit;
-	protected ValueUnits visibilityUnit;
-	protected ValueUnits clockUnit;
-	protected String tempUnitStr;
+	protected String tempUnitText;
 	protected Bundle bundle;
 	protected Double latitude;
 	protected Double longitude;
 	protected String addressName;
 	protected String countryCode;
-	protected WeatherProviderType mainWeatherProviderType;
 	protected ZoneId zoneId;
 
 	protected NotScrolledView[] notScrolledViews;
@@ -56,22 +50,13 @@ public class BaseForecastComparisonFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-
-		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
-		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));
-		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
-		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
-		tempUnitStr = ValueUnits.convertToStr(getContext(), tempUnit);
-
 		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
-		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(
-				BundleKey.WeatherDataSource.name());
+		tempUnitText = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 	}
 
 	@Override

@@ -13,9 +13,7 @@ import androidx.preference.PreferenceViewHolder;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.ValueUnit;
-
-import java.util.Locale;
+import com.lifedawn.bestweather.main.MyApplication;
 
 public class UnitPreference extends Preference {
 	private TextView unitTextView;
@@ -30,7 +28,7 @@ public class UnitPreference extends Preference {
 		super.onBindViewHolder(holder);
 		if (unitTextView == null) {
 			unitTextView = new TextView(getContext());
-			unitTextView.setText(ValueUnits.convertToStr(getContext(), valueUnit));
+			unitTextView.setText(MyApplication.VALUE_UNIT_OBJ.getTempUnitText());
 			unitTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
 			unitTextView.setTextColor(Color.BLACK);
 
@@ -54,7 +52,7 @@ public class UnitPreference extends Preference {
 	public void setUnit(ValueUnits valueUnit) {
 		this.valueUnit = valueUnit;
 		if (unitTextView != null) {
-			unitTextView.setText(ValueUnits.convertToStr(getContext(), valueUnit));
+			unitTextView.setText(ValueUnits.toString(valueUnit));
 		}
 	}
 

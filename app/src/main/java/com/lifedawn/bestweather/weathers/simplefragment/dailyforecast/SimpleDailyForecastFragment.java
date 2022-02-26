@@ -15,9 +15,9 @@ import androidx.fragment.app.FragmentManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
@@ -59,7 +59,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			public void onClick(View view) {
 				if (availableNetwork()) {
 					DailyForecastComparisonFragment comparisonFragment = new DailyForecastComparisonFragment();
-					comparisonFragment.setArguments(getArguments());
+					comparisonFragment.setArguments(bundle);
 
 					String tag = getString(R.string.tag_comparison_fragment);
 					FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
@@ -74,14 +74,14 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				Bundle bundle = new Bundle();
-				bundle.putSerializable(WeatherDataType.dailyForecast.name(), (Serializable) dailyForecastDtoList);
-				bundle.putString(BundleKey.AddressName.name(), addressName);
-				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
-				bundle.putSerializable(BundleKey.WeatherDataSource.name(), mainWeatherProviderType);
+				Bundle arguments = new Bundle();
+				arguments.putSerializable(WeatherDataType.dailyForecast.name(), (Serializable) dailyForecastDtoList);
+				arguments.putString(BundleKey.AddressName.name(), bundle.getString(BundleKey.AddressName.name()));
+				arguments.putSerializable(BundleKey.TimeZone.name(), bundle.getSerializable(BundleKey.TimeZone.name()));
+				arguments.putSerializable(BundleKey.WeatherProvider.name(), mainWeatherProviderType);
 
 				DetailDailyForecastFragment detailDailyForecastFragment = new DetailDailyForecastFragment();
-				detailDailyForecastFragment.setArguments(bundle);
+				detailDailyForecastFragment.setArguments(arguments);
 
 				String tag = getString(R.string.tag_detail_daily_forecast_fragment);
 				FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
@@ -129,7 +129,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
 
-		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
+		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String mm = "mm";
 		final String cm = "cm";
 

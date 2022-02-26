@@ -5,7 +5,6 @@ import android.content.Context;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 
 public class WeatherUtil {
 	private WeatherUtil() {
@@ -38,7 +37,7 @@ public class WeatherUtil {
 	}
 
 	public static String makeTempCompareToYesterdayText(String currentTempText, String yesterdayTemp, ValueUnits tempUnit, Context context) {
-		String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+		String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		int yesterdayTempVal = ValueUnits.convertTemperature(yesterdayTemp.replace(tempUnitStr,
 				""), tempUnit);
 		int todayTempVal = Integer.parseInt(currentTempText.replace(tempUnitStr, ""));

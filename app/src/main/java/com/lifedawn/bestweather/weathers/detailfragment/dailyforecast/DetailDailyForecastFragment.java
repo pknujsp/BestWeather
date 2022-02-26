@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 
@@ -19,7 +18,6 @@ import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment {
 
@@ -41,7 +39,7 @@ public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment
 
 	@Override
 	protected void setDataViewsByList() {
-		DailyForecastListAdapter adapter = new DailyForecastListAdapter(getContext(), this, tempUnit);
+		DailyForecastListAdapter adapter = new DailyForecastListAdapter(getContext(), this);
 		adapter.setDailyForecastDtoList(dailyForecastDtoList);
 		binding.listview.setAdapter(adapter);
 	}

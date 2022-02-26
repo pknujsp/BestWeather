@@ -24,6 +24,9 @@ public interface WidgetDao {
 	@Query("SELECT * FROM widget_table")
 	List<WidgetDto> getAll();
 
+	@Query("SELECT * FROM widget_table WHERE widgetProviderClassName = :widgetProviderClassName")
+	List<WidgetDto> getAll(String widgetProviderClassName);
+
 	@Query("DELETE FROM widget_table WHERE appWidgetId = :appWidgetId")
 	void delete(int appWidgetId);
 

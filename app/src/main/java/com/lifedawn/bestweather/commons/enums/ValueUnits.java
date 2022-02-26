@@ -1,12 +1,7 @@
 package com.lifedawn.bestweather.commons.enums;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.lifedawn.bestweather.R;
-
 public enum ValueUnits {
-	celsius, fahrenheit, mPerSec, kmPerHour, km, mile, clock12, clock24, percent, mm, hpa;
+	celsius, fahrenheit, mPerSec, kmPerHour, km, mile, clock12, clock24;
 
 	/*
 	accu weather 기본 단위
@@ -28,30 +23,24 @@ public enum ValueUnits {
 		throw new IllegalArgumentException();
 	}
 
-	public static String convertToStr(Context context, ValueUnits valueUnit) {
+	public static String toString(ValueUnits valueUnit) {
 		switch (valueUnit) {
 			case celsius:
 				return "℃";
 			case fahrenheit:
 				return "℉";
 			case mPerSec:
-				return context.getString(R.string.mPerSec);
+				return "m/s";
 			case kmPerHour:
-				return context.getString(R.string.kmPerHour);
+				return "km/h";
 			case km:
-				return context.getString(R.string.km);
+				return "km";
 			case mile:
-				return context.getString(R.string.mile);
+				return "mile";
 			case clock12:
-				return context.getString(R.string.clock12);
+				return "PM 3:00";
 			case clock24:
-				return context.getString(R.string.clock24);
-			case percent:
-				return context.getString(R.string.percent);
-			case mm:
-				return context.getString(R.string.mm);
-			case hpa:
-				return context.getString(R.string.hpa);
+				return "15:00";
 			default:
 				return null;
 		}

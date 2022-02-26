@@ -1,8 +1,11 @@
 package com.lifedawn.bestweather.widget.foreground;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
@@ -302,11 +305,7 @@ public class WidgetForegroundService extends Service {
 
 				}
 			});
-
-		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
-
 		}
-
 		return START_NOT_STICKY;
 	}
 

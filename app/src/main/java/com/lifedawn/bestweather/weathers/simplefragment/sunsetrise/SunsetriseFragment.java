@@ -35,9 +35,6 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	private Location location;
 	private Double latitude;
 	private Double longitude;
-	private String addressName;
-	private String countryCode;
-	private WeatherProviderType mainWeatherProviderType;
 	private ZoneId zoneId;
 	private Bundle bundle;
 	private boolean registeredReceiver = false;
@@ -49,10 +46,6 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
-		addressName = bundle.getString(BundleKey.AddressName.name());
-		countryCode = bundle.getString(BundleKey.CountryCode.name());
-		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(
-				BundleKey.WeatherDataSource.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
 		location = new Location(latitude, longitude);

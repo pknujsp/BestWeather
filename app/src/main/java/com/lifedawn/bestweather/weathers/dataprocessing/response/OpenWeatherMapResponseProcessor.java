@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.currentweather.OwmCurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
@@ -94,18 +95,20 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoListOneCall(Context context,
-	                                                                       OwmOneCallResponse owmOneCallResponse,
-	                                                                       ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
-		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
+	                                                                       OwmOneCallResponse owmOneCallResponse) {
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		ValueUnits visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
+		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String percent = "%";
 		final String mm = "mm";
 
-		final String windUnitStr = ValueUnits.convertToStr(context, windUnit);
+		final String windUnitStr = MyApplication.VALUE_UNIT_OBJ.getWindUnitText();
 		final String zeroSnowVolume = "0.0mm";
 		final String zeroRainVolume = "0.0mm";
 		final String zeroPrecipitationVolume = "0.0mm";
 		final String pressureUnit = "hpa";
-		final String visibilityUnitStr = ValueUnits.convertToStr(context, visibilityUnit);
+		final String visibilityUnitStr = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnitText();
 
 		String snowVolume;
 		String rainVolume;
@@ -166,12 +169,13 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 
 	public static List<DailyForecastDto> makeDailyForecastDtoListOneCall(Context context,
-	                                                                     OwmOneCallResponse owmOneCallResponse,
-	                                                                     ValueUnits windUnit, ValueUnits tempUnit) {
-		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
+	                                                                     OwmOneCallResponse owmOneCallResponse) {
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String mm = "mm";
 		final String percent = "%";
-		final String wind = ValueUnits.convertToStr(context, windUnit);
+		final String wind = MyApplication.VALUE_UNIT_OBJ.getWindUnitText();
 		final String zeroSnowVolume = "0.0mm";
 		final String zeroRainVolume = "0.0mm";
 		final String hpa = "hpa";
@@ -238,9 +242,11 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 
 	public static CurrentConditionsDto makeCurrentConditionsDtoOneCall(Context context,
-	                                                                   OwmOneCallResponse owmOneCallResponse,
-	                                                                   ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
-		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+	                                                                   OwmOneCallResponse owmOneCallResponse) {
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		ValueUnits visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
+		final String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String percent = "%";
 		final ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
 
@@ -258,17 +264,16 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		currentConditionsDto.setDewPoint(ValueUnits.convertTemperature(item.getDewPoint(), tempUnit) + tempUnitStr);
 		currentConditionsDto.setWindDirectionDegree(Integer.parseInt(item.getWind_deg()));
 		currentConditionsDto.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, item.getWind_deg()));
-		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(item.getWind_speed(), windUnit) + ValueUnits.convertToStr(context, windUnit));
+		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(item.getWind_speed(), windUnit) + MyApplication.VALUE_UNIT_OBJ.getWindUnitText());
 		if (item.getWindGust() != null) {
-			currentConditionsDto.setWindGust(ValueUnits.convertWindSpeed(item.getWindGust(), windUnit) + ValueUnits.convertToStr(context,
-					windUnit));
+			currentConditionsDto.setWindGust(ValueUnits.convertWindSpeed(item.getWindGust(), windUnit) + MyApplication.VALUE_UNIT_OBJ.getWindUnitText());
 		}
 		currentConditionsDto.setSimpleWindStrength(WindUtil.getSimpleWindSpeedDescription(item.getWind_speed()));
 		currentConditionsDto.setWindStrength(WindUtil.getWindSpeedDescription(item.getWind_speed()));
 		currentConditionsDto.setPressure(item.getPressure() + "hpa");
 		currentConditionsDto.setUvIndex(item.getUvi());
 		currentConditionsDto.setVisibility(ValueUnits.convertVisibility(item.getVisibility(),
-				visibilityUnit) + ValueUnits.convertToStr(context, visibilityUnit));
+				visibilityUnit) + MyApplication.VALUE_UNIT_OBJ.getVisibilityUnitText());
 		currentConditionsDto.setCloudiness(item.getClouds() + percent);
 
 		double precipitationVolume = 0.0;
@@ -300,9 +305,11 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static CurrentConditionsDto makeCurrentConditionsDtoIndividual(Context context,
-	                                                                      OwmCurrentConditionsResponse response,
-	                                                                      ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
-		final String tempUnitStr = ValueUnits.convertToStr(context, tempUnit);
+	                                                                      OwmCurrentConditionsResponse response) {
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		ValueUnits visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
+		final String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String percent = "%";
 		final Integer timeZoneSecond = Integer.parseInt(response.getTimezone());
 		final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(timeZoneSecond);
@@ -322,17 +329,15 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		currentConditionsDto.setHumidity(response.getMain().getHumidity() + percent);
 		currentConditionsDto.setWindDirectionDegree(Integer.parseInt(response.getWind().getDeg()));
 		currentConditionsDto.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, response.getWind().getDeg()));
-		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(response.getWind().getSpeed(), windUnit) + ValueUnits.convertToStr(context,
-				windUnit));
+		currentConditionsDto.setWindSpeed(ValueUnits.convertWindSpeed(response.getWind().getSpeed(), windUnit) + MyApplication.VALUE_UNIT_OBJ.getWindUnitText());
 		if (response.getWind().getGust() != null) {
-			currentConditionsDto.setWindGust(ValueUnits.convertWindSpeed(response.getWind().getGust(), windUnit) + ValueUnits.convertToStr(context,
-					windUnit));
+			currentConditionsDto.setWindGust(ValueUnits.convertWindSpeed(response.getWind().getGust(), windUnit) + MyApplication.VALUE_UNIT_OBJ.getWindUnitText());
 		}
 		currentConditionsDto.setSimpleWindStrength(WindUtil.getSimpleWindSpeedDescription(response.getWind().getSpeed()));
 		currentConditionsDto.setWindStrength(WindUtil.getWindSpeedDescription(response.getWind().getSpeed()));
 		currentConditionsDto.setPressure(response.getMain().getPressure() + "hpa");
 		currentConditionsDto.setVisibility(ValueUnits.convertVisibility(response.getVisibility(),
-				visibilityUnit) + ValueUnits.convertToStr(context, visibilityUnit));
+				visibilityUnit) + MyApplication.VALUE_UNIT_OBJ.getVisibilityUnitText());
 		currentConditionsDto.setCloudiness(response.getClouds().getAll() + percent);
 
 		double precipitationVolume = 0.0;
@@ -354,18 +359,20 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoListIndividual(Context context,
-	                                                                          OwmHourlyForecastResponse owmHourlyForecastResponse,
-	                                                                          ValueUnits windUnit, ValueUnits tempUnit, ValueUnits visibilityUnit) {
-		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
+	                                                                          OwmHourlyForecastResponse owmHourlyForecastResponse) {
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		ValueUnits visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
+		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String percent = "%";
 		final String mm = "mm";
 
-		final String windUnitStr = ValueUnits.convertToStr(context, windUnit);
+		final String windUnitStr = MyApplication.VALUE_UNIT_OBJ.getWindUnitText();
 		final String zeroSnowVolume = "0.0mm";
 		final String zeroRainVolume = "0.0mm";
 		final String zeroPrecipitationVolume = "0.0mm";
 		final String pressureUnit = "hpa";
-		final String visibilityUnitStr = ValueUnits.convertToStr(context, visibilityUnit);
+		final String visibilityUnitStr = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnitText();
 
 		String snowVolume;
 		String rainVolume;
@@ -425,12 +432,13 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<DailyForecastDto> makeDailyForecastDtoListIndividual(Context context,
-	                                                                        OwmDailyForecastResponse owmDailyForecastResponse,
-	                                                                        ValueUnits windUnit, ValueUnits tempUnit) {
-		final String tempDegree = ValueUnits.convertToStr(null, tempUnit);
+	                                                                        OwmDailyForecastResponse owmDailyForecastResponse) {
+		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String mm = "mm";
 		final String percent = "%";
-		final String wind = ValueUnits.convertToStr(context, windUnit);
+		final String wind = MyApplication.VALUE_UNIT_OBJ.getWindUnitText();
 		final String zeroSnowVolume = "0.0mm";
 		final String zeroRainVolume = "0.0mm";
 		final String hpa = "hpa";

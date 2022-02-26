@@ -11,16 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class DetailHourlyForecastFragment extends BaseDetailHourlyForecastFragment {
 
@@ -42,7 +38,7 @@ public class DetailHourlyForecastFragment extends BaseDetailHourlyForecastFragme
 	@Override
 	protected void setDataViewsByList() {
 		HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(getContext(),
-				this, tempUnit);
+				this);
 		adapter.setHourlyForecastDtoList(hourlyForecastDtoList);
 		binding.listview.setAdapter(adapter);
 	}

@@ -37,7 +37,6 @@ import com.lifedawn.bestweather.weathers.FragmentType;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -50,12 +49,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	private AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse;
 	private Double latitude;
 	private Double longitude;
-	private String addressName;
-	private String countryCode;
-	private WeatherProviderType mainWeatherProviderType;
 	private ZoneId zoneId;
-	private ZoneOffset zoneOffset;
-	private ValueUnits clockUnit;
 	private Bundle bundle;
 
 	@Override
@@ -65,15 +59,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
-		addressName = bundle.getString(BundleKey.AddressName.name());
-		countryCode = bundle.getString(BundleKey.CountryCode.name());
-		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(BundleKey.WeatherDataSource.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
-
-		zoneOffset = ZonedDateTime.now(zoneId).getOffset();
-
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
 	}
 
 	@Override

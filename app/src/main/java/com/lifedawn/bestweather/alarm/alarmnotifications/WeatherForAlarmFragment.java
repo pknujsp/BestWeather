@@ -22,6 +22,7 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.databinding.FragmentWeatherForAlarmBinding;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
@@ -62,16 +63,14 @@ public class WeatherForAlarmFragment extends Fragment {
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 	private ValueUnits tempUnit;
-	private ValueUnits windUnit;
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		alarmDto = (AlarmDto) getArguments().getSerializable(AlarmDto.class.getName());
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
-		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));
+		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 	}
 
 	@Override
@@ -256,7 +255,7 @@ public class WeatherForAlarmFragment extends Fragment {
 				weatherIcon = KmaResponseProcessor.getWeatherSkyIconImg(finalHourlyForecastList.get(0).getSky(),
 						SunRiseSetUtil.isNight(calendar, sunRise, sunSet));
 				temp = ValueUnits.convertTemperature(finalCurrentConditions.getTemperature(),
-						tempUnit) + ValueUnits.convertToStr(getContext(), tempUnit);
+						tempUnit) + MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 				break;
 			case ACCU_WEATHER:
 				MultipleRestApiDownloader.ResponseResult currentConditionsResponseResult =
@@ -280,8 +279,8 @@ public class WeatherForAlarmFragment extends Fragment {
 				}
 
 				weatherIcon = AccuWeatherResponseProcessor.getWeatherIconImg(item.getWeatherIcon());
-				temp = ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(), tempUnit) + ValueUnits.convertToStr(
-						getContext(), tempUnit);
+				temp =
+						ValueUnits.convertTemperature(item.getTemperature().getMetric().getValue(), tempUnit) + MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 				break;
 			case OWM_ONECALL:
 				MultipleRestApiDownloader.ResponseResult owmResponseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
@@ -306,7 +305,7 @@ public class WeatherForAlarmFragment extends Fragment {
 				}
 
 				weatherIcon = OpenWeatherMapResponseProcessor.getWeatherIconImg(current.getWeather().get(0).getId(), current.getWeather().get(0).getIcon().contains("n"));
-				temp = ValueUnits.convertTemperature(current.getTemp(), tempUnit) + ValueUnits.convertToStr(getContext(), tempUnit);
+				temp = ValueUnits.convertTemperature(current.getTemp(), tempUnit) + MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 				break;
 		}
 
@@ -345,7 +344,7 @@ public class WeatherForAlarmFragment extends Fragment {
 		defaultBundle.putDouble(BundleKey.Longitude.name(), longitude);
 		defaultBundle.putString(BundleKey.AddressName.name(), alarmDto.getLocationAddressName());
 		defaultBundle.putString(BundleKey.CountryCode.name(), alarmDto.getLocationCountryCode());
-		defaultBundle.putSerializable(BundleKey.WeatherDataSource.name(), weatherProviderType);
+		defaultBundle.putSerializable(BundleKey.WeatherProvider.name(), weatherProviderType);
 		defaultBundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
 
 		hourlyForecastFragment.setArguments(defaultBundle);

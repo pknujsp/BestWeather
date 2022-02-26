@@ -135,82 +135,8 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void initWidgets() {
-		WidgetRepository widgetRepository = new WidgetRepository(getApplicationContext());
-		widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
-			@Override
-			public void onResultSuccessful(List<WidgetDto> result) {
-				if (result.size() > 0) {
-					AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
-					ArrayMap<Class<?>, List<Integer>> widgetArrMap = new ArrayMap<>();
-					Map<Integer, WidgetDto> widgetDtoMap = new HashMap<>();
-					WidgetHelper widgetHelper = null;
-
-					for (WidgetDto widgetDto : result) {
-						final AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(widgetDto.getAppWidgetId());
-						ComponentName componentName = appWidgetProviderInfo.provider;
-						final String providerClassName = componentName.getClassName();
-						try {
-							Class<?> cls = Class.forName(providerClassName);
-
-							if (!widgetArrMap.containsKey(cls)) {
-								widgetArrMap.put(cls, new ArrayList<>());
-							}
-							widgetArrMap.get(cls).add(widgetDto.getAppWidgetId());
-							widgetDtoMap.put(widgetDto.getAppWidgetId(), widgetDto);
-						} catch (ClassNotFoundException e) {
-							e.printStackTrace();
-							return;
-						}
-					}
-
-					int requestCode = 100000;
-					for (Class<?> cls : widgetArrMap.keySet()) {
-						Intent refreshIntent = null;
-						try {
-							refreshIntent = new Intent(getApplicationContext(), cls);
-							refreshIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-
-							Bundle bundle = new Bundle();
-							List<Integer> idList = widgetArrMap.valueAt(widgetArrMap.indexOfKey(cls));
-							int[] ids = new int[idList.size()];
-							int index = 0;
-
-							if (widgetHelper == null) {
-								widgetHelper = new WidgetHelper(getApplicationContext());
-							}
-
-							for (Integer id : idList) {
-								ids[index++] = id;
-
-								if (widgetDtoMap.get(id).getUpdateIntervalMillis() > 0) {
-
-									if (!widgetHelper.isRepeating(id, cls)) {
-										widgetHelper.onSelectedAutoRefreshInterval(widgetDtoMap.get(id).getUpdateIntervalMillis(), id, cls);
-									}
-								}
-							}
-							bundle.putIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-							refreshIntent.putExtras(bundle);
-
-							PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), requestCode++, refreshIntent,
-									PendingIntent.FLAG_ONE_SHOT);
-							pendingIntent.send();
-
-						} catch (PendingIntent.CanceledException e) {
-							e.printStackTrace();
-							return;
-						}
-					}
-
-
-				}
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
+		WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
+		widgetHelper.reDrawWidgets();
 	}
 
 }

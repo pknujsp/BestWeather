@@ -25,6 +25,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -70,12 +71,9 @@ public abstract class AbstractWidgetCreator {
 		this.widgetUpdateCallback = widgetUpdateCallback;
 		this.appWidgetId = appWidgetId;
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
-				ValueUnits.celsius.name()));
-		clockUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_clock),
-				ValueUnits.clock12.name()));
-		tempDegree = ValueUnits.convertToStr(null, tempUnit);
+		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit();
+		tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 
 		widgetRepository = new WidgetRepository(context);
 		appWidgetManager = AppWidgetManager.getInstance(context);

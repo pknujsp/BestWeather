@@ -11,11 +11,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
-import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,9 +28,6 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	protected BaseLayoutSimpleCurrentConditionsBinding binding;
 	protected SharedPreferences sharedPreferences;
 	protected ValueUnits tempUnit;
-	protected ValueUnits windUnit;
-	protected ValueUnits visibilityUnit;
-	protected ValueUnits clockUnit;
 	protected Double latitude;
 	protected Double longitude;
 	protected String addressName;
@@ -44,11 +41,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-
-		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
-		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));
-		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
-		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
+		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 
 		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 
@@ -57,7 +50,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		countryCode = bundle.getString(BundleKey.CountryCode.name());
 		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(
-				BundleKey.WeatherDataSource.name());
+				BundleKey.WeatherProvider.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
 		zoneOffset = ZonedDateTime.now(zoneId).getOffset();

@@ -19,6 +19,8 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 public class OngoingNotificationForegroundService extends Service {
+	private Timer timer;
+
 	public OngoingNotificationForegroundService() {
 	}
 
@@ -43,7 +45,7 @@ public class OngoingNotificationForegroundService extends Service {
 		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.ForegroundService);
 
 		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
-		builder.setSmallIcon(R.mipmap.ic_launcher_round).setContentText(getString(R.string.msg_refreshing_weather_data)).setContentTitle(getString(R.string.msg_refreshing_weather_data))
+		builder.setSmallIcon(R.mipmap.ic_launcher_round).setContentText(getString(R.string.updatingNotification)).setContentTitle(getString(R.string.updatingNotification))
 				.setOnlyAlertOnce(true).setWhen(0).setOngoing(true);
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -57,7 +59,14 @@ public class OngoingNotificationForegroundService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		final String action = intent.getAction();
-		final Timer timer = new Timer();
+		timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				timer = null;
+				stopService();
+			}
+		}, TimeUnit.SECONDS.toMillis(25L));
 
 		if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 			OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
@@ -89,6 +98,10 @@ public class OngoingNotificationForegroundService extends Service {
 	}
 
 	private void stopService() {
+		if (timer != null) {
+			timer.cancel();
+			timer = null;
+		}
 		stopForeground(true);
 		stopSelf();
 	}

@@ -21,6 +21,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
@@ -54,12 +55,9 @@ public abstract class AbstractOngoingNotiViewCreator {
 		this.notificationUpdateCallback = notificationUpdateCallback;
 		this.notificationType = notificationType;
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
-				ValueUnits.celsius.name()));
-		tempDegree = ValueUnits.convertToStr(null, tempUnit);
-		windSpeedUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
-				ValueUnits.mPerSec.name()));
+		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
+		windSpeedUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
 		notificationHelper = new NotificationHelper(context);
 	}
 
@@ -90,7 +88,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 								.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode())
 								.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getAddressName()).commit();
 
-						loadWeatherData( expandedRemoteViews);
+						loadWeatherData(expandedRemoteViews);
 					}
 				});
 			}
