@@ -448,4 +448,5 @@
     <string name="notificationForegroundServiceChannelName">포그라운드</string>
     <string name="notificationForegroundServiceChannelDescription">위젯/알림 데이터를 가져올 때 표시됩니다</string>
     <string name="updatingNotification">알림 업데이트 중...</string>
+    <string name="data_type_of_icon">아이콘 표시 유형</string>
 </resources>
