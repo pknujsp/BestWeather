@@ -653,6 +653,11 @@
         <item>21600000</item>
     </string-array>
 
+    <string-array name="DataTypeOfIcons">
+        <item>@string/temperature</item>
+        <item>@string/weather</item>
+    </string-array>
+
     <string-array name="DailyPushNotificationType">
         <item>@string/FirstDailyPushNotification</item>
         <item>@string/SecondDailyPushNotification</item>

@@ -43,15 +43,19 @@ import org.jetbrains.annotations.NotNull;
 
 public class OngoingNotificationSettingsFragment extends Fragment implements NotificationUpdateCallback {
 	private final NotificationType notificationType = NotificationType.Ongoing;
+	private final WidgetNotiConstants.DataTypeOfIcon[] dataTypeOfIcons =
+			new WidgetNotiConstants.DataTypeOfIcon[]{WidgetNotiConstants.DataTypeOfIcon.TEMPERATURE, WidgetNotiConstants.DataTypeOfIcon.WEATHER_ICON};
+
 	private FragmentBaseNotificationSettingsBinding binding;
 
-	private OngoingNotiViewCreator alwaysNotiViewCreator;
+	private OngoingNotiViewCreator ongoingNotiViewCreator;
 	private boolean initializing = true;
 	private OngoingNotificationHelper ongoingNotificationHelper;
 	private FavoriteAddressDto newSelectedAddressDto;
 	private FavoriteAddressDto originalSelectedFavoriteAddressDto;
 
 	private long[] intervalsLong;
+
 	private NotificationHelper notificationHelper;
 	private boolean originalEnabled;
 	private boolean selectedFavoriteLocation;
@@ -83,7 +87,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 			intervalsLong[i] = Long.parseLong(intervalsStr[i]);
 		}
 
-		alwaysNotiViewCreator = new OngoingNotiViewCreator(getActivity().getApplicationContext(), this);
+		ongoingNotiViewCreator = new OngoingNotiViewCreator(getActivity().getApplicationContext(), this);
 		ongoingNotificationHelper = new OngoingNotificationHelper(getActivity().getApplicationContext());
 
 		initPreferences();
@@ -117,6 +121,10 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.AutoRefreshIntervals));
 		binding.commons.autoRefreshIntervalSpinner.setAdapter(spinnerAdapter);
 
+		SpinnerAdapter dataTypeOfIconSpinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,
+				getResources().getStringArray(R.array.DataTypeOfIcons));
+		binding.dataTypeOfIconSpinner.setAdapter(dataTypeOfIconSpinnerAdapter);
+
 		initLocation();
 		initWeatherProvider();
 		initAutoRefreshInterval();
@@ -132,11 +140,11 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 
 					if (isChecked) {
 						if (NotificationManagerCompat.from(getContext()).areNotificationsEnabled()) {
-							alwaysNotiViewCreator.savePreferences();
-							alwaysNotiViewCreator.loadSavedPreferences();
+							ongoingNotiViewCreator.savePreferences();
+							ongoingNotiViewCreator.loadSavedPreferences();
 
-							alwaysNotiViewCreator.initNotification(null);
-							onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
+							ongoingNotiViewCreator.initNotification(null);
+							ongoingNotificationHelper.onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
 						} else {
 							Toast.makeText(getContext(), R.string.disabledNotification, Toast.LENGTH_SHORT).show();
 							binding.notificationSwitch.setChecked(false);
@@ -156,29 +164,27 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		});
 
 
-		RemoteViews remoteViews = alwaysNotiViewCreator.createRemoteViews(true);
+		RemoteViews remoteViews = ongoingNotiViewCreator.createRemoteViews(true);
 		View previewWidgetView = remoteViews.apply(getActivity().getApplicationContext(), binding.previewLayout);
 		binding.previewLayout.addView(previewWidgetView);
 
 		binding.notificationSwitch.setChecked(originalEnabled);
-		if (alwaysNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.SelectedAddress) {
+		if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.SelectedAddress) {
 			originalSelectedFavoriteAddressDto = new FavoriteAddressDto();
-			originalSelectedFavoriteAddressDto.setAddress(alwaysNotiViewCreator.getNotificationDataObj().getAddressName());
-			originalSelectedFavoriteAddressDto.setCountryCode(alwaysNotiViewCreator.getNotificationDataObj().getCountryCode());
-			originalSelectedFavoriteAddressDto.setLatitude(String.valueOf(alwaysNotiViewCreator.getNotificationDataObj().getLatitude()));
-			originalSelectedFavoriteAddressDto.setLongitude(String.valueOf(alwaysNotiViewCreator.getNotificationDataObj().getLongitude()));
+			originalSelectedFavoriteAddressDto.setAddress(ongoingNotiViewCreator.getNotificationDataObj().getAddressName());
+			originalSelectedFavoriteAddressDto.setCountryCode(ongoingNotiViewCreator.getNotificationDataObj().getCountryCode());
+			originalSelectedFavoriteAddressDto.setLatitude(String.valueOf(ongoingNotiViewCreator.getNotificationDataObj().getLatitude()));
+			originalSelectedFavoriteAddressDto.setLongitude(String.valueOf(ongoingNotiViewCreator.getNotificationDataObj().getLongitude()));
 
 			selectedFavoriteLocation = true;
 			binding.commons.selectedLocationRadio.setChecked(true);
-			binding.commons.selectedAddressName.setText(alwaysNotiViewCreator.getNotificationDataObj().getAddressName());
+			binding.commons.selectedAddressName.setText(ongoingNotiViewCreator.getNotificationDataObj().getAddressName());
 		} else {
 			binding.commons.currentLocationRadio.setChecked(true);
 		}
 
-		binding.commons.kmaTopPrioritySwitch.setChecked(alwaysNotiViewCreator.getNotificationDataObj().isTopPriorityKma());
-
 		final String[] intervalsStr = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
-		final long autoRefreshInterval = alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis();
+		final long autoRefreshInterval = ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis();
 
 		for (int i = 0; i < intervalsStr.length; i++) {
 			if (Long.parseLong(intervalsStr[i]) == autoRefreshInterval) {
@@ -186,6 +192,18 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 				break;
 			}
 		}
+
+		binding.dataTypeOfIconSpinner.setSelection(ongoingNotiViewCreator.getNotificationDataObj().getDataTypeOfIcon() == WidgetNotiConstants.DataTypeOfIcon.TEMPERATURE
+				? 0 : 1, false);
+
+		binding.commons.kmaTopPrioritySwitch.setChecked(ongoingNotiViewCreator.getNotificationDataObj().isTopPriorityKma());
+
+		initDataTypeOfIconSpinner();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
 		initializing = false;
 	}
 
@@ -199,8 +217,29 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		binding.commons.autoRefreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				long autoRefreshInterval = intervalsLong[position];
-				onSelectedAutoRefreshInterval(autoRefreshInterval);
+				if (!initializing) {
+					ongoingNotiViewCreator.getNotificationDataObj().setUpdateIntervalMillis(intervalsLong[position]);
+					ongoingNotiViewCreator.savePreferences();
+					ongoingNotificationHelper.onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
+				}
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
+			}
+		});
+	}
+
+	protected void initDataTypeOfIconSpinner() {
+		binding.dataTypeOfIconSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				if (!initializing) {
+					ongoingNotiViewCreator.getNotificationDataObj().setDataTypeOfIcon(dataTypeOfIcons[position]);
+					ongoingNotiViewCreator.savePreferences();
+					ongoingNotiViewCreator.initNotification(null);
+				}
 			}
 
 			@Override
@@ -304,24 +343,24 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 	public void onSelectedFavoriteLocation(FavoriteAddressDto favoriteAddressDto) {
 		if (!initializing) {
 			originalSelectedFavoriteAddressDto = favoriteAddressDto;
-			alwaysNotiViewCreator.getNotificationDataObj().setAddressName(favoriteAddressDto.getAddress())
+			ongoingNotiViewCreator.getNotificationDataObj().setAddressName(favoriteAddressDto.getAddress())
 					.setCountryCode(favoriteAddressDto.getCountryCode())
 					.setLatitude(Float.parseFloat(favoriteAddressDto.getLatitude())).setLongitude(Float.parseFloat(favoriteAddressDto.getLongitude()));
 
-			alwaysNotiViewCreator.getNotificationDataObj().setLocationType(LocationType.SelectedAddress);
-			alwaysNotiViewCreator.savePreferences();
-			alwaysNotiViewCreator.loadSavedPreferences();
+			ongoingNotiViewCreator.getNotificationDataObj().setLocationType(LocationType.SelectedAddress);
+			ongoingNotiViewCreator.savePreferences();
+			ongoingNotiViewCreator.loadSavedPreferences();
 
-			alwaysNotiViewCreator.initNotification(null);
+			ongoingNotiViewCreator.initNotification(null);
 		}
 	}
 
 	public void onSelectedCurrentLocation() {
 		if (!initializing) {
-			alwaysNotiViewCreator.getNotificationDataObj().setLocationType(LocationType.CurrentLocation);
-			alwaysNotiViewCreator.savePreferences();
+			ongoingNotiViewCreator.getNotificationDataObj().setLocationType(LocationType.CurrentLocation);
+			ongoingNotiViewCreator.savePreferences();
 
-			alwaysNotiViewCreator.initNotification(null);
+			ongoingNotiViewCreator.initNotification(null);
 		}
 	}
 
@@ -333,36 +372,28 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 
 	public void onCheckedKmaPriority(boolean checked) {
 		if (!initializing) {
-			alwaysNotiViewCreator.getNotificationDataObj().setTopPriorityKma(checked);
-			alwaysNotiViewCreator.savePreferences();
+			ongoingNotiViewCreator.getNotificationDataObj().setTopPriorityKma(checked);
+			ongoingNotiViewCreator.savePreferences();
 
-			alwaysNotiViewCreator.initNotification(null);
+			ongoingNotiViewCreator.initNotification(null);
 		}
 	}
 
 	public void onCheckedWeatherProvider(WeatherProviderType weatherProviderType) {
 		if (!initializing) {
-			if (alwaysNotiViewCreator.getNotificationDataObj().getWeatherSourceType() != weatherProviderType) {
+			if (ongoingNotiViewCreator.getNotificationDataObj().getWeatherSourceType() != weatherProviderType) {
 
-				alwaysNotiViewCreator.getNotificationDataObj().setWeatherSourceType(weatherProviderType);
-				alwaysNotiViewCreator.savePreferences();
+				ongoingNotiViewCreator.getNotificationDataObj().setWeatherSourceType(weatherProviderType);
+				ongoingNotiViewCreator.savePreferences();
 
-				alwaysNotiViewCreator.initNotification(null);
+				ongoingNotiViewCreator.initNotification(null);
 			}
 		}
 	}
 
-	public void onSelectedAutoRefreshInterval(long val) {
-		if (!initializing) {
-			alwaysNotiViewCreator.getNotificationDataObj().setUpdateIntervalMillis(val);
-			alwaysNotiViewCreator.savePreferences();
-
-			ongoingNotificationHelper.onSelectedAutoRefreshInterval(alwaysNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
-		}
-	}
 
 	public void initPreferences() {
-		alwaysNotiViewCreator.loadPreferences();
+		ongoingNotiViewCreator.loadPreferences();
 	}
 
 

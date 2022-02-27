@@ -512,6 +512,7 @@
     <string name="updatingWidgets">updating widgets...</string>
     <string name="runningUpdateService">running updates...</string>
     <string name="updatingNotification">updating Notification...</string>
+    <string name="data_type_of_icon">아이콘 표시 유형</string>
 
 
 </resources>

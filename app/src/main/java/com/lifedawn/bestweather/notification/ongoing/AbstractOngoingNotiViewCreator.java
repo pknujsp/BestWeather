@@ -9,7 +9,6 @@ import android.location.Location;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
-import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
@@ -110,7 +109,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 				expandedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 				RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, errorType);
 
-				makeNotification(expandedRemoteViews, R.mipmap.ic_launcher_round, true);
+				makeNotification(expandedRemoteViews, R.mipmap.ic_launcher_round, null, true);
 			}
 		};
 		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, true);
@@ -119,7 +118,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 
 	public void loadWeatherData(RemoteViews expandedRemoteViews) {
 		RemoteViewsUtil.onBeginProcess(expandedRemoteViews);
-		makeNotification(expandedRemoteViews, R.mipmap.ic_launcher_round, false);
+		makeNotification(expandedRemoteViews, R.mipmap.ic_launcher_round, null, false);
 
 		final Set<WeatherDataType> weatherDataTypeSet = getRequestWeatherDataTypeSet();
 		WeatherProviderType weatherProviderType = notificationDataObj.getWeatherSourceType();
@@ -166,7 +165,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 	                                       WeatherProviderType requestWeatherProviderType, @Nullable MultipleRestApiDownloader multipleRestApiDownloader,
 	                                       Set<WeatherDataType> weatherDataTypeSet);
 
-	abstract protected void makeNotification(RemoteViews expandedRemoteViews, int icon, boolean isFinished);
+	abstract protected void makeNotification(RemoteViews expandedRemoteViews, int icon, String temperature, boolean isFinished);
 
 	abstract public void loadSavedPreferences();
 

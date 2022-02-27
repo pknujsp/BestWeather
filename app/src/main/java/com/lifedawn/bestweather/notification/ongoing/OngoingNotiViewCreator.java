@@ -2,7 +2,15 @@ package com.lifedawn.bestweather.notification.ongoing;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.text.TextPaint;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -10,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.IconCompat;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
@@ -20,10 +29,11 @@ import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
-import com.lifedawn.bestweather.notification.model.AlwaysNotiDataObj;
+import com.lifedawn.bestweather.notification.model.OngoingNotiDataObj;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -69,18 +79,20 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		this.callback = callback;
 		RemoteViews remoteViews = createRemoteViews(false);
 		RemoteViewsUtil.onBeginProcess(remoteViews);
-		makeNotification(remoteViews, R.drawable.refresh, false);
+		makeNotification(remoteViews, R.drawable.refresh, null, false);
 
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				timer = null;
-				remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
-				RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-				makeNotification(remoteViews, R.mipmap.ic_launcher_round, true);
+				if (callback != null) {
+					remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+					RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+					makeNotification(remoteViews, R.mipmap.ic_launcher_round, null, true);
 
-				callback.onResult();
+					callback.onResult();
+				}
 			}
 		}, TimeUnit.SECONDS.toMillis(20L));
 
@@ -105,6 +117,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		ZoneOffset zoneOffset = null;
 		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		int icon = R.mipmap.ic_launcher_round;
+		String temperature = null;
 
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
 				requestWeatherProviderType);
@@ -112,6 +125,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			setCurrentConditionsViews(expandedRemoteViews, currentConditionsDto);
 			icon = currentConditionsDto.getWeatherIcon();
+			temperature = currentConditionsDto.getTemp().replace(MyApplication.VALUE_UNIT_OBJ.getTempUnitText(), "°");
 		}
 
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
@@ -141,7 +155,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 			RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 		}
 
-		makeNotification(expandedRemoteViews, icon, true);
+		makeNotification(expandedRemoteViews, icon, temperature, true);
 	}
 
 	public void setHeaderViews(RemoteViews remoteViews, String addressName, String dateTime) {
@@ -244,15 +258,45 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		}
 	}
 
-	public void makeNotification(RemoteViews expandedRemoteViews, int icon, boolean isFinished) {
+	@Override
+	public void makeNotification(RemoteViews expandedRemoteViews, int icon, @Nullable String temperature, boolean isFinished) {
 		boolean enabled =
 				PreferenceManager.getDefaultSharedPreferences(context).getBoolean(notificationType.getPreferenceName(), false);
 
 		if (enabled) {
 			NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(notificationType);
-
 			NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
-			builder.setSmallIcon(icon).setAutoCancel(false).setOngoing(true).setOnlyAlertOnce(true)
+
+			if (isFinished) {
+				if (temperature != null) {
+					if (notificationDataObj.getDataTypeOfIcon() == WidgetNotiConstants.DataTypeOfIcon.TEMPERATURE) {
+						final int iconSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, context.getResources().getDisplayMetrics());
+						final int textSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18f,
+								context.getResources().getDisplayMetrics());
+						Bitmap iconBitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
+
+						TextPaint textPaint = new TextPaint();
+						textPaint.setColor(Color.WHITE);
+						textPaint.setTextAlign(Paint.Align.CENTER);
+						textPaint.setTextSize(textSize);
+
+						Rect textRect = new Rect();
+						textPaint.getTextBounds(temperature, 0, temperature.length(), textRect);
+						Canvas canvas = new Canvas(iconBitmap);
+						canvas.drawText(temperature, canvas.getWidth() / 2, canvas.getHeight() / 2 + textRect.height() / 2, textPaint);
+
+						builder.setSmallIcon(IconCompat.createWithBitmap(iconBitmap));
+					} else {
+						builder.setSmallIcon(icon);
+					}
+				} else {
+					builder.setSmallIcon(icon);
+				}
+			} else {
+				builder.setSmallIcon(icon);
+			}
+
+			builder.setAutoCancel(false).setOngoing(true).setOnlyAlertOnce(true)
 					.setCustomContentView(expandedRemoteViews).setCustomBigContentView(expandedRemoteViews).setSilent(true);
 
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -266,12 +310,14 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 			notificationHelper.cancelNotification(notificationType.getNotificationId());
 		}
 
-		if (isFinished && callback != null) {
+		if (isFinished) {
 			if (timer != null) {
 				timer.cancel();
 				timer = null;
 			}
-			callback.onResult();
+			if (callback != null) {
+				callback.onResult();
+			}
 		}
 	}
 
@@ -311,13 +357,15 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	public void loadSavedPreferences() {
 		SharedPreferences notiPreferences = context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
 
-		notificationDataObj = new AlwaysNotiDataObj();
+		notificationDataObj = new OngoingNotiDataObj();
 		notificationDataObj.setLocationType(LocationType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), LocationType.CurrentLocation.name())));
 		notificationDataObj.setWeatherSourceType(WeatherProviderType.valueOf(notiPreferences.getString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(),
 				WeatherProviderType.OWM_ONECALL.name())));
 		notificationDataObj.setTopPriorityKma(notiPreferences.getBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), false));
 		notificationDataObj.setUpdateIntervalMillis(notiPreferences.getLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), 0L));
 		notificationDataObj.setSelectedAddressDtoId(notiPreferences.getInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), 0));
+		notificationDataObj.setDataTypeOfIcon(WidgetNotiConstants.DataTypeOfIcon.valueOf(notiPreferences.getString(WidgetNotiConstants.OngoingNotiAttributes.DATA_TYPE_OF_ICON.name(),
+				WidgetNotiConstants.DataTypeOfIcon.TEMPERATURE.name())));
 
 		notificationDataObj.setAddressName(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), ""));
 		notificationDataObj.setLatitude(notiPreferences.getFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), 0f));
@@ -327,12 +375,13 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 
 	@Override
 	public void loadDefaultPreferences() {
-		notificationDataObj = new AlwaysNotiDataObj();
+		notificationDataObj = new OngoingNotiDataObj();
 		notificationDataObj.setLocationType(LocationType.CurrentLocation);
 		notificationDataObj.setWeatherSourceType(WeatherProviderType.OWM_ONECALL);
 		notificationDataObj.setTopPriorityKma(false);
 		notificationDataObj.setUpdateIntervalMillis(0);
 		notificationDataObj.setSelectedAddressDtoId(0);
+		notificationDataObj.setDataTypeOfIcon(WidgetNotiConstants.DataTypeOfIcon.TEMPERATURE);
 
 		SharedPreferences notiPreferences = context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = notiPreferences.edit();
@@ -341,6 +390,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		editor.putBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), notificationDataObj.isTopPriorityKma());
 		editor.putLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), notificationDataObj.getUpdateIntervalMillis());
 		editor.putInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), notificationDataObj.getSelectedAddressDtoId());
+		editor.putString(WidgetNotiConstants.OngoingNotiAttributes.DATA_TYPE_OF_ICON.name(), notificationDataObj.getDataTypeOfIcon().name());
 		editor.commit();
 	}
 
@@ -354,6 +404,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		editor.putBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), notificationDataObj.isTopPriorityKma());
 		editor.putLong(WidgetNotiConstants.Commons.Attributes.UPDATE_INTERVAL.name(), notificationDataObj.getUpdateIntervalMillis());
 		editor.putInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), notificationDataObj.getSelectedAddressDtoId());
+		editor.putString(WidgetNotiConstants.OngoingNotiAttributes.DATA_TYPE_OF_ICON.name(), notificationDataObj.getDataTypeOfIcon().name());
 
 		editor.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getAddressName());
 		editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), (float) notificationDataObj.getLatitude());
@@ -362,7 +413,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		editor.commit();
 	}
 
-	public AlwaysNotiDataObj getNotificationDataObj() {
-		return (AlwaysNotiDataObj) notificationDataObj;
+	public OngoingNotiDataObj getNotificationDataObj() {
+		return (OngoingNotiDataObj) notificationDataObj;
 	}
 }

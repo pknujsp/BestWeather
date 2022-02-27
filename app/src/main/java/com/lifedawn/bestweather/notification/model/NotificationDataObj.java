@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.notification.model;
 
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 
 public class NotificationDataObj {
 	private LocationType locationType;
@@ -9,11 +10,21 @@ public class NotificationDataObj {
 	private boolean topPriorityKma;
 	private long updateIntervalMillis;
 	private int selectedAddressDtoId;
+	private WidgetNotiConstants.DataTypeOfIcon dataTypeOfIcon;
 
 	private String addressName;
 	private double latitude;
 	private double longitude;
 	private String countryCode;
+
+	public NotificationDataObj setDataTypeOfIcon(WidgetNotiConstants.DataTypeOfIcon dataTypeOfIcon) {
+		this.dataTypeOfIcon = dataTypeOfIcon;
+		return this;
+	}
+
+	public WidgetNotiConstants.DataTypeOfIcon getDataTypeOfIcon() {
+		return dataTypeOfIcon;
+	}
 
 	public LocationType getLocationType() {
 		return locationType;

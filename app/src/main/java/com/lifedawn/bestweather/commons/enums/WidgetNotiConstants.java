@@ -20,4 +20,12 @@ public class WidgetNotiConstants {
 		ALARM_CLOCK
 	}
 
+	public enum OngoingNotiAttributes {
+		DATA_TYPE_OF_ICON
+	}
+
+	public enum DataTypeOfIcon {
+		TEMPERATURE, WEATHER_ICON
+	}
+
 }
