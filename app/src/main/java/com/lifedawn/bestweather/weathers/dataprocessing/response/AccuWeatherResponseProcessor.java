@@ -298,6 +298,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 			am.setHasRainVolume(hasRain);
 			am.setRainVolume(rainVolume);
 			am.setHasSnowVolume(hasSnow);
+			am.setHasPrecipitationVolume(hasRain || hasSnow);
 			am.setSnowVolume(snowVolume);
 			am.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, daily.getDay().getWind().getDirection().getDegrees()));
 			am.setWindDirectionVal(Integer.parseInt(daily.getDay().getWind().getDirection().getDegrees()));
@@ -340,6 +341,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 			pm.setHasRainVolume(hasRain);
 			pm.setRainVolume(rainVolume);
 			pm.setHasSnowVolume(hasSnow);
+			pm.setHasPrecipitationVolume(hasRain || hasSnow);
 			pm.setSnowVolume(snowVolume);
 			pm.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, daily.getNight().getWind().getDirection().getDegrees()));
 			pm.setWindDirectionVal(Integer.parseInt(daily.getNight().getWind().getDirection().getDegrees()));

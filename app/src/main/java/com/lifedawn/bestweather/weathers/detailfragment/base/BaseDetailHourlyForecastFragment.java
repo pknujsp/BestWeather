@@ -2,6 +2,8 @@ package com.lifedawn.bestweather.weathers.detailfragment.base;
 
 import android.os.Bundle;
 
+import androidx.fragment.app.Fragment;
+
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.detailfragment.base.dialogfragments.DetailHourlyForecastDialogFragment;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
@@ -14,16 +16,27 @@ public class BaseDetailHourlyForecastFragment extends BaseDetailForecastFragment
 
 	@Override
 	public void onClickedItem(Integer position) {
-		Bundle bundle = new Bundle();
-		bundle.putSerializable(WeatherDataType.hourlyForecast.name(), (Serializable) hourlyForecastDtoList);
-		bundle.putInt("FirstSelectedPosition", position);
+		if (clickableItem) {
+			clickableItem = false;
 
-		DetailHourlyForecastDialogFragment detailHourlyForecastDialogFragment =
-				new DetailHourlyForecastDialogFragment();
-		detailHourlyForecastDialogFragment.setArguments(bundle);
+			Bundle bundle = new Bundle();
+			bundle.putSerializable(WeatherDataType.hourlyForecast.name(), (Serializable) hourlyForecastDtoList);
+			bundle.putInt("FirstSelectedPosition", position);
 
-		detailHourlyForecastDialogFragment.show(getChildFragmentManager(),
-				DetailHourlyForecastDialogFragment.class.getName());
+			DetailHourlyForecastDialogFragment detailHourlyForecastDialogFragment =
+					new DetailHourlyForecastDialogFragment();
+			detailHourlyForecastDialogFragment.setArguments(bundle);
+
+			detailHourlyForecastDialogFragment.show(getChildFragmentManager(),
+					DetailHourlyForecastDialogFragment.class.getName());
+		}
+	}
+
+	@Override
+	protected void onFragmentStarted(Fragment fragment) {
+		if (fragment instanceof DetailHourlyForecastDialogFragment) {
+			super.onFragmentStarted(fragment);
+		}
 	}
 
 	@Override

@@ -39,8 +39,21 @@ public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment
 
 	@Override
 	protected void setDataViewsByList() {
+		boolean hasPrecipitationVolume = false;
+		for (DailyForecastDto item : dailyForecastDtoList) {
+			if (item.isSingle()) {
+				hasPrecipitationVolume = item.getSingleValues().isHasPrecipitationVolume();
+			} else {
+				hasPrecipitationVolume = item.getAmValues().isHasPrecipitationVolume() || item.getPmValues().isHasPrecipitationVolume();
+			}
+
+			if (hasPrecipitationVolume) {
+				break;
+			}
+		}
+
 		DailyForecastListAdapter adapter = new DailyForecastListAdapter(getContext(), this);
-		adapter.setDailyForecastDtoList(dailyForecastDtoList);
+		adapter.setDailyForecastDtoList(dailyForecastDtoList, hasPrecipitationVolume);
 		binding.listview.setAdapter(adapter);
 	}
 

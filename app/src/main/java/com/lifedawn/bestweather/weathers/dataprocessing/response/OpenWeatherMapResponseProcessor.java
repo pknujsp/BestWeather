@@ -222,6 +222,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 					.setRainVolume(rainVolume)
 					.setHasSnowVolume(hasSnow)
 					.setSnowVolume(snowVolume)
+					.setHasPrecipitationVolume(hasRain || hasSnow)
 					.setWeatherIcon(OpenWeatherMapResponseProcessor.getWeatherIconImg(daily.getWeather().get(0).getId(), false))
 					.setWeatherDescription(OpenWeatherMapResponseProcessor.getWeatherIconDescription(daily.getWeather().get(0).getId()))
 					.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, daily.getWindDeg()))

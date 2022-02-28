@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +28,6 @@ import com.lifedawn.bestweather.databinding.ViewDetailHourlyForecastListBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
-import com.lifedawn.bestweather.weathers.view.DateView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -45,7 +45,6 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	protected ValueUnits visibilityUnit;
 	protected ValueUnits clockUnit;
 	protected String addressName;
-	protected DateView dateRow;
 	protected ZoneId zoneId;
 	protected Double latitude;
 	protected Double longitude;
@@ -54,9 +53,24 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	protected WeatherProviderType mainWeatherProviderType;
 	protected Bundle bundle;
 
+	protected boolean clickableItem = true;
+
+	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
+		@Override
+		public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
+			super.onFragmentStarted(fm, f);
+			BaseDetailForecastFragment.this.onFragmentStarted(f);
+		}
+	};
+
+	protected void onFragmentStarted(Fragment fragment) {
+		clickableItem = true;
+	}
+
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
 		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
@@ -102,6 +116,12 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		});
 
 		setDataViewsByList();
+	}
+
+	@Override
+	public void onDestroy() {
+		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
+		super.onDestroy();
 	}
 
 	@Override
@@ -164,7 +184,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 				binding.getRoot().setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						onClickedForecastItem.onClickedItem(getAdapterPosition());
+						onClickedForecastItem.onClickedItem(getBindingAdapterPosition());
 					}
 				});
 			}
@@ -201,6 +221,8 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		private final String tempDegree;
 		private final String degree = "°";
 
+		private boolean hasPrecipitationVolume;
+
 		private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
 		private DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
 
@@ -211,8 +233,9 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 			tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		}
 
-		public void setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
+		public void setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList, boolean hasPrecipitationVolume) {
 			this.dailyForecastDtoList = dailyForecastDtoList;
+			this.hasPrecipitationVolume = hasPrecipitationVolume;
 		}
 
 		@NonNull
@@ -242,12 +265,14 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 				binding.getRoot().setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						onClickedForecastItem.onClickedItem(getAdapterPosition());
+						onClickedForecastItem.onClickedItem(getBindingAdapterPosition());
 					}
 				});
 			}
 
 			public void onBind(DailyForecastDto daily) {
+				binding.volumeLayout.setVisibility(hasPrecipitationVolume ? View.VISIBLE : View.GONE);
+
 				binding.date.setText(daily.getDate().format(dateFormatter));
 				binding.day.setText(daily.getDate().format(dayFormatter));
 
