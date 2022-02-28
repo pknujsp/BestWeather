@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.TextPaint;
@@ -270,20 +271,24 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 			if (isFinished) {
 				if (temperature != null) {
 					if (notificationDataObj.getDataTypeOfIcon() == WidgetNotiConstants.DataTypeOfIcon.TEMPERATURE) {
-						final int iconSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, context.getResources().getDisplayMetrics());
 						final int textSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 18f,
 								context.getResources().getDisplayMetrics());
-						Bitmap iconBitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
 
 						TextPaint textPaint = new TextPaint();
 						textPaint.setColor(Color.WHITE);
+						textPaint.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
 						textPaint.setTextAlign(Paint.Align.CENTER);
+						textPaint.setTextScaleX(0.9f);
 						textPaint.setTextSize(textSize);
 
 						Rect textRect = new Rect();
 						textPaint.getTextBounds(temperature, 0, temperature.length(), textRect);
+
+						final int iconSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f,
+								context.getResources().getDisplayMetrics());
+						Bitmap iconBitmap = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888);
 						Canvas canvas = new Canvas(iconBitmap);
-						canvas.drawText(temperature, canvas.getWidth() / 2, canvas.getHeight() / 2 + textRect.height() / 2, textPaint);
+						canvas.drawText(temperature, canvas.getWidth() / 2f, canvas.getHeight() / 2f + textRect.height() / 2f, textPaint);
 
 						builder.setSmallIcon(IconCompat.createWithBitmap(iconBitmap));
 					} else {

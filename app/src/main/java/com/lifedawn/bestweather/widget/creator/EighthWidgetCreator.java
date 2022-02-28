@@ -49,7 +49,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 	private int currentFeelsLikeTempTextSize;
 	private int forecastPopTextSize;
 
-	private final int hourlyForecastCount = 5;
+	private final int hourlyForecastCount = 7;
 	private final int dailyForecastCount = 3;
 
 	public EighthWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
