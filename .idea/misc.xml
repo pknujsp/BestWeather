@@ -18,6 +18,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/rectangle_btn_background.xml" value="0.2255" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/refresh.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/rounded_btn_background.xml" value="0.3764102564102564" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/rounded_btn_background_no_padding.xml" value="0.259" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/selector_switch_thumb.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/simple_weather_card.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/tabindicator.xml" value="0.2265" />
@@ -89,7 +90,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_hourly_forecast_item_in_linear.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_notification.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_ongoing_notification_collapsed.xml" value="0.17806484295845998" />
-        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_ongoing_notification_expanded.xml" value="0.33" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_ongoing_notification_expanded.xml" value="0.536" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_progress_result.xml" value="0.22" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_seventh_widget.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_simple_air_quality_item.xml" value="0.25" />
