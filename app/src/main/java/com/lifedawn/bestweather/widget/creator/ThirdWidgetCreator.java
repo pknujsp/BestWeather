@@ -138,6 +138,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 	public void makeCurrentConditionsViews(View view, CurrentConditionsDto currentConditionsDto,
 	                                       AirQualityDto airQualityDto) {
 		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp());
+		((ImageView) view.findViewById(R.id.weatherIcon)).setImageResource(currentConditionsDto.getWeatherIcon());
 
 		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
 		((TextView) view.findViewById(R.id.airQuality)).setText(airQuality);

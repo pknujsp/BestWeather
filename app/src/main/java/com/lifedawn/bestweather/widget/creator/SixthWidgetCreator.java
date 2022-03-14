@@ -143,6 +143,7 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 		((TextView) sixWidgetView.findViewById(R.id.airQuality)).setTextSize(TypedValue.COMPLEX_UNIT_PX, simpleAirQualityTextSize);
 
 		((TextView) sixWidgetView.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp());
+		((ImageView) sixWidgetView.findViewById(R.id.weatherIcon)).setImageResource(currentConditionsDto.getWeatherIcon());
 
 		if (currentConditionsDto.getYesterdayTemp() != null) {
 			String yesterdayCompText = WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),

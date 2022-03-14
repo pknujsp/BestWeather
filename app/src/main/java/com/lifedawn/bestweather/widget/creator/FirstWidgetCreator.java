@@ -6,6 +6,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
@@ -126,6 +127,7 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 		View view = layoutInflater.inflate(R.layout.view_first_widget, null, false);
 
 		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp());
+		((ImageView) view.findViewById(R.id.weatherIcon)).setImageResource(currentConditionsDto.getWeatherIcon());
 
 		String airQuality =
 				context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
