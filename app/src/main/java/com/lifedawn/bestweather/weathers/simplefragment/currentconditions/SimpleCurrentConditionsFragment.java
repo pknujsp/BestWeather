@@ -12,6 +12,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
@@ -21,9 +22,12 @@ import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentCo
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZonedDateTime;
+
 public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
 	private CurrentConditionsDto currentConditionsDto;
 	private AirQualityDto airQualityDto;
+	private AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -39,7 +43,8 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		currentConditionsDto = (CurrentConditionsDto) bundle.getSerializable(WeatherDataType.currentConditions.name());
-		airQualityDto = (AirQualityDto) bundle.getSerializable(WeatherDataType.airQuality.name());
+		aqiCnGeolocalizedFeedResponse = (AqiCnGeolocalizedFeedResponse) bundle.getSerializable("AqiCnGeolocalizedFeedResponse");
+		airQualityDto = AqicnResponseProcessor.makeAirQualityDto(aqiCnGeolocalizedFeedResponse, ZonedDateTime.now(zoneId).getOffset());
 
 		setValuesToViews();
 	}

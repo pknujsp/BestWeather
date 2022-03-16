@@ -162,7 +162,14 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 			precipitation = context.getString(R.string.not_precipitation);
 		}
 		valuesRemoteViews.setTextViewText(R.id.precipitation, precipitation);
-		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+
+
+		String airQuality = context.getString(R.string.air_quality) + ": ";
+		if (airQualityDto.isSuccessful()) {
+			airQuality += AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+		} else {
+			airQuality += context.getString(R.string.noData);
+		}
 		valuesRemoteViews.setTextViewText(R.id.airQuality, airQuality);
 
 		valuesRemoteViews.setTextViewTextSize(R.id.temperature, TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
@@ -250,7 +257,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude());
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,
 				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude());
-		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
+		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(jsonObject);
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto,
 				hourlyForecastDtoList, null, airQualityDto, null);

@@ -78,8 +78,8 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		Bundle arguments = savedInstanceState != null ? savedInstanceState : getArguments();
-		airQualityDto = (AirQualityDto) arguments.getSerializable(WeatherDataType.airQuality.name());
 		aqiCnGeolocalizedFeedResponse = (AqiCnGeolocalizedFeedResponse) arguments.getSerializable("AqiCnGeolocalizedFeedResponse");
+		airQualityDto = AqicnResponseProcessor.makeAirQualityDto(aqiCnGeolocalizedFeedResponse, ZonedDateTime.now(zoneId).getOffset());
 
 		binding.progressResultView.setContentView(binding.contentContainer);
 		binding.progressResultView.setTextColor(Color.WHITE);

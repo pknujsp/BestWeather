@@ -9,8 +9,8 @@ import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 
@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 public class OngoingNotificationForegroundService extends Service {
 	private Timer timer;
+	private OngoingNotiViewCreator ongoingNotiViewCreator;
 
 	public OngoingNotificationForegroundService() {
 	}
@@ -64,6 +65,10 @@ public class OngoingNotificationForegroundService extends Service {
 			@Override
 			public void run() {
 				timer = null;
+				if (ongoingNotiViewCreator != null) {
+					ongoingNotiViewCreator.forceFailedNotification(RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+				}
+
 				stopService();
 			}
 		}, TimeUnit.SECONDS.toMillis(25L));
@@ -77,7 +82,7 @@ public class OngoingNotificationForegroundService extends Service {
 				}
 			});
 		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			OngoingNotiViewCreator ongoingNotiViewCreator = new OngoingNotiViewCreator(getApplicationContext(), null);
+			ongoingNotiViewCreator = new OngoingNotiViewCreator(getApplicationContext(), null);
 			ongoingNotiViewCreator.loadSavedPreferences();
 
 			if (ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
@@ -102,6 +107,7 @@ public class OngoingNotificationForegroundService extends Service {
 			timer.cancel();
 			timer = null;
 		}
+
 		stopForeground(true);
 		stopSelf();
 	}

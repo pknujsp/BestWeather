@@ -1086,7 +1086,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap = null;
 
-		AirQualityDto airQualityDto = null;
 		CurrentConditionsDto currentConditionsDto = null;
 		List<HourlyForecastDto> hourlyForecastDtoList = null;
 		List<DailyForecastDto> dailyForecastDtoList = null;
@@ -1229,7 +1228,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			ZoneOffset zoneOffsetSecond = ZoneOffset.ofTotalSeconds(Integer.parseInt(owmCurrentConditionsResponse.getTimezone()));
 			zoneId = zoneOffsetSecond.normalized();
 			mainWeatherProviderType = WeatherProviderType.OWM_INDIVIDUAL;
-
 		}
 
 		MultipleRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherProviderType.AQICN).get(
@@ -1239,9 +1237,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		if (aqicnResponse.isSuccessful()) {
 			airQualityResponse = (AqiCnGeolocalizedFeedResponse) aqicnResponse.getResponseObj();
 		}
-
-		airQualityDto = AqicnResponseProcessor.makeAirQualityDto(getContext(), airQualityResponse,
-				ZonedDateTime.now(zoneId).getOffset());
 
 		final Bundle defaultBundle = new Bundle();
 		defaultBundle.putDouble(BundleKey.Latitude.name(), this.latitude);
@@ -1255,7 +1250,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		final Bundle simpleCurrentConditionsBundle = new Bundle();
 		simpleCurrentConditionsBundle.putAll(defaultBundle);
 		simpleCurrentConditionsBundle.putSerializable(WeatherDataType.currentConditions.name(), currentConditionsDto);
-		simpleCurrentConditionsBundle.putSerializable(WeatherDataType.airQuality.name(), airQualityDto);
+		simpleCurrentConditionsBundle.putSerializable("AqiCnGeolocalizedFeedResponse", airQualityResponse);
 
 		// hourly forecasts ----------------------------------------------------------------------------------------------------------------
 		final Bundle hourlyForecastBundle = new Bundle();
@@ -1276,7 +1271,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		final Bundle airQualityBundle = new Bundle();
 		airQualityBundle.putAll(defaultBundle);
 		airQualityBundle.putSerializable("AqiCnGeolocalizedFeedResponse", airQualityResponse);
-		airQualityBundle.putSerializable(WeatherDataType.airQuality.name(), airQualityDto);
 
 		simpleAirQualityFragment.setArguments(airQualityBundle);
 		sunSetRiseFragment.setArguments(defaultBundle);

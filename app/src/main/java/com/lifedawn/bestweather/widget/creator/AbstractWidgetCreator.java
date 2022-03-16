@@ -342,7 +342,9 @@ public abstract class AbstractWidgetCreator {
 
 				if (weatherDataTypeSet.contains(WeatherDataType.airQuality)) {
 					text = arrayMap.get(WeatherProviderType.AQICN).get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED).getResponseText();
-					aqiCnJsonObject.addProperty(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name(), text);
+					if (text != null && !text.equals("{}")) {
+						aqiCnJsonObject.addProperty(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name(), text);
+					}
 				}
 
 				rootJsonObject.add(weatherProviderType.name(), aqiCnJsonObject);

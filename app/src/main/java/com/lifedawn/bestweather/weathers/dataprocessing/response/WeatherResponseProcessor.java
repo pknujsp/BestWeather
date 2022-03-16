@@ -83,7 +83,7 @@ public class WeatherResponseProcessor {
 		MultipleRestApiDownloader.ResponseResult aqiCnResponseResult = multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.AQICN).get(
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 
-		return AqicnResponseProcessor.makeAirQualityDto(context, (AqiCnGeolocalizedFeedResponse) aqiCnResponseResult.getResponseObj(),
+		return AqicnResponseProcessor.makeAirQualityDto((AqiCnGeolocalizedFeedResponse) aqiCnResponseResult.getResponseObj(),
 				zoneOffset);
 	}
 

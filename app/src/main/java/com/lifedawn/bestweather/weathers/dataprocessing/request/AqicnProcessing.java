@@ -25,16 +25,18 @@ public class AqicnProcessing {
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				AqiCnGeolocalizedFeedResponse airQualityResponse =
-						AqicnResponseProcessor.getAirQualityObjFromJson(response.body().toString());
-				callback.onResponseResult(response, airQualityResponse, response.body().toString());
-				Log.e(RetrofitClient.LOG_TAG, "aqicn geolocalizedfeed 성공");
+				if (response.body() == null) {
+					onFailure(call, new Exception("aqicn response failed"));
+				} else {
+					callback.onResponseResult(response, AqicnResponseProcessor.getAirQualityObjFromJson(response.body().toString()), response.body().toString());
+					Log.e(RetrofitClient.LOG_TAG, "aqicn geolocalizedfeed 성공");
+				}
 			}
 
 			@Override
 			public void onFailure(Call<JsonElement> call, Throwable t) {
 				callback.onResponseResult(t);
-				Log.e(RetrofitClient.LOG_TAG, "aqicn geolocalizedfeed 실패");
+				Log.e(RetrofitClient.LOG_TAG, "aqicn response failed");
 			}
 		});
 		return call;
@@ -59,6 +61,5 @@ public class AqicnProcessing {
 
 		});
 		multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, localizedFeedCall);
-
 	}
 }

@@ -140,7 +140,12 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		((TextView) view.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp());
 		((ImageView) view.findViewById(R.id.weatherIcon)).setImageResource(currentConditionsDto.getWeatherIcon());
 
-		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+		String airQuality = context.getString(R.string.air_quality) + ": ";
+		if (airQualityDto.isSuccessful()) {
+			airQuality += AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+		} else {
+			airQuality += context.getString(R.string.noData);
+		}
 		((TextView) view.findViewById(R.id.airQuality)).setText(airQuality);
 
 		String precipitation = "";
@@ -302,7 +307,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		RemoteViews remoteViews = createRemoteViews();
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
-		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
+		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(jsonObject);
 		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.parseTextToCurrentConditionsDto(context, jsonObject,
 				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude());
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,

@@ -20,6 +20,7 @@ import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
@@ -134,6 +135,12 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                       AirQualityDto airQualityDto, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, @Nullable Integer parentWidth,
 	                       @Nullable Integer parentHeight) {
+		if (!airQualityDto.isSuccessful()) {
+			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			setRefreshPendingIntent(widgetProviderClass(), remoteViews, appWidgetId);
+			return;
+		}
+
 		RelativeLayout rootLayout = new RelativeLayout(context);
 		LayoutInflater layoutInflater = LayoutInflater.from(context);
 
@@ -297,7 +304,7 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		RemoteViews remoteViews = createRemoteViews();
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
-		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
+		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(jsonObject);
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 				airQualityDto, null);

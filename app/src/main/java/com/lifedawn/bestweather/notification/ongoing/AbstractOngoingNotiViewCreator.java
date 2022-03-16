@@ -106,10 +106,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 					errorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA;
 				}
 
-				expandedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
-				RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, errorType);
-
-				makeNotification(expandedRemoteViews, R.mipmap.ic_launcher_round, null, true);
+				forceFailedNotification(errorType);
 			}
 		};
 		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, true);
@@ -184,5 +181,12 @@ public abstract class AbstractOngoingNotiViewCreator {
 
 	protected NotificationDataObj getNotificationDataObj() {
 		return notificationDataObj;
+	}
+
+	public void forceFailedNotification(RemoteViewsUtil.ErrorType errorType) {
+		RemoteViews remoteViews = createRemoteViews(false);
+		remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+		RemoteViewsUtil.onErrorProcess(remoteViews, context, errorType);
+		makeNotification(remoteViews, R.mipmap.ic_launcher_round, null, true);
 	}
 }

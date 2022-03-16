@@ -326,37 +326,6 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		}
 	}
 
-	/*
-		public void setDailyForecastViews(RemoteViews remoteViews, WeatherJsonObj.DailyForecasts dailyForecasts) {
-			remoteViews.removeAllViews(R.id.dailyForecast);
-			DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(context.getString(R.string.date_pattern_of_daily_forecast_in_widget));
-			List<DailyForecastObj> dailyForecastObjList = dailyForecasts.getDailyForecastObjs();
-
-			for (int day = 0; day < 4; day++) {
-				RemoteViews childRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_daily_forecast_item_in_linear);
-
-				childRemoteViews.setTextViewText(R.id.daily_date, ZonedDateTime.parse(dailyForecastObjList.get(day).getDate()).format(dateFormatter));
-				childRemoteViews.setTextViewText(R.id.daily_temperature, ValueUnits.convertTemperature(dailyForecastObjList.get(day).getMinTemp(),
-						tempUnit) + tempDegree + " / " + ValueUnits.convertTemperature(dailyForecastObjList.get(day).getMaxTemp(),
-						tempUnit) + tempDegree);
-
-				childRemoteViews.setViewVisibility(R.id.daily_left_weather_icon, View.VISIBLE);
-				childRemoteViews.setViewVisibility(R.id.daily_right_weather_icon, View.VISIBLE);
-
-				if (dailyForecastObjList.get(day).isSingle()) {
-					childRemoteViews.setImageViewResource(R.id.daily_left_weather_icon, dailyForecastObjList.get(day).getLeftWeatherIcon());
-					childRemoteViews.setViewVisibility(R.id.daily_left_weather_icon, View.GONE);
-				} else {
-					childRemoteViews.setImageViewResource(R.id.daily_left_weather_icon, dailyForecastObjList.get(day).getLeftWeatherIcon());
-					childRemoteViews.setImageViewResource(R.id.daily_right_weather_icon, dailyForecastObjList.get(day).getRightWeatherIcon());
-				}
-
-				remoteViews.addView(R.id.dailyForecast, childRemoteViews);
-			}
-		}
-
-
-	 */
 
 	@Override
 	public void loadSavedPreferences() {
@@ -402,8 +371,9 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 
 	@Override
 	public void savePreferences() {
-		SharedPreferences notiPreferences = context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
-		SharedPreferences.Editor editor = notiPreferences.edit();
+		SharedPreferences sharedPreferences = context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+
 		editor.putString(WidgetNotiConstants.Commons.Attributes.LOCATION_TYPE.name(), notificationDataObj.getLocationType().name());
 		editor.putString(WidgetNotiConstants.Commons.Attributes.WEATHER_SOURCE_TYPE.name(), notificationDataObj.getWeatherSourceType().name());
 		editor.putBoolean(WidgetNotiConstants.Commons.Attributes.TOP_PRIORITY_KMA.name(), notificationDataObj.isTopPriorityKma());
@@ -421,4 +391,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	public OngoingNotiDataObj getNotificationDataObj() {
 		return (OngoingNotiDataObj) notificationDataObj;
 	}
+
+
+
 }

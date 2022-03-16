@@ -130,7 +130,14 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 			precipitation = context.getString(R.string.not_precipitation);
 		}
 		((TextView) view.findViewById(R.id.precipitation)).setText(precipitation);
-		((TextView) view.findViewById(R.id.airQuality)).setText(AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
+
+		String airQuality = context.getString(R.string.air_quality) + ": ";
+		if (airQualityDto.isSuccessful()) {
+			airQuality += AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+		} else {
+			airQuality += context.getString(R.string.noData);
+		}
+		((TextView) view.findViewById(R.id.airQuality)).setText(airQuality);
 
 		((TextView) view.findViewById(R.id.currentLabel)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentLabelTextSize);
 		((TextView) view.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
@@ -289,7 +296,7 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		RemoteViews remoteViews = createRemoteViews();
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
-		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
+		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(jsonObject);
 		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.parseTextToCurrentConditionsDto(context, jsonObject,
 				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude());
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,

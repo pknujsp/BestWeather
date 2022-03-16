@@ -218,7 +218,7 @@ public class AqicnResponseProcessor {
 		}
 	}
 
-	public static AirQualityDto makeAirQualityDto(Context context, AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse, ZoneOffset zoneOffset) {
+	public static AirQualityDto makeAirQualityDto(AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse, ZoneOffset zoneOffset) {
 		AirQualityDto airQualityDto = new AirQualityDto();
 
 		if (aqiCnGeolocalizedFeedResponse == null) {
@@ -376,19 +376,25 @@ public class AqicnResponseProcessor {
 			}
 		}
 		return airQualityDto;
-
 	}
 
-	public static AirQualityDto parseTextToAirQualityDto(Context context, JsonObject jsonObject) {
-		if (jsonObject.get(WeatherProviderType.AQICN.name()) != null) {
+
+	public static AirQualityDto parseTextToAirQualityDto(JsonObject jsonObject) {
+		AirQualityDto airQualityDto = null;
+		if (jsonObject.get(WeatherProviderType.AQICN.name()) != null && !jsonObject.get(WeatherProviderType.AQICN.name()).toString().equals(
+				"{}")) {
 			JsonObject aqiCnObject = jsonObject.getAsJsonObject(WeatherProviderType.AQICN.name());
 			AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse =
 					getAirQualityObjFromJson(aqiCnObject.get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name()).getAsString());
-			AirQualityDto airQualityDto = makeAirQualityDto(context, aqiCnGeolocalizedFeedResponse,
+
+			airQualityDto = makeAirQualityDto(aqiCnGeolocalizedFeedResponse,
 					ZoneOffset.of(jsonObject.get("zoneOffset").getAsString()));
 			return airQualityDto;
+		} else {
+			airQualityDto = new AirQualityDto();
+			airQualityDto.setSuccessful(false);
 		}
 
-		return null;
+		return airQualityDto;
 	}
 }

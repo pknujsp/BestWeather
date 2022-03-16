@@ -165,40 +165,53 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 
 		((TextView) sixWidgetView.findViewById(R.id.precipitation)).setText(precipitation);
 		String simpleAirQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
-		((TextView) sixWidgetView.findViewById(R.id.airQuality)).setText(simpleAirQuality);
+
+		String airQuality = context.getString(R.string.air_quality) + ": ";
+		if (airQualityDto.isSuccessful()) {
+			airQuality += AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+		} else {
+			airQuality += context.getString(R.string.noData);
+		}
+
+		((TextView) sixWidgetView.findViewById(R.id.airQuality)).setText(airQuality);
 
 		GridLayout airQualityGridLayout = sixWidgetView.findViewById(R.id.airQualityGrid);
 
-		//pm10, pm2.5, o3, co, so2, no2 순서로
-		final String[] particleNames = {context.getString(R.string.pm10_str), context.getString(R.string.pm25_str),
-				context.getString(R.string.o3_str), context.getString(R.string.co_str), context.getString(R.string.so2_str),
-				context.getString(R.string.no2_str)};
-		final int[] iconIds = {R.drawable.pm10, R.drawable.pm25, R.drawable.o3, R.drawable.co, R.drawable.so2, R.drawable.no2};
+		if (airQualityDto.isSuccessful()) {
 
-		List<String> gradeValueList = new ArrayList<>();
-		List<String> gradeDescriptionList = new ArrayList<>();
+			//pm10, pm2.5, o3, co, so2, no2 순서로
+			final String[] particleNames = {context.getString(R.string.pm10_str), context.getString(R.string.pm25_str),
+					context.getString(R.string.o3_str), context.getString(R.string.co_str), context.getString(R.string.so2_str),
+					context.getString(R.string.no2_str)};
+			final int[] iconIds = {R.drawable.pm10, R.drawable.pm25, R.drawable.o3, R.drawable.co, R.drawable.so2, R.drawable.no2};
 
-		gradeValueList.add(airQualityDto.getCurrent().getPm10().toString());
-		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getPm10()));
+			List<String> gradeValueList = new ArrayList<>();
+			List<String> gradeDescriptionList = new ArrayList<>();
 
-		gradeValueList.add(airQualityDto.getCurrent().getPm25().toString());
-		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getPm25()));
+			gradeValueList.add(airQualityDto.getCurrent().getPm10().toString());
+			gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getPm10()));
 
-		gradeValueList.add(airQualityDto.getCurrent().getO3().toString());
-		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getO3()));
+			gradeValueList.add(airQualityDto.getCurrent().getPm25().toString());
+			gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getPm25()));
 
-		gradeValueList.add(airQualityDto.getCurrent().getCo().toString());
-		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getCo()));
+			gradeValueList.add(airQualityDto.getCurrent().getO3().toString());
+			gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getO3()));
 
-		gradeValueList.add(airQualityDto.getCurrent().getSo2().toString());
-		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getSo2()));
+			gradeValueList.add(airQualityDto.getCurrent().getCo().toString());
+			gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getCo()));
 
-		gradeValueList.add(airQualityDto.getCurrent().getNo2().toString());
-		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getNo2()));
+			gradeValueList.add(airQualityDto.getCurrent().getSo2().toString());
+			gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getSo2()));
 
-		for (int i = 0; i < 6; i++) {
-			addAirQualityGridItem(layoutInflater, airQualityGridLayout, particleNames[i], gradeValueList.get(i), gradeDescriptionList.get(i),
-					iconIds[i]);
+			gradeValueList.add(airQualityDto.getCurrent().getNo2().toString());
+			gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getNo2()));
+
+			for (int i = 0; i < 6; i++) {
+				addAirQualityGridItem(layoutInflater, airQualityGridLayout, particleNames[i], gradeValueList.get(i), gradeDescriptionList.get(i),
+						iconIds[i]);
+			}
+		} else {
+			airQualityGridLayout.setVisibility(View.GONE);
 		}
 
 		RelativeLayout.LayoutParams headerViewLayoutParams = getHeaderViewLayoutParams();
@@ -262,7 +275,7 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 
 		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.parseTextToCurrentConditionsDto(context, jsonObject,
 				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude());
-		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(context, jsonObject);
+		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(jsonObject);
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto,
 				airQualityDto, null);
