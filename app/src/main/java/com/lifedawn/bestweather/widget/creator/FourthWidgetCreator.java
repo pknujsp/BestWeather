@@ -133,11 +133,11 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 		}
 		((TextView) view.findViewById(R.id.precipitation)).setText(precipitation);
 
-		String airQuality = context.getString(R.string.air_quality) + ": ";
+		String airQuality = null;
 		if (airQualityDto.isSuccessful()) {
-			airQuality += AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+			airQuality = AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
 		} else {
-			airQuality += context.getString(R.string.noData);
+			airQuality = context.getString(R.string.noData);
 		}
 
 		((TextView) view.findViewById(R.id.airQuality)).setText(airQuality);

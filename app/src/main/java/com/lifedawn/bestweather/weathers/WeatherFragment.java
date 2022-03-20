@@ -879,7 +879,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
 		fragmentTransaction.add(R.id.fragment_container, alertFragment,
-				AlertFragment.class.getName()).addToBackStack(AlertFragment.class.getName()).commit();
+				AlertFragment.class.getName()).addToBackStack(AlertFragment.class.getName()).commitAllowingStateLoss();
 		binding.scrollView.setVisibility(View.GONE);
 	}
 
