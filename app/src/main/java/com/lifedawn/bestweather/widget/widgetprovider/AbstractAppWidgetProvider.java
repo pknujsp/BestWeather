@@ -1,19 +1,12 @@
 package com.lifedawn.bestweather.widget.widgetprovider;
 
 import android.app.ActivityManager;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.appwidget.AppWidgetHost;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.util.ArraySet;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -30,7 +23,6 @@ import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.foreground.WidgetForegroundService;
 
 import java.util.List;
-import java.util.Set;
 
 public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	protected AppWidgetManager appWidgetManager;
@@ -62,7 +54,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 							} else {
 								RemoteViews remoteViews = widgetCreator.createRemoteViews();
 
-								widgetCreator.setRefreshPendingIntent(widgetProviderClass, remoteViews, appWidgetId);
+								widgetCreator.setRefreshPendingIntent(widgetProviderClass, remoteViews);
 								RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 								appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
 							}

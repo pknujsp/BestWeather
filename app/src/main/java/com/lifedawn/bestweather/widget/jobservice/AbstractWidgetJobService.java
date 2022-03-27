@@ -199,7 +199,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 	}
 
 	public final void setRefreshPendingIntent(RemoteViews remoteViews, int appWidgetId, int jobId) {
-		widgetCreatorMap.get(jobId).setRefreshPendingIntent(widgetClassMap.get(jobId), remoteViews, appWidgetId);
+		widgetCreatorMap.get(jobId).setRefreshPendingIntent(widgetClassMap.get(jobId), remoteViews);
 	}
 
 	public void loadCurrentLocation(Context context, int appWidgetId, RemoteViews remoteViews, int jobId) {

@@ -1,11 +1,8 @@
 package com.lifedawn.bestweather.widget.foreground;
 
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProviderInfo;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
@@ -365,7 +362,7 @@ public class WidgetForegroundService extends Service {
 
 	private void setRefreshPendingIntent(int appWidgetId) {
 		widgetCreatorMap.get(appWidgetId).setRefreshPendingIntent(allWidgetProviderClassArrayMap.get(appWidgetId), remoteViewsArrayMap.get(appWidgetId)
-				, appWidgetId);
+		);
 	}
 
 

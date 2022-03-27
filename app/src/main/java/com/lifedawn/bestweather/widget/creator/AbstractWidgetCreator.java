@@ -4,7 +4,6 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -16,7 +15,6 @@ import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
-import androidx.preference.PreferenceManager;
 
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.R;
@@ -80,15 +78,15 @@ public abstract class AbstractWidgetCreator {
 	}
 
 
-	public void setRefreshPendingIntent(Class<?> widgetProviderClass, RemoteViews remoteViews, int appWidgetId) {
+	public void setRefreshPendingIntent(Class<?> widgetProviderClass, RemoteViews remoteViews) {
+		remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent(widgetProviderClass));
+	}
+
+	public PendingIntent getRefreshPendingIntent(Class<?> widgetProviderClass) {
 		Intent refreshIntent = new Intent(context, widgetProviderClass);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-
-		Bundle bundle = new Bundle();
-		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-		refreshIntent.putExtras(bundle);
-
-		remoteViews.setOnClickPendingIntent(R.id.refreshBtn, PendingIntent.getBroadcast(context, appWidgetId, refreshIntent, PendingIntent.FLAG_UPDATE_CURRENT));
+		return PendingIntent.getBroadcast(context, 1500, refreshIntent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 
 	public WidgetDto loadDefaultSettings() {
@@ -418,7 +416,7 @@ public abstract class AbstractWidgetCreator {
 			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 		} else {
 			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-			setRefreshPendingIntent(widgetProviderClass(), remoteViews, appWidgetId);
+			setRefreshPendingIntent(widgetProviderClass(), remoteViews);
 		}
 
 		widgetRepository.update(widgetDto, null);

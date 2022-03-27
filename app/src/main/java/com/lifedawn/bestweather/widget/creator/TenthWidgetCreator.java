@@ -38,6 +38,7 @@ import java.util.Set;
 
 public class TenthWidgetCreator extends AbstractWidgetCreator {
 	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
+	private final int DAY_LENGTH = 8;
 
 	private int addressTextSize;
 	private int refreshDateTimeTextSize;
@@ -64,7 +65,7 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 	public RemoteViews createTempViews(Integer parentWidth, Integer parentHeight) {
 		RemoteViews remoteViews = createBaseRemoteViews();
 		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
-				WeatherResponseProcessor.getTempDailyForecastDtoList(context, 7), null, parentWidth, parentHeight);
+				WeatherResponseProcessor.getTempDailyForecastDtoList(context, DAY_LENGTH), null, parentWidth, parentHeight);
 		return remoteViews;
 	}
 
@@ -132,7 +133,7 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 		List<Integer> maxTempList = new ArrayList<>();
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d\nE");
 
-		for (int cell = 0; cell < dailyForecastDtoList.size(); cell++) {
+		for (int cell = 0; cell < DAY_LENGTH; cell++) {
 			View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
 			((TextView) view.findViewById(R.id.dateTime)).setText(dailyForecastDtoList.get(cell).getDate().format(dateFormatter));
 			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, dateTextSize);

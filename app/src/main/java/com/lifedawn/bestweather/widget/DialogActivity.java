@@ -110,22 +110,15 @@ public class DialogActivity extends Activity {
 		((Button) dialogView.findViewById(R.id.updateBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent refreshIntent = new Intent(getApplicationContext(), widgetProviderClass);
-				refreshIntent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-
-				Bundle bundle = new Bundle();
-				bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-				refreshIntent.putExtras(bundle);
-
-				PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), (int) System.currentTimeMillis(), refreshIntent,
-						PendingIntent.FLAG_UPDATE_CURRENT);
-				alertDialog.dismiss();
+				PendingIntent pendingIntent = widgetCreator.getRefreshPendingIntent(widgetProviderClass);
 
 				try {
 					pendingIntent.send();
 				} catch (PendingIntent.CanceledException e) {
 					e.printStackTrace();
 				}
+
+				alertDialog.dismiss();
 				finish();
 			}
 		});
