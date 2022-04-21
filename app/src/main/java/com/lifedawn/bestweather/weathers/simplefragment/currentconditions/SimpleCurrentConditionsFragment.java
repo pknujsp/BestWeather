@@ -54,7 +54,7 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 	public void setValuesToViews() {
 		String precipitation = null;
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
-			precipitation = currentConditionsDto.getPrecipitationType() + " : " + currentConditionsDto.getPrecipitationVolume();
+			precipitation = getString(R.string.precipitation_volume) + " : " + currentConditionsDto.getPrecipitationVolume();
 		} else {
 			precipitation = getString(R.string.not_precipitation);
 		}

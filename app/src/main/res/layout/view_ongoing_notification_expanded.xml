@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
+    android:layout_height="205dp"
     android:padding="8dp"
-    tools:layout_height="200dp"
+    tools:layout_height="205dp"
     >
 
     <LinearLayout
@@ -54,7 +54,10 @@
                 android:clickable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="4dp"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp"
                 >
 
                 <TextView
@@ -73,7 +76,7 @@
                     android:layout_height="16dp"
                     android:scaleType="centerInside"
                     android:src="@drawable/refresh"
-                    android:tint="@color/white"
+                    app:tint="@color/white"
                     />
 
             </LinearLayout>
