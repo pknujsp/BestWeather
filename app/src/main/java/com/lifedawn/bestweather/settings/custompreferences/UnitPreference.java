@@ -28,7 +28,7 @@ public class UnitPreference extends Preference {
 		super.onBindViewHolder(holder);
 		if (unitTextView == null) {
 			unitTextView = new TextView(getContext());
-			unitTextView.setText(MyApplication.VALUE_UNIT_OBJ.getTempUnitText());
+			unitTextView.setText(ValueUnits.toString(valueUnit));
 			unitTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f);
 			unitTextView.setTextColor(Color.BLACK);
 

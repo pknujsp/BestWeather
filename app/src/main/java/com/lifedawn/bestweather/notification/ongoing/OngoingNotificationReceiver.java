@@ -17,7 +17,7 @@ public class OngoingNotificationReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		final String action = intent.getAction();
-		MyApplication.loadValueUnits(context);
+		MyApplication.loadValueUnits(context, false);
 
 		startService(context, action, null);
 	}

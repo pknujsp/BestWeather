@@ -111,7 +111,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
-		MyApplication.loadValueUnits(context);
+		MyApplication.loadValueUnits(context, false);
 		Bundle bundle = intent.getExtras();
 		final String action = intent.getAction();
 

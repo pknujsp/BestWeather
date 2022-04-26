@@ -55,105 +55,100 @@
                     android:layout_height="wrap_content"
                     >
 
-
                     <LinearLayout
-                        android:id="@+id/weatherDataSourceLayout"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/headerLayout"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
                         android:layout_alignParentTop="true"
-                        android:layout_marginLeft="24dp"
                         android:layout_marginTop="24dp"
-                        android:layout_marginBottom="16dp"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
+                        android:layout_marginBottom="140dp"
+                        android:orientation="vertical"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"
+
                         >
 
-                        <ImageView
-                            android:id="@+id/weatherDataSourceIcon"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_marginRight="4dp"
-                            android:scaleType="centerInside"
-                            />
-
-                        <TextView
-                            android:id="@+id/weatherDataSourceName"
-                            style="@style/text_shadow_white"
+                        <LinearLayout
+                            android:id="@+id/weatherDataSourceLayout"
+                            style="@style/forecasts_card_background"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:background="?attr/selectableItemBackground"
-                            android:drawableRight="@drawable/expand_more"
-                            android:drawableTint="@color/purple_500"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginBottom="16dp"
+                            android:clickable="true"
                             android:gravity="center_vertical"
-                            android:text="@string/loading"
-                            android:textSize="16sp"
-                            />
+                            android:orientation="horizontal"
+                            android:padding="8dp"
+                            >
 
+                            <ImageView
+                                android:id="@+id/weatherDataSourceIcon"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginRight="4dp"
+                                android:scaleType="centerInside"
+                                />
+
+                            <TextView
+                                android:id="@+id/weatherDataSourceName"
+                                style="@style/text_shadow_white"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:background="?attr/selectableItemBackground"
+                                android:drawableRight="@drawable/expand_more"
+                                android:drawableTint="@color/white"
+                                android:gravity="center_vertical"
+                                android:text="@string/loading"
+                                android:textSize="16sp"
+                                />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            style="@style/forecasts_card_background"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginBottom="6dp"
+                            android:orientation="vertical"
+                            android:padding="8dp"
+                            >
+
+                            <TextView
+                                android:id="@+id/address_name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/loading"
+                                android:textColor="@color/white"
+                                android:textSize="22sp"
+                                android:layout_marginBottom="4dp"
+                                />
+
+                            <TextView
+                                android:id="@+id/updated_datetime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:text="@string/loading"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                app:drawableLeftCompat="@drawable/refresh"
+                                app:drawableTint="@color/white"
+                                />
+
+                        </LinearLayout>
 
                     </LinearLayout>
-
-                    <TextView
-                        android:id="@+id/address_name"
-                        style="@style/text_shadow_white"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/weatherDataSourceLayout"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="24dp"
-                        android:layout_marginRight="24dp"
-                        android:layout_marginBottom="6dp"
-                        android:text="@string/loading"
-                        android:textSize="22sp"
-                        />
-
-                    <RelativeLayout
-                        android:id="@+id/refreshDateTimeLayout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_below="@id/address_name"
-                        android:layout_alignParentLeft="true"
-                        android:layout_marginLeft="24dp"
-                        android:layout_marginBottom="140dp"
-                        >
-
-                        <ImageView
-                            android:id="@+id/refreshIcon"
-                            style="@style/img_shadow"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignTop="@id/updated_datetime"
-                            android:layout_alignBottom="@id/updated_datetime"
-                            android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true"
-                            android:adjustViewBounds="true"
-                            android:scaleType="centerInside"
-                            android:src="@drawable/refresh"
-                            app:tint="@color/white"
-                            />
-
-                        <TextView
-                            android:id="@+id/updated_datetime"
-                            style="@style/text_shadow_white"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_toRightOf="@id/refreshIcon"
-                            android:text="@string/loading"
-                            android:textSize="14sp"
-                            />
-                    </RelativeLayout>
 
                     <androidx.fragment.app.FragmentContainerView
                         android:id="@+id/simple_current_conditions"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/refreshDateTimeLayout"
+                        android:layout_below="@id/headerLayout"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
                         android:layout_marginBottom="8dp"
-                        android:paddingLeft="24dp"
-                        android:paddingRight="24dp"
                         />
 
                     <LinearLayout

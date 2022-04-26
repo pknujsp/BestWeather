@@ -245,7 +245,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		if (night) {
 			if (weatherDescriptionKr.equals("맑음")) {
 				return R.drawable.night_clear;
-			} else if (weatherDescriptionKr.equals("구름많음")) {
+			} else if (weatherDescriptionKr.equals("구름 많음")) {
 				return R.drawable.night_mostly_cloudy;
 			} else {
 				return WEATHER_WEB_ICON_ID_MAP.get(weatherDescriptionKr);

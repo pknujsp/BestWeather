@@ -15,6 +15,7 @@ import android.view.View;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.settings.custompreferences.UnitPreference;
 
 public class UnitsFragment extends PreferenceFragmentCompat {
@@ -40,6 +41,11 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		initPreferences();
 	}
 
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+
 	private void initPreferences() {
 		//좌측 여백 없애기 :  app:iconSpaceReserved="false"
 		PreferenceScreen preferenceScreen = getPreferenceManager().getPreferenceScreen();
@@ -47,7 +53,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		tempPreference = new UnitPreference(getContext());
 		tempPreference.setKey(getString(R.string.pref_key_unit_temp));
 		tempPreference.setTitle(R.string.pref_title_unit_temp);
-		tempPreference.setUnit(ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), "")));
+		tempPreference.setUnit(ValueUnits.valueOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), "")));
 		tempPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
 		tempPreference.setIconSpaceReserved(false);
 
@@ -62,17 +68,19 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 										switch (which) {
 											case 0:
 												sharedPreferences.edit()
-														.putString(tempPreference.getKey(), ValueUnits.celsius.name()).apply();
+														.putString(tempPreference.getKey(), ValueUnits.celsius.name()).commit();
 												tempPreference.setUnit(ValueUnits.celsius);
 												break;
 											//celsius
 											case 1:
 												sharedPreferences.edit()
-														.putString(tempPreference.getKey(), ValueUnits.fahrenheit.name()).apply();
+														.putString(tempPreference.getKey(), ValueUnits.fahrenheit.name()).commit();
 												tempPreference.setUnit(ValueUnits.fahrenheit);
 												break;
 											//fahrenheit
 										}
+										MyApplication.loadValueUnits(getContext(), true);
+
 										dialog.dismiss();
 									}
 								}).create().show();
@@ -87,7 +95,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		windPreference.setKey(getString(R.string.pref_key_unit_wind));
 		windPreference.setTitle(R.string.pref_title_unit_wind);
 		windPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
-		windPreference.setUnit(ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), "")));
+		windPreference.setUnit(ValueUnits.valueOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), "")));
 		windPreference.setIconSpaceReserved(false);
 
 		windPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -101,17 +109,19 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 										switch (which) {
 											case 0:
 												sharedPreferences.edit()
-														.putString(windPreference.getKey(), ValueUnits.mPerSec.name()).apply();
+														.putString(windPreference.getKey(), ValueUnits.mPerSec.name()).commit();
 												windPreference.setUnit(ValueUnits.mPerSec);
 												break;
 											//mmPerSec
 											case 1:
 												sharedPreferences.edit()
-														.putString(windPreference.getKey(), ValueUnits.kmPerHour.name()).apply();
+														.putString(windPreference.getKey(), ValueUnits.kmPerHour.name()).commit();
 												windPreference.setUnit(ValueUnits.kmPerHour);
 												break;
 											//kmPerHour
 										}
+										MyApplication.loadValueUnits(getContext(), true);
+
 										dialog.dismiss();
 									}
 								}).create().show();
@@ -126,7 +136,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		visibilityPreference.setKey(getString(R.string.pref_key_unit_visibility));
 		visibilityPreference.setTitle(R.string.pref_title_unit_visibility);
 		visibilityPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
-		visibilityPreference.setUnit(ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), "")));
+		visibilityPreference.setUnit(ValueUnits.valueOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), "")));
 		visibilityPreference.setIconSpaceReserved(false);
 
 		visibilityPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -140,17 +150,19 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 										switch (which) {
 											case 0:
 												sharedPreferences.edit()
-														.putString(visibilityPreference.getKey(), ValueUnits.km.name()).apply();
+														.putString(visibilityPreference.getKey(), ValueUnits.km.name()).commit();
 												visibilityPreference.setUnit(ValueUnits.km);
 												break;
 											//km
 											case 1:
 												sharedPreferences.edit()
-														.putString(visibilityPreference.getKey(), ValueUnits.mile.name()).apply();
+														.putString(visibilityPreference.getKey(), ValueUnits.mile.name()).commit();
 												visibilityPreference.setUnit(ValueUnits.mile);
 												break;
 											//mile
 										}
+										MyApplication.loadValueUnits(getContext(), true);
+
 										dialog.dismiss();
 									}
 								}).create().show();
@@ -179,17 +191,19 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 										switch (which) {
 											case 0:
 												sharedPreferences.edit()
-														.putString(clockPreference.getKey(), ValueUnits.clock12.name()).apply();
+														.putString(clockPreference.getKey(), ValueUnits.clock12.name()).commit();
 												clockPreference.setUnit(ValueUnits.clock12);
 												break;
 											//12
 											case 1:
 												sharedPreferences.edit()
-														.putString(clockPreference.getKey(), ValueUnits.clock24.name()).apply();
+														.putString(clockPreference.getKey(), ValueUnits.clock24.name()).commit();
 												clockPreference.setUnit(ValueUnits.clock24);
 												break;
 											//24
 										}
+										MyApplication.loadValueUnits(getContext(), true);
+
 										dialog.dismiss();
 									}
 								}).create().show();

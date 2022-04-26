@@ -38,7 +38,7 @@ public enum ValueUnits {
 			case mile:
 				return "mile";
 			case clock12:
-				return "PM 3:00";
+				return "3:00 PM";
 			case clock24:
 				return "15:00";
 			default:

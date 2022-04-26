@@ -75,7 +75,7 @@ public class MyApplication extends Application {
 						true).commit();
 			}
 
-			loadValueUnits(getApplicationContext());
+			loadValueUnits(getApplicationContext(), false);
 		} catch (NullPointerException e) {
 
 		}
@@ -93,8 +93,8 @@ public class MyApplication extends Application {
 		return localeCountryCode;
 	}
 
-	public static void loadValueUnits(Context context) {
-		if (VALUE_UNIT_OBJ.getTempUnit() == null) {
+	public static void loadValueUnits(Context context, boolean force) {
+		if (VALUE_UNIT_OBJ.getTempUnit() == null || force) {
 			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
 			VALUE_UNIT_OBJ.setTempUnit(ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),

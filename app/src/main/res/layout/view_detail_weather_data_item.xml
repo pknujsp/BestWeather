@@ -5,8 +5,12 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="4dp"
-    app:layout_columnWeight="1">
+    android:paddingLeft="4dp"
+    android:paddingTop="6dp"
+    android:paddingRight="4dp"
+    android:paddingBottom="6dp"
+    app:layout_columnWeight="1"
+    >
 
     <TextView
         android:id="@+id/label"
@@ -17,7 +21,8 @@
         android:text="label"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:textSize="13sp" />
+        android:textSize="13sp"
+        />
 
     <ImageView
         android:id="@+id/label_icon"
@@ -25,19 +30,21 @@
         android:layout_height="30dp"
         android:layout_marginBottom="2dp"
         android:scaleType="centerInside"
-        android:src="@drawable/temp_icon" />
+        android:src="@drawable/temp_icon"
+        />
 
     <TextView
         android:id="@+id/value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-condensed-light"
-        android:text="value"
-        android:textAlignment="center"
         android:maxLines="2"
         android:minLines="1"
+        android:text="value"
+        android:textAlignment="center"
         android:textColor="@color/black"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        />
 
 
 </LinearLayout>

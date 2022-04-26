@@ -76,7 +76,8 @@
                     android:layout_height="16dp"
                     android:scaleType="centerInside"
                     android:src="@drawable/refresh"
-                    app:tint="@color/white"
+                    android:tint="@color/white"
+                    tools:ignore="UseAppTint"
                     />
 
             </LinearLayout>
