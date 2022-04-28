@@ -293,7 +293,7 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		errorView = null;
 
 		if (todaySunRiseCalendar == null || todaySunSetCalendar == null) {
-			onSunRiseSetListener.onCalcResult(false);
+			onSunRiseSetListener.onCalcResult(false, false);
 
 			errorView = new TextView(getContext());
 			errorView.setText(R.string.failed_calculating_sun_rise_set);
@@ -365,7 +365,7 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		addView(type2View);
 		addView(type3View);
 
-		onSunRiseSetListener.onCalcResult(true);
+		onSunRiseSetListener.onCalcResult(true, type1 == SunRiseSetType.SET);
 	}
 
 }

@@ -3,6 +3,7 @@ package com.lifedawn.bestweather.weathers;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
@@ -24,6 +25,7 @@ import androidx.preference.PreferenceManager;
 
 import android.util.ArrayMap;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -109,6 +111,7 @@ import com.lifedawn.bestweather.weathers.simplefragment.aqicn.SimpleAirQualityFr
 import com.lifedawn.bestweather.weathers.simplefragment.currentconditions.SimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.dailyforecast.SimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.hourlyforecast.SimpleHourlyForecastFragment;
+import com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.OnSunRiseSetListener;
 import com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.SunsetriseFragment;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
@@ -256,14 +259,24 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		setHeaderColor(false);
+
 		binding.scrollView.setVisibility(View.GONE);
 		binding.flickrImageUrl.setVisibility(View.GONE);
 		binding.loadingAnimation.setVisibility(View.GONE);
 
+		final int statusBarHeight = MyApplication.getStatusBarHeight();
+
 		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.mainToolbar.getRoot().getLayoutParams();
-		layoutParams.topMargin = MyApplication.getStatusBarHeight();
+		layoutParams.topMargin = statusBarHeight;
 		binding.mainToolbar.getRoot().setLayoutParams(layoutParams);
 
+		int topMargin =
+				(int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics())
+						+ statusBarHeight + getResources().getDimension(R.dimen.toolbarHeight));
+		RelativeLayout.LayoutParams headerLayoutParams = (RelativeLayout.LayoutParams) binding.headerLayout.getLayoutParams();
+		headerLayoutParams.topMargin = topMargin;
+		binding.headerLayout.setLayoutParams(headerLayoutParams);
 
 		weatherViewController = new WeatherViewController(binding.rootLayout);
 		weatherViewController.setWeatherView(PrecipType.CLEAR, null);
@@ -1096,6 +1109,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		final DetailCurrentConditionsFragment detailCurrentConditionsFragment = new DetailCurrentConditionsFragment();
 		final SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
 		final SunsetriseFragment sunSetRiseFragment = new SunsetriseFragment();
+		sunSetRiseFragment.setOnSunRiseSetListener(new OnSunRiseSetListener() {
+			@Override
+			public void onCalcResult(boolean calcSuccessful, boolean night) {
+				setHeaderColor(calcSuccessful ? night : false);
+			}
+		});
 
 		String currentConditionsWeatherVal = null;
 		ZoneId zoneId = null;
@@ -1381,6 +1400,22 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		});
 	}
 
+	private void setHeaderColor(boolean isNight) {
+		int textColor = isNight ? Color.WHITE : Color.BLACK;
+		int shadowColor = isNight ? Color.BLACK : Color.WHITE;
+		float shadowRadius = 2.5f;
+		float dx = 0, dy = 0;
+
+		binding.weatherDataSourceName.setTextColor(textColor);
+		binding.addressName.setTextColor(textColor);
+		binding.updatedDatetime.setTextColor(textColor);
+		binding.weatherDataSourceName.setCompoundDrawableTintList(ColorStateList.valueOf(textColor));
+		binding.updatedDatetime.setCompoundDrawableTintList(ColorStateList.valueOf(textColor));
+
+		binding.weatherDataSourceName.setShadowLayer(shadowRadius, dx, dy, shadowColor);
+		binding.addressName.setShadowLayer(shadowRadius, dx, dy, shadowColor);
+		binding.updatedDatetime.setShadowLayer(shadowRadius, dx, dy, shadowColor);
+	}
 
 	public LocationType getLocationType() {
 		return locationType;

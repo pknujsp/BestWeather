@@ -18,7 +18,6 @@ import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.FragmentSunsetriseBinding;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.sunsetrise.DetailSunRiseSetFragment;
@@ -38,6 +37,11 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 	private ZoneId zoneId;
 	private Bundle bundle;
 	private boolean registeredReceiver = false;
+	private OnSunRiseSetListener onSunRiseSetListener;
+
+	public void setOnSunRiseSetListener(OnSunRiseSetListener onSunRiseSetListener) {
+		this.onSunRiseSetListener = onSunRiseSetListener;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -84,27 +88,30 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 
 		sunSetRiseViewGroup = new SunSetRiseViewGroup(getContext(), location, zoneId, new OnSunRiseSetListener() {
 			@Override
-			public void onCalcResult(boolean calcSuccessful) {
+			public void onCalcResult(boolean calcSuccessful, boolean night) {
 				if (calcSuccessful) {
 					if (!registeredReceiver) {
+						registeredReceiver = true;
+
+						onSunRiseSetListener.onCalcResult(true, night);
 						IntentFilter intentFilter = new IntentFilter();
 						intentFilter.addAction(Intent.ACTION_TIME_TICK);
 						requireActivity().registerReceiver(broadcastReceiver, intentFilter);
 						binding.weatherCardViewHeader.detailForecast.setVisibility(View.VISIBLE);
 					}
-					registeredReceiver = true;
 				} else {
-					if (registeredReceiver) {
-						requireActivity().unregisterReceiver(broadcastReceiver);
-						registeredReceiver = false;
-					}
 					binding.weatherCardViewHeader.detailForecast.setVisibility(View.GONE);
+
+					if (registeredReceiver) {
+						registeredReceiver = false;
+						requireActivity().unregisterReceiver(broadcastReceiver);
+					} else {
+						onSunRiseSetListener.onCalcResult(false, false);
+					}
 				}
 			}
 		});
 		binding.rootLayout.addView(sunSetRiseViewGroup, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-
 	}
 
 	@Override
