@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     >
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         android:background="?attr/backgroundColor"
         >
 
@@ -25,9 +25,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_below="@id/toolbar"
+                android:clipToPadding="true"
                 android:overScrollMode="never"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
+                android:paddingHorizontal="16dp"
                 android:scrollbars="none"
                 >
 
@@ -37,59 +37,54 @@
                     android:orientation="vertical"
                     >
 
-                    <TextView
-                        android:id="@+id/always"
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sunRiseSwitch"
+                        style="@style/Switch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="16dp"
-                        android:text="@string/always_notification"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
+                        android:checked="true"
+                        android:text="@string/use_sun_rise_notification"
                         />
 
                     <TextView
-                        android:id="@+id/daily"
+                        android:id="@+id/sunrise_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="16dp"
-                        android:text="@string/daily_notification"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
+                        android:clickable="true"
+                        android:gravity="right"
+                        android:text="10분전에 알림"
+                        />
+
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/sunSetSwitch"
+                        style="@style/Switch"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="@string/use_sun_set_notification"
                         />
 
                     <TextView
-                        android:id="@+id/alarm"
+                        android:id="@+id/sunset_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="16dp"
-                        android:text="@string/alarm"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        android:visibility="gone"
+                        android:clickable="true"
+                        android:gravity="right"
+                        android:text="10분전에 알림"
                         />
 
-                    <TextView
-                        android:id="@+id/sunsetrise"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="16dp"
-                        android:text="@string/sun_set_rise_notification"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        />
+
                 </LinearLayout>
+
 
             </androidx.core.widget.NestedScrollView>
 
         </RelativeLayout>
 
     </FrameLayout>
+
+
 </layout>

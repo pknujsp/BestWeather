@@ -121,9 +121,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.AutoRefreshIntervals));
 		binding.commons.autoRefreshIntervalSpinner.setAdapter(spinnerAdapter);
 
-		SpinnerAdapter dataTypeOfIconSpinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,
-				getResources().getStringArray(R.array.DataTypeOfIcons));
-		binding.dataTypeOfIconSpinner.setAdapter(dataTypeOfIconSpinnerAdapter);
+		binding.dataTypeOfIconSpinner.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,
+				getResources().getStringArray(R.array.DataTypeOfIcons)));
 
 		initLocation();
 		initWeatherProvider();
@@ -153,7 +152,6 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 							startActivity(IntentUtil.getNotificationSettingsIntent(getActivity()));
 						}
 
-
 					} else {
 						ongoingNotificationHelper.cancelAutoRefresh();
 						notificationHelper.cancelNotification(notificationType.getNotificationId());
@@ -163,10 +161,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 			}
 		});
 
-
 		RemoteViews remoteViews = ongoingNotiViewCreator.createRemoteViews(true);
-		View previewWidgetView = remoteViews.apply(getActivity().getApplicationContext(), binding.previewLayout);
-		binding.previewLayout.addView(previewWidgetView);
+		binding.previewLayout.addView(remoteViews.apply(getActivity().getApplicationContext(), binding.previewLayout));
 
 		binding.notificationSwitch.setChecked(originalEnabled);
 		if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.SelectedAddress) {
@@ -195,16 +191,13 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 
 		binding.dataTypeOfIconSpinner.setSelection(ongoingNotiViewCreator.getNotificationDataObj().getDataTypeOfIcon() == WidgetNotiConstants.DataTypeOfIcon.TEMPERATURE
 				? 0 : 1, false);
-
 		binding.commons.kmaTopPrioritySwitch.setChecked(ongoingNotiViewCreator.getNotificationDataObj().isTopPriorityKma());
-
 		initDataTypeOfIconSpinner();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		initializing = false;
 	}
 
 	@Override
@@ -239,6 +232,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 					ongoingNotiViewCreator.getNotificationDataObj().setDataTypeOfIcon(dataTypeOfIcons[position]);
 					ongoingNotiViewCreator.savePreferences();
 					ongoingNotiViewCreator.initNotification(null);
+				}else{
+					initializing = false;
 				}
 			}
 
@@ -350,7 +345,6 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 			ongoingNotiViewCreator.getNotificationDataObj().setLocationType(LocationType.SelectedAddress);
 			ongoingNotiViewCreator.savePreferences();
 			ongoingNotiViewCreator.loadSavedPreferences();
-
 			ongoingNotiViewCreator.initNotification(null);
 		}
 	}
@@ -359,7 +353,6 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		if (!initializing) {
 			ongoingNotiViewCreator.getNotificationDataObj().setLocationType(LocationType.CurrentLocation);
 			ongoingNotiViewCreator.savePreferences();
-
 			ongoingNotiViewCreator.initNotification(null);
 		}
 	}
@@ -395,6 +388,5 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 	public void initPreferences() {
 		ongoingNotiViewCreator.loadPreferences();
 	}
-
 
 }

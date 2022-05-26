@@ -37,4 +37,8 @@
     <string name="pref_key_never_ask_again_permission_for_access_location" translatable="false">pref_key_never_ask_again_permission_for_access_location</string>
 
     <string name="pref_key_forecast_view_type" translatable="false">pref_key_forecast_view_type</string>
+
+    <string name="pref_key_sun_rise_notification" translatable="false">pref_key_sun_rise_notification</string>
+
+    <string name="pref_key_sun_set_notification" translatable="false">pref_key_sun_set_notification</string>
 </resources>

@@ -93,7 +93,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 					if (!registeredReceiver) {
 						registeredReceiver = true;
 
-						onSunRiseSetListener.onCalcResult(true, night);
+						//onSunRiseSetListener.onCalcResult(true, night);
 						IntentFilter intentFilter = new IntentFilter();
 						intentFilter.addAction(Intent.ACTION_TIME_TICK);
 						requireActivity().registerReceiver(broadcastReceiver, intentFilter);
@@ -106,7 +106,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues {
 						registeredReceiver = false;
 						requireActivity().unregisterReceiver(broadcastReceiver);
 					} else {
-						onSunRiseSetListener.onCalcResult(false, false);
+						//onSunRiseSetListener.onCalcResult(false, false);
 					}
 				}
 			}

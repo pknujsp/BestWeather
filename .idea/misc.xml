@@ -61,8 +61,9 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_find_address.xml" value="0.37720111214087115" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_intro.xml" value="0.25" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_main.xml" value="0.17806484295845998" />
-        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_notification.xml" value="0.17806484295845998" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_notification.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_settings_main.xml" value="0.17806484295845998" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_sun_set_rise_notification.xml" value="0.5536458333333333" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_sunsetrise.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_weather.xml" value="0.264" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_weather_sources.xml" value="0.25" />

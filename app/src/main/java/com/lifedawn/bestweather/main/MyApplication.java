@@ -69,6 +69,8 @@ public class MyApplication extends Application {
 				editor.putString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name());
 				editor.putBoolean(getString(R.string.pref_key_use_current_location), true);
 				editor.putBoolean(getString(R.string.pref_key_never_ask_again_permission_for_access_location), false);
+				editor.putBoolean(getString(R.string.pref_key_sun_rise_notification), false);
+				editor.putBoolean(getString(R.string.pref_key_sun_set_notification), false);
 				editor.putBoolean(getString(R.string.pref_key_show_intro), true);
 				editor.putBoolean(getString(R.string.pref_key_kma_top_priority), false).putBoolean(
 						getString(R.string.pref_key_accu_weather), false).putBoolean(getString(R.string.pref_key_open_weather_map),

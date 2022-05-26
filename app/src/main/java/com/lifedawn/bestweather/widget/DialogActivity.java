@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
@@ -92,8 +93,46 @@ public class DialogActivity extends Activity {
 			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), null, appWidgetId);
 		}
 
+
 		widgetProviderClass = widgetCreator.widgetProviderClass();
 		final View dialogView = getLayoutInflater().inflate(R.layout.view_widget_dialog, null);
+
+
+		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
+			@Override
+			public void onResultSuccessful(WidgetDto result) {
+				final Long refreshInterval = result.getUpdateIntervalMillis();
+				String refreshIntervalText = null;
+
+				if (refreshInterval > 0) {
+					String[] autoRefreshIntervalsValue = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
+					String[] autoRefreshIntervalsText = getResources().getStringArray(R.array.AutoRefreshIntervals);
+
+					for (int i = 0; i < autoRefreshIntervalsValue.length; i++) {
+						if (refreshInterval.toString().equals(autoRefreshIntervalsValue[i])) {
+							refreshIntervalText = autoRefreshIntervalsText[i];
+							break;
+						}
+					}
+				} else {
+					refreshIntervalText = getString(R.string.disable_auto_refresh);
+				}
+
+				final String finalRefreshIntervalText = refreshIntervalText;
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						((TextView) dialogView.findViewById(R.id.auto_refresh_interval)).setText(finalRefreshIntervalText);
+					}
+				});
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
+
 
 		((Button) dialogView.findViewById(R.id.openAppBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override

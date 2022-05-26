@@ -88,19 +88,13 @@
             android:orientation="horizontal"
             >
 
-            <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:layout_marginRight="4dp"
-                android:scaleType="centerInside"
-                android:src="@mipmap/ic_launcher_round"
-                />
-
             <TextView
                 style="@style/text_shadow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:shadowColor="@color/black"
                 android:text="@string/app_name"
+                android:textColor="@color/white"
                 android:textSize="18sp"
                 />
 

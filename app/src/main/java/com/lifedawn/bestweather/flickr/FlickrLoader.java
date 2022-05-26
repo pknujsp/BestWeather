@@ -2,7 +2,10 @@ package com.lifedawn.bestweather.flickr;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,13 +32,18 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.SimpleTimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -45,15 +53,22 @@ import retrofit2.Response;
 public class FlickrLoader {
 	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
 	private static final Set<ImgRequestObj> IMG_REQUEST_OBJ_SET = new HashSet<>();
+	private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
 	private FlickrLoader() {
 	}
 
 	public static void loadImg(Activity activity, WeatherProviderType weatherProviderType, String val, Double latitude, Double longitude,
 	                           ZoneId zoneId, String volume, GlideImgCallback glideImgCallback, ZonedDateTime refreshDateTime) {
-		MyApplication.getExecutorService().execute(new Runnable() {
+		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
+				if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
+					Log.e("on loadImg", "메인 스레드");
+				} else {
+					Log.e("on loadImg", "백그라운드 스레드");
+				}
+
 				cancelAllRequest(activity);
 				final ZonedDateTime lastRefreshDateTime = refreshDateTime.withZoneSameInstant(zoneId);
 
@@ -141,6 +156,12 @@ public class FlickrLoader {
 					call.enqueue(new Callback<JsonElement>() {
 						@Override
 						public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+
+							if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
+								Log.e("on getPhotosFromGallery", "메인 스레드");
+							} else {
+								Log.e("on getPhotosFromGallery", "백그라운드 스레드");
+							}
 							Gson gson = new Gson();
 							final PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
 									PhotosFromGalleryResponse.class);
@@ -151,7 +172,8 @@ public class FlickrLoader {
 									// https://live.staticflickr.com/server/id_secret_size.jpg
 									final int randomIdx =
 											new Random().nextInt(Integer.parseInt(photosFromGalleryResponse.getPhotos().getTotal()));
-									PhotosFromGalleryResponse.Photos.Photo photo = photosFromGalleryResponse.getPhotos().getPhoto().get(randomIdx);
+									final PhotosFromGalleryResponse.Photos.Photo photo =
+											photosFromGalleryResponse.getPhotos().getPhoto().get(randomIdx);
 
 									final FlickrGetInfoParameter getInfoParameter = new FlickrGetInfoParameter();
 									getInfoParameter.setSecret(photo.getSecret());
@@ -164,6 +186,11 @@ public class FlickrLoader {
 									getPhotoInfoCall.enqueue(new Callback<JsonElement>() {
 										@Override
 										public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+											if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
+												Log.e("on getPhotoInfoCall", "메인 스레드");
+											} else {
+												Log.e("on getPhotoInfoCall", "백그라운드 스레드");
+											}
 											final GetInfoPhotoResponse getInfoPhotoResponse = gson.fromJson(response.body().toString(),
 													GetInfoPhotoResponse.class);
 
@@ -175,16 +202,18 @@ public class FlickrLoader {
 															"_b.jpg" : "_o.jpg");
 
 											final FlickrImgObj flickrImgObj = new FlickrImgObj();
+											BACKGROUND_IMG_MAP.put(galleryName, flickrImgObj);
+
 											flickrImgObj.setPhoto(photo);
 											flickrImgObj.setTime(finalTime);
 											flickrImgObj.setVolume(volume);
 											flickrImgObj.setWeather(finalWeather);
-											BACKGROUND_IMG_MAP.put(galleryName, flickrImgObj);
 
-											final CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {
+											imgRequestObj.glideTarget = new CustomTarget<Bitmap>() {
 												@Override
 												public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-													BACKGROUND_IMG_MAP.get(galleryName).setImg(resource.copy(Bitmap.Config.RGB_565, true));
+													Bitmap res = resource.copy(Bitmap.Config.RGB_565, true);
+													BACKGROUND_IMG_MAP.get(galleryName).setImg(res);
 													glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), true);
 												}
 
@@ -198,8 +227,8 @@ public class FlickrLoader {
 													glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
 												}
 											};
-											imgRequestObj.glideTarget = target;
-											Glide.with(activity).asBitmap().load(backgroundImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(target);
+
+											Glide.with(activity).asBitmap().load(backgroundImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(imgRequestObj.glideTarget);
 										}
 
 										@Override
@@ -215,6 +244,7 @@ public class FlickrLoader {
 							} else {
 								glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
 							}
+
 						}
 
 						@Override
@@ -242,6 +272,57 @@ public class FlickrLoader {
 		}
 
 		IMG_REQUEST_OBJ_SET.clear();
+	}
+
+	private static Bitmap setBrightness(Bitmap src, int value) {
+		// original image size
+		int width = src.getWidth();
+		int height = src.getHeight();
+		// create output bitmap
+		Bitmap bmOut = Bitmap.createBitmap(width, height, src.getConfig());
+		// color information
+		int A, R, G, B;
+		int pixel;
+
+		// scan through all pixels
+		for (int x = 0; x < width; ++x) {
+			for (int y = 0; y < height; ++y) {
+				// get pixel color
+				pixel = src.getPixel(x, y);
+				A = Color.alpha(pixel);
+				R = Color.red(pixel);
+				G = Color.green(pixel);
+				B = Color.blue(pixel);
+
+				// increase/decrease each channel
+				R += value;
+				if (R > 255) {
+					R = 255;
+				} else if (R < 0) {
+					R = 0;
+				}
+
+				G += value;
+				if (G > 255) {
+					G = 255;
+				} else if (G < 0) {
+					G = 0;
+				}
+
+				B += value;
+				if (B > 255) {
+					B = 255;
+				} else if (B < 0) {
+					B = 0;
+				}
+
+				// apply new pixel color to output bitmap
+				bmOut.setPixel(x, y, Color.argb(A, R, G, B));
+			}
+		}
+
+		// return final image
+		return bmOut;
 	}
 
 	public interface GlideImgCallback {

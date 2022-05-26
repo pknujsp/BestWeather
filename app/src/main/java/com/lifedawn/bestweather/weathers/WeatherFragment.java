@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Location;
@@ -24,7 +25,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import android.util.ArrayMap;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,14 +96,12 @@ import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.detailfragment.currentconditions.DetailCurrentConditionsFragment;
-import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
@@ -111,7 +109,6 @@ import com.lifedawn.bestweather.weathers.simplefragment.aqicn.SimpleAirQualityFr
 import com.lifedawn.bestweather.weathers.simplefragment.currentconditions.SimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.dailyforecast.SimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.hourlyforecast.SimpleHourlyForecastFragment;
-import com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.OnSunRiseSetListener;
 import com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.SunsetriseFragment;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
@@ -259,11 +256,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		setHeaderColor(false);
 
 		binding.scrollView.setVisibility(View.GONE);
 		binding.flickrImageUrl.setVisibility(View.GONE);
 		binding.loadingAnimation.setVisibility(View.GONE);
+
+		binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(getContext(), R.color.black_alpha_25), PorterDuff.Mode.DARKEN);
 
 		final int statusBarHeight = MyApplication.getStatusBarHeight();
 
@@ -303,10 +301,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
 					FindAddressFragment findAddressFragment = new FindAddressFragment();
+
 					Bundle bundle = new Bundle();
 					bundle.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
 					findAddressFragment.setArguments(bundle);
-
 					findAddressFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
 						@Override
 						public void onResultFragment(Bundle result) {
@@ -323,7 +321,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 					getParentFragmentManager().beginTransaction().hide(WeatherFragment.this).add(R.id.fragment_container,
 							findAddressFragment, getString(R.string.tag_find_address_fragment)).addToBackStack(
-							getString(R.string.tag_find_address_fragment)).commit();
+							getString(R.string.tag_find_address_fragment)).commitAllowingStateLoss();
 				}
 			}
 		});
@@ -523,7 +521,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		FlickrLoader.loadImg(requireActivity(), weatherProviderType, val, latitude, longitude, zoneId, volume, new FlickrLoader.GlideImgCallback() {
 			@Override
 			public void onLoadedImg(FlickrImgObj flickrImgObj, boolean successful) {
-				Log.e("FLICKR", "fragment isAdded: " + (isAdded() ? 1 : 0));
 				if (getActivity() != null && isAdded()) {
 					requireActivity().runOnUiThread(new Runnable() {
 						@Override
@@ -1048,9 +1045,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		if (weatherProviderTypeSet.contains(WeatherProviderType.KMA_WEB)) {
 			RequestKma requestKma = new RequestKma();
 			requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST).addRequestServiceType(
-					RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).addRequestServiceType(
-					RetrofitClient.ServiceType.KMA_VILAGE_FCST).addRequestServiceType(
-					RetrofitClient.ServiceType.KMA_MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.KMA_MID_TA_FCST)
+							RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).addRequestServiceType(
+							RetrofitClient.ServiceType.KMA_VILAGE_FCST).addRequestServiceType(
+							RetrofitClient.ServiceType.KMA_MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.KMA_MID_TA_FCST)
 					.addRequestServiceType(RetrofitClient.ServiceType.KMA_YESTERDAY_ULTRA_SRT_NCST);
 			newRequestWeatherSources.put(WeatherProviderType.KMA_WEB, requestKma);
 		}
@@ -1109,12 +1106,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		final DetailCurrentConditionsFragment detailCurrentConditionsFragment = new DetailCurrentConditionsFragment();
 		final SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
 		final SunsetriseFragment sunSetRiseFragment = new SunsetriseFragment();
-		sunSetRiseFragment.setOnSunRiseSetListener(new OnSunRiseSetListener() {
-			@Override
-			public void onCalcResult(boolean calcSuccessful, boolean night) {
-				setHeaderColor(calcSuccessful ? night : false);
-			}
-		});
 
 		String currentConditionsWeatherVal = null;
 		ZoneId zoneId = null;
