@@ -24,12 +24,16 @@ import com.lifedawn.bestweather.widget.foreground.WidgetForegroundService;
 
 import java.util.List;
 
-public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
+public class BaseAppWidgetProvider extends AppWidgetProvider {
 	protected AppWidgetManager appWidgetManager;
 
-	protected abstract Class<?> getJobServiceClass();
+	protected Class<?> getJobServiceClass() {
+		return null;
+	}
 
-	protected abstract AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId);
+	protected AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId) {
+		return null;
+	}
 
 	protected void reDraw(Context context, int[] appWidgetIds, Class<?> widgetProviderClass) {
 		if (appWidgetManager == null) {
@@ -101,7 +105,7 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 		WidgetRepository widgetRepository = new WidgetRepository(context);
 
 		for (int appWidgetId : appWidgetIds) {
-			widgetHelper.cancelAutoRefresh(appWidgetId, getClass());
+			widgetHelper.cancelAutoRefresh();
 			widgetRepository.delete(appWidgetId, null);
 		}
 		super.onDeleted(context, appWidgetIds);
@@ -136,16 +140,17 @@ public abstract class AbstractAppWidgetProvider extends AppWidgetProvider {
 					int index = 0;
 					for (WidgetDto widgetDto : result) {
 						ids[index++] = widgetDto.getAppWidgetId();
-						if (widgetDto.getUpdateIntervalMillis() > 0) {
-
-							if (!widgetHelper.isRepeating(widgetDto.getAppWidgetId(), widgetProviderClass)) {
-								widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId(),
-										widgetProviderClass);
-							}
-						}
 					}
 
 					reDraw(context, ids, widgetProviderClass);
+
+					long widgetRefreshInterval = widgetHelper.getRefreshInterval();
+					if (widgetRefreshInterval > 0L) {
+						if (!widgetHelper.isRepeating()) {
+							widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
+						}
+					}
+
 				}
 
 				@Override

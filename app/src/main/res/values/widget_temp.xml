@@ -4,7 +4,7 @@
     <string name="temp_precipitationRain">rain: 1.2mm</string>
     <string name="temp_noPrecipitation">no precipitation</string>
     <string name="temp_temperature" translatable="false">12℃</string>
-    <string name="temp_yesterdayTemperature">어제보다 2℃ 낮음</string>
+    <string name="temp_yesterdayTemperature">lower 2℃ than yesterday</string>
     <string name="temp_minTemperature" translatable="false">7℃</string>
     <string name="temp_maxTemperature" translatable="false">13℃</string>
     <string name="temp_feelsLikeTemperature">feels: 12℃</string>

@@ -7,16 +7,17 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.ArrayMap;
+
+import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
-import com.lifedawn.bestweather.widget.widgetprovider.AbstractAppWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.BaseAppWidgetProvider;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ import java.util.Map;
 public class WidgetHelper {
 	private Context context;
 	private AlarmManager alarmManager;
-	private Class<?> widgetProviderClass;
+	private final int AUTO_REFRESH_REQUEST_CODE = 11111;
 
 	public WidgetHelper(Context context) {
 		this.context = context;
@@ -34,25 +35,22 @@ public class WidgetHelper {
 	}
 
 
-	public void onSelectedAutoRefreshInterval(long val, int appWidgetId, Class<?> widgetProviderClass) {
-		cancelAutoRefresh(appWidgetId, widgetProviderClass);
+	public void onSelectedAutoRefreshInterval(long val) {
+		cancelAutoRefresh();
 
 		if (val > 0) {
-			Intent refreshIntent = new Intent(context, widgetProviderClass);
+			Intent refreshIntent = new Intent(context, BaseAppWidgetProvider.class);
 			refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-			Bundle bundle = new Bundle();
-			bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-			refreshIntent.putExtras(bundle);
 
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, refreshIntent,
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, refreshIntent,
 					PendingIntent.FLAG_UPDATE_CURRENT);
 
 			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), val, pendingIntent);
 		}
 	}
 
-	public void cancelAutoRefresh(int appWidgetId, Class<?> widgetProviderClass) {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, widgetProviderClass),
+	public void cancelAutoRefresh() {
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, BaseAppWidgetProvider.class),
 				PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
@@ -60,8 +58,8 @@ public class WidgetHelper {
 		}
 	}
 
-	public boolean isRepeating(int appWidgetId, Class<?> widgetProviderClass) {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, appWidgetId + 10000, new Intent(context, widgetProviderClass),
+	public boolean isRepeating() {
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, BaseAppWidgetProvider.class),
 				PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			return true;
@@ -109,17 +107,7 @@ public class WidgetHelper {
 							Bundle bundle = new Bundle();
 							List<Integer> idList = widgetArrMap.valueAt(widgetArrMap.indexOfKey(cls));
 							int[] ids = new int[idList.size()];
-							int index = 0;
 
-							for (Integer id : idList) {
-								ids[index++] = id;
-
-								if (widgetDtoMap.get(id).getUpdateIntervalMillis() > 0) {
-									if (!isRepeating(id, cls)) {
-										onSelectedAutoRefreshInterval(widgetDtoMap.get(id).getUpdateIntervalMillis(), id, cls);
-									}
-								}
-							}
 							bundle.putIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
 							refreshIntent.putExtras(bundle);
 
@@ -129,6 +117,13 @@ public class WidgetHelper {
 
 						} catch (PendingIntent.CanceledException e) {
 							e.printStackTrace();
+						}
+					}
+
+					long widgetRefreshInterval = getRefreshInterval();
+					if (widgetRefreshInterval > 0L) {
+						if (!isRepeating()) {
+							onSelectedAutoRefreshInterval(widgetRefreshInterval);
 						}
 					}
 
@@ -142,4 +137,10 @@ public class WidgetHelper {
 			}
 		});
 	}
+
+	public Long getRefreshInterval() {
+		return PreferenceManager.getDefaultSharedPreferences(context)
+				.getLong(context.getString(R.string.pref_key_widget_refresh_interval), 0L);
+	}
+
 }

@@ -9,7 +9,7 @@ import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.EighthWidgetCreator;
 import com.lifedawn.bestweather.widget.jobservice.EighthWidgetJobService;
 
-public class EighthWidgetProvider extends AbstractAppWidgetProvider {
+public class EighthWidgetProvider extends BaseAppWidgetProvider {
 	@Override
 	protected AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId) {
 		return new EighthWidgetCreator(context,null,appWidgetId);

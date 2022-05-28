@@ -107,9 +107,10 @@ public abstract class AbstractWidgetJobService extends JobService {
 						@Override
 						public void onResultSuccessful(WidgetDto widgetDto) {
 							WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
-							if (widgetDto.getUpdateIntervalMillis() > 0) {
-								widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId,
-										widgetClassMap.get(jobId));
+							long widgetRefreshInterval = widgetHelper.getRefreshInterval();
+
+							if (widgetRefreshInterval > 0) {
+								widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
 							}
 
 							final RemoteViews remoteViews = widgetViewCreator.createRemoteViews();
@@ -339,11 +340,11 @@ public abstract class AbstractWidgetJobService extends JobService {
 			@Override
 			public void onResultSuccessful(List<WidgetDto> list) {
 				WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
-				for (WidgetDto widgetDto : list) {
-					if (widgetDto.getUpdateIntervalMillis() > 0) {
-						widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), widgetDto.getAppWidgetId(),
-								widgetClassMap.get(jobParameters.getJobId()));
-					}
+
+				long widgetRefreshInterval = widgetHelper.getRefreshInterval();
+
+				if (widgetRefreshInterval > 0) {
+					widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
 				}
 				jobFinished(jobParameters, false);
 			}

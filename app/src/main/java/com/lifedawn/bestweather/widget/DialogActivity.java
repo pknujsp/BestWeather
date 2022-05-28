@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.widget;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
+import androidx.preference.PreferenceManager;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -10,6 +11,7 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -97,42 +99,25 @@ public class DialogActivity extends Activity {
 		widgetProviderClass = widgetCreator.widgetProviderClass();
 		final View dialogView = getLayoutInflater().inflate(R.layout.view_widget_dialog, null);
 
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		final Long refreshInterval = sharedPreferences.getLong(getString(R.string.pref_key_widget_refresh_interval), 0L);
+		String refreshIntervalText = null;
 
-		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto result) {
-				final Long refreshInterval = result.getUpdateIntervalMillis();
-				String refreshIntervalText = null;
+		if (refreshInterval > 0) {
+			String[] autoRefreshIntervalsValue = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
+			String[] autoRefreshIntervalsText = getResources().getStringArray(R.array.AutoRefreshIntervals);
 
-				if (refreshInterval > 0) {
-					String[] autoRefreshIntervalsValue = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
-					String[] autoRefreshIntervalsText = getResources().getStringArray(R.array.AutoRefreshIntervals);
-
-					for (int i = 0; i < autoRefreshIntervalsValue.length; i++) {
-						if (refreshInterval.toString().equals(autoRefreshIntervalsValue[i])) {
-							refreshIntervalText = autoRefreshIntervalsText[i];
-							break;
-						}
-					}
-				} else {
-					refreshIntervalText = getString(R.string.disable_auto_refresh);
+			for (int i = 0; i < autoRefreshIntervalsValue.length; i++) {
+				if (refreshInterval.toString().equals(autoRefreshIntervalsValue[i])) {
+					refreshIntervalText = autoRefreshIntervalsText[i];
+					break;
 				}
-
-				final String finalRefreshIntervalText = refreshIntervalText;
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						((TextView) dialogView.findViewById(R.id.auto_refresh_interval)).setText(finalRefreshIntervalText);
-					}
-				});
 			}
+		} else {
+			refreshIntervalText = getString(R.string.disable_auto_refresh);
+		}
 
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
-
+		((TextView) dialogView.findViewById(R.id.auto_refresh_interval)).setText(refreshIntervalText);
 
 		((Button) dialogView.findViewById(R.id.openAppBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override

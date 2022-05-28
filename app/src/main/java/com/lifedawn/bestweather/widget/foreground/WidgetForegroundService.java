@@ -195,9 +195,10 @@ public class WidgetForegroundService extends Service {
 				public void onResultSuccessful(WidgetDto widgetDto) {
 					AbstractWidgetCreator widgetCreator = createWidgetViewCreator(appWidgetId, widgetDto.getWidgetProviderClassName());
 					WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
-					if (widgetDto.getUpdateIntervalMillis() > 0) {
-						widgetHelper.onSelectedAutoRefreshInterval(widgetDto.getUpdateIntervalMillis(), appWidgetId,
-								allWidgetProviderClassArrayMap.get(appWidgetId));
+					long widgetRefreshInterval = widgetHelper.getRefreshInterval();
+
+					if (widgetRefreshInterval > 0) {
+						widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
 					}
 
 					remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),

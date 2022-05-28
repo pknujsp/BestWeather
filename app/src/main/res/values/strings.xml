@@ -355,7 +355,7 @@
     <string name="location">location</string>
     <string name="selected_location">Selected location</string>
     <string name="background_transparency">background transparency</string>
-    <string name="auto_refresh_interval">auto update interval</string>
+    <string name="auto_refresh_interval">refresh interval</string>
     <string name="display_datetime">display datetime</string>
     <string name="display_local_datetime">display local datetime</string>
     <string name="create_widget">create widget</string>
@@ -512,11 +512,13 @@
     <string name="runningUpdateService">running updates...</string>
     <string name="updatingNotification">updating Notification...</string>
     <string name="data_type_of_icon">DataType Of Icon</string>
-    <string name="sun_set_rise_notification">일출, 일몰 알림</string>
+    <string name="sun_set_rise_notification">Sun rise/set Notification</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="use_sun_rise_notification">일출 알림</string>
-    <string name="use_sun_set_notification">일몰 알림</string>
+    <string name="use_sun_rise_notification">sunrise notification</string>
+    <string name="use_sun_set_notification">sunset notification</string>
+    <string name="pref_key_widget_refresh_interval" translatable="false">pref_key_widget_refresh_interval</string>
+    <string name="pref_title_widget_refresh_interval">widget refresh interval</string>
 
 
 </resources>

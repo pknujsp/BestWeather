@@ -127,6 +127,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		initLocation();
 		initWeatherProvider();
 		initAutoRefreshInterval();
+		initDataTypeOfIconSpinner();
 
 		binding.notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
@@ -192,12 +193,12 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		binding.dataTypeOfIconSpinner.setSelection(ongoingNotiViewCreator.getNotificationDataObj().getDataTypeOfIcon() == WidgetNotiConstants.DataTypeOfIcon.TEMPERATURE
 				? 0 : 1, false);
 		binding.commons.kmaTopPrioritySwitch.setChecked(ongoingNotiViewCreator.getNotificationDataObj().isTopPriorityKma());
-		initDataTypeOfIconSpinner();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
+		initializing = false;
 	}
 
 	@Override
@@ -208,12 +209,16 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 
 	protected void initAutoRefreshInterval() {
 		binding.commons.autoRefreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			boolean init = true;
+
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				if (!initializing) {
+				if (!init) {
 					ongoingNotiViewCreator.getNotificationDataObj().setUpdateIntervalMillis(intervalsLong[position]);
 					ongoingNotiViewCreator.savePreferences();
 					ongoingNotificationHelper.onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
+				} else {
+					init = false;
 				}
 			}
 
@@ -226,14 +231,16 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 
 	protected void initDataTypeOfIconSpinner() {
 		binding.dataTypeOfIconSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			boolean init = true;
+
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				if (!initializing) {
+				if (!init) {
 					ongoingNotiViewCreator.getNotificationDataObj().setDataTypeOfIcon(dataTypeOfIcons[position]);
 					ongoingNotiViewCreator.savePreferences();
 					ongoingNotiViewCreator.initNotification(null);
-				}else{
-					initializing = false;
+				} else {
+					init = false;
 				}
 			}
 

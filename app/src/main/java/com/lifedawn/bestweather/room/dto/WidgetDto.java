@@ -38,9 +38,6 @@ public class WidgetDto {
 	@ColumnInfo(name = "topPriorityKma")
 	private boolean topPriorityKma;
 
-	@ColumnInfo(name = "updateIntervalMillis")
-	private long updateIntervalMillis;
-
 	@ColumnInfo(name = "selectedAddressDtoId")
 	private int selectedAddressDtoId;
 
@@ -170,13 +167,6 @@ public class WidgetDto {
 		this.topPriorityKma = topPriorityKma;
 	}
 
-	public long getUpdateIntervalMillis() {
-		return updateIntervalMillis;
-	}
-
-	public void setUpdateIntervalMillis(long updateIntervalMillis) {
-		this.updateIntervalMillis = updateIntervalMillis;
-	}
 
 	public int getSelectedAddressDtoId() {
 		return selectedAddressDtoId;

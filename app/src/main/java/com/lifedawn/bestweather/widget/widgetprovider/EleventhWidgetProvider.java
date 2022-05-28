@@ -6,11 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.EighthWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.EleventhWidgetCreator;
 import com.lifedawn.bestweather.widget.jobservice.EleventhWidgetJobService;
 
-public class EleventhWidgetProvider extends AbstractAppWidgetProvider {
+public class EleventhWidgetProvider extends BaseAppWidgetProvider {
 	@Override
 	protected AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId) {
 		return new EleventhWidgetCreator(context,null,appWidgetId);

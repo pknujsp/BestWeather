@@ -297,7 +297,7 @@
     <string name="location">위치</string>
     <string name="selected_location">선택한 주소</string>
     <string name="background_transparency">배경 투명도</string>
-    <string name="auto_refresh_interval">자동 업데이트 간격</string>
+    <string name="auto_refresh_interval">업데이트 간격</string>
     <string name="display_datetime">날짜와 시각 표시</string>
     <string name="display_local_datetime">현지 시각으로 표시</string>
     <string name="create_widget">위젯 생성</string>
@@ -449,4 +449,8 @@
     <string name="notificationForegroundServiceChannelDescription">위젯/알림 데이터를 가져올 때 표시됩니다</string>
     <string name="updatingNotification">알림 업데이트 중...</string>
     <string name="data_type_of_icon">아이콘 표시 유형</string>
+    <string name="sun_set_rise_notification">일출, 일몰 알림</string>
+    <string name="use_sun_rise_notification">일출 알림</string>
+    <string name="use_sun_set_notification">일몰 알림</string>
+    <string name="pref_title_widget_refresh_interval">위젯 업데이트 간격</string>
 </resources>

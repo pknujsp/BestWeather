@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -18,6 +19,7 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -82,6 +84,10 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	private Integer appWidgetId;
 	private Integer layoutId;
 	private WidgetDto widgetDto;
+
+	private Long[] widgetRefreshIntervalValues;
+	private int originalWidgetRefreshIntervalValueIndex;
+	private int widgetRefreshIntervalValueIndex;
 
 	private int widgetHeight;
 	private int widgetWidth;
@@ -270,6 +276,14 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 						MainThreadWorker.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
+								if (originalWidgetRefreshIntervalValueIndex != widgetRefreshIntervalValueIndex) {
+									PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+											.edit().putLong(getString(R.string.pref_key_widget_refresh_interval),
+													widgetRefreshIntervalValues[widgetRefreshIntervalValueIndex]).commit();
+									WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
+									widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshIntervalValues[widgetRefreshIntervalValueIndex]);
+								}
+
 								Intent resultValue = new Intent();
 								resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 								setResult(RESULT_OK, resultValue);
@@ -372,10 +386,13 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	private void initAutoRefreshInterval() {
 		final String[] intervalsDescription = getResources().getStringArray(R.array.AutoRefreshIntervals);
 		final String[] intervalsStr = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
-		final long[] intervalsLong = new long[intervalsStr.length];
+		widgetRefreshIntervalValues = new Long[intervalsStr.length];
+
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		Long currentValue = sharedPreferences.getLong(getString(R.string.pref_key_widget_refresh_interval), 0L);
 
 		for (int i = 0; i < intervalsStr.length; i++) {
-			intervalsLong[i] = Long.parseLong(intervalsStr[i]);
+			widgetRefreshIntervalValues[i] = Long.parseLong(intervalsStr[i]);
 		}
 
 		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, intervalsDescription);
@@ -384,8 +401,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		binding.autoRefreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				long autoRefreshInterval = intervalsLong[position];
-				widgetDto.setUpdateIntervalMillis(autoRefreshInterval);
+				widgetRefreshIntervalValueIndex = position;
 			}
 
 			@Override
@@ -394,6 +410,17 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			}
 		});
 
+
+		widgetRefreshIntervalValueIndex = 0;
+		for (String v : intervalsStr) {
+			if (currentValue.toString().equals(v)) {
+				break;
+			}
+			widgetRefreshIntervalValueIndex++;
+		}
+		originalWidgetRefreshIntervalValueIndex = widgetRefreshIntervalValueIndex;
+
+		binding.autoRefreshIntervalSpinner.setSelection(widgetRefreshIntervalValueIndex);
 	}
 
 	private void initWeatherProvider() {

@@ -5,28 +5,24 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
+import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreference;
 
-import android.preference.PreferenceFragment;
-import android.provider.CalendarContract;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.interfaces.IAppbarTitle;
 import com.lifedawn.bestweather.main.MainActivity;
-
-import org.jetbrains.annotations.NotNull;
+import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.settings.custompreferences.WidgetRefreshIntervalPreference;
+import com.lifedawn.bestweather.widget.WidgetHelper;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 	private IAppbarTitle iAppbarTitle;
@@ -35,6 +31,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 	private Preference unitsPreference;
 	private Preference appThemePreference;
 	private Preference weatherDataSourcesPreference;
+	private WidgetRefreshIntervalPreference widgetRefreshIntervalPreference;
 	private SwitchPreference useCurrentLocationPreference;
 
 	public SettingsFragment(IAppbarTitle iAppbarTitle) {
@@ -70,6 +67,44 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 	}
 
 	private void initPreferences() {
+		//위젯 업데이트
+		widgetRefreshIntervalPreference = new WidgetRefreshIntervalPreference(getContext());
+		widgetRefreshIntervalPreference.setKey(getString(R.string.pref_key_widget_refresh_interval));
+		widgetRefreshIntervalPreference.setTitle(R.string.pref_title_widget_refresh_interval);
+		widgetRefreshIntervalPreference.setValue(sharedPreferences.getLong(getString(R.string.pref_key_widget_refresh_interval), 0L));
+		widgetRefreshIntervalPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
+		widgetRefreshIntervalPreference.setIconSpaceReserved(false);
+
+		widgetRefreshIntervalPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				new MaterialAlertDialogBuilder(getActivity()).setTitle(getString(R.string.pref_title_widget_refresh_interval))
+						.setSingleChoiceItems(widgetRefreshIntervalPreference.getWidgetRefreshIntervalTexts(),
+								widgetRefreshIntervalPreference.getCurrentValueIndex(),
+								new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog, int which) {
+										long newValue = widgetRefreshIntervalPreference
+												.getWidgetRefreshIntervalLongValues()[which];
+										sharedPreferences.edit()
+												.putLong(widgetRefreshIntervalPreference.getKey(), newValue).commit();
+										widgetRefreshIntervalPreference.setValue(newValue);
+
+
+										WidgetHelper widgetHelper = new WidgetHelper(getContext());
+										widgetHelper.onSelectedAutoRefreshInterval(newValue);
+										MyApplication.loadValueUnits(getContext(), true);
+										dialog.dismiss();
+									}
+								}).create().show();
+				return true;
+			}
+		});
+
+		PreferenceScreen preferenceScreen = getPreferenceManager().getPreferenceScreen();
+		preferenceScreen.addPreference(widgetRefreshIntervalPreference);
+
+
 		//값 단위
 		unitsPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override

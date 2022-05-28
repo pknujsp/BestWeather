@@ -101,7 +101,6 @@ public abstract class AbstractWidgetCreator {
 		widgetDto.addWeatherProviderType(WeatherProviderType.OWM_ONECALL);
 		widgetDto.setTextSizeAmount(0);
 		widgetDto.setTopPriorityKma(true);
-		widgetDto.setUpdateIntervalMillis(0);
 
 		if (getRequestWeatherDataTypeSet().contains(WeatherDataType.airQuality)) {
 			widgetDto.getWeatherProviderTypeSet().add(WeatherProviderType.AQICN);

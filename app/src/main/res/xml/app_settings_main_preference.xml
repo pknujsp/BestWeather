@@ -28,4 +28,6 @@
         android:title="@string/pref_title_use_current_location"
         app:iconSpaceReserved="false" />
 
+
+
 </PreferenceScreen>
