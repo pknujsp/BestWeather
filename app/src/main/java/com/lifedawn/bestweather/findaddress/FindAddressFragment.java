@@ -35,6 +35,8 @@ import com.lifedawn.bestweather.commons.views.CustomEditText;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentFindAddressBinding;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.retrofit.responses.google.placesearch.GooglePlaceSearchResponse;
+import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
@@ -44,6 +46,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+
+import retrofit2.Response;
 
 
 public class FindAddressFragment extends Fragment {
@@ -162,7 +166,7 @@ public class FindAddressFragment extends Fragment {
 								@Override
 								public void run() {
 									Log.e("address", newText);
-									addressesAdapter.setAddressList(addressList);
+									addressesAdapter.setItemList(addressList);
 									addressesAdapter.getFilter().filter(newText);
 								}
 							});
@@ -179,6 +183,7 @@ public class FindAddressFragment extends Fragment {
 				}
 			}
 		});
+
 
 	}
 

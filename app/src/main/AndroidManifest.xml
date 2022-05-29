@@ -337,6 +337,10 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/testId" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBLrNp2qRJh4-3J4gypJzZ2pW5Dtf-6QCI" />
     </application>
 
 </manifest>

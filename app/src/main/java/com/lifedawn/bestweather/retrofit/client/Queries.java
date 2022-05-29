@@ -99,4 +99,9 @@ public interface Queries {
 
 	@GET("rest/")
 	Call<JsonElement> getGetInfo(@QueryMap(encoded = true) Map<String, String> queryMap);
+
+
+	//Google place search
+	@GET("json")
+	Call<JsonElement> getGooglePlaceSearch(@QueryMap(encoded = true) Map<String, String> queryMap);
 }

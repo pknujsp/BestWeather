@@ -145,10 +145,8 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 					reDraw(context, ids, widgetProviderClass);
 
 					long widgetRefreshInterval = widgetHelper.getRefreshInterval();
-					if (widgetRefreshInterval > 0L) {
-						if (!widgetHelper.isRepeating()) {
-							widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
-						}
+					if (widgetRefreshInterval > 0L && !widgetHelper.isRepeating()) {
+						widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
 					}
 
 				}

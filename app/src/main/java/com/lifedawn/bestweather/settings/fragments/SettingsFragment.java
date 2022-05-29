@@ -90,7 +90,6 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 												.putLong(widgetRefreshIntervalPreference.getKey(), newValue).commit();
 										widgetRefreshIntervalPreference.setValue(newValue);
 
-
 										WidgetHelper widgetHelper = new WidgetHelper(getContext());
 										widgetHelper.onSelectedAutoRefreshInterval(newValue);
 										MyApplication.loadValueUnits(getContext(), true);

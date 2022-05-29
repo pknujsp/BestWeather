@@ -109,7 +109,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 							WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
 							long widgetRefreshInterval = widgetHelper.getRefreshInterval();
 
-							if (widgetRefreshInterval > 0) {
+							if (widgetRefreshInterval > 0 && !widgetHelper.isRepeating()) {
 								widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
 							}
 

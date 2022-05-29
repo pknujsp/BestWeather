@@ -6,13 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.FoundAddressItemBinding;
+import com.lifedawn.bestweather.retrofit.responses.google.placesearch.GooglePlaceSearchResponse;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAdapter.ViewHolder> implements Filterable {
-	private List<Address> addressList = new ArrayList<>();
+	private List<Address> itemList = new ArrayList<>();
 	private List<Address> filteredAddressList = new ArrayList<>();
 	private Filter filter;
 	private OnClickedAddressListener onClickedAddressListener;
@@ -30,9 +29,9 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 		this.onClickedAddressListener = onClickedAddressListener;
 	}
 
-	public void setAddressList(List<Address> addressList) {
-		this.addressList.clear();
-		this.addressList.addAll(addressList);
+	public void setItemList(List<Address> itemList) {
+		this.itemList.clear();
+		this.itemList.addAll(itemList);
 	}
 
 	@NonNull
@@ -97,12 +96,12 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 			FilterResults filterResults = new FilterResults();
 
 			if (constraint == null || constraint.length() == 0) {
-				filterResults.count = addressList.size();
-				filterResults.values = addressList;
+				filterResults.count = itemList.size();
+				filterResults.values = itemList;
 			} else {
 				List<Address> newAddressList = new ArrayList<>();
 
-				for (Address address : addressList) {
+				for (Address address : itemList) {
 					if (address.getAddressLine(0).contains(constraint.toString())) {
 						newAddressList.add(address);
 					}
