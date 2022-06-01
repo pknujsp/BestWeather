@@ -187,7 +187,7 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				if (single.getPos() != null) {
 					gridItemDtoList.add(new GridItemDto(context.getString(R.string.probability_of_snow), single.getPos(), null));
 				}
-				if (single.isHasPrecipitationVolume()) {
+				if (single.isHasPrecipitationVolume() && single.getPrecipitationVolume() != null) {
 					gridItemDtoList.add(new GridItemDto(context.getString(R.string.precipitation_volume), single.getPrecipitationVolume(), null));
 				}
 				if (single.isHasRainVolume()) {

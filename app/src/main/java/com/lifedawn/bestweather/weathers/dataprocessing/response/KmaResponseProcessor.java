@@ -856,7 +856,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 							isNight))
 					.setWeatherDescription(getWeatherDescriptionWeb(finalHourlyForecast.getWeatherDescription()))
 					.setHumidity(finalHourlyForecast.getHumidity()).setPop(!finalHourlyForecast.getPop().contains("%") ?
-					"-" : finalHourlyForecast.getPop());
+							"-" : finalHourlyForecast.getPop());
 
 			if (finalHourlyForecast.getWindDirection() != null) {
 				windSpeed = finalHourlyForecast.getWindSpeed().replace(mPerSec, "");

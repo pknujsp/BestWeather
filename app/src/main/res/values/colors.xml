@@ -70,4 +70,7 @@
     <color name="sunGradientEnd">#fb8708</color>
 
     <color name="divider">#79747E</color>
+
+    <color name="blueSkiesGradientStart">#56CCF2</color>
+    <color name="blueSkiesGradientEnd">#2F80ED</color>
 </resources>

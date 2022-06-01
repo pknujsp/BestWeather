@@ -35,6 +35,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.github.matteobattilana.weather.PrecipType;
 import com.google.android.ads.nativetemplates.NativeTemplateStyle;
 import com.google.android.ads.nativetemplates.TemplateView;
@@ -256,12 +257,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(getContext(), R.color.black_alpha_25), PorterDuff.Mode.DARKEN);
 
 		binding.scrollView.setVisibility(View.GONE);
 		binding.flickrImageUrl.setVisibility(View.GONE);
 		binding.loadingAnimation.setVisibility(View.GONE);
-
-		binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(getContext(), R.color.black_alpha_25), PorterDuff.Mode.DARKEN);
 
 		final int statusBarHeight = MyApplication.getStatusBarHeight();
 
@@ -526,7 +526,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						@Override
 						public void run() {
 							if (successful) {
-								Glide.with(getContext()).load(flickrImgObj.getImg()).diskCacheStrategy(DiskCacheStrategy.ALL).into(binding.currentConditionsImg);
+								Glide.with(getContext()).load(flickrImgObj.getImg()).diskCacheStrategy(DiskCacheStrategy.ALL).transition(
+										DrawableTransitionOptions.withCrossFade(300)).into(binding.currentConditionsImg);
 								setFlickrImgInfo(flickrImgObj);
 							} else {
 								Glide.with(getContext()).clear(binding.currentConditionsImg);
@@ -691,11 +692,18 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			if (loadingDialog == null) {
 				loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 			}
-			Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
-			weatherProviderTypeSet.add(mainWeatherProviderType);
-			weatherProviderTypeSet.add(WeatherProviderType.AQICN);
-			setWeatherFragments(weatherProviderTypeSet, FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader,
-					latitude, longitude, null);
+
+			executorService.execute(new Runnable() {
+				@Override
+				public void run() {
+					Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
+					weatherProviderTypeSet.add(mainWeatherProviderType);
+					weatherProviderTypeSet.add(WeatherProviderType.AQICN);
+					setWeatherFragments(weatherProviderTypeSet, FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader,
+							latitude, longitude, null);
+				}
+			});
+
 		}
 	}
 
@@ -793,75 +801,69 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			for (MultipleRestApiDownloader.ResponseResult responseResult : entry.getValue().values()) {
 				if (!responseResult.isSuccessful()) {
 
-					if (getActivity() != null) {
-						//다시시도, 취소 중 택1
-						List<AlertFragment.BtnObj> btnObjList = new ArrayList<>();
+					//다시시도, 취소 중 택1
+					List<AlertFragment.BtnObj> btnObjList = new ArrayList<>();
 
-						Set<WeatherProviderType> otherTypes = getOtherWeatherSourceTypes(weatherProviderType,
-								mainWeatherProviderType);
+					Set<WeatherProviderType> otherTypes = getOtherWeatherSourceTypes(weatherProviderType,
+							mainWeatherProviderType);
 
-						final String[] failedDialogItems = new String[otherTypes.size()];
-						final WeatherProviderType[] weatherProviderTypeArr = new WeatherProviderType[otherTypes.size()];
-						int arrIndex = 0;
+					final String[] failedDialogItems = new String[otherTypes.size()];
+					final WeatherProviderType[] weatherProviderTypeArr = new WeatherProviderType[otherTypes.size()];
+					int arrIndex = 0;
 
-						if (otherTypes.contains(WeatherProviderType.KMA_WEB)) {
-							weatherProviderTypeArr[arrIndex] = WeatherProviderType.KMA_WEB;
-							failedDialogItems[arrIndex++] = getString(R.string.kma) + ", " + getString(
-									R.string.rerequest_another_weather_datasource);
-						}
-						if (otherTypes.contains(WeatherProviderType.ACCU_WEATHER)) {
-							weatherProviderTypeArr[arrIndex] = WeatherProviderType.ACCU_WEATHER;
-							failedDialogItems[arrIndex++] = getString(R.string.accu_weather) + ", " + getString(
-									R.string.rerequest_another_weather_datasource);
-						}
-						if (otherTypes.contains(WeatherProviderType.OWM_ONECALL)) {
-							weatherProviderTypeArr[arrIndex] = WeatherProviderType.OWM_ONECALL;
-							failedDialogItems[arrIndex++] = getString(R.string.owm) + ", " + getString(
-									R.string.rerequest_another_weather_datasource);
-						}
+					if (otherTypes.contains(WeatherProviderType.KMA_WEB)) {
+						weatherProviderTypeArr[arrIndex] = WeatherProviderType.KMA_WEB;
+						failedDialogItems[arrIndex++] = getString(R.string.kma) + ", " + getString(
+								R.string.rerequest_another_weather_datasource);
+					}
+					if (otherTypes.contains(WeatherProviderType.ACCU_WEATHER)) {
+						weatherProviderTypeArr[arrIndex] = WeatherProviderType.ACCU_WEATHER;
+						failedDialogItems[arrIndex++] = getString(R.string.accu_weather) + ", " + getString(
+								R.string.rerequest_another_weather_datasource);
+					}
+					if (otherTypes.contains(WeatherProviderType.OWM_ONECALL)) {
+						weatherProviderTypeArr[arrIndex] = WeatherProviderType.OWM_ONECALL;
+						failedDialogItems[arrIndex++] = getString(R.string.owm) + ", " + getString(
+								R.string.rerequest_another_weather_datasource);
+					}
 
-						MainThreadWorker.runOnUiThread(new Runnable() {
+
+					loadingDialog.dismiss();
+					loadingDialog = null;
+
+					if (containWeatherData(latitude, longitude)) {
+						binding.scrollView.setVisibility(View.VISIBLE);
+						Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
+					} else {
+						btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
 							@Override
-							public void run() {
-								loadingDialog.dismiss();
-								loadingDialog = null;
+							public void onClick(View v) {
+								getChildFragmentManager().popBackStackImmediate();
 
-								if (containWeatherData(latitude, longitude)) {
-									binding.scrollView.setVisibility(View.VISIBLE);
-									Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
-								} else {
-									btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
-										@Override
-										public void onClick(View v) {
-											getChildFragmentManager().popBackStackImmediate();
-
-											responseResultObj.multipleRestApiDownloader.setLoadingDialog(
-													reRefreshBySameWeatherSource(responseResultObj));
-										}
-									}, getString(R.string.again)));
-
-									int index = 0;
-									for (WeatherProviderType anotherProvider : weatherProviderTypeArr) {
-										btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
-											@Override
-											public void onClick(View v) {
-												getChildFragmentManager().popBackStackImmediate();
-
-												responseResultObj.mainWeatherProviderType = anotherProvider;
-												responseResultObj.weatherProviderTypeSet.clear();
-												responseResultObj.weatherProviderTypeSet.add(responseResultObj.mainWeatherProviderType);
-												responseResultObj.weatherProviderTypeSet.add(WeatherProviderType.AQICN);
-												responseResultObj.multipleRestApiDownloader.setLoadingDialog(
-														reRefreshByAnotherWeatherSource(responseResultObj));
-											}
-										}, failedDialogItems[index]));
-										index++;
-									}
-
-									setFailFragment(btnObjList);
-								}
+								responseResultObj.multipleRestApiDownloader.setLoadingDialog(
+										reRefreshBySameWeatherSource(responseResultObj));
 							}
-						});
+						}, getString(R.string.again)));
+
+						int index = 0;
+						for (WeatherProviderType anotherProvider : weatherProviderTypeArr) {
+							btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
+								@Override
+								public void onClick(View v) {
+									getChildFragmentManager().popBackStackImmediate();
+
+									responseResultObj.mainWeatherProviderType = anotherProvider;
+									responseResultObj.weatherProviderTypeSet.clear();
+									responseResultObj.weatherProviderTypeSet.add(responseResultObj.mainWeatherProviderType);
+									responseResultObj.weatherProviderTypeSet.add(WeatherProviderType.AQICN);
+									responseResultObj.multipleRestApiDownloader.setLoadingDialog(
+											reRefreshByAnotherWeatherSource(responseResultObj));
+								}
+							}, failedDialogItems[index]));
+							index++;
+						}
+
+						setFailFragment(btnObjList);
 					}
 
 					return;
@@ -869,13 +871,20 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			}
 
 		}
-		//응답 성공 하면
-		final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.multipleRestApiDownloader,
-				responseResultObj.weatherProviderTypeSet, responseResultObj.mainWeatherProviderType);
 
-		FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
-		setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.multipleRestApiDownloader, latitude, longitude,
-				responseResultObj.multipleRestApiDownloader.getLoadingDialog());
+		executorService.execute(new Runnable() {
+			@Override
+			public void run() {
+				//응답 성공 하면
+				final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.multipleRestApiDownloader,
+						responseResultObj.weatherProviderTypeSet, responseResultObj.mainWeatherProviderType);
+
+				FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
+				setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.multipleRestApiDownloader, latitude, longitude,
+						responseResultObj.multipleRestApiDownloader.getLoadingDialog());
+			}
+		});
+
 	}
 
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
@@ -888,7 +897,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		alertFragment.setArguments(bundle);
 
 		FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-		fragmentTransaction.add(R.id.fragment_container, alertFragment,
+		fragmentTransaction.add(binding.fragmentContainer.getId(), alertFragment,
 				AlertFragment.class.getName()).addToBackStack(AlertFragment.class.getName()).commitAllowingStateLoss();
 		binding.scrollView.setVisibility(View.GONE);
 	}

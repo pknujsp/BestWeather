@@ -80,7 +80,6 @@ public class FavoritesFragment extends Fragment {
 		@Override
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
-
 		}
 	};
 

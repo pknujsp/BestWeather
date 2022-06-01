@@ -190,7 +190,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			}
 
 			//강수량
-			if (hourlyForecastDto.isHasPrecipitation()) {
+			if (hourlyForecastDto.isHasPrecipitation() && hourlyForecastDto.getPrecipitationVolume() != null) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
 				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.precipitation_volume_of_grid));

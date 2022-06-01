@@ -60,8 +60,14 @@ public final class KmaProcessing {
 					final Document currentConditionsDocument = Jsoup.parse(response.body());
 					KmaCurrentConditions kmaCurrentConditions = KmaWebParser.parseCurrentConditions(currentConditionsDocument,
 							ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toString());
-					callback.onResponseResult(response, kmaCurrentConditions, response.body());
-					Log.e(RetrofitClient.LOG_TAG, "kma current conditions 성공");
+
+					if (kmaCurrentConditions.getTemp().equals("자료없음") || kmaCurrentConditions.getTemp().contains("999")) {
+						callback.onResponseResult(new Exception());
+						Log.e(RetrofitClient.LOG_TAG, "kma current conditions 실패");
+					} else {
+						callback.onResponseResult(response, kmaCurrentConditions, response.body());
+						Log.e(RetrofitClient.LOG_TAG, "kma current conditions 성공");
+					}
 				} else {
 					callback.onResponseResult(new Exception());
 					Log.e(RetrofitClient.LOG_TAG, "kma current conditions 실패");

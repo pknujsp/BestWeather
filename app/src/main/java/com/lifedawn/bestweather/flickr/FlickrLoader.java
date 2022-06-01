@@ -63,12 +63,6 @@ public class FlickrLoader {
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
-					Log.e("on loadImg", "메인 스레드");
-				} else {
-					Log.e("on loadImg", "백그라운드 스레드");
-				}
-
 				cancelAllRequest(activity);
 				final ZonedDateTime lastRefreshDateTime = refreshDateTime.withZoneSameInstant(zoneId);
 
@@ -156,12 +150,6 @@ public class FlickrLoader {
 					call.enqueue(new Callback<JsonElement>() {
 						@Override
 						public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-
-							if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
-								Log.e("on getPhotosFromGallery", "메인 스레드");
-							} else {
-								Log.e("on getPhotosFromGallery", "백그라운드 스레드");
-							}
 							Gson gson = new Gson();
 							final PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
 									PhotosFromGalleryResponse.class);
@@ -186,11 +174,6 @@ public class FlickrLoader {
 									getPhotoInfoCall.enqueue(new Callback<JsonElement>() {
 										@Override
 										public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-											if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
-												Log.e("on getPhotoInfoCall", "메인 스레드");
-											} else {
-												Log.e("on getPhotoInfoCall", "백그라운드 스레드");
-											}
 											final GetInfoPhotoResponse getInfoPhotoResponse = gson.fromJson(response.body().toString(),
 													GetInfoPhotoResponse.class);
 
