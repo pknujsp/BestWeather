@@ -77,7 +77,7 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 
 public class DetailAirQualityFragment extends Fragment implements IWeatherValues {
-	private AqiCnGeolocalizedFeedResponse response;
+	private static AqiCnGeolocalizedFeedResponse response;
 	private FragmentAirQualityDetailBinding binding;
 	private ValueUnits clockUnit;
 	private ZoneId zoneId;
@@ -92,6 +92,9 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	private int pm25LineColor;
 	private int o3LineColor;
 
+	public static void setResponse(AqiCnGeolocalizedFeedResponse response) {
+		DetailAirQualityFragment.response = response;
+	}
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -101,10 +104,8 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
-		response = (AqiCnGeolocalizedFeedResponse) bundle.getSerializable("AqiCnGeolocalizedFeedResponse");
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock12.name()));
+		clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit();
 
 		pm10LineColor = ContextCompat.getColor(getContext(), R.color.pm10LineColor);
 		pm25LineColor = ContextCompat.getColor(getContext(), R.color.pm25LineColor);

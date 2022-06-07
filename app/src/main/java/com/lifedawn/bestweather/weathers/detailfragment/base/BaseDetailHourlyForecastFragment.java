@@ -20,11 +20,11 @@ public class BaseDetailHourlyForecastFragment extends BaseDetailForecastFragment
 			clickableItem = false;
 
 			Bundle bundle = new Bundle();
-			bundle.putSerializable(WeatherDataType.hourlyForecast.name(), (Serializable) hourlyForecastDtoList);
 			bundle.putInt("FirstSelectedPosition", position);
 
 			DetailHourlyForecastDialogFragment detailHourlyForecastDialogFragment =
 					new DetailHourlyForecastDialogFragment();
+			DetailHourlyForecastDialogFragment.setHourlyForecastDtoList(hourlyForecastDtoList);
 			detailHourlyForecastDialogFragment.setArguments(bundle);
 
 			detailHourlyForecastDialogFragment.show(getChildFragmentManager(),

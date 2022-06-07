@@ -182,6 +182,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
 		                              @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 			super.onFragmentCreated(fm, f, savedInstanceState);
+			if (f instanceof AlertFragment) {
+				onHiddenChanged(true);
+				binding.scrollView.setVisibility(View.GONE);
+			}
 		}
 
 		@Override
@@ -211,6 +215,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
 			if (f instanceof AlertFragment) {
+				onHiddenChanged(false);
 				binding.scrollView.setVisibility(View.VISIBLE);
 			}
 		}
@@ -239,6 +244,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void onHiddenChanged(boolean hidden) {
 		super.onHiddenChanged(hidden);
 		Window window = getActivity().getWindow();
+
+		if (getChildFragmentManager().findFragmentById(binding.fragmentContainer.getId()) != null) {
+			window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+					View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+			return;
+		}
+
 		if (hidden) {
 			window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
 					View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
@@ -800,7 +812,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			for (MultipleRestApiDownloader.ResponseResult responseResult : entry.getValue().values()) {
 				if (!responseResult.isSuccessful()) {
-
 					//다시시도, 취소 중 택1
 					List<AlertFragment.BtnObj> btnObjList = new ArrayList<>();
 
@@ -838,8 +849,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								getChildFragmentManager().popBackStackImmediate();
-
 								responseResultObj.multipleRestApiDownloader.setLoadingDialog(
 										reRefreshBySameWeatherSource(responseResultObj));
 							}
@@ -850,8 +859,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
 								@Override
 								public void onClick(View v) {
-									getChildFragmentManager().popBackStackImmediate();
-
 									responseResultObj.mainWeatherProviderType = anotherProvider;
 									responseResultObj.weatherProviderTypeSet.clear();
 									responseResultObj.weatherProviderTypeSet.add(responseResultObj.mainWeatherProviderType);
@@ -888,6 +895,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
+		FragmentManager fragmentManager = getChildFragmentManager();
+		if (fragmentManager.findFragmentByTag(AlertFragment.class.getName()) != null) {
+			fragmentManager.beginTransaction().remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName())).commitAllowingStateLoss();
+		}
+
 		final Bundle bundle = new Bundle();
 		bundle.putInt(AlertFragment.Constant.DRAWABLE_ID.name(), R.drawable.error);
 		bundle.putString(AlertFragment.Constant.MESSAGE.name(), getString(R.string.update_failed));
@@ -896,10 +908,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		alertFragment.setBtnObjList(btnObjList);
 		alertFragment.setArguments(bundle);
 
-		FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-		fragmentTransaction.add(binding.fragmentContainer.getId(), alertFragment,
-				AlertFragment.class.getName()).addToBackStack(AlertFragment.class.getName()).commitAllowingStateLoss();
-		binding.scrollView.setVisibility(View.GONE);
+
+		fragmentManager.beginTransaction().add(binding.fragmentContainer.getId(), alertFragment,
+				AlertFragment.class.getName()).commitAllowingStateLoss();
 	}
 
 	/**
@@ -1325,7 +1336,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 									getString(R.string.datetime_pattern_clock24), Locale.getDefault());
 					binding.updatedDatetime.setText(dateTime.format(dateTimeFormatter));
 
-					FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+					FragmentManager fragmentManager = getChildFragmentManager();
+					FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+					if (fragmentManager.findFragmentByTag(AlertFragment.class.getName()) != null) {
+						fragmentTransaction.remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName()));
+					}
 
 					fragmentTransaction.replace(binding.simpleCurrentConditions.getId(),
 							simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment));
@@ -1335,8 +1351,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					fragmentTransaction.replace(binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
 							getString(R.string.tag_detail_current_conditions_fragment));
 					fragmentTransaction.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment));
-					fragmentTransaction.replace(binding.sunSetRise.getId(), sunSetRiseFragment, getString(R.string.tag_sun_set_rise_fragment));
-					fragmentTransaction.commitAllowingStateLoss();
+					fragmentTransaction.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
+							getString(R.string.tag_sun_set_rise_fragment)).commitAllowingStateLoss();
 				}
 			});
 

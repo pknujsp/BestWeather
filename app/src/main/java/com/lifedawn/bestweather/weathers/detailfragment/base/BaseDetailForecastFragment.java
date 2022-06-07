@@ -73,14 +73,15 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
-		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));
-		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
-		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
+		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		visibilityUnit =MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
+		clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit();
 		forecastViewType = ForecastViewType.valueOf(sharedPreferences.getString(getString(R.string.pref_key_forecast_view_type),
 				ForecastViewType.List.name()));
 
 		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+
 		addressName = bundle.getString(BundleKey.AddressName.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 		latitude = bundle.getDouble(BundleKey.Latitude.name());

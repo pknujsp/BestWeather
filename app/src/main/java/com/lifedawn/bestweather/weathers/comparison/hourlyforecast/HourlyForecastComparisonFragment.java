@@ -447,15 +447,19 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		multipleRestApiDownloader = new MultipleRestApiDownloader() {
 			@Override
 			public void onResult() {
-				setTable(this, latitude, longitude, dialog);
+				MyApplication.getExecutorService().execute(new Runnable() {
+					@Override
+					public void run() {
+						setTable(multipleRestApiDownloader, latitude, longitude, dialog);
+					}
+				});
 			}
 
 			@Override
 			public void onCanceled() {
 			}
 		};
-		ExecutorService executorService = MyApplication.getExecutorService();
-		executorService.execute(new Runnable() {
+		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
 				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, multipleRestApiDownloader);

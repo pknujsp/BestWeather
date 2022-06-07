@@ -238,7 +238,7 @@ public class AqicnResponseProcessor {
 				time.setV(data.getTime().getV());
 				time.setIso(data.getTime().getIso());
 
-				airQualityDto.setAqi((int) Double.parseDouble(data.getAqi()));
+				airQualityDto.setAqi(data.getAqi().equals("-") ? -1 : (int) Double.parseDouble(data.getAqi()));
 				airQualityDto.setIdx(Integer.parseInt(data.getIdx()));
 				airQualityDto.setTimeInfo(time);
 				airQualityDto.setLatitude(Double.parseDouble(data.getCity().getGeo().get(0)));

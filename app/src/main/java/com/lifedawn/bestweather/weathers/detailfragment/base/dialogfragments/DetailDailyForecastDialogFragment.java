@@ -24,14 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DetailDailyForecastDialogFragment extends BaseDetailDialogFragment {
-	private List<DailyForecastDto> dailyForecastDtoList;
+	private static List<DailyForecastDto> dailyForecastDtoList;
 	private LayoutInflater layoutInflater;
+
+	public static void setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
+		DetailDailyForecastDialogFragment.dailyForecastDtoList = dailyForecastDtoList;
+	}
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		dailyForecastDtoList = (ArrayList<DailyForecastDto>) bundle.getSerializable(WeatherDataType.dailyForecast.name());
 	}
 
 	@Override
