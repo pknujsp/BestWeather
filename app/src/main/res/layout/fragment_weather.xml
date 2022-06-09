@@ -85,6 +85,7 @@
                                 android:background="?attr/selectableItemBackground"
                                 android:drawableRight="@drawable/expand_more"
                                 android:drawableTint="@color/white"
+                                android:drawablePadding="2dp"
                                 android:gravity="center_vertical"
                                 android:shadowColor="@color/black"
                                 android:text="@string/loading"
@@ -109,6 +110,7 @@
                             android:textStyle="bold"
                             app:drawableLeftCompat="@drawable/refresh"
                             app:drawableTint="@color/white"
+                            android:drawablePadding="4dp"
                             />
 
                         <TextView
@@ -121,7 +123,9 @@
                             android:text="@string/loading"
                             android:textColor="@color/white"
                             android:textSize="25sp"
-                            android:textStyle="bold"
+                            android:drawableLeft="@drawable/ic_baseline_near_me_24"
+                            android:drawableTint="@color/white"
+                            android:drawablePadding="4dp"
                             />
 
 

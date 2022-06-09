@@ -9,9 +9,11 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -118,6 +120,8 @@ public class DialogActivity extends Activity {
 		}
 
 		((TextView) dialogView.findViewById(R.id.auto_refresh_interval)).setText(refreshIntervalText);
+		((TextView) dialogView.findViewById(R.id.widgetTypeName)).setText(appWidgetProviderInfo.loadLabel(getPackageManager()));
+
 
 		((Button) dialogView.findViewById(R.id.openAppBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override

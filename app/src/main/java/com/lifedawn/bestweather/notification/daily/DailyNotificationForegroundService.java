@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
@@ -73,7 +74,7 @@ public class DailyNotificationForegroundService extends Service {
 				.setOnlyAlertOnce(true).setWhen(0).setOngoing(true);
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-			builder.setPriority(NotificationCompat.PRIORITY_LOW).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+			builder.setPriority(NotificationCompat.PRIORITY_DEFAULT).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 		}
 
 		Notification notification = notificationObj.getNotificationBuilder().build();

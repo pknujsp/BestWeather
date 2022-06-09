@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.os.Build;
+import android.os.PowerManager;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -86,8 +87,14 @@ public abstract class AbstractDailyNotiViewCreator {
 
 	public abstract Set<WeatherDataType> getRequestWeatherDataTypeSet();
 
-	public abstract void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherProviderType> weatherProviderTypeSet,
+	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherProviderType> weatherProviderTypeSet,
 	                                    @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader,
-	                                    Set<WeatherDataType> weatherDataTypeSet);
+	                                    Set<WeatherDataType> weatherDataTypeSet){
+		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+		PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+				"MyApp::MyWakelockTag");
+		wakeLock.acquire();
+		wakeLock.release();
+	}
 
 }

@@ -52,7 +52,6 @@ import com.lifedawn.bestweather.alert.AlertFragment;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
-import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.classes.TextUtil;
 import com.lifedawn.bestweather.commons.classes.WeatherViewController;
@@ -269,7 +268,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(getContext(), R.color.black_alpha_25), PorterDuff.Mode.DARKEN);
+		binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(getContext(), R.color.black_alpha_28), PorterDuff.Mode.DARKEN);
 
 		binding.scrollView.setVisibility(View.GONE);
 		binding.flickrImageUrl.setVisibility(View.GONE);
@@ -663,6 +662,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							}
 
 							String addressStr = getString(R.string.current_location) + " : " + addressName;
+							Toast.makeText(getContext(), addressStr, Toast.LENGTH_SHORT).show();
 							binding.addressName.setText(addressStr);
 							weatherViewModel.setCurrentLocationAddressName(addressName);
 
