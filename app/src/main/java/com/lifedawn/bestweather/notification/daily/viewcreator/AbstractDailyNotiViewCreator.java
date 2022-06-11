@@ -47,8 +47,8 @@ public abstract class AbstractDailyNotiViewCreator {
 
 		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
 		builder.setAutoCancel(true).setSmallIcon(R.mipmap.ic_launcher_round).setContentIntent(PendingIntent.getActivity(context,
-				notificationObj.getNotificationId(),
-				IntentUtil.getAppIntent(context), PendingIntent.FLAG_UPDATE_CURRENT))
+						notificationObj.getNotificationId(),
+						IntentUtil.getAppIntent(context), PendingIntent.FLAG_UPDATE_CURRENT))
 				.setCustomContentView(remoteViews).setCustomBigContentView(remoteViews);
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
@@ -88,13 +88,8 @@ public abstract class AbstractDailyNotiViewCreator {
 	public abstract Set<WeatherDataType> getRequestWeatherDataTypeSet();
 
 	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherProviderType> weatherProviderTypeSet,
-	                                    @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader,
-	                                    Set<WeatherDataType> weatherDataTypeSet){
-		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-		PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-				"MyApp::MyWakelockTag");
-		wakeLock.acquire();
-		wakeLock.release();
+	                           @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader,
+	                           Set<WeatherDataType> weatherDataTypeSet) {
 	}
 
 }

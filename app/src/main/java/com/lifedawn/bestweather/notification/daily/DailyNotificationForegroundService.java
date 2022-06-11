@@ -133,6 +133,7 @@ public class DailyNotificationForegroundService extends Service {
 				}
 
 				viewCreator.makeFailedNotification(dailyPushNotificationDto.getId(), failText);
+				wakeLock();
 			}
 		};
 
@@ -156,6 +157,7 @@ public class DailyNotificationForegroundService extends Service {
 					@Override
 					public void onResult() {
 						viewCreator.setResultViews(remoteViews, dailyPushNotificationDto, weatherProviderTypeSet, this, weatherDataTypeSet);
+						wakeLock();
 					}
 
 					@Override
@@ -163,6 +165,16 @@ public class DailyNotificationForegroundService extends Service {
 					}
 				}, weatherProviderTypeSet);
 
+	}
+
+	private void wakeLock(){
+		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK |
+						PowerManager.ACQUIRE_CAUSES_WAKEUP |
+						PowerManager.ON_AFTER_RELEASE,
+				"TAG:WAKE_NOTIFICATION");
+		wakeLock.acquire(4000L);
+		wakeLock.release();
 	}
 
 	public void workNotification(Context context, ExecutorService executorService, Integer notificationDtoId, DailyPushNotificationType type) {

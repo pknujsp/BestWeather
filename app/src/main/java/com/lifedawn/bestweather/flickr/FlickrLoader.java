@@ -53,7 +53,7 @@ import retrofit2.Response;
 public class FlickrLoader {
 	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
 	private static final Set<ImgRequestObj> IMG_REQUEST_OBJ_SET = new HashSet<>();
-	private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
+	private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
 	private FlickrLoader() {
 	}
@@ -129,6 +129,7 @@ public class FlickrLoader {
 				final String galleryName = time + " " + weather;
 				// time : sunrise, sunset, day, night
 				// weather : clear, partly cloudy, mostly cloudy, overcast, rain, snow
+				Log.e("flickrGalleryName", galleryName);
 
 				//이미 다운로드 된 이미지가 있으면 다운로드 하지 않음
 				if (BACKGROUND_IMG_MAP.containsKey(galleryName) && BACKGROUND_IMG_MAP.get(galleryName).getImg() != null) {
