@@ -150,6 +150,7 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 			forecastRemoteViews.setTextViewText(R.id.temperature, dailyForecastDtoList.get(cell).getMinTemp() + "/" +
 					dailyForecastDtoList.get(cell).getMaxTemp());
+			forecastRemoteViews.setTextViewText(R.id.pop, pop);
 
 			remoteViews.addView(R.id.dailyForecast, forecastRemoteViews);
 		}

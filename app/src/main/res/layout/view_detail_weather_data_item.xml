@@ -17,10 +17,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
-        android:fontFamily="sans-serif-condensed-light"
         android:text="label"
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="#B1B0B0"
         android:textSize="13sp"
         />
 

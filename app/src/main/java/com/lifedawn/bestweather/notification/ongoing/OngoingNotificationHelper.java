@@ -37,14 +37,13 @@ public class OngoingNotificationHelper {
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), refreshIntent,
 					PendingIntent.FLAG_UPDATE_CURRENT);
 
-			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(),
+			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + millis,
 					millis, pendingIntent);
 		}
 	}
 
 	public void cancelAutoRefresh() {
-		Intent refreshIntent = new Intent(context, OngoingNotificationReceiver.class);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), refreshIntent
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), new Intent(context, OngoingNotificationReceiver.class)
 				, PendingIntent.FLAG_NO_CREATE);
 
 		if (pendingIntent != null) {
@@ -54,8 +53,7 @@ public class OngoingNotificationHelper {
 	}
 
 	public boolean isRepeating() {
-		Intent refreshIntent = new Intent(context, OngoingNotificationReceiver.class);
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), refreshIntent
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), new Intent(context, OngoingNotificationReceiver.class)
 				, PendingIntent.FLAG_NO_CREATE);
 		if (pendingIntent != null) {
 			return true;

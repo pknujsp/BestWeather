@@ -45,7 +45,7 @@ public class WidgetHelper {
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, refreshIntent,
 					PendingIntent.FLAG_UPDATE_CURRENT);
 
-			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), val, pendingIntent);
+			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+ val, val, pendingIntent);
 		}
 	}
 

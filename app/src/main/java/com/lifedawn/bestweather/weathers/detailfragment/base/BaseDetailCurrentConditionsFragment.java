@@ -98,7 +98,6 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 			((ImageView) gridItem.findViewById(R.id.label_icon)).setImageTintList(ColorStateList.valueOf(Color.WHITE));
 		}
 
-		((TextView) gridItem.findViewById(R.id.label)).setTextColor(Color.WHITE);
 		((TextView) gridItem.findViewById(R.id.value)).setTextColor(Color.WHITE);
 
 		int cellCount = binding.conditionsGrid.getChildCount();
