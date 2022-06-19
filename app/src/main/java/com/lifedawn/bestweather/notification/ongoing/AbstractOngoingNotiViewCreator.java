@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
+import android.os.PowerManager;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -109,7 +110,18 @@ public abstract class AbstractOngoingNotiViewCreator {
 				forceFailedNotification(errorType);
 			}
 		};
-		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, true);
+		FusedLocation fusedLocation = FusedLocation.getInstance(context);
+		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+		if (powerManager.isInteractive()) {
+			fusedLocation.findCurrentLocation(locationCallback, true);
+		} else {
+			LocationResult lastLocation = fusedLocation.getLastCurrentLocation();
+			if(lastLocation == null){
+				fusedLocation.findCurrentLocation(locationCallback, true);
+			}else{
+				locationCallback.onSuccessful(lastLocation);
+			}
+		}
 	}
 
 

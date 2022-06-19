@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -85,6 +86,26 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 	@Override
 	public void onConnectionFailed(@NonNull @NotNull ConnectionResult connectionResult) {
 
+	}
+
+	public LocationResult getLastCurrentLocation() {
+		List<Location> locations = new ArrayList<>();
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+		double latitude = Double.parseDouble(
+				sharedPreferences.getString(context.getString(R.string.pref_key_last_current_location_latitude), "0.0"));
+		double longitude = Double.parseDouble(
+				sharedPreferences.getString(context.getString(R.string.pref_key_last_current_location_longitude), "0.0"));
+
+		if (latitude == 0.0 || longitude == 0.0) {
+			return null;
+		}
+
+		Location location = new Location("");
+		location.setLatitude(latitude);
+		location.setLongitude(longitude);
+
+		locations.add(location);
+		return LocationResult.create(locations);
 	}
 
 	public void findCurrentLocation(MyLocationCallback myLocationCallback, boolean isBackground) {

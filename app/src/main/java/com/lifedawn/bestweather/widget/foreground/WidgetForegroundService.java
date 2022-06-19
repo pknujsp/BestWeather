@@ -3,12 +3,14 @@ package com.lifedawn.bestweather.widget.foreground;
 import android.app.Notification;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -417,7 +419,19 @@ public class WidgetForegroundService extends Service {
 		MainThreadWorker.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				FusedLocation.getInstance(getApplicationContext()).findCurrentLocation(locationCallback, true);
+
+				FusedLocation fusedLocation = FusedLocation.getInstance(getApplicationContext());
+				PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+				if (powerManager.isInteractive()) {
+					fusedLocation.findCurrentLocation(locationCallback, true);
+				} else {
+					LocationResult lastLocation = fusedLocation.getLastCurrentLocation();
+					if(lastLocation == null){
+						fusedLocation.findCurrentLocation(locationCallback, true);
+					}else{
+						locationCallback.onSuccessful(lastLocation);
+					}
+				}
 			}
 		});
 	}
