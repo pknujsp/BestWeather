@@ -110,8 +110,10 @@ public abstract class AbstractOngoingNotiViewCreator {
 				forceFailedNotification(errorType);
 			}
 		};
+
 		FusedLocation fusedLocation = FusedLocation.getInstance(context);
 		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+
 		if (powerManager.isInteractive()) {
 			fusedLocation.findCurrentLocation(locationCallback, true);
 		} else {

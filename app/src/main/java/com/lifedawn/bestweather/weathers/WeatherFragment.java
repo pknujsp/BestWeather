@@ -157,6 +157,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 	private AlertDialog loadingDialog;
+	private Bundle arguments;
 
 	public WeatherFragment() {
 	}
@@ -223,6 +224,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		arguments = savedInstanceState != null ? savedInstanceState : getArguments();
 		getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
 				View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 
@@ -395,7 +398,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			}
 		});
 
-		final Bundle arguments = getArguments();
 		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
 
 		final LocationType locationType = (LocationType) arguments.getSerializable("LocationType");
@@ -425,10 +427,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
 					getString(R.string.pref_key_last_selected_location_type), locationType.name()).apply();
 
-			latitude = Double.parseDouble(
-					sharedPreferences.getString(getString(R.string.pref_key_last_current_location_latitude), "0.0"));
-			longitude = Double.parseDouble(
-					sharedPreferences.getString(getString(R.string.pref_key_last_current_location_longitude), "0.0"));
+			LocationResult locationResult = fusedLocation.getLastCurrentLocation();
+
+			latitude = locationResult == null ? 0.0 : locationResult.getLocations().get(0).getLatitude();
+			longitude = locationResult == null ? 0.0 : locationResult.getLocations().get(0).getLongitude();
 
 			if (latitude == 0.0 && longitude == 0.0) {
 				//최근에 현재위치로 잡힌 위치가 없으므로 현재 위치 요청
@@ -467,6 +469,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
+		outState.putAll(arguments);
 	}
 
 	@Override
@@ -565,13 +568,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			//현재 위치 파악 성공
 			//현재 위/경도 좌표를 최근 현재위치의 위/경도로 등록
 			//날씨 데이터 요청
-			final Location location = getBestLocation(locationResult);
-
-			final SharedPreferences.Editor editor = sharedPreferences.edit();
-			editor.putString(getString(R.string.pref_key_last_current_location_latitude), String.valueOf(location.getLatitude())).putString(
-					getString(R.string.pref_key_last_current_location_longitude), String.valueOf(location.getLongitude())).commit();
-
-			onChangedCurrentLocation(location);
+			onChangedCurrentLocation(getBestLocation(locationResult));
 			locationCallbackInMainFragment.onSuccessful(locationResult);
 		}
 

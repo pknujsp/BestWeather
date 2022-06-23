@@ -225,10 +225,10 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 					//기존의 현재 위치 값이 없으면 즐겨찾기로 이동
 					Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
 
-					double latitude = Double.parseDouble(
-							sharedPreferences.getString(getString(R.string.pref_key_last_current_location_latitude), "0.0"));
-					double longitude = Double.parseDouble(
-							sharedPreferences.getString(getString(R.string.pref_key_last_current_location_longitude), "0.0"));
+					LocationResult locationResult =FusedLocation.getInstance(getContext()).getLastCurrentLocation();
+
+					double latitude = locationResult == null ? 0.0 : locationResult.getLocations().get(0).getLatitude();
+					double longitude =locationResult == null ? 0.0 : locationResult.getLocations().get(0).getLongitude();
 
 					if (latitude == 0.0 || longitude == 0.0) {
 						binding.sideNavMenu.favorites.callOnClick();

@@ -137,6 +137,14 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 						if (locationResult != null) {
 							if (locationResult.getLocations().size() > 0) {
+								final Location location = myLocationCallback.getBestLocation(locationResult);
+
+								final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+								editor.putString(context.getString(R.string.pref_key_last_current_location_latitude),
+										String.valueOf(location.getLatitude())).putString(
+										context.getString(R.string.pref_key_last_current_location_longitude),
+										String.valueOf(location.getLongitude())).commit();
+
 								myLocationCallback.onSuccessful(locationResult);
 							} else {
 								myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
@@ -189,6 +197,13 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 							} else {
 								List<Location> locations = new ArrayList<>();
 								locations.add(location);
+
+								final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+								editor.putString(context.getString(R.string.pref_key_last_current_location_latitude),
+										String.valueOf(location.getLatitude())).putString(
+										context.getString(R.string.pref_key_last_current_location_longitude),
+										String.valueOf(location.getLongitude())).commit();
+
 								locationCallback.onLocationResult(LocationResult.create(locations));
 							}
 						}

@@ -128,14 +128,9 @@ public class IntroFragment extends Fragment {
 		@Override
 		public void onSuccessful(LocationResult locationResult) {
 			//현재 위치 파악 성공
-			final Location location = locationResult.getLocations().get(0);
+			final Location location = getBestLocation(locationResult);
 			final Double latitude = location.getLatitude();
 			final Double longitude = location.getLongitude();
-
-			sharedPreferences.edit().putString(getString(R.string.pref_key_last_current_location_latitude), latitude.toString()).putString(
-					getString(R.string.pref_key_last_current_location_longitude), longitude.toString()).putString(
-					getString(R.string.pref_key_last_selected_location_type), LocationType.CurrentLocation.name()).putBoolean(
-					getString(R.string.pref_key_show_intro), false).commit();
 
 			dialog.dismiss();
 
