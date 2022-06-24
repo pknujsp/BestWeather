@@ -65,6 +65,8 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		binding.wind.setText(currentConditionsDto.getWindStrength() != null ? currentConditionsDto.getWindStrength() :
 				getString(R.string.noWindData));
 
+		binding.humidity.setText(new String(getString(R.string.humidity) + " " + currentConditionsDto.getHumidity()));
+
 		final String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String currentTempText = currentConditionsDto.getTemp().replace(tempUnitStr, "");
 

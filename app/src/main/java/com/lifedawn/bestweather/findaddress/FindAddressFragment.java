@@ -63,6 +63,7 @@ public class FindAddressFragment extends Fragment {
 	private NetworkStatus networkStatus;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 	private AlertDialog loadingDialog;
+	private Bundle bundle;
 
 	public FindAddressFragment setOnResultFragmentListener(OnResultFragmentListener onResultFragmentListener) {
 		this.onResultFragmentListener = onResultFragmentListener;
@@ -75,7 +76,7 @@ public class FindAddressFragment extends Fragment {
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		executorService = MyApplication.getExecutorService();
 
-		Bundle bundle = getArguments();
+		bundle = getArguments() != null ? getArguments() : savedInstanceState;
 		requestFragment = bundle.getString(BundleKey.RequestFragment.name());
 		fusedLocation = FusedLocation.getInstance(getContext());
 		networkStatus = NetworkStatus.getInstance(getContext());
@@ -87,6 +88,12 @@ public class FindAddressFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentFindAddressBinding.inflate(inflater);
 		return binding.getRoot();
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
 	}
 
 	@Override

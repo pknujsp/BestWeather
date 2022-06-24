@@ -224,12 +224,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		arguments = savedInstanceState != null ? savedInstanceState : getArguments();
+		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
 				View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 
-		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
+		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
+		getLifecycle().addObserver(locationLifeCycleObserver);
+
 		networkStatus = NetworkStatus.getInstance(getContext());
 		fusedLocation = FusedLocation.getInstance(getContext());
 
@@ -238,26 +239,24 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		weatherViewModel.setiLoadImgOfCurrentConditions(this);
 		locationCallbackInMainFragment = weatherViewModel.getLocationCallback();
 
-		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
-		getLifecycle().addObserver(locationLifeCycleObserver);
+		arguments = savedInstanceState != null ? savedInstanceState : getArguments();
 	}
 
+	/**
+	 *
+	 * hidden is true이면 black, else white
+	 */
 	@Override
 	public void onHiddenChanged(boolean hidden) {
 		super.onHiddenChanged(hidden);
-		Window window = getActivity().getWindow();
-
-		if (getChildFragmentManager().findFragmentById(binding.fragmentContainer.getId()) != null) {
-			window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-					View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-			return;
-		}
-
+		
 		if (hidden) {
-			window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+			// 상단바 블랙으로
+			getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
 					View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 		} else {
-			window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+			// 상단바 하양으로
+			getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
 					View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 		}
 	}
@@ -494,6 +493,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		}
 		getLifecycle().removeObserver(locationLifeCycleObserver);
 		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
+
 		super.onDestroy();
 	}
 

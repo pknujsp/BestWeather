@@ -60,6 +60,8 @@ public class FavoritesFragment extends Fragment {
 	private boolean clickedItem;
 	private String requestFragment;
 
+	private Bundle bundle;
+
 	public boolean isClickedItem() {
 		return clickedItem;
 	}
@@ -120,8 +122,14 @@ public class FavoritesFragment extends Fragment {
 		getActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 
-		Bundle bundle = getArguments();
+		bundle = getArguments() != null ? getArguments() : savedInstanceState;
 		requestFragment = bundle.getString(BundleKey.RequestFragment.name());
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
 	}
 
 	@Override
@@ -170,7 +178,7 @@ public class FavoritesFragment extends Fragment {
 		});
 
 		binding.favoriteAddressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
-		binding.favoriteAddressList.addItemDecoration(new RecyclerViewItemDecoration(getContext()));
+		binding.favoriteAddressList.addItemDecoration(new RecyclerViewItemDecoration(getContext(), true, 0));
 		adapter = new FavoriteAddressesAdapter();
 		adapter.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
 			@Override
@@ -273,7 +281,7 @@ public class FavoritesFragment extends Fragment {
 						public void onClick(DialogInterface dialogInterface, int i) {
 							dialogInterface.dismiss();
 							PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(
-									getString(R.string.pref_key_use_current_location), true)
+											getString(R.string.pref_key_use_current_location), true)
 									.putString(getString(R.string.pref_key_last_selected_location_type), LocationType.CurrentLocation.name()).apply();
 							enableCurrentLocation = true;
 

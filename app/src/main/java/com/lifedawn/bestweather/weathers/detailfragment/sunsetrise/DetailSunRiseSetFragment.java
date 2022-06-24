@@ -122,8 +122,6 @@ public class DetailSunRiseSetFragment extends Fragment {
 		binding.chart.setOnTouchListener(new View.OnTouchListener() {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
-				Log.d("touchEvent", event.getAction() + " : systemCurrent - " + System.currentTimeMillis() +
-						", downTime - " + event.getDownTime() + ", eventTime - " + event.getEventTime());
 				return false;
 			}
 		});

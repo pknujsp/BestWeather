@@ -13,11 +13,16 @@ import org.jetbrains.annotations.NotNull;
 public class RecyclerViewItemDecoration extends RecyclerView.ItemDecoration {
 	private final int marginHorizontal;
 	private final int marginVertical;
+	private final boolean hasFab;
+	private int bottomFreeSpace;
 
-	public RecyclerViewItemDecoration(Context context) {
+	public RecyclerViewItemDecoration(Context context, boolean hasFab, int fabCenterHeight) {
 		marginHorizontal = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, context.getResources().getDisplayMetrics());
 		marginVertical = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, context.getResources().getDisplayMetrics());
+		this.hasFab = hasFab;
+		this.bottomFreeSpace = fabCenterHeight * 2;
 	}
+
 
 	@Override
 	public void getItemOffsets(@NonNull @NotNull Rect outRect, @NonNull @NotNull View view, @NonNull @NotNull RecyclerView parent, @NonNull @NotNull RecyclerView.State state) {
@@ -28,10 +33,15 @@ public class RecyclerViewItemDecoration extends RecyclerView.ItemDecoration {
 		outRect.right = marginHorizontal;
 		outRect.left = marginHorizontal;
 		//set bottom margin to all
-		outRect.bottom = marginVertical;
 		//we only add top margin to the first row
 		if (position < itemCounts) {
 			outRect.top = marginVertical;
+		}
+
+		if (hasFab && position == itemCounts - 1) {
+			outRect.bottom = marginVertical + bottomFreeSpace;
+		} else {
+			outRect.bottom = marginVertical;
 		}
 		/*
 		//add left margin only to the first column

@@ -14,10 +14,13 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.lifedawn.bestweather.R;
@@ -32,6 +35,7 @@ import com.lifedawn.bestweather.room.repository.AlarmRepository;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Type;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -72,61 +76,72 @@ public class AlarmListFragment extends Fragment {
 
 		binding.alarmList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		binding.alarmList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-		alarmListAdapter = new AlarmListAdapter(getContext(), new OnClickedListViewItemListener<AlarmDto>() {
-			@Override
-			public void onClickedItem(AlarmDto e) {
-				AlarmSettingsFragment alarmSettingsFragment = new AlarmSettingsFragment();
-				String tag = AlarmSettingsFragment.class.getName();
 
-				Bundle bundle = new Bundle();
-				bundle.putBoolean(BundleKey.addAlarmSession.name(), false);
-				bundle.putInt(BundleKey.dtoId.name(), e.getId());
-				alarmSettingsFragment.setArguments(bundle);
-
-				getParentFragmentManager().beginTransaction().hide(AlarmListFragment.this).add(R.id.fragment_container,
-						alarmSettingsFragment, tag)
-						.addToBackStack(tag).commit();
-			}
-		}, new OnCheckedSwitchInListListener<AlarmDto>() {
+		binding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			@Override
-			public void onCheckedSwitch(AlarmDto alarmDto, boolean isChecked) {
-				alarmDto.setEnabled(isChecked ? 1 : 0);
-				alarmRepository.update(alarmDto, new DbQueryCallback<AlarmDto>() {
+			public void onGlobalLayout() {
+				binding.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(this);
+
+				alarmListAdapter = new AlarmListAdapter(getContext(), new OnClickedListViewItemListener<AlarmDto>() {
 					@Override
-					public void onResultSuccessful(AlarmDto result) {
-						AlarmUtil.modifyAlarm(getContext(), alarmDto);
+					public void onClickedItem(AlarmDto e) {
+						AlarmSettingsFragment alarmSettingsFragment = new AlarmSettingsFragment();
+						String tag = AlarmSettingsFragment.class.getName();
+
+						Bundle bundle = new Bundle();
+						bundle.putBoolean(BundleKey.addAlarmSession.name(), false);
+						bundle.putInt(BundleKey.dtoId.name(), e.getId());
+						alarmSettingsFragment.setArguments(bundle);
+
+						getParentFragmentManager().beginTransaction().hide(AlarmListFragment.this).add(R.id.fragment_container,
+										alarmSettingsFragment, tag)
+								.addToBackStack(tag).commit();
 					}
-
+				}, new OnCheckedSwitchInListListener<AlarmDto>() {
 					@Override
-					public void onResultNoData() {
+					public void onCheckedSwitch(AlarmDto alarmDto, boolean isChecked) {
+						alarmDto.setEnabled(isChecked ? 1 : 0);
+						alarmRepository.update(alarmDto, new DbQueryCallback<AlarmDto>() {
+							@Override
+							public void onResultSuccessful(AlarmDto result) {
+								AlarmUtil.modifyAlarm(getContext(), alarmDto);
+							}
 
+							@Override
+							public void onResultNoData() {
+
+							}
+						});
+
+						if (isChecked) {
+							String text = LocalTime.parse(alarmDto.getAlarmTime()).format(hoursFormatter) + ", " + getString(R.string.registeredAlarm);
+							Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+						}
+					}
+				}, binding.addBtn.getHeight());
+				binding.alarmList.setAdapter(alarmListAdapter);
+
+				binding.addBtn.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						AlarmSettingsFragment alarmSettingsFragment = new AlarmSettingsFragment();
+						String tag = AlarmSettingsFragment.class.getName();
+
+						Bundle bundle = new Bundle();
+						bundle.putBoolean(BundleKey.addAlarmSession.name(), true);
+						alarmSettingsFragment.setArguments(bundle);
+
+						getParentFragmentManager().beginTransaction().hide(AlarmListFragment.this).add(R.id.fragment_container,
+										alarmSettingsFragment, tag)
+								.addToBackStack(tag).commit();
 					}
 				});
-
-				if (isChecked) {
-					String text = LocalTime.parse(alarmDto.getAlarmTime()).format(hoursFormatter) + ", " + getString(R.string.registeredAlarm);
-					Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
-				}
+				loadAlarmList();
 			}
 		});
-		binding.alarmList.setAdapter(alarmListAdapter);
 
-		binding.addBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				AlarmSettingsFragment alarmSettingsFragment = new AlarmSettingsFragment();
-				String tag = AlarmSettingsFragment.class.getName();
 
-				Bundle bundle = new Bundle();
-				bundle.putBoolean(BundleKey.addAlarmSession.name(), true);
-				alarmSettingsFragment.setArguments(bundle);
 
-				getParentFragmentManager().beginTransaction().hide(AlarmListFragment.this).add(R.id.fragment_container,
-						alarmSettingsFragment, tag)
-						.addToBackStack(tag).commit();
-			}
-		});
-		loadAlarmList();
 	}
 
 	@Override
@@ -165,12 +180,14 @@ public class AlarmListFragment extends Fragment {
 		private OnClickedListViewItemListener<AlarmDto> onClickedItemListener;
 		private OnCheckedSwitchInListListener<AlarmDto> onCheckedSwitchInListListener;
 		private DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a hh:mm");
+		private final int MARGIN;
 
 		public AlarmListAdapter(Context context, OnClickedListViewItemListener<AlarmDto> onClickedItemListener,
-		                        OnCheckedSwitchInListListener<AlarmDto> onCheckedSwitchInListListener) {
+		                        OnCheckedSwitchInListListener<AlarmDto> onCheckedSwitchInListListener, int fabHeight) {
 			this.onClickedItemListener = onClickedItemListener;
 			this.context = context;
 			this.onCheckedSwitchInListListener = onCheckedSwitchInListListener;
+			MARGIN = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, context.getResources().getDisplayMetrics()) + fabHeight);
 		}
 
 		public void setAlarmDtoList(List<AlarmDto> alarmDtoList) {
@@ -203,7 +220,8 @@ public class AlarmListFragment extends Fragment {
 			}
 
 			public void onBind() {
-				AlarmDto alarmDto = alarmDtoList.get(getAdapterPosition());
+				int pos = getBindingAdapterPosition();
+				AlarmDto alarmDto = alarmDtoList.get(pos);
 				binding.alarmSwitch.setChecked(alarmDto.getEnabled() == 1);
 				binding.hours.setText(LocalTime.parse(alarmDto.getAlarmTime()).format(hoursFormatter));
 
@@ -249,6 +267,16 @@ public class AlarmListFragment extends Fragment {
 						onCheckedSwitchInListListener.onCheckedSwitch(alarmDtoList.get(getAdapterPosition()), isChecked);
 					}
 				});
+
+				FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.contentContainer.getLayoutParams();
+
+				if (getItemCount() - 1 == pos) {
+					layoutParams.bottomMargin = MARGIN;
+				} else {
+					layoutParams.bottomMargin = 0;
+				}
+
+				binding.contentContainer.setLayoutParams(layoutParams);
 			}
 		}
 	}

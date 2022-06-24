@@ -225,10 +225,10 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 					//기존의 현재 위치 값이 없으면 즐겨찾기로 이동
 					Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
 
-					LocationResult locationResult =FusedLocation.getInstance(getContext()).getLastCurrentLocation();
+					LocationResult locationResult = FusedLocation.getInstance(getContext()).getLastCurrentLocation();
 
 					double latitude = locationResult == null ? 0.0 : locationResult.getLocations().get(0).getLatitude();
-					double longitude =locationResult == null ? 0.0 : locationResult.getLocations().get(0).getLongitude();
+					double longitude = locationResult == null ? 0.0 : locationResult.getLocations().get(0).getLongitude();
 
 					if (latitude == 0.0 || longitude == 0.0) {
 						binding.sideNavMenu.favorites.callOnClick();
@@ -555,7 +555,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			bundle.putSerializable("FavoriteAddressDto", favoriteAddressDto);
 		}
 
-		final WeatherFragment newWeatherFragment = new WeatherFragment();
+		WeatherFragment newWeatherFragment = new WeatherFragment();
 		newWeatherFragment.setArguments(bundle);
 		newWeatherFragment.setMenuOnClickListener(new View.OnClickListener() {
 			@Override

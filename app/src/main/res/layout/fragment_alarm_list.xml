@@ -23,13 +23,15 @@
                 android:layout_height="match_parent"
                 android:layout_below="@id/toolbar"
                 android:overScrollMode="never"
-                android:scrollbars="none">
+                android:scrollbars="none"
+                >
 
                 <LinearLayout
                     android:id="@+id/settings_container"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    >
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/alarmList"
@@ -37,7 +39,8 @@
                         android:layout_height="match_parent"
                         android:orientation="vertical"
                         tools:itemCount="3"
-                        tools:listitem="@layout/view_alarm_item" />
+                        tools:listitem="@layout/view_alarm_item"
+                        />
 
                 </LinearLayout>
 

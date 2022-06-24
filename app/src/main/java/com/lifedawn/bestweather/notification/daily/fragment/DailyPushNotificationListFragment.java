@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -85,101 +86,111 @@ public class DailyPushNotificationListFragment extends Fragment {
 		});
 
 		binding.notificationList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
-		binding.notificationList.addItemDecoration(new RecyclerViewItemDecoration(getContext()));
-		adapter = new NotificationListAdapter(getContext(), new OnClickedListViewItemListener<DailyPushNotificationDto>() {
+
+		binding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			@Override
-			public void onClickedItem(DailyPushNotificationDto e) {
-				DailyNotificationSettingsFragment settingsFragment = new DailyNotificationSettingsFragment();
-				String tag = DailyNotificationSettingsFragment.class.getName();
+			public void onGlobalLayout() {
+				binding.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
-				Bundle bundle = new Bundle();
-				bundle.putSerializable("dto", e);
-				bundle.putBoolean(BundleKey.NewSession.name(), false);
-				settingsFragment.setArguments(bundle);
+				binding.notificationList.addItemDecoration(new RecyclerViewItemDecoration(getContext(), true,
+						binding.getRoot().getHeight() - binding.addBtn.getTop() - binding.addBtn.getHeight() / 2));
 
-				getParentFragmentManager().beginTransaction().hide(DailyPushNotificationListFragment.this).add(R.id.fragment_container,
-						settingsFragment, tag).addToBackStack(tag).commit();
-			}
-		}, new OnCheckedSwitchInListListener<DailyPushNotificationDto>() {
-			@Override
-			public void onCheckedSwitch(DailyPushNotificationDto dailyPushNotificationDto, boolean isChecked) {
-				dailyPushNotificationDto.setEnabled(isChecked);
-				dailyNotificationHelper.modifyPushNotification(dailyPushNotificationDto);
+				adapter = new NotificationListAdapter(getContext(), new OnClickedListViewItemListener<DailyPushNotificationDto>() {
+					@Override
+					public void onClickedItem(DailyPushNotificationDto e) {
+						DailyNotificationSettingsFragment settingsFragment = new DailyNotificationSettingsFragment();
+						String tag = DailyNotificationSettingsFragment.class.getName();
 
-				repository.update(dailyPushNotificationDto, null);
-				String text = LocalTime.parse(dailyPushNotificationDto.getAlarmClock()).format(hoursFormatter)
-						+ ", ";
+						Bundle bundle = new Bundle();
+						bundle.putSerializable("dto", e);
+						bundle.putBoolean(BundleKey.NewSession.name(), false);
+						settingsFragment.setArguments(bundle);
 
-				if (isChecked) {
-					text += getString(R.string.registeredDailyNotification);
-				} else {
-					text += getString(R.string.unregisteredDailyNotification);
-				}
-				Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
-			}
-		}, new OnClickedPopupMenuItemListener<DailyPushNotificationDto>() {
-			@Override
-			public void onClickedItem(DailyPushNotificationDto e, int position) {
-				switch (position) {
-					case 0:
-						new MaterialAlertDialogBuilder(requireActivity())
-								.setTitle(R.string.removeNotification)
-								.setMessage(R.string.will_you_delete_the_notification)
-								.setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog, int which) {
-										dailyNotificationHelper.disablePushNotification(e);
-										repository.delete(e, new DbQueryCallback<Boolean>() {
+						getParentFragmentManager().beginTransaction().hide(DailyPushNotificationListFragment.this).add(R.id.fragment_container,
+								settingsFragment, tag).addToBackStack(tag).commit();
+					}
+				}, new OnCheckedSwitchInListListener<DailyPushNotificationDto>() {
+					@Override
+					public void onCheckedSwitch(DailyPushNotificationDto dailyPushNotificationDto, boolean isChecked) {
+						dailyPushNotificationDto.setEnabled(isChecked);
+						dailyNotificationHelper.modifyPushNotification(dailyPushNotificationDto);
+
+						repository.update(dailyPushNotificationDto, null);
+						String text = LocalTime.parse(dailyPushNotificationDto.getAlarmClock()).format(hoursFormatter)
+								+ ", ";
+
+						if (isChecked) {
+							text += getString(R.string.registeredDailyNotification);
+						} else {
+							text += getString(R.string.unregisteredDailyNotification);
+						}
+						Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+					}
+				}, new OnClickedPopupMenuItemListener<DailyPushNotificationDto>() {
+					@Override
+					public void onClickedItem(DailyPushNotificationDto e, int position) {
+						switch (position) {
+							case 0:
+								new MaterialAlertDialogBuilder(requireActivity())
+										.setTitle(R.string.removeNotification)
+										.setMessage(R.string.will_you_delete_the_notification)
+										.setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
 											@Override
-											public void onResultSuccessful(Boolean result) {
-												loadList();
-											}
+											public void onClick(DialogInterface dialog, int which) {
+												dailyNotificationHelper.disablePushNotification(e);
+												repository.delete(e, new DbQueryCallback<Boolean>() {
+													@Override
+													public void onResultSuccessful(Boolean result) {
+														loadList();
+													}
 
+													@Override
+													public void onResultNoData() {
+
+													}
+												});
+												dialog.dismiss();
+											}
+										}).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
 											@Override
-											public void onResultNoData() {
-
+											public void onClick(DialogInterface dialog, int which) {
+												dialog.dismiss();
 											}
-										});
-										dialog.dismiss();
-									}
-								}).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.dismiss();
-							}
-						}).create().show();
-						break;
-				}
+										}).create().show();
+								break;
+						}
+					}
+				});
+				adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+					@Override
+					public void onChanged() {
+						super.onChanged();
+						if (adapter.getItemCount() > 0) {
+							binding.progressResultView.onSuccessful();
+						} else {
+							binding.progressResultView.onFailed(getString(R.string.empty_daily_notifications));
+						}
+					}
+				});
+				binding.notificationList.setAdapter(adapter);
+
+				binding.addBtn.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						DailyNotificationSettingsFragment settingsFragment = new DailyNotificationSettingsFragment();
+						String tag = DailyNotificationSettingsFragment.class.getName();
+
+						Bundle bundle = new Bundle();
+						bundle.putBoolean(BundleKey.NewSession.name(), true);
+						settingsFragment.setArguments(bundle);
+
+						getParentFragmentManager().beginTransaction().hide(DailyPushNotificationListFragment.this).add(R.id.fragment_container,
+								settingsFragment, tag).addToBackStack(tag).commit();
+					}
+				});
+				loadList();
 			}
 		});
-		adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-			@Override
-			public void onChanged() {
-				super.onChanged();
-				if (adapter.getItemCount() > 0) {
-					binding.progressResultView.onSuccessful();
-				} else {
-					binding.progressResultView.onFailed(getString(R.string.empty_daily_notifications));
-				}
-			}
-		});
-		binding.notificationList.setAdapter(adapter);
-
-		binding.addBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				DailyNotificationSettingsFragment settingsFragment = new DailyNotificationSettingsFragment();
-				String tag = DailyNotificationSettingsFragment.class.getName();
-
-				Bundle bundle = new Bundle();
-				bundle.putBoolean(BundleKey.NewSession.name(), true);
-				settingsFragment.setArguments(bundle);
-
-				getParentFragmentManager().beginTransaction().hide(DailyPushNotificationListFragment.this).add(R.id.fragment_container,
-						settingsFragment, tag).addToBackStack(tag).commit();
-			}
-		});
-		loadList();
 	}
 
 	@Override
@@ -259,7 +270,9 @@ public class DailyPushNotificationListFragment extends Fragment {
 			}
 
 			public void onBind() {
-				DailyPushNotificationDto dto = notificationList.get(getAdapterPosition());
+				int pos = getBindingAdapterPosition();
+				DailyPushNotificationDto dto = notificationList.get(pos);
+
 				binding.hours.setText(LocalTime.parse(dto.getAlarmClock()).format(hoursFormatter));
 				binding.notiSwitch.setChecked(dto.isEnabled());
 				binding.notificationType.setText(DailyPushNotificationType.getNotificationName(dto.getNotificationType(), context));

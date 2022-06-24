@@ -55,7 +55,7 @@ public class AlarmSettingsFragment extends Fragment {
 
 	private boolean newAlarmSession;
 	private boolean selectedFavoriteLocation = false;
-
+	private Bundle bundle;
 	private Ringtone ringtone;
 	private final DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a hh:mm");
 
@@ -64,7 +64,7 @@ public class AlarmSettingsFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		alarmRepository = new AlarmRepository(getContext());
-		Bundle bundle = getArguments();
+		bundle = getArguments() != null ? getArguments() : savedInstanceState;
 		newAlarmSession = bundle.getBoolean(BundleKey.addAlarmSession.name());
 
 		if (newAlarmSession) {
@@ -83,6 +83,12 @@ public class AlarmSettingsFragment extends Fragment {
 			newAlarmDto.setAlarmTime(LocalTime.of(7, 0).toString());
 			newAlarmDto.setAlarmDays("");
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
 	}
 
 	@Override
@@ -194,7 +200,7 @@ public class AlarmSettingsFragment extends Fragment {
 				String tag = AlarmSettingsFragment.class.getName();
 
 				getParentFragmentManager().beginTransaction().hide(AlarmSettingsFragment.this).add(R.id.fragment_container,
-						favoritesFragment, tag)
+								favoritesFragment, tag)
 						.addToBackStack(tag).commit();
 			}
 		});

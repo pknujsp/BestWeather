@@ -68,6 +68,8 @@ public class DailyNotificationSettingsFragment extends Fragment {
 	private boolean selectedFavoriteLocation = false;
 	private boolean initializing = true;
 
+	private Bundle bundle;
+
 	private WeatherProviderType mainWeatherProviderType;
 	private FavoriteAddressDto selectedFavoriteAddressDto;
 
@@ -93,7 +95,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		repository = new DailyPushNotificationRepository(getContext());
 		mainWeatherProviderType = WeatherRequestUtil.getMainWeatherSourceType(getContext(), null);
 
-		Bundle bundle = getArguments();
+		bundle = getArguments() != null ? getArguments() : savedInstanceState;
 		newNotificationSession = bundle.getBoolean(BundleKey.NewSession.name());
 
 		if (newNotificationSession) {
@@ -108,6 +110,12 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			savedNotificationDto = (DailyPushNotificationDto) bundle.getSerializable("dto");
 			editingNotificationDto = savedNotificationDto;
 		}
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
 	}
 
 	@Nullable
