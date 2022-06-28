@@ -519,6 +519,7 @@
     <string name="use_sun_set_notification">sunset notification</string>
     <string name="pref_key_widget_refresh_interval" translatable="false">pref_key_widget_refresh_interval</string>
     <string name="pref_title_widget_refresh_interval">widget refresh interval</string>
+    <string name="map">map</string>
 
 
 </resources>

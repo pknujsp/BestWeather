@@ -453,4 +453,5 @@
     <string name="use_sun_rise_notification">일출 알림</string>
     <string name="use_sun_set_notification">일몰 알림</string>
     <string name="pref_title_widget_refresh_interval">위젯 업데이트 간격</string>
+    <string name="map">지도</string>
 </resources>

@@ -1,3 +1,4 @@
 rootProject.name = "BestWeather"
 include ':app'
 include ':nativetemplates'
+

@@ -34,6 +34,7 @@ import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.CustomEditText;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentFindAddressBinding;
+import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.responses.google.placesearch.GooglePlaceSearchResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
@@ -130,6 +131,16 @@ public class FindAddressFragment extends Fragment {
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
 				}
+			}
+		});
+
+		binding.mapBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				MapFragment mapFragment = new MapFragment();
+				getParentFragmentManager().beginTransaction().hide(FindAddressFragment.this)
+						.add(R.id.fragment_container, mapFragment, MapFragment.class.getName())
+						.addToBackStack(MapFragment.class.getName()).commitAllowingStateLoss();
 			}
 		});
 

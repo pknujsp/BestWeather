@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.commons.classes;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -124,7 +125,6 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				LocationRequest locationRequest = LocationRequest.create();
 				locationRequest.setInterval(600);
 				locationRequest.setFastestInterval(300);
-				locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 				Timer timer = new Timer();
 
@@ -178,7 +178,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 					}
 				}, 5000L);
 
-				Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
+				@SuppressLint("MissingPermission") Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
 						cancellationTokenSource.getToken());
 
 				locationRequestObj.currentLocationTask = currentLocationTask;
@@ -186,6 +186,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				locationRequestObj.timer = timer;
 
 				currentLocationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
+					@SuppressLint("MissingPermission")
 					@Override
 					public void onSuccess(@NonNull @NotNull Location location) {
 						if (!currentLocationTask.isCanceled()) {
