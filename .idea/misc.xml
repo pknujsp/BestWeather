@@ -15,6 +15,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/icon_circle_background.xml" value="0.25" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/icon_rounded_rect_background.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/img_btn_background.xml" value="0.3764102564102564" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/location.xml" value="0.387" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/navigation_drawer_background.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/rectangle_btn_background.xml" value="0.2255" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/refresh.xml" value="0.2265" />
@@ -45,7 +46,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/common_layout_notification_settings.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/custom_preference_layout.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/dialog_fragment_detail_forecast.xml" value="0.17806484295845998" />
-        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/favorite_address_item.xml" value="0.17806484295845998" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/favorite_address_item.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/favorite_address_item_in_side_nav.xml" value="0.25" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fifth_daily_noti_view.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/first_daily_noti_view.xml" value="0.33" />
@@ -65,6 +66,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_main.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_map.xml" value="0.5390625" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_notification.xml" value="0.33" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_search_address.xml" value="0.5536458333333333" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_settings_main.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_sun_set_rise_notification.xml" value="0.5536458333333333" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_sunsetrise.xml" value="0.17806484295845998" />
@@ -81,7 +83,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/side_nav_menu.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/tab_forecast_item.xml" value="0.36614583333333334" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/third_daily_noti_view.xml" value="0.33" />
-        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/toolbar.xml" value="0.25" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/toolbar.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_alarm_item.xml" value="0.5536458333333333" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_current_conditions_for_simple_widget.xml" value="0.5" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/view_daily_forecast_item_in_linear.xml" value="0.17806484295845998" />

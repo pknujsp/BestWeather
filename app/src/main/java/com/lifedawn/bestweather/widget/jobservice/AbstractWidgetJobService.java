@@ -97,9 +97,6 @@ public abstract class AbstractWidgetJobService extends JobService {
 
 				widgetClassMap.put(jobId, widgetClass);
 
-				Log.e(TAG,
-						"jobId: " + jobId + ", appWidgetId: " + appWidgetId + ", jobService: " + getClass().getName() + ", widgetProvider: " + widgetClass.getName());
-
 				if (action.equals(getString(R.string.com_lifedawn_bestweather_action_INIT))) {
 					addBackgroundCallback(params);
 					final AbstractWidgetCreator widgetViewCreator = createWidgetViewCreator(appWidgetId, jobId);

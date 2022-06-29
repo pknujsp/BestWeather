@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     >
@@ -16,6 +17,17 @@
             android:layout_height="match_parent"
             />
 
+        <com.lifedawn.bestweather.commons.views.CustomSearchView
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginRight="16dp"
+            app:backBtnVisibility="gone"
+            app:hint="@string/hint_input_address"
+            app:searchBtnVisibility="visible"
+            />
 
     </FrameLayout>
 </layout>

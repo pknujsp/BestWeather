@@ -3,6 +3,9 @@ package com.lifedawn.bestweather.commons.classes;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,6 +24,7 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
@@ -34,11 +38,14 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.notification.NotificationHelper;
+import com.lifedawn.bestweather.notification.NotificationType;
 
 import org.jetbrains.annotations.NotNull;
 import org.xml.sax.helpers.AttributesImpl;
@@ -178,7 +185,8 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 					}
 				}, 5000L);
 
-				@SuppressLint("MissingPermission") Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
+				@SuppressLint("MissingPermission")
+				Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
 						cancellationTokenSource.getToken());
 
 				locationRequestObj.currentLocationTask = currentLocationTask;
@@ -288,6 +296,23 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 			locationRequestObjMap.remove(myLocationCallback);
 		}
+	}
+
+	public void startForeground(Service service) {
+		NotificationHelper notificationHelper = new NotificationHelper(context);
+		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Location);
+
+		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
+		builder.setSmallIcon(R.drawable.location).setContentText(context.getString(R.string.msg_finding_current_location))
+				.setContentTitle(context.getString(R.string.current_location))
+				.setOngoing(true);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			builder.setPriority(NotificationCompat.PRIORITY_LOW).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+		}
+
+		Notification notification = notificationObj.getNotificationBuilder().build();
+		service.startForeground(NotificationType.Location.getNotificationId(), notification);
 	}
 
 	public interface MyLocationCallback {

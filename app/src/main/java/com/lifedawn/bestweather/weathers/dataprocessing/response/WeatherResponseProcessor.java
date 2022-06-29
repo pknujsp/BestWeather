@@ -652,7 +652,8 @@ public class WeatherResponseProcessor {
 
 	public static AirQualityDto getTempAirQualityDto() {
 		AirQualityDto airQualityDto = new AirQualityDto();
-		airQualityDto.setAqi(160).setCityName("A");
+		airQualityDto.setSuccessful(true);
+		airQualityDto.setAqi(160).setCityName("CityName");
 
 		AirQualityDto.Current current = new AirQualityDto.Current();
 		airQualityDto.setCurrent(current);

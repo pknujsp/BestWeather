@@ -70,10 +70,11 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 			deleteBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					int position = getAdapterPosition();
+					int position = getBindingAdapterPosition();
 					onClickedAddressListener.onClickedDelete(favoriteAddressDtoList.get(position), position);
+
 					favoriteAddressDtoList.remove(position);
-					notifyDataSetChanged();
+					notifyItemRemoved(position);
 				}
 			});
 		}

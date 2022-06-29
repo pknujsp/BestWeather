@@ -30,6 +30,7 @@ import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
+import com.lifedawn.bestweather.commons.views.CustomEditText;
 import com.lifedawn.bestweather.databinding.FragmentMapBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 
@@ -70,6 +71,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 		SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 		mapFragment.getMapAsync(this);
+
+		binding.searchView.setOnEditTextQueryListener(new CustomEditText.OnEditTextQueryListener() {
+			@Override
+			public void onTextChange(String newText) {
+
+			}
+
+			@Override
+			public void onTextSubmit(String text) {
+
+			}
+		});
+
+		binding.searchView.setOnBackClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				getParentFragmentManager().popBackStack();
+			}
+		});
 	}
 
 	@Override
@@ -84,27 +104,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	public void onMapReady(@NonNull GoogleMap googleMap) {
 		this.googleMap = googleMap;
 
-		googleMap.setPadding(0, MyApplication.getStatusBarHeight(), 0, 0);
+		googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.searchView.getBottom(), 0, 0);
 		googleMap.getUiSettings().setZoomControlsEnabled(true);
 		googleMap.getUiSettings().setRotateGesturesEnabled(false);
 		googleMap.setMyLocationEnabled(true);
-		googleMap.setOnMarkerClickListener(this::onMarkerClick);
+		googleMap.setOnMarkerClickListener(this);
 
 		googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
 			@Override
 			public void onMapLongClick(@NonNull LatLng latLng) {
 				removeMarkers(MarkerType.LONG_CLICK);
-				addMarker(MarkerType.LONG_CLICK, latLng, "LongClicked");
+				addMarker(MarkerType.LONG_CLICK, latLng, "");
 
 				Geocoding.geocoding(getContext(), latLng.latitude, latLng.longitude, new Geocoding.GeocodingCallback() {
 					@Override
 					public void onGeocodingResult(List<Address> addressList) {
-						MainThreadWorker.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								Toast.makeText(getContext(), addressList.get(0).getAddressLine(0), Toast.LENGTH_SHORT).show();
-							}
-						});
+
 					}
 				});
 			}
@@ -117,7 +132,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				return false;
 			}
 		});
-		
+
 
 		googleMap.setOnMyLocationClickListener(new GoogleMap.OnMyLocationClickListener() {
 			@Override

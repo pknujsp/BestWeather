@@ -9,6 +9,8 @@ import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.FusedLocation;
+import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.NotificationHelper;
@@ -92,9 +94,17 @@ public class OngoingNotificationForegroundService extends Service {
 				}
 			}
 
+			if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.CurrentLocation) {
+				FusedLocation.getInstance(getApplicationContext()).startForeground(OngoingNotificationForegroundService.this);
+			}
+
 			ongoingNotiViewCreator.initNotification(new Callback() {
 				@Override
 				public void onResult() {
+					if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.CurrentLocation) {
+						NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+						notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
+					}
 					stopService();
 				}
 			});
@@ -106,6 +116,11 @@ public class OngoingNotificationForegroundService extends Service {
 		if (timer != null) {
 			timer.cancel();
 			timer = null;
+
+			NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+			if (notificationHelper.activeNotification(NotificationType.Location.getNotificationId())) {
+				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
+			}
 		}
 
 		stopForeground(true);

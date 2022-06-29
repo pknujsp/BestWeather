@@ -98,10 +98,13 @@ public class DailyNotificationForegroundService extends Service {
 
 	public void loadCurrentLocation(Context context, ExecutorService executorService, RemoteViews remoteViews,
 	                                DailyPushNotificationDto dailyPushNotificationDto) {
+		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+
 		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
 			public void onSuccessful(LocationResult locationResult) {
-				final Location location = locationResult.getLocations().get(0);
+				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
+				final Location location = getBestLocation(locationResult);
 				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
 					public void onGeocodingResult(List<Address> addressList) {
@@ -120,6 +123,8 @@ public class DailyNotificationForegroundService extends Service {
 
 			@Override
 			public void onFailed(Fail fail) {
+				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
+
 				String failText = null;
 
 				if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
@@ -137,7 +142,9 @@ public class DailyNotificationForegroundService extends Service {
 			}
 		};
 
-		FusedLocation.getInstance(context).findCurrentLocation(locationCallback, true);
+		FusedLocation fusedLocation = FusedLocation.getInstance(context);
+		fusedLocation.startForeground(this);
+		fusedLocation.findCurrentLocation(locationCallback, true);
 	}
 
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,
@@ -167,7 +174,7 @@ public class DailyNotificationForegroundService extends Service {
 
 	}
 
-	private void wakeLock(){
+	private void wakeLock() {
 		PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK |
 						PowerManager.ACQUIRE_CAUSES_WAKEUP |

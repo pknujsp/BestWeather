@@ -89,7 +89,7 @@ public class WidgetForegroundService extends Service {
 	private WidgetRepository widgetRepository;
 	private AppWidgetManager appWidgetManager;
 	private ExecutorService executorService = Executors.newFixedThreadPool(3);
-
+	private FusedLocation fusedLocation;
 	private int requestCount;
 	private int responseCount;
 	private Timer timer;
@@ -358,6 +358,10 @@ public class WidgetForegroundService extends Service {
 		if (timer != null) {
 			timer.cancel();
 			timer = null;
+			NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+			if (notificationHelper.activeNotification(NotificationType.Location.getNotificationId())) {
+				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
+			}
 		}
 		stopForeground(true);
 		stopSelf();
@@ -373,6 +377,9 @@ public class WidgetForegroundService extends Service {
 		final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
 			public void onSuccessful(LocationResult locationResult) {
+				NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
+
 				final Location location = getBestLocation(locationResult);
 				Geocoding.geocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
@@ -412,6 +419,8 @@ public class WidgetForegroundService extends Service {
 
 			@Override
 			public void onFailed(Fail fail) {
+				NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 				onLocationResponse(fail, null);
 			}
 		};
@@ -419,16 +428,17 @@ public class WidgetForegroundService extends Service {
 		MainThreadWorker.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-
-				FusedLocation fusedLocation = FusedLocation.getInstance(getApplicationContext());
+				fusedLocation = FusedLocation.getInstance(getApplicationContext());
 				PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+				fusedLocation.startForeground(WidgetForegroundService.this);
+
 				if (powerManager.isInteractive()) {
 					fusedLocation.findCurrentLocation(locationCallback, true);
 				} else {
 					LocationResult lastLocation = fusedLocation.getLastCurrentLocation();
-					if(lastLocation == null){
+					if (lastLocation == null) {
 						fusedLocation.findCurrentLocation(locationCallback, true);
-					}else{
+					} else {
 						locationCallback.onSuccessful(lastLocation);
 					}
 				}

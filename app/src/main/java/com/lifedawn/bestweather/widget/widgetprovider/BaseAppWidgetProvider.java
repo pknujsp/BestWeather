@@ -101,14 +101,20 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
-		WidgetHelper widgetHelper = new WidgetHelper(context);
+		super.onDeleted(context, appWidgetIds);
+
 		WidgetRepository widgetRepository = new WidgetRepository(context);
 
 		for (int appWidgetId : appWidgetIds) {
-			widgetHelper.cancelAutoRefresh();
 			widgetRepository.delete(appWidgetId, null);
 		}
-		super.onDeleted(context, appWidgetIds);
+
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		if (appWidgetManager.getInstalledProviders().isEmpty()) {
+			WidgetHelper widgetHelper = new WidgetHelper(context);
+			widgetHelper.cancelAutoRefresh();
+		}
+
 	}
 
 

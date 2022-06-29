@@ -21,8 +21,13 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.interfaces.IAppbarTitle;
 import com.lifedawn.bestweather.main.MainActivity;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
+import com.lifedawn.bestweather.room.dto.WidgetDto;
+import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.settings.custompreferences.WidgetRefreshIntervalPreference;
 import com.lifedawn.bestweather.widget.WidgetHelper;
+
+import java.util.List;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
 	private IAppbarTitle iAppbarTitle;
@@ -90,8 +95,26 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 												.putLong(widgetRefreshIntervalPreference.getKey(), newValue).commit();
 										widgetRefreshIntervalPreference.setValue(newValue);
 
-										WidgetHelper widgetHelper = new WidgetHelper(getContext());
-										widgetHelper.onSelectedAutoRefreshInterval(newValue);
+										WidgetRepository widgetRepository = new WidgetRepository(getContext());
+										widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
+											@Override
+											public void onResultSuccessful(List<WidgetDto> result) {
+												WidgetHelper widgetHelper = new WidgetHelper(getContext());
+												
+												if (result.isEmpty()) {
+													widgetHelper.cancelAutoRefresh();
+												} else {
+													widgetHelper.onSelectedAutoRefreshInterval(newValue);
+												}
+											}
+
+											@Override
+											public void onResultNoData() {
+
+											}
+										});
+
+
 										MyApplication.loadValueUnits(getContext(), true);
 										dialog.dismiss();
 									}

@@ -2,16 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="140dp"
+    android:layout_height="170dp"
     android:gravity="center_vertical"
     android:orientation="vertical"
     android:padding="@dimen/notificationPadding">
 
-    <include
-        layout="@layout/header_view_in_widget"
+    <TextView
+        android:id="@+id/forecast_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="6dp" />
+        android:layout_marginBottom="6dp"
+        android:maxLines="1"
+        android:text="@string/FourthDailyPushNotification"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,6 +51,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:layout_marginBottom="4dp"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -187,5 +193,11 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <include
+        layout="@layout/header_view_in_widget"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+ />
 
 </LinearLayout>
