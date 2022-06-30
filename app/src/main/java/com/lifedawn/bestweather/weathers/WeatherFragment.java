@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,7 +30,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -267,10 +267,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		return binding.getRoot();
 	}
 
+	@SuppressLint("MissingPermission")
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(getContext(), R.color.black_alpha_28), PorterDuff.Mode.DARKEN);
+		binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(getContext(), R.color.black_alpha_30), PorterDuff.Mode.DARKEN);
 
 		binding.scrollView.setVisibility(View.GONE);
 		binding.flickrImageUrl.setVisibility(View.GONE);

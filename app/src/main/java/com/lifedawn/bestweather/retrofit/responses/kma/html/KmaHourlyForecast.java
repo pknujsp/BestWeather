@@ -16,6 +16,15 @@ public class KmaHourlyForecast {
     private String humidity;
     private boolean hasRain;
     private boolean hasSnow;
+    private boolean hasThunder;
+
+    public void setHasThunder(boolean hasThunder) {
+        this.hasThunder = hasThunder;
+    }
+
+    public boolean isHasThunder() {
+        return hasThunder;
+    }
 
     public String getSnowVolume() {
         return snowVolume;

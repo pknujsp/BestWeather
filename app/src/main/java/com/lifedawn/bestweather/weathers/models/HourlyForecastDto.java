@@ -28,12 +28,22 @@ public class HourlyForecastDto implements Serializable {
 	private String snowVolume;
 	private String precipitationType;
 	private int precipitationTypeIcon;
+	private boolean hasThunder;
 
 	private boolean hasPrecipitation;
 	private boolean hasRain;
 	private boolean hasSnow;
 	private boolean hasPor;
 	private boolean hasPos;
+
+	public HourlyForecastDto setHasThunder(boolean hasThunder) {
+		this.hasThunder = hasThunder;
+		return this;
+	}
+
+	public boolean isHasThunder() {
+		return hasThunder;
+	}
 
 	public boolean isHasPor() {
 		return hasPor;

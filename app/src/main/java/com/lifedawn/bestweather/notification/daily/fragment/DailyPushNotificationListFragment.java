@@ -42,8 +42,11 @@ import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -53,6 +56,13 @@ public class DailyPushNotificationListFragment extends Fragment {
 	private DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a h:mm");
 	private DailyPushNotificationRepository repository;
 	private DailyNotificationHelper dailyNotificationHelper;
+
+	private final Comparator<DailyPushNotificationDto> sortComparator = new Comparator<DailyPushNotificationDto>() {
+		@Override
+		public int compare(DailyPushNotificationDto o1, DailyPushNotificationDto o2) {
+			return LocalTime.parse(o1.getAlarmClock()).compareTo(LocalTime.parse(o2.getAlarmClock()));
+		}
+	};
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -205,6 +215,8 @@ public class DailyPushNotificationListFragment extends Fragment {
 		repository.getAll(new DbQueryCallback<List<DailyPushNotificationDto>>() {
 			@Override
 			public void onResultSuccessful(List<DailyPushNotificationDto> result) {
+				Collections.sort(result, sortComparator);
+
 				if (getActivity() != null) {
 					getActivity().runOnUiThread(new Runnable() {
 						@Override

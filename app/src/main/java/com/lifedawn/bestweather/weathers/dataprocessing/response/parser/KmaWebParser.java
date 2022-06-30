@@ -101,6 +101,7 @@ public class KmaWebParser {
 		String windDirection = null;
 		String windSpeed = null;
 		String humidity = null;
+		boolean thunder = false;
 		boolean hasShower = false;
 
 		final String hour24 = "24:00";
@@ -139,6 +140,17 @@ public class KmaWebParser {
 					hasShower = ul.attr("data-sonagi").equals("1");
 				}
 				weatherDescription = lis.get(1).getElementsByTag("span").get(1).text();
+
+				if (lis.get(1).getElementsByTag("span").size() >= 3) {
+					if (lis.get(1).getElementsByTag("span").get(2).className().equals("lgt")) {
+						thunder = true;
+					} else {
+						thunder = false;
+					}
+				} else {
+					thunder = false;
+				}
+
 				temp = lis.get(2).getElementsByTag("span").get(1).childNode(0).toString().replace(degree, "");
 				feelsLikeTemp = lis.get(3).getElementsByTag("span").get(1).text().replace(degree, "");
                 /*
@@ -250,7 +262,7 @@ public class KmaWebParser {
 				kmaHourlyForecast.setHour(zonedDateTime).setWeatherDescription(weatherDescription)
 						.setTemp(temp).setFeelsLikeTemp(feelsLikeTemp)
 						.setPop(pop).setWindDirection(windDirection).setWindSpeed(windSpeed).setHumidity(humidity)
-						.setHasShower(hasShower);
+						.setHasShower(hasShower).setHasThunder(thunder);
 				kmaHourlyForecasts.add(kmaHourlyForecast);
 
 			}

@@ -255,6 +255,14 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		}
 	}
 
+	public static int getWeatherIconImgWeb(String weatherDescriptionKr, boolean night, boolean thunder) {
+		if (thunder) {
+			return R.drawable.thunderstorm;
+		} else {
+			return getWeatherIconImgWeb(weatherDescriptionKr, night);
+		}
+	}
+
 
 	public static String getWeatherMidIconDescription(String code) {
 		return WEATHER_MID_ICON_DESCRIPTION_MAP.get(code);
@@ -813,6 +821,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 		String rainVolume;
 		boolean hasRain;
 		boolean hasSnow;
+		boolean hasThunder;
 		String windSpeed = null;
 		int humidity = 0;
 		Double feelsLikeTemp = 0.0;
@@ -838,6 +847,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 				snowVolume = finalHourlyForecast.getSnowVolume();
 			}
 
+			hasThunder = finalHourlyForecast.isHasThunder();
+
 			itemCalendar.setTimeInMillis(finalHourlyForecast.getHour().toInstant().toEpochMilli());
 			sunRise = sunSetRiseDataMap.get(finalHourlyForecast.getHour().getDayOfYear()).getSunrise();
 			sunSet = sunSetRiseDataMap.get(finalHourlyForecast.getHour().getDayOfYear()).getSunset();
@@ -851,9 +862,10 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 					.setHasRain(hasRain)
 					.setHasSnow(hasSnow)
 					.setSnowVolume(snowVolume)
+					.setHasThunder(hasThunder)
 					.setPrecipitationVolume(zeroPrecipitationVolume)
 					.setWeatherIcon(getWeatherIconImgWeb(finalHourlyForecast.getWeatherDescription(),
-							isNight))
+							isNight, hasThunder))
 					.setWeatherDescription(getWeatherDescriptionWeb(finalHourlyForecast.getWeatherDescription()))
 					.setHumidity(finalHourlyForecast.getHumidity()).setPop(!finalHourlyForecast.getPop().contains("%") ?
 							"-" : finalHourlyForecast.getPop());

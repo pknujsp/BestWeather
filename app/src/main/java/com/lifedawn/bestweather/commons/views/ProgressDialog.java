@@ -39,8 +39,6 @@ public class ProgressDialog {
 			WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
 			layoutParams.copyFrom(dialog.getWindow().getAttributes());
 			layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
-			//layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-			//window.setAttributes(layoutParams);
 		}
 
 		if (cancelOnClickListener == null) {
