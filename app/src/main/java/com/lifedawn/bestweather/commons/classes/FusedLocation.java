@@ -39,6 +39,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -130,8 +131,9 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				}
 
 				LocationRequest locationRequest = LocationRequest.create();
-				locationRequest.setInterval(600);
-				locationRequest.setFastestInterval(300);
+				locationRequest.setInterval(1000);
+				locationRequest.setFastestInterval(200);
+				locationRequest.setPriority(Priority.PRIORITY_HIGH_ACCURACY);
 
 				Timer timer = new Timer();
 
@@ -183,10 +185,10 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 						fusedLocationClient.removeLocationUpdates(locationCallback);
 						myLocationCallback.onFailed(MyLocationCallback.Fail.TIME_OUT);
 					}
-				}, 5000L);
+				}, 6000L);
 
 				@SuppressLint("MissingPermission")
-				Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY,
+				Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY,
 						cancellationTokenSource.getToken());
 
 				locationRequestObj.currentLocationTask = currentLocationTask;

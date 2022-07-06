@@ -66,6 +66,7 @@
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/notiSwitch"
+                    android:checked="false"
                     style="@style/Switch" />
 
                 <ImageButton

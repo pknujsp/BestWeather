@@ -168,10 +168,10 @@
 
     <dimen name="headerViewOfDetailForecastItemHeight">140dp</dimen>
     <dimen name="tempTopMargin">2dp</dimen>
-    <dimen name="tempTextSizeInDailyForecastItem">11sp</dimen>
+    <dimen name="tempTextSizeInDailyForecastItem">12sp</dimen>
     <dimen name="dateTextSizeInDailyForecastItem">12sp</dimen>
     <dimen name="hourTextSizeInHourlyForecastItem">12sp</dimen>
-    <dimen name="tempTextSizeInHourlyForecastItem">11sp</dimen>
+    <dimen name="tempTextSizeInHourlyForecastItem">12sp</dimen>
     <dimen name="dateTimeTextSizeInSimpleWidgetForecastItem">12sp</dimen>
     <dimen name="tempTextSizeInSimpleWidgetForecastItem">13sp</dimen>
     <dimen name="currentLabelTextSizeInCurrentConditionsViewForSimpleWidget">12sp</dimen>

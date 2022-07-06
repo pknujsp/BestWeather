@@ -203,13 +203,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		@Override
 		public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
 			super.onFragmentResumed(fm, f);
-			if (f instanceof SunsetriseFragment) {
-				binding.scrollView.setVisibility(View.VISIBLE);
-				if (loadingDialog != null) {
-					loadingDialog.dismiss();
-					loadingDialog = null;
-				}
-			}
+
 		}
 
 		@Override
@@ -573,7 +567,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		@Override
 		public void onFailed(Fail fail) {
-			loadingDialog.dismiss();
+			ProgressDialog.clearDialogs();
 			loadingDialog = null;
 
 			locationCallbackInMainFragment.onFailed(fail);
@@ -1322,7 +1316,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			loadImgOfCurrentConditions(mainWeatherProviderType, finalCurrentConditionsWeatherVal, latitude, longitude,
 					finalZoneId, finalPrecipitationVolume);
 
-			getActivity().runOnUiThread(new Runnable() {
+			MainThreadWorker.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					changeWeatherDataSourcePicker(countryCode);
@@ -1348,7 +1342,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							getString(R.string.tag_detail_current_conditions_fragment));
 					fragmentTransaction.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment));
 					fragmentTransaction.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
-							getString(R.string.tag_sun_set_rise_fragment)).commitAllowingStateLoss();
+							getString(R.string.tag_sun_set_rise_fragment)).commitNowAllowingStateLoss();
+
+					binding.scrollView.setVisibility(View.VISIBLE);
+					ProgressDialog.clearDialogs();
 				}
 			});
 

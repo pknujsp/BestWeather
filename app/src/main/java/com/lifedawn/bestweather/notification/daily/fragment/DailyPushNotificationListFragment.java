@@ -275,43 +275,31 @@ public class DailyPushNotificationListFragment extends Fragment {
 
 		private class ViewHolder extends RecyclerView.ViewHolder {
 			private ViewDailyPushNotificationItemBinding binding;
+			private boolean init = true;
 
 			public ViewHolder(@NonNull @NotNull View itemView) {
 				super(itemView);
 				binding = ViewDailyPushNotificationItemBinding.bind(itemView);
-			}
-
-			public void onBind() {
-				int pos = getBindingAdapterPosition();
-				DailyPushNotificationDto dto = notificationList.get(pos);
-
-				binding.hours.setText(LocalTime.parse(dto.getAlarmClock()).format(hoursFormatter));
-				binding.notiSwitch.setChecked(dto.isEnabled());
-				binding.notificationType.setText(DailyPushNotificationType.getNotificationName(dto.getNotificationType(), context));
-
-				String addressName = dto.getLocationType() == LocationType.SelectedAddress ? dto.getAddressName() :
-						context.getString(R.string.current_location);
-				binding.location.setText(addressName);
-
-				binding.getRoot().setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						onClickedItemListener.onClickedItem(notificationList.get(pos));
-					}
-				});
 
 				binding.notiSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-					boolean init = false;
 
 					@Override
 					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 						if (init) {
-							init = false;
 							return;
 						}
-						onCheckedSwitchInListListener.onCheckedSwitch(notificationList.get(pos), isChecked);
+						onCheckedSwitchInListListener.onCheckedSwitch(notificationList.get(getBindingAdapterPosition()), isChecked);
+					}
+
+				});
+
+				binding.getRoot().setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						onClickedItemListener.onClickedItem(notificationList.get(getBindingAdapterPosition()));
 					}
 				});
+
 
 				binding.control.setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -325,7 +313,7 @@ public class DailyPushNotificationListFragment extends Fragment {
 							public boolean onMenuItemClick(MenuItem menuItem) {
 								switch (menuItem.getItemId()) {
 									default:
-										onClickedPopupMenuItemListener.onClickedItem(dto, 0);
+										onClickedPopupMenuItemListener.onClickedItem(notificationList.get(getBindingAdapterPosition()), getBindingAdapterPosition());
 								}
 								return true;
 							}
@@ -334,7 +322,22 @@ public class DailyPushNotificationListFragment extends Fragment {
 						popupMenu.show();
 					}
 				});
+			}
 
+			public void onBind() {
+				init = true;
+				final int pos = getBindingAdapterPosition();
+				DailyPushNotificationDto dto = notificationList.get(pos);
+
+				binding.hours.setText(LocalTime.parse(dto.getAlarmClock()).format(hoursFormatter));
+				binding.notiSwitch.setChecked(dto.isEnabled());
+
+				binding.notificationType.setText(DailyPushNotificationType.getNotificationName(dto.getNotificationType(), context));
+
+				String addressName = dto.getLocationType() == LocationType.SelectedAddress ? dto.getAddressName() :
+						context.getString(R.string.current_location);
+				binding.location.setText(addressName);
+				init=false;
 			}
 
 		}
