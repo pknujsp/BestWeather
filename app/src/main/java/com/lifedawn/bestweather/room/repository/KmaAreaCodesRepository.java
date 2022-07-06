@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.room.repository;
 
 import android.content.Context;
 
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.AppDb;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dao.KmaAreaCodesDao;
@@ -19,7 +20,7 @@ public class KmaAreaCodesRepository implements KmaAreaCodesQuery {
 
 	@Override
 	public void getAreaCodes(double latitude, double longitude, DbQueryCallback<List<KmaAreaCodeDto>> callback) {
-		new Thread(new Runnable() {
+		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
 				List<KmaAreaCodeDto> list = kmaAreaCodesDao.getAreaCodes(latitude, longitude);
@@ -29,7 +30,7 @@ public class KmaAreaCodesRepository implements KmaAreaCodesQuery {
 					callback.onResultSuccessful(list);
 				}
 			}
-		}).start();
+		});
 	}
 
 	@Override

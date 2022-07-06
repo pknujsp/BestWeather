@@ -53,6 +53,7 @@ public final class KmaProcessing {
 	public static Call<String> getCurrentConditionsData(KmaCurrentConditionsParameters parameter, JsonDownloader callback) {
 		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS);
 		Call<String> call = queries.getKmaCurrentConditions(parameter.getParametersMap());
+
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {

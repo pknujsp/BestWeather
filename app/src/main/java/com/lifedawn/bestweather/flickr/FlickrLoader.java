@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.flickr;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -16,6 +17,7 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.client.Queries;
@@ -53,17 +55,17 @@ import retrofit2.Response;
 public class FlickrLoader {
 	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
 	private static final Set<ImgRequestObj> IMG_REQUEST_OBJ_SET = new HashSet<>();
-	private static final ExecutorService executorService = Executors.newFixedThreadPool(2);
+	private static final ExecutorService executorService = Executors.newFixedThreadPool(3);
 
 	private FlickrLoader() {
 	}
 
-	public static void loadImg(Activity activity, WeatherProviderType weatherProviderType, String val, Double latitude, Double longitude,
+	public static void loadImg(Context context, WeatherProviderType weatherProviderType, String val, Double latitude, Double longitude,
 	                           ZoneId zoneId, String volume, GlideImgCallback glideImgCallback, ZonedDateTime refreshDateTime) {
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				cancelAllRequest(activity);
+				cancelAllRequest(context);
 				final ZonedDateTime lastRefreshDateTime = refreshDateTime.withZoneSameInstant(zoneId);
 
 				SimpleTimeZone timeZone = new SimpleTimeZone(lastRefreshDateTime.getOffset().getTotalSeconds() * 1000, "");
@@ -141,7 +143,7 @@ public class FlickrLoader {
 					Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
 					Call<JsonElement> call = queries.getPhotosFromGallery(photosFromGalleryParameter.getMap());
 
-					ImgRequestObj imgRequestObj = new ImgRequestObj();
+					final ImgRequestObj imgRequestObj = new ImgRequestObj();
 					IMG_REQUEST_OBJ_SET.add(imgRequestObj);
 					imgRequestObj.galleryCall = call;
 
@@ -151,6 +153,12 @@ public class FlickrLoader {
 					call.enqueue(new Callback<JsonElement>() {
 						@Override
 						public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+							if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
+								Log.e("on loadImg", "메인 스레드");
+							} else {
+								Log.e("on loadImg", "백그라운드 스레드");
+							}
+
 							Gson gson = new Gson();
 							final PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
 									PhotosFromGalleryResponse.class);
@@ -212,7 +220,14 @@ public class FlickrLoader {
 												}
 											};
 
-											Glide.with(activity).asBitmap().load(backgroundImgUrl).diskCacheStrategy(DiskCacheStrategy.ALL).into(imgRequestObj.glideTarget);
+											MainThreadWorker.runOnUiThread(new Runnable() {
+												@Override
+												public void run() {
+													Glide.with(context).asBitmap().load(backgroundImgUrl)
+															.diskCacheStrategy(DiskCacheStrategy.ALL).into(imgRequestObj.glideTarget);
+												}
+											});
+
 										}
 
 										@Override
@@ -220,7 +235,6 @@ public class FlickrLoader {
 											glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
 										}
 									});
-
 
 								} else {
 									glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
@@ -242,12 +256,12 @@ public class FlickrLoader {
 
 	}
 
-	public static void cancelAllRequest(Activity activity) {
-		Glide.with(activity).pauseAllRequests();
+	public static void cancelAllRequest(Context context) {
+		Glide.with(context).pauseAllRequests();
 
 		for (ImgRequestObj imgRequestObj : IMG_REQUEST_OBJ_SET) {
 			if (imgRequestObj.glideTarget != null) {
-				Glide.with(activity).clear(imgRequestObj.glideTarget);
+				Glide.with(context).clear(imgRequestObj.glideTarget);
 			} else if (imgRequestObj.getPhotoInfoCall != null) {
 				imgRequestObj.getPhotoInfoCall.cancel();
 			} else if (imgRequestObj.galleryCall != null) {

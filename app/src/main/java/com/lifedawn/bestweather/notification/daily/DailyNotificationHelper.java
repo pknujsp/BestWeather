@@ -38,7 +38,7 @@ public class DailyNotificationHelper {
 		bundle.putString("DailyPushNotificationType", dailyPushNotificationDto.getNotificationType().name());
 
 		refreshIntent.putExtras(bundle);
-		return PendingIntent.getBroadcast(context, dailyPushNotificationDto.getId() + 7000, refreshIntent, flags);
+		return PendingIntent.getBroadcast(context, dailyPushNotificationDto.getId() + 10000, refreshIntent, flags);
 	}
 
 	public void enablePushNotification(DailyPushNotificationDto dailyPushNotificationDto) {

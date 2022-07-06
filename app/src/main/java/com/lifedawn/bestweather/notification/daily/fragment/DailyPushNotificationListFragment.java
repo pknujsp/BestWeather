@@ -117,15 +117,15 @@ public class DailyPushNotificationListFragment extends Fragment {
 						settingsFragment.setArguments(bundle);
 
 						getParentFragmentManager().beginTransaction().hide(DailyPushNotificationListFragment.this).add(R.id.fragment_container,
-								settingsFragment, tag).addToBackStack(tag).commit();
+								settingsFragment, tag).addToBackStack(tag).commitAllowingStateLoss();
 					}
 				}, new OnCheckedSwitchInListListener<DailyPushNotificationDto>() {
 					@Override
 					public void onCheckedSwitch(DailyPushNotificationDto dailyPushNotificationDto, boolean isChecked) {
 						dailyPushNotificationDto.setEnabled(isChecked);
+						repository.update(dailyPushNotificationDto, null);
 						dailyNotificationHelper.modifyPushNotification(dailyPushNotificationDto);
 
-						repository.update(dailyPushNotificationDto, null);
 						String text = LocalTime.parse(dailyPushNotificationDto.getAlarmClock()).format(hoursFormatter)
 								+ ", ";
 
@@ -296,15 +296,23 @@ public class DailyPushNotificationListFragment extends Fragment {
 				binding.getRoot().setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						onClickedItemListener.onClickedItem(notificationList.get(getAdapterPosition()));
+						onClickedItemListener.onClickedItem(notificationList.get(pos));
 					}
 				});
+
 				binding.notiSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+					boolean init = false;
+
 					@Override
 					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-						onCheckedSwitchInListListener.onCheckedSwitch(notificationList.get(getAdapterPosition()), isChecked);
+						if (init) {
+							init = false;
+							return;
+						}
+						onCheckedSwitchInListListener.onCheckedSwitch(notificationList.get(pos), isChecked);
 					}
 				});
+
 				binding.control.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {

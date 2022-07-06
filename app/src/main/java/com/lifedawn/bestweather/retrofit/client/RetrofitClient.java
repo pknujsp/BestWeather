@@ -1,5 +1,8 @@
 package com.lifedawn.bestweather.retrofit.client;
 
+import com.lifedawn.bestweather.main.MyApplication;
+
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
@@ -59,13 +62,15 @@ public class RetrofitClient {
 			case KMA_WEB_CURRENT_CONDITIONS:
 			case KMA_WEB_FORECASTS:
 				Retrofit kmaHtmlInstance = new Retrofit.Builder().client(client).addConverterFactory(ScalarsConverterFactory.create())
+						.callbackExecutor(Executors.newSingleThreadExecutor())
 						.baseUrl(KMA_CURRENT_CONDITIONS_AND_HOURLY_AND_DAILY_FORECAST_URL).build();
 				return kmaHtmlInstance.create(Queries.class);
 
 			case KMA_MID_LAND_FCST:
 			case KMA_MID_TA_FCST:
 				Retrofit midFcstInstance = new Retrofit.Builder().client(client)
-						.baseUrl(MID_FCST_INFO_SERVICE_URL)
+						.baseUrl(MID_FCST_INFO_SERVICE_URL).callbackExecutor(Executors.newSingleThreadExecutor())
+
 						.addConverterFactory(ScalarsConverterFactory.create())
 						.build();
 				return midFcstInstance.create(Queries.class);
@@ -74,7 +79,8 @@ public class RetrofitClient {
 			case KMA_YESTERDAY_ULTRA_SRT_NCST:
 			case KMA_ULTRA_SRT_FCST:
 			case KMA_VILAGE_FCST:
-				Retrofit vilageFcstInstance = new Retrofit.Builder().client(client).baseUrl(VILAGE_FCST_INFO_SERVICE_URL)
+				Retrofit vilageFcstInstance = new Retrofit.Builder().client(client).baseUrl(VILAGE_FCST_INFO_SERVICE_URL).callbackExecutor(Executors.newSingleThreadExecutor())
+
 						.addConverterFactory(ScalarsConverterFactory.create())
 						.build();
 				return vilageFcstInstance.create(Queries.class);
@@ -84,46 +90,53 @@ public class RetrofitClient {
 			case ACCU_CURRENT_CONDITIONS:
 			case ACCU_DAILY_FORECAST:
 				Retrofit accuWeatherInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						ACCU_WEATHER_SERVICE_URL).build();
+								GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
+								ACCU_WEATHER_SERVICE_URL).callbackExecutor(Executors.newSingleThreadExecutor())
+						.build();
 				return accuWeatherInstance.create(Queries.class);
 
 			case MET_NORWAY_LOCATION_FORECAST:
 				Retrofit metNorwayLocationForecastsInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						MET_NORWAY_LOCATION_FORECAST_SERVICE_URL).build();
+								GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
+								MET_NORWAY_LOCATION_FORECAST_SERVICE_URL).callbackExecutor(Executors.newSingleThreadExecutor())
+						.build();
 				return metNorwayLocationForecastsInstance.create(Queries.class);
 
 			case AQICN_GEOLOCALIZED_FEED:
 				Retrofit aqiCnGeolocalizedInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						AQICN_GEOLOCALIZED_FEED_SERVICE_URL).build();
+								GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
+								AQICN_GEOLOCALIZED_FEED_SERVICE_URL).callbackExecutor(Executors.newSingleThreadExecutor())
+						.build();
 				return aqiCnGeolocalizedInstance.create(Queries.class);
 
 			case OWM_CURRENT_CONDITIONS:
 			case OWM_DAILY_FORECAST:
 			case OWM_ONE_CALL:
 				Retrofit owmBeginApiInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						DEFAULT_OPEN_WEATHER_MAP_SERVICE_URL).build();
+								GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
+								DEFAULT_OPEN_WEATHER_MAP_SERVICE_URL).callbackExecutor(Executors.newSingleThreadExecutor())
+						.build();
 				return owmBeginApiInstance.create(Queries.class);
 
 			case OWM_HOURLY_FORECAST:
 				Retrofit owmBeginProInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						PRO_OPEN_WEATHER_MAP_SERVICE_URL).build();
+								GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
+								PRO_OPEN_WEATHER_MAP_SERVICE_URL).callbackExecutor(Executors.newSingleThreadExecutor())
+						.build();
 				return owmBeginProInstance.create(Queries.class);
 
 			case FLICKR:
 				Retrofit flickrInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						FLICKR_SERVICE_URL).build();
+								GsonConverterFactory.create()).callbackExecutor(Executors.newSingleThreadExecutor())
+						.addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
+								FLICKR_SERVICE_URL).build();
 				return flickrInstance.create(Queries.class);
 
 			case GOOGLE_PLACE_SEARCH:
 				Retrofit googlePlaceSearchInstance = new Retrofit.Builder().client(client).addConverterFactory(
-						GsonConverterFactory.create()).addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-						GOOGLE_PLACE_SEARCH_SERVICE_URL).build();
+								GsonConverterFactory.create()).callbackExecutor(Executors.newSingleThreadExecutor())
+						.addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
+								GOOGLE_PLACE_SEARCH_SERVICE_URL).build();
 				return googlePlaceSearchInstance.create(Queries.class);
 
 			default:

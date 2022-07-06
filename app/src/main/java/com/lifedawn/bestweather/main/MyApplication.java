@@ -23,9 +23,14 @@ import java.util.concurrent.Executors;
 
 public class MyApplication extends Application {
 	public final static ValueUnitObj VALUE_UNIT_OBJ = new ValueUnitObj();
-	private static final ExecutorService executorService = Executors.newFixedThreadPool(4);
+	private static final ExecutorService executorService = Executors.newFixedThreadPool(5);
 	private static int statusBarHeight;
 	private static String localeCountryCode;
+
+	@Override
+	public void onTerminate() {
+		super.onTerminate();
+	}
 
 	@Override
 	public void onCreate() {

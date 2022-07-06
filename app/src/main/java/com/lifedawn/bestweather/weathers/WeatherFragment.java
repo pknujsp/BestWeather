@@ -52,6 +52,7 @@ import com.lifedawn.bestweather.alert.AlertFragment;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.classes.TextUtil;
 import com.lifedawn.bestweather.commons.classes.WeatherViewController;
@@ -243,13 +244,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	/**
-	 *
 	 * hidden is true이면 black, else white
 	 */
 	@Override
 	public void onHiddenChanged(boolean hidden) {
 		super.onHiddenChanged(hidden);
-		
+
 		if (hidden) {
 			// 상단바 블랙으로
 			getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
@@ -523,21 +523,19 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void loadImgOfCurrentConditions(WeatherProviderType weatherProviderType, String val, Double latitude, Double longitude,
 	                                       ZoneId zoneId, String volume) {
-		if (getActivity() != null) {
-			getActivity().runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					binding.loadingAnimation.setVisibility(View.VISIBLE);
-					binding.flickrImageUrl.setVisibility(View.GONE);
-				}
-			});
-		}
+		MainThreadWorker.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				binding.loadingAnimation.setVisibility(View.VISIBLE);
+				binding.flickrImageUrl.setVisibility(View.GONE);
+			}
+		});
 
-		FlickrLoader.loadImg(requireActivity(), weatherProviderType, val, latitude, longitude, zoneId, volume, new FlickrLoader.GlideImgCallback() {
+		FlickrLoader.loadImg(getContext(), weatherProviderType, val, latitude, longitude, zoneId, volume, new FlickrLoader.GlideImgCallback() {
 			@Override
 			public void onLoadedImg(FlickrImgObj flickrImgObj, boolean successful) {
 				if (getActivity() != null && isAdded()) {
-					requireActivity().runOnUiThread(new Runnable() {
+					MainThreadWorker.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
 							if (successful) {

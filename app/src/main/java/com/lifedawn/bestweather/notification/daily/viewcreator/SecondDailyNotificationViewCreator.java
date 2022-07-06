@@ -61,8 +61,10 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 		} else {
 			precipitation = context.getString(R.string.not_precipitation);
 		}
+
+		String humidity = context.getString(R.string.humidity) + ": " + currentConditionsDto.getHumidity();
 		remoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
-		remoteViews.setTextViewText(R.id.humidity, currentConditionsDto.getHumidity());
+		remoteViews.setTextViewText(R.id.humidity, humidity);
 		remoteViews.setTextViewText(R.id.precipitation, precipitation);
 		remoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
 
@@ -72,8 +74,8 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 			String yesterdayCompText = WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
 					currentConditionsDto.getYesterdayTemp(), tempUnit, context);
 			remoteViews.setTextViewText(R.id.yesterdayTemperature, yesterdayCompText);
-		}else {
-			remoteViews.setViewVisibility(R.id.yesterdayTemperature,View.GONE);
+		} else {
+			remoteViews.setViewVisibility(R.id.yesterdayTemperature, View.GONE);
 		}
 
 		if (currentConditionsDto.getWindDirection() != null) {
