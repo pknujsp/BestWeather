@@ -58,7 +58,7 @@ public class MainProcessing {
 		if (requestWeatherSources.containsKey(WeatherProviderType.AQICN)) {
 			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader);
 		}
-		
+
 		return multipleRestApiDownloader;
 	}
 
