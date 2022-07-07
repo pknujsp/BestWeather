@@ -5,6 +5,7 @@
     <string name="kma">KoreaMA</string>
     <string name="accu_weather" translatable="false">AccuWeather</string>
     <string name="owm" translatable="false">OpenWeatherMap</string>
+    <string name="met">Meteorologisk institutt</string>
 
     <!-- airquality -->
     <string name="pm10_str">PM10</string>
@@ -51,6 +52,9 @@
 
     <string name="pref_summary_open_weather_map">The company is headquartered in London, UK, and handles weather information for most of the world.</string>
     <string name="pref_title_open_weather_map" translatable="false">OpenWeatherMap</string>
+
+    <string name="pref_summary_met">The Meteorological Institute is a state agency subordinate to the Ministry of Norway Climate and
+        Environment.</string>
 
     <string name="pref_summary_kma_top_priority">If the requested weather data is in the Republic of Korea, data from the Korea Meteorological Administration is displayed by default.</string>
     <string name="pref_title_kma_top_priority">The Korea MA is set as a top priority</string>

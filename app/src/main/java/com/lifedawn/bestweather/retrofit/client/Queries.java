@@ -65,7 +65,10 @@ public interface Queries {
 
 	//met norway---------------------------------------------------------------------------------------------------------
 	//https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=35.235421&lon=128.868227
-	@Headers("User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
+	//@Headers("User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 " +
+//			"Safari/537.36")
+
+	@Headers("User-Agent: BestWeatherApp https://github.com/pknujsp")
 	@GET("locationforecast/2.0/complete")
 	Call<JsonElement> getMetNorwayLocationForecast(@QueryMap(encoded = true) Map<String, String> queryMap);
 

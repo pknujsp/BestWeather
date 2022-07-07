@@ -65,13 +65,7 @@ public class WeatherSourcesFragment extends Fragment {
 		binding.accuWeather.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (!isChecked) {
-					binding.openWeatherMap.setChecked(true);
-				}
-				if (isChecked && binding.openWeatherMap.isChecked()) {
-					binding.openWeatherMap.setChecked(false);
-				}
-				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_accu_weather), isChecked).apply();
+
 			}
 		});
 		
@@ -79,12 +73,25 @@ public class WeatherSourcesFragment extends Fragment {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (!isChecked) {
-					binding.accuWeather.setChecked(true);
+					binding.yr.setChecked(true);
 				}
-				if (isChecked && binding.accuWeather.isChecked()) {
-					binding.accuWeather.setChecked(false);
+				if (isChecked && binding.yr.isChecked()) {
+					binding.yr.setChecked(false);
 				}
 				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_open_weather_map), isChecked).apply();
+			}
+		});
+
+		binding.yr.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (!isChecked) {
+					binding.openWeatherMap.setChecked(true);
+				}
+				if (isChecked && binding.openWeatherMap.isChecked()) {
+					binding.openWeatherMap.setChecked(false);
+				}
+				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_met), isChecked).apply();
 			}
 		});
 		

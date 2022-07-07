@@ -1368,22 +1368,28 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				binding.weatherDataSourceName.setText(R.string.owm);
 				binding.weatherDataSourceIcon.setImageResource(R.drawable.owmicon);
 				break;
+			case MET_NORWAY:
+				binding.weatherDataSourceName.setText(R.string.met);
+				binding.weatherDataSourceIcon.setImageResource(R.drawable.metlogo);
+				break;
 		}
 
 		binding.weatherDataSourceLayout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				CharSequence[] items = new CharSequence[countryCode.equals("KR") ? 2 : 1];
+				CharSequence[] items = new CharSequence[countryCode.equals("KR") ? 3 : 2];
 				int checkedItemIdx = 0;
 
 				if (countryCode.equals("KR")) {
 					items[0] = getString(R.string.kma);
 					items[1] = getString(R.string.owm);
+					items[2] = getString(R.string.met);
 
-					checkedItemIdx = (mainWeatherProviderType == WeatherProviderType.KMA_WEB) ? 0 : 1;
+					checkedItemIdx = (mainWeatherProviderType == WeatherProviderType.KMA_WEB) ? 0 : 2;
 				} else {
 					items[0] = getString(R.string.owm);
-					checkedItemIdx = 0;
+					items[1] = getString(R.string.met);
+					checkedItemIdx = 1;
 				}
 				final int finalCheckedItemIdx = checkedItemIdx;
 
@@ -1395,10 +1401,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 								WeatherProviderType newWeatherProviderType;
 
 								if (finalCheckedItemIdx != index) {
-									if (!items[index].equals(getString(R.string.kma))) {
-										newWeatherProviderType = WeatherProviderType.OWM_ONECALL;
-									} else {
+									if (items[index].equals(getString(R.string.kma))) {
 										newWeatherProviderType = WeatherProviderType.KMA_WEB;
+									} else if (items[index].equals(getString(R.string.met))) {
+										newWeatherProviderType = WeatherProviderType.MET_NORWAY;
+									} else {
+										newWeatherProviderType = WeatherProviderType.OWM_ONECALL;
 									}
 									requestNewDataWithAnotherWeatherSource(newWeatherProviderType, lastWeatherProviderType);
 								}

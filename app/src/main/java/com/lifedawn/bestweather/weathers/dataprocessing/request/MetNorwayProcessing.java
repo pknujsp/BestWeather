@@ -1,12 +1,16 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.request;
 
 import com.google.gson.JsonElement;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestMet;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.metnorway.LocationForecastParameter;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,7 +39,10 @@ public class MetNorwayProcessing {
 		return call;
 	}
 
-	public static void getMetNorwayForecasts(String latitude, String longitude, MultipleRestApiDownloader multipleRestApiDownloader) {
+	public static void getMetNorwayForecasts(String latitude, String longitude, RequestMet requestMet,
+	                                         MultipleRestApiDownloader multipleRestApiDownloader) {
+		Set<RetrofitClient.ServiceType> serviceTypeSet = requestMet.getRequestServiceTypes();
+
 		LocationForecastParameter locationForecastParameter = new LocationForecastParameter();
 		locationForecastParameter.setLatitude(latitude).setLongitude(longitude);
 		Call<JsonElement> locationForecastCall = getLocationForecast(locationForecastParameter, new JsonDownloader() {

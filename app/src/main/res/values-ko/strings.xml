@@ -2,6 +2,8 @@
 <resources>
     <string name="app_name">날씨:</string>
     <string name="kma">대한민국 기상청</string>
+    <string name="met">노르웨이 기상청</string>
+
     <string name="pm10_str">미세먼지</string>
     <string name="pm25_str">초미세먼지</string>
     <string name="o3_str">오존</string>
@@ -37,6 +39,7 @@
     <string name="pref_summary_weather_data_sources">OpenWeatherMap, 기상청</string>
     <string name="pref_title_weather_data_sources">날씨 제공사</string>
     <string name="pref_title_forecast_view_type">예보 데이터 목록의 표시 유형</string>
+    <string name="pref_summary_met">노르웨이 기상청은 노르웨이 기후환경부에 소속된 국가기관 입니다.</string>
     <string name="black">검정</string>
     <string name="white">하양</string>
     <string name="wind_direction_N">북</string>

@@ -16,6 +16,8 @@
 
     <string name="pref_key_open_weather_map" translatable="false">pref_key_open_weather_map</string>
 
+    <string name="pref_key_met" translatable="false">pref_key_met</string>
+
     <string name="pref_key_kma_top_priority" translatable="false">pref_key_kma_top_priority</string>
 
     <string name="pref_key_use_current_location" translatable="false">pref_key_use_current_location</string>

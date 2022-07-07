@@ -5,6 +5,7 @@ import android.util.ArrayMap;
 
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestMet;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
@@ -41,6 +42,10 @@ public class MainProcessing {
 			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherProviderType.KMA_WEB),
 					multipleRestApiDownloader);
 		}
+		if (requestWeatherSources.containsKey(WeatherProviderType.MET_NORWAY)) {
+			MetNorwayProcessing.getMetNorwayForecasts(latitude.toString(), longitude.toString(),
+					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), multipleRestApiDownloader);
+		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.OWM_ONECALL)) {
 			OpenWeatherMapProcessing.requestWeatherDataOneCall(context, latitude, longitude,
 					(RequestOwmOneCall) requestWeatherSources.get(WeatherProviderType.OWM_ONECALL), multipleRestApiDownloader);
@@ -53,7 +58,7 @@ public class MainProcessing {
 		if (requestWeatherSources.containsKey(WeatherProviderType.AQICN)) {
 			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader);
 		}
-
+		
 		return multipleRestApiDownloader;
 	}
 

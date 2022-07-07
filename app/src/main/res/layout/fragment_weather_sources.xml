@@ -26,7 +26,8 @@
                     android:layout_alignTop="@id/accu_weather_name"
                     android:layout_alignBottom="@id/accu_weather_name"
                     android:layout_alignParentLeft="true"
-                    android:src="@drawable/accuicon" />
+                    android:src="@drawable/accuicon"
+                    />
 
                 <TextView
                     android:id="@+id/accu_weather_name"
@@ -76,7 +77,8 @@
                     android:layout_alignTop="@id/open_weather_map_name"
                     android:layout_alignBottom="@id/open_weather_map_name"
                     android:layout_alignParentLeft="true"
-                    android:src="@drawable/owmicon" />
+                    android:src="@drawable/owmicon"
+                    />
 
                 <TextView
                     android:id="@+id/open_weather_map_name"
@@ -88,7 +90,8 @@
                     android:text="@string/owm"
 
                     android:textColor="@color/black"
-                    android:textSize="22sp" />
+                    android:textSize="22sp"
+                    />
 
                 <TextView
                     android:id="@+id/open_weather_map_description"
@@ -114,6 +117,59 @@
 
             </RelativeLayout>
 
+            <RelativeLayout
+                android:id="@+id/yr_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp">
+
+                <ImageView
+                    android:id="@+id/yricon"
+                    android:layout_width="32dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/yr_name"
+                    android:layout_alignBottom="@id/yr_name"
+                    android:layout_alignParentLeft="true"
+                    android:src="@drawable/metlogo"
+                    />
+
+                <TextView
+                    android:id="@+id/yr_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_toLeftOf="@id/yr"
+                    android:layout_toRightOf="@id/yricon"
+                    android:text="@string/met"
+
+                    android:textColor="@color/black"
+                    android:textSize="22sp"
+                    />
+
+                <TextView
+                    android:id="@+id/yrp_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:layout_below="@id/yr_name"
+                    android:layout_alignLeft="@id/yr_name"
+                    android:layout_toLeftOf="@id/yr"
+                    android:text="@string/pref_summary_met"
+                    android:textSize="14sp" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/yr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignTop="@id/yr_name"
+                    android:layout_alignBottom="@id/yr_name"
+                    android:layout_alignParentRight="true"
+                    android:checked="true"
+                    android:enabled="false"
+                    android:gravity="center_vertical" />
+
+            </RelativeLayout>
+
 
             <RelativeLayout
                 android:id="@+id/kma_priority_layout"
@@ -128,7 +184,8 @@
                     android:layout_alignTop="@id/kma_top_priority_title"
                     android:layout_alignBottom="@id/kma_top_priority_title"
                     android:layout_alignParentLeft="true"
-                    android:src="@drawable/kmaicon" />
+                    android:src="@drawable/kmaicon"
+                    />
 
                 <TextView
                     android:id="@+id/kma_top_priority_title"
