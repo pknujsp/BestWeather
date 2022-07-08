@@ -2,6 +2,8 @@ package com.lifedawn.bestweather.weathers.models;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DailyForecastDto implements Serializable {
 	private ZonedDateTime date;
@@ -9,6 +11,7 @@ public class DailyForecastDto implements Serializable {
 
 	private Values amValues;
 	private Values pmValues;
+	private List<Values> valuesList = new ArrayList<>();
 	private Values singleValues;
 
 	private String minTemp;
@@ -19,6 +22,7 @@ public class DailyForecastDto implements Serializable {
 	public final static class Values implements Serializable {
 		private int weatherIcon;
 		private String weatherDescription;
+		private ZonedDateTime dateTime;
 
 		private String pop;
 		private String pos;
@@ -27,6 +31,10 @@ public class DailyForecastDto implements Serializable {
 		private String precipitationVolume;
 		private String rainVolume;
 		private String snowVolume;
+
+		private String minTemp;
+		private String maxTemp;
+		private String temp;
 
 		private String windDirection;
 		private int windDirectionVal;
@@ -41,10 +49,76 @@ public class DailyForecastDto implements Serializable {
 		private String uvIndex;
 		private String precipitationType;
 		private int precipitationTypeIcon;
+		private int PrecipitationNextHoursAmount;
 
 		private boolean hasRainVolume;
 		private boolean hasSnowVolume;
 		private boolean hasPrecipitationVolume;
+		private boolean hasPop;
+		private boolean hasPrecipitationNextHoursAmount;
+
+		public String getTemp() {
+			return temp;
+		}
+
+		public Values setTemp(String temp) {
+			this.temp = temp;
+			return this;
+		}
+
+		public String getMinTemp() {
+			return minTemp;
+		}
+
+		public Values setMinTemp(String minTemp) {
+			this.minTemp = minTemp;
+			return this;
+		}
+
+		public String getMaxTemp() {
+			return maxTemp;
+		}
+
+		public Values setMaxTemp(String maxTemp) {
+			this.maxTemp = maxTemp;
+			return this;
+		}
+
+		public ZonedDateTime getDateTime() {
+			return dateTime;
+		}
+
+		public Values setDateTime(ZonedDateTime dateTime) {
+			this.dateTime = dateTime;
+			return this;
+		}
+
+		public int getPrecipitationNextHoursAmount() {
+			return PrecipitationNextHoursAmount;
+		}
+
+		public Values setPrecipitationNextHoursAmount(int precipitationNextHoursAmount) {
+			PrecipitationNextHoursAmount = precipitationNextHoursAmount;
+			return this;
+		}
+
+		public boolean isHasPop() {
+			return hasPop;
+		}
+
+		public Values setHasPop(boolean hasPop) {
+			this.hasPop = hasPop;
+			return this;
+		}
+
+		public boolean isHasPrecipitationNextHoursAmount() {
+			return hasPrecipitationNextHoursAmount;
+		}
+
+		public Values setHasPrecipitationNextHoursAmount(boolean hasPrecipitationNextHoursAmount) {
+			this.hasPrecipitationNextHoursAmount = hasPrecipitationNextHoursAmount;
+			return this;
+		}
 
 		public boolean isHasRainVolume() {
 			return hasRainVolume;
@@ -97,6 +171,7 @@ public class DailyForecastDto implements Serializable {
 
 		public Values setPop(String pop) {
 			this.pop = pop;
+			hasPop = true;
 			return this;
 		}
 
@@ -342,5 +417,9 @@ public class DailyForecastDto implements Serializable {
 	public DailyForecastDto setSingleValues(Values singleValues) {
 		this.singleValues = singleValues;
 		return this;
+	}
+
+	public List<Values> getValuesList() {
+		return valuesList;
 	}
 }

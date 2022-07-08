@@ -13,6 +13,7 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.UvIndexProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
@@ -55,6 +56,7 @@ public class MyApplication extends Application {
 		//AccuWeatherResponseProcessor.init(context);
 		AqicnResponseProcessor.init(context);
 		KmaResponseProcessor.init(context);
+		MetNorwayResponseProcessor.init(context);
 		OpenWeatherMapResponseProcessor.init(context);
 		FlickrUtil.init(context);
 		UvIndexProcessor.init(context);

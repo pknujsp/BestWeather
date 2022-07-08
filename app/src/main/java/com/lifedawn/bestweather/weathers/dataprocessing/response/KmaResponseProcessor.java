@@ -770,7 +770,6 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 					.setHasRain(hasRain)
 					.setHasSnow(hasSnow)
 					.setSnowVolume(snowVolume)
-					.setPrecipitationVolume(zeroPrecipitationVolume)
 					.setWeatherIcon(KmaResponseProcessor.getWeatherSkyAndPtyIconImg(finalHourlyForecast.getPrecipitationType(),
 							finalHourlyForecast.getSky(), isNight))
 					.setWeatherDescription(KmaResponseProcessor.getWeatherDescription(finalHourlyForecast.getPrecipitationType(),
@@ -863,7 +862,6 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 					.setHasSnow(hasSnow)
 					.setSnowVolume(snowVolume)
 					.setHasThunder(hasThunder)
-					.setPrecipitationVolume(zeroPrecipitationVolume)
 					.setWeatherIcon(getWeatherIconImgWeb(finalHourlyForecast.getWeatherDescription(),
 							isNight, hasThunder))
 					.setWeatherDescription(getWeatherDescriptionWeb(finalHourlyForecast.getWeatherDescription()))

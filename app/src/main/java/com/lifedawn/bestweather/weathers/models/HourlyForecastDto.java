@@ -24,6 +24,7 @@ public class HourlyForecastDto implements Serializable {
 	private String visibility;
 	private String uvIndex;
 	private String precipitationVolume;
+	private String next6HoursPrecipitationVolume;
 	private String rainVolume;
 	private String snowVolume;
 	private String precipitationType;
@@ -31,10 +32,31 @@ public class HourlyForecastDto implements Serializable {
 	private boolean hasThunder;
 
 	private boolean hasPrecipitation;
+	private boolean hasNext6HoursPrecipitation;
 	private boolean hasRain;
 	private boolean hasSnow;
 	private boolean hasPor;
 	private boolean hasPos;
+
+
+	public String getNext6HoursPrecipitationVolume() {
+		return next6HoursPrecipitationVolume;
+	}
+
+	public HourlyForecastDto setNext6HoursPrecipitationVolume(String next6HoursPrecipitationVolume) {
+		this.next6HoursPrecipitationVolume = next6HoursPrecipitationVolume;
+		hasNext6HoursPrecipitation = true;
+		return this;
+	}
+
+	public boolean isHasNext6HoursPrecipitation() {
+		return hasNext6HoursPrecipitation;
+	}
+
+	public HourlyForecastDto setHasNext6HoursPrecipitation(boolean hasNext6HoursPrecipitation) {
+		this.hasNext6HoursPrecipitation = hasNext6HoursPrecipitation;
+		return this;
+	}
 
 	public HourlyForecastDto setHasThunder(boolean hasThunder) {
 		this.hasThunder = hasThunder;

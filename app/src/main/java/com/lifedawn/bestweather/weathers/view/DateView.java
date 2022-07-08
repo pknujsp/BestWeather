@@ -25,7 +25,6 @@ public class DateView extends View {
 	private final int viewWidth;
 	private final int columnWidth;
 	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE");
-	;
 	private List<DateValue> dateValueList;
 	private int currentX;
 	private int firstColX;
@@ -60,6 +59,7 @@ public class DateView extends View {
 	public void init(List<ZonedDateTime> dateTimeList) {
 		ZonedDateTime date = ZonedDateTime.of(dateTimeList.get(0).toLocalDateTime(), dateTimeList.get(0).getZone());
 		ZonedDateTime lastDate = ZonedDateTime.of(date.toLocalDateTime(), date.getZone());
+		lastDate = lastDate.minusDays(5);
 
 		List<DateView.DateValue> dateValueList = new ArrayList<>();
 		int beginX = 0;
@@ -67,17 +67,17 @@ public class DateView extends View {
 		for (int col = 0; col < dateTimeList.size(); col++) {
 			date = ZonedDateTime.of(dateTimeList.get(col).toLocalDateTime(), lastDate.getZone());
 
-			if (date.getHour() == 0 || col == 0) {
+			if (date.getDayOfYear() != lastDate.getDayOfYear() || col == 0) {
 				if (dateValueList.size() > 0) {
 					dateValueList.get(dateValueList.size() - 1).endX = columnWidth * (col - 1) + columnWidth / 2;
 				}
 				beginX = columnWidth * col + columnWidth / 2;
 				dateValueList.add(new DateView.DateValue(beginX, date));
+
+				lastDate = date;
+
 			}
 
-			if (lastDate.getDayOfYear() != date.getDayOfYear()) {
-				lastDate = date;
-			}
 		}
 		dateValueList.get(dateValueList.size() - 1).endX = columnWidth * (dateTimeList.size() - 1) + columnWidth / 2;
 

@@ -29,6 +29,7 @@ import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryRespo
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
@@ -125,6 +126,9 @@ public class FlickrLoader {
 						break;
 					case OWM_ONECALL:
 						weather = OpenWeatherMapResponseProcessor.getFlickrGalleryName(val);
+						break;
+					case MET_NORWAY:
+						weather = MetNorwayResponseProcessor.getFlickrGalleryName(val);
 						break;
 				}
 

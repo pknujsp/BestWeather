@@ -92,7 +92,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			}
 		});
 
-		setValuesToViews();
+		//setValuesToViews();
 	}
 
 	@Override
@@ -189,7 +189,6 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 					haveSnow = true;
 				}
 			}
-
 		}
 
 		weatherIconRow.setIcons(weatherIconObjList);

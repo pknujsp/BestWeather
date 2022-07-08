@@ -59,6 +59,7 @@ import com.lifedawn.bestweather.commons.classes.WeatherViewController;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqicn;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestMet;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
@@ -89,6 +90,7 @@ import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
+import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.currentweather.OwmCurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
@@ -98,6 +100,7 @@ import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
@@ -790,7 +793,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private void processOnResult(ResponseResultObj responseResultObj) {
-		Set<Map.Entry<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>>> entrySet = responseResultObj.multipleRestApiDownloader.getResponseMap().entrySet();
+		Set<Map.Entry<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>>> entrySet =
+				responseResultObj.multipleRestApiDownloader.getResponseMap().entrySet();
 		//메인 날씨 제공사의 데이터가 정상이면 메인 날씨 제공사의 프래그먼트들을 설정하고 값을 표시한다.
 		//메인 날씨 제공사의 응답이 불량이면 재 시도, 취소 중 택1 다이얼로그 표시
 		for (Map.Entry<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> entry : entrySet) {
@@ -827,7 +831,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						failedDialogItems[arrIndex++] = getString(R.string.owm) + ", " + getString(
 								R.string.rerequest_another_weather_datasource);
 					}
-
+					if (otherTypes.contains(WeatherProviderType.MET_NORWAY)) {
+						weatherProviderTypeArr[arrIndex] = WeatherProviderType.MET_NORWAY;
+						failedDialogItems[arrIndex++] = getString(R.string.met) + ", " + getString(
+								R.string.rerequest_another_weather_datasource);
+					}
 
 					loadingDialog.dismiss();
 					loadingDialog = null;
@@ -928,26 +936,26 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		if (requestWeatherProviderType == WeatherProviderType.KMA_WEB) {
 
 			if (lastWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
-				//others.add(WeatherDataSourceType.ACCU_WEATHER);
-			} else if (lastWeatherProviderType == WeatherProviderType.ACCU_WEATHER) {
+				others.add(WeatherProviderType.MET_NORWAY);
+			} else if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
 				others.add(WeatherProviderType.OWM_ONECALL);
 			} else {
 				others.add(WeatherProviderType.OWM_ONECALL);
-				//others.add(WeatherDataSourceType.ACCU_WEATHER);
+				others.add(WeatherProviderType.MET_NORWAY);
 			}
 		} else if (requestWeatherProviderType == WeatherProviderType.KMA_API) {
 
 			if (lastWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
-				//others.add(WeatherDataSourceType.ACCU_WEATHER);
-			} else if (lastWeatherProviderType == WeatherProviderType.ACCU_WEATHER) {
+				others.add(WeatherProviderType.MET_NORWAY);
+			} else if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
 				others.add(WeatherProviderType.OWM_ONECALL);
 			} else {
 				others.add(WeatherProviderType.OWM_ONECALL);
-				//	others.add(WeatherDataSourceType.ACCU_WEATHER);
+				others.add(WeatherProviderType.MET_NORWAY);
 			}
-		} else if (requestWeatherProviderType == WeatherProviderType.ACCU_WEATHER) {
+		} else if (requestWeatherProviderType == WeatherProviderType.MET_NORWAY) {
 
-			if (lastWeatherProviderType == WeatherProviderType.ACCU_WEATHER) {
+			if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
 				if (countryCode.equals("KR")) {
 					others.add(WeatherProviderType.OWM_ONECALL);
 					others.add(WeatherProviderType.KMA_WEB);
@@ -965,33 +973,33 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			if (lastWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
 				if (countryCode.equals("KR")) {
-					//others.add(WeatherDataSourceType.ACCU_WEATHER);
+					others.add(WeatherProviderType.MET_NORWAY);
 					others.add(WeatherProviderType.KMA_WEB);
 				} else {
-					//others.add(WeatherDataSourceType.ACCU_WEATHER);
+					others.add(WeatherProviderType.MET_NORWAY);
 				}
-			} else if (lastWeatherProviderType == WeatherProviderType.ACCU_WEATHER) {
+			} else if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
 				if (countryCode.equals("KR")) {
 					others.add(WeatherProviderType.KMA_WEB);
 				}
 			} else {
-				//others.add(WeatherDataSourceType.ACCU_WEATHER);
+				others.add(WeatherProviderType.MET_NORWAY);
 			}
 		} else if (requestWeatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
 
 			if (lastWeatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
 				if (countryCode.equals("KR")) {
-					//others.add(WeatherDataSourceType.ACCU_WEATHER);
+					others.add(WeatherProviderType.MET_NORWAY);
 					others.add(WeatherProviderType.KMA_WEB);
 				} else {
-					//others.add(WeatherDataSourceType.ACCU_WEATHER);
+					others.add(WeatherProviderType.MET_NORWAY);
 				}
-			} else if (lastWeatherProviderType == WeatherProviderType.ACCU_WEATHER) {
+			} else if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
 				if (countryCode.equals("KR")) {
 					others.add(WeatherProviderType.KMA_WEB);
 				}
 			} else {
-				//others.add(WeatherDataSourceType.ACCU_WEATHER);
+				others.add(WeatherProviderType.MET_NORWAY);
 			}
 		}
 
@@ -1002,26 +1010,26 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		binding.scrollView.setVisibility(View.GONE);
 		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
-		final WeatherProviderType requestWeatherSource = responseResultObj.mainWeatherProviderType;
-		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> result = responseResultObj.multipleRestApiDownloader.getResponseMap().get(
-				requestWeatherSource);
-
-		ArrayMap<WeatherProviderType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
-		//요청한 날씨 제공사만 가져옴
-		RequestWeatherSource failedRequestWeatherSource = responseResultObj.requestWeatherSources.get(requestWeatherSource);
-		newRequestWeatherSources.put(requestWeatherSource, failedRequestWeatherSource);
-		failedRequestWeatherSource.getRequestServiceTypes().clear();
-
-		//실패한 자료만 재 요청
-		for (int i = 0; i < result.size(); i++) {
-			if (!result.valueAt(i).isSuccessful()) {
-				failedRequestWeatherSource.addRequestServiceType(result.keyAt(i));
-			}
-		}
-
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
+				final WeatherProviderType requestWeatherSource = responseResultObj.mainWeatherProviderType;
+				ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> result = responseResultObj.multipleRestApiDownloader.getResponseMap().get(
+						requestWeatherSource);
+
+				ArrayMap<WeatherProviderType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
+				//요청한 날씨 제공사만 가져옴
+				RequestWeatherSource failedRequestWeatherSource = responseResultObj.requestWeatherSources.get(requestWeatherSource);
+				newRequestWeatherSources.put(requestWeatherSource, failedRequestWeatherSource);
+				failedRequestWeatherSource.getRequestServiceTypes().clear();
+
+				//실패한 자료만 재 요청
+				for (int i = 0; i < result.size(); i++) {
+					if (!result.valueAt(i).isSuccessful()) {
+						failedRequestWeatherSource.addRequestServiceType(result.keyAt(i));
+					}
+				}
+
 				MainProcessing.reRequestWeatherDataBySameWeatherSourceIfFailed(getContext(), latitude, longitude, newRequestWeatherSources,
 						responseResultObj.multipleRestApiDownloader);
 			}
@@ -1034,13 +1042,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		binding.scrollView.setVisibility(View.GONE);
 		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
-		ArrayMap<WeatherProviderType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
-		setRequestWeatherSourceWithSourceTypes(responseResultObj.weatherProviderTypeSet, newRequestWeatherSources);
-		responseResultObj.requestWeatherSources = newRequestWeatherSources;
-
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
+				ArrayMap<WeatherProviderType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
+				setRequestWeatherSourceWithSourceTypes(responseResultObj.weatherProviderTypeSet, newRequestWeatherSources);
+				responseResultObj.requestWeatherSources = newRequestWeatherSources;
+
 				MainProcessing.reRequestWeatherDataByAnotherWeatherSourceIfFailed(getContext(), latitude, longitude,
 						responseResultObj.requestWeatherSources, responseResultObj.multipleRestApiDownloader);
 			}
@@ -1076,6 +1084,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			requestOwmOneCall.setExcludeApis(excludes);
 
 			newRequestWeatherSources.put(WeatherProviderType.OWM_ONECALL, requestOwmOneCall);
+		}
+		if (weatherProviderTypeSet.contains(WeatherProviderType.MET_NORWAY)) {
+			RequestMet requestMet = new RequestMet();
+			requestMet.addRequestServiceType(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
+
+			newRequestWeatherSources.put(WeatherProviderType.MET_NORWAY, requestMet);
 		}
 		if (weatherProviderTypeSet.contains(WeatherProviderType.ACCU_WEATHER)) {
 			RequestAccu requestAccu = new RequestAccu();
@@ -1248,6 +1262,25 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			ZoneOffset zoneOffsetSecond = ZoneOffset.ofTotalSeconds(Integer.parseInt(owmCurrentConditionsResponse.getTimezone()));
 			zoneId = zoneOffsetSecond.normalized();
 			mainWeatherProviderType = WeatherProviderType.OWM_INDIVIDUAL;
+		} else if (weatherProviderTypeSet.contains(WeatherProviderType.MET_NORWAY)) {
+			arrayMap = responseMap.get(WeatherProviderType.MET_NORWAY);
+			zoneId = MetNorwayResponseProcessor.getZoneId(latitude, longitude);
+
+			LocationForecastResponse locationForecastResponse =
+					(LocationForecastResponse) arrayMap.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST).getResponseObj();
+
+			currentConditionsDto = MetNorwayResponseProcessor.makeCurrentConditionsDto(getContext(), locationForecastResponse
+					, zoneId);
+
+			hourlyForecastDtoList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(getContext(), locationForecastResponse, zoneId);
+
+			dailyForecastDtoList = MetNorwayResponseProcessor.makeDailyForecastDtoList(getContext(), locationForecastResponse, zoneId);
+
+			currentConditionsWeatherVal = locationForecastResponse.getProperties().getTimeSeries().get(0)
+					.getData().getNext_1_hours().getSummary().getSymbolCode().replace("day", "").replace("night", "")
+					.replace("_", "");
+
+			mainWeatherProviderType = WeatherProviderType.MET_NORWAY;
 		}
 
 		MultipleRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherProviderType.AQICN).get(
@@ -1385,11 +1418,22 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					items[1] = getString(R.string.owm);
 					items[2] = getString(R.string.met);
 
-					checkedItemIdx = (mainWeatherProviderType == WeatherProviderType.KMA_WEB) ? 0 : 2;
+					if (mainWeatherProviderType == WeatherProviderType.KMA_WEB) {
+						checkedItemIdx = 0;
+					} else if (mainWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
+						checkedItemIdx = 1;
+					} else {
+						checkedItemIdx = 2;
+					}
 				} else {
 					items[0] = getString(R.string.owm);
 					items[1] = getString(R.string.met);
-					checkedItemIdx = 1;
+
+					if (mainWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
+						checkedItemIdx = 0;
+					} else {
+						checkedItemIdx = 1;
+					}
 				}
 				final int finalCheckedItemIdx = checkedItemIdx;
 

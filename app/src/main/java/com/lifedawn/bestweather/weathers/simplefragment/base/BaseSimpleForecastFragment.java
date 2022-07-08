@@ -26,6 +26,8 @@ import com.lifedawn.bestweather.weathers.view.DateView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -127,7 +129,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 			String rainUnit = "mm";
 			String snowUnit = null;
 
-			if (weatherProviderType == WeatherProviderType.OWM_ONECALL) {
+			if (weatherProviderType == WeatherProviderType.OWM_ONECALL || weatherProviderType == WeatherProviderType.MET_NORWAY) {
 				snowUnit = "mm";
 			} else {
 				snowUnit = "cm";
@@ -136,13 +138,13 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 			StringBuilder stringBuilder = new StringBuilder();
 
 			if (haveRain) {
-				stringBuilder.append(getString(R.string.rain)).append(" : ").append(rainUnit);
+				stringBuilder.append(getString(R.string.rain)).append(" - ").append(rainUnit);
 			}
 			if (haveSnow) {
 				if (stringBuilder.length() > 0) {
 					stringBuilder.append(", ");
 				}
-				stringBuilder.append(getString(R.string.snow)).append(" : ").append(snowUnit);
+				stringBuilder.append(getString(R.string.snow)).append(" - ").append(snowUnit);
 			}
 
 			TextView textView = new TextView(getContext());
@@ -159,6 +161,41 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 			binding.extraView.setVisibility(View.VISIBLE);
 		} else {
 			binding.extraView.setVisibility(View.GONE);
+		}
+	}
+
+	protected void createValueUnitsDescription(WeatherProviderType weatherProviderType, boolean haveRain, boolean haveSnow,
+	                                           ZonedDateTime firstDateTime_hasNextNHoursPrecipitation,
+	                                           String hourAmount) {
+		createValueUnitsDescription(weatherProviderType, haveRain, haveSnow);
+
+		if (haveRain || haveSnow) {
+			DateTimeFormatter dateTimeFormatter = null;
+			String txt = null;
+
+			if (countryCode.equals("KR")) {
+				dateTimeFormatter = DateTimeFormatter.ofPattern("d일 E HH시");
+				txt = firstDateTime_hasNextNHoursPrecipitation.format(dateTimeFormatter) +
+						" 이후로 표시되는 강수량은 직후 " + hourAmount +
+						"시간 동안의 강수량입니다";
+			} else {
+				dateTimeFormatter = DateTimeFormatter.ofPattern("HH on EEEE d");
+				txt = "The precipitation shown from " +
+						firstDateTime_hasNextNHoursPrecipitation.format(dateTimeFormatter) +
+						" is the precipitation for the next " + hourAmount + " hours";
+			}
+
+			TextView textView = new TextView(getContext());
+			FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+					ViewGroup.LayoutParams.WRAP_CONTENT);
+			layoutParams.gravity = Gravity.RIGHT;
+			textView.setLayoutParams(layoutParams);
+			textView.setTextColor(Color.GRAY);
+			textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f);
+			textView.setText(txt);
+			textView.setIncludeFontPadding(false);
+
+			binding.extraView.addView(textView);
 		}
 	}
 }

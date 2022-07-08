@@ -96,7 +96,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 
 				fragmentManager.beginTransaction().hide(
 						fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
-						detailHourlyForecastFragment, tag).addToBackStack(tag).commit();
+						detailHourlyForecastFragment, tag).addToBackStack(tag).commitAllowingStateLoss();
 			}
 		});
 
@@ -123,6 +123,8 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 				columnWidth, R.drawable.pop);
 		IconTextView rainVolumeRow = new IconTextView(context, FragmentType.Simple, viewWidth,
 				columnWidth, R.drawable.raindrop);
+		IconTextView precipitationVolumeRow = new IconTextView(context, FragmentType.Simple, viewWidth,
+				columnWidth, R.drawable.raindrop);
 		IconTextView snowVolumeRow = new IconTextView(context, FragmentType.Simple, viewWidth,
 				columnWidth, R.drawable.snowparticle);
 
@@ -132,6 +134,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 		List<String> popList = new ArrayList<>();
 		List<String> rainVolumeList = new ArrayList<>();
 		List<String> snowVolumeList = new ArrayList<>();
+		List<String> precipitationVolumeList = new ArrayList<>();
 		List<ZonedDateTime> dateTimeList = new ArrayList<>();
 
 		final String mm = "mm";
@@ -140,6 +143,9 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 
 		boolean haveSnow = false;
 		boolean haveRain = false;
+		boolean havePrecipitation = false;
+		boolean hasNextNHoursPrecipitation = false;
+		ZonedDateTime firstDateTime_hasNextNHours = null;
 
 		for (HourlyForecastDto item : hourlyForecastDtoList) {
 			dateTimeList.add(item.getHours());
@@ -148,9 +154,22 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 					ContextCompat.getDrawable(context, item.getWeatherIcon()), item.getWeatherDescription()));
 			tempList.add(Integer.parseInt(item.getTemp().replace(degree, "")));
 
-			popList.add(item.getPop());
-			rainVolumeList.add(item.getRainVolume().replace(mm, "").replace(cm, ""));
-			snowVolumeList.add(item.getSnowVolume().replace(mm, "").replace(cm, ""));
+			if (item.getPop() != null)
+				popList.add(item.getPop());
+			if (item.getRainVolume() != null)
+				rainVolumeList.add(item.getRainVolume().replace(mm, "").replace(cm, ""));
+			if (item.getSnowVolume() != null)
+				snowVolumeList.add(item.getSnowVolume().replace(mm, "").replace(cm, ""));
+
+			if (item.getPrecipitationVolume() != null) {
+				precipitationVolumeList.add(item.getPrecipitationVolume().replace(mm, "").replace(cm, ""));
+			} else if (item.getNext6HoursPrecipitationVolume() != null) {
+				if (firstDateTime_hasNextNHours == null) {
+					firstDateTime_hasNextNHours = item.getHours();
+					hasNextNHoursPrecipitation = true;
+				}
+				precipitationVolumeList.add(item.getNext6HoursPrecipitationVolume().replace(mm, "").replace(cm, ""));
+			}
 
 			if (item.isHasSnow()) {
 				if (!haveSnow) {
@@ -162,11 +181,17 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 					haveRain = true;
 				}
 			}
+			if (item.isHasNext6HoursPrecipitation() || item.isHasPrecipitation()) {
+				if (!havePrecipitation) {
+					havePrecipitation = true;
+				}
+			}
 		}
 
 		dateRow.init(dateTimeList);
 		probabilityOfPrecipitationRow.setValueList(popList);
 		rainVolumeRow.setValueList(rainVolumeList);
+		precipitationVolumeRow.setValueList(precipitationVolumeList);
 		snowVolumeRow.setValueList(snowVolumeList);
 		weatherIconRow.setWeatherImgs(weatherIconObjList);
 
@@ -231,12 +256,19 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 		if (haveSnow) {
 			binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
 		}
+		if (havePrecipitation) {
+			binding.forecastView.addView(precipitationVolumeRow, rowLayoutParams);
+		}
 
 		LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				(int) context.getResources().getDimension(R.dimen.singleTemperatureRowHeightInCOMMON));
 		binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
-		createValueUnitsDescription(mainWeatherProviderType, haveRain, haveSnow);
+		if (hasNextNHoursPrecipitation) {
+			createValueUnitsDescription(mainWeatherProviderType, true, haveSnow, firstDateTime_hasNextNHours, "6");
+		} else {
+			createValueUnitsDescription(mainWeatherProviderType, haveRain, haveSnow);
+		}
 	}
 
 }

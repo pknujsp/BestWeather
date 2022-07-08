@@ -152,6 +152,16 @@ dependencies {
     implementation "androidx.core:core-ktx:1.6.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.7.0'
+
+
+
+
+    implementation('us.dustinj.timezonemap:timezonemap:4.5') {
+            exclude group: 'com.github.luben', module: 'zstd-jni'
+    }
+    // Import aar for native component compilation
+    implementation 'com.github.luben:zstd-jni:1.4.9-5@aar'
+
 }
 repositories {
     mavenCentral()

@@ -526,4 +526,47 @@
     <string name="map">map</string>
 
 
+    <string name="met_norway_clearsky">clear sky</string>
+    <string name="met_norway_cloudy">cloudy</string>
+    <string name="met_norway_fair">fair</string>
+    <string name="met_norway_fog">fog</string>
+    <string name="met_norway_heavyrain">heavy rain</string>
+    <string name="met_norway_heavyrainandthunder">heavy rain, thunder</string>
+    <string name="met_norway_heavyrainshowers">heavy rain, showers</string>
+    <string name="met_norway_heavyrainshowersandthunder">heavy rain showers, thunder</string>
+    <string name="met_norway_heavysleet">heavy sleet</string>
+    <string name="met_norway_heavysleetandthunder">heavy sleet, thunder</string>
+    <string name="met_norway_heavysleetshowers">heavy sleet, showers</string>
+    <string name="met_norway_heavysleetshowersandthunder">heavy sleet showers, thunder</string>
+    <string name="met_norway_heavysnow">heavy snow</string>
+    <string name="met_norway_heavysnowandthunder">heavy snow, thunder</string>
+    <string name="met_norway_heavysnowshowers">heavy snow, showers</string>
+    <string name="met_norway_heavysnowshowersandthunder">heavy snow showers, thunder</string>
+    <string name="met_norway_lightrain">light rain</string>
+    <string name="met_norway_lightrainandthunder">light rain, thunder</string>
+    <string name="met_norway_lightrainshowers">light rain, showers</string>
+    <string name="met_norway_lightrainshowersandthunder">light rain showers, thunder</string>
+    <string name="met_norway_lightsleet">light sleet</string>
+    <string name="met_norway_lightsleetandthunder">light sleet, thunder</string>
+    <string name="met_norway_lightsleetshowers">light sleet, showers</string>
+    <string name="met_norway_lightsnow">light snow</string>
+    <string name="met_norway_lightsnowandthunder">light snow, thunder</string>
+    <string name="met_norway_lightsnowshowers">light snow, showers</string>
+    <string name="met_norway_lightssleetshowersandthunder">light sleet showers, thunder</string>
+    <string name="met_norway_lightssnowshowersandthunder">light snow showers, thunder</string>
+    <string name="met_norway_partlycloudy">partly cloudy</string>
+    <string name="met_norway_rain">rain</string>
+    <string name="met_norway_rainandthunder">rain, thunder</string>
+    <string name="met_norway_rainshowers">rain, showers</string>
+    <string name="met_norway_rainshowersandthunder">rain showers, thunder</string>
+    <string name="met_norway_sleet">sleet</string>
+    <string name="met_norway_sleetandthunder">sleet, thunder</string>
+    <string name="met_norway_sleetshowers">sleet showers</string>
+    <string name="met_norway_sleetshowersandthunder">sleet showers, thunder</string>
+    <string name="met_norway_snow">snow</string>
+    <string name="met_norway_snowandthunder">snow, thunder</string>
+    <string name="met_norway_snowshowers">snow showers</string>
+    <string name="met_norway_snowshowersandthunder">snow showers, thunder</string>
+
+
 </resources>

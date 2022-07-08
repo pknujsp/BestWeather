@@ -610,7 +610,6 @@ public class WeatherResponseProcessor {
 					.setWeatherIcon(R.drawable.day_clear)
 					.setTemp(tempDegree)
 					.setPop(context.getString(R.string.temp_pop))
-					.setPrecipitationVolume(zeroPrecipitationVolume)
 					.setHasRain(false)
 					.setHasSnow(false)
 					.setRainVolume(zeroRainVolume)

@@ -104,7 +104,7 @@ public class IntroFragment extends Fragment {
 							final int newFavoriteAddressDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name());
 							sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
 									newFavoriteAddressDtoId).putString(getString(R.string.pref_key_last_selected_location_type),
-									LocationType.SelectedAddress.name()).putBoolean(getString(R.string.pref_key_show_intro), false).commit();
+									LocationType.SelectedAddress.name()).putBoolean(getString(R.string.pref_key_show_intro), false).apply();
 						} else {
 
 						}
@@ -128,11 +128,10 @@ public class IntroFragment extends Fragment {
 		@Override
 		public void onSuccessful(LocationResult locationResult) {
 			//현재 위치 파악 성공
-			final Location location = getBestLocation(locationResult);
-			final Double latitude = location.getLatitude();
-			final Double longitude = location.getLongitude();
-
 			dialog.dismiss();
+
+			PreferenceManager.getDefaultSharedPreferences(getContext())
+					.edit().putBoolean(getString(R.string.pref_key_show_intro), false).apply();
 
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 			getParentFragment().getParentFragmentManager().beginTransaction()

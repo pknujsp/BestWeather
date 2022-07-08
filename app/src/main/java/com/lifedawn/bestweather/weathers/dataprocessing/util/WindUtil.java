@@ -55,7 +55,7 @@ public class WindUtil {
 	}
 
 	public static String parseWindDirectionDegreeAsStr(Context context, String degree) {
-		final int convertedToSixteen = (int) ((Integer.parseInt(degree) + 22.5 * 0.5) / 22.5);
+		final int convertedToSixteen = (int) ((Double.parseDouble(degree) + 22.5 * 0.5) / 22.5);
 		switch (convertedToSixteen) {
 			case 1:
 				return context.getString(R.string.wind_direction_NNE);
