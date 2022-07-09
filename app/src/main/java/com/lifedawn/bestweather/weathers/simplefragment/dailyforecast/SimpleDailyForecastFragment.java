@@ -92,7 +92,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			}
 		});
 
-		//setValuesToViews();
+		setValuesToViews();
 	}
 
 	@Override
@@ -104,7 +104,15 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
 
-		final int COLUMN_COUNT = dailyForecastDtoList.size();
+		int noAvailableDayCount = 0;
+		for (int i = 0; i < dailyForecastDtoList.size(); i++) {
+			if (!dailyForecastDtoList.get(i).isAvailable_toMakeMinMaxTemp()) {
+				noAvailableDayCount = dailyForecastDtoList.size() - i;
+				break;
+			}
+		}
+
+		final int COLUMN_COUNT = dailyForecastDtoList.size() - noAvailableDayCount;
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyOwm);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 
@@ -140,6 +148,9 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		float snowVolume = 0f;
 
 		for (DailyForecastDto item : dailyForecastDtoList) {
+			if (!item.isAvailable_toMakeMinMaxTemp())
+				break;
+
 			rainVolume = 0f;
 			snowVolume = 0f;
 
@@ -147,33 +158,48 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			minTempList.add(Integer.parseInt(item.getMinTemp().replace(tempDegree, "")));
 			maxTempList.add(Integer.parseInt(item.getMaxTemp().replace(tempDegree, "")));
 
-			if (item.isSingle()) {
-				popList.add(item.getSingleValues().getPop());
+			if (item.getValuesList().size() == 1) {
+				popList.add(item.getValuesList().get(0).getPop());
 				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-						item.getSingleValues().getWeatherIcon()), item.getSingleValues().getWeatherDescription()));
+						item.getValuesList().get(0).getWeatherIcon()), item.getValuesList().get(0).getWeatherDescription()));
 
-				if (item.getSingleValues().getRainVolume() != null) {
-					rainVolume = Float.parseFloat(item.getSingleValues().getRainVolume().replace(mm, "").replace(cm, ""));
+				if (item.getValuesList().get(0).getRainVolume() != null) {
+					rainVolume = Float.parseFloat(item.getValuesList().get(0).getRainVolume().replace(mm, "").replace(cm, ""));
 				}
-				if (item.getSingleValues().getSnowVolume() != null) {
-					snowVolume = Float.parseFloat(item.getSingleValues().getSnowVolume().replace(mm, "").replace(cm, ""));
+				if (item.getValuesList().get(0).getSnowVolume() != null) {
+					snowVolume = Float.parseFloat(item.getValuesList().get(0).getSnowVolume().replace(mm, "").replace(cm, ""));
 				}
-			} else {
-				popList.add(item.getAmValues().getPop() + "/" + item.getPmValues().getPop());
+			} else if (item.getValuesList().size() == 2) {
+				popList.add(item.getValuesList().get(0).getPop() + "/" + item.getValuesList().get(1).getPop());
 				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
-						item.getAmValues().getWeatherIcon()),
-						ContextCompat.getDrawable(context, item.getPmValues().getWeatherIcon()),
-						item.getAmValues().getWeatherDescription(),
-						item.getPmValues().getWeatherDescription()));
+						item.getValuesList().get(0).getWeatherIcon()),
+						ContextCompat.getDrawable(context, item.getValuesList().get(1).getWeatherIcon()),
+						item.getValuesList().get(0).getWeatherDescription(),
+						item.getValuesList().get(1).getWeatherDescription()));
 
-				if (item.getAmValues().getRainVolume() != null || item.getPmValues().getRainVolume() != null) {
-					rainVolume = Float.parseFloat(item.getAmValues().getRainVolume().replace(mm, "").replace(cm, ""))
-							+ Float.parseFloat(item.getPmValues().getRainVolume().replace(mm, "").replace(cm, ""));
+				if (item.getValuesList().get(0).getRainVolume() != null || item.getValuesList().get(1).getRainVolume() != null) {
+					rainVolume = Float.parseFloat(item.getValuesList().get(0).getRainVolume().replace(mm, "").replace(cm, ""))
+							+ Float.parseFloat(item.getValuesList().get(1).getRainVolume().replace(mm, "").replace(cm, ""));
 				}
-				if (item.getAmValues().getSnowVolume() != null || item.getPmValues().getSnowVolume() != null) {
-					snowVolume = Float.parseFloat(item.getAmValues().getSnowVolume().replace(mm, "").replace(cm, ""))
-							+ Float.parseFloat(item.getPmValues().getSnowVolume().replace(mm, "").replace(cm, ""));
+				if (item.getValuesList().get(0).getSnowVolume() != null || item.getValuesList().get(1).getSnowVolume() != null) {
+					snowVolume = Float.parseFloat(item.getValuesList().get(0).getSnowVolume().replace(mm, "").replace(cm, ""))
+							+ Float.parseFloat(item.getValuesList().get(1).getSnowVolume().replace(mm, "").replace(cm, ""));
 				}
+			} else if (item.getValuesList().size() == 4) {
+				weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context,
+						item.getValuesList().get(1).getWeatherIcon()),
+						ContextCompat.getDrawable(context, item.getValuesList().get(2).getWeatherIcon()),
+						item.getValuesList().get(1).getWeatherDescription(),
+						item.getValuesList().get(2).getWeatherDescription()));
+
+				if (item.getValuesList().get(0).isHasPrecipitationVolume() || item.getValuesList().get(1).isHasPrecipitationVolume() ||
+						item.getValuesList().get(2).isHasPrecipitationVolume() || item.getValuesList().get(3).isHasPrecipitationVolume()) {
+					rainVolume = Float.parseFloat(item.getValuesList().get(0).getPrecipitationVolume().replace(mm, "").replace(cm, ""))
+							+ Float.parseFloat(item.getValuesList().get(1).getPrecipitationVolume().replace(mm, "").replace(cm, ""))
+							+ Float.parseFloat(item.getValuesList().get(2).getPrecipitationVolume().replace(mm, "").replace(cm, ""))
+							+ Float.parseFloat(item.getValuesList().get(3).getPrecipitationVolume().replace(mm, "").replace(cm, ""));
+				}
+
 			}
 
 			rainVolumeList.add(String.format(Locale.getDefault(), rainVolume > 0f ? "%.2f" : "%.1f", rainVolume));

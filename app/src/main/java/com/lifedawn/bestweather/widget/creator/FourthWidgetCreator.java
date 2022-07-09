@@ -198,20 +198,20 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 		boolean haveSnow = false;
 
 		for (int cell = 0; cell < cellCount; cell++) {
-			if (dailyForecastDtoList.get(cell).isSingle()) {
-				if (dailyForecastDtoList.get(cell).getSingleValues().isHasRainVolume()) {
+			if (dailyForecastDtoList.get(cell).getValuesList().size() == 1) {
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume()) {
 					haveRain = true;
 				}
-				if (dailyForecastDtoList.get(cell).getSingleValues().isHasSnowVolume()) {
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume()) {
 					haveSnow = true;
 				}
 			} else {
-				if (dailyForecastDtoList.get(cell).getAmValues().isHasRainVolume() ||
-						dailyForecastDtoList.get(cell).getPmValues().isHasRainVolume()) {
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume() ||
+						dailyForecastDtoList.get(cell).getValuesList().get(1).isHasRainVolume()) {
 					haveRain = true;
 				}
-				if (dailyForecastDtoList.get(cell).getAmValues().isHasSnowVolume() ||
-						dailyForecastDtoList.get(cell).getPmValues().isHasSnowVolume()) {
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume() ||
+						dailyForecastDtoList.get(cell).getValuesList().get(1).isHasSnowVolume()) {
 					haveSnow = true;
 				}
 			}
@@ -225,7 +225,7 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 		Double snowVolume = 0.0;
 
 		for (int cell = 0; cell < cellCount; cell++) {
-			isSingle = dailyForecastDtoList.get(cell).isSingle();
+			isSingle = dailyForecastDtoList.get(cell).getValuesList().size() == 1;
 			rainVolume = 0.0;
 			snowVolume = 0.0;
 
@@ -237,31 +237,31 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 			((TextView) view.findViewById(R.id.pop)).setTextSize(TypedValue.COMPLEX_UNIT_PX, popTextSize);
 
 			if (isSingle) {
-				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getSingleValues().getWeatherIcon());
-				pop = dailyForecastDtoList.get(cell).getSingleValues().getPop();
+				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(0).getWeatherIcon());
+				pop = dailyForecastDtoList.get(cell).getValuesList().get(0).getPop();
 
 				view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
 			} else {
-				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getAmValues().getWeatherIcon());
-				((ImageView) view.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(cell).getPmValues().getWeatherIcon());
-				pop = dailyForecastDtoList.get(cell).getAmValues().getPop() + "/" +
-						dailyForecastDtoList.get(cell).getPmValues().getPop();
+				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(0).getWeatherIcon());
+				((ImageView) view.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(1).getWeatherIcon());
+				pop = dailyForecastDtoList.get(cell).getValuesList().get(0).getPop() + "/" +
+						dailyForecastDtoList.get(cell).getValuesList().get(1).getPop();
 			}
 			((TextView) view.findViewById(R.id.pop)).setText(pop);
 
 			if (haveRain) {
 				if (isSingle) {
-					if (dailyForecastDtoList.get(cell).getSingleValues().isHasRainVolume()) {
-						rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getSingleValues().getRainVolume().replace(mm, "")
+					if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume()) {
+						rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getRainVolume().replace(mm, "")
 								.replace(cm, ""));
 					}
 				} else {
-					if (dailyForecastDtoList.get(cell).getAmValues().isHasRainVolume()) {
-						rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getAmValues().getRainVolume().replace(mm, "")
+					if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume()) {
+						rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getRainVolume().replace(mm, "")
 								.replace(cm, ""));
 					}
-					if (dailyForecastDtoList.get(cell).getPmValues().isHasRainVolume()) {
-						rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getPmValues().getRainVolume().replace(mm, "")
+					if (dailyForecastDtoList.get(cell).getValuesList().get(1).isHasRainVolume()) {
+						rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(1).getRainVolume().replace(mm, "")
 								.replace(cm, ""));
 					}
 				}
@@ -277,17 +277,17 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 
 			if (haveSnow) {
 				if (isSingle) {
-					if (dailyForecastDtoList.get(cell).getSingleValues().isHasSnowVolume()) {
-						snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getSingleValues().getSnowVolume().replace(mm, "")
+					if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume()) {
+						snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getSnowVolume().replace(mm, "")
 								.replace(cm, ""));
 					}
 				} else {
-					if (dailyForecastDtoList.get(cell).getAmValues().isHasSnowVolume()) {
-						snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getAmValues().getSnowVolume().replace(mm, "")
+					if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume()) {
+						snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getSnowVolume().replace(mm, "")
 								.replace(cm, ""));
 					}
-					if (dailyForecastDtoList.get(cell).getPmValues().isHasSnowVolume()) {
-						snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getPmValues().getSnowVolume().replace(mm, "")
+					if (dailyForecastDtoList.get(cell).getValuesList().get(1).isHasSnowVolume()) {
+						snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(1).getSnowVolume().replace(mm, "")
 								.replace(cm, ""));
 					}
 				}

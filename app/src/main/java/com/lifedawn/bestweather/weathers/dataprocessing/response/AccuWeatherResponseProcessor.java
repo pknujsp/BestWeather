@@ -255,7 +255,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 			DailyForecastDto dailyForecastDto = new DailyForecastDto();
 
 			dailyForecastDto.setDate(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getEpochDate()) * 1000L, zoneId))
-					.setSingle(false).setMinTemp(ValueUnits.convertTemperature(daily.getTemperature().getMinimum().getValue(), tempUnit) + tempDegree)
+				.setMinTemp(ValueUnits.convertTemperature(daily.getTemperature().getMinimum().getValue(), tempUnit) + tempDegree)
 					.setMaxTemp(ValueUnits.convertTemperature(daily.getTemperature().getMaximum().getValue(), tempUnit) + tempDegree)
 					.setMinFeelsLikeTemp(ValueUnits.convertTemperature(daily.getRealFeelTemperature().getMinimum().getValue(), tempUnit) + tempDegree)
 					.setMaxFeelsLikeTemp(ValueUnits.convertTemperature(daily.getRealFeelTemperature().getMinimum().getValue(),
@@ -350,7 +350,8 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 			pm.setWindGust(ValueUnits.convertWindSpeedForAccu(daily.getNight().getWind().getSpeed().getValue(), windUnit) + windUnitStr);
 			pm.setCloudiness(daily.getNight().getCloudCover() + percent);
 
-			dailyForecastDto.setAmValues(am).setPmValues(pm);
+			dailyForecastDto.getValuesList().add(am);
+			dailyForecastDto.getValuesList().add(pm);
 			dailyForecastDtoList.add(dailyForecastDto);
 		}
 		return dailyForecastDtoList;

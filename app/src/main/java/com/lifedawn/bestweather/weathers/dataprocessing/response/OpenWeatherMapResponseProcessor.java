@@ -139,7 +139,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 			}
 
 			hourlyForecastDto.setHours(WeatherResponseProcessor.convertDateTimeOfHourlyForecast
-					(Long.parseLong(hourly.getDt()) * 1000L, zoneId))
+							(Long.parseLong(hourly.getDt()) * 1000L, zoneId))
 					.setWeatherIcon(OpenWeatherMapResponseProcessor.getWeatherIconImg(hourly.getWeather().get(0).getId(),
 							hourly.getWeather().get(0).getIcon().contains("n")))
 					.setTemp(ValueUnits.convertTemperature(hourly.getTemp(), tempUnit) + tempDegree)
@@ -193,12 +193,13 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 		for (OwmOneCallResponse.Daily daily : owmOneCallResponse.getDaily()) {
 			DailyForecastDto dailyForecastDto = new DailyForecastDto();
-			dailyForecastDto.setSingle(true).setSingleValues(new DailyForecastDto.Values())
+			dailyForecastDto
 					.setDate(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, zoneId))
 					.setMinTemp(ValueUnits.convertTemperature(daily.getTemp().getMin(), tempUnit) + tempDegree)
 					.setMaxTemp(ValueUnits.convertTemperature(daily.getTemp().getMax(), tempUnit) + tempDegree);
 
-			DailyForecastDto.Values single = dailyForecastDto.getSingleValues();
+			DailyForecastDto.Values single = new DailyForecastDto.Values();
+			dailyForecastDto.getValuesList().add(single);
 
 			if (daily.getRain() == null) {
 				hasRain = false;
@@ -404,7 +405,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 			}
 
 			hourlyForecastDto.setHours(WeatherResponseProcessor.convertDateTimeOfHourlyForecast
-					(Long.parseLong(hourly.getDt()) * 1000L, zoneId))
+							(Long.parseLong(hourly.getDt()) * 1000L, zoneId))
 					.setWeatherIcon(OpenWeatherMapResponseProcessor.getWeatherIconImg(hourly.getWeather().get(0).getId(),
 							hourly.getWeather().get(0).getIcon().contains("n")))
 					.setTemp(ValueUnits.convertTemperature(hourly.getMain().getTemp(), tempUnit) + tempDegree)
@@ -458,12 +459,13 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 		for (OwmDailyForecastResponse.Item daily : owmDailyForecastResponse.getList()) {
 			DailyForecastDto dailyForecastDto = new DailyForecastDto();
-			dailyForecastDto.setSingle(true).setSingleValues(new DailyForecastDto.Values())
+			dailyForecastDto
 					.setDate(WeatherResponseProcessor.convertDateTimeOfDailyForecast(Long.parseLong(daily.getDt()) * 1000L, zoneId))
 					.setMinTemp(ValueUnits.convertTemperature(daily.getTemp().getMin(), tempUnit) + tempDegree)
 					.setMaxTemp(ValueUnits.convertTemperature(daily.getTemp().getMax(), tempUnit) + tempDegree);
 
-			DailyForecastDto.Values single = dailyForecastDto.getSingleValues();
+			DailyForecastDto.Values single = new DailyForecastDto.Values();
+			dailyForecastDto.getValuesList().add(single);
 
 			if (daily.getRain() == null) {
 				hasRain = false;

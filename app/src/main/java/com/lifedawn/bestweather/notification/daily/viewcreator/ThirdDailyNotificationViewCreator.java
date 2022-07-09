@@ -58,22 +58,22 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		boolean haveSnow = false;
 
 		for (int cell = 0; cell < cellCount; cell++) {
-			if (dailyForecastDtoList.get(cell).isSingle()) {
-				if (dailyForecastDtoList.get(cell).getSingleValues().isHasRainVolume()) {
+			if (dailyForecastDtoList.get(cell).getValuesList().size() == 1) {
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume()) {
 					haveRain = true;
 				}
 
-				if (dailyForecastDtoList.get(cell).getSingleValues().isHasSnowVolume()) {
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume()) {
 					haveSnow = true;
 				}
 			} else {
-				if (dailyForecastDtoList.get(cell).getAmValues().isHasRainVolume() ||
-						dailyForecastDtoList.get(cell).getPmValues().isHasRainVolume()) {
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume() ||
+						dailyForecastDtoList.get(cell).getValuesList().get(1).isHasRainVolume()) {
 					haveRain = true;
 				}
 
-				if (dailyForecastDtoList.get(cell).getAmValues().isHasSnowVolume() ||
-						dailyForecastDtoList.get(cell).getPmValues().isHasSnowVolume()) {
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume() ||
+						dailyForecastDtoList.get(cell).getValuesList().get(1).isHasSnowVolume()) {
 					haveSnow = true;
 				}
 			}
@@ -91,39 +91,39 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			rainVolume = 0f;
 			snowVolume = 0f;
 
-			if (dailyForecastDtoList.get(cell).isSingle()) {
-				forecastRemoteViews.setImageViewResource(R.id.leftIcon, dailyForecastDtoList.get(cell).getSingleValues().getWeatherIcon());
+			if (dailyForecastDtoList.get(cell).getValuesList().size() == 1) {
+				forecastRemoteViews.setImageViewResource(R.id.leftIcon, dailyForecastDtoList.get(cell).getValuesList().get(0).getWeatherIcon());
 				forecastRemoteViews.setViewVisibility(R.id.rightIcon, View.GONE);
 
-				pop = dailyForecastDtoList.get(cell).getSingleValues().getPop();
-				if (dailyForecastDtoList.get(cell).getSingleValues().isHasRainVolume()) {
-					rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getSingleValues().getRainVolume().replace(cm, "").replace(mm,
+				pop = dailyForecastDtoList.get(cell).getValuesList().get(0).getPop();
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume()) {
+					rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getRainVolume().replace(cm, "").replace(mm,
 							""));
 				}
-				if (dailyForecastDtoList.get(cell).getSingleValues().isHasSnowVolume()) {
-					snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getSingleValues().getSnowVolume().replace(cm, "").replace(mm,
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume()) {
+					snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getSnowVolume().replace(cm, "").replace(mm,
 							""));
 				}
 			} else {
-				forecastRemoteViews.setImageViewResource(R.id.leftIcon, dailyForecastDtoList.get(cell).getAmValues().getWeatherIcon());
-				forecastRemoteViews.setImageViewResource(R.id.rightIcon, dailyForecastDtoList.get(cell).getPmValues().getWeatherIcon());
+				forecastRemoteViews.setImageViewResource(R.id.leftIcon, dailyForecastDtoList.get(cell).getValuesList().get(0).getWeatherIcon());
+				forecastRemoteViews.setImageViewResource(R.id.rightIcon, dailyForecastDtoList.get(cell).getValuesList().get(1).getWeatherIcon());
 
-				pop = dailyForecastDtoList.get(cell).getAmValues().getPop() + "/" + dailyForecastDtoList.get(cell).getPmValues().getPop();
-				if (dailyForecastDtoList.get(cell).getAmValues().isHasRainVolume()) {
-					rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getAmValues().getRainVolume().replace(cm, "").replace(mm,
+				pop = dailyForecastDtoList.get(cell).getValuesList().get(0).getPop() + "/" + dailyForecastDtoList.get(cell).getValuesList().get(1).getPop();
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume()) {
+					rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getRainVolume().replace(cm, "").replace(mm,
 							""));
 				}
-				if (dailyForecastDtoList.get(cell).getPmValues().isHasRainVolume()) {
-					rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getPmValues().getRainVolume().replace(cm, "").replace(mm,
+				if (dailyForecastDtoList.get(cell).getValuesList().get(1).isHasRainVolume()) {
+					rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(1).getRainVolume().replace(cm, "").replace(mm,
 							""));
 				}
 
-				if (dailyForecastDtoList.get(cell).getAmValues().isHasSnowVolume()) {
-					snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getAmValues().getSnowVolume().replace(cm, "").replace(mm,
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume()) {
+					snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getSnowVolume().replace(cm, "").replace(mm,
 							""));
 				}
-				if (dailyForecastDtoList.get(cell).getPmValues().isHasSnowVolume()) {
-					snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getPmValues().getSnowVolume().replace(cm, "").replace(mm,
+				if (dailyForecastDtoList.get(cell).getValuesList().get(1).isHasSnowVolume()) {
+					snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(1).getSnowVolume().replace(cm, "").replace(mm,
 							""));
 				}
 			}

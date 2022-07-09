@@ -21,6 +21,7 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleForecastBinding;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
 
@@ -45,7 +46,6 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 
 	protected int headerVisibility = View.VISIBLE;
 
-
 	public void setTextSizeMap(Map<WeatherValueType, Integer> textSizeMap) {
 		this.textSizeMap = textSizeMap;
 	}
@@ -64,7 +64,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 
 		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 
-		countryCode = bundle.getString(BundleKey.CountryCode.name());
+		countryCode = MyApplication.getLocaleCountryCode();
 		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(BundleKey.WeatherProvider.name());
 
 		networkStatus = NetworkStatus.getInstance(getContext());
@@ -179,7 +179,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 						" 이후로 표시되는 강수량은 직후 " + hourAmount +
 						"시간 동안의 강수량입니다";
 			} else {
-				dateTimeFormatter = DateTimeFormatter.ofPattern("HH on EEEE d");
+				dateTimeFormatter = DateTimeFormatter.ofPattern("HH EEEE d");
 				txt = "The precipitation shown from " +
 						firstDateTime_hasNextNHoursPrecipitation.format(dateTimeFormatter) +
 						" is the precipitation for the next " + hourAmount + " hours";

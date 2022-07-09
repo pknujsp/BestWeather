@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers.comparison.dailyforecast;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -80,6 +81,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		super.onStart();
 	}
 
+	@SuppressLint("DefaultLocale")
 	private void setValues(DailyForecastResponse dailyForecastResponse) {
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 
@@ -270,17 +272,17 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 					temp = item.e.getMinTemp().replace(tempUnitText, degree) + " / " + item.e.getMaxTemp().replace(tempUnitText, degree);
 					tempList.add(temp);
 
-					if (item.e.isSingle()) {
-						pop = item.e.getSingleValues().getPop();
-						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(getContext(), item.e.getSingleValues().getWeatherIcon()),
-								item.e.getSingleValues().getWeatherDescription()));
+					if (item.e.getValuesList().size() == 1) {
+						pop = item.e.getValuesList().get(0).getPop();
+						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(getContext(), item.e.getValuesList().get(0).getWeatherIcon()),
+								item.e.getValuesList().get(0).getWeatherDescription()));
 					} else {
-						pop = item.e.getAmValues().getPop() + " / " + item.e.getPmValues().getPop();
+						pop = item.e.getValuesList().get(0).getPop() + " / " + item.e.getValuesList().get(1).getPop();
 						weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
-								ContextCompat.getDrawable(context, item.e.getAmValues().getWeatherIcon()),
-								ContextCompat.getDrawable(context, item.e.getPmValues().getWeatherIcon()),
-								item.e.getAmValues().getWeatherDescription(),
-								item.e.getPmValues().getWeatherDescription()));
+								ContextCompat.getDrawable(context, item.e.getValuesList().get(0).getWeatherIcon()),
+								ContextCompat.getDrawable(context, item.e.getValuesList().get(1).getWeatherIcon()),
+								item.e.getValuesList().get(0).getWeatherDescription(),
+								item.e.getValuesList().get(1).getWeatherDescription()));
 					}
 					probabilityOfPrecipitationList.add(pop);
 
@@ -291,34 +293,34 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 					temp = item.e.getMinTemp().replace(tempUnitText, degree) + " / " + item.e.getMaxTemp().replace(tempUnitText, degree);
 					tempList.add(temp);
 
-					pop = item.e.getAmValues().getPop() + " / " + item.e.getPmValues().getPop();
+					pop = item.e.getValuesList().get(0).getPop() + " / " + item.e.getValuesList().get(1).getPop();
 					probabilityOfPrecipitationList.add(pop);
 
 					rainVolumeList.add(
-							String.format("%.2f", Float.parseFloat(item.e.getAmValues().getRainVolume().replace(mm, ""))
-									+ Float.parseFloat(item.e.getPmValues().getRainVolume().replace(mm, ""))));
+							String.format("%.2f", Float.parseFloat(item.e.getValuesList().get(0).getRainVolume().replace(mm, ""))
+									+ Float.parseFloat(item.e.getValuesList().get(1).getRainVolume().replace(mm, ""))));
 					snowVolumeList.add(
-							String.format("%.2f", Float.parseFloat(item.e.getAmValues().getSnowVolume().replace(cm, ""))
-									+ Float.parseFloat(item.e.getPmValues().getSnowVolume().replace(cm, ""))));
+							String.format("%.2f", Float.parseFloat(item.e.getValuesList().get(0).getSnowVolume().replace(cm, ""))
+									+ Float.parseFloat(item.e.getValuesList().get(1).getSnowVolume().replace(cm, ""))));
 
 					if (!haveSnow) {
-						if (item.e.getAmValues().isHasSnowVolume() ||
-								item.e.getPmValues().isHasSnowVolume()) {
+						if (item.e.getValuesList().get(0).isHasSnowVolume() ||
+								item.e.getValuesList().get(1).isHasSnowVolume()) {
 							haveSnow = true;
 						}
 					}
 
 					if (!haveRain) {
-						if (item.e.getAmValues().isHasRainVolume() ||
-								item.e.getPmValues().isHasRainVolume()) {
+						if (item.e.getValuesList().get(0).isHasRainVolume() ||
+								item.e.getValuesList().get(1).isHasRainVolume()) {
 							haveRain = true;
 						}
 					}
 					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
-							ContextCompat.getDrawable(context, item.e.getAmValues().getWeatherIcon()),
-							ContextCompat.getDrawable(context, item.e.getPmValues().getWeatherIcon()),
-							item.e.getAmValues().getWeatherDescription(),
-							item.e.getPmValues().getWeatherDescription()));
+							ContextCompat.getDrawable(context, item.e.getValuesList().get(0).getWeatherIcon()),
+							ContextCompat.getDrawable(context, item.e.getValuesList().get(1).getWeatherIcon()),
+							item.e.getValuesList().get(0).getWeatherDescription(),
+							item.e.getValuesList().get(1).getWeatherDescription()));
 				}
 
 			} else if (weatherProviderTypeList.get(i) == WeatherProviderType.OWM_ONECALL) {
@@ -326,24 +328,24 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 					temp = item.e.getMinTemp().replace(tempUnitText, degree) + " / " + item.e.getMaxTemp().replace(tempUnitText, degree);
 					tempList.add(temp);
 
-					pop = item.e.getSingleValues().getPop();
+					pop = item.e.getValuesList().get(0).getPop();
 					probabilityOfPrecipitationList.add(pop);
 
-					if (item.e.getSingleValues().isHasSnowVolume()) {
+					if (item.e.getValuesList().get(0).isHasSnowVolume()) {
 						if (!haveSnow) {
 							haveSnow = true;
 						}
 					}
-					if (item.e.getSingleValues().isHasRainVolume()) {
+					if (item.e.getValuesList().get(0).isHasRainVolume()) {
 						if (!haveRain) {
 							haveRain = true;
 						}
 					}
-					snowVolumeList.add(item.e.getSingleValues().getSnowVolume().replace(mm, ""));
-					rainVolumeList.add(item.e.getSingleValues().getRainVolume().replace(mm, ""));
+					snowVolumeList.add(item.e.getValuesList().get(0).getSnowVolume().replace(mm, ""));
+					rainVolumeList.add(item.e.getValuesList().get(0).getRainVolume().replace(mm, ""));
 
-					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(getContext(), item.e.getSingleValues().getWeatherIcon()),
-							item.e.getSingleValues().getWeatherDescription()));
+					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(getContext(), item.e.getValuesList().get(0).getWeatherIcon()),
+							item.e.getValuesList().get(0).getWeatherDescription()));
 				}
 			}
 			weatherSourceUnitObjList.add(new WeatherSourceUnitObj(weatherProviderTypeList.get(i), haveRain, haveSnow));

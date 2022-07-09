@@ -89,47 +89,47 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 			setPrecipitationGridItems(dailyForecastDto);
 
 			//날씨 아이콘, 최저/최고 기온, 강수확률, 강수량, 강우량, 강설량 설정
-			if (dailyForecastDto.isSingle()) {
+			if (dailyForecastDto.getValuesList().size() == 1) {
 				binding.timezone.setText(R.string.allDay);
 
-				binding.leftIcon.setImageResource(dailyForecastDto.getSingleValues().getWeatherIcon());
+				binding.leftIcon.setImageResource(dailyForecastDto.getValuesList().get(0).getWeatherIcon());
 				binding.leftIcon.setVisibility(View.VISIBLE);
 				binding.rightIcon.setVisibility(View.GONE);
 
-				binding.weatherDescription.setText(dailyForecastDto.getSingleValues().getWeatherDescription());
+				binding.weatherDescription.setText(dailyForecastDto.getValuesList().get(0).getWeatherDescription());
 
-				addListItem(labelValueItemList, context.getString(R.string.wind_direction), dailyForecastDto.getSingleValues().getWindDirection());
-				addListItem(labelValueItemList, context.getString(R.string.wind_speed), dailyForecastDto.getSingleValues().getWindSpeed());
-				addListItem(labelValueItemList, context.getString(R.string.wind_strength), dailyForecastDto.getSingleValues().getWindStrength());
-				addListItem(labelValueItemList, context.getString(R.string.wind_gust), dailyForecastDto.getSingleValues().getWindGust());
-				addListItem(labelValueItemList, context.getString(R.string.pressure), dailyForecastDto.getSingleValues().getPressure());
-				addListItem(labelValueItemList, context.getString(R.string.humidity), dailyForecastDto.getSingleValues().getHumidity());
-				addListItem(labelValueItemList, context.getString(R.string.dew_point), dailyForecastDto.getSingleValues().getDewPointTemp());
-				addListItem(labelValueItemList, context.getString(R.string.cloud_cover), dailyForecastDto.getSingleValues().getCloudiness());
-				addListItem(labelValueItemList, context.getString(R.string.uv_index), dailyForecastDto.getSingleValues().getUvIndex());
+				addListItem(labelValueItemList, context.getString(R.string.wind_direction), dailyForecastDto.getValuesList().get(0).getWindDirection());
+				addListItem(labelValueItemList, context.getString(R.string.wind_speed), dailyForecastDto.getValuesList().get(0).getWindSpeed());
+				addListItem(labelValueItemList, context.getString(R.string.wind_strength), dailyForecastDto.getValuesList().get(0).getWindStrength());
+				addListItem(labelValueItemList, context.getString(R.string.wind_gust), dailyForecastDto.getValuesList().get(0).getWindGust());
+				addListItem(labelValueItemList, context.getString(R.string.pressure), dailyForecastDto.getValuesList().get(0).getPressure());
+				addListItem(labelValueItemList, context.getString(R.string.humidity), dailyForecastDto.getValuesList().get(0).getHumidity());
+				addListItem(labelValueItemList, context.getString(R.string.dew_point), dailyForecastDto.getValuesList().get(0).getDewPointTemp());
+				addListItem(labelValueItemList, context.getString(R.string.cloud_cover), dailyForecastDto.getValuesList().get(0).getCloudiness());
+				addListItem(labelValueItemList, context.getString(R.string.uv_index), dailyForecastDto.getValuesList().get(0).getUvIndex());
 			} else {
 				binding.timezone.setText(new String(context.getString(R.string.am) + " / " +
 						context.getString(R.string.pm)));
 
-				binding.weatherDescription.setText(new String(dailyForecastDto.getAmValues().getWeatherDescription() + " / " +
-						dailyForecastDto.getPmValues().getWeatherDescription()));
+				binding.weatherDescription.setText(new String(dailyForecastDto.getValuesList().get(0).getWeatherDescription() + " / " +
+						dailyForecastDto.getValuesList().get(1).getWeatherDescription()));
 
-				binding.leftIcon.setImageResource(dailyForecastDto.getAmValues().getWeatherIcon());
-				binding.rightIcon.setImageResource(dailyForecastDto.getPmValues().getWeatherIcon());
+				binding.leftIcon.setImageResource(dailyForecastDto.getValuesList().get(0).getWeatherIcon());
+				binding.rightIcon.setImageResource(dailyForecastDto.getValuesList().get(1).getWeatherIcon());
 
 				binding.leftIcon.setVisibility(View.VISIBLE);
 				binding.rightIcon.setVisibility(View.VISIBLE);
 
 				addListItem(labelValueItemList, context.getString(R.string.wind_direction),
-						dailyForecastDto.getAmValues().getWindDirection(), dailyForecastDto.getPmValues().getWindDirection());
-				addListItem(labelValueItemList, context.getString(R.string.wind_speed), dailyForecastDto.getAmValues().getWindSpeed(), dailyForecastDto.getPmValues().getWindSpeed());
-				addListItem(labelValueItemList, context.getString(R.string.wind_strength), dailyForecastDto.getAmValues().getWindStrength(), dailyForecastDto.getPmValues().getWindStrength());
-				addListItem(labelValueItemList, context.getString(R.string.wind_gust), dailyForecastDto.getAmValues().getWindGust(), dailyForecastDto.getPmValues().getWindGust());
-				addListItem(labelValueItemList, context.getString(R.string.pressure), dailyForecastDto.getAmValues().getPressure(), dailyForecastDto.getPmValues().getPressure());
-				addListItem(labelValueItemList, context.getString(R.string.humidity), dailyForecastDto.getAmValues().getHumidity(), dailyForecastDto.getPmValues().getHumidity());
-				addListItem(labelValueItemList, context.getString(R.string.dew_point), dailyForecastDto.getAmValues().getDewPointTemp(), dailyForecastDto.getPmValues().getDewPointTemp());
-				addListItem(labelValueItemList, context.getString(R.string.cloud_cover), dailyForecastDto.getAmValues().getCloudiness(), dailyForecastDto.getPmValues().getCloudiness());
-				addListItem(labelValueItemList, context.getString(R.string.uv_index), dailyForecastDto.getAmValues().getUvIndex(), dailyForecastDto.getPmValues().getUvIndex());
+						dailyForecastDto.getValuesList().get(0).getWindDirection(), dailyForecastDto.getValuesList().get(1).getWindDirection());
+				addListItem(labelValueItemList, context.getString(R.string.wind_speed), dailyForecastDto.getValuesList().get(0).getWindSpeed(), dailyForecastDto.getValuesList().get(1).getWindSpeed());
+				addListItem(labelValueItemList, context.getString(R.string.wind_strength), dailyForecastDto.getValuesList().get(0).getWindStrength(), dailyForecastDto.getValuesList().get(1).getWindStrength());
+				addListItem(labelValueItemList, context.getString(R.string.wind_gust), dailyForecastDto.getValuesList().get(0).getWindGust(), dailyForecastDto.getValuesList().get(1).getWindGust());
+				addListItem(labelValueItemList, context.getString(R.string.pressure), dailyForecastDto.getValuesList().get(0).getPressure(), dailyForecastDto.getValuesList().get(1).getPressure());
+				addListItem(labelValueItemList, context.getString(R.string.humidity), dailyForecastDto.getValuesList().get(0).getHumidity(), dailyForecastDto.getValuesList().get(1).getHumidity());
+				addListItem(labelValueItemList, context.getString(R.string.dew_point), dailyForecastDto.getValuesList().get(0).getDewPointTemp(), dailyForecastDto.getValuesList().get(1).getDewPointTemp());
+				addListItem(labelValueItemList, context.getString(R.string.cloud_cover), dailyForecastDto.getValuesList().get(0).getCloudiness(), dailyForecastDto.getValuesList().get(1).getCloudiness());
+				addListItem(labelValueItemList, context.getString(R.string.uv_index), dailyForecastDto.getValuesList().get(0).getUvIndex(), dailyForecastDto.getValuesList().get(1).getUvIndex());
 
 			}
 
@@ -175,8 +175,8 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 		private void setPrecipitationGridItems(DailyForecastDto dailyForecastDto) {
 			List<GridItemDto> gridItemDtoList = new ArrayList<>();
 
-			if (dailyForecastDto.isSingle()) {
-				final DailyForecastDto.Values single = dailyForecastDto.getSingleValues();
+			if (dailyForecastDto.getValuesList().size() == 1) {
+				final DailyForecastDto.Values single = dailyForecastDto.getValuesList().get(0);
 
 				if (single.getPop() != null) {
 					gridItemDtoList.add(new GridItemDto(context.getString(R.string.probability_of_precipitation), single.getPop(), null));
@@ -197,8 +197,8 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 					gridItemDtoList.add(new GridItemDto(context.getString(R.string.snow_volume), single.getSnowVolume(), null));
 				}
 			} else {
-				final DailyForecastDto.Values am = dailyForecastDto.getAmValues();
-				final DailyForecastDto.Values pm = dailyForecastDto.getPmValues();
+				final DailyForecastDto.Values am = dailyForecastDto.getValuesList().get(0);
+				final DailyForecastDto.Values pm = dailyForecastDto.getValuesList().get(1);
 				final String divider = " / ";
 
 				if (am.getPop() != null || pm.getPop() != null) {

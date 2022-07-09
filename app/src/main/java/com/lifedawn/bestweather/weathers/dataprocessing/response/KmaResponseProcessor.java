@@ -902,8 +902,7 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 			dailyForecastDto.setDate(finalDailyForecast.getDate())
 					.setMinTemp(ValueUnits.convertTemperature(finalDailyForecast.getMinTemp(), tempUnit) + tempDegree)
-					.setMaxTemp(ValueUnits.convertTemperature(finalDailyForecast.getMaxTemp(), tempUnit) + tempDegree)
-					.setSingle(finalDailyForecast.isSingle());
+					.setMaxTemp(ValueUnits.convertTemperature(finalDailyForecast.getMaxTemp(), tempUnit) + tempDegree);
 
 			DailyForecastDto.Values single = null;
 			DailyForecastDto.Values am = null;
@@ -914,6 +913,8 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 				single.setPop(finalDailyForecast.getProbabilityOfPrecipitation())
 						.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getSky(), false))
 						.setWeatherDescription(finalDailyForecast.getSky());
+
+				dailyForecastDto.getValuesList().add(single);
 			} else {
 				am = new DailyForecastDto.Values();
 				pm = new DailyForecastDto.Values();
@@ -924,8 +925,11 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 				pm.setPop(finalDailyForecast.getPmProbabilityOfPrecipitation())
 						.setWeatherIcon(KmaResponseProcessor.getWeatherMidIconImg(finalDailyForecast.getPmSky(), false))
 						.setWeatherDescription(finalDailyForecast.getPmSky());
+
+				dailyForecastDto.getValuesList().add(am);
+				dailyForecastDto.getValuesList().add(pm);
 			}
-			dailyForecastDto.setSingleValues(single).setAmValues(am).setPmValues(pm);
+
 			dailyForecastDtoList.add(dailyForecastDto);
 		}
 		return dailyForecastDtoList;
@@ -943,20 +947,20 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 			dailyForecastDto.setDate(finalDailyForecast.getDate())
 					.setMinTemp(ValueUnits.convertTemperature(finalDailyForecast.getMinTemp(), tempUnit) + tempDegree)
-					.setMaxTemp(ValueUnits.convertTemperature(finalDailyForecast.getMaxTemp(), tempUnit) + tempDegree)
-					.setSingle(finalDailyForecast.isSingle());
+					.setMaxTemp(ValueUnits.convertTemperature(finalDailyForecast.getMaxTemp(), tempUnit) + tempDegree);
 
 			if (finalDailyForecast.isSingle()) {
 				DailyForecastDto.Values single = new DailyForecastDto.Values();
-				dailyForecastDto.setSingleValues(single);
 
 				single.setPop(finalDailyForecast.getSingleValues().getPop())
 						.setWeatherIcon(getWeatherMidIconImg(finalDailyForecast.getSingleValues().getWeatherDescription(), false))
 						.setWeatherDescription(getWeatherMidIconDescription(finalDailyForecast.getSingleValues().getWeatherDescription()));
+				dailyForecastDto.getValuesList().add(single);
 			} else {
 				DailyForecastDto.Values am = new DailyForecastDto.Values();
 				DailyForecastDto.Values pm = new DailyForecastDto.Values();
-				dailyForecastDto.setAmValues(am).setPmValues(pm);
+				dailyForecastDto.getValuesList().add(am);
+				dailyForecastDto.getValuesList().add(pm);
 
 				am.setPop(finalDailyForecast.getAmValues().getPop())
 						.setWeatherIcon(getWeatherMidIconImg(finalDailyForecast.getAmValues().getWeatherDescription(), false))

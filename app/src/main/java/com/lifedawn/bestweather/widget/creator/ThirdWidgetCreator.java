@@ -232,13 +232,13 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 			temp = dailyForecastDtoList.get(day).getMinTemp() + "/" + dailyForecastDtoList.get(day).getMaxTemp();
 			((TextView) itemView.findViewById(R.id.temperature)).setText(temp);
 
-			if (dailyForecastDtoList.get(day).isSingle()) {
-				((ImageView) itemView.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(day).getSingleValues().getWeatherIcon());
+			if (dailyForecastDtoList.get(day).getValuesList().size() == 1) {
 				itemView.findViewById(R.id.rightIcon).setVisibility(View.GONE);
 			} else {
-				((ImageView) itemView.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(day).getAmValues().getWeatherIcon());
-				((ImageView) itemView.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(day).getPmValues().getWeatherIcon());
+				((ImageView) itemView.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(day).getValuesList().get(1).getWeatherIcon());
 			}
+			((ImageView) itemView.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(day).getValuesList().get(0).getWeatherIcon());
+
 
 			itemView.findViewById(R.id.popLayout).setVisibility(View.GONE);
 			itemView.findViewById(R.id.rainVolumeLayout).setVisibility(View.GONE);

@@ -277,49 +277,49 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 				binding.date.setText(daily.getDate().format(dateFormatter));
 				binding.day.setText(daily.getDate().format(dayFormatter));
 
-				if (daily.isSingle()) {
-					binding.pop.setText(daily.getSingleValues().getPop());
+				if (daily.getValuesList().size() == 1) {
+					binding.pop.setText(daily.getValuesList().get(0).getPop());
 
-					if (!daily.getSingleValues().isHasSnowVolume()) {
+					if (!daily.getValuesList().get(0).isHasSnowVolume()) {
 						binding.snowVolumeLayout.setVisibility(View.GONE);
 					} else {
-						binding.snowVolume.setText(daily.getSingleValues().getSnowVolume());
+						binding.snowVolume.setText(daily.getValuesList().get(0).getSnowVolume());
 						binding.snowVolumeLayout.setVisibility(View.VISIBLE);
 					}
 
-					if (!daily.getSingleValues().isHasRainVolume()) {
+					if (!daily.getValuesList().get(0).isHasRainVolume()) {
 						binding.rainVolumeLayout.setVisibility(View.GONE);
 					} else {
-						binding.rainVolume.setText(daily.getSingleValues().getRainVolume());
+						binding.rainVolume.setText(daily.getValuesList().get(0).getRainVolume());
 						binding.rainVolumeLayout.setVisibility(View.VISIBLE);
 					}
 
-					binding.leftWeatherIcon.setImageResource(daily.getSingleValues().getWeatherIcon());
+					binding.leftWeatherIcon.setImageResource(daily.getValuesList().get(0).getWeatherIcon());
 					binding.rightWeatherIcon.setVisibility(View.GONE);
 				} else {
-					binding.leftWeatherIcon.setImageResource(daily.getAmValues().getWeatherIcon());
-					binding.rightWeatherIcon.setImageResource(daily.getPmValues().getWeatherIcon());
+					binding.leftWeatherIcon.setImageResource(daily.getValuesList().get(0).getWeatherIcon());
+					binding.rightWeatherIcon.setImageResource(daily.getValuesList().get(1).getWeatherIcon());
 					binding.rightWeatherIcon.setVisibility(View.VISIBLE);
 
-					String pop = daily.getAmValues().getPop() + " / " + daily.getPmValues().getPop();
+					String pop = daily.getValuesList().get(0).getPop() + " / " + daily.getValuesList().get(1).getPop();
 					binding.pop.setText(pop);
 
-					if (!daily.getAmValues().isHasSnowVolume() &&
-							!daily.getPmValues().isHasSnowVolume()) {
+					if (!daily.getValuesList().get(0).isHasSnowVolume() &&
+							!daily.getValuesList().get(1).isHasSnowVolume()) {
 						binding.snowVolumeLayout.setVisibility(View.GONE);
 					} else {
-						String snow = daily.getAmValues().getSnowVolume() + " / " +
-								daily.getPmValues().getSnowVolume();
+						String snow = daily.getValuesList().get(0).getSnowVolume() + " / " +
+								daily.getValuesList().get(1).getSnowVolume();
 						binding.snowVolume.setText(snow);
 						binding.snowVolumeLayout.setVisibility(View.VISIBLE);
 					}
 
-					if (!daily.getAmValues().isHasRainVolume() &&
-							!daily.getPmValues().isHasRainVolume()) {
+					if (!daily.getValuesList().get(0).isHasRainVolume() &&
+							!daily.getValuesList().get(1).isHasRainVolume()) {
 						binding.rainVolumeLayout.setVisibility(View.GONE);
 					} else {
-						String rain = daily.getAmValues().getRainVolume() + " / " +
-								daily.getPmValues().getRainVolume();
+						String rain = daily.getValuesList().get(0).getRainVolume() + " / " +
+								daily.getValuesList().get(1).getRainVolume();
 						binding.snowVolume.setText(rain);
 						binding.rainVolumeLayout.setVisibility(View.VISIBLE);
 					}

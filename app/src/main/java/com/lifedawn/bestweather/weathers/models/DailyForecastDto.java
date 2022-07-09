@@ -7,17 +7,13 @@ import java.util.List;
 
 public class DailyForecastDto implements Serializable {
 	private ZonedDateTime date;
-	private boolean isSingle;
-
-	private Values amValues;
-	private Values pmValues;
-	private List<Values> valuesList = new ArrayList<>();
-	private Values singleValues;
+	private final List<Values> valuesList = new ArrayList<>();
 
 	private String minTemp;
 	private String maxTemp;
 	private String minFeelsLikeTemp;
 	private String maxFeelsLikeTemp;
+	private boolean available_toMakeMinMaxTemp = true;
 
 	public final static class Values implements Serializable {
 		private int weatherIcon;
@@ -347,32 +343,6 @@ public class DailyForecastDto implements Serializable {
 		return this;
 	}
 
-	public boolean isSingle() {
-		return isSingle;
-	}
-
-	public DailyForecastDto setSingle(boolean single) {
-		isSingle = single;
-		return this;
-	}
-
-	public Values getAmValues() {
-		return amValues;
-	}
-
-	public DailyForecastDto setAmValues(Values amValues) {
-		this.amValues = amValues;
-		return this;
-	}
-
-	public Values getPmValues() {
-		return pmValues;
-	}
-
-	public DailyForecastDto setPmValues(Values pmValues) {
-		this.pmValues = pmValues;
-		return this;
-	}
 
 	public String getMinTemp() {
 		return minTemp;
@@ -410,12 +380,12 @@ public class DailyForecastDto implements Serializable {
 		return this;
 	}
 
-	public Values getSingleValues() {
-		return singleValues;
+	public boolean isAvailable_toMakeMinMaxTemp() {
+		return available_toMakeMinMaxTemp;
 	}
 
-	public DailyForecastDto setSingleValues(Values singleValues) {
-		this.singleValues = singleValues;
+	public DailyForecastDto setAvailable_toMakeMinMaxTemp(boolean available_toMakeMinMaxTemp) {
+		this.available_toMakeMinMaxTemp = available_toMakeMinMaxTemp;
 		return this;
 	}
 

@@ -636,11 +636,12 @@ public class WeatherResponseProcessor {
 
 		for (int i = 0; i < count; i++) {
 			DailyForecastDto dailyForecastDto = new DailyForecastDto();
+			dailyForecastDto.getValuesList().add(new DailyForecastDto.Values());
+			dailyForecastDto.getValuesList().add(new DailyForecastDto.Values());
 
-			dailyForecastDto.setAmValues(new DailyForecastDto.Values()).setPmValues(new DailyForecastDto.Values())
-					.setMinTemp(minTemp).setMaxTemp(maxTemp).setDate(zonedDateTime).getAmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop)
+			dailyForecastDto.setMinTemp(minTemp).setMaxTemp(maxTemp).setDate(zonedDateTime).getValuesList().get(0).setWeatherIcon(R.drawable.day_clear).setPop(pop)
 					.setRainVolume(zeroRainVolume).setSnowVolume(zeroSnowVolume);
-			dailyForecastDto.getPmValues().setWeatherIcon(R.drawable.day_clear).setPop(pop)
+			dailyForecastDto.getValuesList().get(1).setWeatherIcon(R.drawable.day_clear).setPop(pop)
 					.setRainVolume(zeroRainVolume).setSnowVolume(zeroSnowVolume);
 
 			dailyForecastDtoList.add(dailyForecastDto);

@@ -71,7 +71,7 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 				.replace("_", "");
 		int iconId = WEATHER_ICON_ID_MAP.get(symbolCode);
 
-		if (symbolCode.contains("night")) {
+		if (isNight) {
 			if (iconId == R.drawable.day_clear) {
 				iconId = R.drawable.night_clear;
 			} else if (iconId == R.drawable.day_partly_cloudy) {
@@ -87,7 +87,6 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 		final String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String percent = "%";
-
 
 		ZonedDateTime time =
 				ZonedDateTime.parse(locationForecastResponse.getProperties().getTimeSeries().get(0).getTime());
@@ -289,66 +288,7 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 
 		String precipitation = null;
 
-		while (i < startIdx_dayHasNotNext1Hours) {
-			data = hourlyList.get(i).getData();
-
-			date =
-					ZonedDateTime.parse(hourlyList.get(i).getTime());
-			date = date.withZoneSameInstant(zoneId);
-			date = date.withMinute(0).withSecond(0).withNano(0);
-			hour = date.getHour();
-			dayOfYear = date.getDayOfYear();
-
-			if (dayOfYear == hasNotNext1HoursDayOfYear) {
-				break;
-			}
-
-			if (!forecastDtoSortedMap.containsKey(date.toLocalDate().toString())) {
-				DailyForecastDto dailyForecastDto = new DailyForecastDto();
-				dailyForecastDto.setDate(date);
-				forecastDtoSortedMap.put(date.toLocalDate().toString(), dailyForecastDto);
-			}
-
-			if (hour <= 23) {
-				minTemp = Math.min(Double.parseDouble(data.getInstant().getDetails().getAirTemperature()), minTemp);
-				maxTemp = Math.max(Double.parseDouble(data.getInstant().getDetails().getAirTemperature()), maxTemp);
-			}
-
-			if (!data.getNext_6_hours().getDetails().getPrecipitationAmount().equals(zero)) {
-				precipitation = data.getNext_6_hours().getDetails().getPrecipitationAmount() + mm;
-			} else {
-				precipitation = null;
-			}
-
-
-			DailyForecastDto.Values values = new DailyForecastDto.Values();
-			values.setMinTemp(ValueUnits.convertTemperature(data.getNext_6_hours().getDetails().getAirTemperatureMin(), tempUnit) + tempDegree)
-					.setMaxTemp(ValueUnits.convertTemperature(data.getNext_6_hours().getDetails().getAirTemperatureMax(), tempUnit) + tempDegree)
-					.setWeatherIcon(getWeatherIconImg(data.getNext_6_hours().getSummary().getSymbolCode()))
-					.setWeatherDescription(getWeatherIconDescription(data.getNext_6_hours().getSummary().getSymbolCode()))
-					.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, data.getInstant().getDetails().getWindFromDirection()))
-					.setWindDirectionVal((int) Double.parseDouble(data.getInstant().getDetails().getWindFromDirection()))
-					.setWindSpeed(ValueUnits.convertWindSpeed(data.getInstant().getDetails().getWindSpeed(), windUnit) + wind)
-					.setWindStrength(WindUtil.getSimpleWindSpeedDescription(data.getInstant().getDetails().getWindSpeed()))
-					.setHasPrecipitationNextHoursAmount(true)
-					.setPrecipitationNextHoursAmount(6)
-					.setDateTime(date);
-
-			values.setHasPrecipitationVolume(precipitation != null)
-					.setPrecipitationVolume(precipitation == null ? zeroPrecipitationVolume : precipitation);
-
-			forecastDtoSortedMap.get(date.toLocalDate().toString()).getValuesList().add(values);
-
-			if (hour == 23) {
-				forecastDtoSortedMap.get(date.toLocalDate().toString()).setMinTemp(ValueUnits.convertTemperature(String.valueOf(minTemp), tempUnit) + tempDegree)
-						.setMaxTemp(ValueUnits.convertTemperature(String.valueOf(maxTemp), tempUnit) + tempDegree)
-						.setDate(date.withHour(0));
-			}
-
-			i += 6;
-		}
-
-		for (i = startIdx_dayHasNotNext1Hours; i < idx_hasNotNext1Hours; i++) {
+		while (i < idx_hasNotNext1Hours) {
 			data = hourlyList.get(i).getData();
 
 			date = ZonedDateTime.parse(hourlyList.get(i).getTime());
@@ -376,14 +316,17 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 			if (!data.getNext_1_hours().getDetails().getPrecipitationAmount().equals(zero)) {
 				precipitation = data.getNext_1_hours().getDetails().getPrecipitationAmount() + mm;
 			} else {
-				precipitation = null;
+				precipitation = zeroPrecipitationVolume;
 			}
 
-			values.setHasPrecipitationVolume(precipitation != null)
-					.setPrecipitationVolume(precipitation == null ? zeroPrecipitationVolume : precipitation);
+			values.setHasPrecipitationVolume(!data.getNext_1_hours().getDetails().getPrecipitationAmount().equals(zero))
+					.setPrecipitationVolume(precipitation);
 
 			forecastDtoSortedMap.get(date.toLocalDate().toString()).getValuesList().add(values);
+
+			i++;
 		}
+
 
 		for (i = idx_hasNotNext1Hours; i < hourlyList.size(); i++) {
 			data = hourlyList.get(i).getData();
@@ -422,14 +365,54 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 				precipitation = zeroPrecipitationVolume;
 			}
 
-			values.setHasPrecipitationVolume(precipitation != null)
-					.setPrecipitationVolume(precipitation == null ? zeroPrecipitationVolume : precipitation);
+			values.setHasPrecipitationVolume(!data.getNext_6_hours().getDetails().getPrecipitationAmount().equals(zero))
+					.setPrecipitationVolume(precipitation);
 
 			forecastDtoSortedMap.get(date.toLocalDate().toString()).getValuesList().add(values);
 		}
 
 		List<DailyForecastDto> dailyForecastDtos = new ArrayList<>();
 		dailyForecastDtos.addAll(forecastDtoSortedMap.values());
+
+
+		for (DailyForecastDto dto : dailyForecastDtos) {
+			int hours = 0;
+			minTemp = Double.MAX_VALUE;
+			maxTemp = Double.MIN_VALUE;
+
+			for (DailyForecastDto.Values values : dto.getValuesList()) {
+				hours = values.getPrecipitationNextHoursAmount() == 0 ? hours + 1 : hours + values.getPrecipitationNextHoursAmount();
+
+				if (values.isHasPrecipitationNextHoursAmount()) {
+					// 6 hours
+					minTemp = Math.min(Integer.parseInt(values.getMinTemp().replace(tempDegree, "")), minTemp);
+					maxTemp = Math.max(Integer.parseInt(values.getMaxTemp().replace(tempDegree, "")), maxTemp);
+				} else {
+					// 1 hours
+					int temp = Integer.parseInt(values.getTemp().replace(tempDegree, ""));
+					minTemp = Math.min(temp, minTemp);
+					maxTemp = Math.max(temp, maxTemp);
+				}
+			}
+
+			if (hours < 23) {
+				dto.setAvailable_toMakeMinMaxTemp(false);
+			} else {
+				// available
+				dto.setMinTemp(ValueUnits.convertTemperature(String.valueOf(minTemp), tempUnit) + tempDegree)
+						.setMaxTemp(ValueUnits.convertTemperature(String.valueOf(maxTemp), tempUnit) + tempDegree);
+
+				if (dto.getValuesList().size() == 24) {
+					//1시간별 예보만 포함
+				} else if (dto.getValuesList().size() > 4) {
+					//1시간, 6시간별 예보 혼합
+
+				}
+			}
+
+
+		}
+
 		return dailyForecastDtos;
 	}
 
