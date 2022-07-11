@@ -76,9 +76,6 @@ public abstract class MultipleRestApiDownloader {
 		this.loadingDialog = loadingDialog;
 	}
 
-	public AlertDialog getLoadingDialog() {
-		return loadingDialog;
-	}
 
 	public void put(@NonNull @NotNull String key, @NonNull @NotNull String value) {
 		valueMap.put(key, value);

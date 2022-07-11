@@ -160,7 +160,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private MultipleRestApiDownloader multipleRestApiDownloader;
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
-	private AlertDialog loadingDialog;
 	private Bundle arguments;
 
 	public WeatherFragment() {
@@ -295,11 +294,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
-					if (loadingDialog == null) {
-						loadingDialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
-					} else {
-						loadingDialog.setMessage(getString(R.string.msg_finding_current_location));
-					}
+					ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
 					fusedLocation.findCurrentLocation(MY_LOCATION_CALLBACK, false);
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
@@ -341,7 +336,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
-					loadingDialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
 					requestNewData();
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
@@ -406,8 +400,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	public void load(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
-		loadingDialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
-
 		binding.mainToolbar.gps.setVisibility(locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
 		binding.mainToolbar.find.setVisibility(locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
 
@@ -571,7 +563,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		@Override
 		public void onFailed(Fail fail) {
 			ProgressDialog.clearDialogs();
-			loadingDialog = null;
 
 			locationCallbackInMainFragment.onFailed(fail);
 
@@ -694,9 +685,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void reDraw() {
 		//날씨 프래그먼트 다시 그림
 		if (FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString())) {
-			if (loadingDialog == null) {
-				loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
-			}
+			ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
+
 
 			executorService.execute(new Runnable() {
 				@Override
@@ -705,7 +695,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					weatherProviderTypeSet.add(mainWeatherProviderType);
 					weatherProviderTypeSet.add(WeatherProviderType.AQICN);
 					setWeatherFragments(weatherProviderTypeSet, FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader,
-							latitude, longitude, null);
+							latitude, longitude);
 				}
 			});
 
@@ -721,10 +711,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	public void requestNewData() {
+		ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
 		binding.scrollView.setVisibility(View.GONE);
-		if (loadingDialog != null) {
-			loadingDialog.setMessage(getString(R.string.msg_refreshing_weather_data));
-		}
 
 		executorService.execute(new Runnable() {
 			@Override
@@ -751,7 +739,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 					}
 				};
-				multipleRestApiDownloader.setLoadingDialog(loadingDialog);
 				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleRestApiDownloader);
 			}
 		});
@@ -759,7 +746,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private void requestNewDataWithAnotherWeatherSource(WeatherProviderType newWeatherProviderType, WeatherProviderType lastWeatherProviderType) {
 		binding.scrollView.setVisibility(View.GONE);
-		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
+		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		executorService.execute(new Runnable() {
 			@Override
@@ -786,7 +773,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 					}
 				};
-				multipleRestApiDownloader.setLoadingDialog(loadingDialog);
+
 				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleRestApiDownloader);
 			}
 		});
@@ -837,18 +824,22 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 								R.string.rerequest_another_weather_datasource);
 					}
 
-					loadingDialog.dismiss();
-					loadingDialog = null;
 
 					if (containWeatherData(latitude, longitude)) {
-						binding.scrollView.setVisibility(View.VISIBLE);
-						Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
+						MainThreadWorker.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								binding.scrollView.setVisibility(View.VISIBLE);
+								Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
+							}
+						});
+
 					} else {
 						btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								responseResultObj.multipleRestApiDownloader.setLoadingDialog(
-										reRefreshBySameWeatherSource(responseResultObj));
+
+								reRefreshBySameWeatherSource(responseResultObj);
 							}
 						}, getString(R.string.again)));
 
@@ -861,8 +852,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 									responseResultObj.weatherProviderTypeSet.clear();
 									responseResultObj.weatherProviderTypeSet.add(responseResultObj.mainWeatherProviderType);
 									responseResultObj.weatherProviderTypeSet.add(WeatherProviderType.AQICN);
-									responseResultObj.multipleRestApiDownloader.setLoadingDialog(
-											reRefreshByAnotherWeatherSource(responseResultObj));
+									reRefreshByAnotherWeatherSource(responseResultObj);
 								}
 							}, failedDialogItems[index]));
 							index++;
@@ -870,6 +860,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 						setFailFragment(btnObjList);
 					}
+
+					ProgressDialog.clearDialogs();
 
 					return;
 				}
@@ -885,8 +877,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						responseResultObj.weatherProviderTypeSet, responseResultObj.mainWeatherProviderType);
 
 				FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
-				setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.multipleRestApiDownloader, latitude, longitude,
-						responseResultObj.multipleRestApiDownloader.getLoadingDialog());
+				setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.multipleRestApiDownloader, latitude, longitude
+				);
 			}
 		});
 
@@ -1006,9 +998,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		return others;
 	}
 
-	private AlertDialog reRefreshBySameWeatherSource(ResponseResultObj responseResultObj) {
+	private void reRefreshBySameWeatherSource(ResponseResultObj responseResultObj) {
+		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 		binding.scrollView.setVisibility(View.GONE);
-		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		executorService.execute(new Runnable() {
 			@Override
@@ -1035,12 +1027,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			}
 		});
 
-		return loadingDialog;
 	}
 
-	private AlertDialog reRefreshByAnotherWeatherSource(ResponseResultObj responseResultObj) {
+	private void reRefreshByAnotherWeatherSource(ResponseResultObj responseResultObj) {
 		binding.scrollView.setVisibility(View.GONE);
-		loadingDialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
+		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		executorService.execute(new Runnable() {
 			@Override
@@ -1054,7 +1045,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			}
 		});
 
-		return loadingDialog;
 	}
 
 	private void setRequestWeatherSourceWithSourceTypes(Set<WeatherProviderType> weatherProviderTypeSet,
@@ -1116,7 +1106,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	private void setWeatherFragments(Set<WeatherProviderType> weatherProviderTypeSet, MultipleRestApiDownloader multipleRestApiDownloader,
-	                                 Double latitude, Double longitude, @Nullable AlertDialog loadingDialog) {
+	                                 Double latitude, Double longitude) {
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap = null;
 

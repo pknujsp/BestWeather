@@ -26,10 +26,11 @@ public class ProgressDialog {
 	}
 
 	public static AlertDialog show(Activity activity, String msg, @Nullable View.OnClickListener cancelOnClickListener) {
+		clearDialogs();
+
 		View progressView = LayoutInflater.from(activity.getApplicationContext()).inflate(R.layout.progress_view, null);
 		((TextView) progressView.findViewById(R.id.progress_msg)).setText(msg);
 
-		clearDialogs();
 		AlertDialog dialog = new AlertDialog.Builder(activity).setCancelable(false).setView(progressView).create();
 		dialog.show();
 

@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<DetailDailyForecastViewPagerAdapter.ViewHolder> {
 	private Context context;
@@ -222,9 +223,11 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				}
 
 			} else {
-				final DailyForecastDto.Values am = dailyForecastDto.getValuesList().get(dailyForecastDto.getValuesList().size() == 2 ? 0
+				final int valuesSize = dailyForecastDto.getValuesList().size();
+
+				final DailyForecastDto.Values am = dailyForecastDto.getValuesList().get(valuesSize == 2 ? 0
 						: 1);
-				final DailyForecastDto.Values pm = dailyForecastDto.getValuesList().get(dailyForecastDto.getValuesList().size() == 2 ? 1
+				final DailyForecastDto.Values pm = dailyForecastDto.getValuesList().get(valuesSize == 2 ? 1
 						: 2);
 				final String divider = " / ";
 
@@ -241,8 +244,14 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				}
 
 				if (am.isHasPrecipitationVolume() || pm.isHasPrecipitationVolume()) {
+					String mm = "mm";
+					final float amVolume = Float.parseFloat(dailyForecastDto.getValuesList().get(0).getPrecipitationVolume().replace(mm, "")) +
+							Float.parseFloat(dailyForecastDto.getValuesList().get(1).getPrecipitationVolume().replace(mm, ""));
+					final float pmVolume = Float.parseFloat(dailyForecastDto.getValuesList().get(2).getPrecipitationVolume().replace(mm,
+							"")) + Float.parseFloat(dailyForecastDto.getValuesList().get(3).getPrecipitationVolume().replace(mm, ""));
+
 					gridItemDtoList.add(new GridItemDto(context.getString(R.string.precipitation_volume),
-							am.getPrecipitationVolume() + divider + pm.getPrecipitationVolume(),
+							String.format(Locale.getDefault(), "%.2fmm", amVolume) + divider + String.format(Locale.getDefault(), "%.2fmm", pmVolume),
 							null));
 				}
 				if (am.isHasRainVolume() || pm.isHasRainVolume()) {

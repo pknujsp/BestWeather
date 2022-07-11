@@ -169,8 +169,6 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 							ValueUnits.convertWindSpeed(instantDetails.getWindSpeed(), ValueUnits.kmPerHour),
 							Double.parseDouble(instantDetails.getRelativeHumidity()));
 
-			hasPrecipitation = false;
-
 			if (hourly.getData().getNext_1_hours() == null) {
 				//이후 6시간 강수량 표기
 				if (hourly.getData().getNext_6_hours().getDetails().getPrecipitationAmount().equals(zero)) {
@@ -204,7 +202,7 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 			hourlyForecastDto.setHours(time)
 					.setWeatherIcon(weatherIcon)
 					.setTemp(ValueUnits.convertTemperature(instantDetails.getAirTemperature(), tempUnit) + tempDegree)
-					.setHasNext6HoursPrecipitation(hourly.getData().getNext_6_hours() != null)
+					.setHasNext6HoursPrecipitation(hourly.getData().getNext_1_hours() == null)
 					.setHasPrecipitation(hasPrecipitation)
 					.setWeatherDescription(weatherDescription)
 					.setFeelsLikeTemp(ValueUnits.convertTemperature(feelsLikeTemp.toString(), tempUnit) + tempDegree)
