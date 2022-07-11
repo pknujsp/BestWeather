@@ -88,9 +88,12 @@ public class DetailDailyForecastDialogFragment extends BaseDetailDialogFragment 
 			if (item.getValuesList().size() == 1) {
 				leftIcon.setImageResource(item.getValuesList().get(0).getWeatherIcon());
 				rightIcon.setVisibility(View.GONE);
-			} else {
+			} else if (item.getValuesList().size() == 2) {
 				leftIcon.setImageResource(item.getValuesList().get(0).getWeatherIcon());
 				rightIcon.setImageResource(item.getValuesList().get(1).getWeatherIcon());
+			} else if (item.getValuesList().size() == 4) {
+				leftIcon.setImageResource(item.getValuesList().get(1).getWeatherIcon());
+				rightIcon.setImageResource(item.getValuesList().get(2).getWeatherIcon());
 			}
 
 			binding.tabLayout.getTabAt(index++).setCustomView(itemView);

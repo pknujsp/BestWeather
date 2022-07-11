@@ -58,6 +58,7 @@ public class DetailHourlyForecastDialogFragment extends BaseDetailDialogFragment
 		setTabCustomView();
 	}
 
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();

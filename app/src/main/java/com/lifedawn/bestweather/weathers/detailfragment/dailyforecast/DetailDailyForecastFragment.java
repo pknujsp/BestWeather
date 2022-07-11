@@ -41,11 +41,11 @@ public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment
 	protected void setDataViewsByList() {
 		boolean hasPrecipitationVolume = false;
 		for (DailyForecastDto item : dailyForecastDtoList) {
-			if (item.getValuesList().size() == 1) {
-				hasPrecipitationVolume = item.getValuesList().get(0).isHasPrecipitationVolume();
-			} else {
-				hasPrecipitationVolume =
-						item.getValuesList().get(0).isHasPrecipitationVolume() || item.getValuesList().get(1).isHasPrecipitationVolume();
+			for (DailyForecastDto.Values values : item.getValuesList()) {
+				if (values.isHasPrecipitationVolume()) {
+					hasPrecipitationVolume = true;
+					break;
+				}
 			}
 
 			if (hasPrecipitationVolume) {

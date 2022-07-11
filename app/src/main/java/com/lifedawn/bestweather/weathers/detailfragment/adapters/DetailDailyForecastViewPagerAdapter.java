@@ -107,7 +107,7 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				addListItem(labelValueItemList, context.getString(R.string.dew_point), dailyForecastDto.getValuesList().get(0).getDewPointTemp());
 				addListItem(labelValueItemList, context.getString(R.string.cloud_cover), dailyForecastDto.getValuesList().get(0).getCloudiness());
 				addListItem(labelValueItemList, context.getString(R.string.uv_index), dailyForecastDto.getValuesList().get(0).getUvIndex());
-			} else {
+			} else if (dailyForecastDto.getValuesList().size() == 2) {
 				binding.timezone.setText(new String(context.getString(R.string.am) + " / " +
 						context.getString(R.string.pm)));
 
@@ -131,6 +131,30 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				addListItem(labelValueItemList, context.getString(R.string.cloud_cover), dailyForecastDto.getValuesList().get(0).getCloudiness(), dailyForecastDto.getValuesList().get(1).getCloudiness());
 				addListItem(labelValueItemList, context.getString(R.string.uv_index), dailyForecastDto.getValuesList().get(0).getUvIndex(), dailyForecastDto.getValuesList().get(1).getUvIndex());
 
+			} else if (dailyForecastDto.getValuesList().size() == 4) {
+				// 강수량, 날씨 아이콘, 날씨 설명, 풍향, 풍속
+
+				binding.timezone.setText(new String(context.getString(R.string.am) + " / " +
+						context.getString(R.string.pm)));
+
+				binding.weatherDescription.setText(new String(dailyForecastDto.getValuesList().get(1).getWeatherDescription() + " / " +
+						dailyForecastDto.getValuesList().get(2).getWeatherDescription()));
+
+				binding.leftIcon.setImageResource(dailyForecastDto.getValuesList().get(1).getWeatherIcon());
+				binding.rightIcon.setImageResource(dailyForecastDto.getValuesList().get(2).getWeatherIcon());
+
+				binding.leftIcon.setVisibility(View.VISIBLE);
+				binding.rightIcon.setVisibility(View.VISIBLE);
+
+				addListItem(labelValueItemList, context.getString(R.string.wind_direction),
+						dailyForecastDto.getValuesList().get(1).getWindDirection(),
+						dailyForecastDto.getValuesList().get(2).getWindDirection());
+				addListItem(labelValueItemList, context.getString(R.string.wind_speed),
+						dailyForecastDto.getValuesList().get(1).getWindSpeed()
+						, dailyForecastDto.getValuesList().get(2).getWindSpeed());
+				addListItem(labelValueItemList, context.getString(R.string.wind_strength),
+						dailyForecastDto.getValuesList().get(1).getWindStrength(),
+						dailyForecastDto.getValuesList().get(2).getWindStrength());
 			}
 
 			for (LabelValueItem labelValueItem : labelValueItemList) {
@@ -196,9 +220,12 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				if (single.isHasSnowVolume()) {
 					gridItemDtoList.add(new GridItemDto(context.getString(R.string.snow_volume), single.getSnowVolume(), null));
 				}
+
 			} else {
-				final DailyForecastDto.Values am = dailyForecastDto.getValuesList().get(0);
-				final DailyForecastDto.Values pm = dailyForecastDto.getValuesList().get(1);
+				final DailyForecastDto.Values am = dailyForecastDto.getValuesList().get(dailyForecastDto.getValuesList().size() == 2 ? 0
+						: 1);
+				final DailyForecastDto.Values pm = dailyForecastDto.getValuesList().get(dailyForecastDto.getValuesList().size() == 2 ? 1
+						: 2);
 				final String divider = " / ";
 
 				if (am.getPop() != null || pm.getPop() != null) {
@@ -212,16 +239,17 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				if (am.getPos() != null || pm.getPos() != null) {
 					gridItemDtoList.add(new GridItemDto(context.getString(R.string.probability_of_snow), am.getPos() + divider + pm.getPos(), null));
 				}
-				if (am.isHasPrecipitationVolume()) {
+
+				if (am.isHasPrecipitationVolume() || pm.isHasPrecipitationVolume()) {
 					gridItemDtoList.add(new GridItemDto(context.getString(R.string.precipitation_volume),
 							am.getPrecipitationVolume() + divider + pm.getPrecipitationVolume(),
 							null));
 				}
-				if (am.isHasRainVolume()) {
+				if (am.isHasRainVolume() || pm.isHasRainVolume()) {
 					gridItemDtoList.add(new GridItemDto(context.getString(R.string.rain_volume),
 							am.getRainVolume() + divider + pm.getRainVolume(), null));
 				}
-				if (am.isHasSnowVolume()) {
+				if (am.isHasSnowVolume() || pm.isHasSnowVolume()) {
 					gridItemDtoList.add(new GridItemDto(context.getString(R.string.snow_volume),
 							am.getSnowVolume() + divider + pm.getSnowVolume(), null));
 				}

@@ -14,6 +14,7 @@ public class DailyForecastDto implements Serializable {
 	private String minFeelsLikeTemp;
 	private String maxFeelsLikeTemp;
 	private boolean available_toMakeMinMaxTemp = true;
+	private boolean haveOnly1HoursForecast = false;
 
 	public final static class Values implements Serializable {
 		private int weatherIcon;
@@ -386,6 +387,15 @@ public class DailyForecastDto implements Serializable {
 
 	public DailyForecastDto setAvailable_toMakeMinMaxTemp(boolean available_toMakeMinMaxTemp) {
 		this.available_toMakeMinMaxTemp = available_toMakeMinMaxTemp;
+		return this;
+	}
+
+	public boolean isHaveOnly1HoursForecast() {
+		return haveOnly1HoursForecast;
+	}
+
+	public DailyForecastDto setHaveOnly1HoursForecast(boolean haveOnly1HoursForecast) {
+		this.haveOnly1HoursForecast = haveOnly1HoursForecast;
 		return this;
 	}
 

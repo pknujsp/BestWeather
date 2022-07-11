@@ -137,13 +137,12 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 
 		final String windUnitStr = MyApplication.VALUE_UNIT_OBJ.getWindUnitText();
 		final String zeroPrecipitationVolume = "0.0mm";
-		final String zero = "0";
+		final String zero = "0.0";
 		final String pressureUnit = "hpa";
 
 		String precipitationVolume;
 
-		boolean has1HoursPrecipitation = false;
-		boolean has6HoursPrecipitation = false;
+		boolean hasPrecipitation = false;
 
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 		HourlyForecastDto hourlyForecastDto = null;
@@ -170,32 +169,25 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 							ValueUnits.convertWindSpeed(instantDetails.getWindSpeed(), ValueUnits.kmPerHour),
 							Double.parseDouble(instantDetails.getRelativeHumidity()));
 
-			has6HoursPrecipitation = false;
-			has1HoursPrecipitation = false;
+			hasPrecipitation = false;
 
 			if (hourly.getData().getNext_1_hours() == null) {
 				//이후 6시간 강수량 표기
 				if (hourly.getData().getNext_6_hours().getDetails().getPrecipitationAmount().equals(zero)) {
 					precipitationVolume = zeroPrecipitationVolume;
-					has6HoursPrecipitation = false;
+					hasPrecipitation = false;
 				} else {
 					precipitationVolume = hourly.getData().getNext_6_hours().getDetails().getPrecipitationAmount() + mm;
-					has6HoursPrecipitation = true;
+					hasPrecipitation = true;
 				}
 			} else {
 				if (hourly.getData().getNext_1_hours().getDetails().getPrecipitationAmount().equals(zero)) {
 					precipitationVolume = zeroPrecipitationVolume;
-					has1HoursPrecipitation = false;
+					hasPrecipitation = false;
 				} else {
 					precipitationVolume = hourly.getData().getNext_1_hours().getDetails().getPrecipitationAmount() + mm;
-					has1HoursPrecipitation = true;
+					hasPrecipitation = true;
 				}
-			}
-
-			if (has1HoursPrecipitation) {
-				hourlyForecastDto.setPrecipitationVolume(precipitationVolume);
-			} else if (has6HoursPrecipitation) {
-				hourlyForecastDto.setNext6HoursPrecipitationVolume(precipitationVolume);
 			}
 
 			int weatherIcon = 0;
@@ -212,8 +204,8 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 			hourlyForecastDto.setHours(time)
 					.setWeatherIcon(weatherIcon)
 					.setTemp(ValueUnits.convertTemperature(instantDetails.getAirTemperature(), tempUnit) + tempDegree)
-					.setHasNext6HoursPrecipitation(has6HoursPrecipitation)
-					.setHasPrecipitation(has1HoursPrecipitation)
+					.setHasNext6HoursPrecipitation(hourly.getData().getNext_6_hours() != null)
+					.setHasPrecipitation(hasPrecipitation)
 					.setWeatherDescription(weatherDescription)
 					.setFeelsLikeTemp(ValueUnits.convertTemperature(feelsLikeTemp.toString(), tempUnit) + tempDegree)
 					.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, instantDetails.getWindFromDirection()))
@@ -223,7 +215,8 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 					.setPressure(instantDetails.getAirPressureAtSeaLevel() + pressureUnit)
 					.setHumidity((int) Double.parseDouble(instantDetails.getRelativeHumidity()) + percent)
 					.setCloudiness(instantDetails.getCloudAreaFraction() + percent)
-					.setUvIndex(instantDetails.getUltravioletIndexClearSky());
+					.setUvIndex(instantDetails.getUltravioletIndexClearSky())
+					.setPrecipitationVolume(precipitationVolume);
 
 			hourlyForecastDtoList.add(hourlyForecastDto);
 
@@ -238,7 +231,7 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 		final String mm = "mm";
 		final String wind = MyApplication.VALUE_UNIT_OBJ.getWindUnitText();
 		final String zeroPrecipitationVolume = "0.0mm";
-		final String zero = "0";
+		final String zero = "0.0";
 
 		final ZonedDateTime now = ZonedDateTime.now(zoneId);
 		ZonedDateTime time =
@@ -277,9 +270,6 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 
 		double minTemp = Double.MAX_VALUE, maxTemp = Double.MIN_VALUE;
 		// 강수량, 날씨 아이콘, 날씨 설명, 풍향, 풍속
-		int hour = -1;
-		int dayOfYear = -1;
-
 		Data data = null;
 		ZonedDateTime date = null;
 
@@ -287,6 +277,7 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 		int i = tomorrowIdx;
 
 		String precipitation = null;
+		boolean hasPrecipitation = false;
 
 		while (i < idx_hasNotNext1Hours) {
 			data = hourlyList.get(i).getData();
@@ -313,18 +304,27 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 					.setHasPrecipitationNextHoursAmount(false)
 					.setDateTime(date);
 
+
 			if (!data.getNext_1_hours().getDetails().getPrecipitationAmount().equals(zero)) {
 				precipitation = data.getNext_1_hours().getDetails().getPrecipitationAmount() + mm;
+				hasPrecipitation = true;
 			} else {
 				precipitation = zeroPrecipitationVolume;
+				hasPrecipitation = false;
 			}
 
-			values.setHasPrecipitationVolume(!data.getNext_1_hours().getDetails().getPrecipitationAmount().equals(zero))
+			values.setHasPrecipitationVolume(hasPrecipitation)
 					.setPrecipitationVolume(precipitation);
 
 			forecastDtoSortedMap.get(date.toLocalDate().toString()).getValuesList().add(values);
 
+			if (date.getHour() == 23) {
+				forecastDtoSortedMap.get(date.toLocalDate().toString()).setHaveOnly1HoursForecast(true);
+			}
+
 			i++;
+
+			hasPrecipitation = false;
 		}
 
 
@@ -361,11 +361,13 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 
 			if (!data.getNext_6_hours().getDetails().getPrecipitationAmount().equals(zero)) {
 				precipitation = data.getNext_6_hours().getDetails().getPrecipitationAmount() + mm;
+				hasPrecipitation = true;
 			} else {
 				precipitation = zeroPrecipitationVolume;
+				hasPrecipitation = false;
 			}
 
-			values.setHasPrecipitationVolume(!data.getNext_6_hours().getDetails().getPrecipitationAmount().equals(zero))
+			values.setHasPrecipitationVolume(hasPrecipitation)
 					.setPrecipitationVolume(precipitation);
 
 			forecastDtoSortedMap.get(date.toLocalDate().toString()).getValuesList().add(values);
@@ -402,24 +404,131 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 				dto.setMinTemp(ValueUnits.convertTemperature(String.valueOf(minTemp), tempUnit) + tempDegree)
 						.setMaxTemp(ValueUnits.convertTemperature(String.valueOf(maxTemp), tempUnit) + tempDegree);
 
-				if (dto.getValuesList().size() == 24) {
+				List<DailyForecastDto.Values> newValues = new ArrayList<>();
+				DailyForecastDto.Values values = null;
+				double precipitationVolume = 0.0;
+
+				if (dto.isHaveOnly1HoursForecast()) {
 					//1시간별 예보만 포함
+
+					for (int idx = 0; idx < 24; idx++) {
+						int temp = Integer.parseInt(dto.getValuesList().get(idx).getTemp().replace(tempDegree, ""));
+						minTemp = Math.min(temp, minTemp);
+						maxTemp = Math.max(temp, maxTemp);
+
+						precipitationVolume += Double.parseDouble(dto.getValuesList().get(idx).getPrecipitationVolume().replace(mm, ""));
+
+						if (idx == 5 || idx == 11 || idx == 17 || idx == 23) {
+							values = new DailyForecastDto.Values();
+
+							values.setHasPrecipitationNextHoursAmount(true).setPrecipitationNextHoursAmount(6)
+									.setMinTemp(ValueUnits.convertTemperature(String.valueOf(minTemp), tempUnit) + tempDegree)
+									.setMaxTemp(ValueUnits.convertTemperature(String.valueOf(maxTemp), tempUnit) + tempDegree)
+									.setWeatherIcon(dto.getValuesList().get(idx).getWeatherIcon())
+									.setWeatherDescription(dto.getValuesList().get(idx).getWeatherDescription())
+									.setWindDirection(dto.getValuesList().get(idx).getWindDirection())
+									.setWindDirectionVal(dto.getValuesList().get(idx).getWindDirectionVal())
+									.setWindSpeed(dto.getValuesList().get(idx).getWindSpeed())
+									.setWindStrength(dto.getValuesList().get(idx).getWindStrength())
+									.setPrecipitationVolume(precipitationVolume == 0.0 ? zeroPrecipitationVolume :
+											String.format(Locale.getDefault(), "%.2f", (float) precipitationVolume) + mm)
+									.setHasPrecipitationVolume(precipitationVolume != 0.0)
+									.setDateTime(dto.getValuesList().get(idx).getDateTime());
+
+							newValues.add(values);
+
+							minTemp = Double.MAX_VALUE;
+							maxTemp = Double.MIN_VALUE;
+							precipitationVolume = 0.0;
+						}
+					}
+
+					dto.getValuesList().clear();
+					dto.getValuesList().addAll(newValues);
 				} else if (dto.getValuesList().size() > 4) {
 					//1시간, 6시간별 예보 혼합
 
+					int startIdx_6HoursForecast = 0;
+					int hours_start6HoursForecast = 0;
+					int count_6HoursForecast = 0;
+
+					for (int idx = 0; idx < dto.getValuesList().size(); idx++) {
+						if (dto.getValuesList().get(idx).isHasPrecipitationNextHoursAmount()) {
+							startIdx_6HoursForecast = idx;
+							hours_start6HoursForecast = dto.getValuesList().get(idx).getDateTime().getHour();
+							count_6HoursForecast = dto.getValuesList().size() - startIdx_6HoursForecast;
+							break;
+						}
+					}
+
+					if (count_6HoursForecast == 4) {
+						for (int count = 0; count < startIdx_6HoursForecast; count++) {
+							dto.getValuesList().remove(0);
+						}
+					} else {
+						for (int idx = startIdx_6HoursForecast - 1; idx >= 0; idx--) {
+							int temp = Integer.parseInt(dto.getValuesList().get(idx).getTemp().replace(tempDegree, ""));
+							minTemp = Math.min(temp, minTemp);
+							maxTemp = Math.max(temp, maxTemp);
+
+							precipitationVolume += Double.parseDouble(dto.getValuesList().get(idx).getPrecipitationVolume().replace(mm, ""));
+
+							if (idx == startIdx_6HoursForecast - 6 || idx == startIdx_6HoursForecast - 12 ||
+									idx == startIdx_6HoursForecast - 18 ||
+									idx == startIdx_6HoursForecast - 24) {
+								values = new DailyForecastDto.Values();
+
+								values.setHasPrecipitationNextHoursAmount(true).setPrecipitationNextHoursAmount(6)
+										.setMinTemp(ValueUnits.convertTemperature(String.valueOf(minTemp), tempUnit) + tempDegree)
+										.setMaxTemp(ValueUnits.convertTemperature(String.valueOf(maxTemp), tempUnit) + tempDegree)
+										.setWeatherIcon(dto.getValuesList().get(idx).getWeatherIcon())
+										.setWeatherDescription(dto.getValuesList().get(idx).getWeatherDescription())
+										.setWindDirection(dto.getValuesList().get(idx).getWindDirection())
+										.setWindDirectionVal(dto.getValuesList().get(idx).getWindDirectionVal())
+										.setWindSpeed(dto.getValuesList().get(idx).getWindSpeed())
+										.setWindStrength(dto.getValuesList().get(idx).getWindStrength())
+										.setPrecipitationVolume(precipitationVolume == 0.0 ? zeroPrecipitationVolume :
+												String.format(Locale.getDefault(), "%.2f", (float) precipitationVolume) + mm)
+										.setHasPrecipitationVolume(precipitationVolume != 0.0)
+										.setDateTime(dto.getValuesList().get(idx).getDateTime());
+
+								newValues.add(values);
+
+								minTemp = Double.MAX_VALUE;
+								maxTemp = Double.MIN_VALUE;
+								precipitationVolume = 0.0;
+							}
+						}
+
+						for (int count = 0; count < startIdx_6HoursForecast; count++) {
+							dto.getValuesList().remove(0);
+						}
+						dto.getValuesList().addAll(newValues);
+					}
 				}
 			}
 
+		}
 
+		int noAvailableDayCount = 0;
+		for (i = 0; i < dailyForecastDtos.size(); i++) {
+			if (!dailyForecastDtos.get(i).isAvailable_toMakeMinMaxTemp()) {
+				noAvailableDayCount = dailyForecastDtos.size() - i;
+				break;
+			}
+		}
+
+		for (i = 0; i < noAvailableDayCount; i++) {
+			dailyForecastDtos.remove(dailyForecastDtos.size() - 1);
 		}
 
 		return dailyForecastDtos;
 	}
 
 	public static ZoneId getZoneId(Double latitude, Double longitude) {
-		TimeZoneMap map = TimeZoneMap.forRegion(latitude - 4.0,
-				longitude - 4.0, latitude + 4.0
-				, longitude + 4.0);
+		TimeZoneMap map = TimeZoneMap.forRegion(latitude - 3.0,
+				longitude - 3.0, latitude + 3.0
+				, longitude + 3.0);
 
 		String area = map.getOverlappingTimeZone(latitude, longitude).getZoneId();
 		return ZoneId.of(area);

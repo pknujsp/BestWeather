@@ -26,6 +26,7 @@ import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,8 +96,24 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 
 		public void onBind(HourlyForecastDto hourlyForecastDto) {
 			//header 화면 구성
-			headerBinding.date.setText(hourlyForecastDto.getHours().format(dateFormatter));
-			headerBinding.hours.setText(hourlyForecastDto.getHours().format(hoursFormatter));
+
+			if (hourlyForecastDto.isHasNext6HoursPrecipitation()) {
+				ZonedDateTime dateTime = hourlyForecastDto.getHours();
+				String date = dateTime.format(dateFormatter);
+				String time = dateTime.format(hoursFormatter);
+
+				dateTime = dateTime.plusHours(6);
+
+				date += " - " + dateTime.format(dateFormatter);
+				time += " - " + dateTime.format(hoursFormatter);
+				headerBinding.date.setText(date);
+				headerBinding.hours.setText(time);
+			} else {
+				headerBinding.date.setText(hourlyForecastDto.getHours().format(dateFormatter));
+				headerBinding.hours.setText(hourlyForecastDto.getHours().format(hoursFormatter));
+			}
+
+
 			headerBinding.weatherIcon.setImageResource(hourlyForecastDto.getWeatherIcon());
 			headerBinding.temp.setText(hourlyForecastDto.getTemp());
 			headerBinding.feelsLikeTemp.setText(new String(feelsLikeTempLabel + hourlyForecastDto.getFeelsLikeTemp()));
@@ -156,9 +173,11 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 		private void addPrecipitationGridItem(LayoutInflater layoutInflater, HourlyForecastDto hourlyForecastDto) {
 			View gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 			final int blueColor = ContextCompat.getColor(context, R.color.blue);
+
+
 			//강수확률
 			((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.probability_of_precipitation));
-			((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPop());
+			((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPop() == null ? "-" : hourlyForecastDto.getPop());
 			((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 			gridItem.findViewById(R.id.label_icon).setVisibility(View.GONE);
 			headerBinding.precipitationGridLayout.addView(gridItem);

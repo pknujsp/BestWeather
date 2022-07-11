@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers.detailfragment.base;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
@@ -28,6 +30,7 @@ import com.lifedawn.bestweather.databinding.ViewDetailHourlyForecastListBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,6 +38,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 
 public abstract class BaseDetailForecastFragment extends Fragment implements OnClickedListViewItemListener<Integer> {
@@ -48,7 +52,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	protected ZoneId zoneId;
 	protected Double latitude;
 	protected Double longitude;
-	protected ForecastViewType forecastViewType;
+	protected ForecastViewType forecastViewType = ForecastViewType.List;
 	protected ExecutorService executorService = MyApplication.getExecutorService();
 	protected WeatherProviderType mainWeatherProviderType;
 	protected Bundle bundle;
@@ -75,10 +79,8 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 
 		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 		windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
-		visibilityUnit =MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
+		visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
 		clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit();
-		forecastViewType = ForecastViewType.valueOf(sharedPreferences.getString(getString(R.string.pref_key_forecast_view_type),
-				ForecastViewType.List.name()));
 
 		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 
@@ -98,6 +100,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		return binding.getRoot();
 	}
 
+	@SuppressLint("MissingPermission")
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -195,7 +198,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 				binding.hours.setText(hourlyForecastDto.getHours().format(hourFormatter));
 				binding.weatherIcon.setImageResource(hourlyForecastDto.getWeatherIcon());
 				binding.temp.setText(hourlyForecastDto.getTemp().replace(tempDegree, degree));
-				binding.pop.setText(hourlyForecastDto.getPop());
+				binding.pop.setText(hourlyForecastDto.getPop() == null ? "-" : hourlyForecastDto.getPop());
 
 				if (hourlyForecastDto.isHasSnow()) {
 					binding.snowVolume.setText(hourlyForecastDto.getSnowVolume());
@@ -204,12 +207,14 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 					binding.snowVolumeLayout.setVisibility(View.GONE);
 				}
 
-				if (hourlyForecastDto.isHasRain()) {
-					binding.rainVolume.setText(hourlyForecastDto.getRainVolume());
+				if (hourlyForecastDto.isHasRain() || hourlyForecastDto.isHasPrecipitation()) {
+					binding.rainVolume.setText(hourlyForecastDto.isHasRain() ? hourlyForecastDto.getRainVolume() :
+							hourlyForecastDto.getPrecipitationVolume());
 					binding.rainVolumeLayout.setVisibility(View.VISIBLE);
 				} else {
 					binding.rainVolumeLayout.setVisibility(View.GONE);
 				}
+
 			}
 		}
 	}
@@ -296,7 +301,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 
 					binding.leftWeatherIcon.setImageResource(daily.getValuesList().get(0).getWeatherIcon());
 					binding.rightWeatherIcon.setVisibility(View.GONE);
-				} else {
+				} else if (daily.getValuesList().size() == 2) {
 					binding.leftWeatherIcon.setImageResource(daily.getValuesList().get(0).getWeatherIcon());
 					binding.rightWeatherIcon.setImageResource(daily.getValuesList().get(1).getWeatherIcon());
 					binding.rightWeatherIcon.setVisibility(View.VISIBLE);
@@ -320,9 +325,36 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 					} else {
 						String rain = daily.getValuesList().get(0).getRainVolume() + " / " +
 								daily.getValuesList().get(1).getRainVolume();
-						binding.snowVolume.setText(rain);
+						binding.rainVolume.setText(rain);
 						binding.rainVolumeLayout.setVisibility(View.VISIBLE);
 					}
+				} else if (daily.getValuesList().size() == 4) {
+					binding.leftWeatherIcon.setImageResource(daily.getValuesList().get(1).getWeatherIcon());
+					binding.rightWeatherIcon.setImageResource(daily.getValuesList().get(2).getWeatherIcon());
+					binding.rightWeatherIcon.setVisibility(View.VISIBLE);
+					binding.pop.setText("-");
+
+					if (daily.getValuesList().get(0).isHasPrecipitationVolume() || daily.getValuesList().get(1).isHasPrecipitationVolume() ||
+							daily.getValuesList().get(2).isHasPrecipitationVolume() || daily.getValuesList().get(3).isHasPrecipitationVolume()) {
+						String mm = "mm";
+
+						float leftVol =
+								Float.parseFloat(daily.getValuesList().get(0).getPrecipitationVolume().replace(mm, ""))
+										+ Float.parseFloat(daily.getValuesList().get(1).getPrecipitationVolume().replace(mm, ""));
+						float rightVol =
+								Float.parseFloat(daily.getValuesList().get(2).getPrecipitationVolume().replace(mm, ""))
+										+ Float.parseFloat(daily.getValuesList().get(3).getPrecipitationVolume().replace(mm, ""));
+
+						String rain = String.format(Locale.getDefault(), "%.2fmm", leftVol) + " / " +
+								String.format(Locale.getDefault(), "%.2fmm", rightVol);
+						binding.rainVolume.setText(rain);
+						binding.rainVolumeLayout.setVisibility(View.VISIBLE);
+
+					} else {
+						binding.rainVolumeLayout.setVisibility(View.GONE);
+					}
+
+					binding.snowVolumeLayout.setVisibility(View.GONE);
 				}
 
 				binding.minTemp.setText(daily.getMinTemp().replace(tempDegree, degree));

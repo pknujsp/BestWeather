@@ -104,15 +104,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 		final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
 
-		int noAvailableDayCount = 0;
-		for (int i = 0; i < dailyForecastDtoList.size(); i++) {
-			if (!dailyForecastDtoList.get(i).isAvailable_toMakeMinMaxTemp()) {
-				noAvailableDayCount = dailyForecastDtoList.size() - i;
-				break;
-			}
-		}
-
-		final int COLUMN_COUNT = dailyForecastDtoList.size() - noAvailableDayCount;
+		final int COLUMN_COUNT = dailyForecastDtoList.size();
 		final int COLUMN_WIDTH = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSDailyOwm);
 		final int VIEW_WIDTH = COLUMN_COUNT * COLUMN_WIDTH;
 

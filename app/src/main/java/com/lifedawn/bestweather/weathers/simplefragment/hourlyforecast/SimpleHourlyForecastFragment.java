@@ -163,12 +163,11 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 
 			if (item.getPrecipitationVolume() != null) {
 				precipitationVolumeList.add(item.getPrecipitationVolume().replace(mm, "").replace(cm, ""));
-			} else if (item.getNext6HoursPrecipitationVolume() != null) {
+
 				if (firstDateTime_hasNextNHours == null) {
 					firstDateTime_hasNextNHours = item.getHours();
 					hasNextNHoursPrecipitation = true;
 				}
-				precipitationVolumeList.add(item.getNext6HoursPrecipitationVolume().replace(mm, "").replace(cm, ""));
 			}
 
 			if (item.isHasSnow()) {
