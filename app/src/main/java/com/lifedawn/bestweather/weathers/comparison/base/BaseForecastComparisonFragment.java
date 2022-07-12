@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers.comparison.base;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -72,6 +73,7 @@ public class BaseForecastComparisonFragment extends Fragment {
 		outState.putAll(bundle);
 	}
 
+	@SuppressLint("MissingPermission")
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -130,6 +132,10 @@ public class BaseForecastComparisonFragment extends Fragment {
 						break;
 					case OWM_ONECALL:
 						weatherSourceTypeName = getString(R.string.owm);
+						snowUnit = "mm";
+						break;
+					case MET_NORWAY:
+						weatherSourceTypeName = getString(R.string.met);
 						snowUnit = "mm";
 						break;
 					default:

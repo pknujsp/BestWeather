@@ -16,7 +16,9 @@ import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.ForecastObj;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestMet;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
@@ -27,6 +29,7 @@ import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCa
 import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
+import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
@@ -34,6 +37,7 @@ import com.lifedawn.bestweather.weathers.comparison.base.BaseForecastComparisonF
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DateView;
@@ -49,6 +53,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -77,12 +82,12 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 	private void setValuesToViews(HourlyForecastResponse hourlyForecastResponse) {
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
-
 		final List<WeatherProviderType> weatherProviderTypeList = new ArrayList<>();
 
 		List<ForecastObj<HourlyForecastDto>> kmaFinalHourlyForecasts = null;
 		List<ForecastObj<HourlyForecastDto>> accuFinalHourlyForecasts = null;
 		List<ForecastObj<HourlyForecastDto>> owmFinalHourlyForecasts = null;
+		List<ForecastObj<HourlyForecastDto>> metNorwayFinalHourlyForecasts = null;
 
 		if (hourlyForecastResponse.kmaSuccessful) {
 			List<HourlyForecastDto> hourlyForecastDtoList = hourlyForecastResponse.kmaHourlyForecastList;
@@ -125,6 +130,23 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			binding.owm.setVisibility(View.GONE);
 		}
 
+		if (hourlyForecastResponse.metNorwaySuccessful) {
+			List<HourlyForecastDto> hourlyForecastDtoList = hourlyForecastResponse.metNorwayHourlyForecastList;
+			metNorwayFinalHourlyForecasts = new ArrayList<>();
+
+			for (HourlyForecastDto finalHourlyForecast : hourlyForecastDtoList) {
+				if (finalHourlyForecast.isHasNext6HoursPrecipitation()) {
+					break;
+				}
+				metNorwayFinalHourlyForecasts.add(new ForecastObj<>(finalHourlyForecast.getHours(), finalHourlyForecast));
+			}
+
+			weatherProviderTypeList.add(WeatherProviderType.MET_NORWAY);
+			binding.metNorway.setVisibility(View.VISIBLE);
+		} else {
+			binding.metNorway.setVisibility(View.GONE);
+		}
+
 		ZonedDateTime now = ZonedDateTime.now(zoneId).plusDays(2).withMinute(0).withSecond(0).withNano(0);
 
 		ZonedDateTime firstDateTime = ZonedDateTime.of(now.toLocalDateTime(), zoneId);
@@ -156,6 +178,15 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			if (owmFinalHourlyForecasts.get(owmFinalHourlyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
 				lastDateTime =
 						ZonedDateTime.of(owmFinalHourlyForecasts.get(owmFinalHourlyForecasts.size() - 1).dateTime.toLocalDateTime(), zoneId);
+			}
+		}
+		if (metNorwayFinalHourlyForecasts != null) {
+			if (metNorwayFinalHourlyForecasts.get(0).dateTime.isBefore(firstDateTime)) {
+				firstDateTime = ZonedDateTime.of(metNorwayFinalHourlyForecasts.get(0).dateTime.toLocalDateTime(), zoneId);
+			}
+			if (metNorwayFinalHourlyForecasts.get(metNorwayFinalHourlyForecasts.size() - 1).dateTime.isAfter(lastDateTime)) {
+				lastDateTime =
+						ZonedDateTime.of(metNorwayFinalHourlyForecasts.get(metNorwayFinalHourlyForecasts.size() - 1).dateTime.toLocalDateTime(), zoneId);
 			}
 		}
 
@@ -213,6 +244,15 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 						break;
 					}
 				}
+			} else if (weatherProviderTypeList.get(i) == WeatherProviderType.MET_NORWAY) {
+				specificRowWidth = metNorwayFinalHourlyForecasts.size() * columnWidth;
+
+				for (int idx = 0; idx < dateTimeList.size(); idx++) {
+					if (dateTimeList.get(idx).equals(metNorwayFinalHourlyForecasts.get(0).dateTime)) {
+						beginColumnIndex = idx;
+						break;
+					}
+				}
 			}
 
 			weatherIconRows[i] = new SingleWeatherIconView(getContext(), FragmentType.Comparison, specificRowWidth, weatherValueRowHeight,
@@ -246,7 +286,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		List<WeatherSourceUnitObj> weatherSourceUnitObjList = new ArrayList<>();
 
 		//날씨,기온,강수량,강수확률
-		//kma, accu weather, owm 순서
+		//kma, accu weather, owm, met Norway 순서
 
 		for (int i = 0; i < weatherProviderTypeList.size(); i++) {
 			List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
@@ -261,7 +301,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				for (ForecastObj<HourlyForecastDto> item : kmaFinalHourlyForecasts) {
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 							ContextCompat.getDrawable(context, item.e.getWeatherIcon()), item.e.getWeatherDescription()));
-					tempList.add(item.e.getTemp().replace(tempUnitText,degree));
+					tempList.add(item.e.getTemp().replace(tempUnitText, degree));
 
 					popList.add(item.e.getPop());
 					rainVolumeList.add(item.e.getRainVolume().replace(mm, ""));
@@ -283,7 +323,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					dateTimeList.add(item.e.getHours());
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(
 							ContextCompat.getDrawable(context, item.e.getWeatherIcon()), item.e.getWeatherDescription()));
-					tempList.add(item.e.getTemp().replace(tempUnitText,degree));
+					tempList.add(item.e.getTemp().replace(tempUnitText, degree));
 					popList.add(item.e.getPop());
 					rainVolumeList.add(item.e.getRainVolume().replace(mm, ""));
 
@@ -305,7 +345,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					dateTimeList.add(item.e.getHours());
 					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context, item.e.getWeatherIcon()),
 							item.e.getWeatherDescription()));
-					tempList.add(item.e.getTemp().replace(tempUnitText,degree));
+					tempList.add(item.e.getTemp().replace(tempUnitText, degree));
 					popList.add(item.e.getPop());
 					rainVolumeList.add(item.e.getRainVolume().replace("mm", ""));
 
@@ -320,6 +360,22 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 						}
 					}
 					snowVolumeList.add(item.e.getSnowVolume().replace("mm", ""));
+				}
+
+			} else if (weatherProviderTypeList.get(i) == WeatherProviderType.MET_NORWAY) {
+				for (ForecastObj<HourlyForecastDto> item : metNorwayFinalHourlyForecasts) {
+					dateTimeList.add(item.e.getHours());
+					weatherIconObjList.add(new SingleWeatherIconView.WeatherIconObj(ContextCompat.getDrawable(context, item.e.getWeatherIcon()),
+							item.e.getWeatherDescription()));
+					tempList.add(item.e.getTemp().replace(tempUnitText, degree));
+					popList.add("-");
+					rainVolumeList.add(item.e.getPrecipitationVolume().replace("mm", ""));
+
+					if (item.e.isHasPrecipitation()) {
+						if (!haveRain) {
+							haveRain = true;
+						}
+					}
 				}
 
 			}
@@ -380,10 +436,15 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					sourceName = getString(R.string.accu_weather);
 					logoId = R.drawable.accuicon;
 					break;
-				default:
+				case OWM_ONECALL:
 					view = binding.owm;
 					sourceName = getString(R.string.owm);
 					logoId = R.drawable.owmicon;
+					break;
+				default:
+					view = binding.metNorway;
+					sourceName = getString(R.string.met);
+					logoId = R.drawable.metlogo;
 					break;
 			}
 			notScrolledViews[i] = new NotScrolledView(getContext());
@@ -421,6 +482,11 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		//request.put(WeatherDataSourceType.ACCU_WEATHER, requestAccu);
 		request.put(WeatherProviderType.OWM_ONECALL, requestOwmOneCall);
 
+		RequestMet requestMet = new RequestMet();
+		requestMet.addRequestServiceType(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
+
+		request.put(WeatherProviderType.MET_NORWAY, requestMet);
+
 		/*
 		RequestOwmIndividual requestOwmIndividual = new RequestOwmIndividual();
 		requestOwmIndividual.addRequestServiceType(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
@@ -447,12 +513,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		multipleRestApiDownloader = new MultipleRestApiDownloader() {
 			@Override
 			public void onResult() {
-				MyApplication.getExecutorService().execute(new Runnable() {
-					@Override
-					public void run() {
-						setTable(multipleRestApiDownloader, latitude, longitude, dialog);
-					}
-				});
+				setTable(multipleRestApiDownloader, latitude, longitude, dialog);
 			}
 
 			@Override
@@ -569,8 +630,23 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			}
 		}
 
+		// met norway
+		if (responseMap.containsKey(WeatherProviderType.MET_NORWAY)) {
+			arrayMap = responseMap.get(WeatherProviderType.MET_NORWAY);
+			MultipleRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
+
+			if (responseResult.isSuccessful()) {
+				hourlyForecastResponse.metNorwaySuccessful = true;
+				hourlyForecastResponse.metNorwayHourlyForecastList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(getContext(),
+						(LocationForecastResponse) responseResult.getResponseObj(), zoneId);
+			} else {
+				hourlyForecastResponse.metNorwayThrowable = responseResult.getT();
+			}
+		}
+
+
 		if (getActivity() != null) {
-			getActivity().runOnUiThread(new Runnable() {
+			MainThreadWorker.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					setValuesToViews(hourlyForecastResponse);
@@ -586,14 +662,17 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		List<HourlyForecastDto> kmaHourlyForecastList;
 		List<HourlyForecastDto> accuHourlyForecastList;
 		List<HourlyForecastDto> owmHourlyForecastList;
+		List<HourlyForecastDto> metNorwayHourlyForecastList;
 
 		boolean kmaSuccessful;
 		boolean accuSuccessful;
 		boolean owmSuccessful;
+		boolean metNorwaySuccessful;
 
 		Throwable kmaThrowable;
 		Throwable accuThrowable;
 		Throwable owmThrowable;
+		Throwable metNorwayThrowable;
 	}
 
 }

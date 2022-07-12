@@ -64,7 +64,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 			public void onClick(View view) {
 				if (availableNetwork()) {
 					HourlyForecastComparisonFragment comparisonFragment = new HourlyForecastComparisonFragment();
-					comparisonFragment.setArguments(getArguments());
+					comparisonFragment.setArguments(bundle);
 
 					String tag = getString(R.string.tag_comparison_fragment);
 					FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
@@ -164,7 +164,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 			if (item.getPrecipitationVolume() != null) {
 				precipitationVolumeList.add(item.getPrecipitationVolume().replace(mm, "").replace(cm, ""));
 
-				if (firstDateTime_hasNextNHours == null) {
+				if (item.isHasNext6HoursPrecipitation() && firstDateTime_hasNextNHours == null) {
 					firstDateTime_hasNextNHours = item.getHours();
 					hasNextNHoursPrecipitation = true;
 				}
