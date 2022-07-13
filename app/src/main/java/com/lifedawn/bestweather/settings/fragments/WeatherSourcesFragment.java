@@ -25,25 +25,26 @@ import java.util.Locale;
 public class WeatherSourcesFragment extends Fragment {
 	private FragmentWeatherSourcesBinding binding;
 	private SharedPreferences sharedPreferences;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentWeatherSourcesBinding.inflate(inflater);
 		return binding.getRoot();
 	}
-	
+
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		
+
 		//binding.accuWeather.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_accu_weather), true));
-		//binding.openWeatherMap.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_open_weather_map), true));
+		binding.openWeatherMap.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_open_weather_map), true));
+		binding.yr.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_met), true));
 		binding.kmaTopPriority.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), true));
 
 		/*
@@ -61,14 +62,14 @@ public class WeatherSourcesFragment extends Fragment {
 			binding.kmaPriorityLayout.setVisibility(View.GONE);
 		}
 		 */
-		
+
 		binding.accuWeather.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
 			}
 		});
-		
+
 		binding.openWeatherMap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -94,11 +95,11 @@ public class WeatherSourcesFragment extends Fragment {
 				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_met), isChecked).apply();
 			}
 		});
-		
+
 		binding.kmaTopPriority.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_kma_top_priority), isChecked).commit();
+				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_kma_top_priority), isChecked).apply();
 			}
 		});
 	}

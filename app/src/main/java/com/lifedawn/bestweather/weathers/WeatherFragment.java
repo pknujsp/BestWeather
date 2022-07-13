@@ -669,7 +669,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private WeatherProviderType getMainWeatherSourceType(@NonNull String countryCode) {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		WeatherProviderType mainWeatherProviderType = WeatherProviderType.OWM_ONECALL;
+		WeatherProviderType mainWeatherProviderType = sharedPreferences.getBoolean(getString(R.string.pref_key_met), true) ?
+				WeatherProviderType.MET_NORWAY : WeatherProviderType.OWM_ONECALL;
 
 		if (countryCode.equals("KR")) {
 			boolean kmaIsTopPriority = sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), true);
