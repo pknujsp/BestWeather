@@ -191,7 +191,7 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		boolean haveSnow = false;
 
 		for (int cell = 0; cell < cellCount; cell++) {
-			if (hourlyForecastDtoList.get(cell).isHasRain()) {
+			if (hourlyForecastDtoList.get(cell).isHasRain() || hourlyForecastDtoList.get(cell).isHasPrecipitation()) {
 				haveRain = true;
 			}
 			if (hourlyForecastDtoList.get(cell).isHasSnow()) {
@@ -202,6 +202,8 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		List<Integer> tempList = new ArrayList<>();
 		final String degree = tempDegree;
 		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E 0");
+
+		String rain = null;
 
 		for (int cell = 0; cell < cellCount; cell++) {
 			View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
@@ -217,8 +219,11 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 			((TextView) view.findViewById(R.id.pop)).setText(hourlyForecastDtoList.get(cell).getPop());
 
 			if (haveRain) {
-				if (hourlyForecastDtoList.get(cell).isHasRain()) {
-					((TextView) view.findViewById(R.id.rainVolume)).setText(hourlyForecastDtoList.get(cell).getRainVolume().replace(mm
+				if (hourlyForecastDtoList.get(cell).isHasRain() || hourlyForecastDtoList.get(cell).isHasPrecipitation()) {
+					rain = hourlyForecastDtoList.get(cell).isHasRain() ? hourlyForecastDtoList.get(cell).getRainVolume() :
+							hourlyForecastDtoList.get(cell).getPrecipitationVolume();
+
+					((TextView) view.findViewById(R.id.rainVolume)).setText(rain.replace(mm
 							, "").replace(cm, ""));
 					((TextView) view.findViewById(R.id.rainVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, rainVolumeTextSize);
 				} else {

@@ -134,6 +134,8 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d\nE");
 
 		for (int cell = 0; cell < DAY_LENGTH; cell++) {
+			if (!dailyForecastDtoList.get(cell).isAvailable_toMakeMinMaxTemp())
+				break;
 			View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
 			((TextView) view.findViewById(R.id.dateTime)).setText(dailyForecastDtoList.get(cell).getDate().format(dateFormatter));
 			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, dateTextSize);
@@ -141,9 +143,12 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 			if (dailyForecastDtoList.get(cell).getValuesList().size() == 1) {
 				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(0).getWeatherIcon());
 				view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
-			} else {
+			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 2) {
 				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(0).getWeatherIcon());
 				((ImageView) view.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(1).getWeatherIcon());
+			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 4) {
+				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(1).getWeatherIcon());
+				((ImageView) view.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(2).getWeatherIcon());
 			}
 
 			view.findViewById(R.id.temperature).setVisibility(View.GONE);
@@ -200,7 +205,7 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.parseTextToDailyForecastDtoList(context, jsonObject,
-				weatherProviderType);
+				weatherProviderType, widgetDto.getTimeZoneId());
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 				dailyForecastDtoList, null);

@@ -275,11 +275,11 @@ public class WidgetForegroundService extends Service {
 								selectedLocationRequestMap.put(widgetDto.getAddressName(), requestObj);
 								addressList.add(widgetDto.getAddressName());
 							}
+
 							requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
 							requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet());
 							requestObj.appWidgetSet.add(widgetDto.getAppWidgetId());
 						}
-
 					}
 
 					allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
@@ -532,7 +532,6 @@ public class WidgetForegroundService extends Service {
 				widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
 				widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId), responseMap.get(addressName));
 			}
-
 			//응답 처리가 끝난 요청객체는 제거
 			requestObjMap.remove(addressName);
 		}

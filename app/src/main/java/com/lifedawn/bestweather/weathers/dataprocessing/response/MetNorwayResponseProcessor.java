@@ -122,7 +122,7 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 		precipitationVolume += Double.parseDouble(data.getNext_1_hours().getDetails().getPrecipitationAmount());
 
 		if (precipitationVolume > 0.0) {
-			currentConditionsDto.setPrecipitationVolume(String.format(Locale.getDefault(), "%.2f mm", precipitationVolume));
+			currentConditionsDto.setPrecipitationVolume(String.format(Locale.getDefault(), "%.1fmm", precipitationVolume));
 		}
 
 		return currentConditionsDto;
@@ -214,6 +214,7 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 					.setHumidity((int) Double.parseDouble(instantDetails.getRelativeHumidity()) + percent)
 					.setCloudiness(instantDetails.getCloudAreaFraction() + percent)
 					.setUvIndex(instantDetails.getUltravioletIndexClearSky())
+					.setPop("-")
 					.setPrecipitationVolume(precipitationVolume);
 
 			hourlyForecastDtoList.add(hourlyForecastDto);
@@ -300,6 +301,7 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 					.setWindSpeed(ValueUnits.convertWindSpeed(data.getInstant().getDetails().getWindSpeed(), windUnit) + wind)
 					.setWindStrength(WindUtil.getSimpleWindSpeedDescription(data.getInstant().getDetails().getWindSpeed()))
 					.setHasPrecipitationNextHoursAmount(false)
+					.setPop("-")
 					.setDateTime(date);
 
 
@@ -355,6 +357,7 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 					.setWindStrength(WindUtil.getSimpleWindSpeedDescription(data.getInstant().getDetails().getWindSpeed()))
 					.setHasPrecipitationNextHoursAmount(true)
 					.setPrecipitationNextHoursAmount(6)
+					.setPop("-")
 					.setDateTime(date);
 
 			if (!data.getNext_6_hours().getDetails().getPrecipitationAmount().equals(zero)) {
@@ -429,8 +432,9 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 									.setWindSpeed(dto.getValuesList().get(idx).getWindSpeed())
 									.setWindStrength(dto.getValuesList().get(idx).getWindStrength())
 									.setPrecipitationVolume(precipitationVolume == 0.0 ? zeroPrecipitationVolume :
-											String.format(Locale.getDefault(), "%.2f", (float) precipitationVolume) + mm)
+											String.format(Locale.getDefault(), "%.1f", (float) precipitationVolume) + mm)
 									.setHasPrecipitationVolume(precipitationVolume != 0.0)
+									.setPop("-")
 									.setDateTime(dto.getValuesList().get(idx).getDateTime());
 
 							newValues.add(values);
@@ -486,8 +490,9 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 										.setWindSpeed(dto.getValuesList().get(idx).getWindSpeed())
 										.setWindStrength(dto.getValuesList().get(idx).getWindStrength())
 										.setPrecipitationVolume(precipitationVolume == 0.0 ? zeroPrecipitationVolume :
-												String.format(Locale.getDefault(), "%.2f", (float) precipitationVolume) + mm)
+												String.format(Locale.getDefault(), "%.1f", (float) precipitationVolume) + mm)
 										.setHasPrecipitationVolume(precipitationVolume != 0.0)
+										.setPop("-")
 										.setDateTime(dto.getValuesList().get(idx).getDateTime());
 
 								newValues.add(values);
@@ -505,7 +510,6 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 					}
 				}
 			}
-
 		}
 
 		int noAvailableDayCount = 0;
@@ -524,9 +528,9 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static ZoneId getZoneId(Double latitude, Double longitude) {
-		TimeZoneMap map = TimeZoneMap.forRegion(latitude - 3.0,
-				longitude - 3.0, latitude + 3.0
-				, longitude + 3.0);
+		TimeZoneMap map = TimeZoneMap.forRegion(latitude - 2.0,
+				longitude - 2.0, latitude + 2.0
+				, longitude + 2.0);
 
 		String area = map.getOverlappingTimeZone(latitude, longitude).getZoneId();
 		return ZoneId.of(area);

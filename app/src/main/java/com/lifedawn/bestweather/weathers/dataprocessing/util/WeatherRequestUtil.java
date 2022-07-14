@@ -11,6 +11,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqicn;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
+import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestMet;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
@@ -23,6 +24,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 
 import java.util.HashSet;
@@ -54,6 +56,9 @@ public class WeatherRequestUtil {
 				break;
 			case OWM_ONECALL:
 				OpenWeatherMapResponseProcessor.init(context);
+				break;
+			case MET_NORWAY:
+				MetNorwayResponseProcessor.init(context);
 				break;
 		}
 		if (aqi) {
@@ -127,6 +132,14 @@ public class WeatherRequestUtil {
 			requestOwmOneCall.setExcludeApis(excludeSet);
 			requestOwmOneCall.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
 		}
+
+		if (weatherProviderTypeSet.contains(WeatherProviderType.MET_NORWAY)) {
+			RequestMet requestMet = new RequestMet();
+			requestWeatherSources.put(WeatherProviderType.MET_NORWAY, requestMet);
+
+			requestMet.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
+		}
+
 		if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_INDIVIDUAL)) {
 			RequestOwmIndividual requestOwmIndividual = new RequestOwmIndividual();
 			requestWeatherSources.put(WeatherProviderType.OWM_INDIVIDUAL, requestOwmIndividual);
@@ -154,8 +167,8 @@ public class WeatherRequestUtil {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		WeatherProviderType mainWeatherProviderType = null;
 
-		if (sharedPreferences.getBoolean(context.getString(R.string.pref_key_accu_weather), true)) {
-			mainWeatherProviderType = WeatherProviderType.ACCU_WEATHER;
+		if (sharedPreferences.getBoolean(context.getString(R.string.pref_key_met), true)) {
+			mainWeatherProviderType = WeatherProviderType.MET_NORWAY;
 		} else {
 			mainWeatherProviderType = WeatherProviderType.OWM_ONECALL;
 		}

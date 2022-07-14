@@ -243,6 +243,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		} else if (widgetProviderClassName.equals(EleventhWidgetProvider.class.getName())) {
 			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), this, appWidgetId);
 			binding.kmaTopPrioritySwitch.setText(R.string.containsKma);
+			binding.weatherDataSourceRadioGroup.setVisibility(View.GONE);
 		}
 
 		widgetDto = widgetCreator.loadDefaultSettings();
@@ -302,7 +303,9 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 								} catch (PendingIntent.CanceledException e) {
 									e.printStackTrace();
 								}
+
 								finishAndRemoveTask();
+
 							}
 						});
 					}
@@ -319,7 +322,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 
 		binding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
 			@Override
 			public void onGlobalLayout() {
 				binding.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -427,7 +429,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		binding.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				widgetDto.addWeatherProviderType(WeatherProviderType.OWM_ONECALL);
+				widgetDto.addWeatherProviderType(checkedId == R.id.owm_radio ? WeatherProviderType.OWM_ONECALL : WeatherProviderType.MET_NORWAY);
 			}
 		});
 
@@ -438,7 +440,11 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			}
 		});
 
-		binding.owmRadio.setChecked(true);
+		if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_key_open_weather_map), true)) {
+			binding.owmRadio.setChecked(true);
+		} else {
+			binding.metNorwayRadio.setChecked(true);
+		}
 	}
 
 	private void initLocation() {

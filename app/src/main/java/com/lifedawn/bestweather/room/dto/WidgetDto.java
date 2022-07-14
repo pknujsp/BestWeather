@@ -254,11 +254,18 @@ public class WidgetDto {
 
 	public Set<WeatherProviderType> getWeatherProviderTypeSet() {
 		if (countryCode != null) {
-			if (isTopPriorityKma() && getCountryCode().equals("KR")) {
-				if (!isMultipleWeatherDataSource()) {
+			if (topPriorityKma && countryCode.equals("KR")) {
+				if (!multipleWeatherDataSource) {
 					weatherProviderTypeSet.remove(WeatherProviderType.OWM_ONECALL);
+					weatherProviderTypeSet.remove(WeatherProviderType.MET_NORWAY);
 				}
 				weatherProviderTypeSet.add(WeatherProviderType.KMA_WEB);
+			}
+
+			if (!countryCode.equals("KR") && multipleWeatherDataSource) {
+				weatherProviderTypeSet.clear();
+				weatherProviderTypeSet.add(WeatherProviderType.OWM_ONECALL);
+				weatherProviderTypeSet.add(WeatherProviderType.MET_NORWAY);
 			}
 		}
 		return weatherProviderTypeSet;

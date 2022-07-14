@@ -61,7 +61,7 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		boolean haveSnow = false;
 
 		for (int cell = 0; cell < cellCount; cell++) {
-			if (hourlyForecastDtoList.get(cell).isHasRain()) {
+			if (hourlyForecastDtoList.get(cell).isHasRain() || hourlyForecastDtoList.get(cell).isHasPrecipitation()) {
 				haveRain = true;
 			}
 
@@ -69,6 +69,8 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 				haveSnow = true;
 			}
 		}
+
+		String rain = null;
 
 		for (int cell = 0; cell < cellCount; cell++) {
 			RemoteViews forecastRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_forecast_item_in_linear);
@@ -79,9 +81,11 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			forecastRemoteViews.setImageViewResource(R.id.leftIcon, hourlyForecastDtoList.get(cell).getWeatherIcon());
 			forecastRemoteViews.setTextViewText(R.id.pop, hourlyForecastDtoList.get(cell).getPop());
 
-			if (hourlyForecastDtoList.get(cell).isHasRain()) {
-				forecastRemoteViews.setTextViewText(R.id.rainVolume,
-						hourlyForecastDtoList.get(cell).getRainVolume().replace(mm, "").replace(cm, ""));
+			if (hourlyForecastDtoList.get(cell).isHasRain() || hourlyForecastDtoList.get(cell).isHasPrecipitation()) {
+				rain = hourlyForecastDtoList.get(cell).isHasRain() ? hourlyForecastDtoList.get(cell).getRainVolume() :
+						hourlyForecastDtoList.get(cell).getPrecipitationVolume();
+
+				forecastRemoteViews.setTextViewText(R.id.rainVolume, rain.replace(mm, "").replace(cm, ""));
 			} else {
 				forecastRemoteViews.setViewVisibility(R.id.rainVolumeLayout, haveRain ? View.INVISIBLE : View.GONE);
 			}

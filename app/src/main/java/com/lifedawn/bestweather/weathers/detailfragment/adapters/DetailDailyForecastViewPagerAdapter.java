@@ -251,7 +251,7 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 							"")) + Float.parseFloat(dailyForecastDto.getValuesList().get(3).getPrecipitationVolume().replace(mm, ""));
 
 					gridItemDtoList.add(new GridItemDto(context.getString(R.string.precipitation_volume),
-							String.format(Locale.getDefault(), "%.2fmm", amVolume) + divider + String.format(Locale.getDefault(), "%.2fmm", pmVolume),
+							String.format(Locale.getDefault(), "%.1fmm", amVolume) + divider + String.format(Locale.getDefault(), "%.1fmm", pmVolume),
 							null));
 				}
 				if (am.isHasRainVolume() || pm.isHasRainVolume()) {

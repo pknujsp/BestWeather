@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
+import androidx.preference.PreferenceManager;
 
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.R;
@@ -36,6 +37,7 @@ import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Set;
+import java.util.prefs.PreferenceChangeEvent;
 
 import static android.view.View.MeasureSpec.EXACTLY;
 
@@ -98,7 +100,8 @@ public abstract class AbstractWidgetCreator {
 		widgetDto.setDisplayClock(true);
 		widgetDto.setDisplayLocalClock(false);
 		widgetDto.setLocationType(LocationType.CurrentLocation);
-		widgetDto.addWeatherProviderType(WeatherProviderType.OWM_ONECALL);
+		widgetDto.addWeatherProviderType(PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(context.getString(R.string.pref_key_met), true) ?
+				WeatherProviderType.MET_NORWAY : WeatherProviderType.OWM_ONECALL);
 		widgetDto.setTextSizeAmount(0);
 		widgetDto.setTopPriorityKma(true);
 

@@ -82,8 +82,13 @@
                     android:id="@+id/owm_radio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="true"
                     android:text="@string/owm" />
+
+                <RadioButton
+                    android:id="@+id/met_norway_radio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/met" />
 
             </RadioGroup>
 

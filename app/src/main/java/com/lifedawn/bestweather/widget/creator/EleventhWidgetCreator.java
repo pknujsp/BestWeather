@@ -226,7 +226,7 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 			int count = cellCount + firstBeginIdxMap.get(weatherProviderType);
 
 			for (int cell = firstBeginIdxMap.get(weatherProviderType); cell < count; cell++) {
-				if (hourlyForecastDtoList.get(cell).isHasRain()) {
+				if (hourlyForecastDtoList.get(cell).isHasRain() || hourlyForecastDtoList.get(cell).isHasPrecipitation()) {
 					if (!haveRain) {
 						haveRain = true;
 					}
@@ -237,6 +237,8 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 					}
 				}
 			}
+
+			String rain = null;
 
 			for (int cell = firstBeginIdxMap.get(weatherProviderType); cell < count; cell++) {
 				View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
@@ -249,9 +251,11 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 				}
 
 				if (haveRain) {
-					if (hourlyForecastDtoList.get(cell).isHasRain()) {
-						((TextView) view.findViewById(R.id.rainVolume)).setText(hourlyForecastDtoList.get(cell).getRainVolume().replace(mm,
-								"").replace(cm, ""));
+					if (hourlyForecastDtoList.get(cell).isHasRain() || hourlyForecastDtoList.get(cell).isHasPrecipitation()) {
+						rain = hourlyForecastDtoList.get(cell).isHasRain() ? hourlyForecastDtoList.get(cell).getRainVolume() :
+								hourlyForecastDtoList.get(cell).getPrecipitationVolume();
+
+						((TextView) view.findViewById(R.id.rainVolume)).setText(rain.replace(mm, "").replace(cm, ""));
 						((TextView) view.findViewById(R.id.rainVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, rainVolumeTextSize);
 					} else {
 						view.findViewById(R.id.rainVolumeLayout).setVisibility(View.INVISIBLE);
@@ -294,6 +298,9 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 					|| weatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
 				weatherSource = context.getString(R.string.owm);
 				icon = R.drawable.owmicon;
+			} else {
+				weatherSource = context.getString(R.string.met);
+				icon = R.drawable.metlogo;
 			}
 
 			View weatherSourceView = layoutInflater.inflate(R.layout.weather_data_source_view, null);

@@ -152,7 +152,7 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 			if (hourlyForecastDtoList.get(cell).isHasSnow()) {
 				haveSnowVolume = true;
 			}
-			if (hourlyForecastDtoList.get(cell).isHasRain()) {
+			if (hourlyForecastDtoList.get(cell).isHasRain() || hourlyForecastDtoList.get(cell).isHasPrecipitation()) {
 				haveRainVolume = true;
 			}
 			count++;

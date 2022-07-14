@@ -352,7 +352,8 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	public void loadDefaultPreferences() {
 		notificationDataObj = new OngoingNotiDataObj();
 		notificationDataObj.setLocationType(LocationType.CurrentLocation);
-		notificationDataObj.setWeatherSourceType(WeatherProviderType.OWM_ONECALL);
+		notificationDataObj.setWeatherSourceType(PreferenceManager.getDefaultSharedPreferences(context).getBoolean(context
+				.getString(R.string.pref_key_met), true) ? WeatherProviderType.MET_NORWAY : WeatherProviderType.OWM_ONECALL);
 		notificationDataObj.setTopPriorityKma(false);
 		notificationDataObj.setUpdateIntervalMillis(0);
 		notificationDataObj.setSelectedAddressDtoId(0);

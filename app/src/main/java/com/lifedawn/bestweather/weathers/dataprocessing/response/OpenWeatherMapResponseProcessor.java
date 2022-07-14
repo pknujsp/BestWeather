@@ -288,7 +288,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		}
 
 		if (precipitationVolume > 0.0) {
-			currentConditionsDto.setPrecipitationVolume(String.format(Locale.getDefault(), "%.2f mm", precipitationVolume));
+			currentConditionsDto.setPrecipitationVolume(String.format(Locale.getDefault(), "%.1fmm", precipitationVolume));
 		}
 
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
@@ -352,7 +352,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		}
 
 		if (precipitationVolume > 0.0) {
-			currentConditionsDto.setPrecipitationVolume(String.format(Locale.getDefault(), "%.2f mm", precipitationVolume));
+			currentConditionsDto.setPrecipitationVolume(String.format(Locale.getDefault(), "%.1fmm", precipitationVolume));
 		}
 
 		return currentConditionsDto;

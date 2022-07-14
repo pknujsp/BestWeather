@@ -205,7 +205,7 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume()) {
 					haveSnow = true;
 				}
-			} else {
+			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 2) {
 				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume() ||
 						dailyForecastDtoList.get(cell).getValuesList().get(1).isHasRainVolume()) {
 					haveRain = true;
@@ -214,18 +214,23 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 						dailyForecastDtoList.get(cell).getValuesList().get(1).isHasSnowVolume()) {
 					haveSnow = true;
 				}
+			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 4) {
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasPrecipitationVolume() ||
+						dailyForecastDtoList.get(cell).getValuesList().get(1).isHasPrecipitationVolume() ||
+						dailyForecastDtoList.get(cell).getValuesList().get(2).isHasPrecipitationVolume() ||
+						dailyForecastDtoList.get(cell).getValuesList().get(3).isHasPrecipitationVolume()) {
+					haveRain = true;
+				}
 			}
 		}
 
 		final String mm = "mm";
 		final String cm = "cm";
 
-		boolean isSingle = false;
 		Double rainVolume = 0.0;
 		Double snowVolume = 0.0;
 
 		for (int cell = 0; cell < cellCount; cell++) {
-			isSingle = dailyForecastDtoList.get(cell).getValuesList().size() == 1;
 			rainVolume = 0.0;
 			snowVolume = 0.0;
 
@@ -236,26 +241,31 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, dateTextSize);
 			((TextView) view.findViewById(R.id.pop)).setTextSize(TypedValue.COMPLEX_UNIT_PX, popTextSize);
 
-			if (isSingle) {
+			if (dailyForecastDtoList.get(cell).getValuesList().size() == 1) {
 				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(0).getWeatherIcon());
 				pop = dailyForecastDtoList.get(cell).getValuesList().get(0).getPop();
 
 				view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
-			} else {
+			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 2) {
 				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(0).getWeatherIcon());
 				((ImageView) view.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(1).getWeatherIcon());
 				pop = dailyForecastDtoList.get(cell).getValuesList().get(0).getPop() + "/" +
 						dailyForecastDtoList.get(cell).getValuesList().get(1).getPop();
+
+			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 4) {
+				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(1).getWeatherIcon());
+				((ImageView) view.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(2).getWeatherIcon());
+				pop = "-/-";
 			}
 			((TextView) view.findViewById(R.id.pop)).setText(pop);
 
 			if (haveRain) {
-				if (isSingle) {
+				if (dailyForecastDtoList.get(cell).getValuesList().size() == 1) {
 					if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume()) {
 						rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getRainVolume().replace(mm, "")
 								.replace(cm, ""));
 					}
-				} else {
+				} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 2) {
 					if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume()) {
 						rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getRainVolume().replace(mm, "")
 								.replace(cm, ""));
@@ -264,7 +274,22 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 						rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(1).getRainVolume().replace(mm, "")
 								.replace(cm, ""));
 					}
+				} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 4) {
+					if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasPrecipitationVolume() ||
+							dailyForecastDtoList.get(cell).getValuesList().get(1).isHasPrecipitationVolume()) {
+						rainVolume = rainVolume + Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getPrecipitationVolume().replace(mm
+								, "")) +
+								Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(1).getPrecipitationVolume().replace(mm
+										, ""));
+					}
+					if (dailyForecastDtoList.get(cell).getValuesList().get(2).isHasPrecipitationVolume() ||
+							dailyForecastDtoList.get(cell).getValuesList().get(3).isHasPrecipitationVolume()) {
+						rainVolume = rainVolume + Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(2).getPrecipitationVolume().replace(mm
+								, "")) + Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(3).getPrecipitationVolume().replace(mm
+								, ""));
+					}
 				}
+
 				if (rainVolume == 0.0) {
 					view.findViewById(R.id.rainVolumeLayout).setVisibility(View.INVISIBLE);
 				} else {
@@ -276,7 +301,7 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 			}
 
 			if (haveSnow) {
-				if (isSingle) {
+				if (dailyForecastDtoList.get(cell).getValuesList().size() == 1) {
 					if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume()) {
 						snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getSnowVolume().replace(mm, "")
 								.replace(cm, ""));
@@ -361,7 +386,7 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude());
 
 		List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.parseTextToDailyForecastDtoList(context, jsonObject,
-				weatherProviderType);
+				weatherProviderType, widgetDto.getTimeZoneId());
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto, currentConditionsDto,
 				dailyForecastDtoList, null);

@@ -414,7 +414,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 									+ Float.parseFloat(item.e.getValuesList().get(2).getPrecipitationVolume().replace(mm, ""))
 									+ Float.parseFloat(item.e.getValuesList().get(3).getPrecipitationVolume().replace(mm, ""));
 
-					rainVolumeList.add(String.format(Locale.getDefault(), precipitationVolume > 0f ? "%.2f" : "%.1f", precipitationVolume));
+					rainVolumeList.add(String.format(Locale.getDefault(), "%.1f", precipitationVolume));
 
 					weatherIconObjList.add(new DoubleWeatherIconView.WeatherIconObj(
 							ContextCompat.getDrawable(context, item.e.getValuesList().get(1).getWeatherIcon()),

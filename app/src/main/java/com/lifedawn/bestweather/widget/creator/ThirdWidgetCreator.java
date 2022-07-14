@@ -233,11 +233,15 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 			((TextView) itemView.findViewById(R.id.temperature)).setText(temp);
 
 			if (dailyForecastDtoList.get(day).getValuesList().size() == 1) {
+				((ImageView) itemView.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(day).getValuesList().get(0).getWeatherIcon());
 				itemView.findViewById(R.id.rightIcon).setVisibility(View.GONE);
-			} else {
+			} else if (dailyForecastDtoList.get(day).getValuesList().size() == 2) {
+				((ImageView) itemView.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(day).getValuesList().get(0).getWeatherIcon());
 				((ImageView) itemView.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(day).getValuesList().get(1).getWeatherIcon());
+			} else if (dailyForecastDtoList.get(day).getValuesList().size() == 4) {
+				((ImageView) itemView.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(day).getValuesList().get(1).getWeatherIcon());
+				((ImageView) itemView.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(day).getValuesList().get(2).getWeatherIcon());
 			}
-			((ImageView) itemView.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(day).getValuesList().get(0).getWeatherIcon());
 
 
 			itemView.findViewById(R.id.popLayout).setVisibility(View.GONE);
@@ -313,7 +317,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,
 				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude());
 		List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.parseTextToDailyForecastDtoList(context, jsonObject,
-				weatherProviderType);
+				weatherProviderType, widgetDto.getTimeZoneId());
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto, currentConditionsDto,
 				hourlyForecastDtoList, dailyForecastDtoList, null);

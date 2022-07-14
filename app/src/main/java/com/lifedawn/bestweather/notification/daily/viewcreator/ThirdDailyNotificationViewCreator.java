@@ -130,7 +130,7 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 			if (haveRain) {
 				if (rainVolume > 0f) {
-					forecastRemoteViews.setTextViewText(R.id.rainVolume, String.format(Locale.getDefault(), "%.2f", rainVolume));
+					forecastRemoteViews.setTextViewText(R.id.rainVolume, String.format(Locale.getDefault(), "%.1f", rainVolume));
 				} else {
 					forecastRemoteViews.setViewVisibility(R.id.rainVolumeLayout, View.INVISIBLE);
 				}
@@ -140,7 +140,7 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 			if (haveSnow) {
 				if (snowVolume > 0f) {
-					forecastRemoteViews.setTextViewText(R.id.snowVolume, String.format(Locale.getDefault(), "%.2f", snowVolume));
+					forecastRemoteViews.setTextViewText(R.id.snowVolume, String.format(Locale.getDefault(), "%.1f", snowVolume));
 				} else {
 					forecastRemoteViews.setViewVisibility(R.id.snowVolumeLayout, View.INVISIBLE);
 				}

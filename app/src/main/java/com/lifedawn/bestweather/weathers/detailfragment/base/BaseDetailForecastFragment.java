@@ -345,8 +345,8 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 								Float.parseFloat(daily.getValuesList().get(2).getPrecipitationVolume().replace(mm, ""))
 										+ Float.parseFloat(daily.getValuesList().get(3).getPrecipitationVolume().replace(mm, ""));
 
-						String rain = String.format(Locale.getDefault(), "%.2fmm", leftVol) + " / " +
-								String.format(Locale.getDefault(), "%.2fmm", rightVol);
+						String rain = String.format(Locale.getDefault(), "%.1fmm", leftVol) + " / " +
+								String.format(Locale.getDefault(), "%.1fmm", rightVol);
 						binding.rainVolume.setText(rain);
 						binding.rainVolumeLayout.setVisibility(View.VISIBLE);
 

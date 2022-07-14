@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -236,6 +237,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			}
 		});
 
+
 		initLocation();
 		initWeatherDataSource();
 		initNotificationTypeSpinner();
@@ -257,6 +259,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 				binding.commons.currentLocationRadio.setChecked(true);
 			}
 
+
 		}
 		binding.notificationTypesSpinner.setSelection(editingNotificationDto.getNotificationType().getIndex());
 
@@ -266,6 +269,8 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		Set<WeatherProviderType> weatherProviderTypeSet = editingNotificationDto.getWeatherProviderTypeSet();
 		if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_ONECALL)) {
 			binding.commons.owmRadio.setChecked(true);
+		} else {
+			binding.commons.metNorwayRadio.setChecked(true);
 		}
 
 		binding.commons.kmaTopPrioritySwitch.setChecked(editingNotificationDto.isTopPriorityKma());
@@ -309,21 +314,24 @@ public class DailyNotificationSettingsFragment extends Fragment {
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new FirstDailyNotificationViewCreator(context);
 				editingNotificationDto.removeWeatherSourceType(WeatherProviderType.AQICN);
-				editingNotificationDto.addWeatherSourceType(WeatherProviderType.OWM_ONECALL);
+				editingNotificationDto.addWeatherSourceType(binding.commons.metNorwayRadio.isChecked() ? WeatherProviderType.MET_NORWAY :
+						WeatherProviderType.OWM_ONECALL);
 				break;
 			case Second:
 				//현재날씨
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new SecondDailyNotificationViewCreator(context);
 				editingNotificationDto.addWeatherSourceType(WeatherProviderType.AQICN);
-				editingNotificationDto.addWeatherSourceType(WeatherProviderType.OWM_ONECALL);
+				editingNotificationDto.addWeatherSourceType(binding.commons.metNorwayRadio.isChecked() ? WeatherProviderType.MET_NORWAY :
+						WeatherProviderType.OWM_ONECALL);
 				break;
 			case Third:
 				//일별 예보
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new ThirdDailyNotificationViewCreator(context);
 				editingNotificationDto.removeWeatherSourceType(WeatherProviderType.AQICN);
-				editingNotificationDto.addWeatherSourceType(WeatherProviderType.OWM_ONECALL);
+				editingNotificationDto.addWeatherSourceType(binding.commons.metNorwayRadio.isChecked() ? WeatherProviderType.MET_NORWAY :
+						WeatherProviderType.OWM_ONECALL);
 				break;
 			case Fourth:
 				//현재 대기질
@@ -352,7 +360,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				WeatherProviderType checked = WeatherProviderType.OWM_ONECALL;
+				WeatherProviderType checked = checkedId == R.id.met_norway_radio ? WeatherProviderType.MET_NORWAY : WeatherProviderType.OWM_ONECALL;
 				editingNotificationDto.addWeatherSourceType(checked);
 			}
 		});

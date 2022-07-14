@@ -21,6 +21,7 @@
             android:layout_width="45dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
+            android:layout_marginRight="8dp"
             android:layout_centerVertical="true"
             android:orientation="vertical"
             >
@@ -57,9 +58,8 @@
             android:layout_below="@id/weather_icon_layout"
             android:layout_marginTop="6dp"
             android:layout_toRightOf="@id/date_layout"
-            android:layout_marginLeft="8dp"
             android:gravity="center_vertical"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             >
 
             <LinearLayout

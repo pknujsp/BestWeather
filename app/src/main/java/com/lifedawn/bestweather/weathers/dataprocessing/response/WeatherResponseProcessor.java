@@ -18,6 +18,7 @@ import com.lifedawn.bestweather.retrofit.parameters.kma.KmaCurrentConditionsPara
 import com.lifedawn.bestweather.retrofit.parameters.kma.KmaForecastsParameters;
 import com.lifedawn.bestweather.retrofit.parameters.kma.UltraSrtNcstParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.VilageFcstParameter;
+import com.lifedawn.bestweather.retrofit.parameters.metnorway.LocationForecastParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
@@ -28,6 +29,7 @@ import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
+import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.currentweather.OwmCurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
@@ -175,13 +177,6 @@ public class WeatherResponseProcessor {
 		}
 		CurrentConditionsDto currentConditionsDto = null;
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		ValueUnits windUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
-				ValueUnits.mPerSec.name()));
-		ValueUnits tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
-				ValueUnits.celsius.name()));
-		ValueUnits visibilityUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_visibility),
-				ValueUnits.km.name()));
 
 		if (weatherProviderType == WeatherProviderType.KMA_API) {
 			MultipleRestApiDownloader.ResponseResult ultraSrtNcstResponseResult =
@@ -252,7 +247,23 @@ public class WeatherResponseProcessor {
 				currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(context, owmCurrentConditionsResponse
 				);
 			}
+		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
+			MultipleRestApiDownloader.ResponseResult metResponseResult =
+					multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.MET_NORWAY)
+							.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
+
+			if (metResponseResult != null && metResponseResult.isSuccessful()) {
+				LocationForecastResponse metResponse =
+						(LocationForecastResponse) metResponseResult.getResponseObj();
+
+				LocationForecastParameter parameters = (LocationForecastParameter) metResponseResult.getRequestParameter();
+
+				currentConditionsDto = MetNorwayResponseProcessor.makeCurrentConditionsDto(context, metResponse,
+						MetNorwayResponseProcessor.getZoneId(Double.parseDouble(parameters.getLatitude()),
+								Double.parseDouble(parameters.getLongitude())));
+			}
 		}
+
 		return currentConditionsDto;
 	}
 
@@ -260,15 +271,6 @@ public class WeatherResponseProcessor {
 	                                                                       WeatherProviderType weatherProviderType, Double latitude,
 	                                                                       Double longitude) {
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
-
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		ValueUnits windUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
-				ValueUnits.mPerSec.name()));
-		ValueUnits tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
-				ValueUnits.celsius.name()));
-		ValueUnits visibilityUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_visibility),
-				ValueUnits.km.name()));
-
 		JsonObject weatherSourceElement = jsonObject.getAsJsonObject(weatherProviderType.name());
 
 		if (weatherProviderType == WeatherProviderType.KMA_API) {
@@ -323,25 +325,25 @@ public class WeatherResponseProcessor {
 
 			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(context, owmHourlyForecastResponse
 			);
+		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
+			if (weatherSourceElement.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name()) != null) {
+				LocationForecastResponse metNorwayResponse =
+						MetNorwayResponseProcessor.getLocationForecastResponseObjFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name()).getAsString());
+
+				hourlyForecastDtoList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(context, metNorwayResponse,
+						MetNorwayResponseProcessor.getZoneId(latitude, longitude));
+			}
 		}
 		return hourlyForecastDtoList;
 	}
 
-	public static List<HourlyForecastDto> getHourlyForecastDtoList(Context context, MultipleRestApiDownloader multipleRestApiDownloader,
-	                                                               WeatherProviderType weatherProviderType) {
+	public static List<HourlyForecastDto> getHourlyForecastDtoList(Context context, MultipleRestApiDownloader
+			multipleRestApiDownloader, WeatherProviderType weatherProviderType) {
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 		if (multipleRestApiDownloader == null) {
 			return hourlyForecastDtoList;
 		}
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
-
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		ValueUnits windUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
-				ValueUnits.mPerSec.name()));
-		ValueUnits tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
-				ValueUnits.celsius.name()));
-		ValueUnits visibilityUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_visibility),
-				ValueUnits.km.name()));
 
 		if (weatherProviderType == WeatherProviderType.KMA_API) {
 			MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponseResult = responseMap.get(WeatherProviderType.KMA_API).get(
@@ -394,8 +396,7 @@ public class WeatherResponseProcessor {
 				OwmOneCallResponse owmOneCallResponse =
 						(OwmOneCallResponse) responseResult.getResponseObj();
 
-				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(context, owmOneCallResponse
-				);
+				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(context, owmOneCallResponse);
 			}
 		} else if (weatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
 			MultipleRestApiDownloader.ResponseResult owmHourlyForecastResponseResult =
@@ -409,6 +410,20 @@ public class WeatherResponseProcessor {
 				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(context, owmHourlyForecastResponse
 				);
 			}
+		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
+			MultipleRestApiDownloader.ResponseResult responseResult =
+					responseMap.get(weatherProviderType).get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
+
+			if (responseResult != null && responseResult.isSuccessful()) {
+				LocationForecastResponse metNorwayResponse =
+						(LocationForecastResponse) responseResult.getResponseObj();
+
+				LocationForecastParameter parameters = (LocationForecastParameter) responseResult.getRequestParameter();
+
+				hourlyForecastDtoList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(context, metNorwayResponse,
+						MetNorwayResponseProcessor.getZoneId(Double.parseDouble(parameters.getLatitude()),
+								Double.parseDouble(parameters.getLongitude())));
+			}
 		}
 
 		return hourlyForecastDtoList;
@@ -416,14 +431,8 @@ public class WeatherResponseProcessor {
 
 
 	public static List<DailyForecastDto> parseTextToDailyForecastDtoList(Context context, JsonObject jsonObject,
-	                                                                     WeatherProviderType weatherProviderType) {
+	                                                                     WeatherProviderType weatherProviderType, String zoneId) {
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
-
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		ValueUnits windUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
-				ValueUnits.mPerSec.name()));
-		ValueUnits tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
-				ValueUnits.celsius.name()));
 		JsonObject weatherSourceElement = jsonObject.getAsJsonObject(weatherProviderType.name());
 
 
@@ -492,7 +501,15 @@ public class WeatherResponseProcessor {
 				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(context, owmDailyForecastResponse
 				);
 			}
+		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
+			if (weatherSourceElement.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name()) != null) {
+				LocationForecastResponse metNorwayResponse =
+						MetNorwayResponseProcessor.getLocationForecastResponseObjFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name()).getAsString());
+
+				dailyForecastDtoList = MetNorwayResponseProcessor.makeDailyForecastDtoList(context, metNorwayResponse, ZoneId.of(zoneId));
+			}
 		}
+
 		return dailyForecastDtoList;
 	}
 
@@ -576,6 +593,20 @@ public class WeatherResponseProcessor {
 				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(context, owmDailyForecastResponse
 				);
 			}
+		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
+			MultipleRestApiDownloader.ResponseResult responseResult =
+					responseMap.get(WeatherProviderType.MET_NORWAY).get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
+
+			if (responseResult.isSuccessful()) {
+				LocationForecastResponse metResponse =
+						(LocationForecastResponse) responseResult.getResponseObj();
+
+				LocationForecastParameter parameters = (LocationForecastParameter) responseResult.getRequestParameter();
+
+				dailyForecastDtoList = MetNorwayResponseProcessor.makeDailyForecastDtoList(context, metResponse,
+						MetNorwayResponseProcessor.getZoneId(Double.parseDouble(parameters.getLatitude()),
+								Double.parseDouble(parameters.getLongitude())));
+			}
 		}
 
 		return dailyForecastDtoList;
@@ -597,7 +628,6 @@ public class WeatherResponseProcessor {
 
 		final String zeroSnowVolume = context.getString(R.string.temp_snowVolume);
 		final String zeroRainVolume = context.getString(R.string.temp_rainVolume);
-		final String zeroPrecipitationVolume = context.getString(R.string.temp_precipitationVolume);
 
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 
@@ -690,6 +720,8 @@ public class WeatherResponseProcessor {
 			return WeatherProviderType.ACCU_WEATHER;
 		} else if (requestWeatherProviderTypeSet.contains(WeatherProviderType.OWM_ONECALL)) {
 			return WeatherProviderType.OWM_ONECALL;
+		} else if (requestWeatherProviderTypeSet.contains(WeatherProviderType.MET_NORWAY)) {
+			return WeatherProviderType.MET_NORWAY;
 		} else {
 			return WeatherProviderType.OWM_INDIVIDUAL;
 		}

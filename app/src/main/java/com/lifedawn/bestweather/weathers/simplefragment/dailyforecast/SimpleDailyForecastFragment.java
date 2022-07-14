@@ -194,8 +194,8 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 			}
 
-			rainVolumeList.add(String.format(Locale.getDefault(), rainVolume > 0f ? "%.2f" : "%.1f", rainVolume));
-			snowVolumeList.add(String.format(Locale.getDefault(), snowVolume > 0f ? "%.2f" : "%.1f", snowVolume));
+			rainVolumeList.add(String.format(Locale.getDefault(), rainVolume > 0f ? "%.1f" : "%.1f", rainVolume));
+			snowVolumeList.add(String.format(Locale.getDefault(), snowVolume > 0f ? "%.1f" : "%.1f", snowVolume));
 
 			if (!haveRain) {
 				if (rainVolume > 0f) {

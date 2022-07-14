@@ -124,6 +124,12 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		binding.dataTypeOfIconSpinner.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,
 				getResources().getStringArray(R.array.DataTypeOfIcons)));
 
+		if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_met), true)) {
+			binding.commons.metNorwayRadio.setChecked(true);
+		} else {
+			binding.commons.owmRadio.setChecked(true);
+		}
+
 		initLocation();
 		initWeatherProvider();
 		initAutoRefreshInterval();
@@ -256,7 +262,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				WeatherProviderType checked = WeatherProviderType.OWM_ONECALL;
+				WeatherProviderType checked = checkedId == R.id.met_norway_radio ? WeatherProviderType.MET_NORWAY :
+						WeatherProviderType.OWM_ONECALL;
 				onCheckedWeatherProvider(checked);
 			}
 		});
@@ -382,10 +389,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 	public void onCheckedWeatherProvider(WeatherProviderType weatherProviderType) {
 		if (!initializing) {
 			if (ongoingNotiViewCreator.getNotificationDataObj().getWeatherSourceType() != weatherProviderType) {
-
 				ongoingNotiViewCreator.getNotificationDataObj().setWeatherSourceType(weatherProviderType);
 				ongoingNotiViewCreator.savePreferences();
-
 				ongoingNotiViewCreator.initNotification(null);
 			}
 		}
