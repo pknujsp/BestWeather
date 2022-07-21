@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.findaddress;
 
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -63,7 +65,6 @@ public class FindAddressFragment extends Fragment {
 	private FusedLocation fusedLocation;
 	private NetworkStatus networkStatus;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
-	private AlertDialog loadingDialog;
 	private Bundle bundle;
 
 	public FindAddressFragment setOnResultFragmentListener(OnResultFragmentListener onResultFragmentListener) {
@@ -120,11 +121,10 @@ public class FindAddressFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
-					loadingDialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), new View.OnClickListener() {
+					ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), new View.OnClickListener() {
 						@Override
 						public void onClick(View v) {
 							fusedLocation.cancel(myLocationCallback);
-							loadingDialog = null;
 						}
 					});
 					fusedLocation.findCurrentLocation(myLocationCallback, false);
@@ -180,7 +180,7 @@ public class FindAddressFragment extends Fragment {
 					@Override
 					public void onReverseGeocodingResult(List<Address> addressList) {
 						if (getActivity() != null) {
-							getActivity().runOnUiThread(new Runnable() {
+							MainThreadWorker.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
 									Log.e("address", newText);
@@ -236,7 +236,7 @@ public class FindAddressFragment extends Fragment {
 									newFavoriteAddressDto = favoriteAddressDto;
 
 									if (getActivity() != null) {
-										getActivity().runOnUiThread(new Runnable() {
+										MainThreadWorker.runOnUiThread(new Runnable() {
 											@Override
 											public void run() {
 												Toast.makeText(getContext(),
@@ -264,19 +264,20 @@ public class FindAddressFragment extends Fragment {
 
 	@Override
 	public void onDestroy() {
+		getLifecycle().removeObserver(locationLifeCycleObserver);
+		ProgressDialog.clearDialogs();
+
 		Bundle bundle = new Bundle();
 		bundle.putString(BundleKey.LastFragment.name(), FindAddressFragment.class.getName());
 		bundle.putBoolean(BundleKey.SelectedAddressDto.name(), selectedAddress);
 		if (selectedAddress) {
+			PreferenceManager.getDefaultSharedPreferences(getContext())
+					.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), newFavoriteAddressDto.getId()).commit();
 			bundle.putInt(BundleKey.newFavoriteAddressDtoId.name(), newFavoriteAddressDto.getId());
 		}
 
 		onResultFragmentListener.onResultFragment(bundle);
-		getLifecycle().removeObserver(locationLifeCycleObserver);
-		if (loadingDialog != null) {
-			loadingDialog.dismiss();
-			loadingDialog = null;
-		}
+
 		super.onDestroy();
 	}
 
@@ -291,10 +292,8 @@ public class FindAddressFragment extends Fragment {
 							MainThreadWorker.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									if (loadingDialog != null) {
-										loadingDialog.dismiss();
-										loadingDialog = null;
-									}
+									ProgressDialog.clearDialogs();
+
 
 									if (addressList.size() > 0) {
 										onClickedNewLocation(addressList.get(0));
@@ -309,10 +308,7 @@ public class FindAddressFragment extends Fragment {
 
 		@Override
 		public void onFailed(Fail fail) {
-			if (loadingDialog != null) {
-				loadingDialog.dismiss();
-				loadingDialog = null;
-			}
+			ProgressDialog.clearDialogs();
 
 			if (fail == Fail.DISABLED_GPS) {
 				fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {

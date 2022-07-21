@@ -356,7 +356,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			}
 		});
 
-
 		AdRequest adRequest = new AdRequest.Builder().build();
 		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_testUnitId))
 				.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
@@ -374,6 +373,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					}
 				}).withNativeAdOptions(new NativeAdOptions.Builder().setRequestCustomMuteThisAd(true).build())
 				.build();
+
 		adLoader.loadAd(adRequest);
 		binding.adViewBelowAirQuality.loadAd(adRequest);
 		binding.adViewBelowAirQuality.setAdListener(new AdListener() {
@@ -381,6 +381,20 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			public void onAdClosed() {
 				super.onAdClosed();
 				binding.adViewBelowAirQuality.loadAd(new AdRequest.Builder().build());
+			}
+
+			@Override
+			public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+				super.onAdFailedToLoad(loadAdError);
+			}
+		});
+
+		binding.adViewBelowDetailCurrentConditions.loadAd(adRequest);
+		binding.adViewBelowDetailCurrentConditions.setAdListener(new AdListener() {
+			@Override
+			public void onAdClosed() {
+				super.onAdClosed();
+				binding.adViewBelowDetailCurrentConditions.loadAd(new AdRequest.Builder().build());
 			}
 
 			@Override

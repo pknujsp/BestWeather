@@ -121,7 +121,6 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 		} else {
 			makeFailedNotification(dailyPushNotificationDto.getId(), context.getString(R.string.msg_failed_update));
 		}
-
 	}
 
 	@Override

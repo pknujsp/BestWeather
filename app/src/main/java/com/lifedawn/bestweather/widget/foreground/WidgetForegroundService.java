@@ -136,7 +136,6 @@ public class WidgetForegroundService extends Service {
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
 		currentLocationWidgetDtoArrayMap.clear();
 		selectedLocationWidgetDtoArrayMap.clear();
 		allWidgetDtoArrayMap.clear();
@@ -151,6 +150,8 @@ public class WidgetForegroundService extends Service {
 
 		allWidgetProviderClassArrayMap.clear();
 		widgetCreatorMap.clear();
+
+		super.onDestroy();
 	}
 
 	@Override
@@ -235,7 +236,6 @@ public class WidgetForegroundService extends Service {
 						showProgressBar();
 						loadWeatherData(LocationType.SelectedAddress, addressList);
 					}
-
 				}
 
 				@Override
@@ -243,6 +243,7 @@ public class WidgetForegroundService extends Service {
 
 				}
 			});
+
 		} else if (action.equals(getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
 			widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
 				@Override
@@ -359,6 +360,7 @@ public class WidgetForegroundService extends Service {
 			timer.cancel();
 			timer = null;
 			NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+
 			if (notificationHelper.activeNotification(NotificationType.Location.getNotificationId())) {
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 			}
@@ -523,9 +525,8 @@ public class WidgetForegroundService extends Service {
 				requestObjMap = currentLocationRequestMap;
 				responseMap = currentLocationResponseMap;
 			}
-			RequestObj requestObj = requestObjMap.get(addressName);
 
-			Set<Integer> appWidgetIdSet = requestObj.appWidgetSet;
+			Set<Integer> appWidgetIdSet = requestObjMap.get(addressName).appWidgetSet;
 
 			for (Integer appWidgetId : appWidgetIdSet) {
 				AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);

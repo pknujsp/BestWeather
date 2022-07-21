@@ -215,6 +215,6 @@
     <dimen name="yesterdayTempTextSizeInThirdWidget">14sp</dimen>
     <dimen name="yesterdayTempTextSizeInSixWidget">14sp</dimen>
     <dimen name="feelsLikeTempTextSizeInThirdWidget">18sp</dimen>
-    <dimen name="adViewMargin">3dp</dimen>
+    <dimen name="adViewMargin">4dp</dimen>
 
 </resources>

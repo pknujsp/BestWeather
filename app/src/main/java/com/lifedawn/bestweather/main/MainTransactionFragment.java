@@ -40,6 +40,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.CloseWindow;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
@@ -266,6 +267,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
 		binding.sideNavMenu.currentLocationLayout.setPadding(padding, MyApplication.getStatusBarHeight() + padding, padding,
 				padding);
+
 		binding.sideNavMenu.currentLocationLayout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -361,7 +363,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			@Override
 			public void onResultNoData() {
 				if (getActivity() != null) {
-					getActivity().runOnUiThread(new Runnable() {
+					MainThreadWorker.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
 							callback.onResultNoData();
@@ -493,12 +495,16 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 							List<FavoriteAddressDto> newFavoriteAddressDtoList = (List<FavoriteAddressDto>) result.getSerializable(
 									BundleKey.newFavoriteAddressDtoList.name());
 
+							final boolean added = result.getBoolean(BundleKey.SelectedAddressDto.name(), false);
+							final int addedLocationDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name(), -1);
+
 							Set<Integer> lastSet = new HashSet<>();
 							Set<Integer> newSet = new HashSet<>();
 
 							for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
 								lastSet.add(favoriteAddressDto.getId());
 							}
+							
 							for (FavoriteAddressDto favoriteAddressDto : newFavoriteAddressDtoList) {
 								newSet.add(favoriteAddressDto.getId());
 							}
@@ -511,6 +517,16 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 							if (!addedSet.isEmpty() || !removedSet.isEmpty()) {
 								//즐겨찾기 변동 발생
 								refreshFavoriteLocationsList(lastFragment, result);
+
+								if (added) {
+									for (int i = 0; i < binding.sideNavMenu.favoriteAddressLayout.getChildCount(); i++) {
+										if (((FavoriteAddressDto) binding.sideNavMenu.favoriteAddressLayout.getChildAt(i).getTag(favDtoTagInFavLocItemView))
+												.getId() == addedLocationDtoId) {
+											binding.sideNavMenu.favoriteAddressLayout.getChildAt(i).callOnClick();
+											break;
+										}
+									}
+								}
 							} else {
 								//변동 없음
 								processIfPreviousFragmentIsFavorite(result);
