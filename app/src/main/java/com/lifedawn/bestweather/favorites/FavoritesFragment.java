@@ -36,6 +36,7 @@ import com.lifedawn.bestweather.commons.classes.RecyclerViewItemDecoration;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
+import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.FragmentFavoritesBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
@@ -126,6 +127,8 @@ public class FavoritesFragment extends Fragment {
 		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		getActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
+
+		HeaderbarStyle.setStyle(HeaderbarStyle.Style.Black, getActivity());
 
 		bundle = getArguments() != null ? getArguments() : savedInstanceState;
 		requestFragment = bundle.getString(BundleKey.RequestFragment.name());
@@ -315,7 +318,8 @@ public class FavoritesFragment extends Fragment {
 											dialogInterface.dismiss();
 											PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(
 															getString(R.string.pref_key_use_current_location), true)
-													.putString(getString(R.string.pref_key_last_selected_location_type), LocationType.CurrentLocation.name()).apply();
+													.putString(getString(R.string.pref_key_last_selected_location_type),
+															LocationType.CurrentLocation.name()).commit();
 											enableCurrentLocation = true;
 
 											if (checkPermissionAndGpsOn()) {

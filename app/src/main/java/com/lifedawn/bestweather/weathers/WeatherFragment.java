@@ -71,6 +71,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
+import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
@@ -248,12 +249,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		if (hidden) {
 			// 상단바 블랙으로
-			getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-					View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+			HeaderbarStyle.setStyle(HeaderbarStyle.Style.Black, getActivity());
 		} else {
 			// 상단바 하양으로
-			getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-					View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+			HeaderbarStyle.setStyle(HeaderbarStyle.Style.White, getActivity());
 		}
 	}
 

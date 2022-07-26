@@ -28,6 +28,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
+import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
 import com.lifedawn.bestweather.intro.IntroTransactionFragment;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
@@ -64,8 +65,8 @@ public class MainActivity extends AppCompatActivity {
 		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 		window.setStatusBarColor(Color.TRANSPARENT);
-		window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
+		HeaderbarStyle.setStyle(HeaderbarStyle.Style.Black, this);
 
 		networkStatus = NetworkStatus.getInstance(getApplicationContext());
 

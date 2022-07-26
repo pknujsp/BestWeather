@@ -80,7 +80,7 @@ public class MyApplication extends Application {
 				editor.putBoolean(getString(R.string.pref_key_sun_rise_notification), false);
 				editor.putBoolean(getString(R.string.pref_key_sun_set_notification), false);
 				editor.putBoolean(getString(R.string.pref_key_show_intro), true);
-				editor.putBoolean(getString(R.string.pref_key_kma_top_priority), false).putBoolean(
+				editor.putBoolean(getString(R.string.pref_key_kma_top_priority), true).putBoolean(
 						getString(R.string.pref_key_accu_weather), false).putBoolean(getString(R.string.pref_key_open_weather_map),
 						true).commit();
 			}

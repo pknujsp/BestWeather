@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
@@ -424,7 +425,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			}
 		} else {
 			//현재 위치
-
+			binding.sideNavMenu.currentLocationLayout.callOnClick();
 		}
 	}
 
@@ -504,7 +505,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 							for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
 								lastSet.add(favoriteAddressDto.getId());
 							}
-							
+
 							for (FavoriteAddressDto favoriteAddressDto : newFavoriteAddressDtoList) {
 								newSet.add(favoriteAddressDto.getId());
 							}
@@ -536,10 +537,15 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 					final String tag = FavoritesFragment.class.getName();
 
-					getChildFragmentManager().beginTransaction().hide(
-							getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName())).add(
+					FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+					if (getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName()) != null) {
+						transaction.hide(
+								getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName()));
+					}
+
+					transaction.add(
 							binding.fragmentContainer.getId(), favoritesFragment,
-							tag).addToBackStack(tag).commit();
+							tag).addToBackStack(tag).commitAllowingStateLoss();
 					break;
 				case R.id.settings:
 					SettingsMainFragment settingsMainFragment = new SettingsMainFragment();
