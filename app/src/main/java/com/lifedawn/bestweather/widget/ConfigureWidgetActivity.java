@@ -243,7 +243,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		} else if (widgetProviderClassName.equals(EleventhWidgetProvider.class.getName())) {
 			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), this, appWidgetId);
 			binding.kmaTopPrioritySwitch.setText(R.string.containsKma);
-			binding.weatherDataSourceRadioGroup.setVisibility(View.GONE);
+			binding.weatherDataSourceLayout.setVisibility(View.GONE);
 		}
 
 		widgetDto = widgetCreator.loadDefaultSettings();
@@ -412,7 +412,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			}
 		});
 
-
 		widgetRefreshIntervalValueIndex = 0;
 		for (String v : intervalsStr) {
 			if (currentValue.toString().equals(v)) {
@@ -420,8 +419,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			}
 			widgetRefreshIntervalValueIndex++;
 		}
-		originalWidgetRefreshIntervalValueIndex = widgetRefreshIntervalValueIndex;
 
+		originalWidgetRefreshIntervalValueIndex = widgetRefreshIntervalValueIndex;
 		binding.autoRefreshIntervalSpinner.setSelection(widgetRefreshIntervalValueIndex);
 	}
 
@@ -440,7 +439,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			}
 		});
 
-		if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_key_open_weather_map), true)) {
+		if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString(R.string.pref_key_open_weather_map), false)) {
 			binding.owmRadio.setChecked(true);
 		} else {
 			binding.metNorwayRadio.setChecked(true);
@@ -475,14 +474,15 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 				openFavoritesFragment();
 			}
 		});
+
 	}
 
 	private void openFavoritesFragment() {
 		FavoritesFragment favoritesFragment = new FavoritesFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString(BundleKey.RequestFragment.name(), ConfigureWidgetActivity.class.getName());
-		favoritesFragment.setArguments(bundle);
 
+		favoritesFragment.setArguments(bundle);
 		favoritesFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
 			@Override
 			public void onResultFragment(Bundle result) {
@@ -508,9 +508,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 		String tag = FavoritesFragment.class.getName();
 		getSupportFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), favoritesFragment, tag)
-				.addToBackStack(tag).commit();
+				.addToBackStack(tag).commitAllowingStateLoss();
 	}
-
 
 	private void setTextSizeInWidget(int value) {
 		widgetCreator.setTextSize(value);
@@ -527,7 +526,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		binding.previewLayout.removeAllViews();
 		RemoteViews removeViews = widgetCreator.createTempViews(widgetWidth, widgetHeight);
 		View view = removeViews.apply(getApplicationContext(), binding.previewLayout);
+
 		binding.previewLayout.addView(view);
 	}
-
 }

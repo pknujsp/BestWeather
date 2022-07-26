@@ -1,6 +1,6 @@
 package com.lifedawn.bestweather.weathers.detailfragment.aqicn;
 
-import android.content.SharedPreferences;
+import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,7 +21,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.gridlayout.widget.GridLayout;
-import androidx.preference.PreferenceManager;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.Chart;
@@ -74,9 +73,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
 
 public class DetailAirQualityFragment extends Fragment implements IWeatherValues {
+	private final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("E");
+
 	private static AqiCnGeolocalizedFeedResponse response;
 	private FragmentAirQualityDetailBinding binding;
 	private ValueUnits clockUnit;
@@ -84,7 +84,6 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 	private Double latitude;
 	private Double longitude;
-	private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("E");
 
 	private Bundle bundle;
 
@@ -127,6 +126,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		return binding.getRoot();
 	}
 
+	@SuppressLint("MissingPermission")
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -191,11 +191,9 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void setValuesToViews() {
 		final AqiCnGeolocalizedFeedResponse.Data.IAqi iAqi = response.getData().getIaqi();
-		ExecutorService executorService = MyApplication.getExecutorService();
-		executorService.execute(new Runnable() {
+		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
-
 				AirQualityForecastObj current = new AirQualityForecastObj(null);
 				if (iAqi.getPm10() != null) {
 					current.pm10 = (int) Double.parseDouble(iAqi.getPm10().getValue());
@@ -206,6 +204,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 				if (iAqi.getO3() != null) {
 					current.o3 = (int) Double.parseDouble(iAqi.getO3().getValue());
 				}
+
 				List<AirQualityForecastObj> airQualityForecastObjList = new ArrayList<>();
 				airQualityForecastObjList.add(current);
 				airQualityForecastObjList.addAll(AqicnResponseProcessor.getAirQualityForecastObjList(response, zoneId));
@@ -214,7 +213,13 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 			}
 		});
 
-		final int overallGrade = (int) Double.parseDouble(response.getData().getAqi() == null ? "-1" : response.getData().getAqi());
+		int overallGrade = 0;
+		try {
+			overallGrade = (int) Double.parseDouble(response.getData().getAqi() == null ? "-1" : response.getData().getAqi());
+		} catch (NumberFormatException e) {
+			overallGrade = -1;
+		}
+
 		final String currentOverallDescription =
 				AqicnResponseProcessor.getGradeDescription(overallGrade);
 		final int currentOverallColor = AqicnResponseProcessor.getGradeColorId(overallGrade);
@@ -515,7 +520,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		for (int i = 0; i < airQualityForecastObjList.size(); i++) {
 			AirQualityForecastObj airQualityForecastObj = airQualityForecastObjList.get(i);
 			dateList.add(airQualityForecastObj.date == null ? getString(R.string.current) :
-					airQualityForecastObj.date.format(dateFormatter));
+					airQualityForecastObj.date.format(DATE_FORMATTER));
 
 			int pm10 = airQualityForecastObj.pm10 == null ? -1 : airQualityForecastObj.pm10;
 			int pm25 = airQualityForecastObj.pm25 == null ? -1 : airQualityForecastObj.pm25;

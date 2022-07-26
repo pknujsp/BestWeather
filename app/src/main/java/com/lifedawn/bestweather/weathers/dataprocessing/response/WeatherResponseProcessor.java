@@ -93,15 +93,6 @@ public class WeatherResponseProcessor {
 	                                                                   WeatherProviderType weatherProviderType, Double latitude,
 	                                                                   Double longitude) {
 		CurrentConditionsDto currentConditionsDto = null;
-
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		ValueUnits windUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
-				ValueUnits.mPerSec.name()));
-		ValueUnits tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
-				ValueUnits.celsius.name()));
-		ValueUnits visibilityUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_visibility),
-				ValueUnits.km.name()));
-
 		JsonObject weatherSourceElement = jsonObject.getAsJsonObject(weatherProviderType.name());
 
 		if (weatherProviderType == WeatherProviderType.KMA_API) {
@@ -160,6 +151,12 @@ public class WeatherResponseProcessor {
 
 			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(context, owmOneCallResponse
 			);
+		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
+			LocationForecastResponse metNorwayResponse =
+					MetNorwayResponseProcessor.getLocationForecastResponseObjFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name()).getAsString());
+
+			currentConditionsDto = MetNorwayResponseProcessor.makeCurrentConditionsDto(context, metNorwayResponse,
+					MetNorwayResponseProcessor.getZoneId(latitude, longitude));
 		} else if (weatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
 			OwmCurrentConditionsResponse owmCurrentConditionsResponse =
 					OpenWeatherMapResponseProcessor.getOwmCurrentConditionsResponseFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS.name()).getAsString());

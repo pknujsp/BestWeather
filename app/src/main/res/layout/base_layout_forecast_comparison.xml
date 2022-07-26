@@ -33,8 +33,12 @@
                     android:layout_marginLeft="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginRight="16dp"
+                    android:drawableLeft="@drawable/ic_baseline_near_me_24"
+                    android:gravity="center_vertical"
+                    android:drawablePadding="4dp"
                     android:fontFamily="sans-serif-light"
                     android:text="addressName"
+                    android:drawableTint="@color/blue"
                     android:textColor="?attr/textColor"
                     android:textSize="16sp" />
 

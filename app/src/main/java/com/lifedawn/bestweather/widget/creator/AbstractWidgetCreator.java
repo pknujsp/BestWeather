@@ -248,6 +248,13 @@ public abstract class AbstractWidgetCreator {
 				owmJsonObject.addProperty(RetrofitClient.ServiceType.OWM_ONE_CALL.name(), text);
 				rootJsonObject.add(weatherProviderType.name(), owmJsonObject);
 
+			} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
+				JsonObject metNorwayJsonObject = new JsonObject();
+
+				text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST).getResponseText();
+				metNorwayJsonObject.addProperty(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name(), text);
+				rootJsonObject.add(weatherProviderType.name(), metNorwayJsonObject);
+
 			} else if (weatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
 				JsonObject owmIndividualJsonObject = new JsonObject();
 

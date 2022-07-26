@@ -66,7 +66,7 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume()) {
 					haveSnow = true;
 				}
-			} else {
+			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 2) {
 				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasRainVolume() ||
 						dailyForecastDtoList.get(cell).getValuesList().get(1).isHasRainVolume()) {
 					haveRain = true;
@@ -75,6 +75,11 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasSnowVolume() ||
 						dailyForecastDtoList.get(cell).getValuesList().get(1).isHasSnowVolume()) {
 					haveSnow = true;
+				}
+			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 4) {
+				if (dailyForecastDtoList.get(cell).getValuesList().get(1).isHasPrecipitationVolume() ||
+						dailyForecastDtoList.get(cell).getValuesList().get(2).isHasPrecipitationVolume()) {
+					haveRain = true;
 				}
 			}
 		}
@@ -104,7 +109,7 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 					snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getSnowVolume().replace(cm, "").replace(mm,
 							""));
 				}
-			} else {
+			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 2) {
 				forecastRemoteViews.setImageViewResource(R.id.leftIcon, dailyForecastDtoList.get(cell).getValuesList().get(0).getWeatherIcon());
 				forecastRemoteViews.setImageViewResource(R.id.rightIcon, dailyForecastDtoList.get(cell).getValuesList().get(1).getWeatherIcon());
 
@@ -126,6 +131,30 @@ public class ThirdDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 					snowVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(1).getSnowVolume().replace(cm, "").replace(mm,
 							""));
 				}
+			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 4) {
+				forecastRemoteViews.setImageViewResource(R.id.leftIcon,
+						dailyForecastDtoList.get(cell).getValuesList().get(1).getWeatherIcon());
+				forecastRemoteViews.setImageViewResource(R.id.rightIcon,
+						dailyForecastDtoList.get(cell).getValuesList().get(2).getWeatherIcon());
+
+				pop = "-";
+				if (dailyForecastDtoList.get(cell).getValuesList().get(0).isHasPrecipitationVolume()) {
+					rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(0).getPrecipitationVolume().replace(mm,
+							""));
+				}
+				if (dailyForecastDtoList.get(cell).getValuesList().get(1).isHasPrecipitationVolume()) {
+					rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(1).getPrecipitationVolume().replace(mm,
+							""));
+				}
+				if (dailyForecastDtoList.get(cell).getValuesList().get(2).isHasPrecipitationVolume()) {
+					rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(2).getPrecipitationVolume().replace(mm,
+							""));
+				}
+				if (dailyForecastDtoList.get(cell).getValuesList().get(3).isHasPrecipitationVolume()) {
+					rainVolume += Double.parseDouble(dailyForecastDtoList.get(cell).getValuesList().get(3).getPrecipitationVolume().replace(mm,
+							""));
+				}
+
 			}
 
 			if (haveRain) {

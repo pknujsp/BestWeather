@@ -32,12 +32,17 @@ import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.views.CustomEditText;
 import com.lifedawn.bestweather.databinding.FragmentMapBinding;
+import com.lifedawn.bestweather.findaddress.GooglePlaceSearchProcessing;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.retrofit.responses.google.placesearch.GooglePlaceSearchResponse;
+import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import retrofit2.Response;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
@@ -80,7 +85,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 			@Override
 			public void onTextSubmit(String text) {
+				GooglePlaceSearchProcessing.textSearch(text, new JsonDownloader() {
+					@Override
+					public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
+						GooglePlaceSearchResponse googlePlaceSearchResponse = (GooglePlaceSearchResponse) responseObj;
+					}
 
+					@Override
+					public void onResponseResult(Throwable t) {
+
+					}
+				});
 			}
 		});
 

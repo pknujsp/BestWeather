@@ -129,7 +129,6 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 
 		valuesRemoteViews.setTextViewText(R.id.address, addressName);
 		valuesRemoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-
 		valuesRemoteViews.setTextViewTextSize(R.id.address, TypedValue.COMPLEX_UNIT_PX, addressTextSize);
 		valuesRemoteViews.setTextViewTextSize(R.id.refresh, TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
 

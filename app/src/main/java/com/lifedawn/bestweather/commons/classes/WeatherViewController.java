@@ -47,11 +47,11 @@ public class WeatherViewController {
 				if (volumeValue >= 30) {
 					amount = 1.3f;
 				} else if (volumeValue >= 15) {
-					amount = 1.15f;
+					amount = 1.2f;
 				} else if (volumeValue >= 3) {
-					amount = 0.85f;
+					amount = 0.9f;
 				} else {
-					amount = 0.6f;
+					amount = 0.7f;
 				}
 
 				weatherView.setEmissionRate(originalEr * amount);
