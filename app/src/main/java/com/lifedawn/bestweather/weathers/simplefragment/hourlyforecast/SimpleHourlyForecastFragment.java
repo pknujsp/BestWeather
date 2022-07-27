@@ -87,8 +87,8 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 				arguments.putDouble(BundleKey.Latitude.name(), bundle.getDouble(BundleKey.Latitude.name()));
 				arguments.putDouble(BundleKey.Longitude.name(), bundle.getDouble(BundleKey.Longitude.name()));
 				arguments.putSerializable(BundleKey.WeatherProvider.name(), mainWeatherProviderType);
-				arguments.putSerializable(WeatherDataType.hourlyForecast.name(), (Serializable) hourlyForecastDtoList);
 
+				DetailHourlyForecastFragment.setHourlyForecastDtoList(hourlyForecastDtoList);
 				detailHourlyForecastFragment.setArguments(arguments);
 
 				String tag = getString(R.string.tag_detail_hourly_forecast_fragment);

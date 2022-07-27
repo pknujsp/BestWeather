@@ -209,6 +209,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		}
 
 		@Override
+		public void onFragmentStopped(@NonNull FragmentManager fm, @NonNull Fragment f) {
+			super.onFragmentStopped(fm, f);
+		}
+
+		@Override
 		public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
 			if (f instanceof AlertFragment) {
@@ -439,7 +444,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		if (locationType == LocationType.CurrentLocation) {
 			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
-					getString(R.string.pref_key_last_selected_location_type), locationType.name()).apply();
+					getString(R.string.pref_key_last_selected_location_type), locationType.name()).commit();
 
 			LocationResult locationResult = fusedLocation.getLastCurrentLocation();
 

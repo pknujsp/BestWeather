@@ -285,12 +285,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		});
 
 
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-
 		createLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
@@ -333,6 +327,12 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 			}
 		});
+
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
 
 		initializing = false;
 	}

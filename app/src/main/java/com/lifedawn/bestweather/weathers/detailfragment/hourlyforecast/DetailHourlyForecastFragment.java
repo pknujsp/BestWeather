@@ -24,7 +24,6 @@ public class DetailHourlyForecastFragment extends BaseDetailHourlyForecastFragme
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		hourlyForecastDtoList = (ArrayList<HourlyForecastDto>) bundle.getSerializable(WeatherDataType.hourlyForecast.name());
 	}
 
 	@Override

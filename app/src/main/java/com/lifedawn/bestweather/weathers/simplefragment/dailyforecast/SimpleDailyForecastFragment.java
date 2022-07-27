@@ -75,12 +75,12 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			@Override
 			public void onClick(View view) {
 				Bundle arguments = new Bundle();
-				arguments.putSerializable(WeatherDataType.dailyForecast.name(), (Serializable) dailyForecastDtoList);
 				arguments.putString(BundleKey.AddressName.name(), bundle.getString(BundleKey.AddressName.name()));
 				arguments.putSerializable(BundleKey.TimeZone.name(), bundle.getSerializable(BundleKey.TimeZone.name()));
 				arguments.putSerializable(BundleKey.WeatherProvider.name(), mainWeatherProviderType);
 
 				DetailDailyForecastFragment detailDailyForecastFragment = new DetailDailyForecastFragment();
+				DetailDailyForecastFragment.setDailyForecastDtoList(dailyForecastDtoList);
 				detailDailyForecastFragment.setArguments(arguments);
 
 				String tag = getString(R.string.tag_detail_daily_forecast_fragment);

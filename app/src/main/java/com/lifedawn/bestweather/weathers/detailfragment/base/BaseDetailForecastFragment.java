@@ -140,7 +140,6 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 
 	@Override
 	public void onClickedItem(Integer position) {
-
 	}
 
 	public static class HourlyForecastListAdapter extends RecyclerView.Adapter<HourlyForecastListAdapter.ViewHolder> {

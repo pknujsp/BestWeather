@@ -12,7 +12,11 @@ import java.io.Serializable;
 import java.util.List;
 
 public class BaseDetailHourlyForecastFragment extends BaseDetailForecastFragment {
-	protected List<HourlyForecastDto> hourlyForecastDtoList;
+	protected static List<HourlyForecastDto> hourlyForecastDtoList;
+
+	public static void setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
+		BaseDetailHourlyForecastFragment.hourlyForecastDtoList = hourlyForecastDtoList;
+	}
 
 	@Override
 	public void onClickedItem(Integer position) {

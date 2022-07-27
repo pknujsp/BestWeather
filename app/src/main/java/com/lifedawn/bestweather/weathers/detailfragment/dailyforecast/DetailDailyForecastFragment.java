@@ -25,7 +25,6 @@ public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		dailyForecastDtoList = (ArrayList<DailyForecastDto>) bundle.getSerializable(WeatherDataType.dailyForecast.name());
 	}
 
 	@Override
