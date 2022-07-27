@@ -54,9 +54,17 @@
                         android:layout_marginBottom="140dp"
                         android:orientation="vertical"
                         android:paddingLeft="16dp"
-                        android:paddingTop="12dp"
-                        android:paddingBottom="12dp"
                         >
+
+                        <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+                            android:id="@+id/adViewTop"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginBottom="12dp"
+                            ads:adSize="BANNER"
+                            ads:adUnitId="@string/BANNER_testUnitId"
+                            />
 
                         <LinearLayout
                             android:id="@+id/weatherDataSourceLayout"

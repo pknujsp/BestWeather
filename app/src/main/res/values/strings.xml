@@ -567,6 +567,7 @@
     <string name="met_norway_snowandthunder">snow, thunder</string>
     <string name="met_norway_snowshowers">snow showers</string>
     <string name="met_norway_snowshowersandthunder">snow showers, thunder</string>
+    <string name="refreshing_view">refreshing views</string>
 
 
 </resources>

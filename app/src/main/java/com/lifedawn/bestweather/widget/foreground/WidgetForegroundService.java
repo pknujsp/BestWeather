@@ -438,7 +438,8 @@ public class WidgetForegroundService extends Service {
 					fusedLocation.findCurrentLocation(locationCallback, true);
 				} else {
 					LocationResult lastLocation = fusedLocation.getLastCurrentLocation();
-					if (lastLocation == null) {
+					if (lastLocation.getLocations().get(0).getLatitude() == 0.0 ||
+							lastLocation.getLocations().get(0).getLongitude() == 0.0) {
 						fusedLocation.findCurrentLocation(locationCallback, true);
 					} else {
 						locationCallback.onSuccessful(lastLocation);

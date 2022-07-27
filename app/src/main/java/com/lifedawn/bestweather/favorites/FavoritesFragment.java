@@ -268,13 +268,14 @@ public class FavoritesFragment extends Fragment {
 	@Override
 	public void onHiddenChanged(boolean hidden) {
 		super.onHiddenChanged(hidden);
+
 		if (!hidden) {
 			weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 				@Override
 				public void onResultSuccessful(List<FavoriteAddressDto> result) {
 					adapter.setFavoriteAddressDtoList(result);
 					if (getActivity() != null) {
-						getActivity().runOnUiThread(new Runnable() {
+						MainThreadWorker.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
 								adapter.notifyDataSetChanged();
@@ -300,7 +301,7 @@ public class FavoritesFragment extends Fragment {
 					public void run() {
 						final boolean haveFavorites = adapter.getItemCount() > 0;
 						final boolean useCurrentLocation = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(
-								getString(R.string.pref_key_use_current_location), true);
+								getString(R.string.pref_key_use_current_location), false);
 
 						Bundle bundle = new Bundle();
 						bundle.putSerializable(BundleKey.newFavoriteAddressDtoList.name(), (Serializable) result);
@@ -329,13 +330,15 @@ public class FavoritesFragment extends Fragment {
 												onResultFragmentListener.onResultFragment(bundle);
 												getParentFragmentManager().popBackStack();
 											}
+
 										}
 									}).setNegativeButton(R.string.add_favorite, new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialogInterface, int i) {
 									dialogInterface.dismiss();
 									PreferenceManager.getDefaultSharedPreferences(getContext()).edit()
-											.putString(getString(R.string.pref_key_last_selected_location_type), LocationType.SelectedAddress.name()).apply();
+											.putString(getString(R.string.pref_key_last_selected_location_type),
+													LocationType.SelectedAddress.name()).commit();
 									binding.searchview.callOnClick();
 								}
 							}).setNeutralButton(R.string.close_app, new DialogInterface.OnClickListener() {
@@ -345,12 +348,12 @@ public class FavoritesFragment extends Fragment {
 									getActivity().finish();
 								}
 							}).create().show();
-
 						} else if (haveFavorites) {
 							onResultFragmentListener.onResultFragment(bundle);
 							getParentFragmentManager().popBackStack();
 						} else {
 							if (checkPermissionAndGpsOn()) {
+								onResultFragmentListener.onResultFragment(bundle);
 								getParentFragmentManager().popBackStack();
 							}
 						}
@@ -407,4 +410,5 @@ public class FavoritesFragment extends Fragment {
 			onBackPressedCallback.handleOnBackPressed();
 		}
 	}
+
 }

@@ -264,8 +264,8 @@ public class FindAddressFragment extends Fragment {
 
 	@Override
 	public void onDestroy() {
-		getLifecycle().removeObserver(locationLifeCycleObserver);
 		ProgressDialog.clearDialogs();
+		getLifecycle().removeObserver(locationLifeCycleObserver);
 
 		Bundle bundle = new Bundle();
 		bundle.putString(BundleKey.LastFragment.name(), FindAddressFragment.class.getName());
@@ -277,7 +277,6 @@ public class FindAddressFragment extends Fragment {
 		}
 
 		onResultFragmentListener.onResultFragment(bundle);
-
 		super.onDestroy();
 	}
 

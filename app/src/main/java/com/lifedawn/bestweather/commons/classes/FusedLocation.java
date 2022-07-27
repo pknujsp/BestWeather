@@ -105,10 +105,6 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		double longitude = Double.parseDouble(
 				sharedPreferences.getString(context.getString(R.string.pref_key_last_current_location_longitude), "0.0"));
 
-		if (latitude == 0.0 || longitude == 0.0) {
-			return null;
-		}
-
 		Location location = new Location("");
 		location.setLatitude(latitude);
 		location.setLongitude(longitude);

@@ -43,9 +43,9 @@ public class WeatherSourcesFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 
 		//binding.accuWeather.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_accu_weather), true));
-		binding.openWeatherMap.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_open_weather_map), true));
-		binding.yr.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_met), true));
-		binding.kmaTopPriority.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), true));
+		binding.openWeatherMap.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_open_weather_map), false));
+		binding.yr.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_met), false));
+		binding.kmaTopPriority.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), false));
 
 		/*
 		Locale locale;
@@ -79,7 +79,7 @@ public class WeatherSourcesFragment extends Fragment {
 				if (isChecked && binding.yr.isChecked()) {
 					binding.yr.setChecked(false);
 				}
-				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_open_weather_map), isChecked).apply();
+				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_open_weather_map), isChecked).commit();
 			}
 		});
 
@@ -92,14 +92,14 @@ public class WeatherSourcesFragment extends Fragment {
 				if (isChecked && binding.openWeatherMap.isChecked()) {
 					binding.openWeatherMap.setChecked(false);
 				}
-				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_met), isChecked).apply();
+				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_met), isChecked).commit();
 			}
 		});
 
 		binding.kmaTopPriority.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_kma_top_priority), isChecked).apply();
+				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_kma_top_priority), isChecked).commit();
 			}
 		});
 	}

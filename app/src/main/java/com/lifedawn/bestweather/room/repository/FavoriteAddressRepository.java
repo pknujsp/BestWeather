@@ -21,14 +21,17 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 	private FavoriteAddressDao favoriteAddressDao;
 	private MutableLiveData<FavoriteAddressDto> addAddressesLiveData = new MutableLiveData<>();
 	private MutableLiveData<FavoriteAddressDto> deleteAddressesLiveData = new MutableLiveData<>();
+	private MutableLiveData<List<FavoriteAddressDto>> favoriteAddressesLiveData = new MutableLiveData<>();
 	private ExecutorService executors = MyApplication.getExecutorService();
-	private SharedPreferences sharedPreferences;
 	private Context context;
 
 	public FavoriteAddressRepository(Context context) {
 		this.context = context;
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 		favoriteAddressDao = AppDb.getInstance(context).favoriteAddressDao();
+	}
+
+	public MutableLiveData<List<FavoriteAddressDto>> getFavoriteAddressesLiveData() {
+		return favoriteAddressesLiveData;
 	}
 
 	@Override
@@ -81,6 +84,7 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 				long id = favoriteAddressDao.add(favoriteAddressDto);
 				callback.processResult(id);
 				addAddressesLiveData.postValue(favoriteAddressDao.get((int) id));
+				favoriteAddressesLiveData.postValue(favoriteAddressDao.getAll());
 			}
 		});
 	}
@@ -92,6 +96,7 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 			public void run() {
 				favoriteAddressDao.delete(favoriteAddressDto);
 				deleteAddressesLiveData.postValue(favoriteAddressDto);
+				favoriteAddressesLiveData.postValue(favoriteAddressDao.getAll());
 			}
 		});
 	}

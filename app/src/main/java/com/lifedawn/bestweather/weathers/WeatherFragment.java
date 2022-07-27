@@ -17,7 +17,6 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -280,7 +279,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		int topMargin =
 				(int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics())
-						+ statusBarHeight + getResources().getDimension(R.dimen.toolbarHeight));
+						+ getResources().getDimension(R.dimen.toolbarHeight));
 		RelativeLayout.LayoutParams headerLayoutParams = (RelativeLayout.LayoutParams) binding.headerLayout.getLayoutParams();
 		headerLayoutParams.topMargin = topMargin;
 		binding.headerLayout.setLayoutParams(headerLayoutParams);
@@ -318,12 +317,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							if (isSelectedNewAddress) {
 								final int newFavoriteAddressDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name());
 								sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
-										newFavoriteAddressDtoId).apply();
-								iRefreshFavoriteLocationListOnSideNav.refreshFavoriteLocationsList(result.getString(BundleKey.LastFragment.name()), result);
+										newFavoriteAddressDtoId).commit();
+								iRefreshFavoriteLocationListOnSideNav.onRefreshedFavoriteLocationsList(result.getString(BundleKey.LastFragment.name()), result);
 							}
 						}
 					});
-
 					getParentFragmentManager().beginTransaction().hide(WeatherFragment.this).add(R.id.fragment_container,
 							findAddressFragment, getString(R.string.tag_find_address_fragment)).addToBackStack(
 							getString(R.string.tag_find_address_fragment)).commitAllowingStateLoss();
@@ -402,6 +400,20 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			}
 		});
 
+
+		binding.adViewTop.loadAd(adRequest);
+		binding.adViewTop.setAdListener(new AdListener() {
+			@Override
+			public void onAdClosed() {
+				super.onAdClosed();
+				binding.adViewTop.loadAd(new AdRequest.Builder().build());
+			}
+
+			@Override
+			public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+				super.onAdFailedToLoad(loadAdError);
+			}
+		});
 		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
 
 		final LocationType locationType = (LocationType) arguments.getSerializable("LocationType");
@@ -431,8 +443,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			LocationResult locationResult = fusedLocation.getLastCurrentLocation();
 
-			latitude = locationResult == null ? 0.0 : locationResult.getLocations().get(0).getLatitude();
-			longitude = locationResult == null ? 0.0 : locationResult.getLocations().get(0).getLongitude();
+			latitude = locationResult.getLocations().get(0).getLatitude();
+			longitude = locationResult.getLocations().get(0).getLongitude();
 
 			if (latitude == 0.0 && longitude == 0.0) {
 				//최근에 현재위치로 잡힌 위치가 없으므로 현재 위치 요청
@@ -699,8 +711,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void reDraw() {
 		//날씨 프래그먼트 다시 그림
 		if (FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString())) {
-			ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
-
+			ProgressDialog.show(getActivity(), getString(R.string.refreshing_view), null);
 
 			executorService.execute(new Runnable() {
 				@Override
