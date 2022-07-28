@@ -404,21 +404,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				super.onAdFailedToLoad(loadAdError);
 			}
 		});
-
-
-		binding.adViewTop.loadAd(adRequest);
-		binding.adViewTop.setAdListener(new AdListener() {
-			@Override
-			public void onAdClosed() {
-				super.onAdClosed();
-				binding.adViewTop.loadAd(new AdRequest.Builder().build());
-			}
-
-			@Override
-			public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-				super.onAdFailedToLoad(loadAdError);
-			}
-		});
+		
 		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
 
 		final LocationType locationType = (LocationType) arguments.getSerializable("LocationType");

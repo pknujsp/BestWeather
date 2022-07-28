@@ -58,6 +58,12 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		} else {
 			precipitation = getString(R.string.not_precipitation);
 		}
+
+		if (currentConditionsDto.getWindDirection() != null) {
+			binding.windDirectionArrow.setRotation(currentConditionsDto.getWindDirectionDegree() + 180);
+		}
+		binding.windDirectionArrow.setVisibility(currentConditionsDto.getWindDirection() == null ? View.GONE : View.VISIBLE);
+
 		binding.precipitation.setText(precipitation);
 
 		binding.weatherIcon.setImageResource(currentConditionsDto.getWeatherIcon());
@@ -79,7 +85,6 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		if (currentConditionsDto.getYesterdayTemp() != null) {
 			binding.tempDescription.setText(WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
 					currentConditionsDto.getYesterdayTemp(), tempUnit, getContext()));
-
 			binding.tempDescription.setVisibility(View.VISIBLE);
 		} else {
 			binding.tempDescription.setVisibility(View.GONE);

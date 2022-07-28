@@ -469,7 +469,7 @@
     <string name="lowerTemperature">lower</string>
     <string name="sixthWidgetLabel">current/current aqi</string>
     <string name="seventhWidgetLabel">aqi current/forecast</string>
-    <string name="eighthWidgetLabel">current/hourly/daily 2</string>
+    <string name="eighthWidgetLabel">current/hourly 2</string>
     <string name="ninthWidgetLabel">long hourly</string>
     <string name="tenthWidgetLabel">long daily</string>
     <string name="eleventhWidgetLabel">compare hourly</string>
