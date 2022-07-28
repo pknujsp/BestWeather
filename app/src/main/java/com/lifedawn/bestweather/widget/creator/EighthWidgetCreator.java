@@ -5,7 +5,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -145,13 +147,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		valuesRemoteViews.setTextViewTextSize(R.id.dateClock, TypedValue.COMPLEX_UNIT_PX, dateClockTextSize);
 
 		//현재 날씨------------------------------------------------------
-		valuesRemoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
-		if (currentConditionsDto.getFeelsLikeTemp() != null) {
-			String feelsLikeTemp = context.getString(R.string.feelsLike) + ": " + currentConditionsDto.getFeelsLikeTemp();
-			valuesRemoteViews.setTextViewText(R.id.feelsLikeTemp, feelsLikeTemp);
-		} else {
-			valuesRemoteViews.setViewVisibility(R.id.feelsLikeTemp, View.GONE);
-		}
+		valuesRemoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp().replace(tempDegree, "°"));
 		valuesRemoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
 
 		String precipitation = "";
@@ -162,41 +158,17 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		}
 		valuesRemoteViews.setTextViewText(R.id.precipitation, precipitation);
 
-
-		String airQuality = context.getString(R.string.air_quality) + ": ";
+		String airQuality = null;
 		if (airQualityDto.isSuccessful()) {
-			airQuality += AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
+			airQuality = AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
 		} else {
-			airQuality += context.getString(R.string.noData);
+			airQuality = context.getString(R.string.noData);
 		}
-		valuesRemoteViews.setTextViewText(R.id.airQuality, airQuality);
 
+		valuesRemoteViews.setTextViewText(R.id.airQuality, airQuality);
 		valuesRemoteViews.setTextViewTextSize(R.id.temperature, TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
-		valuesRemoteViews.setTextViewTextSize(R.id.feelsLikeTemp, TypedValue.COMPLEX_UNIT_PX, currentFeelsLikeTempTextSize);
 		valuesRemoteViews.setTextViewTextSize(R.id.precipitation, TypedValue.COMPLEX_UNIT_PX, currentPrecipitationTextSize);
 		valuesRemoteViews.setTextViewTextSize(R.id.airQuality, TypedValue.COMPLEX_UNIT_PX, currentAirQualityTextSize);
-
-		//시간별 예보-------------------------------------------------------------------------------------
-		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E 0");
-
-		for (int cell = 0; cell < hourlyForecastCount; cell++) {
-			RemoteViews hourlyRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_forecast_item_in_linear);
-
-			if (hourlyForecastDtoList.get(cell).getHours().getHour() == 0) {
-				hourlyRemoteViews.setTextViewText(R.id.dateTime, hourlyForecastDtoList.get(cell).getHours().format(hour0Formatter));
-			} else {
-				hourlyRemoteViews.setTextViewText(R.id.dateTime, String.valueOf(hourlyForecastDtoList.get(cell).getHours().getHour()));
-			}
-			hourlyRemoteViews.setImageViewResource(R.id.leftIcon, hourlyForecastDtoList.get(cell).getWeatherIcon());
-			hourlyRemoteViews.setTextViewText(R.id.temperature, hourlyForecastDtoList.get(cell).getTemp());
-			hourlyRemoteViews.setTextViewText(R.id.pop, hourlyForecastDtoList.get(cell).getPop());
-
-			hourlyRemoteViews.setViewVisibility(R.id.rainVolumeLayout, View.GONE);
-			hourlyRemoteViews.setViewVisibility(R.id.snowVolumeLayout, View.GONE);
-			hourlyRemoteViews.setViewVisibility(R.id.rightIcon, View.GONE);
-
-			valuesRemoteViews.addView(R.id.hourlyForecast, hourlyRemoteViews);
-		}
 
 		/*
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("E");

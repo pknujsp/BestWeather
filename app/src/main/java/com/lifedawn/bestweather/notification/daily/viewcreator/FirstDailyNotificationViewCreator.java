@@ -69,7 +69,6 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 				haveSnow = true;
 			}
 		}
-
 		String rain = null;
 
 		for (int cell = 0; cell < cellCount; cell++) {
@@ -84,7 +83,6 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 			if (hourlyForecastDtoList.get(cell).isHasRain() || hourlyForecastDtoList.get(cell).isHasPrecipitation()) {
 				rain = hourlyForecastDtoList.get(cell).isHasRain() ? hourlyForecastDtoList.get(cell).getRainVolume() :
 						hourlyForecastDtoList.get(cell).getPrecipitationVolume();
-
 				forecastRemoteViews.setTextViewText(R.id.rainVolume, rain.replace(mm, "").replace(cm, ""));
 			} else {
 				forecastRemoteViews.setViewVisibility(R.id.rainVolumeLayout, haveRain ? View.INVISIBLE : View.GONE);

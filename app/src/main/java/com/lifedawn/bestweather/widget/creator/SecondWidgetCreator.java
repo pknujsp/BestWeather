@@ -87,7 +87,6 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		RemoteViews remoteViews = createBaseRemoteViews();
 		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 
-
 		return remoteViews;
 	}
 
@@ -153,7 +152,6 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		View view = layoutInflater.inflate(R.layout.header_view_in_widget, null, false);
 		((TextView) view.findViewById(R.id.address)).setText(addressName);
 		((TextView) view.findViewById(R.id.refresh)).setText(ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-
 		((TextView) view.findViewById(R.id.address)).setTextSize(TypedValue.COMPLEX_UNIT_PX, addressTextSize);
 		((TextView) view.findViewById(R.id.refresh)).setTextSize(TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
 

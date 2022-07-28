@@ -353,7 +353,6 @@ public abstract class AbstractWidgetCreator {
 						aqiCnJsonObject.addProperty(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name(), text);
 					}
 				}
-
 				rootJsonObject.add(weatherProviderType.name(), aqiCnJsonObject);
 			}
 		}
@@ -361,8 +360,8 @@ public abstract class AbstractWidgetCreator {
 		if (zoneOffset != null) {
 			rootJsonObject.addProperty("zoneOffset", zoneOffset.getId());
 		}
-		rootJsonObject.addProperty("lastUpdatedDateTime", multipleRestApiDownloader.getRequestDateTime().toString());
 
+		rootJsonObject.addProperty("lastUpdatedDateTime", multipleRestApiDownloader.getRequestDateTime().toString());
 		widgetDto.setResponseText(rootJsonObject.toString());
 	}
 
@@ -437,6 +436,7 @@ public abstract class AbstractWidgetCreator {
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		layoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f,
 				context.getResources().getDisplayMetrics());
+
 		return layoutParams;
 	}
 

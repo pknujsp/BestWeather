@@ -16,67 +16,16 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
         >
 
-        <TextClock
-            android:id="@+id/timeClock"
+        <LinearLayout
+            android:id="@+id/clockLayout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="24dp"
-            android:format12Hour="HH:mm"
-            android:format24Hour="HH:mm"
-            android:includeFontPadding="false"
-            android:text="@string/temp_time"
-            android:textColor="@color/widgetTextColor"
-            android:textSize="@dimen/timeClockTextSizeInEighthWidget"
-            />
-
-        <LinearLayout
-            android:id="@+id/extraInfoLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/timeClock"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            >
-
-            <TextView
-                android:id="@+id/precipitation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="8dp"
-                android:includeFontPadding="false"
-                android:text="@string/temp_noPrecipitation"
-                android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/precipitationTextSizeInEighthWidget"
-                />
-
-            <TextView
-                android:id="@+id/airQuality"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:includeFontPadding="false"
-                android:text="@string/temp_airQuality"
-                android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/airQualityTextSizeInEighthWidget"
-                />
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/currentConditionsLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/timeClock"
-            android:layout_alignBottom="@id/timeClock"
-            android:layout_toLeftOf="@id/weatherIcon"
-            android:gravity="center_vertical|right"
+            android:gravity="center_vertical"
             android:orientation="vertical"
             >
 
@@ -92,62 +41,29 @@
                 android:textSize="@dimen/dateClockTextSizeInEighthWidget"
                 />
 
-            <RelativeLayout
+            <TextClock
+                android:id="@+id/timeClock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                >
-
-                <TextView
-                    android:id="@+id/temperature"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-light"
-                    android:includeFontPadding="false"
-                    android:text="@string/temp_temperature"
-                    android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/tempTextSizeInEighthWidget"
-                    />
-
-                <TextView
-                    android:id="@+id/feelsLikeTemp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBaseline="@id/temperature"
-                    android:layout_marginLeft="4dp"
-                    android:layout_toRightOf="@id/temperature"
-                    android:fontFamily="sans-serif-light"
-                    android:includeFontPadding="false"
-                    android:text="@string/temp_feelsLikeTemperature"
-                    android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/feelsLikeTempTextSizeInEighthWidget"
-                    />
-            </RelativeLayout>
-
+                android:format12Hour="HH:mm"
+                android:format24Hour="HH:mm"
+                android:includeFontPadding="false"
+                android:text="@string/temp_time"
+                android:textColor="@color/widgetTextColor"
+                android:textSize="@dimen/timeClockTextSizeInEighthWidget"
+                />
 
         </LinearLayout>
 
 
-        <ImageView
-            android:id="@+id/weatherIcon"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_alignTop="@id/timeClock"
-            android:layout_alignBottom="@id/timeClock"
+        <include
+            android:id="@+id/current"
+            layout="@layout/view_current_conditions_for_simple_widget"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:layout_marginLeft="6dp"
-            android:layout_marginRight="24dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/day_clear"
             />
 
-        <LinearLayout
-            android:id="@+id/hourlyForecast"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/extraInfoLayout"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            />
+
     </RelativeLayout>
 </LinearLayout>

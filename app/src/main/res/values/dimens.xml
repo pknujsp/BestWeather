@@ -188,7 +188,7 @@
     <dimen name="stationNameTextSizeInSeventhWidget">14sp</dimen>
     <dimen name="airQualityTextSizeInSeventhWidget">16sp</dimen>
     <dimen name="dateClockTextSizeInEighthWidget">24sp</dimen>
-    <dimen name="timeClockTextSizeInEighthWidget">64sp</dimen>
+    <dimen name="timeClockTextSizeInEighthWidget">60sp</dimen>
     <dimen name="tempTextSizeInEighthWidget">24sp</dimen>
     <dimen name="precipitationTextSizeInEighthWidget">13sp</dimen>
     <dimen name="airQualityTextSizeInEighthWidget">13sp</dimen>

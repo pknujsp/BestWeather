@@ -393,7 +393,7 @@
     <string name="lowerTemperature">낮음</string>
     <string name="sixthWidgetLabel">현재/세부 대기질</string>
     <string name="seventhWidgetLabel">현재 대기질/대기예보</string>
-    <string name="eighthWidgetLabel">현재/시간별 2</string>
+    <string name="eighthWidgetLabel">현재/시계</string>
     <string name="ninthWidgetLabel">긴 시간별 예보</string>
     <string name="tenthWidgetLabel">긴 일별 예보</string>
     <string name="eleventhWidgetLabel">시간별 예보 비교</string>

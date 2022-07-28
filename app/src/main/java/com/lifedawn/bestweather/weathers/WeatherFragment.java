@@ -284,7 +284,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		int topMargin =
 				(int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics())
-						+ getResources().getDimension(R.dimen.toolbarHeight));
+						+ getResources().getDimension(R.dimen.toolbarHeight) + statusBarHeight);
 		RelativeLayout.LayoutParams headerLayoutParams = (RelativeLayout.LayoutParams) binding.headerLayout.getLayoutParams();
 		headerLayoutParams.topMargin = topMargin;
 		binding.headerLayout.setLayoutParams(headerLayoutParams);
@@ -404,9 +404,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				super.onAdFailedToLoad(loadAdError);
 			}
 		});
-		
-		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
 
+		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
 		final LocationType locationType = (LocationType) arguments.getSerializable("LocationType");
 		final FavoriteAddressDto favoriteAddressDto = arguments.containsKey("FavoriteAddressDto") ?
 				(FavoriteAddressDto) arguments.getSerializable("FavoriteAddressDto") : null;
@@ -433,7 +432,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					getString(R.string.pref_key_last_selected_location_type), locationType.name()).commit();
 
 			LocationResult locationResult = fusedLocation.getLastCurrentLocation();
-
 			latitude = locationResult.getLocations().get(0).getLatitude();
 			longitude = locationResult.getLocations().get(0).getLongitude();
 
