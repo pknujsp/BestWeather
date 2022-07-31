@@ -103,10 +103,9 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 				fragmentManager.beginTransaction().hide(
 						fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
-						detailAirQualityFragment, tag).addToBackStack(tag).commit();
+						detailAirQualityFragment, tag).addToBackStack(tag).commitAllowingStateLoss();
 			}
 		});
-
 		setValuesToViews();
 	}
 
@@ -131,7 +130,6 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 				distanceStr += ", " + getString(R.string.the_measuring_station_is_very_far_away);
 			}
 			binding.distanceToMeasuringStation.setText(distanceStr);
-
 			binding.measuringStationName.setText(airQualityDto.getCityName() != null ? airQualityDto.getCityName() : noData);
 
 			final int overallGrade = airQualityDto.getAqi();
@@ -153,13 +151,11 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 				addGridItem(airQualityDto.getCurrent().getPm25(), R.string.pm25_str, R.drawable.pm25);
 			}
 
-
 			if (!airQualityDto.getCurrent().isHasO3()) {
 				addGridItem(null, R.string.o3_str, R.drawable.o3);
 			} else {
 				addGridItem(airQualityDto.getCurrent().getO3(), R.string.o3_str, R.drawable.o3);
 			}
-
 
 			if (!airQualityDto.getCurrent().isHasCo()) {
 				addGridItem(null, R.string.co_str, R.drawable.co);
@@ -178,34 +174,52 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			} else {
 				addGridItem(airQualityDto.getCurrent().getNo2(), R.string.no2_str, R.drawable.no2);
 			}
+
 			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
-			LayoutInflater layoutInflater = LayoutInflater.from(getContext());
 
 			List<AirQualityDto.DailyForecast> forecastList = airQualityDto.getDailyForecastList();
 			final int textColor = AppTheme.getColor(getContext(), R.attr.textColorInWeatherCard);
 
+			LayoutInflater layoutInflater = LayoutInflater.from(getContext());
 			View labelView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
+
 			labelView.findViewById(R.id.date).setVisibility(View.INVISIBLE);
-			((TextView) labelView.findViewById(R.id.pm10)).setText(getString(R.string.pm10_str));
-			((TextView) labelView.findViewById(R.id.pm25)).setText(getString(R.string.pm25_str));
-			((TextView) labelView.findViewById(R.id.o3)).setText(getString(R.string.o3_str));
+
+			((TextView) labelView.findViewById(R.id.pm10)).setText(getString(R.string.air_quality));
+			((TextView) labelView.findViewById(R.id.pm25)).setVisibility(View.GONE);
+			((TextView) labelView.findViewById(R.id.o3)).setVisibility(View.GONE);
 
 			((TextView) labelView.findViewById(R.id.date)).setTextColor(textColor);
 			((TextView) labelView.findViewById(R.id.pm10)).setTextColor(textColor);
-			((TextView) labelView.findViewById(R.id.pm25)).setTextColor(textColor);
-			((TextView) labelView.findViewById(R.id.o3)).setTextColor(textColor);
+			//((TextView) labelView.findViewById(R.id.pm25)).setTextColor(textColor);
+			//((TextView) labelView.findViewById(R.id.o3)).setTextColor(textColor);
 			binding.forecast.addView(labelView);
 
 			for (AirQualityDto.DailyForecast forecastObj : forecastList) {
-
 				View forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
+
 				((TextView) forecastItemView.findViewById(R.id.date)).setText(forecastObj.getDate().format(dateTimeFormatter));
+				((TextView) forecastItemView.findViewById(R.id.date)).setTextColor(textColor);
+				((TextView) forecastItemView.findViewById(R.id.pm25)).setVisibility(View.GONE);
+				((TextView) forecastItemView.findViewById(R.id.o3)).setVisibility(View.GONE);
 
-				((TextView) forecastItemView.findViewById(R.id.pm10)).setText(
-						!forecastObj.isHasPm10() ? noData : AqicnResponseProcessor.getGradeDescription(forecastObj.getPm10().getAvg()));
-				((TextView) forecastItemView.findViewById(R.id.pm10)).setTextColor(!forecastObj.isHasPm10() ? ContextCompat.getColor(getContext(),
-						R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.getPm10().getAvg()));
+				int grade = -1;
+				if (forecastObj.isHasPm10()) {
+					grade = Math.max(grade, forecastObj.getPm10().getAvg());
+				}
+				if (forecastObj.isHasPm25()) {
+					grade = Math.max(grade, forecastObj.getPm25().getAvg());
+				}
+				if (forecastObj.isHasO3()) {
+					grade = Math.max(grade, forecastObj.getO3().getAvg());
+				}
 
+				((TextView) forecastItemView.findViewById(R.id.pm10)).setText(grade == -1
+						? noData : AqicnResponseProcessor.getGradeDescription(grade));
+				((TextView) forecastItemView.findViewById(R.id.pm10)).setTextColor(grade == -1 ? ContextCompat.getColor(getContext(),
+						R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(grade));
+
+				/*
 				((TextView) forecastItemView.findViewById(R.id.pm25)).setText(
 						!forecastObj.isHasPm25() ? noData : AqicnResponseProcessor.getGradeDescription(forecastObj.getPm25().getAvg()));
 				((TextView) forecastItemView.findViewById(R.id.pm25)).setTextColor(!forecastObj.isHasPm25() ?
@@ -217,9 +231,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 				((TextView) forecastItemView.findViewById(R.id.o3)).setTextColor(!forecastObj.isHasO3() ?
 						ContextCompat.getColor(getContext(),
 								R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.getO3().getAvg()));
-
-				((TextView) forecastItemView.findViewById(R.id.date)).setTextColor(textColor);
-
+				 */
 				binding.forecast.addView(forecastItemView);
 			}
 		}
@@ -229,7 +241,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 	protected final View addGridItem(@Nullable Integer value, int labelDescriptionId, @NonNull Integer labelIconId) {
 		View gridItem = getLayoutInflater().inflate(R.layout.air_quality_item, null);
-		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
+		((ImageView) gridItem.findViewById(R.id.label_icon)).setVisibility(View.GONE);
 		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
 		((TextView) gridItem.findViewById(R.id.label)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
 		((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
