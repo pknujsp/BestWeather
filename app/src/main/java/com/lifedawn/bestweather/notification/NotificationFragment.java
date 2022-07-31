@@ -60,9 +60,9 @@ public class NotificationFragment extends Fragment {
 				String tag = OngoingNotificationSettingsFragment.class.getName();
 
 				getParentFragmentManager().beginTransaction().hide(NotificationFragment.this).add(R.id.fragment_container,
-						ongoingNotificationSettingsFragment,
-						tag)
-						.addToBackStack(tag).commit();
+								ongoingNotificationSettingsFragment,
+								tag)
+						.addToBackStack(tag).commitAllowingStateLoss();
 			}
 		});
 
@@ -73,8 +73,8 @@ public class NotificationFragment extends Fragment {
 				String tag = DailyPushNotificationListFragment.class.getName();
 
 				getParentFragmentManager().beginTransaction().hide(NotificationFragment.this).add(R.id.fragment_container,
-						listFragment, tag)
-						.addToBackStack(tag).commit();
+								listFragment, tag)
+						.addToBackStack(tag).commitAllowingStateLoss();
 			}
 		});
 
@@ -85,8 +85,8 @@ public class NotificationFragment extends Fragment {
 				String tag = AlarmListFragment.class.getName();
 
 				getParentFragmentManager().beginTransaction().hide(NotificationFragment.this).add(R.id.fragment_container,
-						alarmListFragment, tag)
-						.addToBackStack(tag).commit();
+								alarmListFragment, tag)
+						.addToBackStack(tag).commitAllowingStateLoss();
 			}
 		});
 	}

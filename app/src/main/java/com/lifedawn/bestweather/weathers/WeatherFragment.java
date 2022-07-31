@@ -297,7 +297,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
-					ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
+					ProgressDialog.show(getActivity(), getString(R.string.msg_finding_current_location), null);
 					fusedLocation.findCurrentLocation(MY_LOCATION_CALLBACK, false);
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
