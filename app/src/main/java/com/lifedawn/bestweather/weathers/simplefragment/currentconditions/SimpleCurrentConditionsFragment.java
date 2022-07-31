@@ -104,6 +104,7 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		} else {
 			airQuality = getString(R.string.noData);
 		}
+
 		binding.airQuality.setText(airQuality);
 	}
 

@@ -150,11 +150,31 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		private DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("H");
 		private final String tempDegree;
 		private final String degree = "°";
+		private ShowDataType showDataType;
+
+		enum ShowDataType {
+			Precipitation, Humidity, Wind
+		}
 
 		public HourlyForecastListAdapter(Context context, @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
 			this.context = context;
 			this.onClickedForecastItem = onClickedForecastItem;
 			tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
+
+			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+			final int selectedItem = sharedPreferences.getInt(context.getString(R.string.pref_key_detail_hourly_forecast_show_data), 0);
+
+			switch (selectedItem) {
+				case 0:
+					showDataType = ShowDataType.Precipitation;
+					break;
+				case 1:
+					showDataType = ShowDataType.Wind;
+					break;
+				case 2:
+					showDataType = ShowDataType.Humidity;
+					break;
+			}
 		}
 
 		public void setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
@@ -199,19 +219,43 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 				binding.temp.setText(hourlyForecastDto.getTemp().replace(tempDegree, degree));
 				binding.pop.setText(hourlyForecastDto.getPop() == null ? "-" : hourlyForecastDto.getPop());
 
-				if (hourlyForecastDto.isHasSnow()) {
-					binding.snowVolume.setText(hourlyForecastDto.getSnowVolume());
-					binding.snowVolumeLayout.setVisibility(View.VISIBLE);
-				} else {
-					binding.snowVolumeLayout.setVisibility(View.GONE);
-				}
+				if (showDataType == ShowDataType.Precipitation) {
+					if (hourlyForecastDto.isHasSnow()) {
+						binding.snowVolume.setText(hourlyForecastDto.getSnowVolume());
+						binding.snowVolumeLayout.setVisibility(View.VISIBLE);
+					} else {
+						binding.snowVolumeLayout.setVisibility(View.GONE);
+					}
 
-				if (hourlyForecastDto.isHasRain() || hourlyForecastDto.isHasPrecipitation()) {
-					binding.rainVolume.setText(hourlyForecastDto.isHasRain() ? hourlyForecastDto.getRainVolume() :
-							hourlyForecastDto.getPrecipitationVolume());
+					if (hourlyForecastDto.isHasRain() || hourlyForecastDto.isHasPrecipitation()) {
+						binding.rainVolume.setText(hourlyForecastDto.isHasRain() ? hourlyForecastDto.getRainVolume() :
+								hourlyForecastDto.getPrecipitationVolume());
+						binding.rainVolumeLayout.setVisibility(View.VISIBLE);
+					} else {
+						binding.rainVolumeLayout.setVisibility(View.GONE);
+					}
+
+					binding.topIcon.setImageResource(R.drawable.raindrop);
+					binding.bottomIcon.setImageResource(R.drawable.snowparticle);
+					binding.bottomIcon.setRotation(0);
+				} else if (showDataType == ShowDataType.Wind) {
+					binding.topIcon.setImageResource(R.drawable.winddirection);
+					binding.bottomIcon.setImageResource(R.drawable.arrow);
+					binding.bottomIcon.setRotation(hourlyForecastDto.getWindDirectionVal() + 180);
+
+					binding.rainVolume.setText(hourlyForecastDto.getWindSpeed() == null ?
+							context.getString(R.string.noData) : hourlyForecastDto.getWindSpeed());
+					binding.snowVolume.setText(hourlyForecastDto.getWindDirection() == null ?
+							context.getString(R.string.noData) : hourlyForecastDto.getWindDirection());
+
 					binding.rainVolumeLayout.setVisibility(View.VISIBLE);
-				} else {
-					binding.rainVolumeLayout.setVisibility(View.GONE);
+					binding.snowVolumeLayout.setVisibility(View.VISIBLE);
+				} else if (showDataType == ShowDataType.Humidity) {
+					binding.rainVolumeLayout.setVisibility(View.VISIBLE);
+					binding.snowVolumeLayout.setVisibility(View.GONE);
+
+					binding.topIcon.setImageResource(R.drawable.humidity);
+					binding.rainVolume.setText(hourlyForecastDto.getHumidity());
 				}
 
 			}

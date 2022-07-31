@@ -842,4 +842,10 @@
         <item>@string/FourthDailyPushNotification</item>
         <item>@string/FifthDailyPushNotification</item>
     </string-array>
+
+    <string-array name="DetailHourlyForecastShowDataType">
+        <item>@string/precipitation</item>
+        <item>@string/wind</item>
+        <item>@string/humidity</item>
+    </string-array>
 </resources>

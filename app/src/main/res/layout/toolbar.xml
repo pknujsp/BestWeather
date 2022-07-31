@@ -5,23 +5,26 @@
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+    android:paddingRight="16dp"
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingBottom="8dp"
+        >
 
         <ImageView
             android:id="@+id/back_btn"
             android:layout_width="@dimen/btnSizeInToolbar"
             android:layout_height="@dimen/btnSizeInToolbar"
             android:background="?attr/selectableItemBackground"
-            android:src="@drawable/back"
             android:scaleType="center"
-            app:tint="?attr/toolbarIconColor" />
+            android:src="@drawable/back"
+            app:tint="?attr/toolbarIconColor"
+            />
 
         <TextView
             android:id="@+id/fragment_title"
@@ -32,7 +35,23 @@
             android:fontFamily="sans-serif"
             android:gravity="center_vertical"
             android:text="fragmentTitle"
-            android:textColor="?attr/toolbarTextColor" />
+            android:textColor="?attr/toolbarTextColor"
+            />
+
+        <TextView
+            android:id="@+id/extraBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:fontFamily="sans-serif"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:visibility="gone"
+            android:text="txt"
+            android:textColor="?attr/toolbarTextColor"
+            />
+
     </RelativeLayout>
 
 </FrameLayout>

@@ -77,16 +77,18 @@
             />
 
         <ImageView
+            android:id="@+id/windDirectionArrow"
+            style="@style/text_shadow"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:id="@+id/windDirectionArrow"
-            android:src="@drawable/arrow"
-            android:layout_toLeftOf="@id/wind"
             android:layout_alignTop="@id/wind"
-            android:scaleType="fitCenter"
             android:layout_alignBottom="@id/wind"
             android:layout_marginRight="4dp"
-            app:tint="@color/light_blue_600"
+            android:layout_toLeftOf="@id/wind"
+            android:scaleType="fitCenter"
+            android:shadowColor="@color/black"
+            android:src="@drawable/arrow"
+            app:tint="@color/white"
             />
 
         <TextView
@@ -172,15 +174,15 @@
 
 
         <TextView
+            style="@style/text_shadow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/temperature"
             android:layout_marginRight="8dp"
             android:layout_toLeftOf="@id/feelsLikeTemp"
             android:fontFamily="sans-serif-light"
-            android:text="@string/real_feel_temperature_simple"
-            style="@style/text_shadow"
             android:shadowColor="@color/black"
+            android:text="@string/real_feel_temperature_simple"
             android:textColor="@color/white"
             android:textSize="19sp"
             />

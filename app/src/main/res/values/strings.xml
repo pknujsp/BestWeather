@@ -568,6 +568,9 @@
     <string name="met_norway_snowshowers">snow showers</string>
     <string name="met_norway_snowshowersandthunder">snow showers, thunder</string>
     <string name="refreshing_view">refreshing views</string>
+    <string name="graph">그래프</string>
+    <string name="pref_key_detail_hourly_forecast_show_data" translatable="false">pref_key_detail_hourly_forecast_show_data</string>
+    <string name="show_data_type">show data type settings</string>
 
 
 </resources>
