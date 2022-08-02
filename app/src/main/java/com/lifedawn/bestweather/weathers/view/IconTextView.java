@@ -35,6 +35,7 @@ public class IconTextView extends View {
 
 	private Drawable icon;
 	private List<String> valueList;
+	private List<Boolean> visibleList;
 	private Rect textRect = new Rect();
 	private int padding;
 
@@ -61,6 +62,11 @@ public class IconTextView extends View {
 
 	public IconTextView setValueList(List<String> valueList) {
 		this.valueList = valueList;
+		return this;
+	}
+
+	public IconTextView setVisibleList(List<Boolean> visibleList) {
+		this.visibleList = visibleList;
 		return this;
 	}
 
@@ -107,11 +113,14 @@ public class IconTextView extends View {
 		iconRect.top = getHeight() / 2 - iconSize / 2;
 		iconRect.bottom = iconRect.top + iconSize;
 		StaticLayout staticLayout = null;
+
 		final int availableTextWidth = columnWidth - iconSize - spacingBetweenIconAndValue;
 		int moveDistance;
 		Rect textRect = new Rect();
 		final String tab = "\n";
 		String separatedStr;
+
+		int idx = 0;
 
 		for (String value : valueList) {
 			separatedStr = value.split(tab)[0];
@@ -128,14 +137,18 @@ public class IconTextView extends View {
 			iconRect.left = iconRect.right - iconSize;
 
 			icon.setBounds(iconRect);
-			icon.draw(canvas);
 
-			canvas.save();
-			canvas.translate(x, y);
-			staticLayout.draw(canvas);
-			canvas.restore();
+			if (visibleList == null || visibleList.get(idx)) {
+				icon.draw(canvas);
+				canvas.save();
+				canvas.translate(x, y);
+				staticLayout.draw(canvas);
+				canvas.restore();
+			}
 
 			column++;
+			idx++;
 		}
+
 	}
 }

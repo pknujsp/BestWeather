@@ -49,7 +49,7 @@
             android:gravity="center_vertical"
             android:visibility="gone"
             android:text="txt"
-            android:textColor="?attr/toolbarTextColor"
+            android:textColor="@color/blue"
             />
 
     </RelativeLayout>

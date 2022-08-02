@@ -327,6 +327,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							}
 						}
 					});
+
 					getParentFragmentManager().beginTransaction().hide(WeatherFragment.this).add(R.id.fragment_container,
 							findAddressFragment, getString(R.string.tag_find_address_fragment)).addToBackStack(
 							getString(R.string.tag_find_address_fragment)).commitAllowingStateLoss();
@@ -467,6 +468,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				requestNewData();
 			}
 		}
+
 	}
 
 	@Override
@@ -557,11 +559,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 									setBackgroundWeatherView(flickrImgObj.getWeather(), flickrImgObj.getVolume());
 								}
 							}
+
 						}
 					});
 				}
 			}
 		}, ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader.getRequestDateTime().toString()));
+
 	}
 
 	private final FusedLocation.MyLocationCallback MY_LOCATION_CALLBACK = new FusedLocation.MyLocationCallback() {
@@ -622,6 +626,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				}, getString(R.string.again)));
 				setFailFragment(btnObjList);
 			}
+
 		}
 	};
 
@@ -672,6 +677,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 										latitude.toString() + longitude.toString()).requestMainWeatherProviderType;
 								reDraw();
 							}
+
 						}
 					});
 
@@ -852,7 +858,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-
 								reRefreshBySameWeatherSource(responseResultObj);
 							}
 						}, getString(R.string.again)));
@@ -876,11 +881,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					}
 
 					ProgressDialog.clearDialogs();
-
 					return;
 				}
 			}
-
 		}
 
 		executorService.execute(new Runnable() {
@@ -891,8 +894,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						responseResultObj.weatherProviderTypeSet, responseResultObj.mainWeatherProviderType);
 
 				FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
-				setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.multipleRestApiDownloader, latitude, longitude
-				);
+				setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.multipleRestApiDownloader, latitude, longitude);
 			}
 		});
 
@@ -900,8 +902,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
 		FragmentManager fragmentManager = getChildFragmentManager();
+		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
 		if (fragmentManager.findFragmentByTag(AlertFragment.class.getName()) != null) {
-			fragmentManager.beginTransaction().remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName())).commitAllowingStateLoss();
+			fragmentTransaction.remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName()));
 		}
 
 		final Bundle bundle = new Bundle();
@@ -912,8 +916,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		alertFragment.setBtnObjList(btnObjList);
 		alertFragment.setArguments(bundle);
 
-
-		fragmentManager.beginTransaction().add(binding.fragmentContainer.getId(), alertFragment,
+		fragmentTransaction.add(binding.fragmentContainer.getId(), alertFragment,
 				AlertFragment.class.getName()).commitAllowingStateLoss();
 	}
 
@@ -1019,24 +1022,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
-				final WeatherProviderType requestWeatherSource = responseResultObj.mainWeatherProviderType;
-				ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> result = responseResultObj.multipleRestApiDownloader.getResponseMap().get(
-						requestWeatherSource);
-
-				ArrayMap<WeatherProviderType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
-				//요청한 날씨 제공사만 가져옴
-				RequestWeatherSource failedRequestWeatherSource = responseResultObj.requestWeatherSources.get(requestWeatherSource);
-				newRequestWeatherSources.put(requestWeatherSource, failedRequestWeatherSource);
-				failedRequestWeatherSource.getRequestServiceTypes().clear();
-
-				//실패한 자료만 재 요청
-				for (int i = 0; i < result.size(); i++) {
-					if (!result.valueAt(i).isSuccessful()) {
-						failedRequestWeatherSource.addRequestServiceType(result.keyAt(i));
-					}
-				}
-
-				MainProcessing.reRequestWeatherDataBySameWeatherSourceIfFailed(getContext(), latitude, longitude, newRequestWeatherSources,
+				MainProcessing.reRequestWeatherDataBySameWeatherSourceIfFailed(getContext(), latitude, longitude, responseResultObj.requestWeatherSources,
 						responseResultObj.multipleRestApiDownloader);
 			}
 		});
@@ -1063,7 +1049,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private void setRequestWeatherSourceWithSourceTypes(Set<WeatherProviderType> weatherProviderTypeSet,
 	                                                    ArrayMap<WeatherProviderType, RequestWeatherSource> newRequestWeatherSources) {
-
 		if (weatherProviderTypeSet.contains(WeatherProviderType.KMA_WEB)) {
 			RequestKma requestKma = new RequestKma();
 			requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST).addRequestServiceType(

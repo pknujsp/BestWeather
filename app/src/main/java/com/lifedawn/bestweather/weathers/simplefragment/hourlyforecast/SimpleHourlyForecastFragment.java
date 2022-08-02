@@ -136,6 +136,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 		List<String> snowVolumeList = new ArrayList<>();
 		List<String> precipitationVolumeList = new ArrayList<>();
 		List<ZonedDateTime> dateTimeList = new ArrayList<>();
+		List<Boolean> precipitationVisibleList = new ArrayList<>();
 
 		final String mm = "mm";
 		final String cm = "cm";
@@ -185,13 +186,16 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 					havePrecipitation = true;
 				}
 			}
+
+			precipitationVisibleList.add(item.isHasSnow() || item.isHasRain() || item.isHasPrecipitation() || item.isHasNext6HoursPrecipitation());
 		}
 
 		dateRow.init(dateTimeList);
 		probabilityOfPrecipitationRow.setValueList(popList);
-		rainVolumeRow.setValueList(rainVolumeList);
+		rainVolumeRow.setValueList(rainVolumeList).setVisibleList(precipitationVisibleList);
+		precipitationVolumeRow.setVisibleList(precipitationVisibleList);
 		precipitationVolumeRow.setValueList(precipitationVolumeList);
-		snowVolumeRow.setValueList(snowVolumeList);
+		snowVolumeRow.setValueList(snowVolumeList).setVisibleList(precipitationVisibleList);
 		weatherIconRow.setWeatherImgs(weatherIconObjList);
 
 		TextsView hourRow = new TextsView(context, viewWidth, columnWidth, hourList);

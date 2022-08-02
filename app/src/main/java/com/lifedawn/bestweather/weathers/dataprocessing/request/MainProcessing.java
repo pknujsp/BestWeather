@@ -66,22 +66,8 @@ public class MainProcessing {
 	                                                                                        ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources,
 	                                                                                        MultipleRestApiDownloader multipleRestApiDownloader) {
 		//실패한 데이터는 모두 삭제(aqicn 제외)
-		Set<RetrofitClient.ServiceType> failedRequestServiceTypes = requestWeatherSources.valueAt(0).getRequestServiceTypes();
-		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> resultArrayMap =
-				multipleRestApiDownloader.getResponseMap().get(requestWeatherSources.keyAt(0));
-
-		for (RetrofitClient.ServiceType fail : failedRequestServiceTypes) {
-			if (resultArrayMap.containsKey(fail)) {
-				resultArrayMap.remove(fail);
-			}
-		}
-
-		int totalResponseCount = multipleRestApiDownloader.getResponseCount();
-		for (RequestWeatherSource requestWeatherSource : requestWeatherSources.values()) {
-			totalResponseCount -= requestWeatherSource.getRequestServiceTypes().size();
-		}
-
-		multipleRestApiDownloader.setResponseCount(totalResponseCount);
+		multipleRestApiDownloader.getResponseMap().clear();
+		multipleRestApiDownloader.setResponseCount(0);
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.ACCU_WEATHER)) {
 			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherProviderType.ACCU_WEATHER), multipleRestApiDownloader);
