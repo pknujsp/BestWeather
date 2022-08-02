@@ -32,6 +32,7 @@ import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.views.CustomEditText;
 import com.lifedawn.bestweather.databinding.FragmentMapBinding;
+import com.lifedawn.bestweather.findaddress.GoogleFindPlaceProcessing;
 import com.lifedawn.bestweather.findaddress.GooglePlaceSearchProcessing;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.responses.google.placesearch.GooglePlaceSearchResponse;
@@ -89,6 +90,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 					@Override
 					public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 						GooglePlaceSearchResponse googlePlaceSearchResponse = (GooglePlaceSearchResponse) responseObj;
+
+						ArrayList<GooglePlaceSearchResponse.Item> items = googlePlaceSearchResponse.getResults();
 					}
 
 					@Override
@@ -96,6 +99,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 					}
 				});
+
 			}
 		});
 
@@ -137,6 +141,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 					}
 				});
+				
 			}
 		});
 

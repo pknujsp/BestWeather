@@ -71,7 +71,7 @@
                     android:backgroundTint="@color/gray"
                     android:drawableTint="@color/gray"
                     android:gravity="center_vertical"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     android:text="@string/map"
                     />
             </LinearLayout>

@@ -170,7 +170,6 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 					hasNextNHoursPrecipitation = true;
 				}
 			}
-
 			if (item.isHasSnow()) {
 				if (!haveSnow) {
 					haveSnow = true;
@@ -187,7 +186,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 				}
 			}
 
-			precipitationVisibleList.add(item.isHasSnow() || item.isHasRain() || item.isHasPrecipitation() || item.isHasNext6HoursPrecipitation());
+			precipitationVisibleList.add(item.isHasSnow() || item.isHasRain() || item.isHasPrecipitation());
 		}
 
 		dateRow.init(dateTimeList);

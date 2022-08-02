@@ -499,7 +499,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		}
 		getLifecycle().removeObserver(locationLifeCycleObserver);
 		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
-		
+
 		super.onDestroy();
 	}
 

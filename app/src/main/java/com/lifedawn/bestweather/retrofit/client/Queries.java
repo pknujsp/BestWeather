@@ -107,4 +107,7 @@ public interface Queries {
 	//Google place search
 	@GET("json")
 	Call<JsonElement> getGooglePlaceSearch(@QueryMap(encoded = true) Map<String, String> queryMap);
+
+	@GET("json")
+	Call<JsonElement> getFindPlaceSearch(@QueryMap(encoded = true) Map<String, String> queryMap);
 }
