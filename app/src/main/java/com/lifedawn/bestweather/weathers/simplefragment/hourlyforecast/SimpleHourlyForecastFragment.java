@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.ArrayMap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -15,6 +16,7 @@ import androidx.fragment.app.FragmentManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.enums.Flickr;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.main.MyApplication;
@@ -32,13 +34,18 @@ import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.TextsView;
+import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
+import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 
 public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 	private List<HourlyForecastDto> hourlyForecastDtoList;
@@ -107,11 +114,9 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public void setValuesToViews() {
-		//kma hourly forecast simple : 날짜, 시각, 날씨, 기온, 강수확률, 강수량
 		Context context = getContext();
 
 		final int weatherRowHeight = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
-
 		final int columnCount = hourlyForecastDtoList.size();
 		final int columnWidth = (int) context.getResources().getDimension(R.dimen.valueColumnWidthInSCHourly);
 		final int viewWidth = columnCount * columnWidth;
@@ -185,7 +190,6 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 					havePrecipitation = true;
 				}
 			}
-
 			precipitationVisibleList.add(item.isHasSnow() || item.isHasRain() || item.isHasPrecipitation());
 		}
 
@@ -271,6 +275,8 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 		} else {
 			createValueUnitsDescription(mainWeatherProviderType, haveRain, haveSnow);
 		}
+
 	}
+
 
 }

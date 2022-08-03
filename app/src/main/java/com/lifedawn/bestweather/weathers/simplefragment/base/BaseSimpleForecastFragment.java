@@ -27,6 +27,7 @@ import com.lifedawn.bestweather.weathers.view.DateView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -43,6 +44,9 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	protected Integer cardBackgroundColor;
 	protected NetworkStatus networkStatus;
 	protected Bundle bundle;
+	protected Double latitude;
+	protected Double longitude;
+	protected ZoneId zoneId;
 
 	protected int headerVisibility = View.VISIBLE;
 
@@ -66,6 +70,10 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 
 		countryCode = MyApplication.getLocaleCountryCode();
 		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(BundleKey.WeatherProvider.name());
+
+		latitude = bundle.getDouble(BundleKey.Latitude.name(), 0);
+		longitude = bundle.getDouble(BundleKey.Longitude.name(), 0);
+		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
 		networkStatus = NetworkStatus.getInstance(getContext());
 	}
