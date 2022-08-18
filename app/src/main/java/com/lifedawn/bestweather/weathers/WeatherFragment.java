@@ -74,6 +74,7 @@ import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
+import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.flickr.FlickrImgObj;
 import com.lifedawn.bestweather.flickr.FlickrLoader;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
@@ -309,28 +310,25 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
-					FindAddressFragment findAddressFragment = new FindAddressFragment();
+					MapFragment mapFragment = new MapFragment();
 
 					Bundle bundle = new Bundle();
 					bundle.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
-					findAddressFragment.setArguments(bundle);
-					findAddressFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+					mapFragment.setArguments(bundle);
+					mapFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
 						@Override
 						public void onResultFragment(Bundle result) {
 							final boolean isSelectedNewAddress = result.getBoolean(BundleKey.SelectedAddressDto.name());
 
 							if (isSelectedNewAddress) {
-								final int newFavoriteAddressDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name());
-								sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
-										newFavoriteAddressDtoId).commit();
 								iRefreshFavoriteLocationListOnSideNav.onRefreshedFavoriteLocationsList(result.getString(BundleKey.LastFragment.name()), result);
 							}
 						}
 					});
 
 					getParentFragmentManager().beginTransaction().hide(WeatherFragment.this).add(R.id.fragment_container,
-							findAddressFragment, getString(R.string.tag_find_address_fragment)).addToBackStack(
-							getString(R.string.tag_find_address_fragment)).commitAllowingStateLoss();
+							mapFragment, MapFragment.class.getName()).addToBackStack(
+							MapFragment.class.getName()).commitAllowingStateLoss();
 				}
 			}
 		});

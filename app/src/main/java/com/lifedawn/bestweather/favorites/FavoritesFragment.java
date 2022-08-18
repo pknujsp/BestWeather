@@ -39,6 +39,7 @@ import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.FragmentFavoritesBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
+import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationSettingsFragment;
@@ -103,12 +104,13 @@ public class FavoritesFragment extends Fragment {
 						requestFragment.equals(AlarmSettingsFragment.class.getName()) ||
 						requestFragment.equals(DailyNotificationSettingsFragment.class.getName())) {
 
+					getParentFragmentManager().popBackStack();
+
 					if (!clickedItem) {
 						Bundle bundle = new Bundle();
 						bundle.putSerializable(BundleKey.SelectedAddressDto.name(), null);
 						onResultFragmentListener.onResultFragment(bundle);
 					}
-					getParentFragmentManager().popBackStack();
 				}
 			}
 
@@ -168,12 +170,12 @@ public class FavoritesFragment extends Fragment {
 		binding.searchview.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				FindAddressFragment findAddressFragment = new FindAddressFragment();
+				MapFragment mapFragment = new MapFragment();
 				Bundle bundle = new Bundle();
-				bundle.putString(BundleKey.RequestFragment.name(), FavoritesFragment.class.getName());
-				findAddressFragment.setArguments(bundle);
+				bundle.putString(BundleKey.RequestFragment.name(), MapFragment.class.getName());
+				mapFragment.setArguments(bundle);
 
-				findAddressFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+				mapFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
 					@Override
 					public void onResultFragment(Bundle result) {
 						boolean addedNewLocation = result.getBoolean(BundleKey.SelectedAddressDto.name(), false);
@@ -201,9 +203,9 @@ public class FavoritesFragment extends Fragment {
 					}
 				});
 
-				getParentFragmentManager().beginTransaction().hide(FavoritesFragment.this).add(R.id.fragment_container, findAddressFragment,
-						getString(R.string.tag_find_address_fragment)).addToBackStack(
-						getString(R.string.tag_find_address_fragment)).commitAllowingStateLoss();
+				getParentFragmentManager().beginTransaction().hide(FavoritesFragment.this).add(R.id.fragment_container, mapFragment,
+						MapFragment.class.getName()).addToBackStack(
+						MapFragment.class.getName()).commitAllowingStateLoss();
 			}
 		});
 
@@ -327,8 +329,8 @@ public class FavoritesFragment extends Fragment {
 												bundle.putBoolean(BundleKey.ChangedUseCurrentLocation.name(), enableCurrentLocation);
 												bundle.putBoolean(BundleKey.Refresh.name(), refresh);
 
-												onResultFragmentListener.onResultFragment(bundle);
 												getParentFragmentManager().popBackStack();
+												onResultFragmentListener.onResultFragment(bundle);
 											}
 
 										}

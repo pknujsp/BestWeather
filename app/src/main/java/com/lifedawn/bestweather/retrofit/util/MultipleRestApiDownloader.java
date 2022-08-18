@@ -35,6 +35,11 @@ public abstract class MultipleRestApiDownloader {
 	public MultipleRestApiDownloader() {
 	}
 
+	public MultipleRestApiDownloader setResponseCompleted(boolean responseCompleted) {
+		this.responseCompleted = responseCompleted;
+		return this;
+	}
+
 	public Map<RetrofitClient.ServiceType, Call<?>> getCallMap() {
 		return callMap;
 	}

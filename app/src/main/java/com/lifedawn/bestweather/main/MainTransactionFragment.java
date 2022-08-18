@@ -47,6 +47,7 @@ import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentMainBinding;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
+import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.notification.NotificationFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -379,7 +380,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		createLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				if (requestKey.equals(FindAddressFragment.class.getName())) {
+				if (requestKey.equals(MapFragment.class.getName())) {
 					if (isSelectedNewAddress) {
 						final int lastSelectedFavoriteAddressId = sharedPreferences.getInt(
 								getString(R.string.pref_key_last_selected_favorite_address_id), -1);

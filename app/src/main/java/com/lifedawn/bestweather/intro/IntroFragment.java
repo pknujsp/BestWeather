@@ -28,6 +28,7 @@ import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentIntroBinding;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
+import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
 import com.lifedawn.bestweather.main.MyApplication;
 
@@ -48,12 +49,8 @@ public class IntroFragment extends Fragment {
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
 
-			if (f instanceof FindAddressFragment) {
-				if (((FindAddressFragment) f).isSelectedAddress()) {
-					MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-					getParentFragment().getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, mainTransactionFragment,
-							mainTransactionFragment.getTag()).commitAllowingStateLoss();
-				}
+			if (f instanceof MapFragment) {
+
 			}
 		}
 	};
@@ -90,12 +87,12 @@ public class IntroFragment extends Fragment {
 		binding.findAddress.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				FindAddressFragment findAddressFragment = new FindAddressFragment();
+				MapFragment mapFragment = new MapFragment();
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.RequestFragment.name(), IntroFragment.class.getName());
-				findAddressFragment.setArguments(bundle);
+				mapFragment.setArguments(bundle);
 
-				findAddressFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+				mapFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
 					@Override
 					public void onResultFragment(Bundle result) {
 						final boolean isSelectedNewAddress = result.getBoolean(BundleKey.SelectedAddressDto.name());
@@ -105,14 +102,18 @@ public class IntroFragment extends Fragment {
 							sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
 									newFavoriteAddressDtoId).putString(getString(R.string.pref_key_last_selected_location_type),
 									LocationType.SelectedAddress.name()).putBoolean(getString(R.string.pref_key_show_intro), false).apply();
+
+							MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
+							getParentFragment().getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, mainTransactionFragment,
+									mainTransactionFragment.getTag()).commitAllowingStateLoss();
 						} else {
 
 						}
 					}
 				});
 
-				getParentFragmentManager().beginTransaction().hide(IntroFragment.this).add(R.id.fragment_container, findAddressFragment,
-						getString(R.string.tag_find_address_fragment)).addToBackStack(getString(R.string.tag_find_address_fragment)).commit();
+				getParentFragmentManager().beginTransaction().hide(IntroFragment.this).add(R.id.fragment_container, mapFragment,
+						MapFragment.class.getName()).addToBackStack(MapFragment.class.getName()).commitAllowingStateLoss();
 			}
 		});
 	}

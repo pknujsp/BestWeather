@@ -5,29 +5,75 @@
     xmlns:tools="http://schemas.android.com/tools"
     >
 
-    <FrameLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
 
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            >
+
+            <fragment
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <LinearLayout
+                android:id="@+id/header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="60dp"
+                android:layout_marginRight="16dp"
+                android:background="@drawable/rounded_btn_background"
+                android:backgroundTint="#B5FFFFFF"
+                android:clickable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="12dp"
+                android:paddingTop="12dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="12dp"
+                >
+
+
+                <ImageView
+                    android:id="@+id/back_btn"
+                    android:layout_width="@dimen/btnSizeInToolbar"
+                    android:layout_height="@dimen/btnSizeInToolbar"
+                    android:background="?attr/selectableItemBackground"
+                    android:scaleType="center"
+                    android:src="@drawable/back"
+                    app:tint="?attr/toolbarIconColor"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:drawableLeft="@drawable/search"
+                    android:gravity="center_vertical"
+                    android:text="@string/find_address"
+                    android:textColor="@color/black"
+                    />
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <include
+            android:id="@+id/bottom_sheet_search_place"
+            layout="@layout/view_bottom_sheet_search_place"
             />
 
-        <com.lifedawn.bestweather.commons.views.CustomSearchView
-            android:id="@+id/search_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginRight="16dp"
-            app:backBtnVisibility="gone"
-            app:hint="@string/hint_input_address"
-            app:searchBtnVisibility="visible"
+        <include
+            android:id="@+id/placeslist_bottom_sheet"
+            layout="@layout/place_list_bottom_sheet_view"
             />
 
-    </FrameLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

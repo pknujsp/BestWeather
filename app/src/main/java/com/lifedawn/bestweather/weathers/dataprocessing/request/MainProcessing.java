@@ -67,6 +67,8 @@ public class MainProcessing {
 	                                                                                        MultipleRestApiDownloader multipleRestApiDownloader) {
 		//실패한 데이터는 모두 삭제(aqicn 제외)
 		multipleRestApiDownloader.getResponseMap().clear();
+		multipleRestApiDownloader.setResponseCompleted(false);
+		multipleRestApiDownloader.getCallMap().clear();
 		multipleRestApiDownloader.setResponseCount(0);
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.ACCU_WEATHER)) {
@@ -87,6 +89,11 @@ public class MainProcessing {
 			MetNorwayProcessing.getMetNorwayForecasts(latitude.toString(), longitude.toString(),
 					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), multipleRestApiDownloader);
 		}
+
+		if (requestWeatherSources.containsKey(WeatherProviderType.AQICN)) {
+			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader);
+		}
+
 
 		return multipleRestApiDownloader;
 	}

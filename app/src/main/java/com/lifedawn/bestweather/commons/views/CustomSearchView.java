@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.commons.views;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 
 import com.lifedawn.bestweather.R;
@@ -20,6 +22,7 @@ public class CustomSearchView extends FrameLayout {
 	private CustomEditText.OnEditTextQueryListener onEditTextQueryListener;
 	int backBtnVisibility = 0;
 	int searchBtnVisibility = 0;
+	boolean enabled = false;
 	String hint = null;
 
 	public CustomSearchView(Context context) {
@@ -53,6 +56,7 @@ public class CustomSearchView extends FrameLayout {
 			backBtnVisibility = a.getInt(R.styleable.CustomSearchView_backBtnVisibility, View.VISIBLE);
 			searchBtnVisibility = a.getInt(R.styleable.CustomSearchView_searchBtnVisibility, View.VISIBLE);
 			hint = a.getString(R.styleable.CustomSearchView_hint);
+			enabled = a.getBoolean(R.styleable.CustomSearchView_enabled, true);
 		} finally {
 			a.recycle();
 		}
@@ -62,6 +66,11 @@ public class CustomSearchView extends FrameLayout {
 		binding.back.setVisibility(backBtnVisibility);
 		binding.search.setVisibility(searchBtnVisibility);
 		binding.edittext.setHint(hint);
+		binding.edittext.setEnabled(enabled);
+
+		if (!enabled) {
+			binding.search.setVisibility(GONE);
+		}
 
 		binding.search.setOnClickListener(new OnClickListener() {
 			@Override
@@ -84,6 +93,14 @@ public class CustomSearchView extends FrameLayout {
 			}
 		});
 
+	}
+
+	public void setBackgroundTint(int color) {
+		binding.getRoot().setBackgroundTintList(ColorStateList.valueOf(color));
+	}
+
+	public void setOnClickListener(@Nullable OnClickListener l) {
+		binding.getRoot().setOnClickListener(l);
 	}
 
 	@Override

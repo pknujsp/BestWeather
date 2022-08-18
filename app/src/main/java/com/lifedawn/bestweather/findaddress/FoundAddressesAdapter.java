@@ -1,5 +1,7 @@
 package com.lifedawn.bestweather.findaddress;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.location.Address;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.Filterable;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.FoundAddressItemBinding;
 import com.lifedawn.bestweather.retrofit.responses.google.placesearch.GooglePlaceSearchResponse;
 
@@ -18,12 +21,32 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAdapter.ViewHolder> implements Filterable {
 	private List<Address> itemList = new ArrayList<>();
 	private List<Address> filteredAddressList = new ArrayList<>();
+	private Set<String> favoriteAddressSet;
+
 	private Filter filter;
 	private OnClickedAddressListener onClickedAddressListener;
+	private FindAddressFragment.OnAddressListListener onAddressListListener;
+	private FindAddressFragment.OnListListener onListListener;
+
+	public FoundAddressesAdapter setFavoriteAddressSet(Set<String> favoriteAddressSet) {
+		this.favoriteAddressSet = favoriteAddressSet;
+		return this;
+	}
+
+	public FoundAddressesAdapter setOnListListener(FindAddressFragment.OnListListener onListListener) {
+		this.onListListener = onListListener;
+		return this;
+	}
+
+	public FoundAddressesAdapter setOnAddressListListener(FindAddressFragment.OnAddressListListener onAddressListListener) {
+		this.onAddressListListener = onAddressListListener;
+		return this;
+	}
 
 	public void setOnClickedAddressListener(OnClickedAddressListener onClickedAddressListener) {
 		this.onClickedAddressListener = onClickedAddressListener;
@@ -38,9 +61,10 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 	@NotNull
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-		FoundAddressItemBinding binding = FoundAddressItemBinding.inflate(LayoutInflater.from(parent.getContext()));
+		FoundAddressItemBinding binding = FoundAddressItemBinding.inflate(LayoutInflater.from(parent.getContext()), null, false);
 		binding.getRoot().setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT));
+
 		return new ViewHolder(binding);
 	}
 
@@ -69,12 +93,22 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 			super(binding.getRoot());
 			this.binding = binding;
 
-			itemView.getRootView().setOnClickListener(new View.OnClickListener() {
+			binding.getRoot().setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					onListListener.onPOIItemSelectedByList(getBindingAdapterPosition());
+				}
+			});
+
+			binding.addBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					onClickedAddressListener.onClickedAddress(filteredAddressList.get(getBindingAdapterPosition()));
 				}
 			});
+
+			binding.itemPosition.setVisibility(View.GONE);
+
 		}
 
 		public void onBind() {
@@ -82,10 +116,20 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 
 			binding.country.setText(address.getCountryName());
 			binding.addressName.setText(address.getAddressLine(0));
+
+			if (favoriteAddressSet.contains(address.getLatitude() + "" + address.getLongitude())) {
+				binding.addBtn.setClickable(false);
+				binding.addBtn.setText(R.string.duplicate);
+				binding.addBtn.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+			} else {
+				binding.addBtn.setClickable(true);
+				binding.addBtn.setText(R.string.add);
+				binding.addBtn.setBackgroundTintList(ColorStateList.valueOf(Color.BLUE));
+			}
 		}
 	}
 
-	interface OnClickedAddressListener {
+	public interface OnClickedAddressListener {
 		void onClickedAddress(Address address);
 	}
 
@@ -117,6 +161,7 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 			filteredAddressList.clear();
 			filteredAddressList.addAll((Collection<? extends Address>) results.values);
 
+			onAddressListListener.onSearchedAddressList(filteredAddressList);
 			notifyDataSetChanged();
 
 		}
