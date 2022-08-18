@@ -3,6 +3,7 @@ package com.lifedawn.bestweather.findaddress.map;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.location.Address;
@@ -29,16 +30,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
@@ -59,6 +63,7 @@ import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -83,6 +88,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 
 	private ViewPager2 locationItemBottomSheetViewPager;
+	private boolean removedLocation = false;
 
 	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
 		@Override
@@ -150,6 +156,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 												Bundle bundle = new Bundle();
 												bundle.putBoolean(BundleKey.SelectedAddressDto.name(), true);
+												bundle.putBoolean("removedLocation", removedLocation);
 												bundle.putString(BundleKey.LastFragment.name(), MapFragment.class.getName());
 												bundle.putInt(BundleKey.newFavoriteAddressDtoId.name(), favoriteAddressDto.getId());
 
@@ -325,6 +332,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 		Bundle bundle = new Bundle();
 		bundle.putBoolean(BundleKey.SelectedAddressDto.name(), false);
+		bundle.putBoolean("removedLocation", removedLocation);
+		bundle.putString(BundleKey.LastFragment.name(), MapFragment.class.getName());
+
 		onResultFragmentListener.onResultFragment(bundle);
 
 		super.onDestroy();
@@ -363,13 +373,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 		});
 
-		googleMap.setOnMyLocationClickListener(new GoogleMap.OnMyLocationClickListener() {
-			@Override
-			public void onMyLocationClick(@NonNull Location location) {
-				onLongClicked(new LatLng(location.getLatitude(), location.getLongitude()));
-			}
-		});
-
 		initFavorites();
 	}
 
@@ -377,44 +380,78 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				FavoriteLocationItemViewPagerAdapter adapter = new FavoriteLocationItemViewPagerAdapter();
-				adapterMap.put(MarkerType.FAVORITE, adapter);
-				adapter.setAddressList(result);
-				adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<FavoriteAddressDto>() {
-					@Override
-					public void onSelected(FavoriteAddressDto e, boolean remove) {
-						if (remove) {
-							weatherViewModel.delete(e);
-							collapseAllExpandedBottomSheets();
-							initFavorites();
-						}
-					}
-				});
-				adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
-					@Override
-					public void toLeft() {
-						if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
-							binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-									binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
-						}
-					}
-
-					@Override
-					public void toRight() {
-						if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
-							binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-									binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
-						}
-					}
-				});
-
-				for (FavoriteAddressDto favoriteAddressDto : result) {
-					favoriteAddressSet.add(favoriteAddressDto.getLatitude() + favoriteAddressDto.getLongitude());
-				}
-
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
+						FavoriteLocationItemViewPagerAdapter adapter = new FavoriteLocationItemViewPagerAdapter();
+						adapterMap.put(MarkerType.FAVORITE, adapter);
+						adapter.setAddressList(result);
+						adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<FavoriteAddressDto>() {
+							@Override
+							public void onSelected(FavoriteAddressDto e, boolean remove) {
+								if (remove) {
+									new MaterialAlertDialogBuilder(getActivity()).
+											setTitle(R.string.remove)
+											.setMessage(e.getAddress()).
+											setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
+												@Override
+												public void onClick(DialogInterface dialog, int which) {
+													weatherViewModel.delete(e, new DbQueryCallback<Boolean>() {
+														@Override
+														public void onResultSuccessful(Boolean result) {
+															MainThreadWorker.runOnUiThread(new Runnable() {
+																@Override
+																public void run() {
+																	setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_COLLAPSED);
+																	initFavorites();
+																	removedLocation = true;
+																	dialog.dismiss();
+																}
+															});
+														}
+
+														@Override
+														public void onResultNoData() {
+
+														}
+													});
+												}
+											}).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+												@Override
+												public void onClick(DialogInterface dialog, int which) {
+													dialog.dismiss();
+												}
+											}).create().show();
+
+								}
+							}
+						});
+
+						adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
+							@Override
+							public void toLeft() {
+								if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
+									binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+											binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
+								}
+							}
+
+							@Override
+							public void toRight() {
+								if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
+									binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+											binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
+								}
+							}
+						});
+
+						favoriteAddressSet.clear();
+						for (FavoriteAddressDto favoriteAddressDto : result) {
+							favoriteAddressSet.add(favoriteAddressDto.getLatitude() + favoriteAddressDto.getLongitude());
+						}
+
+						removeMarkers(MarkerType.FAVORITE);
+
 						for (int i = 0; i < result.size(); i++) {
 							addFavoriteMarker(i, result.get(i));
 						}
@@ -436,17 +473,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
+						List<Address> addresses = new ArrayList<>();
+						addresses.add(addressList.get(0));
+
 						LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
 						adapterMap.put(MarkerType.LONG_CLICK, adapter);
-						adapter.setAddressList(addressList);
+						adapter.setAddressList(addresses);
 						adapter.setFavoriteAddressSet(favoriteAddressSet);
 						adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<Address>() {
 							@Override
 							public void onSelected(Address e, boolean remove) {
 								onClickedAddress(e);
-
 							}
 						});
+
 						adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
 							@Override
 							public void toLeft() {
@@ -503,7 +543,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 		View view = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.marker_view, null);
 		TextView tv_marker = view.findViewById(R.id.marker);
-		tv_marker.setText((position + 1) + "");
+		tv_marker.setText(new String((position + 1) + ""));
 
 		Marker marker = googleMap.addMarker(markerOptions.icon(BitmapDescriptorFactory.fromBitmap(createDrawableFromView(getActivity(),
 				view))));
@@ -551,8 +591,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 
 			LatLngBounds bounds = builder.build();
-			googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36f,
-					getResources().getDisplayMetrics())));
+			CameraUpdate cameraUpdate = null;
+
+			if (markerMaps.get(markerType).size() == 1) {
+				cameraUpdate = CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 15);
+			} else {
+				cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36f,
+						getResources().getDisplayMetrics()));
+			}
+
+			googleMap.moveCamera(cameraUpdate);
 		}
 	}
 
@@ -596,7 +644,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			public void onStateChanged(@NonNull View bottomSheet, int newState) {
 				if (newState == BottomSheetBehavior.STATE_EXPANDED) {
 					//binding.naverMapButtonsLayout.getRoot().setY(binding.getRoot().getHeight() - bottomSheet.getHeight());
-
 				} else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
 					//binding.naverMapButtonsLayout.getRoot().setY(binding.getRoot().getHeight() - binding.naverMapButtonsLayout.getRoot
 					// ().getHeight());
@@ -634,6 +681,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 			}
 		});
+
 		locationSearchBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
 		bottomSheetViewMap.put(BottomSheetType.SEARCH_LOCATION, locationSearchBottomSheet);
@@ -648,6 +696,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	@Override
 	public int getStateOfBottomSheet(BottomSheetType bottomSheetType) {
 		return bottomSheetBehaviorMap.get(bottomSheetType).getState();
+	}
+
+	public List<BottomSheetBehavior> getBottomSheetBehaviorOfExpanded(BottomSheetBehavior currentBottomSheetBehavior) {
+		Set<BottomSheetType> keySet = bottomSheetBehaviorMap.keySet();
+		List<BottomSheetBehavior> bottomSheetBehaviors = new ArrayList<>();
+
+		for (BottomSheetType bottomSheetType : keySet) {
+			if (bottomSheetBehaviorMap.get(bottomSheetType).getState() == BottomSheetBehavior.STATE_EXPANDED) {
+
+				if (currentBottomSheetBehavior != null) {
+					if (!bottomSheetBehaviorMap.get(bottomSheetType).equals(currentBottomSheetBehavior)) {
+						bottomSheetBehaviors.add(bottomSheetBehaviorMap.get(bottomSheetType));
+					}
+				}
+			}
+		}
+		return bottomSheetBehaviors;
 	}
 
 	@Override

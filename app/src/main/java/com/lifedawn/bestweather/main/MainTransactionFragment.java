@@ -334,7 +334,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	@Override
 	public void onStart() {
 		super.onStart();
-
 		initializing = false;
 	}
 
@@ -490,9 +489,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 						@Override
 						public void onResultFragment(Bundle result) {
 							//변경된 위치가 있는지 확인
-
-							setCurrentLocationState(sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location),
-									false));
+							setCurrentLocationState(sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false));
 							String lastFragment = result.getString(BundleKey.LastFragment.name());
 							List<FavoriteAddressDto> newFavoriteAddressDtoList = (List<FavoriteAddressDto>) result.getSerializable(
 									BundleKey.newFavoriteAddressDtoList.name());

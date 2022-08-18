@@ -17,4 +17,6 @@ public interface FavoriteAddressQuery {
 	void add(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Long> callback);
 
 	void delete(FavoriteAddressDto favoriteAddressDto);
+
+	void delete(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Boolean> callback);
 }

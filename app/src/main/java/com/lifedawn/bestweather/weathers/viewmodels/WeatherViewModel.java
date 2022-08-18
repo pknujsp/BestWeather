@@ -92,6 +92,11 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 		favoriteAddressRepository.delete(favoriteAddressDto);
 	}
 
+	@Override
+	public void delete(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Boolean> callback) {
+		favoriteAddressRepository.delete(favoriteAddressDto, callback);
+	}
+
 	public LiveData<String> getCurrentLocationLiveData() {
 		return currentLocationLiveData;
 	}

@@ -101,6 +101,20 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 		});
 	}
 
+	@Override
+	public void delete(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Boolean> callback) {
+		executors.execute(new Runnable() {
+			@Override
+			public void run() {
+				favoriteAddressDao.delete(favoriteAddressDto);
+				deleteAddressesLiveData.postValue(favoriteAddressDto);
+				favoriteAddressesLiveData.postValue(favoriteAddressDao.getAll());
+
+				callback.onResultSuccessful(true);
+			}
+		});
+	}
+
 	public MutableLiveData<FavoriteAddressDto> getAddAddressesLiveData() {
 		return addAddressesLiveData;
 	}

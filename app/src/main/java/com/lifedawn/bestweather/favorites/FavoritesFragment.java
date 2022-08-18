@@ -179,8 +179,9 @@ public class FavoritesFragment extends Fragment {
 					@Override
 					public void onResultFragment(Bundle result) {
 						boolean addedNewLocation = result.getBoolean(BundleKey.SelectedAddressDto.name(), false);
+						boolean removedLocation = result.getBoolean("removedLocation", false);
 
-						if (addedNewLocation) {
+						if (addedNewLocation || removedLocation) {
 							weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 								@Override
 								public void onResultSuccessful(List<FavoriteAddressDto> favoriteAddressDtoList) {
