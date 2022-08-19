@@ -94,6 +94,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		@Override
 		public void onFragmentAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
 			super.onFragmentAttached(fm, f, context);
+
+			if (f instanceof FindAddressFragment) {
+				binding.searchBar.setVisibility(View.GONE);
+			}
 		}
 
 		@Override
@@ -103,6 +107,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			if (f instanceof FindAddressFragment) {
 				removeMarkers(MarkerType.SEARCH);
 				collapseAllExpandedBottomSheets();
+				binding.searchBar.setVisibility(View.VISIBLE);
 			}
 		}
 	};
