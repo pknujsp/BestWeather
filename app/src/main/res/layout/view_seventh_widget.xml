@@ -45,6 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:alignmentMode="alignBounds"
+        android:layout_gravity="center_vertical"
         app:columnCount="3"
         app:orientation="horizontal"
         app:rowOrderPreserved="false"

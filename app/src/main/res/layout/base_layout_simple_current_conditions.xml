@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,13 +12,11 @@
         android:paddingBottom="8dp"
         >
 
-
         <LinearLayout
             android:id="@+id/weatherIconLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
             android:layout_marginBottom="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -67,7 +64,7 @@
             style="@style/text_shadow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/wind"
+            android:layout_above="@id/windDirection"
             android:layout_alignParentRight="true"
             android:layout_marginBottom="6dp"
             android:shadowColor="@color/black"
@@ -81,14 +78,28 @@
             style="@style/text_shadow"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_alignTop="@id/wind"
-            android:layout_alignBottom="@id/wind"
-            android:layout_marginRight="4dp"
-            android:layout_toLeftOf="@id/wind"
+            android:layout_alignTop="@id/windDirection"
+            android:layout_alignBottom="@id/windDirection"
+            android:layout_marginRight="6dp"
+            android:layout_toLeftOf="@id/windDirection"
             android:scaleType="fitCenter"
             android:shadowColor="@color/black"
             android:src="@drawable/arrow"
             app:tint="@color/white"
+            />
+
+        <TextView
+            android:id="@+id/windDirection"
+            style="@style/text_shadow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:shadowColor="@color/black"
+            android:layout_toLeftOf="@id/wind"
+            android:layout_alignBottom="@id/wind"
+            android:layout_marginRight="6dp"
+            android:text="@string/wind_direction"
+            android:textColor="@color/white"
+            android:textSize="15sp"
             />
 
         <TextView
@@ -104,7 +115,6 @@
             android:textColor="@color/white"
             android:textSize="17sp"
             />
-
 
         <LinearLayout
             android:id="@+id/airQualityLayout"
@@ -217,7 +227,6 @@
             android:textSize="21sp"
             />
 
-
         <TextView
             android:id="@+id/tempDescription"
             style="@style/text_shadow"
@@ -229,7 +238,6 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             />
-
 
     </RelativeLayout>
 

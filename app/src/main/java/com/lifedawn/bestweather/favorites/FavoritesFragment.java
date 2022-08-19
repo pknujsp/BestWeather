@@ -64,6 +64,7 @@ public class FavoritesFragment extends Fragment {
 	private boolean refresh;
 	private boolean clickedItem;
 	private String requestFragment;
+	private boolean removedLocation = false;
 
 	private Bundle bundle;
 
@@ -217,6 +218,7 @@ public class FavoritesFragment extends Fragment {
 			@Override
 			public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {
 				weatherViewModel.delete(favoriteAddressDto);
+				removedLocation = true;
 			}
 
 			@Override
@@ -309,6 +311,7 @@ public class FavoritesFragment extends Fragment {
 						Bundle bundle = new Bundle();
 						bundle.putSerializable(BundleKey.newFavoriteAddressDtoList.name(), (Serializable) result);
 						bundle.putString(BundleKey.LastFragment.name(), FavoritesFragment.class.getName());
+						bundle.putBoolean("removedLocation", removedLocation);
 
 						if (!haveFavorites && !useCurrentLocation) {
 							//즐겨찾기가 비었고, 현재 위치 사용이 꺼져있음

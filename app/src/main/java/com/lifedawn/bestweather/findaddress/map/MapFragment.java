@@ -654,9 +654,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
 				//expanded일때 offset == 1.0, collapsed일때 offset == 0.0
 				//offset에 따라서 버튼들이 이동하고, 지도의 좌표가 변경되어야 한다.
-				differenceY = bottomSheet.getHeight();
-				float translationValue = -differenceY * slideOffset;
-				//binding.naverMapButtonsLayout.getRoot().animate().translationY(translationValue);
+				int translationValue = (int) (bottomSheet.getHeight() * slideOffset);
+
+				//expanded일때 offset == 1.0, collapsed일때 offset == 0.0
+				//offset에 따라서 버튼들이 이동하고, 지도의 좌표가 변경되어야 한다.
+				googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.header.getBottom(), 0, translationValue);
 			}
 		});
 

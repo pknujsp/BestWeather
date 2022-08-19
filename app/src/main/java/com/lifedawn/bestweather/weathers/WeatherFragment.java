@@ -319,8 +319,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						@Override
 						public void onResultFragment(Bundle result) {
 							final boolean isSelectedNewAddress = result.getBoolean(BundleKey.SelectedAddressDto.name());
+							boolean removedLocation = result.getBoolean("removedLocation", false);
 
-							if (isSelectedNewAddress) {
+							if (isSelectedNewAddress || removedLocation) {
 								iRefreshFavoriteLocationListOnSideNav.onRefreshedFavoriteLocationsList(result.getString(BundleKey.LastFragment.name()), result);
 							}
 						}
@@ -466,7 +467,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				requestNewData();
 			}
 		}
-
 	}
 
 	@Override
@@ -563,7 +563,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				}
 			}
 		}, ZonedDateTime.parse(FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader.getRequestDateTime().toString()));
-
 	}
 
 	private final FusedLocation.MyLocationCallback MY_LOCATION_CALLBACK = new FusedLocation.MyLocationCallback() {
@@ -770,7 +769,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void run() {
 				ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
-
 				//메인 날씨 제공사만 요청
 				Set<WeatherProviderType> newWeatherProviderTypeSet = new HashSet<>();
 				newWeatherProviderTypeSet.add(newWeatherProviderType);
@@ -874,7 +872,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							}, failedDialogItems[index]));
 							index++;
 						}
-
 						setFailFragment(btnObjList);
 					}
 
@@ -890,7 +887,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				//응답 성공 하면
 				final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.multipleRestApiDownloader,
 						responseResultObj.weatherProviderTypeSet, responseResultObj.mainWeatherProviderType);
-
 				FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
 				setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.multipleRestApiDownloader, latitude, longitude);
 			}

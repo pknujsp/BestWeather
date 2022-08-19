@@ -63,6 +63,7 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 			binding.windDirectionArrow.setRotation(currentConditionsDto.getWindDirectionDegree() + 180);
 		}
 		binding.windDirectionArrow.setVisibility(currentConditionsDto.getWindDirection() == null ? View.GONE : View.VISIBLE);
+		binding.windDirection.setVisibility(currentConditionsDto.getWindDirection() == null ? View.GONE : View.VISIBLE);
 
 		binding.precipitation.setText(precipitation);
 
@@ -70,6 +71,8 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		binding.sky.setText(currentConditionsDto.getWeatherDescription());
 		binding.wind.setText(currentConditionsDto.getWindStrength() != null ? currentConditionsDto.getWindStrength() :
 				getString(R.string.noWindData));
+
+		binding.windDirection.setText(currentConditionsDto.getWindDirection());
 
 		binding.humidity.setText(new String(getString(R.string.humidity) + " " + currentConditionsDto.getHumidity()));
 

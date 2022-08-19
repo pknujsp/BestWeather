@@ -104,6 +104,7 @@
         android:layout_height="wrap_content"
         app:alignmentMode="alignBounds"
         app:columnCount="3"
+        android:layout_gravity="center_vertical"
         app:orientation="horizontal"
         app:rowOrderPreserved="false"
         app:useDefaultMargins="false" />
