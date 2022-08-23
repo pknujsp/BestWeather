@@ -121,10 +121,13 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		} else {
 			if (checkDefaultPermissions()) {
 
+				/*
 				if (isBackground && !checkBackgroundLocationPermission()) {
 					myLocationCallback.onFailed(MyLocationCallback.Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION);
 					return;
 				}
+
+				 */
 
 				LocationRequest locationRequest = LocationRequest.create();
 				locationRequest.setInterval(1000);

@@ -55,11 +55,11 @@ public class DailyNotificationHelper {
 		}
 
 		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(),
-				getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_UPDATE_CURRENT));
+				getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE));
 	}
 
 	public void disablePushNotification(DailyPushNotificationDto dailyPushNotificationDto) {
-		PendingIntent pendingIntent = getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_NO_CREATE);
+		PendingIntent pendingIntent = getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();
@@ -75,7 +75,7 @@ public class DailyNotificationHelper {
 	}
 
 	public boolean isRepeating(DailyPushNotificationDto dailyPushNotificationDto) {
-		PendingIntent pendingIntent = getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_NO_CREATE);
+		PendingIntent pendingIntent = getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
 
 		if (pendingIntent != null) {
 			return true;

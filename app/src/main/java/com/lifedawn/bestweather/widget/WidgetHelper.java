@@ -43,15 +43,15 @@ public class WidgetHelper {
 			refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, refreshIntent,
-					PendingIntent.FLAG_UPDATE_CURRENT);
+					PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
-			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime()+ val, val, pendingIntent);
+			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + val, val, pendingIntent);
 		}
 	}
 
 	public void cancelAutoRefresh() {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, BaseAppWidgetProvider.class),
-				PendingIntent.FLAG_NO_CREATE);
+				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();
@@ -60,7 +60,7 @@ public class WidgetHelper {
 
 	public boolean isRepeating() {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, BaseAppWidgetProvider.class),
-				PendingIntent.FLAG_NO_CREATE);
+				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
 		if (pendingIntent != null) {
 			return true;
 		} else {
@@ -112,7 +112,7 @@ public class WidgetHelper {
 							refreshIntent.putExtras(bundle);
 
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode++, refreshIntent,
-									PendingIntent.FLAG_ONE_SHOT);
+									 PendingIntent.FLAG_MUTABLE);
 							pendingIntent.send();
 
 						} catch (PendingIntent.CanceledException e) {

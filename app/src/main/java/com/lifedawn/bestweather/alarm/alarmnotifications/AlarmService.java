@@ -73,7 +73,7 @@ public class AlarmService extends Service {
 		alarmIntent.putExtras(bundle);
 		alarmIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-		notificationObj.getNotificationBuilder().setContentIntent(PendingIntent.getActivity(getApplicationContext(), 32323, alarmIntent, 0));
+		notificationObj.getNotificationBuilder().setContentIntent(PendingIntent.getActivity(getApplicationContext(), 32323, alarmIntent, PendingIntent.FLAG_MUTABLE));
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 			startForeground((int) System.currentTimeMillis(), notificationObj.getNotificationBuilder().build());

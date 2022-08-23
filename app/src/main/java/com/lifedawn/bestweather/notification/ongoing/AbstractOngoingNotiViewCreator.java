@@ -167,7 +167,7 @@ public abstract class AbstractOngoingNotiViewCreator {
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
 		return PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId() + 1, refreshIntent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 	}
 
 	abstract protected Set<WeatherDataType> getRequestWeatherDataTypeSet();

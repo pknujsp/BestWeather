@@ -48,7 +48,7 @@ public abstract class AbstractDailyNotiViewCreator {
 		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
 		builder.setAutoCancel(true).setSmallIcon(R.mipmap.ic_launcher_round).setContentIntent(PendingIntent.getActivity(context,
 						notificationObj.getNotificationId(),
-						IntentUtil.getAppIntent(context), PendingIntent.FLAG_UPDATE_CURRENT))
+						IntentUtil.getAppIntent(context), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE))
 				.setCustomContentView(remoteViews).setCustomBigContentView(remoteViews);
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {

@@ -297,7 +297,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 								intent.putExtras(initBundle);
 
 								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent,
-										PendingIntent.FLAG_ONE_SHOT);
+										PendingIntent.FLAG_MUTABLE);
 								try {
 									pendingIntent.send();
 								} catch (PendingIntent.CanceledException e) {

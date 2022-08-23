@@ -88,7 +88,7 @@ public abstract class AbstractWidgetCreator {
 		Intent refreshIntent = new Intent(context, widgetProviderClass);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 		return PendingIntent.getBroadcast(context, 1500, refreshIntent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 	}
 
 	public WidgetDto loadDefaultSettings() {
@@ -181,7 +181,7 @@ public abstract class AbstractWidgetCreator {
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 		intent.putExtras(bundle);
 
-		return PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		return PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 	}
 
 	protected int getWidgetSizeInDp(AppWidgetManager appWidgetManager, String key) {

@@ -35,7 +35,7 @@ public class OngoingNotificationHelper {
 			Intent refreshIntent = new Intent(context, OngoingNotificationReceiver.class);
 			refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), refreshIntent,
-					PendingIntent.FLAG_UPDATE_CURRENT);
+					PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
 			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + millis,
 					millis, pendingIntent);
@@ -44,7 +44,7 @@ public class OngoingNotificationHelper {
 
 	public void cancelAutoRefresh() {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), new Intent(context, OngoingNotificationReceiver.class)
-				, PendingIntent.FLAG_NO_CREATE);
+				, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
 
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
@@ -54,7 +54,7 @@ public class OngoingNotificationHelper {
 
 	public boolean isRepeating() {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId(), new Intent(context, OngoingNotificationReceiver.class)
-				, PendingIntent.FLAG_NO_CREATE);
+				, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
 		if (pendingIntent != null) {
 			return true;
 		} else {

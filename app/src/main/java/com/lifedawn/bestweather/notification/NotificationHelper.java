@@ -61,7 +61,7 @@ public class NotificationHelper {
 		clickIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, (int) System.currentTimeMillis(), clickIntent,
-				PendingIntent.FLAG_UPDATE_CURRENT);
+				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
 		NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationObj.channelId);
 
