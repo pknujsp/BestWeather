@@ -573,6 +573,7 @@
     <string name="show_data_type">show data type settings</string>
     <string name="add">add</string>
     <string name="duplicate">duplicate</string>
+    <string name="change">change</string>
 
 
 </resources>

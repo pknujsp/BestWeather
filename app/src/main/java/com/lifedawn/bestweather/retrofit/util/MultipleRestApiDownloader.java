@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -26,9 +27,8 @@ public abstract class MultipleRestApiDownloader {
 	private volatile int responseCount;
 	private boolean responseCompleted;
 
-	private AlertDialog loadingDialog;
-	private Map<String, String> valueMap = new HashMap<>();
-	private Map<RetrofitClient.ServiceType, Call<?>> callMap = new HashMap<>();
+	private Map<String, String> valueMap = new ConcurrentHashMap<>();
+	private Map<RetrofitClient.ServiceType, Call<?>> callMap = new ConcurrentHashMap<>();
 
 	protected Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ArrayMap<>();
 
@@ -74,11 +74,6 @@ public abstract class MultipleRestApiDownloader {
 
 	public String get(@NonNull @NotNull String key) {
 		return valueMap.get(key);
-	}
-
-
-	public void setLoadingDialog(AlertDialog loadingDialog) {
-		this.loadingDialog = loadingDialog;
 	}
 
 

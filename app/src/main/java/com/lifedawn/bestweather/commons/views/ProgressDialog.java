@@ -63,7 +63,9 @@ public class ProgressDialog {
 
 		for (int i = 0; i < dialogsCount; i++) {
 			AlertDialog dialog = dialogStack.pop();
-			dialog.dismiss();
+			if (dialog.getWindow() != null) {
+				dialog.dismiss();
+			}
 		}
 	}
 }

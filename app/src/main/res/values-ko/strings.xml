@@ -502,4 +502,6 @@
     <string name="show_data_type">표시할 자료 설정</string>
     <string name="add">추가</string>
     <string name="duplicate">중복</string>
+    <string name="change">변경</string>
+
 </resources>

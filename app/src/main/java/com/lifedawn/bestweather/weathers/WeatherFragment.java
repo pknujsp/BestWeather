@@ -809,38 +809,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			for (MultipleRestApiDownloader.ResponseResult responseResult : entry.getValue().values()) {
 				if (!responseResult.isSuccessful()) {
-					//다시시도, 취소 중 택1
-					List<AlertFragment.BtnObj> btnObjList = new ArrayList<>();
-
-					Set<WeatherProviderType> otherTypes = getOtherWeatherSourceTypes(weatherProviderType,
-							mainWeatherProviderType);
-
-					final String[] failedDialogItems = new String[otherTypes.size()];
-					final WeatherProviderType[] weatherProviderTypeArr = new WeatherProviderType[otherTypes.size()];
-					int arrIndex = 0;
-
-					if (otherTypes.contains(WeatherProviderType.KMA_WEB)) {
-						weatherProviderTypeArr[arrIndex] = WeatherProviderType.KMA_WEB;
-						failedDialogItems[arrIndex++] = getString(R.string.kma) + ", " + getString(
-								R.string.rerequest_another_weather_datasource);
-					}
-					if (otherTypes.contains(WeatherProviderType.ACCU_WEATHER)) {
-						weatherProviderTypeArr[arrIndex] = WeatherProviderType.ACCU_WEATHER;
-						failedDialogItems[arrIndex++] = getString(R.string.accu_weather) + ", " + getString(
-								R.string.rerequest_another_weather_datasource);
-					}
-					if (otherTypes.contains(WeatherProviderType.OWM_ONECALL)) {
-						weatherProviderTypeArr[arrIndex] = WeatherProviderType.OWM_ONECALL;
-						failedDialogItems[arrIndex++] = getString(R.string.owm) + ", " + getString(
-								R.string.rerequest_another_weather_datasource);
-					}
-					if (otherTypes.contains(WeatherProviderType.MET_NORWAY)) {
-						weatherProviderTypeArr[arrIndex] = WeatherProviderType.MET_NORWAY;
-						failedDialogItems[arrIndex++] = getString(R.string.met) + ", " + getString(
-								R.string.rerequest_another_weather_datasource);
-					}
-
-
 					if (containWeatherData(latitude, longitude)) {
 						MainThreadWorker.runOnUiThread(new Runnable() {
 							@Override
@@ -851,6 +819,37 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						});
 
 					} else {
+						//다시시도, 취소 중 택1
+						List<AlertFragment.BtnObj> btnObjList = new ArrayList<>();
+
+						Set<WeatherProviderType> otherTypes = getOtherWeatherSourceTypes(weatherProviderType,
+								mainWeatherProviderType);
+
+						final String[] failedDialogItems = new String[otherTypes.size()];
+						final WeatherProviderType[] weatherProviderTypeArr = new WeatherProviderType[otherTypes.size()];
+						int arrIndex = 0;
+
+						if (otherTypes.contains(WeatherProviderType.KMA_WEB)) {
+							weatherProviderTypeArr[arrIndex] = WeatherProviderType.KMA_WEB;
+							failedDialogItems[arrIndex++] = getString(R.string.kma) + ", " + getString(
+									R.string.rerequest_another_weather_datasource);
+						}
+						if (otherTypes.contains(WeatherProviderType.ACCU_WEATHER)) {
+							weatherProviderTypeArr[arrIndex] = WeatherProviderType.ACCU_WEATHER;
+							failedDialogItems[arrIndex++] = getString(R.string.accu_weather) + ", " + getString(
+									R.string.rerequest_another_weather_datasource);
+						}
+						if (otherTypes.contains(WeatherProviderType.OWM_ONECALL)) {
+							weatherProviderTypeArr[arrIndex] = WeatherProviderType.OWM_ONECALL;
+							failedDialogItems[arrIndex++] = getString(R.string.owm) + ", " + getString(
+									R.string.rerequest_another_weather_datasource);
+						}
+						if (otherTypes.contains(WeatherProviderType.MET_NORWAY)) {
+							weatherProviderTypeArr[arrIndex] = WeatherProviderType.MET_NORWAY;
+							failedDialogItems[arrIndex++] = getString(R.string.met) + ", " + getString(
+									R.string.rerequest_another_weather_datasource);
+						}
+
 						btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
@@ -896,10 +895,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
 		FragmentManager fragmentManager = getChildFragmentManager();
-		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
 		if (fragmentManager.findFragmentByTag(AlertFragment.class.getName()) != null) {
-			fragmentTransaction.remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName()));
+			fragmentManager.beginTransaction().remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName())).commit();
 		}
 
 		final Bundle bundle = new Bundle();
@@ -910,8 +908,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		alertFragment.setBtnObjList(btnObjList);
 		alertFragment.setArguments(bundle);
 
-		fragmentTransaction.add(binding.fragmentContainer.getId(), alertFragment,
-				AlertFragment.class.getName()).commitAllowingStateLoss();
+		fragmentManager.beginTransaction().add(binding.fragmentContainer.getId(), alertFragment,
+				AlertFragment.class.getName()).commit();
 	}
 
 	/**

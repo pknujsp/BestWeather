@@ -11,6 +11,8 @@ import android.location.Location;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -33,6 +35,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -44,6 +47,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
@@ -86,6 +90,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	protected final Map<BottomSheetType, LinearLayout> bottomSheetViewMap = new HashMap<>();
 	protected final Map<MarkerType, RecyclerView.Adapter> adapterMap = new HashMap<>();
 
+	private FusedLocation fusedLocation;
+
 
 	private ViewPager2 locationItemBottomSheetViewPager;
 	private boolean removedLocation = false;
@@ -105,9 +111,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			super.onFragmentDestroyed(fm, f);
 
 			if (f instanceof FindAddressFragment) {
+				binding.searchBar.setVisibility(View.VISIBLE);
 				removeMarkers(MarkerType.SEARCH);
 				collapseAllExpandedBottomSheets();
-				binding.searchBar.setVisibility(View.VISIBLE);
 			}
 		}
 	};
@@ -207,6 +213,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, true);
+
+		fusedLocation = FusedLocation.getInstance(getContext());
 	}
 
 	@Override
@@ -354,7 +362,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.header.getBottom(), 0, 0);
 		googleMap.getUiSettings().setZoomControlsEnabled(true);
 		googleMap.getUiSettings().setRotateGesturesEnabled(false);
-		googleMap.setMyLocationEnabled(true);
 		googleMap.setOnMarkerClickListener(this);
 
 		googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -377,6 +384,47 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				return false;
 			}
 		});
+
+		googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+			@Override
+			public boolean onMyLocationButtonClick() {
+				if (!fusedLocation.isOnGps()) {
+					fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
+						@Override
+						public void onActivityResult(ActivityResult result) {
+						}
+					});
+				}
+				return false;
+			}
+		});
+
+		try {
+			googleMap.setMyLocationEnabled(true);
+		} catch (SecurityException e) {
+			fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
+				@Override
+				public void onActivityResult(ActivityResult result) {
+					if (fusedLocation.checkDefaultPermissions()) {
+						googleMap.setMyLocationEnabled(true);
+					}
+				}
+			}, new ActivityResultCallback<Map<String, Boolean>>() {
+				@Override
+				public void onActivityResult(Map<String, Boolean> result) {
+					//gps사용 권한
+					//허가남 : 현재 위치 다시 파악
+					//거부됨 : 작업 취소
+					//계속 거부 체크됨 : 작업 취소
+					if (!result.containsValue(false)) {
+						googleMap.setMyLocationEnabled(true);
+					} else {
+						googleMap.setMyLocationEnabled(false);
+					}
+				}
+			});
+
+		}
 
 		initFavorites();
 	}

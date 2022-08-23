@@ -52,6 +52,7 @@
                         android:layout_alignParentTop="true"
                         android:layout_marginRight="16dp"
                         android:layout_marginBottom="140dp"
+                        android:gravity="center_horizontal"
                         android:orientation="vertical"
                         android:paddingLeft="16dp"
                         >
@@ -61,6 +62,7 @@
                             android:id="@+id/weatherDataSourceLayout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
                             android:layout_marginBottom="2dp"
                             android:clickable="true"
                             android:gravity="center_vertical"
@@ -81,16 +83,28 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center_vertical"
-                                android:background="?attr/selectableItemBackground"
-                                android:drawableRight="@drawable/expand_more"
-                                android:drawablePadding="2dp"
-                                android:drawableTint="@color/white"
                                 android:gravity="center_vertical"
                                 android:shadowColor="@color/black"
                                 android:text="@string/loading"
                                 android:textColor="@color/white"
                                 android:textSize="16sp"
                                 android:textStyle="bold"
+                                />
+
+                            <TextView
+                                style="@style/text_shadow"
+                                android:background="@drawable/rounded_btn_background"
+                                android:padding="3dp"
+                                android:backgroundTint="@color/gray"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_vertical"
+                                android:layout_marginLeft="4dp"
+                                android:gravity="center_vertical"
+                                android:shadowColor="@color/black"
+                                android:text="@string/change"
+                                android:textColor="@color/white"
+                                android:textSize="13sp"
                                 />
 
                         </LinearLayout>
@@ -100,6 +114,7 @@
                             style="@style/text_shadow"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
                             android:layout_marginBottom="16dp"
                             android:drawablePadding="4dp"
                             android:gravity="center_vertical"
@@ -116,9 +131,11 @@
                             style="@style/text_shadow"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
                             android:fontFamily="sans-serif-condensed"
                             android:shadowColor="@color/black"
                             android:text="@string/loading"
+                            android:textAlignment="center"
                             android:textColor="@color/white"
                             android:textSize="25sp"
                             />
