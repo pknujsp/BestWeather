@@ -25,9 +25,14 @@ import com.lifedawn.bestweather.retrofit.parameters.kma.VilageFcstParameter;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.KmaAreaCodeDto;
 import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.parser.KmaWebParser;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.UvIndexProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -45,6 +50,7 @@ import retrofit2.Response;
 
 public final class KmaProcessing {
 	private KmaProcessing() {
+
 	}
 
 	/**
@@ -585,6 +591,8 @@ public final class KmaProcessing {
 	public static void requestWeatherDataAsWEB(Context context, Double latitude, Double longitude,
 	                                           RequestKma requestKma,
 	                                           MultipleRestApiDownloader multipleRestApiDownloader) {
+		KmaResponseProcessor.init(context);
+
 		KmaAreaCodesRepository kmaAreaCodesRepository = new KmaAreaCodesRepository(context);
 		kmaAreaCodesRepository.getAreaCodes(latitude, longitude,
 				new DbQueryCallback<List<KmaAreaCodeDto>>() {

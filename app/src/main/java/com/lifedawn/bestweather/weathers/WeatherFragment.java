@@ -514,6 +514,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private void setBackgroundWeatherView(String weather, String volume) {
+		if (!PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_show_background_animation),
+				false)) {
+			weatherViewController.setWeatherView(PrecipType.CLEAR, null);
+			return;
+		}
+
 		if (weather.equals(Flickr.Weather.rain.getText())) {
 			weatherViewController.setWeatherView(PrecipType.RAIN, volume);
 		} else if (weather.equals(Flickr.Weather.snow.getText())) {

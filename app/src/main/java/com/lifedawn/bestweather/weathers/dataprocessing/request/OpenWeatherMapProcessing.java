@@ -139,6 +139,8 @@ public class OpenWeatherMapProcessing {
 
 	public static void requestWeatherDataOneCall(Context context, Double latitude, Double longitude,
 	                                             RequestOwmOneCall requestOwmOneCall, MultipleRestApiDownloader multipleRestApiDownloader) {
+		OpenWeatherMapResponseProcessor.init(context);
+
 		OneCallParameter oneCallParameter = new OneCallParameter();
 		Set<OneCallParameter.OneCallApis> excludeOneCallApis = requestOwmOneCall.getExcludeApis();
 		oneCallParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString()).setOneCallApis(excludeOneCallApis);

@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
+import android.os.Looper;
 import android.os.PowerManager;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -114,17 +116,24 @@ public abstract class AbstractOngoingNotiViewCreator {
 		FusedLocation fusedLocation = FusedLocation.getInstance(context);
 		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
+		if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
+			Log.e("loadCurrentLocation", "메인 스레드");
+		} else {
+			Log.e("loadCurrentLocation", "백그라운드 스레드");
+		}
+
 		if (powerManager.isInteractive()) {
-			fusedLocation.findCurrentLocation(locationCallback, true);
+			fusedLocation.findCurrentLocation(locationCallback, false);
 		} else {
 			LocationResult lastLocation = fusedLocation.getLastCurrentLocation();
 			if (lastLocation.getLocations().get(0).getLatitude() == 0.0 ||
 					lastLocation.getLocations().get(0).getLongitude() == 0.0) {
-				fusedLocation.findCurrentLocation(locationCallback, true);
+				fusedLocation.findCurrentLocation(locationCallback, false);
 			} else {
 				locationCallback.onSuccessful(lastLocation);
 			}
 		}
+
 	}
 
 

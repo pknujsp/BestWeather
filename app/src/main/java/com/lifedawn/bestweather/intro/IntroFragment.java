@@ -22,6 +22,7 @@ import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
@@ -174,7 +175,12 @@ public class IntroFragment extends Fragment {
 
 			} else {
 				//검색 실패
-				Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
+				MainThreadWorker.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
+					}
+				});
 			}
 
 		}

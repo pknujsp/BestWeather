@@ -503,5 +503,7 @@
     <string name="add">추가</string>
     <string name="duplicate">중복</string>
     <string name="change">변경</string>
+    <string name="pref_summary_show_background_animation">날씨 강수 효과 표시</string>
+    <string name="pref_title_show_background_animation">날씨 강수 효과</string>
 
 </resources>

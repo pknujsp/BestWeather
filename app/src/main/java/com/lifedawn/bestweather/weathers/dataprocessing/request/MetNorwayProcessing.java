@@ -1,23 +1,18 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.request;
 
+import android.content.Context;
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestMet;
-import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.metnorway.LocationForecastParameter;
 import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-
-import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,7 +46,9 @@ public class MetNorwayProcessing {
 	}
 
 	public static void getMetNorwayForecasts(String latitude, String longitude, RequestMet requestMet,
-	                                         MultipleRestApiDownloader multipleRestApiDownloader) {
+	                                         MultipleRestApiDownloader multipleRestApiDownloader, Context context) {
+		MetNorwayResponseProcessor.init(context);
+
 		LocationForecastParameter locationForecastParameter = new LocationForecastParameter();
 		locationForecastParameter.setLatitude(latitude).setLongitude(longitude);
 		Call<JsonElement> locationForecastCall = getLocationForecast(locationForecastParameter, new JsonDownloader() {

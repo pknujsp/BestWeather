@@ -28,6 +28,10 @@
         android:title="@string/pref_title_use_current_location"
         app:iconSpaceReserved="false" />
 
-
+    <SwitchPreference
+        android:key="@string/pref_key_show_background_animation"
+        android:summary="@string/pref_summary_show_background_animation"
+        android:title="@string/pref_title_show_background_animation"
+        app:iconSpaceReserved="false" />
 
 </PreferenceScreen>

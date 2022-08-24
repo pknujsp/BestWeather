@@ -5,6 +5,8 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.Looper;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
@@ -35,7 +37,6 @@ public class OngoingNotificationForegroundService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		showNotification();
 	}
 
 	@Override
@@ -61,6 +62,8 @@ public class OngoingNotificationForegroundService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		showNotification();
+
 		final String action = intent.getAction();
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
@@ -87,15 +90,22 @@ public class OngoingNotificationForegroundService extends Service {
 			ongoingNotiViewCreator = new OngoingNotiViewCreator(getApplicationContext(), null);
 			ongoingNotiViewCreator.loadSavedPreferences();
 
+			if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.CurrentLocation) {
+				FusedLocation.getInstance(getApplicationContext()).startForeground(OngoingNotificationForegroundService.this);
+			}
+
 			if (ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
 				OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
+
 				if (!ongoingNotificationHelper.isRepeating()) {
 					ongoingNotificationHelper.onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
 				}
 			}
 
-			if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.CurrentLocation) {
-				FusedLocation.getInstance(getApplicationContext()).startForeground(OngoingNotificationForegroundService.this);
+			if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
+				Log.e("ongoing notification", "메인 스레드");
+			} else {
+				Log.e("ongoing notification", "백그라운드 스레드");
 			}
 
 			ongoingNotiViewCreator.initNotification(new Callback() {
@@ -105,6 +115,7 @@ public class OngoingNotificationForegroundService extends Service {
 						NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
 						notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 					}
+
 					stopService();
 				}
 			});

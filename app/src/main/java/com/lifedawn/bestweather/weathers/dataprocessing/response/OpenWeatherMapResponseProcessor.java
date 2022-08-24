@@ -106,7 +106,6 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		final String windUnitStr = MyApplication.VALUE_UNIT_OBJ.getWindUnitText();
 		final String zeroSnowVolume = "0.0mm";
 		final String zeroRainVolume = "0.0mm";
-		final String zeroPrecipitationVolume = "0.0mm";
 		final String pressureUnit = "hpa";
 		final String visibilityUnitStr = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnitText();
 
@@ -138,8 +137,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 				snowVolume = hourly.getSnow().getPrecipitation1Hour() + mm;
 			}
 
-			hourlyForecastDto.setHours(WeatherResponseProcessor.convertDateTimeOfHourlyForecast
-							(Long.parseLong(hourly.getDt()) * 1000L, zoneId))
+			hourlyForecastDto.setHours(WeatherResponseProcessor.convertDateTimeOfHourlyForecast(Long.parseLong(hourly.getDt()) * 1000L, zoneId))
 					.setWeatherIcon(OpenWeatherMapResponseProcessor.getWeatherIconImg(hourly.getWeather().get(0).getId(),
 							hourly.getWeather().get(0).getIcon().contains("n")))
 					.setTemp(ValueUnits.convertTemperature(hourly.getTemp(), tempUnit) + tempDegree)
@@ -154,12 +152,15 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 					.setWindDirectionVal(Integer.parseInt(hourly.getWind_deg()))
 					.setWindSpeed(ValueUnits.convertWindSpeed(hourly.getWind_speed(), windUnit) + windUnitStr)
 					.setWindStrength(WindUtil.getSimpleWindSpeedDescription(hourly.getWind_speed()))
-					.setWindGust(ValueUnits.convertWindSpeed(hourly.getWindGust(), windUnit) + windUnitStr)
 					.setPressure(hourly.getPressure() + pressureUnit)
 					.setHumidity(hourly.getHumidity() + percent)
 					.setCloudiness(hourly.getClouds() + percent)
 					.setVisibility(ValueUnits.convertVisibility(hourly.getVisibility(), visibilityUnit) + visibilityUnitStr)
 					.setUvIndex(hourly.getUvi());
+
+			if (hourly.getWindGust() != null) {
+				hourlyForecastDto.setWindGust(ValueUnits.convertWindSpeed(hourly.getWindGust(), windUnit) + windUnitStr);
+			}
 
 			hourlyForecastDtoList.add(hourlyForecastDto);
 		}
@@ -370,7 +371,6 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		final String windUnitStr = MyApplication.VALUE_UNIT_OBJ.getWindUnitText();
 		final String zeroSnowVolume = "0.0mm";
 		final String zeroRainVolume = "0.0mm";
-		final String zeroPrecipitationVolume = "0.0mm";
 		final String pressureUnit = "hpa";
 		final String visibilityUnitStr = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnitText();
 

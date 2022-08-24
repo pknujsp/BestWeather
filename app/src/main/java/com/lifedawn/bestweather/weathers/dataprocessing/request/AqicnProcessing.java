@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.request;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.JsonElement;
@@ -7,7 +8,6 @@ import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.aqicn.AqicnParameter;
-import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
@@ -42,7 +42,9 @@ public class AqicnProcessing {
 		return call;
 	}
 
-	public static void getAirQuality(Double latitude, Double longitude, MultipleRestApiDownloader multipleRestApiDownloader) {
+	public static void getAirQuality(Double latitude, Double longitude, MultipleRestApiDownloader multipleRestApiDownloader, Context context) {
+		AqicnResponseProcessor.init(context);
+
 		AqicnParameter aqicnParameter = new AqicnParameter();
 		aqicnParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString());
 

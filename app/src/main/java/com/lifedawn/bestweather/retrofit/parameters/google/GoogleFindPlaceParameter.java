@@ -14,7 +14,7 @@ public class GoogleFindPlaceParameter extends RequestParameter {
 
 		//boolean containKr = query.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*");
 		map.put("input", input);
-		map.put("key", "AIzaSyBLrNp2qRJh4-3J4gypJzZ2pW5Dtf-6QCI");
+		map.put("key", "");
 		//map.put("language", containKr ? "ko" : "en");
 		map.put("inputtype", "textquery");
 

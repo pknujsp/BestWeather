@@ -53,13 +53,8 @@ public class MyApplication extends Application {
 
 		initPreferences();
 		WindUtil.init(context);
+		//UvIndexProcessor.init(context);
 		//AccuWeatherResponseProcessor.init(context);
-		AqicnResponseProcessor.init(context);
-		KmaResponseProcessor.init(context);
-		MetNorwayResponseProcessor.init(context);
-		OpenWeatherMapResponseProcessor.init(context);
-		FlickrUtil.init(context);
-		UvIndexProcessor.init(context);
 	}
 
 
@@ -79,6 +74,7 @@ public class MyApplication extends Application {
 				editor.putBoolean(getString(R.string.pref_key_never_ask_again_permission_for_access_location), false);
 				editor.putBoolean(getString(R.string.pref_key_sun_rise_notification), false);
 				editor.putBoolean(getString(R.string.pref_key_sun_set_notification), false);
+				editor.putBoolean(getString(R.string.pref_key_show_background_animation), true);
 				editor.putBoolean(getString(R.string.pref_key_show_intro), true);
 				editor.putBoolean(getString(R.string.pref_key_kma_top_priority), true).putBoolean(
 								getString(R.string.pref_key_accu_weather), false).putBoolean(getString(R.string.pref_key_open_weather_map),

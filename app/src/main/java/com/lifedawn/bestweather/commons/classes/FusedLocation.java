@@ -121,16 +121,13 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		} else {
 			if (checkDefaultPermissions()) {
 
-				/*
 				if (isBackground && !checkBackgroundLocationPermission()) {
 					myLocationCallback.onFailed(MyLocationCallback.Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION);
 					return;
 				}
 
-				 */
-
 				LocationRequest locationRequest = LocationRequest.create();
-				locationRequest.setInterval(1000);
+				locationRequest.setInterval(900);
 				locationRequest.setFastestInterval(200);
 				locationRequest.setPriority(Priority.PRIORITY_HIGH_ACCURACY);
 
@@ -306,7 +303,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
 		builder.setSmallIcon(R.drawable.location).setContentText(context.getString(R.string.msg_finding_current_location))
 				.setContentTitle(context.getString(R.string.current_location))
-				.setOngoing(true);
+				.setOngoing(false);
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 			builder.setPriority(NotificationCompat.PRIORITY_LOW).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);

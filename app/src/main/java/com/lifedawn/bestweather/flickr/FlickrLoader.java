@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.flickr;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -19,7 +18,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
-import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.flickr.FlickrGetInfoParameter;
@@ -35,18 +33,15 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
@@ -66,6 +61,8 @@ public class FlickrLoader {
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
+				FlickrUtil.init();
+
 				cancelAllRequest(context);
 				final ZonedDateTime lastRefreshDateTime = refreshDateTime.withZoneSameInstant(zoneId);
 

@@ -1,7 +1,5 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.response;
 
-import android.content.Context;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +9,7 @@ public class FlickrUtil {
 	private FlickrUtil() {
 	}
 
-	public static void init(Context context) {
+	public static void init() {
 		if (!WEATHER_GALLERY_ID_MAP.isEmpty()) {
 			return;
 		}

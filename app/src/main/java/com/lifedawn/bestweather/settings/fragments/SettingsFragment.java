@@ -38,6 +38,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 	private Preference weatherDataSourcesPreference;
 	private WidgetRefreshIntervalPreference widgetRefreshIntervalPreference;
 	private SwitchPreference useCurrentLocationPreference;
+	private SwitchPreference animationPreference;
 
 	public SettingsFragment(IAppbarTitle iAppbarTitle) {
 		this.iAppbarTitle = iAppbarTitle;
@@ -65,8 +66,10 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 		appThemePreference = findPreference(getString(R.string.pref_key_app_theme));
 		weatherDataSourcesPreference = findPreference(getString(R.string.pref_key_weather_data_sources));
 		useCurrentLocationPreference = findPreference(getString(R.string.pref_key_use_current_location));
+		animationPreference = findPreference(getString(R.string.pref_key_show_background_animation));
 
 		useCurrentLocationPreference.setOnPreferenceChangeListener(onPreferenceChangeListener);
+		animationPreference.setOnPreferenceChangeListener(onPreferenceChangeListener);
 
 		initPreferences();
 	}
@@ -100,7 +103,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 											@Override
 											public void onResultSuccessful(List<WidgetDto> result) {
 												WidgetHelper widgetHelper = new WidgetHelper(getContext());
-												
+
 												if (result.isEmpty()) {
 													widgetHelper.cancelAutoRefresh();
 												} else {
@@ -191,6 +194,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 
 		//현재 위치 사용
 		useCurrentLocationPreference.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), true));
+		animationPreference.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_key_show_background_animation), true));
 	}
 
 	private Preference.OnPreferenceChangeListener onPreferenceChangeListener = new Preference.OnPreferenceChangeListener() {
@@ -200,9 +204,19 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 				boolean enabled = (Boolean) newValue;
 
 				sharedPreferences.edit().putString(getString(R.string.pref_key_last_current_location_latitude), "0.0").putString(
-						getString(R.string.pref_key_last_current_location_longitude), "0.0").apply();
+						getString(R.string.pref_key_last_current_location_longitude), "0.0").commit();
 
 				if (enabled != useCurrentLocationPreference.isChecked()) {
+					return true;
+				} else {
+					return false;
+				}
+			} else if (preference.getKey().equals(animationPreference.getKey())) {
+				boolean enabled = (Boolean) newValue;
+
+				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_show_background_animation), enabled).commit();
+
+				if (enabled != animationPreference.isChecked()) {
 					return true;
 				} else {
 					return false;
@@ -220,6 +234,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 	@Override
 	public void onHiddenChanged(boolean hidden) {
 		super.onHiddenChanged(hidden);
+
 		if (!hidden) {
 			iAppbarTitle.setAppbarTitle(getString(R.string.settings));
 		}

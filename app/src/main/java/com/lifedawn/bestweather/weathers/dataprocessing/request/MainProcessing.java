@@ -13,8 +13,6 @@ import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 
-import java.util.Set;
-
 public class MainProcessing {
 
 	public static MultipleRestApiDownloader requestNewWeatherData(Context context, Double latitude, Double longitude,
@@ -44,7 +42,7 @@ public class MainProcessing {
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.MET_NORWAY)) {
 			MetNorwayProcessing.getMetNorwayForecasts(latitude.toString(), longitude.toString(),
-					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), multipleRestApiDownloader);
+					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), multipleRestApiDownloader, context);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.OWM_ONECALL)) {
 			OpenWeatherMapProcessing.requestWeatherDataOneCall(context, latitude, longitude,
@@ -56,7 +54,7 @@ public class MainProcessing {
 		}
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.AQICN)) {
-			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader);
+			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader, context);
 		}
 
 		return multipleRestApiDownloader;
@@ -87,11 +85,11 @@ public class MainProcessing {
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.MET_NORWAY)) {
 			MetNorwayProcessing.getMetNorwayForecasts(latitude.toString(), longitude.toString(),
-					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), multipleRestApiDownloader);
+					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), multipleRestApiDownloader, context);
 		}
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.AQICN)) {
-			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader);
+			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader, context);
 		}
 
 
@@ -129,11 +127,11 @@ public class MainProcessing {
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.MET_NORWAY)) {
 			MetNorwayProcessing.getMetNorwayForecasts(latitude.toString(), longitude.toString(),
-					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), multipleRestApiDownloader);
+					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), multipleRestApiDownloader, context);
 		}
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.AQICN)) {
-			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader);
+			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader, context);
 		}
 
 		return multipleRestApiDownloader;

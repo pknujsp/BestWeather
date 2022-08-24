@@ -574,6 +574,9 @@
     <string name="add">add</string>
     <string name="duplicate">duplicate</string>
     <string name="change">change</string>
+    <string name="pref_key_show_background_animation">pref_key_show_background_animation</string>
+    <string name="pref_summary_show_background_animation">Show background weather animation</string>
+    <string name="pref_title_show_background_animation">Weather animation</string>
 
 
 </resources>
