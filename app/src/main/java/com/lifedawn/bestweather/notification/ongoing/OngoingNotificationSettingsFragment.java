@@ -168,8 +168,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 			}
 		});
 
-		RemoteViews remoteViews = ongoingNotiViewCreator.createRemoteViews(true);
-		binding.previewLayout.addView(remoteViews.apply(getActivity().getApplicationContext(), binding.previewLayout));
+		RemoteViews[] remoteViews = ongoingNotiViewCreator.createRemoteViews(true);
+		binding.previewLayout.addView(remoteViews[1].apply(getActivity().getApplicationContext(), binding.previewLayout));
 
 		binding.notificationSwitch.setChecked(originalEnabled);
 		if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.SelectedAddress) {

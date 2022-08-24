@@ -1,6 +1,8 @@
 package com.lifedawn.bestweather.notification.ongoing;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -8,11 +10,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Location;
 import android.os.Build;
+import android.os.Looper;
+import android.os.PowerManager;
 import android.text.TextPaint;
+import android.util.Log;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -23,8 +28,12 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.IconCompat;
 import androidx.preference.PreferenceManager;
 
+import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.FusedLocation;
+import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.enums.LocationType;
+import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
@@ -35,10 +44,12 @@ import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
+import com.lifedawn.bestweather.notification.model.NotificationDataObj;
 import com.lifedawn.bestweather.notification.model.OngoingNotiDataObj;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
@@ -52,36 +63,175 @@ import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
+public class OngoingNotiViewCreator {
 	private final int hourlyForecastCount = 8;
 	private Callback callback;
 
-	public OngoingNotiViewCreator(Context context, NotificationUpdateCallback notificationUpdateCallback) {
-		super(context, NotificationType.Ongoing, notificationUpdateCallback);
+	private final NotificationUpdateCallback notificationUpdateCallback;
+	private final ValueUnits windSpeedUnit;
+	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
+	private final ValueUnits tempUnit;
+	private final String tempDegree;
+	private final NotificationType notificationType = NotificationType.Ongoing;
+
+	private Context context;
+	private NotificationHelper notificationHelper;
+	private NotificationDataObj notificationDataObj;
+	private Timer timer;
+
+	public NotificationDataObj getNotificationDataObj() {
+		return notificationDataObj;
 	}
 
-	@Override
-	public RemoteViews createRemoteViews(boolean temp) {
+	public OngoingNotiViewCreator(Context context, NotificationUpdateCallback notificationUpdateCallback) {
+		this.context = context;
+		this.notificationUpdateCallback = notificationUpdateCallback;
+
+		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
+		windSpeedUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		notificationHelper = new NotificationHelper(context);
+	}
+
+	public void loadCurrentLocation(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
+		final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
+			@Override
+			public void onSuccessful(LocationResult locationResult) {
+				final Location location = getBestLocation(locationResult);
+				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
+					@Override
+					public void onGeocodingResult(List<Address> addressList) {
+						final SharedPreferences sharedPreferences =
+								context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
+						SharedPreferences.Editor editor = sharedPreferences.edit();
+						Address address = addressList.get(0);
+						notificationDataObj.setAddressName(address.getAddressLine(0))
+								.setCountryCode(address.getCountryCode())
+								.setLatitude(address.getLatitude()).setLongitude(address.getLongitude());
+
+						editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), (float) notificationDataObj.getLatitude())
+								.putFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(),
+										(float) notificationDataObj.getLongitude())
+								.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode())
+								.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getAddressName()).commit();
+
+						loadWeatherData(collapsedRemoteViews, expandedRemoteViews);
+					}
+				});
+			}
+
+			@Override
+			public void onFailed(Fail fail) {
+				RemoteViewsUtil.ErrorType errorType = null;
+
+				if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
+					errorType = RemoteViewsUtil.ErrorType.DENIED_GPS_PERMISSIONS;
+				} else if (fail == Fail.DISABLED_GPS) {
+					errorType = RemoteViewsUtil.ErrorType.GPS_OFF;
+				} else if (fail == Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION) {
+					errorType = RemoteViewsUtil.ErrorType.DENIED_BACKGROUND_LOCATION_PERMISSION;
+				} else {
+					errorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA;
+				}
+
+				forceFailedNotification(errorType);
+			}
+		};
+
+		FusedLocation fusedLocation = FusedLocation.getInstance(context);
+		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+
+		if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
+			Log.e("loadCurrentLocation", "메인 스레드");
+		} else {
+			Log.e("loadCurrentLocation", "백그라운드 스레드");
+		}
+
+		if (powerManager.isInteractive()) {
+			fusedLocation.findCurrentLocation(locationCallback, false);
+		} else {
+			LocationResult lastLocation = fusedLocation.getLastCurrentLocation();
+			if (lastLocation.getLocations().get(0).getLatitude() == 0.0 ||
+					lastLocation.getLocations().get(0).getLongitude() == 0.0) {
+				fusedLocation.findCurrentLocation(locationCallback, false);
+			} else {
+				locationCallback.onSuccessful(lastLocation);
+			}
+		}
+
+	}
+
+
+	public void loadWeatherData(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
+		RemoteViewsUtil.onBeginProcess(expandedRemoteViews);
+		makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_round, null, false);
+
+		final Set<WeatherDataType> weatherDataTypeSet = getRequestWeatherDataTypeSet();
+		WeatherProviderType weatherProviderType = notificationDataObj.getWeatherSourceType();
+
+		if (notificationDataObj.isTopPriorityKma() && notificationDataObj.getCountryCode().equals("KR")) {
+			weatherProviderType = WeatherProviderType.KMA_WEB;
+		}
+
+		final Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
+		weatherProviderTypeSet.add(weatherProviderType);
+		if (weatherDataTypeSet.contains(WeatherDataType.airQuality)) {
+			weatherProviderTypeSet.add(WeatherProviderType.AQICN);
+		}
+
+		ExecutorService executorService = Executors.newSingleThreadExecutor();
+		WeatherProviderType finalWeatherProviderType = weatherProviderType;
+		WeatherRequestUtil.loadWeatherData(context, executorService,
+				notificationDataObj.getLatitude(), notificationDataObj.getLongitude(), weatherDataTypeSet,
+				new MultipleRestApiDownloader() {
+					@Override
+					public void onResult() {
+						setResultViews(collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this, weatherDataTypeSet);
+					}
+
+					@Override
+					public void onCanceled() {
+						setResultViews(collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this, weatherDataTypeSet);
+					}
+				}, weatherProviderTypeSet);
+	}
+
+	protected PendingIntent getRefreshPendingIntent() {
+		Intent refreshIntent = new Intent(context, OngoingNotificationReceiver.class);
+		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+
+		return PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId() + 1, refreshIntent,
+				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+	}
+
+	public RemoteViews[] createRemoteViews(boolean temp) {
+		RemoteViews collapsedRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_ongoing_notification_collapsed);
 		RemoteViews expandedRemoteViews = new RemoteViews(context.getPackageName(), R.layout.view_ongoing_notification_expanded);
 
 		if (temp) {
 			setHourlyForecastViews(expandedRemoteViews, WeatherResponseProcessor.getTempHourlyForecastDtoList(context, hourlyForecastCount));
 		} else {
+			collapsedRemoteViews.setOnClickPendingIntent(R.id.refreshLayout, getRefreshPendingIntent());
 			expandedRemoteViews.setOnClickPendingIntent(R.id.refreshLayout, getRefreshPendingIntent());
 		}
 
-		return expandedRemoteViews;
+		return new RemoteViews[]{collapsedRemoteViews, expandedRemoteViews};
 	}
 
 
-	@Override
 	public void initNotification(Callback callback) {
 		this.callback = callback;
-		RemoteViews remoteViews = createRemoteViews(false);
-		RemoteViewsUtil.onBeginProcess(remoteViews);
-		makeNotification(remoteViews, R.drawable.refresh, null, false);
+		RemoteViews[] remoteViews = createRemoteViews(false);
+
+		RemoteViews collapsedView = remoteViews[0];
+		RemoteViews expandedView = remoteViews[1];
+
+		RemoteViewsUtil.onBeginProcess(expandedView);
+		makeNotification(collapsedView, expandedView, R.drawable.refresh, null, false);
 
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
@@ -89,9 +239,10 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 			public void run() {
 				timer = null;
 				if (callback != null) {
-					remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
-					RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-					makeNotification(remoteViews, R.mipmap.ic_launcher_round, null, true);
+					collapsedView.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+					expandedView.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+					RemoteViewsUtil.onErrorProcess(expandedView, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+					makeNotification(collapsedView, expandedView, R.mipmap.ic_launcher_round, null, true);
 
 					callback.onResult();
 				}
@@ -99,13 +250,12 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		}, TimeUnit.SECONDS.toMillis(20L));
 
 		if (notificationDataObj.getLocationType() == LocationType.CurrentLocation) {
-			loadCurrentLocation(remoteViews);
+			loadCurrentLocation(collapsedView, expandedView);
 		} else {
-			loadWeatherData(remoteViews);
+			loadWeatherData(collapsedView, expandedView);
 		}
 	}
 
-	@Override
 	protected Set<WeatherDataType> getRequestWeatherDataTypeSet() {
 		Set<WeatherDataType> set = new HashSet<>();
 		set.add(WeatherDataType.currentConditions);
@@ -114,10 +264,11 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		return set;
 	}
 
-	@Override
-	protected void setResultViews(RemoteViews expandedRemoteViews, WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
+	protected void setResultViews(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
 		ZoneOffset zoneOffset = null;
+		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
+
 		int icon = R.mipmap.ic_launcher_round;
 		String temperature = null;
 
@@ -126,6 +277,8 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		if (currentConditionsDto != null) {
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			setCurrentConditionsViews(expandedRemoteViews, currentConditionsDto);
+			setCollapsedCurrentConditionsViews(expandedRemoteViews, currentConditionsDto);
+
 			icon = currentConditionsDto.getWeatherIcon();
 			temperature = currentConditionsDto.getTemp().replace(MyApplication.VALUE_UNIT_OBJ.getTempUnitText(), "°");
 		}
@@ -154,10 +307,11 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 			RemoteViewsUtil.onSuccessfulProcess(expandedRemoteViews);
 		} else {
 			expandedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+			collapsedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 			RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 		}
 
-		makeNotification(expandedRemoteViews, icon, temperature, true);
+		makeNotification(collapsedRemoteViews, expandedRemoteViews, icon, temperature, true);
 	}
 
 	public void setHeaderViews(RemoteViews remoteViews, String addressName, String dateTime) {
@@ -179,6 +333,22 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 			precipitation = context.getString(R.string.not_precipitation);
 		}
 		remoteViews.setTextViewText(R.id.precipitation, precipitation);
+		remoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
+		remoteViews.setTextViewText(R.id.feelsLikeTemp, new String(context.getString(R.string.feelsLike) + ": " + currentConditionsDto.getFeelsLikeTemp()));
+
+		if (currentConditionsDto.getYesterdayTemp() != null) {
+			String yesterdayCompText = WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
+					currentConditionsDto.getYesterdayTemp(), tempUnit, context);
+			remoteViews.setTextViewText(R.id.yesterdayTemperature, yesterdayCompText);
+			remoteViews.setViewVisibility(R.id.yesterdayTemperature, View.VISIBLE);
+		} else {
+			remoteViews.setViewVisibility(R.id.yesterdayTemperature, View.GONE);
+		}
+	}
+
+	public void setCollapsedCurrentConditionsViews(RemoteViews remoteViews, CurrentConditionsDto currentConditionsDto) {
+		remoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
+
 		remoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp());
 		remoteViews.setTextViewText(R.id.feelsLikeTemp, new String(context.getString(R.string.feelsLike) + ": " + currentConditionsDto.getFeelsLikeTemp()));
 
@@ -260,8 +430,7 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		}
 	}
 
-	@Override
-	public void makeNotification(RemoteViews expandedRemoteViews, int icon, @Nullable String temperature, boolean isFinished) {
+	public void makeNotification(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, int icon, @Nullable String temperature, boolean isFinished) {
 		boolean enabled =
 				PreferenceManager.getDefaultSharedPreferences(context).getBoolean(notificationType.getPreferenceName(), false);
 
@@ -302,12 +471,18 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 				builder.setSmallIcon(icon);
 			}
 
-			builder.setAutoCancel(false).setOngoing(true).setOnlyAlertOnce(true)
-					.setCustomContentView(expandedRemoteViews).setCustomBigContentView(expandedRemoteViews).setSilent(true);
-
 			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
 				builder.setDefaults(0).setVibrate(null).setSound(null).setLights(0, 0, 0)
 						.setPriority(NotificationCompat.PRIORITY_LOW).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+			}
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+				builder.setAutoCancel(false).setOngoing(true).setOnlyAlertOnce(true)
+						.setCustomContentView(collapsedRemoteViews).setCustomBigContentView(expandedRemoteViews).setSilent(true);
+
+			} else {
+				builder.setAutoCancel(false).setOngoing(true).setOnlyAlertOnce(true)
+						.setCustomContentView(expandedRemoteViews).setCustomBigContentView(expandedRemoteViews).setSilent(true);
 			}
 
 			NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
@@ -328,7 +503,6 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	}
 
 
-	@Override
 	public void loadSavedPreferences() {
 		SharedPreferences notiPreferences = context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
 
@@ -348,7 +522,6 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		notificationDataObj.setCountryCode(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), ""));
 	}
 
-	@Override
 	public void loadDefaultPreferences() {
 		notificationDataObj = new OngoingNotiDataObj();
 		notificationDataObj.setLocationType(LocationType.CurrentLocation);
@@ -371,7 +544,6 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 	}
 
 
-	@Override
 	public void savePreferences() {
 		SharedPreferences sharedPreferences = context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -390,9 +562,22 @@ public class OngoingNotiViewCreator extends AbstractOngoingNotiViewCreator {
 		editor.commit();
 	}
 
-	public OngoingNotiDataObj getNotificationDataObj() {
-		return (OngoingNotiDataObj) notificationDataObj;
+
+	public void loadPreferences() {
+		SharedPreferences notiPreferences = context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
+		if (notiPreferences.getAll().isEmpty()) {
+			loadDefaultPreferences();
+		} else {
+			loadSavedPreferences();
+		}
 	}
 
 
+	public void forceFailedNotification(RemoteViewsUtil.ErrorType errorType) {
+		RemoteViews[] remoteViews = createRemoteViews(false);
+		remoteViews[0].setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+		remoteViews[1].setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+		RemoteViewsUtil.onErrorProcess(remoteViews[1], context, errorType);
+		makeNotification(remoteViews[0], remoteViews[1], R.mipmap.ic_launcher_round, null, true);
+	}
 }
