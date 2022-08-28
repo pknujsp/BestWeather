@@ -577,6 +577,9 @@
     <string name="pref_key_show_background_animation">pref_key_show_background_animation</string>
     <string name="pref_summary_show_background_animation">Show background weather animation</string>
     <string name="pref_title_show_background_animation">Weather animation</string>
+    <string name="pref_key_redraw_widgets">pref_key_redraw_widgets</string>
+    <string name="pref_summary_redraw_widgets">Redraw the widget if it fails.</string>
+    <string name="pref_title_redraw_widgets">Redraw widgets</string>
 
 
 </resources>

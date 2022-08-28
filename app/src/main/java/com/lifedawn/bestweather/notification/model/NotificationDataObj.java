@@ -13,6 +13,7 @@ public class NotificationDataObj {
 	private WidgetNotiConstants.DataTypeOfIcon dataTypeOfIcon;
 
 	private String addressName;
+	private String admin;
 	private double latitude;
 	private double longitude;
 	private String countryCode;
@@ -78,6 +79,15 @@ public class NotificationDataObj {
 	public NotificationDataObj setAddressName(String addressName) {
 		this.addressName = addressName;
 		return this;
+	}
+
+	public NotificationDataObj setAdmin(String admin) {
+		this.admin = admin;
+		return this;
+	}
+
+	public String getAdmin() {
+		return admin;
 	}
 
 	public double getLatitude() {

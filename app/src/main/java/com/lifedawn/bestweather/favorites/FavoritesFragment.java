@@ -179,7 +179,7 @@ public class FavoritesFragment extends Fragment {
 				mapFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
 					@Override
 					public void onResultFragment(Bundle result) {
-						boolean addedNewLocation = result.getBoolean(BundleKey.SelectedAddressDto.name(), false);
+						boolean addedNewLocation = result.getSerializable(BundleKey.SelectedAddressDto.name()) != null;
 						boolean removedLocation = result.getBoolean("removedLocation", false);
 
 						if (addedNewLocation || removedLocation) {

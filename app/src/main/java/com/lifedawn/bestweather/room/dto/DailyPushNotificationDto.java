@@ -33,6 +33,9 @@ public class DailyPushNotificationDto implements Serializable {
 	@ColumnInfo(name = "addressName")
 	private String addressName;
 
+	@ColumnInfo(name = "admin")
+	private String admin;
+
 	@ColumnInfo(name = "latitude")
 	private Double latitude;
 
@@ -143,12 +146,20 @@ public class DailyPushNotificationDto implements Serializable {
 	public void removeWeatherSourceType(WeatherProviderType removeType) {
 		weatherProviderTypeSet.remove(removeType);
 	}
-	
+
 	public Set<WeatherProviderType> getWeatherProviderTypeSet() {
 		return weatherProviderTypeSet;
 	}
 
 	public void setWeatherProviderTypeSet(Set<WeatherProviderType> weatherProviderTypeSet) {
 		this.weatherProviderTypeSet = weatherProviderTypeSet;
+	}
+
+	public void setAdmin(String admin) {
+		this.admin = admin;
+	}
+
+	public String getAdmin() {
+		return admin;
 	}
 }

@@ -13,6 +13,7 @@ import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreference;
 
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
@@ -39,6 +40,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 	private WidgetRefreshIntervalPreference widgetRefreshIntervalPreference;
 	private SwitchPreference useCurrentLocationPreference;
 	private SwitchPreference animationPreference;
+	private Preference redrawWidgetsPreference;
 
 	public SettingsFragment(IAppbarTitle iAppbarTitle) {
 		this.iAppbarTitle = iAppbarTitle;
@@ -67,6 +69,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 		weatherDataSourcesPreference = findPreference(getString(R.string.pref_key_weather_data_sources));
 		useCurrentLocationPreference = findPreference(getString(R.string.pref_key_use_current_location));
 		animationPreference = findPreference(getString(R.string.pref_key_show_background_animation));
+		redrawWidgetsPreference = findPreference(getString(R.string.pref_key_redraw_widgets));
 
 		useCurrentLocationPreference.setOnPreferenceChangeListener(onPreferenceChangeListener);
 		animationPreference.setOnPreferenceChangeListener(onPreferenceChangeListener);
@@ -188,6 +191,16 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 				getParentFragmentManager().beginTransaction().hide(SettingsFragment.this).add(R.id.fragment_container,
 						weatherSourcesFragment, getString(R.string.tag_weather_data_sources_fragment)).addToBackStack(
 						getString(R.string.tag_weather_data_sources_fragment)).commit();
+				return true;
+			}
+		});
+
+		redrawWidgetsPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				WidgetHelper widgetHelper = new WidgetHelper(getActivity());
+				widgetHelper.reDrawWidgets();
+				Toast.makeText(getContext(), R.string.pref_title_redraw_widgets, Toast.LENGTH_SHORT).show();
 				return true;
 			}
 		});

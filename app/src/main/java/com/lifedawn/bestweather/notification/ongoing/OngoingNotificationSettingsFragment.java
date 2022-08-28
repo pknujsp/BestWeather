@@ -175,13 +175,14 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.SelectedAddress) {
 			originalSelectedFavoriteAddressDto = new FavoriteAddressDto();
 			originalSelectedFavoriteAddressDto.setAddress(ongoingNotiViewCreator.getNotificationDataObj().getAddressName());
+			originalSelectedFavoriteAddressDto.setAdmin(ongoingNotiViewCreator.getNotificationDataObj().getAdmin());
 			originalSelectedFavoriteAddressDto.setCountryCode(ongoingNotiViewCreator.getNotificationDataObj().getCountryCode());
 			originalSelectedFavoriteAddressDto.setLatitude(String.valueOf(ongoingNotiViewCreator.getNotificationDataObj().getLatitude()));
 			originalSelectedFavoriteAddressDto.setLongitude(String.valueOf(ongoingNotiViewCreator.getNotificationDataObj().getLongitude()));
 
 			selectedFavoriteLocation = true;
 			binding.commons.selectedLocationRadio.setChecked(true);
-			binding.commons.selectedAddressName.setText(ongoingNotiViewCreator.getNotificationDataObj().getAddressName());
+			binding.commons.selectedAddressName.setText(ongoingNotiViewCreator.getNotificationDataObj().getAdmin());
 		} else {
 			binding.commons.currentLocationRadio.setChecked(true);
 		}
@@ -354,6 +355,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 			originalSelectedFavoriteAddressDto = favoriteAddressDto;
 			ongoingNotiViewCreator.getNotificationDataObj().setAddressName(favoriteAddressDto.getAddress())
 					.setCountryCode(favoriteAddressDto.getCountryCode())
+					.setAdmin(favoriteAddressDto.getAdmin())
 					.setLatitude(Float.parseFloat(favoriteAddressDto.getLatitude())).setLongitude(Float.parseFloat(favoriteAddressDto.getLongitude()));
 
 			ongoingNotiViewCreator.getNotificationDataObj().setLocationType(LocationType.SelectedAddress);

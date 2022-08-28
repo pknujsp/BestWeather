@@ -112,7 +112,7 @@ public class WidgetHelper {
 							refreshIntent.putExtras(bundle);
 
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode++, refreshIntent,
-									 PendingIntent.FLAG_MUTABLE);
+									PendingIntent.FLAG_MUTABLE);
 							pendingIntent.send();
 
 						} catch (PendingIntent.CanceledException e) {

@@ -374,7 +374,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 	@Override
 	public void onRefreshedFavoriteLocationsList(String requestKey, Bundle bundle) {
-		final boolean isSelectedNewAddress = bundle.getBoolean(BundleKey.SelectedAddressDto.name());
+		final boolean isSelectedNewAddress = bundle.getSerializable(BundleKey.SelectedAddressDto.name()) != null;
 
 		createLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
@@ -494,7 +494,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 							List<FavoriteAddressDto> newFavoriteAddressDtoList = (List<FavoriteAddressDto>) result.getSerializable(
 									BundleKey.newFavoriteAddressDtoList.name());
 
-							final boolean added = result.getBoolean(BundleKey.SelectedAddressDto.name(), false);
+							final boolean added = result.getSerializable(BundleKey.SelectedAddressDto.name()) != null;
 							final int addedLocationDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name(), -1);
 
 							Set<Integer> lastSet = new HashSet<>();

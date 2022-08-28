@@ -111,7 +111,8 @@ public class OngoingNotiViewCreator {
 						Address address = addressList.get(0);
 						notificationDataObj.setAddressName(address.getAddressLine(0))
 								.setCountryCode(address.getCountryCode())
-								.setLatitude(address.getLatitude()).setLongitude(address.getLongitude());
+								.setLatitude(address.getLatitude()).setLongitude(address.getLongitude())
+								.setAdmin(address.getAdminArea());
 
 						editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), (float) notificationDataObj.getLatitude())
 								.putFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(),
@@ -168,6 +169,7 @@ public class OngoingNotiViewCreator {
 
 	public void loadWeatherData(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
 		RemoteViewsUtil.onBeginProcess(expandedRemoteViews);
+		RemoteViewsUtil.onBeginProcess(collapsedRemoteViews);
 		makeNotification(collapsedRemoteViews, expandedRemoteViews, R.mipmap.ic_launcher_round, null, false);
 
 		final Set<WeatherDataType> weatherDataTypeSet = getRequestWeatherDataTypeSet();
@@ -219,6 +221,10 @@ public class OngoingNotiViewCreator {
 			expandedRemoteViews.setOnClickPendingIntent(R.id.refreshLayout, getRefreshPendingIntent());
 		}
 
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+			expandedRemoteViews.setViewPadding(R.id.root_layout, 0, 0, 0, 0);
+		}
+
 		return new RemoteViews[]{collapsedRemoteViews, expandedRemoteViews};
 	}
 
@@ -231,6 +237,7 @@ public class OngoingNotiViewCreator {
 		RemoteViews expandedView = remoteViews[1];
 
 		RemoteViewsUtil.onBeginProcess(expandedView);
+		RemoteViewsUtil.onBeginProcess(collapsedView);
 		makeNotification(collapsedView, expandedView, R.drawable.refresh, null, false);
 
 		timer = new Timer();
@@ -242,6 +249,7 @@ public class OngoingNotiViewCreator {
 					collapsedView.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 					expandedView.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 					RemoteViewsUtil.onErrorProcess(expandedView, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+					RemoteViewsUtil.onErrorProcess(collapsedView, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 					makeNotification(collapsedView, expandedView, R.mipmap.ic_launcher_round, null, true);
 
 					callback.onResult();
@@ -266,7 +274,7 @@ public class OngoingNotiViewCreator {
 
 	protected void setResultViews(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
 		ZoneOffset zoneOffset = null;
-		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
+		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAdmin(), multipleRestApiDownloader.getRequestDateTime().toString());
 		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 
 		int icon = R.mipmap.ic_launcher_round;
@@ -277,7 +285,7 @@ public class OngoingNotiViewCreator {
 		if (currentConditionsDto != null) {
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			setCurrentConditionsViews(expandedRemoteViews, currentConditionsDto);
-			setCollapsedCurrentConditionsViews(expandedRemoteViews, currentConditionsDto);
+			setCollapsedCurrentConditionsViews(collapsedRemoteViews, currentConditionsDto);
 
 			icon = currentConditionsDto.getWeatherIcon();
 			temperature = currentConditionsDto.getTemp().replace(MyApplication.VALUE_UNIT_OBJ.getTempUnitText(), "°");
@@ -304,10 +312,12 @@ public class OngoingNotiViewCreator {
 		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty();
 
 		if (successful) {
+			RemoteViewsUtil.onSuccessfulProcess(collapsedRemoteViews);
 			RemoteViewsUtil.onSuccessfulProcess(expandedRemoteViews);
 		} else {
 			expandedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 			collapsedRemoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+			RemoteViewsUtil.onErrorProcess(collapsedRemoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 			RemoteViewsUtil.onErrorProcess(expandedRemoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 		}
 
@@ -519,6 +529,7 @@ public class OngoingNotiViewCreator {
 		notificationDataObj.setAddressName(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), ""));
 		notificationDataObj.setLatitude(notiPreferences.getFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), 0f));
 		notificationDataObj.setLongitude(notiPreferences.getFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), 0f));
+		notificationDataObj.setAdmin(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADMIN.name(), ""));
 		notificationDataObj.setCountryCode(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), ""));
 	}
 
@@ -559,6 +570,7 @@ public class OngoingNotiViewCreator {
 		editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), (float) notificationDataObj.getLatitude());
 		editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), (float) notificationDataObj.getLongitude());
 		editor.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode());
+		editor.putString(WidgetNotiConstants.Commons.DataKeys.ADMIN.name(), notificationDataObj.getAdmin());
 		editor.commit();
 	}
 
@@ -577,6 +589,7 @@ public class OngoingNotiViewCreator {
 		RemoteViews[] remoteViews = createRemoteViews(false);
 		remoteViews[0].setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 		remoteViews[1].setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
+		RemoteViewsUtil.onErrorProcess(remoteViews[0], context, errorType);
 		RemoteViewsUtil.onErrorProcess(remoteViews[1], context, errorType);
 		makeNotification(remoteViews[0], remoteViews[1], R.mipmap.ic_launcher_round, null, true);
 	}

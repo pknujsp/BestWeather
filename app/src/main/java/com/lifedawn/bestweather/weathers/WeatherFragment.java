@@ -318,7 +318,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					mapFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
 						@Override
 						public void onResultFragment(Bundle result) {
-							final boolean isSelectedNewAddress = result.getBoolean(BundleKey.SelectedAddressDto.name());
+							final boolean isSelectedNewAddress = result.getSerializable(BundleKey.SelectedAddressDto.name()) != null;
 							boolean removedLocation = result.getBoolean("removedLocation", false);
 
 							if (isSelectedNewAddress || removedLocation) {

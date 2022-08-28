@@ -134,6 +134,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		favoriteAddressDto.setCountryName(address.getCountryName());
 		favoriteAddressDto.setCountryCode(address.getCountryCode());
 		favoriteAddressDto.setAddress(address.getAddressLine(0));
+		favoriteAddressDto.setAdmin(address.getAdminArea());
 		favoriteAddressDto.setLatitude(String.valueOf(address.getLatitude()));
 		favoriteAddressDto.setLongitude(String.valueOf(address.getLongitude()));
 
@@ -166,7 +167,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 																favoriteAddressDto.getId()).commit();
 
 												Bundle bundle = new Bundle();
-												bundle.putBoolean(BundleKey.SelectedAddressDto.name(), true);
+												bundle.putSerializable(BundleKey.SelectedAddressDto.name(), favoriteAddressDto);
 												bundle.putBoolean("removedLocation", removedLocation);
 												bundle.putString(BundleKey.LastFragment.name(), MapFragment.class.getName());
 												bundle.putInt(BundleKey.newFavoriteAddressDtoId.name(), favoriteAddressDto.getId());
@@ -344,7 +345,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		onBackPressedCallback.remove();
 
 		Bundle bundle = new Bundle();
-		bundle.putBoolean(BundleKey.SelectedAddressDto.name(), false);
+		bundle.putSerializable(BundleKey.SelectedAddressDto.name(), null);
 		bundle.putBoolean("removedLocation", removedLocation);
 		bundle.putString(BundleKey.LastFragment.name(), MapFragment.class.getName());
 
@@ -520,6 +521,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	}
 
 	private void onLongClicked(LatLng latLng) {
+		collapseAllExpandedBottomSheets();
+
 		Geocoding.geocoding(getContext(), latLng.latitude, latLng.longitude, new Geocoding.GeocodingCallback() {
 			@Override
 			public void onGeocodingResult(List<Address> addressList) {
@@ -566,7 +569,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 						locationItemBottomSheetViewPager.setAdapter(adapterMap.get(MarkerType.LONG_CLICK));
 						locationItemBottomSheetViewPager.setCurrentItem(0, false);
 
-						collapseAllExpandedBottomSheets();
 						setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_EXPANDED);
 					}
 				});

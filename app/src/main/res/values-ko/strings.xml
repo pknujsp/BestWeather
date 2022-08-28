@@ -505,5 +505,7 @@
     <string name="change">변경</string>
     <string name="pref_summary_show_background_animation">날씨 강수 효과 표시</string>
     <string name="pref_title_show_background_animation">날씨 강수 효과</string>
+    <string name="pref_summary_redraw_widgets">위젯 오류가 있을 때, 위젯을 다시 그립니다.</string>
+    <string name="pref_title_redraw_widgets">위젯 새로고침</string>
 
 </resources>

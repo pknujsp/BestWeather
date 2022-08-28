@@ -96,7 +96,7 @@ public class IntroFragment extends Fragment {
 				mapFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
 					@Override
 					public void onResultFragment(Bundle result) {
-						final boolean isSelectedNewAddress = result.getBoolean(BundleKey.SelectedAddressDto.name());
+						final boolean isSelectedNewAddress = result.getSerializable(BundleKey.SelectedAddressDto.name()) != null;
 
 						if (isSelectedNewAddress) {
 							final int newFavoriteAddressDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name());

@@ -20,6 +20,9 @@ public class FavoriteAddressDto implements Serializable {
 	private String countryName;
 
 	@ColumnInfo
+	private String admin;
+
+	@ColumnInfo
 	private String countryCode;
 
 	@ColumnInfo
@@ -74,5 +77,13 @@ public class FavoriteAddressDto implements Serializable {
 
 	public String getCountryCode() {
 		return countryCode;
+	}
+
+	public void setAdmin(String admin) {
+		this.admin = admin;
+	}
+
+	public String getAdmin() {
+		return admin;
 	}
 }

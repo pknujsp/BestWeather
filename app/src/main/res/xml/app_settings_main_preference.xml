@@ -34,4 +34,10 @@
         android:title="@string/pref_title_show_background_animation"
         app:iconSpaceReserved="false" />
 
+    <Preference
+        android:key="@string/pref_key_redraw_widgets"
+        android:summary="@string/pref_summary_redraw_widgets"
+        android:title="@string/pref_title_redraw_widgets"
+        app:iconSpaceReserved="false" />
+
 </PreferenceScreen>

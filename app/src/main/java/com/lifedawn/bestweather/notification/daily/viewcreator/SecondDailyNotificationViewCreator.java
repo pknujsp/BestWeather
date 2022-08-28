@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.notification.daily.viewcreator;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -30,6 +31,11 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 	@Override
 	public RemoteViews createRemoteViews(boolean needTempData) {
 		final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.second_daily_noti_view);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+			remoteViews.setViewPadding(R.id.root_layout, 0, 0, 0, 0);
+		}
+
 
 		if (needTempData) {
 			setTempDataViews(remoteViews);
