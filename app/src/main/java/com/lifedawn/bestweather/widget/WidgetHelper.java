@@ -20,6 +20,8 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.widget.widgetprovider.BaseAppWidgetProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +77,7 @@ public class WidgetHelper {
 			@Override
 			public void onResultSuccessful(List<WidgetDto> result) {
 				if (result.size() > 0) {
-					ArrayMap<Class<?>, List<Integer>> widgetArrMap = new ArrayMap<>();
+					Map<Class<?>, List<Integer>> widgetArrMap = new HashMap<>();
 					Map<Integer, WidgetDto> widgetDtoMap = new HashMap<>();
 					AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
@@ -102,11 +104,16 @@ public class WidgetHelper {
 						Intent refreshIntent = null;
 						try {
 							refreshIntent = new Intent(context, cls);
-							refreshIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+							refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW));
 
 							Bundle bundle = new Bundle();
-							List<Integer> idList = widgetArrMap.valueAt(widgetArrMap.indexOfKey(cls));
+							List<Integer> idList = widgetArrMap.get(cls);
+
 							int[] ids = new int[idList.size()];
+							int i = 0;
+							for (Integer id : idList) {
+								ids[i++] = id;
+							}
 
 							bundle.putIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
 							refreshIntent.putExtras(bundle);
@@ -114,7 +121,6 @@ public class WidgetHelper {
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode++, refreshIntent,
 									PendingIntent.FLAG_MUTABLE);
 							pendingIntent.send();
-
 						} catch (PendingIntent.CanceledException e) {
 							e.printStackTrace();
 						}

@@ -66,6 +66,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 		if (widgetRepository == null) {
 			widgetRepository = new WidgetRepository(getApplicationContext());
 		}
+		
 		if (appWidgetManager == null) {
 			appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		}

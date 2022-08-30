@@ -10,17 +10,38 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.OutOfQuotaPolicy;
+import androidx.work.WorkManager;
+import androidx.work.Worker;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.widget.foreground.WidgetWorker;
 
 public class OngoingNotificationReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		final String action = intent.getAction();
+		String action = intent.getAction();
+		if (action == null) {
+			return;
+		}
+
 		MyApplication.loadValueUnits(context, false);
 
-		startService(context, action, null);
+		//startService(context, action, null);
+		Data data = new Data.Builder().putString("action", intent.getAction()).build();
+
+		OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(OngoingNotificationWorker.class)
+				.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+				.setInputData(data)
+				.addTag(OngoingNotificationWorker.class.getName())
+				.build();
+
+		WorkManager workManager = WorkManager.getInstance(context);
+		workManager.enqueueUniqueWork(OngoingNotificationWorker.class.getName(), ExistingWorkPolicy.KEEP, request);
 	}
 
 	protected boolean isServiceRunning(Context context) {

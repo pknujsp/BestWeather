@@ -26,6 +26,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.widgetprovider.EleventhWidgetProvider;
@@ -353,6 +354,8 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 			weatherSourceTypeListArrayMap.put(weatherProviderType,
 					WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject, weatherProviderType, widgetDto.getLatitude(),
 							widgetDto.getLongitude()));
+
+			WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, false, context);
 		}
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 				weatherSourceTypeListArrayMap, null);

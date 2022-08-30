@@ -25,6 +25,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
@@ -311,6 +312,29 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 		Notification notification = notificationObj.getNotificationBuilder().build();
 		service.startForeground(NotificationType.Location.getNotificationId(), notification);
+	}
+
+	public void startNotification(Context context) {
+		NotificationHelper notificationHelper = new NotificationHelper(context);
+		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Location);
+
+		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
+		builder.setSmallIcon(R.drawable.location).setContentText(context.getString(R.string.msg_finding_current_location))
+				.setContentTitle(context.getString(R.string.current_location))
+				.setOngoing(false);
+
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+			builder.setPriority(NotificationCompat.PRIORITY_LOW).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+		}
+
+		Notification notification = notificationObj.getNotificationBuilder().build();
+		NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
+		notificationManagerCompat.notify(NotificationType.Location.getNotificationId(), notification);
+	}
+
+	public void cancelNotification(Context context) {
+		NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
+		notificationManagerCompat.cancel(NotificationType.Location.getNotificationId());
 	}
 
 	public interface MyLocationCallback {

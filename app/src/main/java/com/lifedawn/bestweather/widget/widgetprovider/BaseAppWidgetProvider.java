@@ -7,11 +7,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.OutOfQuotaPolicy;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
+import com.google.common.util.concurrent.ListenableFuture;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.main.MyApplication;
@@ -21,11 +29,14 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.foreground.WidgetForegroundService;
+import com.lifedawn.bestweather.widget.foreground.WidgetWorker;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class BaseAppWidgetProvider extends AppWidgetProvider {
 	protected AppWidgetManager appWidgetManager;
+	final String TAG = "WIDGET_PROVIDER";
 
 	protected Class<?> getJobServiceClass() {
 		return null;
@@ -36,17 +47,12 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 	}
 
 	protected void reDraw(Context context, int[] appWidgetIds, Class<?> widgetProviderClass) {
+		Log.e(TAG, "redraw widget");
 		if (appWidgetManager == null) {
 			appWidgetManager = AppWidgetManager.getInstance(context);
 		}
 
-		for (int i = 0; i < appWidgetIds.length; i++) {
-			final int appWidgetId = appWidgetIds[i];
-
-			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null) {
-				continue;
-			}
-
+		for (int appWidgetId : appWidgetIds) {
 			AbstractWidgetCreator widgetCreator = getWidgetCreatorInstance(context, appWidgetId);
 			widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 				@Override
@@ -57,16 +63,13 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 								widgetCreator.setDataViewsOfSavedData();
 							} else {
 								RemoteViews remoteViews = widgetCreator.createRemoteViews();
-
 								widgetCreator.setRefreshPendingIntent(widgetProviderClass, remoteViews);
 								RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 								appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
 							}
+
 						}
-					} else {
-
 					}
-
 				}
 
 				@Override
@@ -74,18 +77,21 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 
 				}
 			});
+
 		}
 	}
 
 	@Override
 	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
 		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
+		Log.e(TAG, "onAppWidgetOptionsChanged");
 		reDraw(context, new int[]{appWidgetId}, getClass());
 	}
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
+		Log.e(TAG, "onUpdate widget");
 		reDraw(context, appWidgetIds, getClass());
 	}
 
@@ -102,7 +108,6 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
 		super.onDeleted(context, appWidgetIds);
-
 		WidgetRepository widgetRepository = new WidgetRepository(context);
 
 		for (int appWidgetId : appWidgetIds) {
@@ -114,7 +119,6 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 			WidgetHelper widgetHelper = new WidgetHelper(context);
 			widgetHelper.cancelAutoRefresh();
 		}
-
 	}
 
 
@@ -125,44 +129,53 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 		Bundle bundle = intent.getExtras();
 		final String action = intent.getAction();
 
-		if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_INIT))) {
-			Bundle argument = new Bundle();
-			argument.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID));
-			startService(context, action, argument);
-		} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			startService(context, action, null);
-		} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-			WidgetRepository widgetRepository = new WidgetRepository(context);
-			final String widgetProviderClassName = getClass().getName();
-			final Class<?> widgetProviderClass = getClass();
+		if (action != null) {
+			Log.e(TAG, "onReceive : " + action);
+			if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_INIT))) {
+				//startService(context, action, argument);
+				Data data = new Data.Builder().putInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
+						bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)).build();
+				startWork(context, action, data);
+			} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
+				//startService(context, action, null);
+				startWork(context, action, null);
+			} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
+				WidgetRepository widgetRepository = new WidgetRepository(context);
+				final String widgetProviderClassName = getClass().getName();
+				final Class<?> widgetProviderClass = getClass();
 
-			widgetRepository.getAll(widgetProviderClassName, new DbQueryCallback<List<WidgetDto>>() {
-				@Override
-				public void onResultSuccessful(List<WidgetDto> result) {
-					appWidgetManager = AppWidgetManager.getInstance(context);
-					WidgetHelper widgetHelper = new WidgetHelper(context);
-					final int[] ids = new int[result.size()];
+				widgetRepository.getAll(widgetProviderClassName, new DbQueryCallback<List<WidgetDto>>() {
+					@Override
+					public void onResultSuccessful(List<WidgetDto> result) {
+						appWidgetManager = AppWidgetManager.getInstance(context);
+						WidgetHelper widgetHelper = new WidgetHelper(context);
+						final int[] ids = new int[result.size()];
 
-					int index = 0;
-					for (WidgetDto widgetDto : result) {
-						ids[index++] = widgetDto.getAppWidgetId();
+						int index = 0;
+						for (WidgetDto widgetDto : result) {
+							ids[index++] = widgetDto.getAppWidgetId();
+						}
+
+						reDraw(context, ids, widgetProviderClass);
+
+						long widgetRefreshInterval = widgetHelper.getRefreshInterval();
+						if (widgetRefreshInterval > 0L && !widgetHelper.isRepeating()) {
+							widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
+						}
+
 					}
 
-					reDraw(context, ids, widgetProviderClass);
+					@Override
+					public void onResultNoData() {
 
-					long widgetRefreshInterval = widgetHelper.getRefreshInterval();
-					if (widgetRefreshInterval > 0L && !widgetHelper.isRepeating()) {
-						widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
 					}
+				});
+			} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW))) {
+				reDraw(context, bundle.getIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS), getClass());
+			}
 
-				}
-
-				@Override
-				public void onResultNoData() {
-
-				}
-			});
 		}
+
 	}
 
 	protected boolean isServiceRunning(Context context) {
@@ -173,6 +186,7 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -191,6 +205,45 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 			} else {
 				context.startService(intent);
 			}
+		}
+	}
+
+	protected boolean isWorkRunning(Context context) {
+		WorkManager instance = WorkManager.getInstance(context);
+		ListenableFuture<List<WorkInfo>> statuses = instance.getWorkInfosByTag(WidgetWorker.class.getName());
+		try {
+			boolean running = false;
+			List<WorkInfo> workInfoList = statuses.get();
+			for (WorkInfo workInfo : workInfoList) {
+				WorkInfo.State state = workInfo.getState();
+				running = state == WorkInfo.State.RUNNING | state == WorkInfo.State.ENQUEUED;
+			}
+			return running;
+		} catch (ExecutionException | InterruptedException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	protected void startWork(Context context, String action, @Nullable Data data) {
+		if (isWorkRunning(context)) {
+			Toast.makeText(context, R.string.runningUpdateService, Toast.LENGTH_SHORT).show();
+		} else {
+			Data.Builder dataBuilder = new Data.Builder()
+					.putString("action", action);
+
+			if (data != null) {
+				dataBuilder.putAll(data);
+			}
+
+			OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(WidgetWorker.class)
+					.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+					.setInputData(dataBuilder.build())
+					.addTag(WidgetWorker.class.getName())
+					.build();
+
+			WorkManager workManager = WorkManager.getInstance(context);
+			workManager.enqueueUniqueWork(WidgetWorker.class.getName(), ExistingWorkPolicy.KEEP, request);
 		}
 	}
 

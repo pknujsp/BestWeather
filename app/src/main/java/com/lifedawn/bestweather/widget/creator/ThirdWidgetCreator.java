@@ -24,6 +24,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
@@ -307,6 +308,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherProviderType = WeatherProviderType.KMA_WEB;
 		}
+		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, true, context);
 
 		RemoteViews remoteViews = createRemoteViews();
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
@@ -322,8 +324,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto, currentConditionsDto,
 				hourlyForecastDtoList, dailyForecastDtoList, null);
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		appWidgetManager.updateAppWidget(appWidgetId,
-				remoteViews);
+		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 
 	@Override

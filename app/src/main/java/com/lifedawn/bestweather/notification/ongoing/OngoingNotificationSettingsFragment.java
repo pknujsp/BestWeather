@@ -182,7 +182,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 
 			selectedFavoriteLocation = true;
 			binding.commons.selectedLocationRadio.setChecked(true);
-			binding.commons.selectedAddressName.setText(ongoingNotiViewCreator.getNotificationDataObj().getAdmin());
+			binding.commons.selectedAddressName.setText(ongoingNotiViewCreator.getNotificationDataObj().getAddressName());
 		} else {
 			binding.commons.currentLocationRadio.setChecked(true);
 		}

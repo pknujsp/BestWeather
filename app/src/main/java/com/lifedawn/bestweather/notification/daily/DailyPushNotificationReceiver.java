@@ -9,10 +9,17 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.OutOfQuotaPolicy;
+import androidx.work.WorkManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationWorker;
+import com.lifedawn.bestweather.widget.foreground.WidgetWorker;
 
 public class DailyPushNotificationReceiver extends BroadcastReceiver {
 
@@ -29,13 +36,21 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 			Bundle arguments = intent.getExtras();
 			final int id = arguments.getInt(BundleKey.dtoId.name());
 
-			Bundle bundle = new Bundle();
-			bundle.putString("DailyPushNotificationType", arguments.getString(
-					"DailyPushNotificationType"));
-			bundle.putInt(BundleKey.dtoId.name(), id);
-			bundle.putString("action", action);
+			Data data = new Data.Builder()
+					.putString("DailyPushNotificationType", arguments.getString(
+							"DailyPushNotificationType"))
+					.putInt(BundleKey.dtoId.name(), id)
+					.putString("action", action)
+					.build();
 
-			startService(context, action, bundle);
+			OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(DailyNotificationWorker.class)
+					.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+					.setInputData(data)
+					.addTag(DailyNotificationWorker.class.getName())
+					.build();
+
+			WorkManager workManager = WorkManager.getInstance(context);
+			workManager.enqueueUniqueWork(DailyNotificationWorker.class.getName(), ExistingWorkPolicy.KEEP, request);
 		}
 	}
 

@@ -19,6 +19,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
@@ -199,7 +200,6 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 
 			valuesRemoteViews.addView(R.id.dailyForecast, dailyRemoteViews);
 		}
-
 		 */
 
 		remoteViews.removeAllViews(R.id.noBitmapValuesView);
@@ -224,6 +224,8 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		RemoteViews remoteViews = createRemoteViews();
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
+		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, true, context);
+
 		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.parseTextToCurrentConditionsDto(context, jsonObject,
 				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude());
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,
@@ -234,8 +236,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 				hourlyForecastDtoList, null, airQualityDto, null);
 
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		appWidgetManager.updateAppWidget(appWidgetId,
-				remoteViews);
+		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 
 	@Override
@@ -247,6 +248,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 				mainWeatherProviderType);
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
 				mainWeatherProviderType);
+
 		AirQualityDto airQualityDto = null;
 		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty();
 
@@ -261,6 +263,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 
 			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto,
 					hourlyForecastDtoList, null, airQualityDto, new OnDrawBitmapCallback() {
+
 						@Override
 						public void onCreatedBitmap(Bitmap bitmap) {
 
@@ -272,4 +275,5 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		widgetDto.setLoadSuccessful(successful);
 		super.setResultViews(appWidgetId, remoteViews, multipleRestApiDownloader);
 	}
+
 }

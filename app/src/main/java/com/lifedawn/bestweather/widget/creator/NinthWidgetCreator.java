@@ -23,6 +23,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
@@ -222,9 +223,12 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
 			weatherProviderType = WeatherProviderType.KMA_WEB;
 		}
+		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, true, context);
 
 		RemoteViews remoteViews = createRemoteViews();
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
+
+		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, false, context);
 
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,
 				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude());

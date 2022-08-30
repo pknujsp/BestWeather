@@ -98,6 +98,8 @@ public class OngoingNotiViewCreator {
 	}
 
 	public void loadCurrentLocation(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews) {
+		FusedLocation fusedLocation = FusedLocation.getInstance(context);
+
 		final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
 			public void onSuccessful(LocationResult locationResult) {
@@ -119,6 +121,8 @@ public class OngoingNotiViewCreator {
 										(float) notificationDataObj.getLongitude())
 								.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode())
 								.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getAddressName()).commit();
+
+						fusedLocation.cancelNotification(context);
 
 						loadWeatherData(collapsedRemoteViews, expandedRemoteViews);
 					}
@@ -143,16 +147,10 @@ public class OngoingNotiViewCreator {
 			}
 		};
 
-		FusedLocation fusedLocation = FusedLocation.getInstance(context);
 		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
 
-		if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
-			Log.e("loadCurrentLocation", "메인 스레드");
-		} else {
-			Log.e("loadCurrentLocation", "백그라운드 스레드");
-		}
-
 		if (powerManager.isInteractive()) {
+			fusedLocation.startNotification(context);
 			fusedLocation.findCurrentLocation(locationCallback, false);
 		} else {
 			LocationResult lastLocation = fusedLocation.getLastCurrentLocation();

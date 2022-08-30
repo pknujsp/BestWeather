@@ -383,6 +383,7 @@ public abstract class AbstractWidgetCreator {
 			widthSize = parentWidth;
 			heightSize = parentHeight;
 		}
+
 		final float widgetPadding = context.getResources().getDimension(R.dimen.widget_padding);
 
 		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (widthSize - widgetPadding * 2), EXACTLY);
@@ -427,8 +428,17 @@ public abstract class AbstractWidgetCreator {
 			setRefreshPendingIntent(widgetProviderClass(), remoteViews);
 		}
 
-		widgetRepository.update(widgetDto, null);
-		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
+			@Override
+			public void onResultSuccessful(WidgetDto result) {
+				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+			}
+
+			@Override
+			public void onResultNoData() {
+				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+			}
+		});
 	}
 
 	public RelativeLayout.LayoutParams getHeaderViewLayoutParams() {

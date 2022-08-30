@@ -134,7 +134,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		favoriteAddressDto.setCountryName(address.getCountryName());
 		favoriteAddressDto.setCountryCode(address.getCountryCode());
 		favoriteAddressDto.setAddress(address.getAddressLine(0));
-		favoriteAddressDto.setAdmin(address.getAdminArea());
+		favoriteAddressDto.setAdmin(address.getLocality());
 		favoriteAddressDto.setLatitude(String.valueOf(address.getLatitude()));
 		favoriteAddressDto.setLongitude(String.valueOf(address.getLongitude()));
 
