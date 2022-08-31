@@ -426,11 +426,16 @@ public abstract class AbstractWidgetCreator {
 			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 			widgetDto.setLastErrorType(null);
 		} else {
+			if (widgetDto.getLastErrorType() == null) {
+				widgetDto.setLastErrorType(RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			}
+
 			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 			setRefreshPendingIntent(widgetProviderClass(), remoteViews);
 		}
-		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+
 		widgetRepository.update(widgetDto, null);
+		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 
 	public RelativeLayout.LayoutParams getHeaderViewLayoutParams() {

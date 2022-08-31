@@ -22,8 +22,7 @@ public class WidgetRepository {
 	public WidgetRepository(Context context) {
 		this.context = context;
 		widgetDao = AppDb.getInstance(context).widgetDao();
-		executorService = Executors.newFixedThreadPool(2);
-
+		executorService = Executors.newSingleThreadExecutor();
 	}
 
 	public void add(WidgetDto widgetDto, DbQueryCallback<WidgetDto> callback) {

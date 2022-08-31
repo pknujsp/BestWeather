@@ -97,7 +97,7 @@ public class WidgetWorker extends Worker {
 
 	private WidgetRepository widgetRepository;
 	private AppWidgetManager appWidgetManager;
-	private ExecutorService executorService = Executors.newFixedThreadPool(3);
+	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 	private FusedLocation fusedLocation;
 	private int requestCount;
 	private int responseCount;
@@ -122,7 +122,6 @@ public class WidgetWorker extends Worker {
 	@Override
 	public Result doWork() {
 		if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_INIT))) {
-
 			widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
 				@Override
 				public void onResultSuccessful(WidgetDto widgetDto) {
@@ -163,6 +162,7 @@ public class WidgetWorker extends Worker {
 						List<String> addressList = new ArrayList<>();
 						addressList.add(widgetDto.getAddressName());
 						allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
+
 						showProgressBar();
 						loadWeatherData(LocationType.SelectedAddress, addressList);
 					}
@@ -361,6 +361,8 @@ public class WidgetWorker extends Worker {
 		}
 
 		fusedLocation = FusedLocation.getInstance(getApplicationContext());
+		fusedLocation.startNotification(getApplicationContext());
+
 		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
 
 		final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
@@ -402,25 +404,20 @@ public class WidgetWorker extends Worker {
 			}
 		};
 
-		MainThreadWorker.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-				fusedLocation.startNotification(getApplicationContext());
+		PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
 
-				if (powerManager.isInteractive()) {
-					fusedLocation.findCurrentLocation(locationCallback, true);
-				} else {
-					LocationResult lastLocation = fusedLocation.getLastCurrentLocation();
-					if (lastLocation.getLocations().get(0).getLatitude() == 0.0 ||
-							lastLocation.getLocations().get(0).getLongitude() == 0.0) {
-						fusedLocation.findCurrentLocation(locationCallback, true);
-					} else {
-						locationCallback.onSuccessful(lastLocation);
-					}
-				}
+		if (powerManager.isInteractive()) {
+			fusedLocation.findCurrentLocation(locationCallback, true);
+		} else {
+			LocationResult lastLocation = fusedLocation.getLastCurrentLocation();
+			if (lastLocation.getLocations().get(0).getLatitude() == 0.0 ||
+					lastLocation.getLocations().get(0).getLongitude() == 0.0) {
+				fusedLocation.findCurrentLocation(locationCallback, true);
+			} else {
+				locationCallback.onSuccessful(lastLocation);
 			}
-		});
+		}
+
 	}
 
 	private void onLocationResponse(@Nullable FusedLocation.MyLocationCallback.Fail fail, @Nullable String addressName) {
