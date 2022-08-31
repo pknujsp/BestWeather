@@ -19,6 +19,7 @@ import androidx.preference.PreferenceManager;
 
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
@@ -423,22 +424,13 @@ public abstract class AbstractWidgetCreator {
 
 		if (widgetDto.isLoadSuccessful()) {
 			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+			widgetDto.setLastErrorType(null);
 		} else {
 			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 			setRefreshPendingIntent(widgetProviderClass(), remoteViews);
 		}
-
-		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto result) {
-				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-			}
-
-			@Override
-			public void onResultNoData() {
-				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-			}
-		});
+		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+		widgetRepository.update(widgetDto, null);
 	}
 
 	public RelativeLayout.LayoutParams getHeaderViewLayoutParams() {

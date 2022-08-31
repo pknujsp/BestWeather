@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey;
 
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -77,6 +78,9 @@ public class WidgetDto {
 
 	@ColumnInfo(name = "widgetProviderClassName")
 	private String widgetProviderClassName;
+
+	@ColumnInfo(name = "lastErrorType")
+	private RemoteViewsUtil.ErrorType lastErrorType;
 
 	public String getWidgetProviderClassName() {
 		return widgetProviderClassName;
@@ -275,4 +279,13 @@ public class WidgetDto {
 	public void setWeatherProviderTypeSet(Set<WeatherProviderType> weatherProviderTypeSet) {
 		this.weatherProviderTypeSet = weatherProviderTypeSet;
 	}
+
+	public void setLastErrorType(RemoteViewsUtil.ErrorType lastErrorType) {
+		this.lastErrorType = lastErrorType;
+	}
+
+	public RemoteViewsUtil.ErrorType getLastErrorType() {
+		return lastErrorType;
+	}
+
 }

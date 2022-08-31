@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class OngoingNotificationWorker extends Worker {
-	private Timer timer;
 	private OngoingNotiViewCreator ongoingNotiViewCreator;
 	private String action;
 
@@ -46,32 +45,18 @@ public class OngoingNotificationWorker extends Worker {
 	@NonNull
 	@Override
 	public Result doWork() {
-		timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				timer = null;
-				if (ongoingNotiViewCreator != null) {
-					ongoingNotiViewCreator.forceFailedNotification(RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-				}
-
-				WorkManager.getInstance(getApplicationContext()).cancelAllWorkByTag(OngoingNotificationWorker.class.getName());
-
-			}
-		}, TimeUnit.SECONDS.toMillis(25L));
 
 		if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 			OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
 			ongoingNotificationHelper.reStartNotification(new Callback() {
 				@Override
 				public void onResult() {
-					WorkManager.getInstance(getApplicationContext()).cancelAllWorkByTag(OngoingNotificationWorker.class.getName());
+
 				}
 			});
 		} else if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
 			ongoingNotiViewCreator = new OngoingNotiViewCreator(getApplicationContext(), null);
 			ongoingNotiViewCreator.loadSavedPreferences();
-
 
 			if (ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
 				OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
@@ -88,14 +73,13 @@ public class OngoingNotificationWorker extends Worker {
 						NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
 						notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 					}
-
-					WorkManager.getInstance(getApplicationContext()).cancelAllWorkByTag(OngoingNotificationWorker.class.getName());
 				}
 			});
 		}
-
 		return Result.success();
+
 	}
+
 
 	@NonNull
 	@Override
@@ -151,17 +135,7 @@ public class OngoingNotificationWorker extends Worker {
 
 	@Override
 	public void onStopped() {
-		if (timer != null) {
-			timer.cancel();
-			timer = null;
-
-			NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-			if (notificationHelper.activeNotification(NotificationType.Location.getNotificationId())) {
-				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
-			}
-		}
-
-		FusedLocation.getInstance(getApplicationContext()).cancelNotification(getApplicationContext());
 		super.onStopped();
 	}
+
 }

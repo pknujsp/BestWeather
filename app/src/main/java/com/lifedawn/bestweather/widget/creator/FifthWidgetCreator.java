@@ -300,7 +300,6 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 		}
 
 		widgetDto.setLoadSuccessful(successful);
-
 		super.setResultViews(appWidgetId, remoteViews, multipleRestApiDownloader);
 	}
 }

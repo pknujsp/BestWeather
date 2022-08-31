@@ -337,6 +337,7 @@ public class WeatherResponseProcessor {
 	public static List<HourlyForecastDto> getHourlyForecastDtoList(Context context, MultipleRestApiDownloader
 			multipleRestApiDownloader, WeatherProviderType weatherProviderType) {
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
+
 		if (multipleRestApiDownloader == null) {
 			return hourlyForecastDtoList;
 		}

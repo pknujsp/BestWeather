@@ -158,7 +158,6 @@ public class DailyNotificationWorker extends Worker {
 				viewCreator.setBackgroundCallback(new Callback() {
 					@Override
 					public void onResult() {
-						WorkManager.getInstance(getApplicationContext()).cancelAllWorkByTag(DailyNotificationWorker.class.getName());
 					}
 				});
 

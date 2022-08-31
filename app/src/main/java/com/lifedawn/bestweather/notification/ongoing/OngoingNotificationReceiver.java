@@ -24,24 +24,21 @@ import com.lifedawn.bestweather.widget.foreground.WidgetWorker;
 public class OngoingNotificationReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		String action = intent.getAction();
-		if (action == null) {
-			return;
+		final String action = intent.getAction();
+
+		if (action != null) {
+			MyApplication.loadValueUnits(context, false);
+			Data data = new Data.Builder().putString("action", action).build();
+
+			OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(OngoingNotificationWorker.class)
+					.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+					.setInputData(data)
+					.addTag(OngoingNotificationWorker.class.getName())
+					.build();
+
+			WorkManager workManager = WorkManager.getInstance(context);
+			workManager.enqueueUniqueWork(OngoingNotificationWorker.class.getName(), ExistingWorkPolicy.KEEP, request);
 		}
-
-		MyApplication.loadValueUnits(context, false);
-
-		//startService(context, action, null);
-		Data data = new Data.Builder().putString("action", intent.getAction()).build();
-
-		OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(OngoingNotificationWorker.class)
-				.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-				.setInputData(data)
-				.addTag(OngoingNotificationWorker.class.getName())
-				.build();
-
-		WorkManager workManager = WorkManager.getInstance(context);
-		workManager.enqueueUniqueWork(OngoingNotificationWorker.class.getName(), ExistingWorkPolicy.KEEP, request);
 	}
 
 	protected boolean isServiceRunning(Context context) {

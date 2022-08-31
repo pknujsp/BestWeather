@@ -7,6 +7,7 @@ import androidx.room.TypeConverter;
 
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 
 import java.io.ByteArrayOutputStream;
@@ -116,5 +117,24 @@ public class RoomTypeConverter {
 		} else {
 			return null;
 		}
+	}
+
+
+	@TypeConverter
+	public String toString(RemoteViewsUtil.ErrorType errorType) {
+		if (errorType == null) {
+			return "";
+		}
+		return errorType.name();
+	}
+
+	@TypeConverter
+	public RemoteViewsUtil.ErrorType toWidgetErrorType(String errorTypeStr) {
+		if (errorTypeStr == null) {
+			return null;
+		} else if (errorTypeStr.isEmpty()) {
+			return null;
+		}
+		return RemoteViewsUtil.ErrorType.valueOf(errorTypeStr);
 	}
 }

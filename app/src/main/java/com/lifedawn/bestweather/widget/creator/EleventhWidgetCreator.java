@@ -378,6 +378,7 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 
 			if (weatherSourceTypeListArrayMap.get(weatherProviderType).isEmpty()) {
 				successful = false;
+				break;
 			}
 		}
 
