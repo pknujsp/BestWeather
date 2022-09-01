@@ -262,7 +262,6 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 					});
 			makeResponseTextToJson(multipleRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherProviderTypeSet(), widgetDto, zoneOffset);
 		}
-
 		widgetDto.setLoadSuccessful(successful);
 		super.setResultViews(appWidgetId, remoteViews, multipleRestApiDownloader);
 	}

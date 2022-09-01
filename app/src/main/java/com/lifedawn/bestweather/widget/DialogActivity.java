@@ -54,7 +54,6 @@ import com.lifedawn.bestweather.widget.widgetprovider.FifthWidgetProvider;
 
 public class DialogActivity extends Activity {
 	private ActivityDialogBinding binding;
-	private Class<?> widgetProviderClass;
 	private int appWidgetId;
 	private AbstractWidgetCreator widgetCreator;
 	private AlertDialog alertDialog;
@@ -97,8 +96,7 @@ public class DialogActivity extends Activity {
 			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), null, appWidgetId);
 		}
 
-
-		widgetProviderClass = widgetCreator.widgetProviderClass();
+		final Class<?> widgetProviderClass = widgetCreator.widgetProviderClass();
 		final View dialogView = getLayoutInflater().inflate(R.layout.view_widget_dialog, null);
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -166,6 +164,10 @@ public class DialogActivity extends Activity {
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
+						if (DialogActivity.this.isFinishing()) {
+							return;
+						}
+
 						alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(DialogActivity.this,
 								R.style.Theme_AppCompat_Light_Dialog))
 								.setCancelable(true)
@@ -179,6 +181,7 @@ public class DialogActivity extends Activity {
 								.setView(dialogView)
 								.create();
 
+
 						alertDialog.show();
 						alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 					}
@@ -190,7 +193,6 @@ public class DialogActivity extends Activity {
 
 			}
 		});
-
 
 	}
 }

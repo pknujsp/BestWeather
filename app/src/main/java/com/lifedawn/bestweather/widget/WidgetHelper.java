@@ -29,7 +29,7 @@ import java.util.Map;
 public class WidgetHelper {
 	private Context context;
 	private AlarmManager alarmManager;
-	private final int AUTO_REFRESH_REQUEST_CODE = 11111;
+	private final int AUTO_REFRESH_REQUEST_CODE = 10000;
 
 	public WidgetHelper(Context context) {
 		this.context = context;

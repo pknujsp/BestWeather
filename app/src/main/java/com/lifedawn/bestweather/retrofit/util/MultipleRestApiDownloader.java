@@ -30,7 +30,7 @@ public abstract class MultipleRestApiDownloader {
 	private Map<String, String> valueMap = new ConcurrentHashMap<>();
 	private Map<RetrofitClient.ServiceType, Call<?>> callMap = new ConcurrentHashMap<>();
 
-	protected Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ArrayMap<>();
+	protected Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ConcurrentHashMap<>();
 
 	public MultipleRestApiDownloader() {
 	}

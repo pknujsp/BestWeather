@@ -54,7 +54,6 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 
 		for (int appWidgetId : appWidgetIds) {
 			AbstractWidgetCreator widgetCreator = getWidgetCreatorInstance(context, appWidgetId);
-
 			widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 				@Override
 				public void onResultSuccessful(WidgetDto widgetDto) {
@@ -68,8 +67,6 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 								RemoteViewsUtil.onErrorProcess(remoteViews, context, widgetDto.getLastErrorType());
 								appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
 							}
-						} else {
-
 						}
 					}
 

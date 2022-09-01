@@ -82,6 +82,9 @@ public class WidgetDto {
 	@ColumnInfo(name = "lastErrorType")
 	private RemoteViewsUtil.ErrorType lastErrorType;
 
+	@ColumnInfo(name = "processing")
+	private boolean processing;
+
 	public String getWidgetProviderClassName() {
 		return widgetProviderClassName;
 	}
@@ -254,8 +257,7 @@ public class WidgetDto {
 	public void removeWeatherSourceType(WeatherProviderType removeType) {
 		weatherProviderTypeSet.remove(removeType);
 	}
-
-
+	
 	public Set<WeatherProviderType> getWeatherProviderTypeSet() {
 		if (countryCode != null) {
 			if (topPriorityKma && countryCode.equals("KR")) {
@@ -275,7 +277,6 @@ public class WidgetDto {
 		return weatherProviderTypeSet;
 	}
 
-
 	public void setWeatherProviderTypeSet(Set<WeatherProviderType> weatherProviderTypeSet) {
 		this.weatherProviderTypeSet = weatherProviderTypeSet;
 	}
@@ -288,4 +289,11 @@ public class WidgetDto {
 		return lastErrorType;
 	}
 
+	public void setProcessing(boolean processing) {
+		this.processing = processing;
+	}
+
+	public boolean isProcessing() {
+		return processing;
+	}
 }

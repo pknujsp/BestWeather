@@ -341,6 +341,7 @@ public class WeatherResponseProcessor {
 		if (multipleRestApiDownloader == null) {
 			return hourlyForecastDtoList;
 		}
+
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 
 		if (weatherProviderType == WeatherProviderType.KMA_API) {
