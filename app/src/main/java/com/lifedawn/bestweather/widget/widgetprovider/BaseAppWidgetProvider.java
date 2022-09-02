@@ -34,7 +34,7 @@ import com.lifedawn.bestweather.widget.foreground.WidgetWorker;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class BaseAppWidgetProvider extends AppWidgetProvider {
+public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 	protected AppWidgetManager appWidgetManager;
 	final String TAG = "WIDGET_PROVIDER";
 
@@ -53,6 +53,10 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 		}
 
 		for (int appWidgetId : appWidgetIds) {
+			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null) {
+				continue;
+			}
+
 			AbstractWidgetCreator widgetCreator = getWidgetCreatorInstance(context, appWidgetId);
 			widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 				@Override
@@ -94,7 +98,11 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
 		Log.e(TAG, "onUpdate");
-		//reDraw(context, appWidgetIds, getClass());
+
+		for (int appWidgetId : appWidgetIds) {
+			Log.e(TAG, "onUpdate : " + appWidgetId);
+		}
+		reDraw(context, appWidgetIds, getClass());
 	}
 
 	@Override

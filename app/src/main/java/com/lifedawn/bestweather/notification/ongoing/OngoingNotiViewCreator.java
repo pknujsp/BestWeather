@@ -272,7 +272,7 @@ public class OngoingNotiViewCreator {
 
 	protected void setResultViews(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
 		ZoneOffset zoneOffset = null;
-		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAdmin(), multipleRestApiDownloader.getRequestDateTime().toString());
+		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 
 		int icon = R.mipmap.ic_launcher_round;

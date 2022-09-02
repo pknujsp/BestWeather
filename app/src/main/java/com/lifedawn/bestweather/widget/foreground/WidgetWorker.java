@@ -8,6 +8,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.PowerManager;
 import android.util.ArrayMap;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
@@ -138,6 +139,8 @@ public class WidgetWorker extends Worker {
 
 					PROCESSING_WIDGET_ID_SET.add(widgetDto.getAppWidgetId());
 
+					Log.e("init widgets", widgetDto.getAppWidgetId() + "");
+
 					if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
 						currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
 						allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
@@ -214,6 +217,9 @@ public class WidgetWorker extends Worker {
 							requestObj.appWidgetSet.add(widgetDto.getAppWidgetId());
 						}
 					}
+
+					Log.e("refresh widgets", PROCESSING_WIDGET_ID_SET.toString());
+
 
 					allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
 					allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
@@ -466,6 +472,7 @@ public class WidgetWorker extends Worker {
 					onResponseResult(locationType, addressName);
 				}
 			};
+
 			RequestObj requestObj = null;
 
 			if (locationType == LocationType.SelectedAddress) {
@@ -480,7 +487,6 @@ public class WidgetWorker extends Worker {
 					requestObj.address.getLongitude(), requestObj.weatherDataTypeSet, multipleRestApiDownloader,
 					requestObj.weatherProviderTypeSet);
 		}
-
 	}
 
 	private void onResponseResult(LocationType locationType, String addressName) {
@@ -497,22 +503,19 @@ public class WidgetWorker extends Worker {
 
 		for (int appWidgetId : appWidgetIdSet) {
 			multipleRestApiDownloaderMap.put(appWidgetId, restApiDownloader);
+
+			AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);
+			widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
+			widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId),
+					multipleRestApiDownloaderMap.get(appWidgetId));
 		}
 
 		//응답 처리가 끝난 요청객체는 제거
 		if (addressName != null && locationType == LocationType.SelectedAddress) {
 			selectedLocationRequestMap.remove(addressName);
+		} else if (locationType == LocationType.CurrentLocation) {
+			currentLocationRequestObj = null;
 		}
-
-		if (++responseCount == requestCount) {
-			for (int appWidgetId : PROCESSING_WIDGET_ID_SET) {
-				AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);
-				widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
-				widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId),
-						multipleRestApiDownloaderMap.get(appWidgetId));
-			}
-		}
-
 	}
 
 

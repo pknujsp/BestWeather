@@ -89,10 +89,10 @@ public abstract class AbstractWidgetCreator {
 	}
 
 	public PendingIntent getRefreshPendingIntent(Class<?> widgetProviderClass) {
-		Intent refreshIntent = new Intent(context, BaseAppWidgetProvider.class);
+		Intent refreshIntent = new Intent(context, widgetProviderClass);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
-		if (!pendingIntentCreated()) {
+		if (!pendingIntentCreated(widgetProviderClass)) {
 			return PendingIntent.getBroadcast(context, 1500, refreshIntent,
 					PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 		} else {
@@ -101,8 +101,8 @@ public abstract class AbstractWidgetCreator {
 		}
 	}
 
-	public boolean pendingIntentCreated() {
-		Intent refreshIntent = new Intent(context, BaseAppWidgetProvider.class);
+	public boolean pendingIntentCreated(Class<?> widgetProviderClass) {
+		Intent refreshIntent = new Intent(context, widgetProviderClass);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1500, refreshIntent,

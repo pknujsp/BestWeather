@@ -15,14 +15,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class WidgetRepository {
-	private Context context;
-	private final WidgetDao widgetDao;
-	private final ExecutorService executorService;
+	private static WidgetDao widgetDao;
+	private static ExecutorService executorService = Executors.newFixedThreadPool(2);
 
 	public WidgetRepository(Context context) {
-		this.context = context;
 		widgetDao = AppDb.getInstance(context).widgetDao();
-		executorService = Executors.newSingleThreadExecutor();
 	}
 
 	public void add(WidgetDto widgetDto, DbQueryCallback<WidgetDto> callback) {
