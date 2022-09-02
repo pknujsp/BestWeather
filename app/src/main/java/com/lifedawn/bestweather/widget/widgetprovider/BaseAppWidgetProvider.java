@@ -94,7 +94,7 @@ public class BaseAppWidgetProvider extends AppWidgetProvider {
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
 		Log.e(TAG, "onUpdate");
-		reDraw(context, appWidgetIds, getClass());
+		//reDraw(context, appWidgetIds, getClass());
 	}
 
 	@Override

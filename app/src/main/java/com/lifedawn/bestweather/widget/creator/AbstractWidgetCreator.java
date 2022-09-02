@@ -26,6 +26,8 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationReceiver;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -34,6 +36,7 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.widget.DialogActivity;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
+import com.lifedawn.bestweather.widget.widgetprovider.BaseAppWidgetProvider;
 
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -86,10 +89,30 @@ public abstract class AbstractWidgetCreator {
 	}
 
 	public PendingIntent getRefreshPendingIntent(Class<?> widgetProviderClass) {
-		Intent refreshIntent = new Intent(context, widgetProviderClass);
+		Intent refreshIntent = new Intent(context, BaseAppWidgetProvider.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-		return PendingIntent.getBroadcast(context, 1500, refreshIntent,
-				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+
+		if (!pendingIntentCreated()) {
+			return PendingIntent.getBroadcast(context, 1500, refreshIntent,
+					PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+		} else {
+			return PendingIntent.getBroadcast(context, 1500, refreshIntent,
+					PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
+		}
+	}
+
+	public boolean pendingIntentCreated() {
+		Intent refreshIntent = new Intent(context, BaseAppWidgetProvider.class);
+		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1500, refreshIntent,
+				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
+
+		if (pendingIntent != null) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	public WidgetDto loadDefaultSettings() {
