@@ -385,6 +385,7 @@ public class FourthWidgetCreator extends AbstractWidgetCreator {
 		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, true, context);
 
 		RemoteViews remoteViews = createRemoteViews();
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(jsonObject);

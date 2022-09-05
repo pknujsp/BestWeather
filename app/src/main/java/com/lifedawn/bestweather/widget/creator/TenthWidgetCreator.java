@@ -208,6 +208,8 @@ public class TenthWidgetCreator extends AbstractWidgetCreator {
 		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, true, context);
 
 		RemoteViews remoteViews = createRemoteViews();
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.parseTextToDailyForecastDtoList(context, jsonObject,

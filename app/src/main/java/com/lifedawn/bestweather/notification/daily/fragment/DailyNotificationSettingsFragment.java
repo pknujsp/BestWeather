@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -351,7 +352,13 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		}
 
 		RemoteViews remoteViews = viewCreator.createRemoteViews(true);
+		final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
+		remoteViews.setViewPadding(R.id.root_layout, padding, padding, padding, padding);
+
+
 		View previewWidgetView = remoteViews.apply(context, binding.previewLayout);
+
+
 		binding.previewLayout.removeAllViews();
 		binding.previewLayout.addView(previewWidgetView);
 	}

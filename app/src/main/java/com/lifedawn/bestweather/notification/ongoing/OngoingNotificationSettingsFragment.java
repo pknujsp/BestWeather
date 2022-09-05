@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -169,6 +170,9 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		});
 
 		RemoteViews[] remoteViews = ongoingNotiViewCreator.createRemoteViews(true);
+		final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
+		remoteViews[1].setViewPadding(R.id.root_layout, padding, padding, padding, padding);
+
 		binding.previewLayout.addView(remoteViews[1].apply(getActivity().getApplicationContext(), binding.previewLayout));
 
 		binding.notificationSwitch.setChecked(originalEnabled);

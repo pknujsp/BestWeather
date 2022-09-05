@@ -53,7 +53,8 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 		}
 
 		for (int appWidgetId : appWidgetIds) {
-			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null) {
+			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null || WidgetWorker.PROCESSING_WIDGET_ID_SET.contains(appWidgetId)) {
+				Log.e(TAG, "pass redraw : " + appWidgetId);
 				continue;
 			}
 

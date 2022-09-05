@@ -14,6 +14,7 @@
         >
 
         <LinearLayout
+            android:id="@+id/value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -87,7 +88,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_gravity="center_vertical"
-            android:layout_toRightOf="@id/valuesLayout"
+            android:layout_toRightOf="@id/value"
             android:gravity="right"
             android:orientation="vertical"
             >
@@ -148,7 +149,7 @@
                     android:id="@+id/address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
+                    android:ellipsize="start"
                     android:fontFamily="sans-serif-condensed"
                     android:maxLines="1"
                     android:minLines="1"

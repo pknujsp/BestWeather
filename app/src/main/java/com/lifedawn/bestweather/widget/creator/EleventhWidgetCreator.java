@@ -349,6 +349,8 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 	@Override
 	public void setDataViewsOfSavedData() {
 		RemoteViews remoteViews = createRemoteViews();
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		ArrayMap<WeatherProviderType, List<HourlyForecastDto>> weatherSourceTypeListArrayMap = new ArrayMap<>();

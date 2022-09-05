@@ -261,6 +261,8 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, false, context);
 
 		RemoteViews remoteViews = createRemoteViews();
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.parseTextToCurrentConditionsDto(context, jsonObject,

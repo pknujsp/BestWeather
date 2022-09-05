@@ -60,6 +60,7 @@ import com.lifedawn.bestweather.widget.widgetprovider.TenthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.ThirdWidgetProvider;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -77,19 +78,19 @@ import java.util.concurrent.TimeoutException;
 public class WidgetWorker extends Worker {
 	public static final Set<Integer> PROCESSING_WIDGET_ID_SET = new CopyOnWriteArraySet<>();
 
-	private final Map<Integer, WidgetDto> currentLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
-	private final Map<Integer, WidgetDto> selectedLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
-	private final Map<Integer, WidgetDto> allWidgetDtoArrayMap = new ConcurrentHashMap<>();
-	private final Map<Integer, Class<?>> allWidgetProviderClassArrayMap = new ConcurrentHashMap<>();
-	private final Map<Integer, RemoteViews> remoteViewsArrayMap = new ConcurrentHashMap<>();
-	private final Map<Integer, MultipleRestApiDownloader> multipleRestApiDownloaderMap = new ConcurrentHashMap<>();
-	private Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new ConcurrentHashMap<>();
+	private final Map<Integer, WidgetDto> currentLocationWidgetDtoArrayMap = new HashMap<>();
+	private final Map<Integer, WidgetDto> selectedLocationWidgetDtoArrayMap = new HashMap<>();
+	private final Map<Integer, WidgetDto> allWidgetDtoArrayMap = new HashMap<>();
+	private final Map<Integer, Class<?>> allWidgetProviderClassArrayMap = new HashMap<>();
+	private final Map<Integer, RemoteViews> remoteViewsArrayMap = new HashMap<>();
+	private final Map<Integer, MultipleRestApiDownloader> multipleRestApiDownloaderMap = new HashMap<>();
+	private Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
 
 	private MultipleRestApiDownloader currentLocationResponseMultipleRestApiDownloader;
-	private final Map<String, MultipleRestApiDownloader> selectedLocationResponseMap = new ConcurrentHashMap<>();
+	private final Map<String, MultipleRestApiDownloader> selectedLocationResponseMap = new HashMap<>();
 
 	private RequestObj currentLocationRequestObj;
-	private final Map<String, RequestObj> selectedLocationRequestMap = new ConcurrentHashMap<>();
+	private final Map<String, RequestObj> selectedLocationRequestMap = new HashMap<>();
 
 	private WidgetRepository widgetRepository;
 	private AppWidgetManager appWidgetManager;
@@ -392,6 +393,7 @@ public class WidgetWorker extends Worker {
 								widgetDto.setCountryCode(newAddress.getCountryCode());
 								widgetDto.setLatitude(newAddress.getLatitude());
 								widgetDto.setLongitude(newAddress.getLongitude());
+
 								widgetRepository.update(widgetDto, null);
 							}
 
@@ -477,6 +479,23 @@ public class WidgetWorker extends Worker {
 			} else {
 				requestObj = currentLocationRequestObj;
 				currentLocationResponseMultipleRestApiDownloader = multipleRestApiDownloader;
+
+				boolean onlyKma = true;
+
+				for (Integer appWidgetId : currentLocationWidgetDtoArrayMap.keySet()) {
+					if (currentLocationWidgetDtoArrayMap.get(appWidgetId).isTopPriorityKma() &&
+							currentLocationWidgetDtoArrayMap.get(appWidgetId).getCountryCode().equals("KR")) {
+						requestObj.weatherProviderTypeSet.add(WeatherProviderType.KMA_WEB);
+					} else if (!currentLocationWidgetDtoArrayMap.get(appWidgetId).isTopPriorityKma()) {
+						onlyKma = false;
+					}
+				}
+
+				if (onlyKma) {
+					requestObj.weatherProviderTypeSet.remove(WeatherProviderType.ACCU_WEATHER);
+					requestObj.weatherProviderTypeSet.remove(WeatherProviderType.MET_NORWAY);
+					requestObj.weatherProviderTypeSet.remove(WeatherProviderType.OWM_ONECALL);
+				}
 			}
 
 			WeatherRequestUtil.loadWeatherData(getApplicationContext(), executorService, requestObj.address.getLatitude(),

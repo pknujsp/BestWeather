@@ -226,6 +226,8 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		}
 
 		RemoteViews remoteViews = createRemoteViews();
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, true, context);
