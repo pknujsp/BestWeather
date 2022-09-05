@@ -23,3 +23,6 @@
 #keep
 -keep public class * { public protected *; }
 -keep class com.luckycatlabs.sunrisesunset.** { *;}
+-keepclassmembers class * extends androidx.datastore.preferences.protobuf.GeneratedMessageLite {
+    <fields>;
+}

@@ -23,6 +23,7 @@ import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -78,6 +79,9 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 	@Override
 	public RemoteViews createTempViews(Integer parentWidth, Integer parentHeight) {
 		RemoteViews remoteViews = createBaseRemoteViews();
+
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		ArrayMap<WeatherProviderType, List<HourlyForecastDto>> hourlyForecastDtoListMap = new ArrayMap<>();
 		hourlyForecastDtoListMap.put(WeatherProviderType.KMA_WEB, WeatherResponseProcessor.getTempHourlyForecastDtoList(context,
 				cellCount));

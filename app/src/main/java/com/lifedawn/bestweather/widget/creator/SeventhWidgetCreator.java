@@ -76,6 +76,9 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 	@Override
 	public RemoteViews createTempViews(Integer parentWidth, Integer parentHeight) {
 		RemoteViews remoteViews = createBaseRemoteViews();
+
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), WeatherResponseProcessor.getTempAirQualityDto(),
 				null, parentWidth, parentHeight);
 		return remoteViews;

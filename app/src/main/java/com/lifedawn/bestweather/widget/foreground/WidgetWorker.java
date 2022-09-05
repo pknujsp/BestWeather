@@ -93,7 +93,7 @@ public class WidgetWorker extends Worker {
 
 	private WidgetRepository widgetRepository;
 	private AppWidgetManager appWidgetManager;
-	private ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private static ExecutorService executorService = Executors.newSingleThreadExecutor();
 	private FusedLocation fusedLocation;
 	private int requestCount;
 	private int responseCount;
@@ -138,7 +138,6 @@ public class WidgetWorker extends Worker {
 					responseCount = 0;
 
 					PROCESSING_WIDGET_ID_SET.add(widgetDto.getAppWidgetId());
-
 					Log.e("init widgets", widgetDto.getAppWidgetId() + "");
 
 					if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
@@ -219,7 +218,6 @@ public class WidgetWorker extends Worker {
 					}
 
 					Log.e("refresh widgets", PROCESSING_WIDGET_ID_SET.toString());
-
 
 					allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
 					allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
@@ -352,14 +350,12 @@ public class WidgetWorker extends Worker {
 
 
 	private void setRefreshPendingIntent(int appWidgetId) {
-		widgetCreatorMap.get(appWidgetId).setRefreshPendingIntent(allWidgetProviderClassArrayMap.get(appWidgetId), remoteViewsArrayMap.get(appWidgetId)
-		);
+		widgetCreatorMap.get(appWidgetId).setRefreshPendingIntent(allWidgetProviderClassArrayMap.get(appWidgetId), remoteViewsArrayMap.get(appWidgetId));
 	}
 
 
 	public void loadCurrentLocation() {
 		final Set<Integer> appWidgetIdSet = currentLocationWidgetDtoArrayMap.keySet();
-
 		currentLocationRequestObj = new RequestObj(null);
 
 		for (Integer appWidgetId : appWidgetIdSet) {
@@ -387,8 +383,7 @@ public class WidgetWorker extends Worker {
 						} else {
 							final Address newAddress = addressList.get(0);
 							final String newAddressName = newAddress.getAddressLine(0);
-							final RequestObj requestObj = currentLocationRequestObj;
-							requestObj.address = newAddress;
+							currentLocationRequestObj.address = newAddress;
 
 							for (Integer appWidgetId : appWidgetIdSet) {
 								WidgetDto widgetDto = currentLocationWidgetDtoArrayMap.get(appWidgetId);
@@ -434,6 +429,7 @@ public class WidgetWorker extends Worker {
 			List<String> addressesList = new ArrayList<>();
 			addressesList.add(addressName);
 			loadWeatherData(LocationType.CurrentLocation, addressesList);
+
 		} else {
 			RemoteViewsUtil.ErrorType errorType = null;
 
@@ -510,12 +506,13 @@ public class WidgetWorker extends Worker {
 					multipleRestApiDownloaderMap.get(appWidgetId));
 		}
 
-		//응답 처리가 끝난 요청객체는 제거
+		//응답 처리가 끝난 요청객체를 제거
 		if (addressName != null && locationType == LocationType.SelectedAddress) {
 			selectedLocationRequestMap.remove(addressName);
 		} else if (locationType == LocationType.CurrentLocation) {
 			currentLocationRequestObj = null;
 		}
+
 	}
 
 

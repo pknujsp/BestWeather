@@ -437,7 +437,10 @@ public abstract class AbstractWidgetCreator {
 	protected final RemoteViews createBaseRemoteViews() {
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 		int layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
-		return new RemoteViews(context.getPackageName(), layoutId);
+
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
+		RemoteViewsUtil.onBeginProcess(remoteViews);
+		return remoteViews;
 	}
 
 	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
@@ -457,8 +460,17 @@ public abstract class AbstractWidgetCreator {
 			setRefreshPendingIntent(widgetProviderClass(), remoteViews);
 		}
 
-		widgetRepository.update(widgetDto, null);
-		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
+			@Override
+			public void onResultSuccessful(WidgetDto result) {
+				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
 	}
 
 	public RelativeLayout.LayoutParams getHeaderViewLayoutParams() {

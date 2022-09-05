@@ -21,6 +21,7 @@ import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
@@ -67,6 +68,9 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 	@Override
 	public RemoteViews createTempViews(Integer parentWidth, Integer parentHeight) {
 		RemoteViews remoteViews = createBaseRemoteViews();
+
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
 				WeatherResponseProcessor.getTempHourlyForecastDtoList(context, 24),
 				null, parentWidth, parentHeight);

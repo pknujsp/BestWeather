@@ -36,7 +36,6 @@ public class MyApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Context context = getApplicationContext();
 
 		final int id = getResources().getIdentifier("status_bar_height", "dimen", "android");
 		if (id > 0) {
@@ -52,7 +51,7 @@ public class MyApplication extends Application {
 		localeCountryCode = locale.getCountry();
 
 		initPreferences();
-		WindUtil.init(context);
+		WindUtil.init(getApplicationContext());
 		//UvIndexProcessor.init(context);
 		//AccuWeatherResponseProcessor.init(context);
 	}
