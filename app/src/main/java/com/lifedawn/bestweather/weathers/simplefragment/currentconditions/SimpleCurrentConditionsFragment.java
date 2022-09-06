@@ -25,9 +25,18 @@ import org.jetbrains.annotations.NotNull;
 import java.time.ZonedDateTime;
 
 public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
-	private CurrentConditionsDto currentConditionsDto;
-	private AirQualityDto airQualityDto;
-	private AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse;
+	private static CurrentConditionsDto currentConditionsDto;
+	private static AirQualityDto airQualityDto;
+
+	public SimpleCurrentConditionsFragment setAirQualityDto(AirQualityDto airQualityDto) {
+		this.airQualityDto = airQualityDto;
+		return this;
+	}
+
+	public SimpleCurrentConditionsFragment setCurrentConditionsDto(CurrentConditionsDto currentConditionsDto) {
+		this.currentConditionsDto = currentConditionsDto;
+		return this;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -42,9 +51,6 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		currentConditionsDto = (CurrentConditionsDto) bundle.getSerializable(WeatherDataType.currentConditions.name());
-		aqiCnGeolocalizedFeedResponse = (AqiCnGeolocalizedFeedResponse) bundle.getSerializable("AqiCnGeolocalizedFeedResponse");
-		airQualityDto = AqicnResponseProcessor.makeAirQualityDto(aqiCnGeolocalizedFeedResponse, ZonedDateTime.now(zoneId).getOffset());
 
 		setValuesToViews();
 	}
@@ -52,11 +58,11 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 
 	@Override
 	public void setValuesToViews() {
-		String precipitation = null;
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
-			precipitation = getString(R.string.precipitation_volume) + " : " + currentConditionsDto.getPrecipitationVolume();
+			String precipitation = getString(R.string.precipitation_volume) + " : " + currentConditionsDto.getPrecipitationVolume();
+			binding.precipitation.setText(precipitation);
 		} else {
-			precipitation = getString(R.string.not_precipitation);
+			binding.precipitation.setVisibility(View.GONE);
 		}
 
 		if (currentConditionsDto.getWindDirection() != null) {
@@ -65,7 +71,6 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		binding.windDirectionArrow.setVisibility(currentConditionsDto.getWindDirection() == null ? View.GONE : View.VISIBLE);
 		binding.windDirection.setVisibility(currentConditionsDto.getWindDirection() == null ? View.GONE : View.VISIBLE);
 
-		binding.precipitation.setText(precipitation);
 
 		binding.weatherIcon.setImageResource(currentConditionsDto.getWeatherIcon());
 		binding.sky.setText(currentConditionsDto.getWeatherDescription());

@@ -5,15 +5,17 @@
     android:layout_height="wrap_content"
     android:background="@drawable/dialog_background"
     android:gravity="center_horizontal"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/progress_circular"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
-        app:lottie_rawRes="@raw/bluedottedprogress" />
+        app:lottie_rawRes="@raw/bluedottedprogress"
+        />
 
     <TextView
         android:id="@+id/progress_msg"
@@ -24,7 +26,8 @@
         android:text="msg"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:textSize="14sp" />
+        android:textSize="15sp"
+        />
 
     <TextView
         android:id="@+id/cancel_btn"
@@ -35,6 +38,7 @@
         android:clickable="true"
         android:text="@string/cancel"
         android:textAlignment="center"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        />
 
 </LinearLayout>

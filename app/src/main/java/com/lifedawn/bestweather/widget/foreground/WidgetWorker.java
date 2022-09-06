@@ -27,6 +27,7 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
@@ -94,7 +95,7 @@ public class WidgetWorker extends Worker {
 
 	private WidgetRepository widgetRepository;
 	private AppWidgetManager appWidgetManager;
-	private static ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private static ExecutorService executorService = MyApplication.getExecutorService();
 	private FusedLocation fusedLocation;
 	private int requestCount;
 	private int responseCount;
@@ -115,6 +116,18 @@ public class WidgetWorker extends Worker {
 		appWidgetId = workerParams.getInputData().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 0);
 
 		PROCESSING_WIDGET_ID_SET.clear();
+		currentLocationRequestObj = null;
+		currentLocationWidgetDtoArrayMap.clear();
+
+		selectedLocationRequestMap.clear();
+		selectedLocationResponseMap.clear();
+		selectedLocationWidgetDtoArrayMap.clear();
+		allWidgetDtoArrayMap.clear();
+		allWidgetProviderClassArrayMap.clear();
+
+		remoteViewsArrayMap.clear();
+		multipleRestApiDownloaderMap.clear();
+		widgetCreatorMap.clear();
 	}
 
 	@NonNull
@@ -532,6 +545,9 @@ public class WidgetWorker extends Worker {
 			currentLocationRequestObj = null;
 		}
 
+		if (requestCount == ++responseCount) {
+
+		}
 	}
 
 

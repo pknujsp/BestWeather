@@ -461,10 +461,10 @@ public abstract class AbstractWidgetCreator {
 			setRefreshPendingIntent(widgetProviderClass(), remoteViews);
 		}
 
-		WidgetWorker.PROCESSING_WIDGET_ID_SET.remove(appWidgetId);
 		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
+				WidgetWorker.PROCESSING_WIDGET_ID_SET.remove(appWidgetId);
 				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 			}
 

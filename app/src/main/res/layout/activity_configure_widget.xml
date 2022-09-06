@@ -80,6 +80,7 @@
                     <LinearLayout
                         style="@style/SettingsLayout"
                         android:orientation="vertical"
+                        android:visibility="gone"
                         >
 
                         <TextView
@@ -180,7 +181,6 @@
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_vertical"
                                     android:layout_marginLeft="16dp"
-                                    android:text="selectedAddressName"
                                     />
 
                             </LinearLayout>

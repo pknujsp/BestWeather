@@ -47,14 +47,12 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 	}
 
 	protected void reDraw(Context context, int[] appWidgetIds, Class<?> widgetProviderClass) {
-		Log.e(TAG, "reDraw");
 		if (appWidgetManager == null) {
 			appWidgetManager = AppWidgetManager.getInstance(context);
 		}
 
 		for (int appWidgetId : appWidgetIds) {
 			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null || WidgetWorker.PROCESSING_WIDGET_ID_SET.contains(appWidgetId)) {
-				Log.e(TAG, "pass redraw : " + appWidgetId);
 				continue;
 			}
 
@@ -171,7 +169,7 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 
 						reDraw(context, ids, widgetProviderClass);
 
-						long widgetRefreshInterval = widgetHelper.getRefreshInterval();
+						final long widgetRefreshInterval = widgetHelper.getRefreshInterval();
 						if (widgetRefreshInterval > 0L && !widgetHelper.isRepeating()) {
 							widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
 						}

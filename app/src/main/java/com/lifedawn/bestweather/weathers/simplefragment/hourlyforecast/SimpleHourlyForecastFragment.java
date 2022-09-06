@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
-	private List<HourlyForecastDto> hourlyForecastDtoList;
+	private static List<HourlyForecastDto> hourlyForecastDtoList;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -63,7 +63,6 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		hourlyForecastDtoList = (ArrayList<HourlyForecastDto>) bundle.getSerializable(WeatherDataType.hourlyForecast.name());
 
 		binding.weatherCardViewHeader.forecastName.setText(R.string.hourly_forecast);
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {

@@ -43,7 +43,6 @@ public class IntroFragment extends Fragment {
 	private FusedLocation fusedLocation;
 	private SharedPreferences sharedPreferences;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
-	private AlertDialog dialog;
 
 	private FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
 		@Override
@@ -81,7 +80,7 @@ public class IntroFragment extends Fragment {
 		binding.useCurrentLocation.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				dialog = ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
+				ProgressDialog.show(requireActivity(), getString(R.string.msg_finding_current_location), null);
 				fusedLocation.findCurrentLocation(locationCallback, false);
 			}
 		});
@@ -130,7 +129,7 @@ public class IntroFragment extends Fragment {
 		@Override
 		public void onSuccessful(LocationResult locationResult) {
 			//현재 위치 파악 성공
-			dialog.dismiss();
+			ProgressDialog.clearDialogs();
 
 			PreferenceManager.getDefaultSharedPreferences(getContext())
 					.edit().putBoolean(getString(R.string.pref_key_show_intro), false).apply();
@@ -143,7 +142,7 @@ public class IntroFragment extends Fragment {
 
 		@Override
 		public void onFailed(Fail fail) {
-			dialog.dismiss();
+			ProgressDialog.clearDialogs();
 
 			if (fail == Fail.DISABLED_GPS) {
 				fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {

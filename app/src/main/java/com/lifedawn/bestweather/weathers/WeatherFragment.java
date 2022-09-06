@@ -100,6 +100,7 @@ import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
@@ -107,6 +108,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.F
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.detailfragment.currentconditions.DetailCurrentConditionsFragment;
+import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
@@ -120,6 +122,7 @@ import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -132,6 +135,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadImgOfCurrentConditions, IGps {
@@ -441,7 +445,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			} else {
 				//위/경도에 해당하는 지역명을 불러오고, 날씨 데이터 다운로드
 				//이미 존재하는 날씨 데이터면 다운로드X
-				requestAddressOfLocation(latitude, longitude, !containWeatherData(latitude, longitude));
+				boolean refresh = !containWeatherData(latitude, longitude);
+
+				if (isOldDownloadedData(latitude, longitude)) {
+					removeOldDownloadedData(latitude, longitude);
+					refresh = true;
+				}
+
+				requestAddressOfLocation(latitude, longitude, refresh);
 			}
 		} else {
 			selectedFavoriteAddressDto = (FavoriteAddressDto) bundle.getSerializable(
@@ -460,9 +471,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			binding.addressName.setText(addressName);
 
 			if (containWeatherData(latitude, longitude)) {
-				//기존 데이터 표시
-				mainWeatherProviderType = FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).requestMainWeatherProviderType;
-				reDraw();
+				if (isOldDownloadedData(latitude, longitude)) {
+					removeOldDownloadedData(latitude, longitude);
+					requestNewData();
+				} else {
+					//기존 데이터 표시
+					mainWeatherProviderType = FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).requestMainWeatherProviderType;
+					reDraw();
+				}
 			} else {
 				requestNewData();
 			}
@@ -633,15 +649,33 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		}
 	};
 
-
 	@Override
 	public void requestCurrentLocation() {
 		binding.mainToolbar.gps.callOnClick();
 	}
 
-
 	private boolean containWeatherData(Double latitude, Double longitude) {
 		return FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString());
+	}
+
+	private void removeOldDownloadedData(Double latitude, Double longitude) {
+		FINAL_RESPONSE_MAP.remove(latitude.toString() + longitude.toString());
+	}
+
+	private boolean isOldDownloadedData(Double latitude, Double longitude) {
+		if (!FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString())) {
+			return false;
+		}
+
+		long dataDownloadedMinutes = TimeUnit.SECONDS.toMinutes(
+				FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).dataDownloadedDateTime.getSecond());
+		long now = TimeUnit.SECONDS.toMinutes(LocalDateTime.now().getSecond());
+
+		if (now - dataDownloadedMinutes > 120) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 
@@ -1278,6 +1312,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			airQualityResponse = (AqiCnGeolocalizedFeedResponse) aqicnResponse.getResponseObj();
 		}
 
+		final AirQualityDto airQualityDto = AqicnResponseProcessor.makeAirQualityDto(airQualityResponse,
+				ZonedDateTime.now(zoneId).getOffset());
+
 		final Bundle defaultBundle = new Bundle();
 		defaultBundle.putDouble(BundleKey.Latitude.name(), this.latitude);
 		defaultBundle.putDouble(BundleKey.Longitude.name(), this.longitude);
@@ -1289,28 +1326,35 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		// simple current conditions ------------------------------------------------------------------------------------------------------
 		final Bundle simpleCurrentConditionsBundle = new Bundle();
 		simpleCurrentConditionsBundle.putAll(defaultBundle);
-		simpleCurrentConditionsBundle.putSerializable(WeatherDataType.currentConditions.name(), currentConditionsDto);
-		simpleCurrentConditionsBundle.putSerializable("AqiCnGeolocalizedFeedResponse", airQualityResponse);
+
+		simpleCurrentConditionsFragment.setCurrentConditionsDto(currentConditionsDto)
+				.setAirQualityDto(airQualityDto);
 
 		// hourly forecasts ----------------------------------------------------------------------------------------------------------------
 		final Bundle hourlyForecastBundle = new Bundle();
 		hourlyForecastBundle.putAll(defaultBundle);
-		hourlyForecastBundle.putSerializable(WeatherDataType.hourlyForecast.name(), (Serializable) hourlyForecastDtoList);
+
+		simpleHourlyForecastFragment.setHourlyForecastDtoList(hourlyForecastDtoList);
 
 		// daily forecasts ----------------------------------------------------------------------------------------------------------------
 		final Bundle dailyForecastBundle = new Bundle();
 		dailyForecastBundle.putAll(defaultBundle);
-		dailyForecastBundle.putSerializable(WeatherDataType.dailyForecast.name(), (Serializable) dailyForecastDtoList);
+
+		simpleDailyForecastFragment.setDailyForecastDtoList(dailyForecastDtoList);
 
 		// detail current conditions ----------------------------------------------
 		final Bundle detailCurrentConditionsBundle = new Bundle();
 		detailCurrentConditionsBundle.putAll(defaultBundle);
 		detailCurrentConditionsBundle.putSerializable(WeatherDataType.currentConditions.name(), currentConditionsDto);
 
+		detailCurrentConditionsFragment.setCurrentConditionsDto(currentConditionsDto);
+
 		// air quality  ----------------------------------------------
 		final Bundle airQualityBundle = new Bundle();
 		airQualityBundle.putAll(defaultBundle);
-		airQualityBundle.putSerializable("AqiCnGeolocalizedFeedResponse", airQualityResponse);
+
+		simpleAirQualityFragment.setAirQualityDto(airQualityDto)
+				.setAqiCnGeolocalizedFeedResponse(airQualityResponse);
 
 		simpleAirQualityFragment.setArguments(airQualityBundle);
 		sunSetRiseFragment.setArguments(defaultBundle);
@@ -1488,11 +1532,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		final MultipleRestApiDownloader multipleRestApiDownloader;
 		final Set<WeatherProviderType> requestWeatherProviderTypeSet;
 		final WeatherProviderType requestMainWeatherProviderType;
+		LocalDateTime dataDownloadedDateTime;
 
 		public WeatherResponseObj(MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherProviderType> requestWeatherProviderTypeSet, WeatherProviderType requestMainWeatherProviderType) {
 			this.multipleRestApiDownloader = multipleRestApiDownloader;
 			this.requestWeatherProviderTypeSet = requestWeatherProviderTypeSet;
 			this.requestMainWeatherProviderType = requestMainWeatherProviderType;
+
+			dataDownloadedDateTime = LocalDateTime.now();
 		}
 	}
 

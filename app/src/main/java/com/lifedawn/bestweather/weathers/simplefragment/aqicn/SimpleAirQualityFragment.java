@@ -52,6 +52,16 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	private ZoneId zoneId;
 	private Bundle bundle;
 
+	public SimpleAirQualityFragment setAirQualityDto(AirQualityDto airQualityDto) {
+		this.airQualityDto = airQualityDto;
+		return this;
+	}
+
+	public SimpleAirQualityFragment setAqiCnGeolocalizedFeedResponse(AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse) {
+		this.aqiCnGeolocalizedFeedResponse = aqiCnGeolocalizedFeedResponse;
+		return this;
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -77,9 +87,6 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
-		aqiCnGeolocalizedFeedResponse = (AqiCnGeolocalizedFeedResponse) bundle.getSerializable("AqiCnGeolocalizedFeedResponse");
-		airQualityDto = AqicnResponseProcessor.makeAirQualityDto(aqiCnGeolocalizedFeedResponse, ZonedDateTime.now(zoneId).getOffset());
 
 		binding.progressResultView.setContentView(binding.contentContainer);
 		binding.progressResultView.setTextColor(Color.WHITE);

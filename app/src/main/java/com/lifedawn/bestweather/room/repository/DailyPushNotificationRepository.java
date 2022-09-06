@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.room.AppDb;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -17,7 +18,7 @@ import java.util.concurrent.Executors;
 public class DailyPushNotificationRepository {
 	private Context context;
 	private DailyPushNotificationDao dailyPushNotificationDao;
-	private ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private ExecutorService executorService = MyApplication.getExecutorService();
 
 	public DailyPushNotificationRepository(Context context) {
 		this.context = context;

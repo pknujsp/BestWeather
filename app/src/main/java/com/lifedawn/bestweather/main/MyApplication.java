@@ -10,12 +10,6 @@ import androidx.preference.PreferenceManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.UvIndexProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 
 import java.util.Locale;
@@ -24,7 +18,7 @@ import java.util.concurrent.Executors;
 
 public class MyApplication extends Application {
 	public final static ValueUnitObj VALUE_UNIT_OBJ = new ValueUnitObj();
-	private static final ExecutorService executorService = Executors.newFixedThreadPool(5);
+	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(6);
 	private static int statusBarHeight;
 	private static String localeCountryCode;
 
@@ -37,6 +31,9 @@ public class MyApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 
+		initPreferences();
+		WindUtil.init(getApplicationContext());
+
 		final int id = getResources().getIdentifier("status_bar_height", "dimen", "android");
 		if (id > 0) {
 			statusBarHeight = getResources().getDimensionPixelSize(id);
@@ -48,10 +45,8 @@ public class MyApplication extends Application {
 		} else {
 			locale = getResources().getConfiguration().locale;
 		}
-		localeCountryCode = locale.getCountry();
 
-		initPreferences();
-		WindUtil.init(getApplicationContext());
+		localeCountryCode = locale.getCountry();
 		//UvIndexProcessor.init(context);
 		//AccuWeatherResponseProcessor.init(context);
 	}
@@ -89,7 +84,7 @@ public class MyApplication extends Application {
 	}
 
 	public static ExecutorService getExecutorService() {
-		return executorService;
+		return EXECUTOR_SERVICE;
 	}
 
 	public static int getStatusBarHeight() {

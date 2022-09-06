@@ -357,18 +357,17 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 		Set<WeatherProviderType> weatherProviderTypeSet = widgetDto.getWeatherProviderTypeSet();
 
 		for (WeatherProviderType weatherProviderType : weatherProviderTypeSet) {
+			WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, false, context);
+
 			weatherSourceTypeListArrayMap.put(weatherProviderType,
 					WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject, weatherProviderType, widgetDto.getLatitude(),
 							widgetDto.getLongitude()));
-
-			WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, false, context);
 		}
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 				weatherSourceTypeListArrayMap, null);
 
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		appWidgetManager.updateAppWidget(appWidgetId,
-				remoteViews);
+		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 
 	@Override

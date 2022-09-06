@@ -11,7 +11,6 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
@@ -53,11 +52,9 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 public class HourlyForecastComparisonFragment extends BaseForecastComparisonFragment {
 	private MultipleRestApiDownloader multipleRestApiDownloader;
@@ -500,7 +497,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			request.put(WeatherProviderType.KMA_WEB, requestKma);
 		}
 
-		AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
+		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (multipleRestApiDownloader != null) {
@@ -513,7 +510,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		multipleRestApiDownloader = new MultipleRestApiDownloader() {
 			@Override
 			public void onResult() {
-				setTable(multipleRestApiDownloader, latitude, longitude, dialog);
+				setTable(multipleRestApiDownloader, latitude, longitude);
 			}
 
 			@Override
@@ -536,8 +533,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		}
 	}
 
-	private void setTable(MultipleRestApiDownloader multipleRestApiDownloader, Double latitude, Double longitude,
-	                      AlertDialog dialog) {
+	private void setTable(MultipleRestApiDownloader multipleRestApiDownloader, Double latitude, Double longitude) {
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap;
 		HourlyForecastResponse hourlyForecastResponse = new HourlyForecastResponse();
@@ -651,7 +647,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				public void run() {
 					setValuesToViews(hourlyForecastResponse);
 					binding.rootScrollView.setVisibility(View.VISIBLE);
-					dialog.dismiss();
+					ProgressDialog.clearDialogs();
 				}
 			});
 

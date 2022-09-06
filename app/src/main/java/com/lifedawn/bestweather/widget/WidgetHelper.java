@@ -54,6 +54,7 @@ public class WidgetHelper {
 	public void cancelAutoRefresh() {
 		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, BaseAppWidgetProvider.class),
 				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
+
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();
@@ -61,13 +62,8 @@ public class WidgetHelper {
 	}
 
 	public boolean isRepeating() {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, BaseAppWidgetProvider.class),
-				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
-		if (pendingIntent != null) {
-			return true;
-		} else {
-			return false;
-		}
+		return PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, BaseAppWidgetProvider.class),
+				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE) != null;
 	}
 
 	public void reDrawWidgets() {
@@ -121,6 +117,7 @@ public class WidgetHelper {
 							PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode++, refreshIntent,
 									PendingIntent.FLAG_MUTABLE);
 							pendingIntent.send();
+
 						} catch (PendingIntent.CanceledException e) {
 							e.printStackTrace();
 						}

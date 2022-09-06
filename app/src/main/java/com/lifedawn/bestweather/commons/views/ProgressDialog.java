@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.widget.DialogActivity;
 
 import java.util.Stack;
 
@@ -26,6 +27,11 @@ public class ProgressDialog {
 	}
 
 	public static AlertDialog show(Activity activity, String msg, @Nullable View.OnClickListener cancelOnClickListener) {
+		if (activity.isFinishing()) {
+			clearDialogs();
+			return null;
+		}
+
 		clearDialogs();
 
 		View progressView = LayoutInflater.from(activity.getApplicationContext()).inflate(R.layout.progress_view, null);
@@ -63,9 +69,12 @@ public class ProgressDialog {
 
 		for (int i = 0; i < dialogsCount; i++) {
 			AlertDialog dialog = dialogStack.pop();
+
 			if (dialog.getWindow() != null) {
 				dialog.dismiss();
 			}
 		}
+
+		dialogStack.clear();
 	}
 }

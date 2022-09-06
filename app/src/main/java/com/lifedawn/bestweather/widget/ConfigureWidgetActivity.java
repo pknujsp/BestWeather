@@ -198,7 +198,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
 				View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
-
 		binding.displayDatetimeSwitch.setVisibility(View.GONE);
 		binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
 

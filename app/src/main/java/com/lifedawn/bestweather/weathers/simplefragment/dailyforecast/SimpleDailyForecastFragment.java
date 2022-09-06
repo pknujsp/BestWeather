@@ -38,8 +38,12 @@ import java.util.List;
 import java.util.Locale;
 
 public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
-	private List<DailyForecastDto> dailyForecastDtoList;
+	private static List<DailyForecastDto> dailyForecastDtoList;
 
+	public SimpleDailyForecastFragment setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
+		this.dailyForecastDtoList = dailyForecastDtoList;
+		return this;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -51,7 +55,6 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		dailyForecastDtoList = (ArrayList<DailyForecastDto>) bundle.getSerializable(WeatherDataType.dailyForecast.name());
 
 		binding.weatherCardViewHeader.forecastName.setText(R.string.daily_forecast);
 		binding.weatherCardViewHeader.compareForecast.setOnClickListener(new View.OnClickListener() {

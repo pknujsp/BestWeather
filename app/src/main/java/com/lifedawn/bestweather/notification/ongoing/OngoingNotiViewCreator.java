@@ -183,7 +183,7 @@ public class OngoingNotiViewCreator {
 			weatherProviderTypeSet.add(WeatherProviderType.AQICN);
 		}
 
-		ExecutorService executorService = Executors.newSingleThreadExecutor();
+		ExecutorService executorService = MyApplication.getExecutorService();
 		WeatherProviderType finalWeatherProviderType = weatherProviderType;
 		WeatherRequestUtil.loadWeatherData(context, executorService,
 				notificationDataObj.getLatitude(), notificationDataObj.getLongitude(), weatherDataTypeSet,

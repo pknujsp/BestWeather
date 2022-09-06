@@ -16,7 +16,7 @@ import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import org.jetbrains.annotations.NotNull;
 
 public class DetailCurrentConditionsFragment extends BaseDetailCurrentConditionsFragment {
-	private CurrentConditionsDto currentConditionsDto;
+	private static CurrentConditionsDto currentConditionsDto;
 
 
 	@Override

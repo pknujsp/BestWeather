@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 
 public class WidgetRepository {
 	private static WidgetDao widgetDao;
-	private static ExecutorService executorService = Executors.newSingleThreadExecutor();
+	private static ExecutorService executorService = MyApplication.getExecutorService();
 
 	public WidgetRepository(Context context) {
 		widgetDao = AppDb.getInstance(context).widgetDao();

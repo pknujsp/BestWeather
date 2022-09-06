@@ -410,7 +410,7 @@
     <string name="FourthDailyPushNotification">현재 대기질</string>
     <string name="FifthDailyPushNotification">대기질 예보</string>
     <string name="remove">삭제</string>
-    <string name="startOnCurrentLocation">현재위치로 시작</string>
+    <string name="startOnCurrentLocation">현재 위치로 시작</string>
     <string name="allDay">종일</string>
     <string name="empty_daily_notifications">추가한 일일 알림이 없습니다</string>
     <string name="will_you_delete_the_notification">알림을 삭제하시겠습니까?</string>

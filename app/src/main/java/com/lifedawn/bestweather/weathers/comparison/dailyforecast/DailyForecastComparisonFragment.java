@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
@@ -61,7 +60,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 public class DailyForecastComparisonFragment extends BaseForecastComparisonFragment {
 	private MultipleRestApiDownloader multipleRestApiDownloader;
@@ -549,7 +547,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 			request.put(WeatherProviderType.KMA_WEB, requestKma);
 		}
-		AlertDialog dialog = ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
+		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (multipleRestApiDownloader != null) {
@@ -562,7 +560,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		multipleRestApiDownloader = new MultipleRestApiDownloader() {
 			@Override
 			public void onResult() {
-				setTable(this, latitude, longitude, dialog);
+				setTable(this);
 			}
 
 			@Override
@@ -570,7 +568,6 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			}
 		};
-
 
 		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
@@ -583,13 +580,13 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+
 		if (multipleRestApiDownloader != null) {
 			multipleRestApiDownloader.cancel();
 		}
 	}
 
-	private void setTable(MultipleRestApiDownloader multipleRestApiDownloader, Double latitude, Double longitude,
-	                      AlertDialog dialog) {
+	private void setTable(MultipleRestApiDownloader multipleRestApiDownloader) {
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap;
 		DailyForecastResponse dailyForecastResponse = new DailyForecastResponse();
@@ -713,7 +710,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 				public void run() {
 					setValues(dailyForecastResponse);
 					binding.rootScrollView.setVisibility(View.VISIBLE);
-					dialog.dismiss();
+					ProgressDialog.clearDialogs();
 				}
 			});
 

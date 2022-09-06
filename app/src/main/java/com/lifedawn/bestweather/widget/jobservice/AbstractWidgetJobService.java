@@ -25,6 +25,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
@@ -41,12 +42,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class AbstractWidgetJobService extends JobService {
-	protected static WidgetRepository widgetRepository;
-	protected static AppWidgetManager appWidgetManager;
-	protected static Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
-	protected static Map<Integer, Callback> backgroundCallbackMap = new HashMap<>();
-	protected static Map<Integer, Class<?>> widgetClassMap = new HashMap<>();
-	protected static ExecutorService executorService = Executors.newFixedThreadPool(3);
+	protected WidgetRepository widgetRepository;
+	protected AppWidgetManager appWidgetManager;
+	protected Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
+	protected Map<Integer, Callback> backgroundCallbackMap = new HashMap<>();
+	protected Map<Integer, Class<?>> widgetClassMap = new HashMap<>();
+	protected ExecutorService executorService = Executors.newFixedThreadPool(4);
 
 	private static final String TAG = "AbstractWidgetJobService";
 
@@ -66,7 +67,7 @@ public abstract class AbstractWidgetJobService extends JobService {
 		if (widgetRepository == null) {
 			widgetRepository = new WidgetRepository(getApplicationContext());
 		}
-		
+
 		if (appWidgetManager == null) {
 			appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		}
