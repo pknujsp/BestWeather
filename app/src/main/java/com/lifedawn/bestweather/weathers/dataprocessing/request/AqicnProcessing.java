@@ -8,6 +8,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.aqicn.AqicnParameter;
+import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
@@ -28,8 +29,15 @@ public class AqicnProcessing {
 				if (response.body() == null) {
 					onFailure(call, new Exception("aqicn response failed"));
 				} else {
-					callback.onResponseResult(response, AqicnResponseProcessor.getAirQualityObjFromJson(response.body().toString()), response.body().toString());
-					Log.e(RetrofitClient.LOG_TAG, "aqicn geolocalizedfeed 성공");
+					try {
+						AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse =
+								AqicnResponseProcessor.getAirQualityObjFromJson(response.body().toString());
+						callback.onResponseResult(response, aqiCnGeolocalizedFeedResponse, response.body().toString());
+						Log.e(RetrofitClient.LOG_TAG, "aqicn geolocalizedfeed 성공");
+					} catch (Exception e) {
+						onFailure(call, new Exception("aqicn response failed"));
+					}
+
 				}
 			}
 

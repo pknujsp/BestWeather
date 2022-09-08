@@ -97,7 +97,12 @@ public class AqicnResponseProcessor {
 	}
 
 	public static AqiCnGeolocalizedFeedResponse getAirQualityObjFromJson(String response) {
-		return new Gson().fromJson(response, AqiCnGeolocalizedFeedResponse.class);
+		try {
+			AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse = new Gson().fromJson(response, AqiCnGeolocalizedFeedResponse.class);
+			return aqiCnGeolocalizedFeedResponse;
+		} catch (Exception e) {
+			throw e;
+		}
 	}
 
 	public static List<AirQualityForecastObj> getAirQualityForecastObjList(AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse, ZoneId timeZone) {
