@@ -190,6 +190,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
 		                              @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 			super.onFragmentCreated(fm, f, savedInstanceState);
+
 			if (f instanceof AlertFragment) {
 				onHiddenChanged(true);
 				binding.scrollView.setVisibility(View.GONE);
@@ -221,6 +222,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		@Override
 		public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
+
 			if (f instanceof AlertFragment) {
 				onHiddenChanged(false);
 				binding.scrollView.setVisibility(View.VISIBLE);
@@ -418,7 +420,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 
-	public void load(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
+	private void load(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
 		binding.mainToolbar.gps.setVisibility(locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
 		binding.mainToolbar.find.setVisibility(locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
 
@@ -483,6 +485,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				requestNewData();
 			}
 		}
+
 	}
 
 	@Override
@@ -530,8 +533,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private void setBackgroundWeatherView(String weather, String volume) {
-		if (!PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_show_background_animation),
-				false)) {
+		if (!PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_show_background_animation), false)) {
 			weatherViewController.setWeatherView(PrecipType.CLEAR, null);
 			return;
 		}

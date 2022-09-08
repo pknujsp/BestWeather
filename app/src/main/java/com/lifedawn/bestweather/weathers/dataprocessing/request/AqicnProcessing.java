@@ -37,7 +37,6 @@ public class AqicnProcessing {
 					} catch (Exception e) {
 						onFailure(call, new Exception("aqicn response failed"));
 					}
-
 				}
 			}
 
@@ -47,6 +46,7 @@ public class AqicnProcessing {
 				Log.e(RetrofitClient.LOG_TAG, "aqicn response failed");
 			}
 		});
+
 		return call;
 	}
 
@@ -68,8 +68,9 @@ public class AqicnProcessing {
 				multipleRestApiDownloader.processResult(WeatherProviderType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, t);
 			}
-
 		});
+
 		multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, localizedFeedCall);
 	}
+
 }
