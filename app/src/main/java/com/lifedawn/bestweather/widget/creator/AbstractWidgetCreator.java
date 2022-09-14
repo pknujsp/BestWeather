@@ -457,7 +457,7 @@ public abstract class AbstractWidgetCreator {
 				widgetDto.setLastErrorType(RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 			}
 
-			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+			RemoteViewsUtil.onErrorProcess(remoteViews, context, widgetDto.getLastErrorType());
 			setRefreshPendingIntent(widgetProviderClass(), remoteViews);
 		}
 

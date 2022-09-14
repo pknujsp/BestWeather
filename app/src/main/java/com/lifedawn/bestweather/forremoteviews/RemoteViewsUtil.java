@@ -39,7 +39,7 @@ public class RemoteViewsUtil {
 			case GPS_OFF:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.request_to_make_gps_on));
 				remoteViews.setOnClickPendingIntent(R.id.btn2, PendingIntent.getActivity(context, 0,
-						IntentUtil.getLocationSettingsIntent(),		 PendingIntent.FLAG_MUTABLE));
+						IntentUtil.getLocationSettingsIntent(), PendingIntent.FLAG_MUTABLE));
 				btn2Text = context.getString(R.string.enable_gps);
 				break;
 			case FAILED_LOAD_WEATHER_DATA:
@@ -48,7 +48,7 @@ public class RemoteViewsUtil {
 			case DENIED_GPS_PERMISSIONS:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.message_needs_location_permission));
 				remoteViews.setOnClickPendingIntent(R.id.btn2, PendingIntent.getActivity(context, 0,
-						IntentUtil.getAppSettingsIntent(context),		 PendingIntent.FLAG_MUTABLE));
+						IntentUtil.getAppSettingsIntent(context), PendingIntent.FLAG_MUTABLE));
 				btn2Text = context.getString(R.string.check_permission);
 				break;
 			case UNAVAILABLE_NETWORK:
@@ -59,7 +59,7 @@ public class RemoteViewsUtil {
 				remoteViews.setOnClickPendingIntent(R.id.btn2,
 						PendingIntent.getActivity(context, 0,
 								IntentUtil.getAppSettingsIntent(context),
-								 PendingIntent.FLAG_MUTABLE));
+								PendingIntent.FLAG_MUTABLE));
 				btn2Text = context.getString(R.string.check_permission);
 				break;
 		}

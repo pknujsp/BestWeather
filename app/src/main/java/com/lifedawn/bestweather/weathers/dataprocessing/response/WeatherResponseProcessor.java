@@ -521,12 +521,6 @@ public class WeatherResponseProcessor {
 		}
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-		ValueUnits windUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_wind),
-				ValueUnits.mPerSec.name()));
-		ValueUnits tempUnit = ValueUnits.valueOf(sharedPreferences.getString(context.getString(R.string.pref_key_unit_temp),
-				ValueUnits.celsius.name()));
-
 		if (weatherProviderType == WeatherProviderType.KMA_API) {
 			MultipleRestApiDownloader.ResponseResult midLandFcstResponseResult =
 					responseMap.get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_MID_LAND_FCST);
