@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.flickr;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -224,8 +225,11 @@ public class FlickrLoader {
 											MainThreadWorker.runOnUiThread(new Runnable() {
 												@Override
 												public void run() {
-													Glide.with(context).asBitmap().load(backgroundImgUrl)
-															.diskCacheStrategy(DiskCacheStrategy.ALL).into(imgRequestObj.glideTarget);
+													Activity activity = (Activity) context;
+													if (!activity.isFinishing()) {
+														Glide.with(context).asBitmap().load(backgroundImgUrl)
+																.diskCacheStrategy(DiskCacheStrategy.ALL).into(imgRequestObj.glideTarget);
+													}
 												}
 											});
 

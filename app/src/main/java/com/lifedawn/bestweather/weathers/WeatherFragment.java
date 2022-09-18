@@ -511,8 +511,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	@Override
 	public void onDestroy() {
-		Glide.with(getContext()).clear(binding.currentConditionsImg);
-
 		if (multipleRestApiDownloader != null) {
 			multipleRestApiDownloader.cancel();
 		}

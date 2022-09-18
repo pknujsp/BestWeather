@@ -17,7 +17,8 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
-import com.lifedawn.bestweather.widget.widgetprovider.BaseAppWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,7 +42,7 @@ public class WidgetHelper {
 		cancelAutoRefresh();
 
 		if (val > 0) {
-			Intent refreshIntent = new Intent(context, BaseAppWidgetProvider.class);
+			Intent refreshIntent = new Intent(context, FirstWidgetProvider.class);
 			refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, refreshIntent,
@@ -52,7 +53,7 @@ public class WidgetHelper {
 	}
 
 	public void cancelAutoRefresh() {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, BaseAppWidgetProvider.class),
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, FirstWidgetProvider.class),
 				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
 
 		if (pendingIntent != null) {
@@ -62,7 +63,7 @@ public class WidgetHelper {
 	}
 
 	public boolean isRepeating() {
-		return PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, BaseAppWidgetProvider.class),
+		return PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, FirstWidgetProvider.class),
 				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE) != null;
 	}
 
@@ -94,7 +95,7 @@ public class WidgetHelper {
 							return;
 						}
 					}
-
+					
 					int requestCode = 100000;
 					for (Class<?> cls : widgetArrMap.keySet()) {
 						Intent refreshIntent = null;

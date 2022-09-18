@@ -180,8 +180,7 @@ public class DialogActivity extends Activity {
 								})
 								.setView(dialogView)
 								.create();
-
-
+						
 						alertDialog.show();
 						alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 					}

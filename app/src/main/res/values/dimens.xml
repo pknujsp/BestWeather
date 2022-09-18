@@ -187,11 +187,13 @@
     <dimen name="airQualityTextSizeInSixthWidget">13sp</dimen>
     <dimen name="stationNameTextSizeInSeventhWidget">14sp</dimen>
     <dimen name="airQualityTextSizeInSeventhWidget">16sp</dimen>
+
     <dimen name="dateClockTextSizeInEighthWidget">24sp</dimen>
     <dimen name="timeClockTextSizeInEighthWidget">60sp</dimen>
-    <dimen name="tempTextSizeInEighthWidget">24sp</dimen>
-    <dimen name="precipitationTextSizeInEighthWidget">13sp</dimen>
-    <dimen name="airQualityTextSizeInEighthWidget">13sp</dimen>
+    <dimen name="tempTextSizeInEighthWidget">30sp</dimen>
+    <dimen name="precipitationTextSizeInEighthWidget">14sp</dimen>
+    <dimen name="airQualityTextSizeInEighthWidget">14sp</dimen>
+
     <dimen name="labelTextSizeInAirQualityItem">13sp</dimen>
     <dimen name="gradeValueTextSizeInAirQualityItem">19sp</dimen>
     <dimen name="gradeDescriptionTextSizeInAirQualityItem">16sp</dimen>
