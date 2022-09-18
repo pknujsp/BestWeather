@@ -74,7 +74,6 @@ public class IntroFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
 		binding.getRoot().setPadding(0, MyApplication.getStatusBarHeight(), 0, 0);
 
 		binding.useCurrentLocation.setOnClickListener(new View.OnClickListener() {
@@ -84,6 +83,7 @@ public class IntroFragment extends Fragment {
 				fusedLocation.findCurrentLocation(locationCallback, false);
 			}
 		});
+
 		binding.findAddress.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -122,6 +122,7 @@ public class IntroFragment extends Fragment {
 	public void onDestroy() {
 		getParentFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		getLifecycle().removeObserver(locationLifeCycleObserver);
+
 		super.onDestroy();
 	}
 
@@ -132,7 +133,7 @@ public class IntroFragment extends Fragment {
 			ProgressDialog.clearDialogs();
 
 			PreferenceManager.getDefaultSharedPreferences(getContext())
-					.edit().putBoolean(getString(R.string.pref_key_show_intro), false).apply();
+					.edit().putBoolean(getString(R.string.pref_key_show_intro), false).commit();
 
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 			getParentFragment().getParentFragmentManager().beginTransaction()

@@ -53,14 +53,10 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-		AppThemes appTheme = AppThemes.valueOf(sharedPreferences.getString(getString(R.string.pref_key_app_theme), AppThemes.BLACK.name()));
-		if (appTheme == AppThemes.BLACK) {
-			setTheme(R.style.AppTheme_Black);
-		}
+		setTheme(R.style.AppTheme_Black);
 
 		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
-		final Window window = getWindow();
+		Window window = getWindow();
 
 		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -75,12 +71,12 @@ public class MainActivity extends AppCompatActivity {
 		} else {
 			new AlertDialog.Builder(this).setTitle(R.string.networkProblem)
 					.setMessage(R.string.need_to_connect_network).setPositiveButton(R.string.check, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
-					finish();
-				}
-			}).setCancelable(false).create().show();
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+							finish();
+						}
+					}).setCancelable(false).create().show();
 		}
 	}
 

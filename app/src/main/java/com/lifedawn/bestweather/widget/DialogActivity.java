@@ -137,7 +137,6 @@ public class DialogActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				PendingIntent pendingIntent = widgetCreator.getRefreshPendingIntent(widgetProviderClass);
-
 				try {
 					pendingIntent.send();
 				} catch (PendingIntent.CanceledException e) {
@@ -180,7 +179,7 @@ public class DialogActivity extends Activity {
 								})
 								.setView(dialogView)
 								.create();
-						
+
 						alertDialog.show();
 						alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 					}
