@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.ArrayMap;
 
+import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.google.gson.JsonArray;
@@ -55,6 +56,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,7 +64,20 @@ import java.util.Set;
 import okio.Buffer;
 
 public class WeatherResponseProcessor {
+	public static final Map<String, ZoneId> TIMEZONE_MAP = new HashMap<>();
 
+	public static boolean containsTimeZone(Double latitude, Double longitude) {
+		return TIMEZONE_MAP.containsKey(latitude.toString() + longitude.toString());
+	}
+
+	@Nullable
+	public static ZoneId getTimeZone(Double latitude, Double longitude) {
+		return TIMEZONE_MAP.get(latitude.toString() + longitude.toString());
+	}
+
+	public static ZoneId putTimeZone(Double latitude, Double longitude, ZoneId zoneId) {
+		return TIMEZONE_MAP.put(latitude.toString() + longitude.toString(), zoneId);
+	}
 
 	public static ZonedDateTime convertDateTimeOfDailyForecast(long millis, ZoneId zoneId) {
 		return ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), zoneId).withHour(0).withMinute(0).withSecond(0).withNano(0);

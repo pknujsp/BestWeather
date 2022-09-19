@@ -524,6 +524,15 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static ZoneId getZoneId(OwmOneCallResponse owmOneCallResponse) {
-		return ZoneId.of(owmOneCallResponse.getTimezone());
+		Double lat = Double.parseDouble(owmOneCallResponse.getLatitude());
+		Double lon = Double.parseDouble(owmOneCallResponse.getLongitude());
+
+		if (containsTimeZone(lat, lon)) {
+			return getTimeZone(lat, lon);
+		} else {
+			ZoneId zoneId = ZoneId.of(owmOneCallResponse.getTimezone());
+			putTimeZone(lat, lon, zoneId);
+			return zoneId;
+		}
 	}
 }

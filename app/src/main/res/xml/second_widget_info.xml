@@ -6,7 +6,7 @@
     android:minHeight="@dimen/secondWidgetHeight"
     android:minResizeWidth="@dimen/secondWidgetWidth"
     android:minResizeHeight="@dimen/secondWidgetHeight"
-    android:previewImage="@drawable/example_appwidget_preview"
+    android:previewImage="@drawable/widget_preview_2"
     android:resizeMode="vertical|horizontal"
 
     android:updatePeriodMillis="0"

@@ -236,10 +236,12 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 					}
 
 					binding.topIcon.setImageResource(R.drawable.raindrop);
+					binding.topIcon.setVisibility(View.VISIBLE);
+
 					binding.bottomIcon.setImageResource(R.drawable.snowparticle);
 					binding.bottomIcon.setRotation(0);
 				} else if (showDataType == ShowDataType.Wind) {
-					binding.topIcon.setImageResource(R.drawable.winddirection);
+					binding.topIcon.setVisibility(View.GONE);
 					binding.bottomIcon.setImageResource(R.drawable.arrow);
 					binding.bottomIcon.setRotation(hourlyForecastDto.getWindDirectionVal() + 180);
 
@@ -253,6 +255,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 				} else if (showDataType == ShowDataType.Humidity) {
 					binding.rainVolumeLayout.setVisibility(View.VISIBLE);
 					binding.snowVolumeLayout.setVisibility(View.GONE);
+					binding.topIcon.setVisibility(View.VISIBLE);
 
 					binding.topIcon.setImageResource(R.drawable.humidity);
 					binding.rainVolume.setText(hourlyForecastDto.getHumidity());

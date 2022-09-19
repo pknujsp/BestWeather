@@ -26,7 +26,6 @@ import java.time.ZonedDateTime;
 
 public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutSimpleCurrentConditionsBinding binding;
-	protected SharedPreferences sharedPreferences;
 	protected ValueUnits tempUnit;
 	protected Double latitude;
 	protected Double longitude;
@@ -40,10 +39,10 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 
 		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+
+		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());

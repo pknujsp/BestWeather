@@ -118,9 +118,12 @@
             style="@style/text_shadow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/airQualityLayout"
+
+
+            android:layout_above="@id/feelsLikeTemp"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="6dp"
+            android:layout_marginBottom="32dp"
+
             android:shadowColor="@color/black"
             android:text="@string/wind"
             android:textColor="@color/white"
@@ -131,9 +134,13 @@
             android:id="@+id/airQualityLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@id/feelsLikeTemp"
+
+
+
+            android:layout_above="@id/humidity"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="6dp"
+
             android:gravity="center_vertical"
             android:orientation="horizontal"
             >

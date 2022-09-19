@@ -33,7 +33,6 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 	private static final Map<String, String> WEATHER_ICON_DESCRIPTION_MAP = new HashMap<>();
 	private static final Map<String, Integer> WEATHER_ICON_ID_MAP = new HashMap<>();
 	private static final Map<String, String> FLICKR_MAP = new HashMap<>();
-	private static final Map<String, ZoneId> TIMEZONE_MAP = new HashMap<>();
 
 	public static void init(Context context) {
 		if (WEATHER_ICON_DESCRIPTION_MAP.size() == 0 || WEATHER_ICON_ID_MAP.size() == 0 || FLICKR_MAP.size() == 0) {
