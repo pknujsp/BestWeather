@@ -54,7 +54,9 @@ import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentMapBinding;
+import com.lifedawn.bestweather.favorites.FavoriteAddressesAdapter;
 import com.lifedawn.bestweather.favorites.FavoritesFragment;
+import com.lifedawn.bestweather.favorites.SimpleFavoritesFragment;
 import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.findaddress.FoundAddressesAdapter;
 import com.lifedawn.bestweather.findaddress.map.adapter.FavoriteLocationItemViewPagerAdapter;
@@ -91,6 +93,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	protected final Map<MarkerType, RecyclerView.Adapter> adapterMap = new HashMap<>();
 
 	private FusedLocation fusedLocation;
+	private Integer dp48;
 
 
 	private ViewPager2 locationItemBottomSheetViewPager;
@@ -113,6 +116,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			if (f instanceof FindAddressFragment) {
 				binding.searchBar.setVisibility(View.VISIBLE);
 				removeMarkers(MarkerType.SEARCH);
+				collapseAllExpandedBottomSheets();
+			} else if (f instanceof SimpleFavoritesFragment) {
 				collapseAllExpandedBottomSheets();
 			}
 		}
@@ -234,6 +239,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 		setSearchPlacesBottomSheet();
 		setLocationItemsBottomSheet();
+		setFavoritesBottomSheet();
 
 		binding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			@Override
@@ -241,11 +247,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				binding.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
 				final int searchBottomSheetHeight =
-						(int) (binding.getRoot().getHeight() - binding.header.getBottom() - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36f, getResources().getDisplayMetrics()));
+						(int) (binding.getRoot().getHeight() - binding.headerLayout.getBottom() - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36f, getResources().getDisplayMetrics()));
 				LinearLayout locationSearchBottomSheet = bottomSheetViewMap.get(BottomSheetType.SEARCH_LOCATION);
+				LinearLayout favoritesBottomSheet = bottomSheetViewMap.get(BottomSheetType.FAVORITES);
 
 				locationSearchBottomSheet.getLayoutParams().height = searchBottomSheetHeight;
+				favoritesBottomSheet.getLayoutParams().height = searchBottomSheetHeight;
+
 				locationSearchBottomSheet.requestLayout();
+				favoritesBottomSheet.requestLayout();
 			}
 		});
 
@@ -330,6 +340,48 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 		});
 
+		binding.favorite.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				FragmentManager childFragmentManager = getChildFragmentManager();
+
+				if (childFragmentManager.findFragmentByTag(SimpleFavoritesFragment.class.getName()) != null) {
+					return;
+				}
+
+				collapseAllExpandedBottomSheets();
+
+				int backStackCount = childFragmentManager.getBackStackEntryCount();
+
+				for (int count = 0; count < backStackCount; count++) {
+					childFragmentManager.popBackStack();
+				}
+
+				SimpleFavoritesFragment simpleFavoritesFragment = new SimpleFavoritesFragment();
+				simpleFavoritesFragment.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
+					@Override
+					public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {
+						initFavorites();
+						removedLocation = true;
+					}
+
+					@Override
+					public void onClicked(FavoriteAddressDto favoriteAddressDto) {
+
+					}
+				});
+
+				childFragmentManager.beginTransaction().
+						add(binding.favoritesBottomSheet.fragmentContainer.getId(), simpleFavoritesFragment,
+								SimpleFavoritesFragment.class.getName()).
+						addToBackStack(
+								SimpleFavoritesFragment.class.getName()).
+						commitAllowingStateLoss();
+
+				setStateOfBottomSheet(BottomSheetType.FAVORITES, BottomSheetBehavior.STATE_EXPANDED);
+			}
+		});
+
 		binding.backBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -360,7 +412,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	public void onMapReady(@NonNull GoogleMap googleMap) {
 		this.googleMap = googleMap;
 
-		googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.header.getBottom(), 0, 0);
+		dp48 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48f, getResources().getDisplayMetrics());
+
+		googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.header.getBottom() +
+				dp48, 0, 0);
 		googleMap.getUiSettings().setZoomControlsEnabled(true);
 		googleMap.getUiSettings().setRotateGesturesEnabled(false);
 		googleMap.setOnMarkerClickListener(this);
@@ -713,7 +768,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 				//expanded일때 offset == 1.0, collapsed일때 offset == 0.0
 				//offset에 따라서 버튼들이 이동하고, 지도의 좌표가 변경되어야 한다.
-				googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.header.getBottom(), 0, translationValue);
+				googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.header.getBottom() +
+						dp48, 0, translationValue);
 			}
 		});
 
@@ -743,6 +799,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 		bottomSheetViewMap.put(BottomSheetType.SEARCH_LOCATION, locationSearchBottomSheet);
 		bottomSheetBehaviorMap.put(BottomSheetType.SEARCH_LOCATION, locationSearchBottomSheetBehavior);
+	}
+
+	private void setFavoritesBottomSheet() {
+		LinearLayout favoritesBottomSheet = binding.favoritesBottomSheet.favoritesBottomsheet;
+
+		BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(favoritesBottomSheet);
+		bottomSheetBehavior.setDraggable(false);
+		bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+			@Override
+			public void onStateChanged(@NonNull View bottomSheet, int newState) {
+
+			}
+
+			@Override
+			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+			}
+		});
+
+		bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+		bottomSheetViewMap.put(BottomSheetType.FAVORITES, favoritesBottomSheet);
+		bottomSheetBehaviorMap.put(BottomSheetType.FAVORITES, bottomSheetBehavior);
 	}
 
 	@Override

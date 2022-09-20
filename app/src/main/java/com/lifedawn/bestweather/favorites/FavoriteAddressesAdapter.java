@@ -74,7 +74,7 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 					onClickedAddressListener.onClickedDelete(favoriteAddressDtoList.get(position), position);
 
 					favoriteAddressDtoList.remove(position);
-					notifyItemRemoved(position);
+					notifyDataSetChanged();
 				}
 			});
 		}

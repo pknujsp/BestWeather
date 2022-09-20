@@ -47,8 +47,6 @@ public class MyApplication extends Application {
 		}
 
 		localeCountryCode = locale.getCountry();
-		//UvIndexProcessor.init(context);
-		//AccuWeatherResponseProcessor.init(context);
 	}
 
 

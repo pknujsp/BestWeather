@@ -186,14 +186,22 @@ public class FavoritesFragment extends Fragment {
 							weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 								@Override
 								public void onResultSuccessful(List<FavoriteAddressDto> favoriteAddressDtoList) {
+									boolean useCurrentLocation = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(
+											getString(R.string.pref_key_use_current_location), false);
+
 									MainThreadWorker.runOnUiThread(new Runnable() {
 										@Override
 										public void run() {
-											result.putSerializable(BundleKey.newFavoriteAddressDtoList.name(), (Serializable) favoriteAddressDtoList);
-											getParentFragmentManager().popBackStack();
-											onResultFragmentListener.onResultFragment(result);
+											if (favoriteAddressDtoList.isEmpty() && !useCurrentLocation) {
+												processIfNoLocations(favoriteAddressDtoList);
+											} else {
+												result.putSerializable(BundleKey.newFavoriteAddressDtoList.name(), (Serializable) favoriteAddressDtoList);
+												getParentFragmentManager().popBackStack();
+												onResultFragmentListener.onResultFragment(result);
+											}
 										}
 									});
+
 								}
 
 								@Override
@@ -203,6 +211,7 @@ public class FavoritesFragment extends Fragment {
 							});
 						}
 					}
+
 				});
 
 				getParentFragmentManager().beginTransaction().hide(FavoritesFragment.this).add(R.id.fragment_container, mapFragment,
@@ -304,65 +313,7 @@ public class FavoritesFragment extends Fragment {
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						final boolean haveFavorites = adapter.getItemCount() > 0;
-						final boolean useCurrentLocation = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(
-								getString(R.string.pref_key_use_current_location), false);
-
-						Bundle bundle = new Bundle();
-						bundle.putSerializable(BundleKey.newFavoriteAddressDtoList.name(), (Serializable) result);
-						bundle.putString(BundleKey.LastFragment.name(), FavoritesFragment.class.getName());
-						bundle.putBoolean("removedLocation", removedLocation);
-
-						if (!haveFavorites && !useCurrentLocation) {
-							//즐겨찾기가 비었고, 현재 위치 사용이 꺼져있음
-							//현재 위치 사용 여부 다이얼로그 표시
-							//확인 : 현재 위치의 날씨 데이터로드, 취소 : 앱 종료
-							new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.title_empty_locations).setMessage(
-									R.string.msg_empty_locations).setPositiveButton(R.string.use,
-									new DialogInterface.OnClickListener() {
-										@Override
-										public void onClick(DialogInterface dialogInterface, int i) {
-											dialogInterface.dismiss();
-											PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(
-															getString(R.string.pref_key_use_current_location), true)
-													.putString(getString(R.string.pref_key_last_selected_location_type),
-															LocationType.CurrentLocation.name()).commit();
-											enableCurrentLocation = true;
-
-											if (checkPermissionAndGpsOn()) {
-												bundle.putBoolean(BundleKey.ChangedUseCurrentLocation.name(), enableCurrentLocation);
-												bundle.putBoolean(BundleKey.Refresh.name(), refresh);
-
-												getParentFragmentManager().popBackStack();
-												onResultFragmentListener.onResultFragment(bundle);
-											}
-
-										}
-									}).setNegativeButton(R.string.add_favorite, new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialogInterface, int i) {
-									dialogInterface.dismiss();
-									PreferenceManager.getDefaultSharedPreferences(getContext()).edit()
-											.putString(getString(R.string.pref_key_last_selected_location_type),
-													LocationType.SelectedAddress.name()).commit();
-									binding.searchview.callOnClick();
-								}
-							}).setNeutralButton(R.string.close_app, new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialogInterface, int i) {
-									dialogInterface.dismiss();
-									getActivity().finish();
-								}
-							}).create().show();
-						} else if (haveFavorites) {
-							onResultFragmentListener.onResultFragment(bundle);
-							getParentFragmentManager().popBackStack();
-						} else {
-							if (checkPermissionAndGpsOn()) {
-								onResultFragmentListener.onResultFragment(bundle);
-								getParentFragmentManager().popBackStack();
-							}
-						}
+						processIfNoLocations(result);
 					}
 				});
 			}
@@ -374,6 +325,68 @@ public class FavoritesFragment extends Fragment {
 		});
 
 
+	}
+
+	private void processIfNoLocations(List<FavoriteAddressDto> result) {
+		final boolean haveFavorites = adapter.getItemCount() > 0;
+		final boolean useCurrentLocation = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(
+				getString(R.string.pref_key_use_current_location), false);
+
+		Bundle bundle = new Bundle();
+		bundle.putSerializable(BundleKey.newFavoriteAddressDtoList.name(), (Serializable) result);
+		bundle.putString(BundleKey.LastFragment.name(), FavoritesFragment.class.getName());
+		bundle.putBoolean("removedLocation", removedLocation);
+
+		if (!haveFavorites && !useCurrentLocation) {
+			//즐겨찾기가 비었고, 현재 위치 사용이 꺼져있음
+			//현재 위치 사용 여부 다이얼로그 표시
+			//확인 : 현재 위치의 날씨 데이터로드, 취소 : 앱 종료
+			new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.title_empty_locations).setMessage(
+					R.string.msg_empty_locations).setPositiveButton(R.string.use,
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialogInterface, int i) {
+							dialogInterface.dismiss();
+							PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(
+											getString(R.string.pref_key_use_current_location), true)
+									.putString(getString(R.string.pref_key_last_selected_location_type),
+											LocationType.CurrentLocation.name()).commit();
+							enableCurrentLocation = true;
+
+							if (checkPermissionAndGpsOn()) {
+								bundle.putBoolean(BundleKey.ChangedUseCurrentLocation.name(), enableCurrentLocation);
+								bundle.putBoolean(BundleKey.Refresh.name(), refresh);
+
+								getParentFragmentManager().popBackStack();
+								onResultFragmentListener.onResultFragment(bundle);
+							}
+
+						}
+					}).setNegativeButton(R.string.add_favorite, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialogInterface, int i) {
+					dialogInterface.dismiss();
+					PreferenceManager.getDefaultSharedPreferences(getContext()).edit()
+							.putString(getString(R.string.pref_key_last_selected_location_type),
+									LocationType.SelectedAddress.name()).commit();
+					binding.searchview.callOnClick();
+				}
+			}).setNeutralButton(R.string.close_app, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialogInterface, int i) {
+					dialogInterface.dismiss();
+					getActivity().finish();
+				}
+			}).create().show();
+		} else if (haveFavorites) {
+			onResultFragmentListener.onResultFragment(bundle);
+			getParentFragmentManager().popBackStack();
+		} else {
+			if (checkPermissionAndGpsOn()) {
+				onResultFragmentListener.onResultFragment(bundle);
+				getParentFragmentManager().popBackStack();
+			}
+		}
 	}
 
 	private boolean checkPermissionAndGpsOn() {

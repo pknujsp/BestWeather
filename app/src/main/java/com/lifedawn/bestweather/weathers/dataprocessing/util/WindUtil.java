@@ -13,9 +13,6 @@ public class WindUtil {
 
 	public static void init(Context context) {
 		if (windStrengthDescriptionMap.isEmpty() || windStrengthDescriptionSimpleMap.isEmpty()) {
-			windStrengthDescriptionMap.clear();
-			windStrengthDescriptionSimpleMap.clear();
-
 			windStrengthDescriptionMap.put("1", context.getString(R.string.wind_strength_1));
 			windStrengthDescriptionMap.put("2", context.getString(R.string.wind_strength_2));
 			windStrengthDescriptionMap.put("3", context.getString(R.string.wind_strength_3));

@@ -21,7 +21,7 @@
         android:fontFamily="sans-serif-light"
         android:text="addressName"
         android:textColor="@color/black"
-        android:textSize="16sp"
+        android:textSize="15sp"
         />
 
     <ImageButton
