@@ -5,7 +5,8 @@
     android:layout_height="@dimen/toolbarHeight"
     android:background="@color/transparent"
     android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+    android:paddingRight="16dp"
+    >
 
     <ImageButton
         android:id="@+id/open_navigation_drawer"
@@ -16,7 +17,10 @@
         android:background="@drawable/img_btn_background"
         android:scaleType="centerInside"
         android:src="@drawable/menu"
-        app:tint="@color/white" />
+        app:tint="@color/white"
+        />
+
+
 
     <ImageButton
         android:id="@+id/find"
@@ -28,8 +32,8 @@
         android:background="@drawable/img_btn_background"
         android:scaleType="centerInside"
         android:src="@drawable/search"
-
-        app:tint="@color/white" />
+        app:tint="@color/white"
+        />
 
     <ImageButton
         android:id="@+id/gps"
@@ -42,7 +46,8 @@
         android:background="@drawable/img_btn_background"
         android:scaleType="centerInside"
         android:src="@drawable/gps"
-        app:tint="@color/white" />
+        app:tint="@color/white"
+        />
 
 
     <ImageButton
@@ -55,6 +60,7 @@
         android:scaleType="centerInside"
         android:src="@drawable/refresh"
 
-        app:tint="@color/white" />
+        app:tint="@color/white"
+        />
 
 </RelativeLayout>

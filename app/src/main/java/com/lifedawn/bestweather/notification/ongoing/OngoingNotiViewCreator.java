@@ -13,10 +13,7 @@ import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Location;
 import android.os.Build;
-import android.os.Looper;
-import android.os.PowerManager;
 import android.text.TextPaint;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -29,6 +26,7 @@ import androidx.core.graphics.drawable.IconCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.location.LocationResult;
+import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
@@ -64,7 +62,6 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class OngoingNotiViewCreator {
@@ -147,9 +144,7 @@ public class OngoingNotiViewCreator {
 			}
 		};
 
-		PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-
-		if (powerManager.isInteractive()) {
+		if (DeviceUtils.Companion.isScreenOn(context)) {
 			fusedLocation.startNotification(context);
 			fusedLocation.findCurrentLocation(locationCallback, false);
 		} else {

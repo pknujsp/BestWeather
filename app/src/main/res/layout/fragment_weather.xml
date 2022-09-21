@@ -63,10 +63,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_horizontal"
-                            android:layout_marginBottom="2dp"
+                            android:layout_marginBottom="3dp"
                             android:clickable="true"
                             android:gravity="center_vertical"
+                            android:background="?attr/selectableItemBackground"
                             android:orientation="horizontal"
+                            android:focusable="true"
                             >
 
                             <ImageView
@@ -94,7 +96,10 @@
                             <TextView
                                 style="@style/text_shadow"
                                 android:background="@drawable/rounded_btn_background"
-                                android:padding="3dp"
+                                android:paddingLeft="4dp"
+                                android:paddingRight="4dp"
+                                android:paddingTop="3dp"
+                                android:paddingBottom="3dp"
                                 android:backgroundTint="@color/gray"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"

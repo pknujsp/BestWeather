@@ -1418,23 +1418,25 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private void changeWeatherDataSourcePicker(String countryCode) {
+		String provide = getString(R.string.provide) + " : ";
+
 		switch (mainWeatherProviderType) {
 			case KMA_WEB:
 			case KMA_API:
-				binding.weatherDataSourceName.setText(R.string.kma);
+				binding.weatherDataSourceName.setText(new String(provide + getString(R.string.kma)));
 				binding.weatherDataSourceIcon.setImageResource(R.drawable.kmaicon);
 				break;
 			case ACCU_WEATHER:
-				binding.weatherDataSourceName.setText(R.string.accu_weather);
+				binding.weatherDataSourceName.setText(new String(provide + getString(R.string.accu_weather)));
 				binding.weatherDataSourceIcon.setImageResource(R.drawable.accuicon);
 				break;
 			case OWM_ONECALL:
 			case OWM_INDIVIDUAL:
-				binding.weatherDataSourceName.setText(R.string.owm);
+				binding.weatherDataSourceName.setText(new String(provide + getString(R.string.owm)));
 				binding.weatherDataSourceIcon.setImageResource(R.drawable.owmicon);
 				break;
 			case MET_NORWAY:
-				binding.weatherDataSourceName.setText(R.string.met);
+				binding.weatherDataSourceName.setText(new String(provide + getString(R.string.met)));
 				binding.weatherDataSourceIcon.setImageResource(R.drawable.metlogo);
 				break;
 		}
@@ -1493,22 +1495,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		});
 	}
 
-	private void setHeaderColor(boolean isNight) {
-		int textColor = isNight ? Color.WHITE : Color.BLACK;
-		int shadowColor = isNight ? Color.BLACK : Color.WHITE;
-		float shadowRadius = 2.5f;
-		float dx = 0, dy = 0;
-
-		binding.weatherDataSourceName.setTextColor(textColor);
-		binding.addressName.setTextColor(textColor);
-		binding.updatedDatetime.setTextColor(textColor);
-		binding.weatherDataSourceName.setCompoundDrawableTintList(ColorStateList.valueOf(textColor));
-		binding.updatedDatetime.setCompoundDrawableTintList(ColorStateList.valueOf(textColor));
-
-		binding.weatherDataSourceName.setShadowLayer(shadowRadius, dx, dy, shadowColor);
-		binding.addressName.setShadowLayer(shadowRadius, dx, dy, shadowColor);
-		binding.updatedDatetime.setShadowLayer(shadowRadius, dx, dy, shadowColor);
-	}
 
 	public LocationType getLocationType() {
 		return locationType;

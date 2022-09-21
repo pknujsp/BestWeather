@@ -97,7 +97,7 @@
             android:layout_marginBottom="24dp"
             android:background="@drawable/rounded_btn_background"
             android:backgroundTint="@color/design_default_color_secondary_variant"
-            android:text="@string/cancel"
+            android:text="@string/close"
             android:textColor="@color/white"
             />
 

@@ -20,6 +20,7 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.main.MyApplication;
@@ -238,24 +239,26 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 	}
 
 	protected void startWork(Context context, String action, @Nullable Data data) {
-		if (isWorkRunning(context)) {
-			Toast.makeText(context, R.string.runningUpdateService, Toast.LENGTH_SHORT).show();
-		} else {
-			Data.Builder dataBuilder = new Data.Builder()
-					.putString("action", action);
+		if (DeviceUtils.Companion.isScreenOn(context)) {
+			if (isWorkRunning(context)) {
+				Toast.makeText(context, R.string.runningUpdateService, Toast.LENGTH_SHORT).show();
+			} else {
+				Data.Builder dataBuilder = new Data.Builder()
+						.putString("action", action);
 
-			if (data != null) {
-				dataBuilder.putAll(data);
+				if (data != null) {
+					dataBuilder.putAll(data);
+				}
+
+				OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(WidgetWorker.class)
+						.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+						.setInputData(dataBuilder.build())
+						.addTag(WidgetWorker.class.getName())
+						.build();
+
+				WorkManager workManager = WorkManager.getInstance(context);
+				workManager.enqueueUniqueWork(WidgetWorker.class.getName(), ExistingWorkPolicy.KEEP, request);
 			}
-
-			OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(WidgetWorker.class)
-					.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-					.setInputData(dataBuilder.build())
-					.addTag(WidgetWorker.class.getName())
-					.build();
-
-			WorkManager workManager = WorkManager.getInstance(context);
-			workManager.enqueueUniqueWork(WidgetWorker.class.getName(), ExistingWorkPolicy.KEEP, request);
 		}
 	}
 
