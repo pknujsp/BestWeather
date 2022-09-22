@@ -287,39 +287,48 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				createLocationsList(result);
-				final boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
-				final LocationType lastSelectedLocationType = LocationType.valueOf(
-						sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
-								LocationType.CurrentLocation.name()));
-				setCurrentLocationState(usingCurrentLocation);
 
-				if (currentAddressName != null) {
-					binding.sideNavMenu.addressName.setText(currentAddressName);
-				}
+				MainThreadWorker.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						createLocationsList(result);
 
-				if (lastSelectedLocationType == LocationType.CurrentLocation) {
-					if (usingCurrentLocation) {
-						addWeatherFragment(lastSelectedLocationType, null);
-					} else {
-						if (favoriteAddressDtoList.size() > 0) {
-							binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+						final boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
+						final LocationType lastSelectedLocationType = LocationType.valueOf(
+								sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
+										LocationType.CurrentLocation.name()));
+						setCurrentLocationState(usingCurrentLocation);
+
+						if (currentAddressName != null) {
+							binding.sideNavMenu.addressName.setText(currentAddressName);
+						}
+
+						if (lastSelectedLocationType == LocationType.CurrentLocation) {
+							if (usingCurrentLocation) {
+								addWeatherFragment(lastSelectedLocationType, null);
+							} else {
+								if (favoriteAddressDtoList.size() > 0) {
+									binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+								} else {
+									binding.sideNavMenu.favorites.callOnClick();
+								}
+							}
+
 						} else {
-							binding.sideNavMenu.favorites.callOnClick();
+							final int lastSelectedFavoriteId = sharedPreferences.getInt(
+									getString(R.string.pref_key_last_selected_favorite_address_id), -1);
+							if (!clickLocationItemById(lastSelectedFavoriteId)) {
+								if (favoriteAddressDtoList.size() > 0) {
+									binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+								} else {
+									binding.sideNavMenu.favorites.callOnClick();
+								}
+							}
 						}
 					}
+				});
 
-				} else {
-					final int lastSelectedFavoriteId = sharedPreferences.getInt(
-							getString(R.string.pref_key_last_selected_favorite_address_id), -1);
-					if (!clickLocationItemById(lastSelectedFavoriteId)) {
-						if (favoriteAddressDtoList.size() > 0) {
-							binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
-						} else {
-							binding.sideNavMenu.favorites.callOnClick();
-						}
-					}
-				}
+
 			}
 
 			@Override
@@ -343,7 +352,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 				View.GONE);
 
 		binding.sideNavMenu.favoriteAddressLayout.removeAllViews();
-		binding.sideNavMenu.favoriteAddressLayout.setVisibility(View.GONE);
 
 		LayoutInflater layoutInflater = getLayoutInflater();
 		for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
