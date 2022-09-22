@@ -19,7 +19,6 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
@@ -29,10 +28,9 @@ import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentAlarmSettingsBinding;
 import com.lifedawn.bestweather.databinding.ViewRepeatAlarmSettingsBinding;
-import com.lifedawn.bestweather.favorites.FavoritesFragment;
+import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.AlarmDto;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -43,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 
 
@@ -154,11 +153,22 @@ public class AlarmSettingsFragment extends Fragment {
 		binding.location.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				FavoritesFragment favoritesFragment = new FavoritesFragment();
-				favoritesFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+				MapFragment mapFragment = new MapFragment();
+
+				mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 					@Override
-					public void onResultFragment(Bundle result) {
-						if (result.getSerializable(BundleKey.SelectedAddressDto.name()) == null) {
+					public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
+
+					}
+
+					@Override
+					public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
+
+					}
+
+					@Override
+					public void onClickedAddress(@Nullable FavoriteAddressDto newSelectedAddressDto) {
+						if (newSelectedAddressDto == null) {
 							if (!selectedFavoriteLocation) {
 								Toast.makeText(getContext(), R.string.not_selected_address, Toast.LENGTH_SHORT).show();
 
@@ -170,9 +180,6 @@ public class AlarmSettingsFragment extends Fragment {
 							}
 						} else {
 							selectedFavoriteLocation = true;
-
-							FavoriteAddressDto newSelectedAddressDto =
-									(FavoriteAddressDto) result.getSerializable(BundleKey.SelectedAddressDto.name());
 							binding.location.setText(newSelectedAddressDto.getAddress());
 
 							if (newAlarmSession) {
@@ -193,14 +200,15 @@ public class AlarmSettingsFragment extends Fragment {
 						}
 					}
 				});
+
 				Bundle bundle = new Bundle();
 				bundle.putString(BundleKey.RequestFragment.name(), AlarmSettingsFragment.class.getName());
-				favoritesFragment.setArguments(bundle);
+				mapFragment.setArguments(bundle);
 
 				String tag = AlarmSettingsFragment.class.getName();
 
 				getParentFragmentManager().beginTransaction().hide(AlarmSettingsFragment.this).add(R.id.fragment_container,
-								favoritesFragment, tag)
+								mapFragment, tag)
 						.addToBackStack(tag).commit();
 			}
 		});

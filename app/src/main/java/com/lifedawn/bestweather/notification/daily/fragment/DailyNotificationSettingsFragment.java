@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.preference.PreferenceManager;
 
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -29,9 +28,8 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
-import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentDailyPushNotificationSettingsBinding;
-import com.lifedawn.bestweather.favorites.FavoritesFragment;
+import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
@@ -53,6 +51,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 
 
@@ -80,8 +79,8 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
 
-			if (f instanceof FavoritesFragment) {
-				if (!((FavoritesFragment) f).isClickedItem() && !selectedFavoriteLocation) {
+			if (f instanceof MapFragment) {
+				if (!((MapFragment) f).isClickedItem() && !selectedFavoriteLocation) {
 					binding.commons.currentLocationRadio.setChecked(true);
 				}
 			}
@@ -416,15 +415,26 @@ public class DailyNotificationSettingsFragment extends Fragment {
 	}
 
 	protected void openFavoritesFragment() {
-		FavoritesFragment favoritesFragment = new FavoritesFragment();
+		MapFragment mapFragment = new MapFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString(BundleKey.RequestFragment.name(), DailyNotificationSettingsFragment.class.getName());
-		favoritesFragment.setArguments(bundle);
+		mapFragment.setArguments(bundle);
 
-		favoritesFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+
+		mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 			@Override
-			public void onResultFragment(Bundle result) {
-				if (result.getSerializable(BundleKey.SelectedAddressDto.name()) == null) {
+			public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
+
+			}
+
+			@Override
+			public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
+
+			}
+
+			@Override
+			public void onClickedAddress(@Nullable FavoriteAddressDto favoriteAddressDto) {
+				if (favoriteAddressDto == null) {
 					if (!selectedFavoriteLocation) {
 						Toast.makeText(getContext(), R.string.not_selected_address, Toast.LENGTH_SHORT).show();
 						binding.commons.currentLocationRadio.setChecked(true);
@@ -432,9 +442,8 @@ public class DailyNotificationSettingsFragment extends Fragment {
 				} else {
 					selectedFavoriteLocation = true;
 
-					FavoriteAddressDto addressDto = (FavoriteAddressDto) result.getSerializable(BundleKey.SelectedAddressDto.name());
-					selectedFavoriteAddressDto = addressDto;
-					binding.commons.selectedAddressName.setText(addressDto.getAddress());
+					selectedFavoriteAddressDto = favoriteAddressDto;
+					binding.commons.selectedAddressName.setText(selectedFavoriteAddressDto.getAddress());
 
 					//address,latitude,longitude,countryCode
 					editingNotificationDto.setAddressName(selectedFavoriteAddressDto.getAddress());
@@ -446,9 +455,9 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			}
 		});
 
-		String tag = FavoritesFragment.class.getName();
+		String tag = MapFragment.class.getName();
 
 		getParentFragmentManager().beginTransaction().hide(DailyNotificationSettingsFragment.this).add(R.id.fragment_container,
-				favoritesFragment, tag).addToBackStack(tag).commit();
+				mapFragment, tag).addToBackStack(tag).commit();
 	}
 }

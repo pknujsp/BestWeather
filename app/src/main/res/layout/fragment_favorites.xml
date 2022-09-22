@@ -15,24 +15,16 @@
             layout="@layout/toolbar"
             />
 
-        <TextView
+        <Button
             android:id="@+id/searchview"
-            android:layout_width="match_parent"
-            android:layout_height="42dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@id/toolbar"
-            android:layout_centerHorizontal="true"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/searchview_background"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:paddingLeft="@dimen/searchviewPaddingHorizontal"
-            android:paddingTop="@dimen/searchviewPaddingVertical"
-            android:paddingRight="@dimen/searchviewPaddingHorizontal"
-            android:paddingBottom="@dimen/searchviewPaddingVertical"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:drawableLeft="@drawable/search"
+            android:drawableTint="@color/white"
             android:text="@string/find_address"
-            app:drawableRightCompat="@drawable/search"
             />
 
         <androidx.recyclerview.widget.RecyclerView

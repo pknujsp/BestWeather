@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -73,7 +72,6 @@ import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
-import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.flickr.FlickrImgObj;
 import com.lifedawn.bestweather.flickr.FlickrLoader;
@@ -97,6 +95,7 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dai
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
@@ -321,15 +320,38 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					Bundle bundle = new Bundle();
 					bundle.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
 					mapFragment.setArguments(bundle);
-					mapFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+					mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 						@Override
-						public void onResultFragment(Bundle result) {
-							final boolean isSelectedNewAddress = result.getSerializable(BundleKey.SelectedAddressDto.name()) != null;
-							boolean removedLocation = result.getBoolean("removedLocation", false);
+						public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
+							final boolean isSelectedNewAddress = newFavoriteAddressDto != null;
 
-							if (isSelectedNewAddress || removedLocation) {
-								iRefreshFavoriteLocationListOnSideNav.onRefreshedFavoriteLocationsList(result.getString(BundleKey.LastFragment.name()), result);
+							Bundle bundle1 = new Bundle();
+							bundle1.putBoolean("added", isSelectedNewAddress);
+
+							if (isSelectedNewAddress || removed) {
+								iRefreshFavoriteLocationListOnSideNav.refreshFavorites(new DbQueryCallback<List<FavoriteAddressDto>>() {
+									@Override
+									public void onResultSuccessful(List<FavoriteAddressDto> result) {
+										iRefreshFavoriteLocationListOnSideNav.onRefreshedFavoriteLocationsList(bundle1.getString(BundleKey.LastFragment.name()), bundle1);
+									}
+
+									@Override
+									public void onResultNoData() {
+
+									}
+								});
+
 							}
+						}
+
+						@Override
+						public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
+
+						}
+
+						@Override
+						public void onClickedAddress(@Nullable FavoriteAddressDto favoriteAddressDto) {
+
 						}
 					});
 

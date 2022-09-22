@@ -46,9 +46,8 @@ import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
-import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.ActivityConfigureWidgetBinding;
-import com.lifedawn.bestweather.favorites.FavoritesFragment;
+import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -78,6 +77,8 @@ import com.lifedawn.bestweather.widget.widgetprovider.FourthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FifthWidgetProvider;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class ConfigureWidgetActivity extends AppCompatActivity implements AbstractWidgetCreator.WidgetUpdateCallback {
 	private ActivityConfigureWidgetBinding binding;
@@ -113,25 +114,18 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		public void onFragmentAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
 			super.onFragmentAttached(fm, f, context);
 
-			if (f instanceof FavoritesFragment) {
+			if (f instanceof MapFragment) {
 				binding.widgetSettingsContainer.setVisibility(View.GONE);
 				binding.fragmentContainer.setVisibility(View.VISIBLE);
 			}
 		}
 
-		@Override
-		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-			super.onFragmentCreated(fm, f, savedInstanceState);
-			if (f instanceof FavoritesFragment) {
-
-			}
-		}
 
 		@Override
 		public void onFragmentDestroyed(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
 
-			if (f instanceof FavoritesFragment) {
+			if (f instanceof MapFragment) {
 				binding.widgetSettingsContainer.setVisibility(View.VISIBLE);
 				binding.fragmentContainer.setVisibility(View.GONE);
 
@@ -477,22 +471,33 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	}
 
 	private void openFavoritesFragment() {
-		FavoritesFragment favoritesFragment = new FavoritesFragment();
+		MapFragment mapFragment = new MapFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString(BundleKey.RequestFragment.name(), ConfigureWidgetActivity.class.getName());
 
-		favoritesFragment.setArguments(bundle);
-		favoritesFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+		mapFragment.setArguments(bundle);
+		mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 			@Override
-			public void onResultFragment(Bundle result) {
-				if (result.getSerializable(BundleKey.SelectedAddressDto.name()) == null) {
+			public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
+
+			}
+
+			@Override
+			public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
+
+			}
+
+			@Override
+			public void onClickedAddress(@Nullable FavoriteAddressDto favoriteSelectedAddressDto) {
+				if (favoriteSelectedAddressDto == null) {
 					if (!selectedFavoriteLocation) {
 						Toast.makeText(getApplicationContext(), R.string.not_selected_address, Toast.LENGTH_SHORT).show();
 						binding.currentLocationRadio.setChecked(true);
 					}
 				} else {
 					selectedFavoriteLocation = true;
-					newSelectedAddressDto = (FavoriteAddressDto) result.getSerializable(BundleKey.SelectedAddressDto.name());
+
+					newSelectedAddressDto = favoriteSelectedAddressDto;
 
 					WidgetDto widgetDto = widgetCreator.getWidgetDto();
 					widgetDto.setAddressName(newSelectedAddressDto.getAddress());
@@ -505,8 +510,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			}
 		});
 
-		String tag = FavoritesFragment.class.getName();
-		getSupportFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), favoritesFragment, tag)
+		String tag = com.lifedawn.bestweather.findaddress.map.MapFragment.class.getName();
+		getSupportFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), mapFragment, tag)
 				.addToBackStack(tag).commitAllowingStateLoss();
 	}
 

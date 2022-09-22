@@ -45,8 +45,6 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentMainBinding;
-import com.lifedawn.bestweather.favorites.FavoritesFragment;
-import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.notification.NotificationFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -286,9 +284,10 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		});
 
 
-		createLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
+		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
+				createLocationsList(result);
 				final boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
 				final LocationType lastSelectedLocationType = LocationType.valueOf(
 						sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
@@ -329,6 +328,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			}
 		});
 
+
 	}
 
 	@Override
@@ -337,62 +337,32 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		initializing = false;
 	}
 
-	private void createLocationsList(DbQueryCallback<List<FavoriteAddressDto>> callback) {
+	private void createLocationsList(List<FavoriteAddressDto> result) {
+		favoriteAddressDtoList = result;
+		binding.sideNavMenu.favoriteAddressLayout.setVisibility(favoriteAddressDtoList.size() > 0 ? View.VISIBLE :
+				View.GONE);
+
 		binding.sideNavMenu.favoriteAddressLayout.removeAllViews();
 		binding.sideNavMenu.favoriteAddressLayout.setVisibility(View.GONE);
 
-		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
-			@Override
-			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				if (getActivity() != null) {
-					MainThreadWorker.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							favoriteAddressDtoList = result;
-							binding.sideNavMenu.favoriteAddressLayout.setVisibility(favoriteAddressDtoList.size() > 0 ? View.VISIBLE :
-									View.GONE);
-
-							LayoutInflater layoutInflater = getLayoutInflater();
-							for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
-								addFavoriteLocationItemView(layoutInflater, LocationType.SelectedAddress, favoriteAddressDto);
-							}
-
-							callback.onResultSuccessful(result);
-						}
-					});
-				}
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
-
+		LayoutInflater layoutInflater = getLayoutInflater();
+		for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
+			addFavoriteLocationItemView(layoutInflater, LocationType.SelectedAddress, favoriteAddressDto);
+		}
 	}
 
 
 	@Override
 	public void onRefreshedFavoriteLocationsList(String requestKey, Bundle bundle) {
-		final boolean isSelectedNewAddress = bundle.getSerializable(BundleKey.SelectedAddressDto.name()) != null;
+		final boolean isSelectedNewAddress = bundle.getBoolean("added");
 
-		createLocationsList(new DbQueryCallback<List<FavoriteAddressDto>>() {
-			@Override
-			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				if (isSelectedNewAddress) {
-					final int lastSelectedFavoriteAddressId = sharedPreferences.getInt(
-							getString(R.string.pref_key_last_selected_favorite_address_id), -1);
-					clickLocationItemById(lastSelectedFavoriteAddressId);
-				} else {
-					processIfPreviousFragmentIsFavorite();
-				}
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
+		if (isSelectedNewAddress) {
+			final int lastSelectedFavoriteAddressId = sharedPreferences.getInt(
+					getString(R.string.pref_key_last_selected_favorite_address_id), -1);
+			clickLocationItemById(lastSelectedFavoriteAddressId);
+		} else {
+			processIfPreviousFragmentIsFavorite();
+		}
 	}
 
 	private void processIfPreviousFragmentIsFavorite() {
@@ -479,60 +449,30 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		public void onClick(View view) {
 			switch (view.getId()) {
 				case R.id.favorites:
-					FavoritesFragment favoritesFragment = new FavoritesFragment();
+					MapFragment mapFragment = new MapFragment();
 					Bundle bundle = new Bundle();
 					bundle.putString(BundleKey.RequestFragment.name(), MainTransactionFragment.class.getName());
 
-					favoritesFragment.setArguments(bundle);
-					favoritesFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+					mapFragment.setArguments(bundle);
+
+					mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
+						@Override
+						public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
+							onResultMapFragment(favoriteAddressDtoList, newFavoriteAddressDto);
+						}
 
 						@Override
-						public void onResultFragment(Bundle result) {
-							//변경된 위치가 있는지 확인
-							setCurrentLocationState(sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false));
-							String lastFragment = result.getString(BundleKey.LastFragment.name());
-							List<FavoriteAddressDto> newFavoriteAddressDtoList = (List<FavoriteAddressDto>) result.getSerializable(
-									BundleKey.newFavoriteAddressDtoList.name());
+						public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
+							onResultMapFragment(favoriteAddressDtoList, null);
+						}
 
-							final boolean added = result.getSerializable(BundleKey.SelectedAddressDto.name()) != null;
-							final int addedLocationDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name(), -1);
+						@Override
+						public void onClickedAddress(@Nullable FavoriteAddressDto favoriteAddressDto) {
 
-							Set<Integer> lastSet = new HashSet<>();
-							Set<Integer> newSet = new HashSet<>();
-
-							for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
-								lastSet.add(favoriteAddressDto.getId());
-							}
-							for (FavoriteAddressDto favoriteAddressDto : newFavoriteAddressDtoList) {
-								newSet.add(favoriteAddressDto.getId());
-							}
-
-							Set<Integer> addedSet = new HashSet<>(newSet);
-							addedSet.removeAll(lastSet);
-							Set<Integer> removedSet = new HashSet<>(lastSet);
-							removedSet.removeAll(newSet);
-
-							if (!addedSet.isEmpty() || !removedSet.isEmpty()) {
-								//즐겨찾기 변동 발생
-								onRefreshedFavoriteLocationsList(lastFragment, result);
-
-								if (added) {
-									for (int i = 0; i < binding.sideNavMenu.favoriteAddressLayout.getChildCount(); i++) {
-										if (((FavoriteAddressDto) binding.sideNavMenu.favoriteAddressLayout.getChildAt(i).getTag(favDtoTagInFavLocItemView))
-												.getId() == addedLocationDtoId) {
-											binding.sideNavMenu.favoriteAddressLayout.getChildAt(i).callOnClick();
-											break;
-										}
-									}
-								}
-							} else {
-								//변동 없음
-								processIfPreviousFragmentIsFavorite();
-							}
 						}
 					});
 
-					final String tag = FavoritesFragment.class.getName();
+					final String tag = MapFragment.class.getName();
 
 					FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
 					if (getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName()) != null) {
@@ -541,7 +481,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 					}
 
 					transaction.add(
-							binding.fragmentContainer.getId(), favoritesFragment,
+							binding.fragmentContainer.getId(), mapFragment,
 							tag).addToBackStack(tag).commitAllowingStateLoss();
 					break;
 				case R.id.settings:
@@ -565,6 +505,51 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			binding.drawerLayout.closeDrawer(binding.sideNavigation, false);
 		}
 	};
+
+	private void onResultMapFragment(List<FavoriteAddressDto> newFavoriteAddressDtoList, @Nullable FavoriteAddressDto newFavoriteAddressDto) {
+		//변경된 위치가 있는지 확인
+		setCurrentLocationState(sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false));
+
+		final boolean added = newFavoriteAddressDto != null;
+		final int addedLocationDtoId = newFavoriteAddressDto != null ? newFavoriteAddressDto.getId() : -1;
+
+		Set<Integer> lastSet = new HashSet<>();
+		Set<Integer> newSet = new HashSet<>();
+
+		for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
+			lastSet.add(favoriteAddressDto.getId());
+		}
+		for (FavoriteAddressDto favoriteAddressDto : newFavoriteAddressDtoList) {
+			newSet.add(favoriteAddressDto.getId());
+		}
+
+		Set<Integer> addedSet = new HashSet<>(newSet);
+		addedSet.removeAll(lastSet);
+		Set<Integer> removedSet = new HashSet<>(lastSet);
+		removedSet.removeAll(newSet);
+
+		if (!addedSet.isEmpty() || !removedSet.isEmpty()) {
+			//즐겨찾기 변동 발생
+			Bundle result = new Bundle();
+			result.putBoolean("added", added);
+
+			createLocationsList(newFavoriteAddressDtoList);
+			onRefreshedFavoriteLocationsList(null, result);
+
+			if (added) {
+				for (int i = 0; i < binding.sideNavMenu.favoriteAddressLayout.getChildCount(); i++) {
+					if (((FavoriteAddressDto) binding.sideNavMenu.favoriteAddressLayout.getChildAt(i).getTag(favDtoTagInFavLocItemView))
+							.getId() == addedLocationDtoId) {
+						binding.sideNavMenu.favoriteAddressLayout.getChildAt(i).callOnClick();
+						break;
+					}
+				}
+			}
+		} else {
+			//변동 없음
+			processIfPreviousFragmentIsFavorite();
+		}
+	}
 
 	private void addWeatherFragment(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
 		Bundle bundle = new Bundle();
@@ -590,6 +575,27 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 		getChildFragmentManager().beginTransaction().replace(binding.fragmentContainer.getId(), newWeatherFragment,
 				WeatherFragment.class.getName()).commitAllowingStateLoss();
+	}
+
+	@Override
+	public void refreshFavorites(DbQueryCallback<List<FavoriteAddressDto>> callback) {
+		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
+			@Override
+			public void onResultSuccessful(List<FavoriteAddressDto> result) {
+				MainThreadWorker.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						createLocationsList(result);
+						callback.onResultSuccessful(result);
+					}
+				});
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
 	}
 
 }

@@ -30,9 +30,8 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
-import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.databinding.FragmentBaseNotificationSettingsBinding;
-import com.lifedawn.bestweather.favorites.FavoritesFragment;
+import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
@@ -40,6 +39,8 @@ import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 
 public class OngoingNotificationSettingsFragment extends Fragment implements NotificationUpdateCallback {
@@ -66,8 +67,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
 
-			if (f instanceof FavoritesFragment) {
-				if (!((FavoritesFragment) f).isClickedItem() && !selectedFavoriteLocation) {
+			if (f instanceof MapFragment) {
+				if (!((MapFragment) f).isClickedItem() && !selectedFavoriteLocation) {
 					binding.commons.currentLocationRadio.setChecked(true);
 				}
 			}
@@ -312,15 +313,25 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 	}
 
 	protected void openFavoritesFragment() {
-		FavoritesFragment favoritesFragment = new FavoritesFragment();
+		MapFragment mapFragment = new MapFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString(BundleKey.RequestFragment.name(), OngoingNotificationSettingsFragment.class.getName());
-		favoritesFragment.setArguments(bundle);
+		mapFragment.setArguments(bundle);
 
-		favoritesFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+		mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 			@Override
-			public void onResultFragment(Bundle result) {
-				if (result.getSerializable(BundleKey.SelectedAddressDto.name()) == null) {
+			public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
+
+			}
+
+			@Override
+			public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
+
+			}
+
+			@Override
+			public void onClickedAddress(@Nullable FavoriteAddressDto favoriteAddressDto) {
+				if (favoriteAddressDto == null) {
 					if (!selectedFavoriteLocation) {
 						Toast.makeText(getContext(), R.string.not_selected_address, Toast.LENGTH_SHORT).show();
 						binding.commons.currentLocationRadio.setChecked(true);
@@ -328,7 +339,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 				} else {
 					selectedFavoriteLocation = true;
 
-					newSelectedAddressDto = (FavoriteAddressDto) result.getSerializable(BundleKey.SelectedAddressDto.name());
+					newSelectedAddressDto = favoriteAddressDto;
 					binding.commons.selectedAddressName.setText(newSelectedAddressDto.getAddress());
 
 					SharedPreferences.Editor editor = getContext().getSharedPreferences(notificationType.getPreferenceName(),
@@ -346,11 +357,10 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 			}
 		});
 
-		String tag = FavoritesFragment.class.getName();
+		String tag = MapFragment.class.getName();
 
 		getParentFragmentManager().beginTransaction().hide(OngoingNotificationSettingsFragment.this).add(R.id.fragment_container,
-				favoritesFragment,
-				tag).addToBackStack(tag).commit();
+				mapFragment, tag).addToBackStack(tag).commit();
 	}
 
 

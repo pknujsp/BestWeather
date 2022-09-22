@@ -1,14 +1,12 @@
 package com.lifedawn.bestweather.intro;
 
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
@@ -25,16 +23,16 @@ import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentIntroBinding;
-import com.lifedawn.bestweather.findaddress.FindAddressFragment;
 import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -92,23 +90,28 @@ public class IntroFragment extends Fragment {
 				bundle.putString(BundleKey.RequestFragment.name(), IntroFragment.class.getName());
 				mapFragment.setArguments(bundle);
 
-				mapFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
+				mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 					@Override
-					public void onResultFragment(Bundle result) {
-						final boolean isSelectedNewAddress = result.getSerializable(BundleKey.SelectedAddressDto.name()) != null;
+					public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
+						final int newFavoriteAddressDtoId = newFavoriteAddressDto.getId();
 
-						if (isSelectedNewAddress) {
-							final int newFavoriteAddressDtoId = result.getInt(BundleKey.newFavoriteAddressDtoId.name());
-							sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
-									newFavoriteAddressDtoId).putString(getString(R.string.pref_key_last_selected_location_type),
-									LocationType.SelectedAddress.name()).putBoolean(getString(R.string.pref_key_show_intro), false).apply();
+						sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
+								newFavoriteAddressDtoId).putString(getString(R.string.pref_key_last_selected_location_type),
+								LocationType.SelectedAddress.name()).putBoolean(getString(R.string.pref_key_show_intro), false).commit();
 
-							MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-							getParentFragment().getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, mainTransactionFragment,
-									mainTransactionFragment.getTag()).commitAllowingStateLoss();
-						} else {
+						MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
+						getParentFragment().getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, mainTransactionFragment,
+								mainTransactionFragment.getTag()).commitAllowingStateLoss();
+					}
 
-						}
+					@Override
+					public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
+
+					}
+
+					@Override
+					public void onClickedAddress(@Nullable FavoriteAddressDto favoriteAddressDto) {
+
 					}
 				});
 

@@ -1,31 +1,21 @@
 package com.lifedawn.bestweather.settings.fragments;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
-import com.google.android.gms.ads.AdRequest;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.IAppbarTitle;
 import com.lifedawn.bestweather.databinding.FragmentSettingsMainBinding;
-import com.lifedawn.bestweather.favorites.FavoritesFragment;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
 

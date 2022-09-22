@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.favorites;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.databinding.FragmentSimpleFavoritesBinding;
@@ -61,8 +63,39 @@ public class SimpleFavoritesFragment extends Fragment {
 		adapter.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
 			@Override
 			public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {
-				weatherViewModel.delete(favoriteAddressDto);
-				onClickedAddressListener.onClickedDelete(favoriteAddressDto, position);
+				new MaterialAlertDialogBuilder(getActivity()).
+						setTitle(R.string.remove)
+						.setMessage(favoriteAddressDto.getAddress()).
+						setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								weatherViewModel.delete(favoriteAddressDto, new DbQueryCallback<Boolean>() {
+									@Override
+									public void onResultSuccessful(Boolean result) {
+										MainThreadWorker.runOnUiThread(new Runnable() {
+											@Override
+											public void run() {
+												onClickedAddressListener.onClickedDelete(favoriteAddressDto, position);
+
+												adapter.getFavoriteAddressDtoList().remove(position);
+												adapter.notifyDataSetChanged();
+												dialog.dismiss();
+											}
+										});
+									}
+
+									@Override
+									public void onResultNoData() {
+
+									}
+								});
+							}
+						}).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						}).create().show();
 			}
 
 			@Override
@@ -82,7 +115,7 @@ public class SimpleFavoritesFragment extends Fragment {
 					binding.progressResultView.onSuccessful();
 				}
 			}
-			
+
 		});
 
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
