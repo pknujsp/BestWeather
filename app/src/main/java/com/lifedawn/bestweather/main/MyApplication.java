@@ -10,9 +10,12 @@ import androidx.preference.PreferenceManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,6 +24,8 @@ public class MyApplication extends Application {
 	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(6);
 	private static int statusBarHeight;
 	private static String localeCountryCode;
+	public static final Map<String, WeatherFragment.WeatherResponseObj> FINAL_RESPONSE_MAP = new HashMap<>();
+
 
 	@Override
 	public void onTerminate() {
