@@ -61,7 +61,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class OngoingNotiViewCreator {
@@ -108,19 +107,20 @@ public class OngoingNotiViewCreator {
 								context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
 						SharedPreferences.Editor editor = sharedPreferences.edit();
 						Address address = addressList.get(0);
-						notificationDataObj.setAddressName(address.getAddressLine(0))
-								.setCountryCode(address.getCountryCode())
-								.setLatitude(address.getLatitude()).setLongitude(address.getLongitude())
-								.setAdmin(address.getAdminArea());
 
 						editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), (float) notificationDataObj.getLatitude())
 								.putFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(),
 										(float) notificationDataObj.getLongitude())
 								.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode())
-								.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getAddressName()).commit();
+								.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getAddressName())
+								.commit();
+
+						notificationDataObj.setAddressName(address.getAddressLine(0))
+								.setCountryCode(address.getCountryCode())
+								.setLatitude(address.getLatitude()).setLongitude(address.getLongitude())
+								.setAdmin(address.getAdminArea());
 
 						fusedLocation.cancelNotification(context);
-
 						loadWeatherData(collapsedRemoteViews, expandedRemoteViews);
 					}
 				});
@@ -178,19 +178,18 @@ public class OngoingNotiViewCreator {
 			weatherProviderTypeSet.add(WeatherProviderType.AQICN);
 		}
 
-		ExecutorService executorService = MyApplication.getExecutorService();
-		WeatherProviderType finalWeatherProviderType = weatherProviderType;
-		WeatherRequestUtil.loadWeatherData(context, executorService,
+		final WeatherProviderType finalWeatherProviderType = weatherProviderType;
+		WeatherRequestUtil.loadWeatherData(context, MyApplication.getExecutorService(),
 				notificationDataObj.getLatitude(), notificationDataObj.getLongitude(), weatherDataTypeSet,
 				new MultipleRestApiDownloader() {
 					@Override
 					public void onResult() {
-						setResultViews(collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this, weatherDataTypeSet);
+						setResultViews(collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this);
 					}
 
 					@Override
 					public void onCanceled() {
-						setResultViews(collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this, weatherDataTypeSet);
+						setResultViews(collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this);
 					}
 				}, weatherProviderTypeSet);
 	}
@@ -265,7 +264,7 @@ public class OngoingNotiViewCreator {
 		return set;
 	}
 
-	protected void setResultViews(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
+	protected void setResultViews(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
 		ZoneOffset zoneOffset = null;
 		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
 		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
@@ -292,8 +291,7 @@ public class OngoingNotiViewCreator {
 
 		AirQualityDto airQualityDto = null;
 		if (zoneOffset != null) {
-			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
-					zoneOffset);
+			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader, zoneOffset);
 			if (airQualityDto.isSuccessful()) {
 				setAirQualityViews(expandedRemoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 			} else {

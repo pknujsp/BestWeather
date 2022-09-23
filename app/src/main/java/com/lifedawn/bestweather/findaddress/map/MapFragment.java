@@ -128,17 +128,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		@Override
 		public void handleOnBackPressed() {
 			if (!getChildFragmentManager().popBackStackImmediate()) {
-				checkHaveLocations();
-			} else {
 				if (requestFragment.equals(MainTransactionFragment.class.getName())) {
 					checkHaveLocations();
-
 				} else if (requestFragment.equals(ConfigureWidgetActivity.class.getName()) ||
 						requestFragment.equals(OngoingNotificationSettingsFragment.class.getName()) ||
 						requestFragment.equals(AlarmSettingsFragment.class.getName()) ||
 						requestFragment.equals(DailyNotificationSettingsFragment.class.getName())) {
-
-					getParentFragmentManager().popBackStackImmediate();
 
 					if (!clickedItem) {
 						weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
@@ -148,6 +143,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 									@Override
 									public void run() {
 										needsOnResultCallback = true;
+										getParentFragmentManager().popBackStack();
+
 										onResultFavoriteListener.onResult(result);
 									}
 								});
@@ -158,9 +155,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 							}
 						});
-					}
-				}
+					} else {
+						getParentFragmentManager().popBackStack();
 
+					}
+
+				}
 			}
 
 		}
@@ -269,12 +269,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		LONG_CLICK, SEARCH, FAVORITE
 	}
 
+	@Override
+	public void onAttach(@NonNull Context context) {
+		super.onAttach(context);
+		getActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		getActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
 
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);

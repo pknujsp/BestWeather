@@ -189,7 +189,6 @@ public class WeatherResponseProcessor {
 		}
 		CurrentConditionsDto currentConditionsDto = null;
 
-
 		if (weatherProviderType == WeatherProviderType.KMA_API) {
 			MultipleRestApiDownloader.ResponseResult ultraSrtNcstResponseResult =
 					multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
@@ -633,12 +632,10 @@ public class WeatherResponseProcessor {
 
 	public static List<HourlyForecastDto> getTempHourlyForecastDtoList(Context context, int count) {
 		final String tempDegree = context.getString(R.string.temp_temperature);
-
 		final String zeroSnowVolume = context.getString(R.string.temp_snowVolume);
 		final String zeroRainVolume = context.getString(R.string.temp_rainVolume);
 
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
-
 		ZonedDateTime zonedDateTime = ZonedDateTime.now();
 
 		for (int i = 0; i < count; i++) {
