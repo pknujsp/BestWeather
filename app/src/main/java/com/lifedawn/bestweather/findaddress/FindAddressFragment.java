@@ -93,8 +93,7 @@ public class FindAddressFragment extends Fragment {
 		networkStatus = NetworkStatus.getInstance(getContext());
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
-		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
-
+		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
 	}
 
 	@Override
@@ -137,7 +136,7 @@ public class FindAddressFragment extends Fragment {
 		binding.searchView.setOnEditTextQueryListener(new CustomEditText.OnEditTextQueryListener() {
 			@Override
 			public void onTextChange(String newText) {
-				getActivity().runOnUiThread(new Runnable() {
+				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						binding.progressResultView.onStarted();
@@ -173,15 +172,15 @@ public class FindAddressFragment extends Fragment {
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
+				Set<String> favoriteAddressSet = new HashSet<>();
+
+				for (FavoriteAddressDto favoriteAddressDto : result) {
+					favoriteAddressSet.add(favoriteAddressDto.getLatitude() + favoriteAddressDto.getLongitude());
+				}
+
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						Set<String> favoriteAddressSet = new HashSet<>();
-
-						for (FavoriteAddressDto favoriteAddressDto : result) {
-							favoriteAddressSet.add(favoriteAddressDto.getLatitude() + favoriteAddressDto.getLongitude());
-						}
-
 						addressesAdapter = new FoundAddressesAdapter();
 						addressesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
 							@Override
@@ -239,6 +238,11 @@ public class FindAddressFragment extends Fragment {
 
 	}
 
+	@Override
+	public void onStart() {
+		super.onStart();
+		binding.searchView.requestFocusEditText();
+	}
 
 	@Override
 	public void onHiddenChanged(boolean hidden) {
@@ -256,7 +260,6 @@ public class FindAddressFragment extends Fragment {
 	public void onDestroy() {
 		ProgressDialog.clearDialogs();
 		getLifecycle().removeObserver(locationLifeCycleObserver);
-
 		super.onDestroy();
 	}
 

@@ -49,9 +49,9 @@
                     android:background="?attr/selectableItemBackground"
                     android:drawableLeft="@drawable/location"
                     android:drawablePadding="4dp"
-                    android:padding="8dp"
                     android:drawableTint="@color/gray"
                     android:gravity="center_vertical"
+                    android:padding="8dp"
                     android:text="@string/current_location"
                     />
 
@@ -61,14 +61,14 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:background="?attr/selectableItemBackground"
+                    android:backgroundTint="@color/gray"
                     android:drawableLeft="@drawable/ic_baseline_map_24"
                     android:drawablePadding="4dp"
-                    android:padding="8dp"
-                    android:backgroundTint="@color/gray"
                     android:drawableTint="@color/gray"
                     android:gravity="center_vertical"
-                    android:visibility="gone"
+                    android:padding="8dp"
                     android:text="@string/map"
+                    android:visibility="gone"
                     />
             </LinearLayout>
         </LinearLayout>

@@ -72,6 +72,7 @@ import com.lifedawn.bestweather.notification.daily.fragment.DailyNotificationSet
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationSettingsFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
+import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 import com.lifedawn.bestweather.widget.ConfigureWidgetActivity;
 
@@ -133,6 +134,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				} else if (requestFragment.equals(ConfigureWidgetActivity.class.getName()) ||
 						requestFragment.equals(OngoingNotificationSettingsFragment.class.getName()) ||
 						requestFragment.equals(AlarmSettingsFragment.class.getName()) ||
+						requestFragment.equals(WeatherFragment.class.getName()) ||
 						requestFragment.equals(DailyNotificationSettingsFragment.class.getName())) {
 
 					if (!clickedItem) {
@@ -144,7 +146,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 									public void run() {
 										needsOnResultCallback = true;
 										getParentFragmentManager().popBackStack();
-
 										onResultFavoriteListener.onResult(result);
 									}
 								});
@@ -463,6 +464,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 		});
 
+		if (requestFragment.equals(MainTransactionFragment.class.getName())) {
+			binding.favorite.callOnClick();
+		}
 	}
 
 	@Override
