@@ -346,7 +346,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		initializing = false;
 	}
 
-	private void createLocationsList(List<FavoriteAddressDto> result) {
+	public void createLocationsList(List<FavoriteAddressDto> result) {
 		favoriteAddressDtoList = result;
 		binding.sideNavMenu.favoriteAddressLayout.setVisibility(favoriteAddressDtoList.size() > 0 ? View.VISIBLE :
 				View.GONE);
@@ -457,12 +457,11 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		public void onClick(View view) {
 			switch (view.getId()) {
 				case R.id.favorites:
-					MapFragment mapFragment = new MapFragment();
+					final MapFragment mapFragment = new MapFragment();
 					Bundle bundle = new Bundle();
 					bundle.putString(BundleKey.RequestFragment.name(), MainTransactionFragment.class.getName());
 
 					mapFragment.setArguments(bundle);
-
 					mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 						@Override
 						public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
@@ -484,8 +483,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 					FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
 					if (getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName()) != null) {
-						transaction.hide(
-								getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName()));
+						transaction.hide(getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName()));
 					}
 
 					transaction.add(
@@ -514,7 +512,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		}
 	};
 
-	private void onResultMapFragment(List<FavoriteAddressDto> newFavoriteAddressDtoList, @Nullable FavoriteAddressDto newFavoriteAddressDto) {
+	public void onResultMapFragment(List<FavoriteAddressDto> newFavoriteAddressDtoList, @Nullable FavoriteAddressDto newFavoriteAddressDto) {
 		//변경된 위치가 있는지 확인
 		setCurrentLocationState(sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false));
 

@@ -3,6 +3,7 @@ package com.lifedawn.bestweather.room.repository;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
 
@@ -23,12 +24,23 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 	private MutableLiveData<FavoriteAddressDto> deleteAddressesLiveData = new MutableLiveData<>();
 	private MutableLiveData<List<FavoriteAddressDto>> favoriteAddressesLiveData = new MutableLiveData<>();
 	private ExecutorService executors = MyApplication.getExecutorService();
-	private Context context;
 
-	public FavoriteAddressRepository(Context context) {
-		this.context = context;
+	private static FavoriteAddressRepository INSTANCE;
+
+	public static void initialize(Context context) {
+		if (INSTANCE == null) {
+			INSTANCE = new FavoriteAddressRepository(context);
+		}
+	}
+
+	public static FavoriteAddressRepository getINSTANCE() {
+		return INSTANCE;
+	}
+
+	private FavoriteAddressRepository(Context context) {
 		favoriteAddressDao = AppDb.getInstance(context).favoriteAddressDao();
 	}
+
 
 	public MutableLiveData<List<FavoriteAddressDto>> getFavoriteAddressesLiveData() {
 		return favoriteAddressesLiveData;
@@ -42,6 +54,10 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 				callback.processResult(favoriteAddressDao.getAll());
 			}
 		});
+	}
+
+	public LiveData<List<FavoriteAddressDto>> getAllData() {
+		return favoriteAddressDao.getAllData();
 	}
 
 	@Override

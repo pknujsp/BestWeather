@@ -103,7 +103,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	private FusedLocation fusedLocation;
 	private Integer dp48;
 
-
 	private ViewPager2 locationItemBottomSheetViewPager;
 	private boolean removedLocation;
 
@@ -129,12 +128,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		@Override
 		public void handleOnBackPressed() {
 			if (!getChildFragmentManager().popBackStackImmediate()) {
-				if (requestFragment.equals(MainTransactionFragment.class.getName())) {
+				if (requestFragment.equals(MainTransactionFragment.class.getName()) || requestFragment.equals(WeatherFragment.class.getName())) {
 					checkHaveLocations();
 				} else if (requestFragment.equals(ConfigureWidgetActivity.class.getName()) ||
 						requestFragment.equals(OngoingNotificationSettingsFragment.class.getName()) ||
 						requestFragment.equals(AlarmSettingsFragment.class.getName()) ||
-						requestFragment.equals(WeatherFragment.class.getName()) ||
 						requestFragment.equals(DailyNotificationSettingsFragment.class.getName())) {
 
 					if (!clickedItem) {
@@ -158,7 +156,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 						});
 					} else {
 						getParentFragmentManager().popBackStack();
-
 					}
 
 				}

@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.room.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -14,6 +15,9 @@ import java.util.List;
 public interface FavoriteAddressDao {
 	@Query("SELECT * FROM favorite_address_table")
 	List<FavoriteAddressDto> getAll();
+
+	@Query("SELECT * FROM favorite_address_table")
+	LiveData<List<FavoriteAddressDto>> getAllData();
 
 	@Query("SELECT count(*) FROM favorite_address_table")
 	int size();

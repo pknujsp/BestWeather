@@ -387,7 +387,7 @@ public final class KmaProcessing {
 	public static void requestWeatherDataAsXML(Context context, Double latitude, Double longitude,
 	                                           RequestKma requestKma,
 	                                           MultipleRestApiDownloader multipleRestApiDownloader) {
-		KmaAreaCodesRepository kmaAreaCodesRepository = new KmaAreaCodesRepository(context);
+		KmaAreaCodesRepository kmaAreaCodesRepository = KmaAreaCodesRepository.getINSTANCE();
 		kmaAreaCodesRepository.getAreaCodes(latitude, longitude,
 				new DbQueryCallback<List<KmaAreaCodeDto>>() {
 					@Override
@@ -593,7 +593,7 @@ public final class KmaProcessing {
 	                                           MultipleRestApiDownloader multipleRestApiDownloader) {
 		KmaResponseProcessor.init(context);
 
-		KmaAreaCodesRepository kmaAreaCodesRepository = new KmaAreaCodesRepository(context);
+		KmaAreaCodesRepository kmaAreaCodesRepository = KmaAreaCodesRepository.getINSTANCE();
 		kmaAreaCodesRepository.getAreaCodes(latitude, longitude,
 				new DbQueryCallback<List<KmaAreaCodeDto>>() {
 					@Override

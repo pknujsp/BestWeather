@@ -169,7 +169,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 	private Bundle arguments;
-	private WidgetRepository widgetRepository;
 
 	public WeatherFragment() {
 	}
@@ -251,7 +250,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		weatherViewModel.setiLoadImgOfCurrentConditions(this);
 		locationCallbackInMainFragment = weatherViewModel.getLocationCallback();
-		widgetRepository = new WidgetRepository(getContext());
 
 		arguments = savedInstanceState != null ? savedInstanceState : getArguments();
 	}
@@ -321,38 +319,21 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void onClick(View v) {
 				if (networkStatus.networkAvailable()) {
-					MapFragment mapFragment = new MapFragment();
+					final MapFragment mapFragment = new MapFragment();
 
-					Bundle bundle = new Bundle();
-					bundle.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
-					mapFragment.setArguments(bundle);
+					final Bundle arguments = new Bundle();
+					arguments.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
+					mapFragment.setArguments(arguments);
+
 					mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 						@Override
 						public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
-							final boolean isSelectedNewAddress = newFavoriteAddressDto != null;
-
-							Bundle bundle1 = new Bundle();
-							bundle1.putBoolean("added", isSelectedNewAddress);
-
-							if (isSelectedNewAddress || removed) {
-								iRefreshFavoriteLocationListOnSideNav.refreshFavorites(new DbQueryCallback<List<FavoriteAddressDto>>() {
-									@Override
-									public void onResultSuccessful(List<FavoriteAddressDto> result) {
-										iRefreshFavoriteLocationListOnSideNav.onRefreshedFavoriteLocationsList(bundle1.getString(BundleKey.LastFragment.name()), bundle1);
-									}
-
-									@Override
-									public void onResultNoData() {
-
-									}
-								});
-
-							}
+							iRefreshFavoriteLocationListOnSideNav.onResultMapFragment(favoriteAddressDtoList, newFavoriteAddressDto);
 						}
 
 						@Override
 						public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
-
+							iRefreshFavoriteLocationListOnSideNav.onResultMapFragment(favoriteAddressDtoList, null);
 						}
 
 						@Override

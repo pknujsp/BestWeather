@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,6 +24,7 @@ import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -49,6 +51,9 @@ public class SimpleFavoritesFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
 		binding = FragmentSimpleFavoritesBinding.inflate(inflater);
+
+		updateRecyclerView(new ArrayList<>());
+
 		return binding.getRoot();
 	}
 
@@ -59,11 +64,47 @@ public class SimpleFavoritesFragment extends Fragment {
 
 		binding.favoriteAddressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		binding.favoriteAddressList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+
+
+		/*
+		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
+			@Override
+			public void onResultSuccessful(List<FavoriteAddressDto> result) {
+				adapter.setFavoriteAddressDtoList(result);
+				if (getActivity() != null) {
+					MainThreadWorker.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							adapter.notifyDataSetChanged();
+						}
+					});
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
+
+			}
+		});
+
+		 */
+
+
+		weatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), new Observer<List<FavoriteAddressDto>>() {
+			@Override
+			public void onChanged(List<FavoriteAddressDto> favoriteAddressDtoList) {
+				updateRecyclerView(favoriteAddressDtoList);
+			}
+		});
+	}
+
+	private void updateRecyclerView(List<FavoriteAddressDto> favoriteAddressDtoList) {
 		adapter = new FavoriteAddressesAdapter();
+		adapter.setFavoriteAddressDtoList(favoriteAddressDtoList);
 		adapter.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
 			@Override
 			public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {
-				new MaterialAlertDialogBuilder(getActivity()).
+				new MaterialAlertDialogBuilder(requireActivity()).
 						setTitle(R.string.remove)
 						.setMessage(favoriteAddressDto.getAddress()).
 						setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
@@ -102,8 +143,6 @@ public class SimpleFavoritesFragment extends Fragment {
 			public void onClicked(FavoriteAddressDto favoriteAddressDto) {
 			}
 		});
-
-		binding.favoriteAddressList.setAdapter(adapter);
 		adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
 			@Override
 			public void onChanged() {
@@ -118,24 +157,8 @@ public class SimpleFavoritesFragment extends Fragment {
 
 		});
 
-		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
-			@Override
-			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				adapter.setFavoriteAddressDtoList(result);
-				if (getActivity() != null) {
-					MainThreadWorker.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							adapter.notifyDataSetChanged();
-						}
-					});
-				}
-			}
+		binding.favoriteAddressList.setAdapter(adapter);
 
-			@Override
-			public void onResultNoData() {
 
-			}
-		});
 	}
 }

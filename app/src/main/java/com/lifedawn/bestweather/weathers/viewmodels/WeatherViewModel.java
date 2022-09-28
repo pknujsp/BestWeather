@@ -30,12 +30,15 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	private MutableLiveData<String> currentLocationLiveData = new MutableLiveData<>();
 	private MutableLiveData<List<FavoriteAddressDto>> favoriteAddressesLiveData;
 
+	public final LiveData<List<FavoriteAddressDto>> favoriteAddressListLiveData;
+
 	public WeatherViewModel(@NonNull @NotNull Application application) {
 		super(application);
-		favoriteAddressRepository = new FavoriteAddressRepository(application.getApplicationContext());
+		favoriteAddressRepository = FavoriteAddressRepository.getINSTANCE();
 		addAddressesLiveData = favoriteAddressRepository.getAddAddressesLiveData();
 		deleteAddressesLiveData = favoriteAddressRepository.getDeleteAddressesLiveData();
 		favoriteAddressesLiveData = favoriteAddressRepository.getFavoriteAddressesLiveData();
+		favoriteAddressListLiveData = favoriteAddressRepository.getAllData();
 	}
 
 	public void setiLoadImgOfCurrentConditions(ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions) {
@@ -66,6 +69,7 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 	public void getAll(DbQueryCallback<List<FavoriteAddressDto>> callback) {
 		favoriteAddressRepository.getAll(callback);
 	}
+
 
 	@Override
 	public void get(int id, DbQueryCallback<FavoriteAddressDto> callback) {

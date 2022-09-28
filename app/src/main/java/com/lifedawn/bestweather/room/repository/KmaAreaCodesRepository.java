@@ -12,10 +12,22 @@ import com.lifedawn.bestweather.room.queryinterfaces.KmaAreaCodesQuery;
 import java.util.List;
 
 public class KmaAreaCodesRepository implements KmaAreaCodesQuery {
-	private KmaAreaCodesDao kmaAreaCodesDao;
+	private final KmaAreaCodesDao dao;
+
+	private static KmaAreaCodesRepository INSTANCE;
+
+	public static void initialize(Context context) {
+		if (INSTANCE == null) {
+			INSTANCE = new KmaAreaCodesRepository(context);
+		}
+	}
+
+	public static KmaAreaCodesRepository getINSTANCE() {
+		return INSTANCE;
+	}
 
 	public KmaAreaCodesRepository(Context context) {
-		this.kmaAreaCodesDao = AppDb.getInstance(context).kmaAreaCodesDao();
+		this.dao = AppDb.getInstance(context).kmaAreaCodesDao();
 	}
 
 	@Override
@@ -23,7 +35,7 @@ public class KmaAreaCodesRepository implements KmaAreaCodesQuery {
 		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
-				List<KmaAreaCodeDto> list = kmaAreaCodesDao.getAreaCodes(latitude, longitude);
+				List<KmaAreaCodeDto> list = dao.getAreaCodes(latitude, longitude);
 				if (list == null) {
 					callback.onResultNoData();
 				} else {
