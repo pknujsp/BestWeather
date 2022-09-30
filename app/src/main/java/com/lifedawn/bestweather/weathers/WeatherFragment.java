@@ -947,10 +947,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		FragmentManager fragmentManager = getChildFragmentManager();
 
 		if (fragmentManager.findFragmentByTag(AlertFragment.class.getName()) != null) {
-			fragmentManager.beginTransaction().remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName())).commit();
+			fragmentManager.beginTransaction().remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName())).commitAllowingStateLoss();
 		}
 
-		final Bundle bundle = new Bundle();
+		Bundle bundle = new Bundle();
 		bundle.putInt(AlertFragment.Constant.DRAWABLE_ID.name(), R.drawable.error);
 		bundle.putString(AlertFragment.Constant.MESSAGE.name(), getString(R.string.update_failed));
 
@@ -959,7 +959,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		alertFragment.setArguments(bundle);
 
 		fragmentManager.beginTransaction().add(binding.fragmentContainer.getId(), alertFragment,
-				AlertFragment.class.getName()).commit();
+				AlertFragment.class.getName()).commitAllowingStateLoss();
 	}
 
 	/**

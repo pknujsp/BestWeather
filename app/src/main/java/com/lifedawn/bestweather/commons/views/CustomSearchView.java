@@ -4,12 +4,9 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
@@ -17,6 +14,7 @@ import androidx.databinding.DataBindingUtil;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.ViewSearchBinding;
+import com.lifedawn.bestweather.utils.DeviceUtils;
 
 public class CustomSearchView extends FrameLayout {
 	private ViewSearchBinding binding;
@@ -98,9 +96,9 @@ public class CustomSearchView extends FrameLayout {
 
 	public void requestFocusEditText() {
 		binding.edittext.requestFocus();
-		InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-		inputMethodManager.showSoftInput(binding.edittext, 0);
+		DeviceUtils.Companion.showKeyboard(getContext(), binding.edittext);
 	}
+
 
 	public void setBackgroundTint(int color) {
 		binding.getRoot().setBackgroundTintList(ColorStateList.valueOf(color));

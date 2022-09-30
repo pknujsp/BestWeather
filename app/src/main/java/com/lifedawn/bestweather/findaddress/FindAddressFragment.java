@@ -38,6 +38,7 @@ import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
+import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -258,6 +259,7 @@ public class FindAddressFragment extends Fragment {
 
 	@Override
 	public void onDestroy() {
+		DeviceUtils.Companion.hideKeyboard(getContext(), getActivity().getCurrentFocus().getWindowToken());
 		ProgressDialog.clearDialogs();
 		getLifecycle().removeObserver(locationLifeCycleObserver);
 		super.onDestroy();

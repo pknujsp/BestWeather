@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -107,6 +108,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	private boolean removedLocation;
 
 	private boolean enableCurrentLocation;
+	private boolean addedNewLocation;
 	private boolean refresh;
 	private boolean clickedItem;
 	private String requestFragment;
@@ -215,6 +217,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 								});
 							}
 						} else {
+							MainThreadWorker.runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									//addedNewLocation = true;
+									weatherViewModel.favoriteAddressListLiveData.removeObservers(getViewLifecycleOwner());
+								}
+							});
+
 							weatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
 								@Override
 								public void onResultSuccessful(Long id) {
@@ -281,7 +291,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
 
-		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
+		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, true);
 
 		fusedLocation = FusedLocation.getInstance(getContext());
@@ -433,7 +443,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				simpleFavoritesFragment.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
 					@Override
 					public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {
-						initFavorites();
 						removedLocation = true;
 					}
 
@@ -524,6 +533,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 		});
 
+
 		try {
 			googleMap.setMyLocationEnabled(true);
 		} catch (SecurityException e) {
@@ -551,102 +561,96 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 		}
 
-		initFavorites();
-	}
-
-	private void initFavorites() {
-		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
+		FavoriteLocationItemViewPagerAdapter adapter = new FavoriteLocationItemViewPagerAdapter();
+		adapterMap.put(MarkerType.FAVORITE, adapter);
+		adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<FavoriteAddressDto>() {
 			@Override
-			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				MainThreadWorker.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						FavoriteLocationItemViewPagerAdapter adapter = new FavoriteLocationItemViewPagerAdapter();
-						adapterMap.put(MarkerType.FAVORITE, adapter);
-						adapter.setAddressList(result);
-						adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<FavoriteAddressDto>() {
-							@Override
-							public void onSelected(FavoriteAddressDto e, boolean remove) {
-								if (remove) {
-									new MaterialAlertDialogBuilder(getActivity()).
-											setTitle(R.string.remove)
-											.setMessage(e.getAddress()).
-											setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
+			public void onSelected(FavoriteAddressDto e, boolean remove) {
+				if (remove) {
+					new MaterialAlertDialogBuilder(getActivity()).
+							setTitle(R.string.remove)
+							.setMessage(e.getAddress()).
+							setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									weatherViewModel.delete(e, new DbQueryCallback<Boolean>() {
+										@Override
+										public void onResultSuccessful(Boolean result) {
+											MainThreadWorker.runOnUiThread(new Runnable() {
 												@Override
-												public void onClick(DialogInterface dialog, int which) {
-													weatherViewModel.delete(e, new DbQueryCallback<Boolean>() {
-														@Override
-														public void onResultSuccessful(Boolean result) {
-															MainThreadWorker.runOnUiThread(new Runnable() {
-																@Override
-																public void run() {
-																	setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_COLLAPSED);
-																	initFavorites();
-																	removedLocation = true;
-																	dialog.dismiss();
-																}
-															});
-														}
-
-														@Override
-														public void onResultNoData() {
-
-														}
-													});
-												}
-											}).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-												@Override
-												public void onClick(DialogInterface dialog, int which) {
+												public void run() {
+													setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_COLLAPSED);
+													removedLocation = true;
 													dialog.dismiss();
 												}
-											}).create().show();
+											});
+										}
 
+										@Override
+										public void onResultNoData() {
+
+										}
+									});
 								}
-							}
-						});
-
-						adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
-							@Override
-							public void toLeft() {
-								if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
-									binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-											binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
+							}).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int which) {
+									dialog.dismiss();
 								}
-							}
+							}).create().show();
 
-							@Override
-							public void toRight() {
-								if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
-									binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-											binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
-								}
-							}
-						});
+				}
+			}
+		});
 
-						favoriteAddressSet.clear();
-						for (FavoriteAddressDto favoriteAddressDto : result) {
-							favoriteAddressSet.add(favoriteAddressDto.getLatitude() + favoriteAddressDto.getLongitude());
-						}
-
-						removeMarkers(MarkerType.FAVORITE);
-
-						for (int i = 0; i < result.size(); i++) {
-							addFavoriteMarker(i, result.get(i));
-						}
-					}
-				});
+		adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
+			@Override
+			public void toLeft() {
+				if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
+					binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+							binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
+				}
 			}
 
 			@Override
-			public void onResultNoData() {
-
+			public void toRight() {
+				if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
+					binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+							binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
+				}
 			}
 		});
+
+		weatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), new Observer<List<FavoriteAddressDto>>() {
+			@Override
+			public void onChanged(List<FavoriteAddressDto> result) {
+				if (!addedNewLocation) {
+					MainThreadWorker.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							FavoriteLocationItemViewPagerAdapter adapter = (FavoriteLocationItemViewPagerAdapter) adapterMap.get(MarkerType.FAVORITE);
+							adapter.setAddressList(result);
+
+							favoriteAddressSet.clear();
+							for (FavoriteAddressDto favoriteAddressDto : result) {
+								favoriteAddressSet.add(favoriteAddressDto.getLatitude() + favoriteAddressDto.getLongitude());
+							}
+
+							removeMarkers(MarkerType.FAVORITE);
+
+							for (int i = 0; i < result.size(); i++) {
+								addFavoriteMarker(i, result.get(i));
+							}
+						}
+					});
+				}
+			}
+		});
+
 	}
 
 	private void onLongClicked(LatLng latLng) {
 		collapseAllExpandedBottomSheets();
-
 		Geocoding.geocoding(getContext(), latLng.latitude, latLng.longitude, new Geocoding.GeocodingCallback() {
 			@Override
 			public void onGeocodingResult(List<Address> addressList) {

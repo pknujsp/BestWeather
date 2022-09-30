@@ -6,14 +6,14 @@
 
     <TextView
         android:id="@+id/marker"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:background="@drawable/ic_baseline_stars_24"
         android:backgroundTint="#EFB628"
         android:gravity="center"
         android:paddingTop="1dp"
         android:textAlignment="center"
-        android:textColor="#03A9F4"
+        android:textColor="#0A4DC1"
         android:textSize="13sp"
         android:textStyle="bold"
         />
