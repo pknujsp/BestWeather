@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
-import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +37,7 @@ public class DetailCurrentConditionsFragment extends BaseDetailCurrentConditions
 
 		if (currentConditionsDto.getWeatherDescription() != null) {
 			addGridItem(R.string.weather, currentConditionsDto.getWeatherDescription(),
-					currentConditionsDto.getWeatherIcon());
+					currentConditionsDto.getWeatherIcon(), true);
 		}
 
 		if (currentConditionsDto.getPrecipitationType() != null) {
@@ -67,7 +66,7 @@ public class DetailCurrentConditionsFragment extends BaseDetailCurrentConditions
 		}
 		if (currentConditionsDto.getWindDirection() != null) {
 			View windDirectionView = addGridItem(R.string.wind_direction, currentConditionsDto.getWindDirection(),
-					R.drawable.arrow);
+					R.drawable.arrow, false);
 			((ImageView) windDirectionView.findViewById(R.id.label_icon)).setRotation(currentConditionsDto.getWindDirectionDegree() + 180);
 		}
 		if (currentConditionsDto.getWindSpeed() != null) {

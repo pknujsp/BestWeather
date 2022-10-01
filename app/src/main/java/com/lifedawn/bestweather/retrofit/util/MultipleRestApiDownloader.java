@@ -21,16 +21,15 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 public abstract class MultipleRestApiDownloader {
-	private static final String tag = "MultipleJsonDownloader";
 	private final ZonedDateTime requestDateTime = ZonedDateTime.now();
 	private volatile int requestCount;
 	private volatile int responseCount;
 	private boolean responseCompleted;
 
-	private Map<String, String> valueMap = new HashMap<>();
-	private Map<RetrofitClient.ServiceType, Call<?>> callMap = new HashMap<>();
+	private Map<String, String> valueMap = new ConcurrentHashMap<>();
+	private Map<RetrofitClient.ServiceType, Call<?>> callMap = new ConcurrentHashMap<>();
 
-	protected Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new HashMap<>();
+	protected Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ConcurrentHashMap<>();
 
 	public MultipleRestApiDownloader() {
 	}
@@ -112,7 +111,6 @@ public abstract class MultipleRestApiDownloader {
 			responseMap.put(weatherProviderType, new ArrayMap<>());
 		}
 		responseMap.get(weatherProviderType).put(serviceType, new ResponseResult(requestParameter, response, responseObj, responseText));
-		Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 
 		if (requestCount == responseCount) {
 			responseCompleted = true;
@@ -128,7 +126,6 @@ public abstract class MultipleRestApiDownloader {
 		}
 
 		responseMap.get(weatherProviderType).put(serviceType, new ResponseResult(requestParameter, t));
-		Log.e(tag, "requestCount : " + requestCount + ",  responseCount : " + responseCount);
 
 		if (requestCount == responseCount) {
 			responseCompleted = true;

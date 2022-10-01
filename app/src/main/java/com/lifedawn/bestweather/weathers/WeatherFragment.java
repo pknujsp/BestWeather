@@ -739,7 +739,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		WeatherProviderType mainWeatherProviderType = sharedPreferences.getBoolean(getString(R.string.pref_key_met), true) ?
 				WeatherProviderType.MET_NORWAY : WeatherProviderType.OWM_ONECALL;
 
-		if (countryCode.equals("KR")) {
+		if (countryCode != null && countryCode.equals("KR")) {
 			boolean kmaIsTopPriority = sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), true);
 			if (kmaIsTopPriority) {
 				mainWeatherProviderType = WeatherProviderType.KMA_WEB;
@@ -1007,14 +1007,15 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		} else if (requestWeatherProviderType == WeatherProviderType.MET_NORWAY) {
 
 			if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
-				if (countryCode.equals("KR")) {
+				if (countryCode != null && countryCode.equals("KR")) {
 					others.add(WeatherProviderType.OWM_ONECALL);
 					others.add(WeatherProviderType.KMA_WEB);
 				} else {
 					others.add(WeatherProviderType.OWM_ONECALL);
 				}
 			} else if (lastWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
-				if (countryCode.equals("KR")) {
+				if (countryCode != null && countryCode.equals("KR")) {
+
 					others.add(WeatherProviderType.KMA_WEB);
 				}
 			} else {
@@ -1023,14 +1024,16 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		} else if (requestWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
 
 			if (lastWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
-				if (countryCode.equals("KR")) {
+				if (countryCode != null && countryCode.equals("KR")) {
+
 					others.add(WeatherProviderType.MET_NORWAY);
 					others.add(WeatherProviderType.KMA_WEB);
 				} else {
 					others.add(WeatherProviderType.MET_NORWAY);
 				}
 			} else if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
-				if (countryCode.equals("KR")) {
+				if (countryCode != null && countryCode.equals("KR")) {
+
 					others.add(WeatherProviderType.KMA_WEB);
 				}
 			} else {
@@ -1039,14 +1042,16 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		} else if (requestWeatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
 
 			if (lastWeatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
-				if (countryCode.equals("KR")) {
+				if (countryCode != null && countryCode.equals("KR")) {
+
 					others.add(WeatherProviderType.MET_NORWAY);
 					others.add(WeatherProviderType.KMA_WEB);
 				} else {
 					others.add(WeatherProviderType.MET_NORWAY);
 				}
 			} else if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
-				if (countryCode.equals("KR")) {
+				if (countryCode != null && countryCode.equals("KR")) {
+
 					others.add(WeatherProviderType.KMA_WEB);
 				}
 			} else {
@@ -1453,10 +1458,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		binding.weatherDataSourceLayout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				CharSequence[] items = new CharSequence[countryCode.equals("KR") ? 3 : 2];
+				CharSequence[] items = new CharSequence[countryCode != null && countryCode.equals("KR") ? 3 : 2];
 				int checkedItemIdx = 0;
 
-				if (countryCode.equals("KR")) {
+				if (countryCode != null && countryCode.equals("KR")) {
 					items[0] = getString(R.string.kma);
 					items[1] = getString(R.string.owm);
 					items[2] = getString(R.string.met);

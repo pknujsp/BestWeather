@@ -133,10 +133,10 @@ public class IntroFragment extends Fragment {
 		@Override
 		public void onSuccessful(LocationResult locationResult) {
 			//현재 위치 파악 성공
-			ProgressDialog.clearDialogs();
-
 			PreferenceManager.getDefaultSharedPreferences(getContext())
 					.edit().putBoolean(getString(R.string.pref_key_show_intro), false).commit();
+
+			ProgressDialog.clearDialogs();
 
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 			getParentFragment().getParentFragmentManager().beginTransaction()

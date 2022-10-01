@@ -9,12 +9,12 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:background="@drawable/ic_baseline_stars_24"
-        android:backgroundTint="#EFB628"
+        android:backgroundTint="@color/mapFavoriteMarkerColor"
         android:gravity="center"
         android:paddingTop="1dp"
         android:textAlignment="center"
-        android:textColor="#0A4DC1"
-        android:textSize="13sp"
+        android:textColor="@color/design_default_color_primary"
+        android:textSize="14sp"
         android:textStyle="bold"
         />
 

@@ -21,6 +21,7 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailCurrentConditionsBinding;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,6 @@ import java.time.ZoneId;
 public class BaseDetailCurrentConditionsFragment extends Fragment implements IWeatherValues {
 	protected BaseLayoutDetailCurrentConditionsBinding binding;
 	protected LayoutInflater layoutInflater;
-	protected SharedPreferences sharedPreferences;
 	protected ValueUnits tempUnit;
 	protected ValueUnits windUnit;
 	protected ValueUnits visibilityUnit;
@@ -44,7 +44,6 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 
 		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 
@@ -54,10 +53,10 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(
 				BundleKey.WeatherProvider.name());
 
-		tempUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), ValueUnits.celsius.name()));
-		windUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_wind), ValueUnits.mPerSec.name()));
-		visibilityUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_visibility), ValueUnits.km.name()));
-		clockUnit = ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), ValueUnits.clock24.name()));
+		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
+		windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
+		visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
+		clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit();
 	}
 
 	@Override
@@ -95,7 +94,6 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 			gridItem.findViewById(R.id.label_icon).setVisibility(View.GONE);
 		} else {
 			((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
-			((ImageView) gridItem.findViewById(R.id.label_icon)).setImageTintList(ColorStateList.valueOf(Color.WHITE));
 		}
 
 		((TextView) gridItem.findViewById(R.id.value)).setTextColor(Color.WHITE);
@@ -112,6 +110,14 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		binding.conditionsGrid.addView(gridItem, layoutParams);
 
 
+		return gridItem;
+	}
+
+
+	protected final View addGridItem(int labelDescriptionId, String value, @Nullable Integer labelIconId, boolean defaultIconColor) {
+		View gridItem = addGridItem(labelDescriptionId, value, labelIconId);
+		if (!defaultIconColor)
+			((ImageView) gridItem.findViewById(R.id.label_icon)).setImageTintList(ColorStateList.valueOf(Color.WHITE));
 		return gridItem;
 	}
 

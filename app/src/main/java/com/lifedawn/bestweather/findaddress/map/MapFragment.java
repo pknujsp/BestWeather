@@ -197,7 +197,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	public void onClickedAddress(Address address) {
 		final FavoriteAddressDto favoriteAddressDto = new FavoriteAddressDto();
 		favoriteAddressDto.setCountryName(address.getCountryName());
-		favoriteAddressDto.setCountryCode(address.getCountryCode());
+		favoriteAddressDto.setCountryCode(address.getCountryCode() == null ? "" : address.getCountryCode());
 		favoriteAddressDto.setAddress(address.getAddressLine(0));
 		favoriteAddressDto.setAdmin(address.getLocality());
 		favoriteAddressDto.setLatitude(String.valueOf(address.getLatitude()));
@@ -330,7 +330,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				binding.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
 				final int searchBottomSheetHeight =
-						(int) (binding.getRoot().getHeight() - binding.headerLayout.getBottom() - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36f, getResources().getDisplayMetrics()));
+						(int) (binding.getRoot().getHeight() - binding.headerLayout.getBottom() - TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, getResources().getDisplayMetrics()));
 				LinearLayout locationSearchBottomSheet = bottomSheetViewMap.get(BottomSheetType.SEARCH_LOCATION);
 				LinearLayout favoritesBottomSheet = bottomSheetViewMap.get(BottomSheetType.FAVORITES);
 

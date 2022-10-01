@@ -73,4 +73,7 @@
 
     <color name="blueSkiesGradientStart">#56CCF2</color>
     <color name="blueSkiesGradientEnd">#2F80ED</color>
+
+    <color name="mapHeaderBackgroundColor">#CDFFFFFF</color>
+    <color name="mapFavoriteMarkerColor">#EFB628</color>
 </resources>

@@ -30,7 +30,7 @@ import java.util.List;
 
 public class SimpleFavoritesFragment extends Fragment {
 	private FragmentSimpleFavoritesBinding binding;
-	private FavoriteAddressesAdapter adapter;
+	private FavoriteAddressesAdapter adapter = new FavoriteAddressesAdapter();
 	private WeatherViewModel weatherViewModel;
 	private FavoriteAddressesAdapter.OnClickedAddressListener onClickedAddressListener;
 
@@ -51,9 +51,6 @@ public class SimpleFavoritesFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
 		binding = FragmentSimpleFavoritesBinding.inflate(inflater);
-
-		updateRecyclerView(new ArrayList<>());
-
 		return binding.getRoot();
 	}
 
@@ -65,42 +62,6 @@ public class SimpleFavoritesFragment extends Fragment {
 		binding.favoriteAddressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		binding.favoriteAddressList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
-
-		/*
-		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
-			@Override
-			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				adapter.setFavoriteAddressDtoList(result);
-				if (getActivity() != null) {
-					MainThreadWorker.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							adapter.notifyDataSetChanged();
-						}
-					});
-				}
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
-
-		 */
-
-
-		weatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), new Observer<List<FavoriteAddressDto>>() {
-			@Override
-			public void onChanged(List<FavoriteAddressDto> favoriteAddressDtoList) {
-				updateRecyclerView(favoriteAddressDtoList);
-			}
-		});
-	}
-
-	private void updateRecyclerView(List<FavoriteAddressDto> favoriteAddressDtoList) {
-		adapter = new FavoriteAddressesAdapter();
-		adapter.setFavoriteAddressDtoList(favoriteAddressDtoList);
 		adapter.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
 			@Override
 			public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {
@@ -117,9 +78,6 @@ public class SimpleFavoritesFragment extends Fragment {
 											@Override
 											public void run() {
 												onClickedAddressListener.onClickedDelete(favoriteAddressDto, position);
-
-												adapter.getFavoriteAddressDtoList().remove(position);
-												adapter.notifyDataSetChanged();
 												dialog.dismiss();
 											}
 										});
@@ -159,6 +117,13 @@ public class SimpleFavoritesFragment extends Fragment {
 
 		binding.favoriteAddressList.setAdapter(adapter);
 
-
+		weatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), new Observer<List<FavoriteAddressDto>>() {
+			@Override
+			public void onChanged(List<FavoriteAddressDto> favoriteAddressDtoList) {
+				adapter.setFavoriteAddressDtoList(favoriteAddressDtoList);
+				adapter.notifyDataSetChanged();
+			}
+		});
 	}
+
 }
