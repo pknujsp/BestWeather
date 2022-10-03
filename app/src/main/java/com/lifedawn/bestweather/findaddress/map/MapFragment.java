@@ -58,6 +58,7 @@ import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
+import com.lifedawn.bestweather.commons.views.CustomEditText;
 import com.lifedawn.bestweather.databinding.FragmentMapBinding;
 import com.lifedawn.bestweather.favorites.FavoriteAddressesAdapter;
 import com.lifedawn.bestweather.favorites.SimpleFavoritesFragment;
@@ -112,6 +113,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	private boolean refresh;
 	private boolean clickedItem;
 	private String requestFragment;
+	private boolean clickedHeader;
 
 	private Bundle bundle;
 	private boolean needsOnResultCallback = true;
@@ -172,8 +174,22 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		public void onFragmentAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
 			super.onFragmentAttached(fm, f, context);
 
+
+		}
+
+		@Override
+		public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
+			super.onFragmentStarted(fm, f);
+
+
+		}
+
+		@Override
+		public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+			super.onFragmentResumed(fm, f);
+
 			if (f instanceof FindAddressFragment) {
-				binding.searchBar.setVisibility(View.GONE);
+				binding.headerLayout.requestFocusEditText();
 			}
 		}
 
@@ -182,7 +198,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			super.onFragmentDestroyed(fm, f);
 
 			if (f instanceof FindAddressFragment) {
-				binding.searchBar.setVisibility(View.VISIBLE);
+				clickedHeader = false;
+				binding.headerLayout.clearFocusEditText();
 				removeMarkers(MarkerType.SEARCH);
 				collapseAllExpandedBottomSheets();
 			} else if (f instanceof SimpleFavoritesFragment) {
@@ -342,85 +359,92 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 		});
 
-
-		binding.searchBar.setOnClickListener(new View.OnClickListener() {
+		binding.headerLayout.setEditTextOnFocusListener(new View.OnFocusChangeListener() {
 			@Override
-			public void onClick(View v) {
-				FragmentManager childFragmentManager = getChildFragmentManager();
-
-				if (childFragmentManager.findFragmentByTag(getString(R.string.tag_find_address_fragment)) != null) {
-					return;
-				}
-
-				collapseAllExpandedBottomSheets();
-				int backStackCount = childFragmentManager.getBackStackEntryCount();
-
-				for (int count = 0; count < backStackCount; count++) {
-					childFragmentManager.popBackStack();
-				}
-
-				FindAddressFragment findAddressFragment = new FindAddressFragment();
-				Bundle bundle = new Bundle();
-				bundle.putString(BundleKey.RequestFragment.name(), MapFragment.class.getName());
-				findAddressFragment.setArguments(bundle);
-
-				findAddressFragment.setOnAddressListListener(new FindAddressFragment.OnAddressListListener() {
-					@Override
-					public void onSearchedAddressList(List<Address> addressList) {
-						removeMarkers(MarkerType.SEARCH);
-
-						LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
-						adapterMap.put(MarkerType.SEARCH, adapter);
-						adapter.setFavoriteAddressSet(favoriteAddressSet);
-						adapter.setAddressList(addressList);
-						adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<Address>() {
-							@Override
-							public void onSelected(Address e, boolean remove) {
-								onClickedAddress(e);
-							}
-						});
-						adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
-							@Override
-							public void toLeft() {
-								if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
-									binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-											binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
-								}
-							}
-
-							@Override
-							public void toRight() {
-								if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
-									binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-											binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
-								}
-							}
-						});
-
-						int i = 0;
-						for (Address address : addressList) {
-							addMarker(MarkerType.SEARCH, i++, address);
-						}
-
-						showMarkers(MarkerType.SEARCH);
-
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					if (clickedHeader) {
+						return;
 					}
-				});
+					clickedHeader = true;
+					FragmentManager childFragmentManager = getChildFragmentManager();
 
-				findAddressFragment.setiBottomSheetState(MapFragment.this);
-				findAddressFragment.setOnClickedAddressListener(MapFragment.this);
-				findAddressFragment.setOnListListener(MapFragment.this);
+					if (childFragmentManager.findFragmentByTag(getString(R.string.tag_find_address_fragment)) != null) {
+						return;
+					}
 
-				childFragmentManager.beginTransaction().
-						add(binding.bottomSheetSearchPlace.searchFragmentContainer.getId(), findAddressFragment,
-								getString(R.string.tag_find_address_fragment)).
-						addToBackStack(
-								getString(R.string.tag_find_address_fragment)).
-						commitAllowingStateLoss();
+					collapseAllExpandedBottomSheets();
+					int backStackCount = childFragmentManager.getBackStackEntryCount();
 
-				setStateOfBottomSheet(BottomSheetType.SEARCH_LOCATION, BottomSheetBehavior.STATE_EXPANDED);
+					for (int count = 0; count < backStackCount; count++) {
+						childFragmentManager.popBackStack();
+					}
+
+					FindAddressFragment findAddressFragment = new FindAddressFragment();
+					Bundle bundle = new Bundle();
+					bundle.putString(BundleKey.RequestFragment.name(), MapFragment.class.getName());
+					findAddressFragment.setArguments(bundle);
+
+					findAddressFragment.setOnAddressListListener(new FindAddressFragment.OnAddressListListener() {
+						@Override
+						public void onSearchedAddressList(List<Address> addressList) {
+							removeMarkers(MarkerType.SEARCH);
+
+							LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
+							adapterMap.put(MarkerType.SEARCH, adapter);
+							adapter.setFavoriteAddressSet(favoriteAddressSet);
+							adapter.setAddressList(addressList);
+							adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<Address>() {
+								@Override
+								public void onSelected(Address e, boolean remove) {
+									onClickedAddress(e);
+								}
+							});
+
+							adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
+								@Override
+								public void toLeft() {
+									if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
+										binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+												binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
+									}
+								}
+
+								@Override
+								public void toRight() {
+									if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
+										binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+												binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
+									}
+								}
+							});
+
+							int i = 0;
+							for (Address address : addressList) {
+								addMarker(MarkerType.SEARCH, i++, address);
+							}
+
+							showMarkers(MarkerType.SEARCH);
+
+						}
+					});
+
+					findAddressFragment.setiBottomSheetState(MapFragment.this);
+					findAddressFragment.setOnClickedAddressListener(MapFragment.this);
+					findAddressFragment.setOnListListener(MapFragment.this);
+
+					binding.headerLayout.setOnEditTextQueryListener(findAddressFragment.getOnEditTextQueryListener());
+
+					childFragmentManager.beginTransaction().
+							add(binding.bottomSheetSearchPlace.searchFragmentContainer.getId(), findAddressFragment,
+									getString(R.string.tag_find_address_fragment)).addToBackStack(
+									getString(R.string.tag_find_address_fragment)).commitAllowingStateLoss();
+
+					setStateOfBottomSheet(BottomSheetType.SEARCH_LOCATION, BottomSheetBehavior.STATE_EXPANDED);
+				}
 			}
 		});
+
 
 		binding.favorite.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -463,7 +487,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 		});
 
-		binding.backBtn.setOnClickListener(new View.OnClickListener() {
+		binding.headerLayout.setOnBackClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onBackPressedCallback.handleOnBackPressed();
@@ -492,7 +516,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 		dp48 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48f, getResources().getDisplayMetrics());
 
-		googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.header.getBottom() +
+		googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.headerLayout.getBottom() +
 				dp48, 0, 0);
 		googleMap.getUiSettings().setZoomControlsEnabled(true);
 		googleMap.getUiSettings().setRotateGesturesEnabled(false);
@@ -841,7 +865,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 				//expanded일때 offset == 1.0, collapsed일때 offset == 0.0
 				//offset에 따라서 버튼들이 이동하고, 지도의 좌표가 변경되어야 한다.
-				googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.header.getBottom() +
+				googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.headerLayout.getBottom() +
 						dp48, 0, translationValue);
 			}
 		});
@@ -989,8 +1013,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 							.putString(getString(R.string.pref_key_last_selected_location_type),
 									LocationType.SelectedAddress.name()).commit();
 
-					binding.searchBar.callOnClick();
 					dialogInterface.dismiss();
+					binding.headerLayout.callOnClickEditText();
 				}
 			}).setNeutralButton(R.string.close_app, new DialogInterface.OnClickListener() {
 				@Override

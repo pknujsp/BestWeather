@@ -63,6 +63,47 @@ public class FindAddressFragment extends Fragment {
 	private FoundAddressesAdapter.OnClickedAddressListener onClickedAddressListener;
 	private IBottomSheetState iBottomSheetState;
 	private WeatherViewModel weatherViewModel;
+	private CustomEditText.OnEditTextQueryListener onEditTextQueryListener = new CustomEditText.OnEditTextQueryListener() {
+		@Override
+		public void onTextChange(String newText) {
+			if (newText.isEmpty())
+				return;
+
+			MainThreadWorker.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					binding.progressResultView.onStarted();
+				}
+			});
+
+			Geocoding.reverseGeocoding(getContext(), executorService, newText, new Geocoding.ReverseGeocodingCallback() {
+				@Override
+				public void onReverseGeocodingResult(List<Address> addressList) {
+					if (getActivity() != null) {
+						MainThreadWorker.runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								addressesAdapter.setItemList(addressList);
+								addressesAdapter.getFilter().filter(newText);
+							}
+						});
+					}
+				}
+			});
+
+		}
+
+		@Override
+		public void onTextSubmit(String text) {
+			if (text.isEmpty()) {
+				Toast.makeText(getContext(), R.string.empty_search_query, Toast.LENGTH_SHORT).show();
+			}
+		}
+	};
+
+	public CustomEditText.OnEditTextQueryListener getOnEditTextQueryListener() {
+		return onEditTextQueryListener;
+	}
 
 	public FindAddressFragment setiBottomSheetState(IBottomSheetState iBottomSheetState) {
 		this.iBottomSheetState = iBottomSheetState;
@@ -129,42 +170,6 @@ public class FindAddressFragment extends Fragment {
 					fusedLocation.findCurrentLocation(myLocationCallback, false);
 				} else {
 					Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
-
-
-		binding.searchView.setOnEditTextQueryListener(new CustomEditText.OnEditTextQueryListener() {
-			@Override
-			public void onTextChange(String newText) {
-				MainThreadWorker.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						binding.progressResultView.onStarted();
-					}
-				});
-
-				Geocoding.reverseGeocoding(getContext(), executorService, newText, new Geocoding.ReverseGeocodingCallback() {
-					@Override
-					public void onReverseGeocodingResult(List<Address> addressList) {
-						if (getActivity() != null) {
-							MainThreadWorker.runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									addressesAdapter.setItemList(addressList);
-									addressesAdapter.getFilter().filter(newText);
-								}
-							});
-						}
-					}
-				});
-
-			}
-
-			@Override
-			public void onTextSubmit(String text) {
-				if (text.isEmpty()) {
-					Toast.makeText(getContext(), R.string.empty_search_query, Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -242,7 +247,6 @@ public class FindAddressFragment extends Fragment {
 	@Override
 	public void onStart() {
 		super.onStart();
-		binding.searchView.requestFocusEditText();
 	}
 
 	@Override

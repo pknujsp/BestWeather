@@ -43,6 +43,7 @@
     <declare-styleable name="CustomSearchView">
         <attr name="hint" format="string" />
         <attr name="enabled" format="boolean" />
+        <attr name="showStroke" format="boolean" />
         <attr name="backBtnVisibility" format="enum">
             <!-- Visible on screen; the default value. -->
             <enum name="visible" value="0" />
