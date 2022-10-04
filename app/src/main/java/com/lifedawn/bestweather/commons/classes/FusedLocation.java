@@ -160,7 +160,12 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 												.putString("zoneId", zoneId.getId())
 												.commit();
 
-										myLocationCallback.onSuccessful(locationResult);
+										MainThreadWorker.runOnUiThread(new Runnable() {
+											@Override
+											public void run() {
+												myLocationCallback.onSuccessful(locationResult);
+											}
+										});
 									}
 								});
 							} else {
