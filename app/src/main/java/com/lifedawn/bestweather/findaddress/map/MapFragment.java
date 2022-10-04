@@ -425,7 +425,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 							}
 
 							showMarkers(MarkerType.SEARCH);
-
 						}
 					});
 

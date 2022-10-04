@@ -30,7 +30,7 @@
             android:layout_marginRight="16dp"
             app:backBtnVisibility="visible"
             app:hint="@string/hint_input_address"
-            app:searchBtnVisibility="visible"
+            app:searchBtnVisibility="gone"
             app:showStroke="true"
             />
 
