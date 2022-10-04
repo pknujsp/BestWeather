@@ -19,17 +19,14 @@ import androidx.preference.PreferenceManager;
 
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationReceiver;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
@@ -37,12 +34,11 @@ import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.widget.DialogActivity;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.widget.foreground.WidgetWorker;
-import com.lifedawn.bestweather.widget.widgetprovider.BaseAppWidgetProvider;
 
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Set;
-import java.util.prefs.PreferenceChangeEvent;
 
 import static android.view.View.MeasureSpec.EXACTLY;
 
@@ -51,6 +47,7 @@ public abstract class AbstractWidgetCreator {
 	protected final ValueUnits tempUnit;
 	protected final ValueUnits clockUnit;
 	protected final String tempDegree;
+	protected ZoneId zoneId;
 
 	protected Context context;
 
@@ -237,12 +234,11 @@ public abstract class AbstractWidgetCreator {
 		return new int[]{(int) widgetWidthPx, (int) widgetHeightPx};
 	}
 
-	public void makeResponseTextToJson(MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet,
+	public void makeResponseTextToJson(WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet,
 	                                   Set<WeatherProviderType> weatherProviderTypeSet, WidgetDto widgetDto, ZoneOffset zoneOffset) {
 		//json형태로 저장
 		/*
 		examples :
-
 		{
 			"KMA":{
 				"ULTRA_SRT_NCST": ~~json text~~,
@@ -253,17 +249,16 @@ public abstract class AbstractWidgetCreator {
 			},
 			"zoneOffset": "09:00"
 		}
-
 		 */
-		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> arrayMap =
-				multipleRestApiDownloader.getResponseMap();
+		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> arrayMap =
+				weatherRestApiDownloader.getResponseMap();
 
 		final JsonObject rootJsonObject = new JsonObject();
 		String text = null;
 
 		//owm이면 onecall이므로 한번만 수행
 		for (WeatherProviderType weatherProviderType : weatherProviderTypeSet) {
-			ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> requestWeatherSourceArr =
+			ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> requestWeatherSourceArr =
 					arrayMap.get(weatherProviderType);
 
 			if (weatherProviderType == WeatherProviderType.OWM_ONECALL) {
@@ -330,7 +325,7 @@ public abstract class AbstractWidgetCreator {
 						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST).getResponseText();
 						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name(), text);
 					}
-					long tmFc = Long.parseLong(multipleRestApiDownloader.get("tmFc"));
+					long tmFc = Long.parseLong(weatherRestApiDownloader.get("tmFc"));
 					kmaJsonObject.addProperty("tmFc", tmFc);
 				}
 				rootJsonObject.add(weatherProviderType.name(), kmaJsonObject);
@@ -386,7 +381,7 @@ public abstract class AbstractWidgetCreator {
 			rootJsonObject.addProperty("zoneOffset", zoneOffset.getId());
 		}
 
-		rootJsonObject.addProperty("lastUpdatedDateTime", multipleRestApiDownloader.getRequestDateTime().toString());
+		rootJsonObject.addProperty("lastUpdatedDateTime", weatherRestApiDownloader.getRequestDateTime().toString());
 		widgetDto.setResponseText(rootJsonObject.toString());
 	}
 
@@ -444,7 +439,9 @@ public abstract class AbstractWidgetCreator {
 		return remoteViews;
 	}
 
-	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
+	public void setResultViews(int appWidgetId, RemoteViews remoteViews,
+	                           @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader,
+	                           @Nullable ZoneId zoneId) {
 		if (!widgetDto.isInitialized()) {
 			widgetDto.setInitialized(true);
 		}
@@ -473,6 +470,7 @@ public abstract class AbstractWidgetCreator {
 
 			}
 		});
+
 	}
 
 	public RelativeLayout.LayoutParams getHeaderViewLayoutParams() {

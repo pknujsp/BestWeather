@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.os.Build;
-import android.os.PowerManager;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -18,9 +17,10 @@ import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
@@ -28,6 +28,7 @@ public abstract class AbstractDailyNotiViewCreator {
 	protected final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	protected Context context;
 	protected Callback callback;
+	protected ZoneId zoneId;
 
 	public AbstractDailyNotiViewCreator(Context context) {
 		this.context = context;
@@ -88,7 +89,7 @@ public abstract class AbstractDailyNotiViewCreator {
 	public abstract Set<WeatherDataType> getRequestWeatherDataTypeSet();
 
 	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherProviderType> weatherProviderTypeSet,
-	                           @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader,
+	                           @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader,
 	                           Set<WeatherDataType> weatherDataTypeSet) {
 	}
 

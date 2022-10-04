@@ -27,7 +27,7 @@ public class ProgressDialog {
 	}
 
 	public static AlertDialog show(Activity activity, String msg, @Nullable View.OnClickListener cancelOnClickListener) {
-		if (activity.isFinishing()) {
+		if (!activity.isFinishing() && !activity.isDestroyed()) {
 			clearDialogs();
 			return null;
 		}

@@ -63,7 +63,8 @@ public class FindAddressFragment extends Fragment {
 	private FoundAddressesAdapter.OnClickedAddressListener onClickedAddressListener;
 	private IBottomSheetState iBottomSheetState;
 	private WeatherViewModel weatherViewModel;
-	private CustomEditText.OnEditTextQueryListener onEditTextQueryListener = new CustomEditText.OnEditTextQueryListener() {
+
+	private final CustomEditText.OnEditTextQueryListener onEditTextQueryListener = new CustomEditText.OnEditTextQueryListener() {
 		@Override
 		public void onTextChange(String newText) {
 			if (newText.isEmpty())
@@ -218,8 +219,6 @@ public class FindAddressFragment extends Fragment {
 						addressesAdapter.setOnListListener(new OnListListener() {
 							@Override
 							public void onPOIItemSelectedByList(int position) {
-								iBottomSheetState.setStateOfBottomSheet(BottomSheetType.SEARCH_LOCATION, BottomSheetBehavior.STATE_COLLAPSED);
-								getParentFragmentManager().beginTransaction().hide(FindAddressFragment.this).addToBackStack(null).commit();
 								onListListener.onPOIItemSelectedByList(position);
 							}
 
@@ -263,7 +262,6 @@ public class FindAddressFragment extends Fragment {
 
 	@Override
 	public void onDestroy() {
-		DeviceUtils.Companion.hideKeyboard(getContext(), getActivity().getCurrentFocus().getWindowToken());
 		ProgressDialog.clearDialogs();
 		getLifecycle().removeObserver(locationLifeCycleObserver);
 		super.onDestroy();

@@ -10,7 +10,7 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.aqicn.AqicnParameter;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 
 import retrofit2.Call;
@@ -50,7 +50,7 @@ public class AqicnProcessing {
 		return call;
 	}
 
-	public static void getAirQuality(Double latitude, Double longitude, MultipleRestApiDownloader multipleRestApiDownloader, Context context) {
+	public static void getAirQuality(Double latitude, Double longitude, WeatherRestApiDownloader weatherRestApiDownloader, Context context) {
 		AqicnResponseProcessor.init(context);
 
 		AqicnParameter aqicnParameter = new AqicnParameter();
@@ -59,18 +59,18 @@ public class AqicnProcessing {
 		Call<JsonElement> localizedFeedCall = getLocalizedFeed(aqicnParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-				multipleRestApiDownloader.processResult(WeatherProviderType.AQICN, aqicnParameter,
+				weatherRestApiDownloader.processResult(WeatherProviderType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, response, responseObj, responseText);
 			}
 
 			@Override
 			public void onResponseResult(Throwable t) {
-				multipleRestApiDownloader.processResult(WeatherProviderType.AQICN, aqicnParameter,
+				weatherRestApiDownloader.processResult(WeatherProviderType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, t);
 			}
 		});
 
-		multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, localizedFeedCall);
+		weatherRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, localizedFeedCall);
 	}
 
 }

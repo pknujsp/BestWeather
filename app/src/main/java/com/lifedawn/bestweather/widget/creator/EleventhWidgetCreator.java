@@ -24,7 +24,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
@@ -351,6 +351,8 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 		RemoteViews remoteViews = createRemoteViews();
 		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 
+		zoneId = ZoneId.of(widgetDto.getTimeZoneId());
+
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		ArrayMap<WeatherProviderType, List<HourlyForecastDto>> weatherSourceTypeListArrayMap = new ArrayMap<>();
@@ -361,7 +363,7 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 
 			weatherSourceTypeListArrayMap.put(weatherProviderType,
 					WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject, weatherProviderType, widgetDto.getLatitude(),
-							widgetDto.getLongitude()));
+							widgetDto.getLongitude(), zoneId));
 		}
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 				weatherSourceTypeListArrayMap, null);
@@ -371,15 +373,15 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	@Override
-	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
-
+	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, ZoneId zoneId) {
+		this.zoneId = zoneId;
 		ArrayMap<WeatherProviderType, List<HourlyForecastDto>> weatherSourceTypeListArrayMap = new ArrayMap<>();
 		Set<WeatherProviderType> requestWeatherProviderTypeSet = widgetDto.getWeatherProviderTypeSet();
 		boolean successful = true;
 
 		for (WeatherProviderType weatherProviderType : requestWeatherProviderTypeSet) {
-			weatherSourceTypeListArrayMap.put(weatherProviderType, WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
-					weatherProviderType));
+			weatherSourceTypeListArrayMap.put(weatherProviderType, WeatherResponseProcessor.getHourlyForecastDtoList(context, weatherRestApiDownloader,
+					weatherProviderType, zoneId));
 
 			if (weatherSourceTypeListArrayMap.get(weatherProviderType).isEmpty()) {
 				successful = false;
@@ -388,10 +390,9 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 		}
 
 		if (successful) {
-			ZoneId zoneId = weatherSourceTypeListArrayMap.valueAt(0).get(0).getHours().getZone();
 			ZoneOffset zoneOffset = weatherSourceTypeListArrayMap.valueAt(0).get(0).getHours().getOffset();
 			widgetDto.setTimeZoneId(zoneId.getId());
-			widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
+			widgetDto.setLastRefreshDateTime(weatherRestApiDownloader.getRequestDateTime().toString());
 
 			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), weatherSourceTypeListArrayMap,
 					new OnDrawBitmapCallback() {
@@ -400,10 +401,10 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 
 						}
 					});
-			makeResponseTextToJson(multipleRestApiDownloader, getRequestWeatherDataTypeSet(), requestWeatherProviderTypeSet, widgetDto, zoneOffset);
+			makeResponseTextToJson(weatherRestApiDownloader, getRequestWeatherDataTypeSet(), requestWeatherProviderTypeSet, widgetDto, zoneOffset);
 		}
 
 		widgetDto.setLoadSuccessful(successful);
-		super.setResultViews(appWidgetId, remoteViews, multipleRestApiDownloader);
+		super.setResultViews(appWidgetId, remoteViews, weatherRestApiDownloader, zoneId);
 	}
 }

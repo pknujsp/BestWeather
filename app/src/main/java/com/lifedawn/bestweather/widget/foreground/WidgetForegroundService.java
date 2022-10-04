@@ -28,7 +28,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
@@ -79,8 +79,8 @@ public class WidgetForegroundService extends Service {
 	private final ArrayMap<Integer, RemoteViews> remoteViewsArrayMap = new ArrayMap<>();
 	private Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
 
-	private final Map<String, MultipleRestApiDownloader> currentLocationResponseMap = new HashMap<>();
-	private final Map<String, MultipleRestApiDownloader> selectedLocationResponseMap = new HashMap<>();
+	private final Map<String, WeatherRestApiDownloader> currentLocationResponseMap = new HashMap<>();
+	private final Map<String, WeatherRestApiDownloader> selectedLocationResponseMap = new HashMap<>();
 
 	private final Map<String, RequestObj> currentLocationRequestMap = new HashMap<>();
 	private final Map<String, RequestObj> selectedLocationRequestMap = new HashMap<>();
@@ -181,7 +181,7 @@ public class WidgetForegroundService extends Service {
 				for (Integer appWidgetId : appWidgetIdSet) {
 					AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);
 					widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
-					widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId), null);
+					widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId), null, null);
 				}
 
 				stopService();
@@ -482,7 +482,7 @@ public class WidgetForegroundService extends Service {
 
 	private void loadWeatherData(LocationType locationType, List<String> addressList) {
 		for (String addressName : addressList) {
-			MultipleRestApiDownloader multipleRestApiDownloader = new MultipleRestApiDownloader() {
+			WeatherRestApiDownloader weatherRestApiDownloader = new WeatherRestApiDownloader() {
 				@Override
 				public void onResult() {
 					onResponseResult(locationType, addressName);
@@ -499,22 +499,22 @@ public class WidgetForegroundService extends Service {
 
 			if (locationType == LocationType.SelectedAddress) {
 				requestObj = selectedLocationRequestMap.get(addressName);
-				selectedLocationResponseMap.put(addressName, multipleRestApiDownloader);
+				selectedLocationResponseMap.put(addressName, weatherRestApiDownloader);
 			} else {
 				requestObj = currentLocationRequestMap.get(addressName);
-				currentLocationResponseMap.put(addressName, multipleRestApiDownloader);
+				currentLocationResponseMap.put(addressName, weatherRestApiDownloader);
 			}
 
 			WeatherRequestUtil.loadWeatherData(getApplicationContext(), executorService, requestObj.address.getLatitude(),
-					requestObj.address.getLongitude(), requestObj.weatherDataTypeSet, multipleRestApiDownloader,
-					requestObj.weatherProviderTypeSet);
+					requestObj.address.getLongitude(), requestObj.weatherDataTypeSet, weatherRestApiDownloader,
+					requestObj.weatherProviderTypeSet, null);
 		}
 
 	}
 
 	private void onResponseResult(LocationType locationType, @Nullable String addressName) {
 		if (addressName != null) {
-			Map<String, MultipleRestApiDownloader> responseMap = null;
+			Map<String, WeatherRestApiDownloader> responseMap = null;
 			Map<String, WidgetForegroundService.RequestObj> requestObjMap = null;
 
 			if (locationType == LocationType.SelectedAddress) {
@@ -530,7 +530,7 @@ public class WidgetForegroundService extends Service {
 			for (Integer appWidgetId : appWidgetIdSet) {
 				AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);
 				widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
-				widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId), responseMap.get(addressName));
+				widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId), responseMap.get(addressName), null);
 			}
 			//응답 처리가 끝난 요청객체는 제거
 			requestObjMap.remove(addressName);

@@ -99,6 +99,7 @@ public class SimpleFavoritesFragment extends Fragment {
 
 			@Override
 			public void onClicked(FavoriteAddressDto favoriteAddressDto) {
+				onClickedAddressListener.onClicked(favoriteAddressDto);
 			}
 		});
 		adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {

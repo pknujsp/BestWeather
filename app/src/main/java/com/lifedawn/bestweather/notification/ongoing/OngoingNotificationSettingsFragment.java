@@ -150,8 +150,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 						if (NotificationManagerCompat.from(getContext()).areNotificationsEnabled()) {
 							ongoingNotiViewCreator.savePreferences();
 							ongoingNotiViewCreator.loadSavedPreferences();
-
 							ongoingNotiViewCreator.initNotification(null);
+
 							ongoingNotificationHelper.onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
 						} else {
 							Toast.makeText(getContext(), R.string.disabledNotification, Toast.LENGTH_SHORT).show();
@@ -160,7 +160,6 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 
 							startActivity(IntentUtil.getNotificationSettingsIntent(getActivity()));
 						}
-
 					} else {
 						ongoingNotificationHelper.cancelAutoRefresh();
 						notificationHelper.cancelNotification(notificationType.getNotificationId());
@@ -184,8 +183,10 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 			originalSelectedFavoriteAddressDto.setCountryCode(ongoingNotiViewCreator.getNotificationDataObj().getCountryCode());
 			originalSelectedFavoriteAddressDto.setLatitude(String.valueOf(ongoingNotiViewCreator.getNotificationDataObj().getLatitude()));
 			originalSelectedFavoriteAddressDto.setLongitude(String.valueOf(ongoingNotiViewCreator.getNotificationDataObj().getLongitude()));
+			originalSelectedFavoriteAddressDto.setZoneId(ongoingNotiViewCreator.getNotificationDataObj().getZoneId());
 
 			selectedFavoriteLocation = true;
+
 			binding.commons.selectedLocationRadio.setChecked(true);
 			binding.commons.selectedAddressName.setText(ongoingNotiViewCreator.getNotificationDataObj().getAddressName());
 		} else {
@@ -201,7 +202,6 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 				break;
 			}
 		}
-
 		binding.dataTypeOfIconSpinner.setSelection(ongoingNotiViewCreator.getNotificationDataObj().getDataTypeOfIcon() == WidgetNotiConstants.DataTypeOfIcon.TEMPERATURE
 				? 0 : 1, false);
 		binding.commons.kmaTopPrioritySwitch.setChecked(ongoingNotiViewCreator.getNotificationDataObj().isTopPriorityKma());
@@ -350,6 +350,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 									Float.parseFloat(newSelectedAddressDto.getLatitude()))
 							.putFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(),
 									Float.parseFloat(newSelectedAddressDto.getLongitude()))
+							.putString(WidgetNotiConstants.Commons.DataKeys.ZONE_ID.name(), newSelectedAddressDto.getZoneId())
 							.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), newSelectedAddressDto.getCountryCode()).commit();
 
 					onSelectedFavoriteLocation(newSelectedAddressDto);
@@ -370,6 +371,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 			ongoingNotiViewCreator.getNotificationDataObj().setAddressName(favoriteAddressDto.getAddress())
 					.setCountryCode(favoriteAddressDto.getCountryCode())
 					.setAdmin(favoriteAddressDto.getAdmin())
+					.setZoneId(favoriteAddressDto.getZoneId())
 					.setLatitude(Float.parseFloat(favoriteAddressDto.getLatitude())).setLongitude(Float.parseFloat(favoriteAddressDto.getLongitude()));
 
 			ongoingNotiViewCreator.getNotificationDataObj().setLocationType(LocationType.SelectedAddress);

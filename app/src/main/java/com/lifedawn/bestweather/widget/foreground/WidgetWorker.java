@@ -7,13 +7,13 @@ import android.location.Address;
 import android.location.Location;
 import android.os.Build;
 import android.os.PowerManager;
-import android.util.ArrayMap;
 import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.preference.PreferenceManager;
 import androidx.work.ForegroundInfo;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
@@ -30,7 +30,7 @@ import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
@@ -60,6 +60,7 @@ import com.lifedawn.bestweather.widget.widgetprovider.SixthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.TenthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.ThirdWidgetProvider;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,12 +68,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -84,11 +83,11 @@ public class WidgetWorker extends Worker {
 	private final Map<Integer, WidgetDto> allWidgetDtoArrayMap = new HashMap<>();
 	private final Map<Integer, Class<?>> allWidgetProviderClassArrayMap = new HashMap<>();
 	private final Map<Integer, RemoteViews> remoteViewsArrayMap = new HashMap<>();
-	private final Map<Integer, MultipleRestApiDownloader> multipleRestApiDownloaderMap = new HashMap<>();
+	private final Map<Integer, WeatherRestApiDownloader> multipleRestApiDownloaderMap = new HashMap<>();
 	private Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
 
-	private MultipleRestApiDownloader currentLocationResponseMultipleRestApiDownloader;
-	private final Map<String, MultipleRestApiDownloader> selectedLocationResponseMap = new HashMap<>();
+	private WeatherRestApiDownloader currentLocationResponseWeatherRestApiDownloader;
+	private final Map<String, WeatherRestApiDownloader> selectedLocationResponseMap = new HashMap<>();
 
 	private RequestObj currentLocationRequestObj;
 	private final Map<String, RequestObj> selectedLocationRequestMap = new HashMap<>();
@@ -169,7 +168,7 @@ public class WidgetWorker extends Worker {
 						address.setAddressLine(0, widgetDto.getAddressName());
 						address.setCountryCode(widgetDto.getCountryCode());
 
-						final RequestObj requestObj = new RequestObj(address);
+						final RequestObj requestObj = new RequestObj(address, ZoneId.of(widgetDto.getTimeZoneId()));
 						requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
 						requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet());
 						requestObj.appWidgetSet.add(widgetDto.getAppWidgetId());
@@ -219,7 +218,7 @@ public class WidgetWorker extends Worker {
 								address.setAddressLine(0, widgetDto.getAddressName());
 								address.setCountryCode(widgetDto.getCountryCode());
 
-								requestObj = new RequestObj(address);
+								requestObj = new RequestObj(address, ZoneId.of(widgetDto.getTimeZoneId()));
 
 								selectedLocationRequestMap.put(widgetDto.getAddressName(), requestObj);
 								addressList.add(widgetDto.getAddressName());
@@ -230,8 +229,6 @@ public class WidgetWorker extends Worker {
 							requestObj.appWidgetSet.add(widgetDto.getAppWidgetId());
 						}
 					}
-
-					Log.e("refresh widgets", PROCESSING_WIDGET_ID_SET.toString());
 
 					allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
 					allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
@@ -249,6 +246,7 @@ public class WidgetWorker extends Worker {
 						requestCount += addressList.size();
 						loadWeatherData(LocationType.SelectedAddress, addressList);
 					}
+
 				}
 
 				@Override
@@ -370,7 +368,7 @@ public class WidgetWorker extends Worker {
 
 	public void loadCurrentLocation() {
 		final Set<Integer> appWidgetIdSet = currentLocationWidgetDtoArrayMap.keySet();
-		currentLocationRequestObj = new RequestObj(null);
+		currentLocationRequestObj = new RequestObj(null, null);
 
 		for (Integer appWidgetId : appWidgetIdSet) {
 			currentLocationRequestObj.weatherDataTypeSet.addAll(widgetCreatorMap.get(appWidgetId).getRequestWeatherDataTypeSet());
@@ -388,6 +386,8 @@ public class WidgetWorker extends Worker {
 			public void onSuccessful(LocationResult locationResult) {
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 				final Location location = getBestLocation(locationResult);
+				ZoneId zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("zoneId", ""));
+				currentLocationRequestObj.zoneId = zoneId;
 
 				Geocoding.geocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
@@ -406,6 +406,7 @@ public class WidgetWorker extends Worker {
 								widgetDto.setCountryCode(newAddress.getCountryCode());
 								widgetDto.setLatitude(newAddress.getLatitude());
 								widgetDto.setLongitude(newAddress.getLongitude());
+								widgetDto.setTimeZoneId(zoneId.getId());
 
 								widgetRepository.update(widgetDto, null);
 							}
@@ -444,7 +445,6 @@ public class WidgetWorker extends Worker {
 			List<String> addressesList = new ArrayList<>();
 			addressesList.add(addressName);
 			loadWeatherData(LocationType.CurrentLocation, addressesList);
-
 		} else {
 			RemoteViewsUtil.ErrorType errorType = null;
 
@@ -472,7 +472,7 @@ public class WidgetWorker extends Worker {
 
 	private void loadWeatherData(LocationType locationType, List<String> addressList) {
 		for (String addressName : addressList) {
-			MultipleRestApiDownloader multipleRestApiDownloader = new MultipleRestApiDownloader() {
+			WeatherRestApiDownloader weatherRestApiDownloader = new WeatherRestApiDownloader() {
 				@Override
 				public void onResult() {
 					onResponseResult(locationType, addressName);
@@ -488,10 +488,10 @@ public class WidgetWorker extends Worker {
 
 			if (locationType == LocationType.SelectedAddress) {
 				requestObj = selectedLocationRequestMap.get(addressName);
-				selectedLocationResponseMap.put(addressName, multipleRestApiDownloader);
+				selectedLocationResponseMap.put(addressName, weatherRestApiDownloader);
 			} else {
 				requestObj = currentLocationRequestObj;
-				currentLocationResponseMultipleRestApiDownloader = multipleRestApiDownloader;
+				currentLocationResponseWeatherRestApiDownloader = weatherRestApiDownloader;
 
 				boolean onlyKma = true;
 
@@ -510,22 +510,23 @@ public class WidgetWorker extends Worker {
 					requestObj.weatherProviderTypeSet.remove(WeatherProviderType.OWM_ONECALL);
 				}
 			}
+			weatherRestApiDownloader.setZoneId(requestObj.zoneId);
 
 			WeatherRequestUtil.loadWeatherData(getApplicationContext(), executorService, requestObj.address.getLatitude(),
-					requestObj.address.getLongitude(), requestObj.weatherDataTypeSet, multipleRestApiDownloader,
-					requestObj.weatherProviderTypeSet);
+					requestObj.address.getLongitude(), requestObj.weatherDataTypeSet, weatherRestApiDownloader,
+					requestObj.weatherProviderTypeSet, weatherRestApiDownloader.getZoneId());
 		}
 	}
 
 	private void onResponseResult(LocationType locationType, String addressName) {
-		MultipleRestApiDownloader restApiDownloader = null;
+		WeatherRestApiDownloader restApiDownloader = null;
 		Set<Integer> appWidgetIdSet = null;
 
 		if (locationType == LocationType.SelectedAddress) {
 			restApiDownloader = selectedLocationResponseMap.get(addressName);
 			appWidgetIdSet = selectedLocationRequestMap.get(addressName).appWidgetSet;
 		} else {
-			restApiDownloader = currentLocationResponseMultipleRestApiDownloader;
+			restApiDownloader = currentLocationResponseWeatherRestApiDownloader;
 			appWidgetIdSet = currentLocationRequestObj.appWidgetSet;
 		}
 
@@ -535,7 +536,7 @@ public class WidgetWorker extends Worker {
 			AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);
 			widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
 			widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId),
-					multipleRestApiDownloaderMap.get(appWidgetId));
+					multipleRestApiDownloaderMap.get(appWidgetId), restApiDownloader.getZoneId());
 		}
 
 		//응답 처리가 끝난 요청객체를 제거
@@ -553,12 +554,14 @@ public class WidgetWorker extends Worker {
 
 	private static class RequestObj {
 		Address address;
+		ZoneId zoneId;
 		Set<Integer> appWidgetSet = new HashSet<>();
 		Set<WeatherDataType> weatherDataTypeSet = new HashSet<>();
 		Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
 
-		public RequestObj(Address address) {
+		public RequestObj(Address address, ZoneId zoneId) {
 			this.address = address;
+			this.zoneId = zoneId;
 		}
 	}
 }

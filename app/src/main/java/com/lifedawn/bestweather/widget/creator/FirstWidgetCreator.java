@@ -19,7 +19,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
@@ -223,10 +223,12 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 		RemoteViews remoteViews = createRemoteViews();
 		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 
+		zoneId = ZoneId.of(widgetDto.getTimeZoneId());
+
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(jsonObject);
 		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.parseTextToCurrentConditionsDto(context, jsonObject,
-				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude());
+				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude(), zoneId);
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto, currentConditionsDto, null);
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
@@ -235,25 +237,24 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	@Override
-	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
-		ZoneId zoneId = null;
+	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, ZoneId zoneId) {
+		this.zoneId = zoneId;
 		ZoneOffset zoneOffset = null;
 
 		final WeatherProviderType weatherProviderType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet());
-		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
-				weatherProviderType);
+		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, weatherRestApiDownloader,
+				weatherProviderType, zoneId);
 		AirQualityDto airQualityDto = null;
 		boolean successful = currentConditionsDto != null;
 
 		if (successful) {
-			widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
-			zoneId = currentConditionsDto.getCurrentTime().getZone();
+			widgetDto.setLastRefreshDateTime(weatherRestApiDownloader.getRequestDateTime().toString());
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 
 			widgetDto.setTimeZoneId(zoneId.getId());
 			setClockTimeZone(remoteViews);
 
-			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader,
+			airQualityDto = WeatherResponseProcessor.getAirQualityDto(weatherRestApiDownloader,
 					zoneOffset);
 			if (airQualityDto == null) {
 				airQualityDto = new AirQualityDto();
@@ -263,12 +264,12 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto,
 					currentConditionsDto, null);
 
-			makeResponseTextToJson(multipleRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherProviderTypeSet(), widgetDto, zoneOffset);
+			makeResponseTextToJson(weatherRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherProviderTypeSet(), widgetDto, zoneOffset);
 		}
 
 		widgetDto.setLoadSuccessful(successful);
 
-		super.setResultViews(appWidgetId, remoteViews, multipleRestApiDownloader);
+		super.setResultViews(appWidgetId, remoteViews, weatherRestApiDownloader, zoneId);
 	}
 
 	@Override

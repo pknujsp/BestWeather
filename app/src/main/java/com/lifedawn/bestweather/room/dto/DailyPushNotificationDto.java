@@ -51,6 +51,9 @@ public class DailyPushNotificationDto implements Serializable {
 	@ColumnInfo(name = "enabled")
 	private boolean enabled;
 
+	@ColumnInfo(name = "zoneId")
+	private String zoneId;
+
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -161,5 +164,13 @@ public class DailyPushNotificationDto implements Serializable {
 
 	public String getAdmin() {
 		return admin;
+	}
+
+	public void setZoneId(String zoneId) {
+		this.zoneId = zoneId;
+	}
+
+	public String getZoneId() {
+		return zoneId;
 	}
 }

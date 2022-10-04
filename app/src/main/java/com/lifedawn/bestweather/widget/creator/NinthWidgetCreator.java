@@ -22,7 +22,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
@@ -232,12 +232,14 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 		RemoteViews remoteViews = createRemoteViews();
 		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 
+		zoneId = ZoneId.of(widgetDto.getTimeZoneId());
+
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
 		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, false, context);
 
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.parseTextToHourlyForecastDtoList(context, jsonObject,
-				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude());
+				weatherProviderType, widgetDto.getLatitude(), widgetDto.getLongitude(), zoneId);
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 				hourlyForecastDtoList, null);
@@ -247,17 +249,16 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	@Override
-	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
-
-		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
-				WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet()));
+	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, ZoneId zoneId) {
+		this.zoneId = zoneId;
+		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, weatherRestApiDownloader,
+				WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet()), zoneId);
 		final boolean successful = !hourlyForecastDtoList.isEmpty();
 
 		if (successful) {
-			ZoneId zoneId = hourlyForecastDtoList.get(0).getHours().getZone();
 			ZoneOffset zoneOffset = hourlyForecastDtoList.get(0).getHours().getOffset();
 			widgetDto.setTimeZoneId(zoneId.getId());
-			widgetDto.setLastRefreshDateTime(multipleRestApiDownloader.getRequestDateTime().toString());
+			widgetDto.setLastRefreshDateTime(weatherRestApiDownloader.getRequestDateTime().toString());
 
 			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 					hourlyForecastDtoList, new OnDrawBitmapCallback() {
@@ -266,9 +267,9 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 
 						}
 					});
-			makeResponseTextToJson(multipleRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherProviderTypeSet(), widgetDto, zoneOffset);
+			makeResponseTextToJson(weatherRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherProviderTypeSet(), widgetDto, zoneOffset);
 		}
 		widgetDto.setLoadSuccessful(successful);
-		super.setResultViews(appWidgetId, remoteViews, multipleRestApiDownloader);
+		super.setResultViews(appWidgetId, remoteViews, weatherRestApiDownloader, zoneId);
 	}
 }

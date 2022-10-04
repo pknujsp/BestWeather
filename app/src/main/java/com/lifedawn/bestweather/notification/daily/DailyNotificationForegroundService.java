@@ -31,7 +31,7 @@ import com.lifedawn.bestweather.notification.daily.viewcreator.FirstDailyNotific
 import com.lifedawn.bestweather.notification.daily.viewcreator.FourthDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.SecondDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.ThirdDailyNotificationViewCreator;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
@@ -160,7 +160,7 @@ public class DailyNotificationForegroundService extends Service {
 		}
 
 		WeatherRequestUtil.loadWeatherData(context, executorService,
-				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), weatherDataTypeSet, new MultipleRestApiDownloader() {
+				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), weatherDataTypeSet, new WeatherRestApiDownloader() {
 					@Override
 					public void onResult() {
 						viewCreator.setResultViews(remoteViews, dailyPushNotificationDto, weatherProviderTypeSet, this, weatherDataTypeSet);
@@ -170,7 +170,7 @@ public class DailyNotificationForegroundService extends Service {
 					@Override
 					public void onCanceled() {
 					}
-				}, weatherProviderTypeSet);
+				}, weatherProviderTypeSet, null);
 
 	}
 

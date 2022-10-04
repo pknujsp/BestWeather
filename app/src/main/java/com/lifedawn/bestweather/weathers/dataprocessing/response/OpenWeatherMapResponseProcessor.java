@@ -12,14 +12,13 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.cur
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,7 +79,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		return WEATHER_ICON_DESCRIPTION_MAP.get(code);
 	}
 
-	public static boolean successfulResponse(MultipleRestApiDownloader.ResponseResult result) {
+	public static boolean successfulResponse(WeatherRestApiDownloader.ResponseResult result) {
 		if (result.getResponse() != null) {
 			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();
 
@@ -95,7 +94,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoListOneCall(Context context,
-	                                                                       OwmOneCallResponse owmOneCallResponse) {
+	                                                                       OwmOneCallResponse owmOneCallResponse, ZoneId zoneId) {
 		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
 		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 		ValueUnits visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
@@ -114,7 +113,6 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		boolean hasRain;
 		boolean hasSnow;
 
-		ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 		List<OwmOneCallResponse.Hourly> hourlyList = owmOneCallResponse.getHourly();
 
@@ -169,7 +167,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 
 	public static List<DailyForecastDto> makeDailyForecastDtoListOneCall(Context context,
-	                                                                     OwmOneCallResponse owmOneCallResponse) {
+	                                                                     OwmOneCallResponse owmOneCallResponse, ZoneId zoneId) {
 		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
 		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
@@ -185,7 +183,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 		//아침/낮/저녁/밤 기온(체감) 제외
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
-		ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
+		//ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
 
 		String rainVolume;
 		String snowVolume;
@@ -243,13 +241,13 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 
 	public static CurrentConditionsDto makeCurrentConditionsDtoOneCall(Context context,
-	                                                                   OwmOneCallResponse owmOneCallResponse) {
+	                                                                   OwmOneCallResponse owmOneCallResponse, ZoneId zoneId) {
 		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
 		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 		ValueUnits visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
 		final String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String percent = "%";
-		final ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
+		//final ZoneId zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
 
 		CurrentConditionsDto currentConditionsDto = new CurrentConditionsDto();
 		OwmOneCallResponse.Current item = owmOneCallResponse.getCurrent();
@@ -306,15 +304,15 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static CurrentConditionsDto makeCurrentConditionsDtoIndividual(Context context,
-	                                                                      OwmCurrentConditionsResponse response) {
+	                                                                      OwmCurrentConditionsResponse response, ZoneId zoneId) {
 		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
 		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 		ValueUnits visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
 		final String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String percent = "%";
-		final Integer timeZoneSecond = Integer.parseInt(response.getTimezone());
-		final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(timeZoneSecond);
-		final ZoneId zoneId = zoneOffset.normalized();
+		//final Integer timeZoneSecond = Integer.parseInt(response.getTimezone());
+		//final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(timeZoneSecond);
+		//final ZoneId zoneId = zoneOffset.normalized();
 
 		CurrentConditionsDto currentConditionsDto = new CurrentConditionsDto();
 
@@ -360,7 +358,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<HourlyForecastDto> makeHourlyForecastDtoListIndividual(Context context,
-	                                                                          OwmHourlyForecastResponse owmHourlyForecastResponse) {
+	                                                                          OwmHourlyForecastResponse owmHourlyForecastResponse, ZoneId zoneId) {
 		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
 		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 		ValueUnits visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
@@ -379,9 +377,9 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		boolean hasRain;
 		boolean hasSnow;
 
-		final Integer timeZoneSecond = Integer.parseInt(owmHourlyForecastResponse.getCity().getTimezone());
-		final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(timeZoneSecond);
-		final ZoneId zoneId = zoneOffset.normalized();
+		//final Integer timeZoneSecond = Integer.parseInt(owmHourlyForecastResponse.getCity().getTimezone());
+		//final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(timeZoneSecond);
+		//final ZoneId zoneId = zoneOffset.normalized();
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 
 		for (OwmHourlyForecastResponse.Item hourly : owmHourlyForecastResponse.getList()) {
@@ -431,7 +429,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 	}
 
 	public static List<DailyForecastDto> makeDailyForecastDtoListIndividual(Context context,
-	                                                                        OwmDailyForecastResponse owmDailyForecastResponse) {
+	                                                                        OwmDailyForecastResponse owmDailyForecastResponse, ZoneId zoneId) {
 		ValueUnits windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
 		ValueUnits tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 		final String tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
@@ -447,9 +445,9 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 
 		//아침/낮/저녁/밤 기온(체감) 제외
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
-		final Integer timeZoneSecond = Integer.parseInt(owmDailyForecastResponse.getCity().getTimezone());
-		final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(timeZoneSecond);
-		final ZoneId zoneId = zoneOffset.normalized();
+		//final Integer timeZoneSecond = Integer.parseInt(owmDailyForecastResponse.getCity().getTimezone());
+		//final ZoneOffset zoneOffset = ZoneOffset.ofTotalSeconds(timeZoneSecond);
+		//final ZoneId zoneId = zoneOffset.normalized();
 
 		String rainVolume;
 		String snowVolume;

@@ -582,6 +582,7 @@
     <string name="pref_title_redraw_widgets">Redraw widgets</string>
     <string name="provide">Data</string>
     <string name="close">close</string>
+    <string name="adding_a_new_favorite_location">Adding a new favorite location</string>
 
 
 </resources>

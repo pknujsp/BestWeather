@@ -14,4 +14,5 @@
     <item name="currentConditions" type="id" />
     <item name="hoursRow" type="id" />
     <item name="datesRow" type="id" />
+    <item name="removeBtn" type="id" />
 </resources>

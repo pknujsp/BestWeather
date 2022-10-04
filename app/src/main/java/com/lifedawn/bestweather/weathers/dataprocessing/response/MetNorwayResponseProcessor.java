@@ -527,22 +527,7 @@ public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 		return dailyForecastDtos;
 	}
 
-	public static ZoneId getZoneId(Double latitude, Double longitude) {
-		final String key = latitude.toString() + longitude.toString();
 
-		if (TIMEZONE_MAP.containsKey(key)) {
-			return TIMEZONE_MAP.get(key);
-		}
-
-		TimeZoneMap map = TimeZoneMap.forRegion(latitude - 5.0,
-				longitude - 5.0, latitude + 5.0
-				, longitude + 5.0);
-
-		ZoneId zoneId = ZoneId.of(map.getOverlappingTimeZone(latitude, longitude).getZoneId());
-		TIMEZONE_MAP.put(key, zoneId);
-
-		return zoneId;
-	}
 
 	public static String getFlickrGalleryName(String code) {
 		return FLICKR_MAP.get(code);

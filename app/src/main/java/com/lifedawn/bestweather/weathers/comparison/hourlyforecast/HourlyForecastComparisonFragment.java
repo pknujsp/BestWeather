@@ -31,7 +31,7 @@ import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.Vi
 import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.comparison.base.BaseForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
@@ -57,7 +57,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class HourlyForecastComparisonFragment extends BaseForecastComparisonFragment {
-	private MultipleRestApiDownloader multipleRestApiDownloader;
+	private WeatherRestApiDownloader weatherRestApiDownloader;
 
 
 	@Override
@@ -500,27 +500,29 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (multipleRestApiDownloader != null) {
-					multipleRestApiDownloader.cancel();
+				if (weatherRestApiDownloader != null) {
+					weatherRestApiDownloader.cancel();
 				}
 				getParentFragmentManager().popBackStack();
 			}
 		});
 
-		multipleRestApiDownloader = new MultipleRestApiDownloader() {
+		weatherRestApiDownloader = new WeatherRestApiDownloader() {
 			@Override
 			public void onResult() {
-				setTable(multipleRestApiDownloader, latitude, longitude);
+				setTable(weatherRestApiDownloader, latitude, longitude);
 			}
 
 			@Override
 			public void onCanceled() {
 			}
 		};
+		weatherRestApiDownloader.setZoneId(zoneId);
+
 		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
-				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, multipleRestApiDownloader);
+				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, weatherRestApiDownloader);
 			}
 		});
 	}
@@ -528,22 +530,22 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (multipleRestApiDownloader != null) {
-			multipleRestApiDownloader.cancel();
+		if (weatherRestApiDownloader != null) {
+			weatherRestApiDownloader.cancel();
 		}
 	}
 
-	private void setTable(MultipleRestApiDownloader multipleRestApiDownloader, Double latitude, Double longitude) {
-		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
-		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap;
+	private void setTable(WeatherRestApiDownloader weatherRestApiDownloader, Double latitude, Double longitude) {
+		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
+		ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> arrayMap;
 		HourlyForecastResponse hourlyForecastResponse = new HourlyForecastResponse();
 
 		//kma api
 		if (responseMap.containsKey(WeatherProviderType.KMA_API)) {
 			arrayMap = responseMap.get(WeatherProviderType.KMA_API);
-			MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponse = Objects.requireNonNull(arrayMap).get(
+			WeatherRestApiDownloader.ResponseResult ultraSrtFcstResponse = Objects.requireNonNull(arrayMap).get(
 					RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
-			MultipleRestApiDownloader.ResponseResult vilageFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
+			WeatherRestApiDownloader.ResponseResult vilageFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
 
 			if (ultraSrtFcstResponse.isSuccessful() && vilageFcstResponse.isSuccessful()) {
 
@@ -567,7 +569,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		//kma web
 		if (responseMap.containsKey(WeatherProviderType.KMA_WEB)) {
 			arrayMap = responseMap.get(WeatherProviderType.KMA_WEB);
-			MultipleRestApiDownloader.ResponseResult forecastsResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
+			WeatherRestApiDownloader.ResponseResult forecastsResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 
 			if (forecastsResponseResult.isSuccessful()) {
 				Object[] objects = (Object[]) forecastsResponseResult.getResponseObj();
@@ -585,7 +587,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		//accu
 		if (responseMap.containsKey(WeatherProviderType.ACCU_WEATHER)) {
 			arrayMap = responseMap.get(WeatherProviderType.ACCU_WEATHER);
-			MultipleRestApiDownloader.ResponseResult accuHourlyForecastResponse = arrayMap.get(
+			WeatherRestApiDownloader.ResponseResult accuHourlyForecastResponse = arrayMap.get(
 					RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
 
 			if (accuHourlyForecastResponse.isSuccessful()) {
@@ -602,12 +604,12 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		//owm onecall
 		if (responseMap.containsKey(WeatherProviderType.OWM_ONECALL)) {
 			arrayMap = responseMap.get(WeatherProviderType.OWM_ONECALL);
-			MultipleRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
+			WeatherRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.owmSuccessful = true;
 				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(),
-						(OwmOneCallResponse) responseResult.getResponseObj());
+						(OwmOneCallResponse) responseResult.getResponseObj(), zoneId);
 			} else {
 				hourlyForecastResponse.owmThrowable = responseResult.getT();
 			}
@@ -615,12 +617,12 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		//owm individual
 		if (responseMap.containsKey(WeatherProviderType.OWM_INDIVIDUAL)) {
 			arrayMap = responseMap.get(WeatherProviderType.OWM_INDIVIDUAL);
-			MultipleRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
+			WeatherRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
 
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.owmSuccessful = true;
 				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(getContext(),
-						(OwmHourlyForecastResponse) responseResult.getResponseObj());
+						(OwmHourlyForecastResponse) responseResult.getResponseObj(), zoneId);
 			} else {
 				hourlyForecastResponse.owmThrowable = responseResult.getT();
 			}
@@ -629,7 +631,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		// met norway
 		if (responseMap.containsKey(WeatherProviderType.MET_NORWAY)) {
 			arrayMap = responseMap.get(WeatherProviderType.MET_NORWAY);
-			MultipleRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
+			WeatherRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
 
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.metNorwaySuccessful = true;

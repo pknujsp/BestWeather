@@ -19,7 +19,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
@@ -27,6 +27,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProc
 import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -34,13 +35,14 @@ import java.util.concurrent.ExecutorService;
 public class WeatherRequestUtil {
 	public static void loadWeatherData(Context context, ExecutorService executorService, Double latitude, Double longitude,
 	                                   Set<WeatherDataType> weatherDataTypeSet,
-	                                   MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherProviderType> weatherProviderTypeSet) {
+	                                   WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherProviderType> weatherProviderTypeSet, ZoneId zoneId) {
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
+				weatherRestApiDownloader.setZoneId(zoneId);
 				final ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
 				setRequestWeatherSourceWithSourceType(weatherProviderTypeSet, requestWeatherSources, weatherDataTypeSet);
-				MainProcessing.requestNewWeatherData(context, latitude, longitude, requestWeatherSources, multipleRestApiDownloader);
+				MainProcessing.requestNewWeatherData(context, latitude, longitude, requestWeatherSources, weatherRestApiDownloader);
 			}
 		});
 	}

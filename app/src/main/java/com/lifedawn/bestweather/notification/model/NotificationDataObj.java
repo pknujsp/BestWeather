@@ -4,6 +4,8 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 
+import java.time.ZoneId;
+
 public class NotificationDataObj {
 	private LocationType locationType;
 	private WeatherProviderType weatherProviderType;
@@ -17,6 +19,16 @@ public class NotificationDataObj {
 	private double latitude;
 	private double longitude;
 	private String countryCode;
+	private String zoneId;
+
+	public NotificationDataObj setZoneId(String zoneId) {
+		this.zoneId = zoneId;
+		return this;
+	}
+
+	public String getZoneId() {
+		return zoneId;
+	}
 
 	public NotificationDataObj setDataTypeOfIcon(WidgetNotiConstants.DataTypeOfIcon dataTypeOfIcon) {
 		this.dataTypeOfIcon = dataTypeOfIcon;

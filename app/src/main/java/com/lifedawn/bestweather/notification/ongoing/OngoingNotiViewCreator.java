@@ -44,7 +44,7 @@ import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.NotificationUpdateCallback;
 import com.lifedawn.bestweather.notification.model.NotificationDataObj;
 import com.lifedawn.bestweather.notification.model.OngoingNotiDataObj;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
@@ -53,6 +53,7 @@ import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -73,6 +74,7 @@ public class OngoingNotiViewCreator {
 	private final ValueUnits tempUnit;
 	private final String tempDegree;
 	private final NotificationType notificationType = NotificationType.Ongoing;
+	private ZoneId zoneId;
 
 	private Context context;
 	private NotificationHelper notificationHelper;
@@ -99,6 +101,7 @@ public class OngoingNotiViewCreator {
 		final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
 			public void onSuccessful(LocationResult locationResult) {
+				zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(context).getString("zoneId", ""));
 				final Location location = getBestLocation(locationResult);
 				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
@@ -113,12 +116,14 @@ public class OngoingNotiViewCreator {
 										(float) notificationDataObj.getLongitude())
 								.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode())
 								.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getAddressName())
+								.putString(WidgetNotiConstants.Commons.DataKeys.ZONE_ID.name(), notificationDataObj.getZoneId())
 								.commit();
 
 						notificationDataObj.setAddressName(address.getAddressLine(0))
 								.setCountryCode(address.getCountryCode())
 								.setLatitude(address.getLatitude()).setLongitude(address.getLongitude())
-								.setAdmin(address.getAdminArea());
+								.setAdmin(address.getAdminArea())
+								.setZoneId(zoneId.getId());
 
 						fusedLocation.cancelNotification(context);
 						loadWeatherData(collapsedRemoteViews, expandedRemoteViews);
@@ -178,10 +183,12 @@ public class OngoingNotiViewCreator {
 			weatherProviderTypeSet.add(WeatherProviderType.AQICN);
 		}
 
+		zoneId = ZoneId.of(notificationDataObj.getZoneId());
+
 		final WeatherProviderType finalWeatherProviderType = weatherProviderType;
 		WeatherRequestUtil.loadWeatherData(context, MyApplication.getExecutorService(),
 				notificationDataObj.getLatitude(), notificationDataObj.getLongitude(), weatherDataTypeSet,
-				new MultipleRestApiDownloader() {
+				new WeatherRestApiDownloader() {
 					@Override
 					public void onResult() {
 						setResultViews(collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this);
@@ -191,7 +198,7 @@ public class OngoingNotiViewCreator {
 					public void onCanceled() {
 						setResultViews(collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this);
 					}
-				}, weatherProviderTypeSet);
+				}, weatherProviderTypeSet, zoneId);
 	}
 
 	protected PendingIntent getRefreshPendingIntent() {
@@ -264,16 +271,16 @@ public class OngoingNotiViewCreator {
 		return set;
 	}
 
-	protected void setResultViews(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader) {
+	protected void setResultViews(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader) {
 		ZoneOffset zoneOffset = null;
-		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
-		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), multipleRestApiDownloader.getRequestDateTime().toString());
+		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAddressName(), weatherRestApiDownloader.getRequestDateTime().toString());
+		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), weatherRestApiDownloader.getRequestDateTime().toString());
 
 		int icon = R.mipmap.ic_launcher_round;
 		String temperature = null;
 
-		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleRestApiDownloader,
-				requestWeatherProviderType);
+		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, weatherRestApiDownloader,
+				requestWeatherProviderType, zoneId);
 		if (currentConditionsDto != null) {
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 			setCurrentConditionsViews(expandedRemoteViews, currentConditionsDto);
@@ -283,15 +290,15 @@ public class OngoingNotiViewCreator {
 			temperature = currentConditionsDto.getTemp().replace(MyApplication.VALUE_UNIT_OBJ.getTempUnitText(), "°");
 		}
 
-		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleRestApiDownloader,
-				requestWeatherProviderType);
+		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, weatherRestApiDownloader,
+				requestWeatherProviderType, zoneId);
 		if (!hourlyForecastDtoList.isEmpty()) {
 			setHourlyForecastViews(expandedRemoteViews, hourlyForecastDtoList);
 		}
 
 		AirQualityDto airQualityDto = null;
 		if (zoneOffset != null) {
-			airQualityDto = WeatherResponseProcessor.getAirQualityDto(context, multipleRestApiDownloader, zoneOffset);
+			airQualityDto = WeatherResponseProcessor.getAirQualityDto(weatherRestApiDownloader, zoneOffset);
 			if (airQualityDto.isSuccessful()) {
 				setAirQualityViews(expandedRemoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 			} else {
@@ -522,6 +529,7 @@ public class OngoingNotiViewCreator {
 		notificationDataObj.setLongitude(notiPreferences.getFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), 0f));
 		notificationDataObj.setAdmin(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADMIN.name(), ""));
 		notificationDataObj.setCountryCode(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), ""));
+		notificationDataObj.setZoneId(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ZONE_ID.name(), ""));
 	}
 
 	public void loadDefaultPreferences() {
@@ -562,6 +570,7 @@ public class OngoingNotiViewCreator {
 		editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), (float) notificationDataObj.getLongitude());
 		editor.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode());
 		editor.putString(WidgetNotiConstants.Commons.DataKeys.ADMIN.name(), notificationDataObj.getAdmin());
+		editor.putString(WidgetNotiConstants.Commons.DataKeys.ZONE_ID.name(), notificationDataObj.getZoneId());
 		editor.commit();
 	}
 

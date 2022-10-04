@@ -7,7 +7,6 @@ import android.os.Bundle;
 
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.creator.EleventhWidgetCreator;
-import com.lifedawn.bestweather.widget.jobservice.EleventhWidgetJobService;
 
 public class EleventhWidgetProvider extends BaseAppWidgetProvider {
 	@Override
@@ -46,8 +45,4 @@ public class EleventhWidgetProvider extends BaseAppWidgetProvider {
 	}
 
 
-	@Override
-	protected Class<?> getJobServiceClass() {
-		return EleventhWidgetJobService.class;
-	}
 }

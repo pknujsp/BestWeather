@@ -1,10 +1,8 @@
 package com.lifedawn.bestweather.retrofit.util;
 
 import android.util.ArrayMap;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
@@ -12,31 +10,41 @@ import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
-public abstract class MultipleRestApiDownloader {
+public abstract class WeatherRestApiDownloader {
 	private final ZonedDateTime requestDateTime = ZonedDateTime.now();
 	private volatile int requestCount;
 	private volatile int responseCount;
 	private boolean responseCompleted;
+	private ZoneId zoneId;
 
 	private Map<String, String> valueMap = new ConcurrentHashMap<>();
 	private Map<RetrofitClient.ServiceType, Call<?>> callMap = new ConcurrentHashMap<>();
 
 	protected Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ConcurrentHashMap<>();
 
-	public MultipleRestApiDownloader() {
+	public WeatherRestApiDownloader() {
 	}
 
-	public MultipleRestApiDownloader setResponseCompleted(boolean responseCompleted) {
+	public WeatherRestApiDownloader setResponseCompleted(boolean responseCompleted) {
 		this.responseCompleted = responseCompleted;
 		return this;
+	}
+
+	public WeatherRestApiDownloader setZoneId(ZoneId zoneId) {
+		this.zoneId = zoneId;
+		return this;
+	}
+
+	public ZoneId getZoneId() {
+		return zoneId;
 	}
 
 	public Map<RetrofitClient.ServiceType, Call<?>> getCallMap() {
@@ -47,7 +55,7 @@ public abstract class MultipleRestApiDownloader {
 		return responseMap;
 	}
 
-	public MultipleRestApiDownloader(int requestCount) {
+	public WeatherRestApiDownloader(int requestCount) {
 		this.requestCount = requestCount;
 	}
 

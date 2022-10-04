@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.notification.daily.viewcreator;
 
 import android.content.Context;
 import android.os.Build;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -11,11 +10,12 @@ import androidx.annotation.Nullable;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
@@ -112,12 +112,14 @@ public class FirstDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 	}
 
 	@Override
-	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherProviderType> weatherProviderTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
-		final String refreshDateTime = multipleRestApiDownloader.getRequestDateTime().toString();
+	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherProviderType> weatherProviderTypeSet, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
+		final String refreshDateTime = weatherRestApiDownloader.getRequestDateTime().toString();
+		zoneId = weatherRestApiDownloader.getZoneId();
+
 
 		WeatherProviderType weatherProviderType = WeatherResponseProcessor.getMainWeatherSourceType(weatherProviderTypeSet);
 		List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context,
-				multipleRestApiDownloader, weatherProviderType);
+				weatherRestApiDownloader, weatherProviderType, zoneId);
 
 		if (!hourlyForecastDtoList.isEmpty()) {
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, hourlyForecastDtoList);

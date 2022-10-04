@@ -509,5 +509,6 @@
     <string name="pref_title_redraw_widgets">위젯 새로고침</string>
     <string name="provide">제공</string>
     <string name="close">닫기</string>
+    <string name="adding_a_new_favorite_location">새로운 위치를 추가하는 중입니다</string>
 
 </resources>

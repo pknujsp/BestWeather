@@ -1,25 +1,21 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.response;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.ArrayMap;
 
 import androidx.annotation.Nullable;
-import androidx.preference.PreferenceManager;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.kma.KmaCurrentConditionsParameters;
 import com.lifedawn.bestweather.retrofit.parameters.kma.KmaForecastsParameters;
 import com.lifedawn.bestweather.retrofit.parameters.kma.UltraSrtNcstParameter;
 import com.lifedawn.bestweather.retrofit.parameters.kma.VilageFcstParameter;
-import com.lifedawn.bestweather.retrofit.parameters.metnorway.LocationForecastParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
@@ -35,7 +31,7 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.cur
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
@@ -62,6 +58,7 @@ import java.util.Map;
 import java.util.Set;
 
 import okio.Buffer;
+import us.dustinj.timezonemap.TimeZoneMap;
 
 public class WeatherResponseProcessor {
 	public static final Map<String, ZoneId> TIMEZONE_MAP = new HashMap<>();
@@ -92,12 +89,29 @@ public class WeatherResponseProcessor {
 		return ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), zoneId).withMinute(0).withSecond(0).withNano(0);
 	}
 
-	public static AirQualityDto getAirQualityDto(Context context, MultipleRestApiDownloader multipleRestApiDownloader,
+	public static ZoneId getZoneId(Double latitude, Double longitude) {
+		final String key = latitude.toString() + longitude.toString();
+
+		if (TIMEZONE_MAP.containsKey(key)) {
+			return TIMEZONE_MAP.get(key);
+		}
+
+		TimeZoneMap map = TimeZoneMap.forRegion(latitude - 5.0,
+				longitude - 5.0, latitude + 5.0
+				, longitude + 5.0);
+
+		ZoneId zoneId = ZoneId.of(map.getOverlappingTimeZone(latitude, longitude).getZoneId());
+		TIMEZONE_MAP.put(key, zoneId);
+
+		return zoneId;
+	}
+
+	public static AirQualityDto getAirQualityDto(WeatherRestApiDownloader weatherRestApiDownloader,
 	                                             ZoneOffset zoneOffset) {
-		if (multipleRestApiDownloader == null) {
+		if (weatherRestApiDownloader == null) {
 			return null;
 		}
-		MultipleRestApiDownloader.ResponseResult aqiCnResponseResult = multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.AQICN).get(
+		WeatherRestApiDownloader.ResponseResult aqiCnResponseResult = weatherRestApiDownloader.getResponseMap().get(WeatherProviderType.AQICN).get(
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 
 		return AqicnResponseProcessor.makeAirQualityDto((AqiCnGeolocalizedFeedResponse) aqiCnResponseResult.getResponseObj(),
@@ -106,7 +120,7 @@ public class WeatherResponseProcessor {
 
 	public static CurrentConditionsDto parseTextToCurrentConditionsDto(Context context, JsonObject jsonObject,
 	                                                                   WeatherProviderType weatherProviderType, Double latitude,
-	                                                                   Double longitude) {
+	                                                                   Double longitude, ZoneId zoneId) {
 		CurrentConditionsDto currentConditionsDto = null;
 		JsonObject weatherSourceElement = jsonObject.getAsJsonObject(weatherProviderType.name());
 
@@ -164,36 +178,37 @@ public class WeatherResponseProcessor {
 			OwmOneCallResponse owmOneCallResponse =
 					OpenWeatherMapResponseProcessor.getOneCallObjFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.OWM_ONE_CALL.name()).getAsString());
 
-			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(context, owmOneCallResponse
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(context, owmOneCallResponse, zoneId
 			);
 		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
 			LocationForecastResponse metNorwayResponse =
 					MetNorwayResponseProcessor.getLocationForecastResponseObjFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name()).getAsString());
 
 			currentConditionsDto = MetNorwayResponseProcessor.makeCurrentConditionsDto(context, metNorwayResponse,
-					MetNorwayResponseProcessor.getZoneId(latitude, longitude));
+					zoneId);
 		} else if (weatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
 			OwmCurrentConditionsResponse owmCurrentConditionsResponse =
 					OpenWeatherMapResponseProcessor.getOwmCurrentConditionsResponseFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS.name()).getAsString());
 
-			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(context, owmCurrentConditionsResponse
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(context,
+					owmCurrentConditionsResponse, zoneId
 			);
 		}
 		return currentConditionsDto;
 	}
 
-	public static CurrentConditionsDto getCurrentConditionsDto(Context context, MultipleRestApiDownloader multipleRestApiDownloader,
-	                                                           WeatherProviderType weatherProviderType) {
-		if (multipleRestApiDownloader == null) {
+	public static CurrentConditionsDto getCurrentConditionsDto(Context context, WeatherRestApiDownloader weatherRestApiDownloader,
+	                                                           WeatherProviderType weatherProviderType, ZoneId zoneId) {
+		if (weatherRestApiDownloader == null) {
 			return null;
 		}
 		CurrentConditionsDto currentConditionsDto = null;
 
 		if (weatherProviderType == WeatherProviderType.KMA_API) {
-			MultipleRestApiDownloader.ResponseResult ultraSrtNcstResponseResult =
-					multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
-			MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponseResult =
-					multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
+			WeatherRestApiDownloader.ResponseResult ultraSrtNcstResponseResult =
+					weatherRestApiDownloader.getResponseMap().get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST);
+			WeatherRestApiDownloader.ResponseResult ultraSrtFcstResponseResult =
+					weatherRestApiDownloader.getResponseMap().get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
 
 			if (ultraSrtNcstResponseResult != null && ultraSrtFcstResponseResult != null && ultraSrtNcstResponseResult.isSuccessful()) {
 				FinalCurrentConditions finalCurrentConditions =
@@ -207,10 +222,10 @@ public class WeatherResponseProcessor {
 						ultraSrtNcstParameter.getLatitude(), ultraSrtNcstParameter.getLongitude());
 			}
 		} else if (weatherProviderType == WeatherProviderType.KMA_WEB) {
-			MultipleRestApiDownloader.ResponseResult currentConditionsResponseResult =
-					multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.KMA_WEB).get(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS);
-			MultipleRestApiDownloader.ResponseResult hourlyForecastsResponseResult =
-					multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.KMA_WEB).get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
+			WeatherRestApiDownloader.ResponseResult currentConditionsResponseResult =
+					weatherRestApiDownloader.getResponseMap().get(WeatherProviderType.KMA_WEB).get(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS);
+			WeatherRestApiDownloader.ResponseResult hourlyForecastsResponseResult =
+					weatherRestApiDownloader.getResponseMap().get(WeatherProviderType.KMA_WEB).get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 
 			if (currentConditionsResponseResult != null && hourlyForecastsResponseResult != null &&
 					currentConditionsResponseResult.isSuccessful() && hourlyForecastsResponseResult.isSuccessful()) {
@@ -225,7 +240,7 @@ public class WeatherResponseProcessor {
 						parameters.getLatitude(), parameters.getLongitude());
 			}
 		} else if (weatherProviderType == WeatherProviderType.ACCU_WEATHER) {
-			MultipleRestApiDownloader.ResponseResult currentConditionsResponseResult = multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.ACCU_WEATHER)
+			WeatherRestApiDownloader.ResponseResult currentConditionsResponseResult = weatherRestApiDownloader.getResponseMap().get(WeatherProviderType.ACCU_WEATHER)
 					.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS);
 
 			if (currentConditionsResponseResult != null && currentConditionsResponseResult.isSuccessful()) {
@@ -236,42 +251,39 @@ public class WeatherResponseProcessor {
 						accuCurrentConditionsResponse.getItems().get(0));
 			}
 		} else if (weatherProviderType == WeatherProviderType.OWM_ONECALL) {
-			MultipleRestApiDownloader.ResponseResult owmResponseResult = multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.OWM_ONECALL)
+			WeatherRestApiDownloader.ResponseResult owmResponseResult = weatherRestApiDownloader.getResponseMap().get(WeatherProviderType.OWM_ONECALL)
 					.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
 			if (owmResponseResult != null && owmResponseResult.isSuccessful()) {
 				OwmOneCallResponse owmOneCallResponse =
 						(OwmOneCallResponse) owmResponseResult.getResponseObj();
 
-				currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(context, owmOneCallResponse
+				currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(context, owmOneCallResponse, zoneId
 				);
 			}
 		} else if (weatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
-			MultipleRestApiDownloader.ResponseResult owmCurrentConditionsResponseResult =
-					multipleRestApiDownloader.getResponseMap().get(weatherProviderType)
+			WeatherRestApiDownloader.ResponseResult owmCurrentConditionsResponseResult =
+					weatherRestApiDownloader.getResponseMap().get(weatherProviderType)
 							.get(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS);
 
 			if (owmCurrentConditionsResponseResult != null && owmCurrentConditionsResponseResult.isSuccessful()) {
 				OwmCurrentConditionsResponse owmCurrentConditionsResponse =
 						(OwmCurrentConditionsResponse) owmCurrentConditionsResponseResult.getResponseObj();
 
-				currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(context, owmCurrentConditionsResponse
+				currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(context,
+						owmCurrentConditionsResponse, zoneId
 				);
 			}
 		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
-			MultipleRestApiDownloader.ResponseResult metResponseResult =
-					multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.MET_NORWAY)
+			WeatherRestApiDownloader.ResponseResult metResponseResult =
+					weatherRestApiDownloader.getResponseMap().get(WeatherProviderType.MET_NORWAY)
 							.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
 
 			if (metResponseResult != null && metResponseResult.isSuccessful()) {
 				LocationForecastResponse metResponse =
 						(LocationForecastResponse) metResponseResult.getResponseObj();
 
-				LocationForecastParameter parameters = (LocationForecastParameter) metResponseResult.getRequestParameter();
-
-				currentConditionsDto = MetNorwayResponseProcessor.makeCurrentConditionsDto(context, metResponse,
-						MetNorwayResponseProcessor.getZoneId(Double.parseDouble(parameters.getLatitude()),
-								Double.parseDouble(parameters.getLongitude())));
+				currentConditionsDto = MetNorwayResponseProcessor.makeCurrentConditionsDto(context, metResponse, zoneId);
 			}
 		}
 
@@ -280,7 +292,7 @@ public class WeatherResponseProcessor {
 
 	public static List<HourlyForecastDto> parseTextToHourlyForecastDtoList(Context context, JsonObject jsonObject,
 	                                                                       WeatherProviderType weatherProviderType, Double latitude,
-	                                                                       Double longitude) {
+	                                                                       Double longitude, ZoneId zoneId) {
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 		JsonObject weatherSourceElement = jsonObject.getAsJsonObject(weatherProviderType.name());
 
@@ -318,8 +330,7 @@ public class WeatherResponseProcessor {
 				AccuHourlyForecastsResponse hourlyForecastsResponse = AccuWeatherResponseProcessor.getHourlyForecastObjFromJson(
 						accuJsonArr);
 
-				hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(context, hourlyForecastsResponse.getItems()
-				);
+				hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(context, hourlyForecastsResponse.getItems());
 			}
 
 		} else if (weatherProviderType == WeatherProviderType.OWM_ONECALL) {
@@ -327,14 +338,14 @@ public class WeatherResponseProcessor {
 				OwmOneCallResponse owmOneCallResponse =
 						OpenWeatherMapResponseProcessor.getOneCallObjFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.OWM_ONE_CALL.name()).getAsString());
 
-				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(context, owmOneCallResponse
+				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(context, owmOneCallResponse, zoneId
 				);
 			}
 		} else if (weatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
 			OwmHourlyForecastResponse owmHourlyForecastResponse =
 					OpenWeatherMapResponseProcessor.getOwmHourlyForecastResponseFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST.name()).getAsString());
 
-			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(context, owmHourlyForecastResponse
+			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(context, owmHourlyForecastResponse, zoneId
 			);
 		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
 			if (weatherSourceElement.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name()) != null) {
@@ -342,26 +353,27 @@ public class WeatherResponseProcessor {
 						MetNorwayResponseProcessor.getLocationForecastResponseObjFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name()).getAsString());
 
 				hourlyForecastDtoList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(context, metNorwayResponse,
-						MetNorwayResponseProcessor.getZoneId(latitude, longitude));
+						zoneId);
 			}
 		}
+
 		return hourlyForecastDtoList;
 	}
 
-	public static List<HourlyForecastDto> getHourlyForecastDtoList(Context context, MultipleRestApiDownloader
-			multipleRestApiDownloader, WeatherProviderType weatherProviderType) {
+	public static List<HourlyForecastDto> getHourlyForecastDtoList(Context context, WeatherRestApiDownloader
+			weatherRestApiDownloader, WeatherProviderType weatherProviderType, ZoneId zoneId) {
 		List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 
-		if (multipleRestApiDownloader == null) {
+		if (weatherRestApiDownloader == null) {
 			return hourlyForecastDtoList;
 		}
 
-		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
+		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
 
 		if (weatherProviderType == WeatherProviderType.KMA_API) {
-			MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponseResult = responseMap.get(WeatherProviderType.KMA_API).get(
+			WeatherRestApiDownloader.ResponseResult ultraSrtFcstResponseResult = responseMap.get(WeatherProviderType.KMA_API).get(
 					RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
-			MultipleRestApiDownloader.ResponseResult vilageFcstResponseResult = responseMap.get(WeatherProviderType.KMA_API).get(
+			WeatherRestApiDownloader.ResponseResult vilageFcstResponseResult = responseMap.get(WeatherProviderType.KMA_API).get(
 					RetrofitClient.ServiceType.KMA_VILAGE_FCST);
 
 			if (ultraSrtFcstResponseResult != null && vilageFcstResponseResult != null
@@ -379,8 +391,8 @@ public class WeatherResponseProcessor {
 						vilageFcstParameter.getLatitude(), vilageFcstParameter.getLongitude());
 			}
 		} else if (weatherProviderType == WeatherProviderType.KMA_WEB) {
-			MultipleRestApiDownloader.ResponseResult hourlyForecastsResponseResult =
-					multipleRestApiDownloader.getResponseMap().get(weatherProviderType).get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
+			WeatherRestApiDownloader.ResponseResult hourlyForecastsResponseResult =
+					weatherRestApiDownloader.getResponseMap().get(weatherProviderType).get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 
 			if (hourlyForecastsResponseResult != null && hourlyForecastsResponseResult.isSuccessful()) {
 				Object[] forecasts = (Object[]) hourlyForecastsResponseResult.getResponseObj();
@@ -392,50 +404,47 @@ public class WeatherResponseProcessor {
 						parameters.getLatitude(), parameters.getLongitude());
 			}
 		} else if (weatherProviderType == WeatherProviderType.ACCU_WEATHER) {
-			MultipleRestApiDownloader.ResponseResult hourlyForecastResponseResult = responseMap.get(weatherProviderType).get(
+			WeatherRestApiDownloader.ResponseResult hourlyForecastResponseResult = responseMap.get(weatherProviderType).get(
 					RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
 
 			if (hourlyForecastResponseResult != null && hourlyForecastResponseResult.isSuccessful()) {
 				AccuHourlyForecastsResponse hourlyForecastsResponse =
 						(AccuHourlyForecastsResponse) hourlyForecastResponseResult.getResponseObj();
 
-				hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(context, hourlyForecastsResponse.getItems()
-				);
+				hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(context, hourlyForecastsResponse.getItems());
 			}
 		} else if (weatherProviderType == WeatherProviderType.OWM_ONECALL) {
-			MultipleRestApiDownloader.ResponseResult responseResult = responseMap.get(weatherProviderType).get(RetrofitClient.ServiceType.OWM_ONE_CALL);
+			WeatherRestApiDownloader.ResponseResult responseResult = responseMap.get(weatherProviderType).get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
 			if (responseResult != null && responseResult.isSuccessful()) {
 				OwmOneCallResponse owmOneCallResponse =
 						(OwmOneCallResponse) responseResult.getResponseObj();
 
-				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(context, owmOneCallResponse);
+				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(context, owmOneCallResponse,
+						zoneId);
 			}
 		} else if (weatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
-			MultipleRestApiDownloader.ResponseResult owmHourlyForecastResponseResult =
-					multipleRestApiDownloader.getResponseMap().get(weatherProviderType)
+			WeatherRestApiDownloader.ResponseResult owmHourlyForecastResponseResult =
+					weatherRestApiDownloader.getResponseMap().get(weatherProviderType)
 							.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
 
 			if (owmHourlyForecastResponseResult != null && owmHourlyForecastResponseResult.isSuccessful()) {
 				OwmHourlyForecastResponse owmHourlyForecastResponse =
 						(OwmHourlyForecastResponse) owmHourlyForecastResponseResult.getResponseObj();
 
-				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(context, owmHourlyForecastResponse
+				hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(context,
+						owmHourlyForecastResponse, zoneId
 				);
 			}
 		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
-			MultipleRestApiDownloader.ResponseResult responseResult =
+			WeatherRestApiDownloader.ResponseResult responseResult =
 					responseMap.get(weatherProviderType).get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
 
 			if (responseResult != null && responseResult.isSuccessful()) {
 				LocationForecastResponse metNorwayResponse =
 						(LocationForecastResponse) responseResult.getResponseObj();
 
-				LocationForecastParameter parameters = (LocationForecastParameter) responseResult.getRequestParameter();
-
-				hourlyForecastDtoList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(context, metNorwayResponse,
-						MetNorwayResponseProcessor.getZoneId(Double.parseDouble(parameters.getLatitude()),
-								Double.parseDouble(parameters.getLongitude())));
+				hourlyForecastDtoList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(context, metNorwayResponse, zoneId);
 			}
 		}
 
@@ -444,10 +453,9 @@ public class WeatherResponseProcessor {
 
 
 	public static List<DailyForecastDto> parseTextToDailyForecastDtoList(Context context, JsonObject jsonObject,
-	                                                                     WeatherProviderType weatherProviderType, String zoneId) {
+	                                                                     WeatherProviderType weatherProviderType, ZoneId zoneId) {
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
 		JsonObject weatherSourceElement = jsonObject.getAsJsonObject(weatherProviderType.name());
-
 
 		if (weatherProviderType == WeatherProviderType.KMA_API) {
 			if (weatherSourceElement.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name()) != null &&
@@ -503,23 +511,23 @@ public class WeatherResponseProcessor {
 				OwmOneCallResponse owmOneCallResponse =
 						OpenWeatherMapResponseProcessor.getOneCallObjFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.OWM_ONE_CALL.name()).getAsString());
 
-				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(context, owmOneCallResponse
-				);
+				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(context, owmOneCallResponse,
+						zoneId);
 			}
 		} else if (weatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
 			if (weatherSourceElement.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST.name()) != null) {
 				OwmDailyForecastResponse owmDailyForecastResponse =
 						OpenWeatherMapResponseProcessor.getOwmDailyForecastResponseFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST.name()).getAsString());
 
-				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(context, owmDailyForecastResponse
-				);
+				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(context, owmDailyForecastResponse,
+						zoneId);
 			}
 		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
 			if (weatherSourceElement.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name()) != null) {
 				LocationForecastResponse metNorwayResponse =
 						MetNorwayResponseProcessor.getLocationForecastResponseObjFromJson(weatherSourceElement.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name()).getAsString());
 
-				dailyForecastDtoList = MetNorwayResponseProcessor.makeDailyForecastDtoList(context, metNorwayResponse, ZoneId.of(zoneId));
+				dailyForecastDtoList = MetNorwayResponseProcessor.makeDailyForecastDtoList(context, metNorwayResponse, zoneId);
 			}
 		}
 
@@ -527,20 +535,20 @@ public class WeatherResponseProcessor {
 	}
 
 
-	public static List<DailyForecastDto> getDailyForecastDtoList(Context context, MultipleRestApiDownloader multipleRestApiDownloader,
-	                                                             WeatherProviderType weatherProviderType) {
+	public static List<DailyForecastDto> getDailyForecastDtoList(Context context, WeatherRestApiDownloader weatherRestApiDownloader,
+	                                                             WeatherProviderType weatherProviderType, ZoneId zoneId) {
 		List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
-		if (multipleRestApiDownloader == null) {
+		if (weatherRestApiDownloader == null) {
 			return dailyForecastDtoList;
 		}
-		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
+		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
 
 		if (weatherProviderType == WeatherProviderType.KMA_API) {
-			MultipleRestApiDownloader.ResponseResult midLandFcstResponseResult =
+			WeatherRestApiDownloader.ResponseResult midLandFcstResponseResult =
 					responseMap.get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_MID_LAND_FCST);
-			MultipleRestApiDownloader.ResponseResult midTaFcstResponseResult = responseMap.get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_MID_TA_FCST);
-			MultipleRestApiDownloader.ResponseResult vilageFcstResponseResult = responseMap.get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
-			MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponseResult = responseMap.get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
+			WeatherRestApiDownloader.ResponseResult midTaFcstResponseResult = responseMap.get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_MID_TA_FCST);
+			WeatherRestApiDownloader.ResponseResult vilageFcstResponseResult = responseMap.get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
+			WeatherRestApiDownloader.ResponseResult ultraSrtFcstResponseResult = responseMap.get(WeatherProviderType.KMA_API).get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
 
 			if (midLandFcstResponseResult.isSuccessful() && midTaFcstResponseResult.isSuccessful() &&
 					vilageFcstResponseResult.isSuccessful() && ultraSrtFcstResponseResult.isSuccessful()) {
@@ -553,14 +561,14 @@ public class WeatherResponseProcessor {
 				List<FinalHourlyForecast> finalHourlyForecasts = KmaResponseProcessor.getFinalHourlyForecastListByXML(ultraSrtFcstRoot,
 						vilageFcstRoot);
 				List<FinalDailyForecast> finalDailyForecasts = KmaResponseProcessor.getFinalDailyForecastListByXML(midLandFcstRoot, midTaRoot,
-						Long.parseLong(multipleRestApiDownloader.get("tmFc")));
+						Long.parseLong(weatherRestApiDownloader.get("tmFc")));
 
 				dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfXML(
 						KmaResponseProcessor.getDailyForecastListByXML(finalDailyForecasts, finalHourlyForecasts));
 			}
 		} else if (weatherProviderType == WeatherProviderType.KMA_WEB) {
-			MultipleRestApiDownloader.ResponseResult dailyForecastsResponseResult =
-					multipleRestApiDownloader.getResponseMap().get(WeatherProviderType.KMA_WEB).get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
+			WeatherRestApiDownloader.ResponseResult dailyForecastsResponseResult =
+					weatherRestApiDownloader.getResponseMap().get(WeatherProviderType.KMA_WEB).get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 
 			if (dailyForecastsResponseResult.isSuccessful()) {
 				Object[] forecasts = (Object[]) dailyForecastsResponseResult.getResponseObj();
@@ -569,7 +577,7 @@ public class WeatherResponseProcessor {
 				dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfWEB(kmaDailyForecasts);
 			}
 		} else if (weatherProviderType == WeatherProviderType.ACCU_WEATHER) {
-			MultipleRestApiDownloader.ResponseResult dailyForecastResponseResult = responseMap.get(WeatherProviderType.ACCU_WEATHER).get(
+			WeatherRestApiDownloader.ResponseResult dailyForecastResponseResult = responseMap.get(WeatherProviderType.ACCU_WEATHER).get(
 					RetrofitClient.ServiceType.ACCU_DAILY_FORECAST);
 
 			if (dailyForecastResponseResult.isSuccessful()) {
@@ -580,39 +588,36 @@ public class WeatherResponseProcessor {
 				);
 			}
 		} else if (weatherProviderType == WeatherProviderType.OWM_ONECALL) {
-			MultipleRestApiDownloader.ResponseResult responseResult = responseMap.get(WeatherProviderType.OWM_ONECALL).get(RetrofitClient.ServiceType.OWM_ONE_CALL);
+			WeatherRestApiDownloader.ResponseResult responseResult = responseMap.get(WeatherProviderType.OWM_ONECALL).get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
 			if (responseResult.isSuccessful()) {
 				OwmOneCallResponse owmOneCallResponse =
 						(OwmOneCallResponse) responseResult.getResponseObj();
 
-				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(context, owmOneCallResponse
+				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(context, owmOneCallResponse, zoneId
 				);
 			}
 		} else if (weatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
-			MultipleRestApiDownloader.ResponseResult responseResult =
+			WeatherRestApiDownloader.ResponseResult responseResult =
 					responseMap.get(weatherProviderType).get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
 
 			if (responseResult.isSuccessful()) {
 				OwmDailyForecastResponse owmDailyForecastResponse =
 						(OwmDailyForecastResponse) responseResult.getResponseObj();
 
-				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(context, owmDailyForecastResponse
-				);
+				dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(context,
+						owmDailyForecastResponse, zoneId);
 			}
 		} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
-			MultipleRestApiDownloader.ResponseResult responseResult =
+			WeatherRestApiDownloader.ResponseResult responseResult =
 					responseMap.get(WeatherProviderType.MET_NORWAY).get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
 
 			if (responseResult.isSuccessful()) {
 				LocationForecastResponse metResponse =
 						(LocationForecastResponse) responseResult.getResponseObj();
 
-				LocationForecastParameter parameters = (LocationForecastParameter) responseResult.getRequestParameter();
-
 				dailyForecastDtoList = MetNorwayResponseProcessor.makeDailyForecastDtoList(context, metResponse,
-						MetNorwayResponseProcessor.getZoneId(Double.parseDouble(parameters.getLatitude()),
-								Double.parseDouble(parameters.getLongitude())));
+						zoneId);
 			}
 		}
 

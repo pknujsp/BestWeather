@@ -34,7 +34,7 @@ import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.Vi
 import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.comparison.base.BaseForecastComparisonFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
@@ -62,7 +62,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class DailyForecastComparisonFragment extends BaseForecastComparisonFragment {
-	private MultipleRestApiDownloader multipleRestApiDownloader;
+	private WeatherRestApiDownloader weatherRestApiDownloader;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -550,14 +550,14 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (multipleRestApiDownloader != null) {
-					multipleRestApiDownloader.cancel();
+				if (weatherRestApiDownloader != null) {
+					weatherRestApiDownloader.cancel();
 				}
 				getParentFragmentManager().popBackStack();
 			}
 		});
 
-		multipleRestApiDownloader = new MultipleRestApiDownloader() {
+		weatherRestApiDownloader = new WeatherRestApiDownloader() {
 			@Override
 			public void onResult() {
 				setTable(this);
@@ -568,11 +568,11 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			}
 		};
-
+		weatherRestApiDownloader.setZoneId(zoneId);
 		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
-				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, multipleRestApiDownloader);
+				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, weatherRestApiDownloader);
 			}
 		});
 	}
@@ -581,23 +581,23 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 	public void onDestroy() {
 		super.onDestroy();
 
-		if (multipleRestApiDownloader != null) {
-			multipleRestApiDownloader.cancel();
+		if (weatherRestApiDownloader != null) {
+			weatherRestApiDownloader.cancel();
 		}
 	}
 
-	private void setTable(MultipleRestApiDownloader multipleRestApiDownloader) {
-		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
-		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap;
+	private void setTable(WeatherRestApiDownloader weatherRestApiDownloader) {
+		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
+		ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> arrayMap;
 		DailyForecastResponse dailyForecastResponse = new DailyForecastResponse();
 
 		//kma api
 		if (responseMap.containsKey(WeatherProviderType.KMA_API)) {
 			arrayMap = responseMap.get(WeatherProviderType.KMA_API);
-			MultipleRestApiDownloader.ResponseResult midLandFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_MID_LAND_FCST);
-			MultipleRestApiDownloader.ResponseResult midTaFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_MID_TA_FCST);
-			MultipleRestApiDownloader.ResponseResult vilageFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
-			MultipleRestApiDownloader.ResponseResult ultraSrtFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
+			WeatherRestApiDownloader.ResponseResult midLandFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_MID_LAND_FCST);
+			WeatherRestApiDownloader.ResponseResult midTaFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_MID_TA_FCST);
+			WeatherRestApiDownloader.ResponseResult vilageFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
+			WeatherRestApiDownloader.ResponseResult ultraSrtFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
 
 			if (midLandFcstResponse.isSuccessful() && midTaFcstResponse.isSuccessful() &&
 					vilageFcstResponse.isSuccessful() && ultraSrtFcstResponse.isSuccessful()) {
@@ -610,7 +610,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 				List<FinalHourlyForecast> finalHourlyForecasts = KmaResponseProcessor.getFinalHourlyForecastListByXML(ultraSrtFcstRoot,
 						vilageFcstRoot);
 				List<FinalDailyForecast> finalDailyForecasts = KmaResponseProcessor.getFinalDailyForecastListByXML(midLandFcstRoot, midTaRoot,
-						Long.parseLong(multipleRestApiDownloader.get("tmFc")));
+						Long.parseLong(weatherRestApiDownloader.get("tmFc")));
 				KmaResponseProcessor.getDailyForecastListByXML(finalDailyForecasts, finalHourlyForecasts);
 
 				dailyForecastResponse.kmaDailyForecastList = KmaResponseProcessor.makeDailyForecastDtoListOfXML(finalDailyForecasts
@@ -631,7 +631,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		//kma web
 		if (responseMap.containsKey(WeatherProviderType.KMA_WEB)) {
 			arrayMap = responseMap.get(WeatherProviderType.KMA_WEB);
-			MultipleRestApiDownloader.ResponseResult forecastsResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
+			WeatherRestApiDownloader.ResponseResult forecastsResponseResult = arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 
 			if (forecastsResponseResult.isSuccessful()) {
 				Object[] objects = (Object[]) forecastsResponseResult.getResponseObj();
@@ -648,7 +648,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		//accu
 		if (responseMap.containsKey(WeatherProviderType.ACCU_WEATHER)) {
 			arrayMap = responseMap.get(WeatherProviderType.ACCU_WEATHER);
-			MultipleRestApiDownloader.ResponseResult accuDailyForecastResponse = arrayMap.get(
+			WeatherRestApiDownloader.ResponseResult accuDailyForecastResponse = arrayMap.get(
 					RetrofitClient.ServiceType.ACCU_DAILY_FORECAST);
 
 			if (accuDailyForecastResponse.isSuccessful()) {
@@ -665,12 +665,12 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		//owm onecall
 		if (responseMap.containsKey(WeatherProviderType.OWM_ONECALL)) {
 			arrayMap = responseMap.get(WeatherProviderType.OWM_ONECALL);
-			MultipleRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
+			WeatherRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
 			if (responseResult.isSuccessful()) {
 				dailyForecastResponse.owmDailyForecastList =
 						OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(getContext(),
-								(OwmOneCallResponse) responseResult.getResponseObj());
+								(OwmOneCallResponse) responseResult.getResponseObj(), zoneId);
 			} else {
 				dailyForecastResponse.owmThrowable = responseResult.getT();
 			}
@@ -679,12 +679,12 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		//owm individual
 		if (responseMap.containsKey(WeatherProviderType.OWM_INDIVIDUAL)) {
 			arrayMap = responseMap.get(WeatherProviderType.OWM_INDIVIDUAL);
-			MultipleRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
+			WeatherRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
 
 			if (responseResult.isSuccessful()) {
 				dailyForecastResponse.owmDailyForecastList =
 						OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(getContext(),
-								(OwmDailyForecastResponse) responseResult.getResponseObj());
+								(OwmDailyForecastResponse) responseResult.getResponseObj(), zoneId);
 			} else {
 				dailyForecastResponse.owmThrowable = responseResult.getT();
 			}
@@ -693,7 +693,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		//met norway
 		if (responseMap.containsKey(WeatherProviderType.MET_NORWAY)) {
 			arrayMap = responseMap.get(WeatherProviderType.MET_NORWAY);
-			MultipleRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
+			WeatherRestApiDownloader.ResponseResult responseResult = arrayMap.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
 
 			if (responseResult.isSuccessful()) {
 				dailyForecastResponse.metNorwayDailyForecastList =

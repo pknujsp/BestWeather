@@ -128,7 +128,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 			if (f instanceof MapFragment) {
 				binding.widgetSettingsContainer.setVisibility(View.VISIBLE);
 				binding.fragmentContainer.setVisibility(View.GONE);
-
 			}
 		}
 	};
@@ -504,6 +503,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 					widgetDto.setCountryCode(newSelectedAddressDto.getCountryCode());
 					widgetDto.setLatitude(Double.parseDouble(newSelectedAddressDto.getLatitude()));
 					widgetDto.setLongitude(Double.parseDouble(newSelectedAddressDto.getLongitude()));
+					widgetDto.setTimeZoneId(newSelectedAddressDto.getZoneId());
 
 					binding.selectedAddressName.setText(newSelectedAddressDto.getAddress());
 				}

@@ -6,7 +6,7 @@ import com.lifedawn.bestweather.commons.enums.LocationType
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType
 import com.lifedawn.bestweather.notification.NotificationType
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotiViewCreator
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader
 import com.lifedawn.bestweather.room.callback.DbQueryCallback
 import com.lifedawn.bestweather.room.dto.WidgetDto
 import com.lifedawn.bestweather.room.repository.WidgetRepository
@@ -19,7 +19,7 @@ class AfterProcessingWork {
 
 
         private suspend fun refreshWidgetsAndOngoingNotification(context: Context, weatherProviderTypeSet: Set<WeatherProviderType>,
-                                                                 multipleRestApiDownloader: MultipleRestApiDownloader,
+                                                                 weatherRestApiDownloader: WeatherRestApiDownloader,
                                                                  latitude: Double, longitude: Double, currentLocation: Boolean):
                 Deferred<String> =
                 coroutineScope.async {

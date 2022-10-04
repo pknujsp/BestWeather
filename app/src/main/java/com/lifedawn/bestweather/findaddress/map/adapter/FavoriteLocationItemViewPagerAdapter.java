@@ -1,8 +1,5 @@
 package com.lifedawn.bestweather.findaddress.map.adapter;
 
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.location.Address;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +19,12 @@ public class FavoriteLocationItemViewPagerAdapter extends RecyclerView.Adapter<F
 	private List<FavoriteAddressDto> addressList;
 	private OnClickedLocationBtnListener<FavoriteAddressDto> onClickedLocationBtnListener;
 	private OnClickedScrollBtnListener onClickedScrollBtnListener;
+	private boolean showAddBtn = true;
+
+	public FavoriteLocationItemViewPagerAdapter setShowAddBtn(boolean showAddBtn) {
+		this.showAddBtn = showAddBtn;
+		return this;
+	}
 
 	public FavoriteLocationItemViewPagerAdapter setAddressList(List<FavoriteAddressDto> addressList) {
 		this.addressList = addressList;
@@ -66,10 +69,16 @@ public class FavoriteLocationItemViewPagerAdapter extends RecyclerView.Adapter<F
 			super(view);
 			binding = FoundAddressItemViewpagerBinding.bind(view);
 
-			binding.addBtn.setText(R.string.remove);
-			binding.addBtn.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
+			binding.addBtn.setVisibility(showAddBtn ? View.VISIBLE : View.GONE);
 
 			binding.addBtn.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View view) {
+					onClickedLocationBtnListener.onSelected(addressList.get(getBindingAdapterPosition()), false);
+				}
+			});
+
+			binding.removeBtn.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View view) {
 					onClickedLocationBtnListener.onSelected(addressList.get(getBindingAdapterPosition()), true);

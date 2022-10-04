@@ -284,10 +284,17 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		});
 
 
+
+
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -337,12 +344,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			}
 		});
 
-
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
 		initializing = false;
 	}
 

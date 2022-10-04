@@ -11,7 +11,7 @@ import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.metnorway.LocationForecastParameter;
 import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
 
 import retrofit2.Call;
@@ -46,7 +46,7 @@ public class MetNorwayProcessing {
 	}
 
 	public static void getMetNorwayForecasts(String latitude, String longitude, RequestMet requestMet,
-	                                         MultipleRestApiDownloader multipleRestApiDownloader, Context context) {
+	                                         WeatherRestApiDownloader weatherRestApiDownloader, Context context) {
 		MetNorwayResponseProcessor.init(context);
 
 		LocationForecastParameter locationForecastParameter = new LocationForecastParameter();
@@ -54,19 +54,19 @@ public class MetNorwayProcessing {
 		Call<JsonElement> locationForecastCall = getLocationForecast(locationForecastParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-				multipleRestApiDownloader.processResult(WeatherProviderType.MET_NORWAY, locationForecastParameter,
+				weatherRestApiDownloader.processResult(WeatherProviderType.MET_NORWAY, locationForecastParameter,
 						RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST, response, responseObj, responseText);
 			}
 
 			@Override
 			public void onResponseResult(Throwable t) {
-				multipleRestApiDownloader.processResult(WeatherProviderType.MET_NORWAY, locationForecastParameter,
+				weatherRestApiDownloader.processResult(WeatherProviderType.MET_NORWAY, locationForecastParameter,
 						RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST, t);
 			}
 
 		});
 
-		multipleRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST, locationForecastCall);
+		weatherRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST, locationForecastCall);
 	}
 
 

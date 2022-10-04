@@ -26,10 +26,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Black"
         android:usesCleartextTraffic="true">
+
         <service
             android:name=".services.WeatherMessengerService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true" />
 
         <activity
             android:name=".alarm.AlarmActivity"
@@ -255,62 +256,7 @@
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".notification.ongoing.OngoingNotiJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".notification.daily.DailyPushNotificationJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.AbstractWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.FirstWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.SecondWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.ThirdWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.FourthWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.FifthWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.SixthWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.SeventhWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.EighthWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.NinthWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.TenthWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-        <service
-            android:name=".widget.jobservice.EleventhWidgetJobService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <service
             android:name=".alarm.alarmnotifications.AlarmService"
             android:enabled="true"

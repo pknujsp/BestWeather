@@ -11,13 +11,13 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmO
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 
 public class MainProcessing {
 
-	public static MultipleRestApiDownloader requestNewWeatherData(Context context, Double latitude, Double longitude,
-	                                                              ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources,
-	                                                              MultipleRestApiDownloader multipleRestApiDownloader) {
+	public static WeatherRestApiDownloader requestNewWeatherData(Context context, Double latitude, Double longitude,
+	                                                             ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources,
+	                                                             WeatherRestApiDownloader weatherRestApiDownloader) {
 		int totalRequestCount = 0;
 		for (RequestWeatherSource requestWeatherSource : requestWeatherSources.values()) {
 			totalRequestCount += requestWeatherSource.getRequestServiceTypes().size();
@@ -31,76 +31,76 @@ public class MainProcessing {
 			}
 		}
 
-		multipleRestApiDownloader.setRequestCount(totalRequestCount);
+		weatherRestApiDownloader.setRequestCount(totalRequestCount);
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.ACCU_WEATHER)) {
-			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherProviderType.ACCU_WEATHER), multipleRestApiDownloader);
+			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherProviderType.ACCU_WEATHER), weatherRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.KMA_WEB)) {
 			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherProviderType.KMA_WEB),
-					multipleRestApiDownloader);
+					weatherRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.MET_NORWAY)) {
 			MetNorwayProcessing.getMetNorwayForecasts(latitude.toString(), longitude.toString(),
-					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), multipleRestApiDownloader, context);
+					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), weatherRestApiDownloader, context);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.OWM_ONECALL)) {
 			OpenWeatherMapProcessing.requestWeatherDataOneCall(context, latitude, longitude,
-					(RequestOwmOneCall) requestWeatherSources.get(WeatherProviderType.OWM_ONECALL), multipleRestApiDownloader);
+					(RequestOwmOneCall) requestWeatherSources.get(WeatherProviderType.OWM_ONECALL), weatherRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.OWM_INDIVIDUAL)) {
 			OpenWeatherMapProcessing.requestWeatherDataIndividual(context, latitude, longitude,
-					(RequestOwmIndividual) requestWeatherSources.get(WeatherProviderType.OWM_INDIVIDUAL), multipleRestApiDownloader);
+					(RequestOwmIndividual) requestWeatherSources.get(WeatherProviderType.OWM_INDIVIDUAL), weatherRestApiDownloader);
 		}
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.AQICN)) {
-			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader, context);
+			AqicnProcessing.getAirQuality(latitude, longitude, weatherRestApiDownloader, context);
 		}
 
-		return multipleRestApiDownloader;
+		return weatherRestApiDownloader;
 	}
 
-	public static MultipleRestApiDownloader reRequestWeatherDataBySameWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
-	                                                                                        ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources,
-	                                                                                        MultipleRestApiDownloader multipleRestApiDownloader) {
+	public static WeatherRestApiDownloader reRequestWeatherDataBySameWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
+	                                                                                       ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources,
+	                                                                                       WeatherRestApiDownloader weatherRestApiDownloader) {
 		//실패한 데이터는 모두 삭제(aqicn 제외)
-		multipleRestApiDownloader.getResponseMap().clear();
-		multipleRestApiDownloader.setResponseCompleted(false);
-		multipleRestApiDownloader.getCallMap().clear();
-		multipleRestApiDownloader.setResponseCount(0);
+		weatherRestApiDownloader.getResponseMap().clear();
+		weatherRestApiDownloader.setResponseCompleted(false);
+		weatherRestApiDownloader.getCallMap().clear();
+		weatherRestApiDownloader.setResponseCount(0);
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.ACCU_WEATHER)) {
-			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherProviderType.ACCU_WEATHER), multipleRestApiDownloader);
+			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherProviderType.ACCU_WEATHER), weatherRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.KMA_WEB)) {
-			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherProviderType.KMA_WEB), multipleRestApiDownloader);
+			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherProviderType.KMA_WEB), weatherRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.OWM_ONECALL)) {
 			OpenWeatherMapProcessing.requestWeatherDataOneCall(context, latitude, longitude,
-					(RequestOwmOneCall) requestWeatherSources.get(WeatherProviderType.OWM_ONECALL), multipleRestApiDownloader);
+					(RequestOwmOneCall) requestWeatherSources.get(WeatherProviderType.OWM_ONECALL), weatherRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.OWM_INDIVIDUAL)) {
 			OpenWeatherMapProcessing.requestWeatherDataIndividual(context, latitude, longitude,
-					(RequestOwmIndividual) requestWeatherSources.get(WeatherProviderType.OWM_INDIVIDUAL), multipleRestApiDownloader);
+					(RequestOwmIndividual) requestWeatherSources.get(WeatherProviderType.OWM_INDIVIDUAL), weatherRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.MET_NORWAY)) {
 			MetNorwayProcessing.getMetNorwayForecasts(latitude.toString(), longitude.toString(),
-					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), multipleRestApiDownloader, context);
+					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), weatherRestApiDownloader, context);
 		}
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.AQICN)) {
-			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader, context);
+			AqicnProcessing.getAirQuality(latitude, longitude, weatherRestApiDownloader, context);
 		}
 
 
-		return multipleRestApiDownloader;
+		return weatherRestApiDownloader;
 	}
 
-	public static MultipleRestApiDownloader reRequestWeatherDataByAnotherWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
-	                                                                                           ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources,
-	                                                                                           MultipleRestApiDownloader multipleRestApiDownloader) {
-		multipleRestApiDownloader.getResponseMap().clear();
-		multipleRestApiDownloader.setResponseCount(0);
+	public static WeatherRestApiDownloader reRequestWeatherDataByAnotherWeatherSourceIfFailed(Context context, Double latitude, Double longitude,
+	                                                                                          ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources,
+	                                                                                          WeatherRestApiDownloader weatherRestApiDownloader) {
+		weatherRestApiDownloader.getResponseMap().clear();
+		weatherRestApiDownloader.setResponseCount(0);
 
 		int totalRequestCount = 0;
 
@@ -108,33 +108,33 @@ public class MainProcessing {
 			totalRequestCount += requestWeatherSource.getRequestServiceTypes().size();
 		}
 
-		multipleRestApiDownloader.setRequestCount(totalRequestCount);
+		weatherRestApiDownloader.setRequestCount(totalRequestCount);
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.ACCU_WEATHER)) {
-			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherProviderType.ACCU_WEATHER), multipleRestApiDownloader);
+			AccuWeatherProcessing.requestWeatherData(context, latitude, longitude, (RequestAccu) requestWeatherSources.get(WeatherProviderType.ACCU_WEATHER), weatherRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.KMA_WEB)) {
-			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherProviderType.KMA_WEB), multipleRestApiDownloader);
+			KmaProcessing.requestWeatherDataAsWEB(context, latitude, longitude, (RequestKma) requestWeatherSources.get(WeatherProviderType.KMA_WEB), weatherRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.OWM_ONECALL)) {
 			OpenWeatherMapProcessing.requestWeatherDataOneCall(context, latitude, longitude,
-					(RequestOwmOneCall) requestWeatherSources.get(WeatherProviderType.OWM_ONECALL), multipleRestApiDownloader);
+					(RequestOwmOneCall) requestWeatherSources.get(WeatherProviderType.OWM_ONECALL), weatherRestApiDownloader);
 		}
 		if (requestWeatherSources.containsKey(WeatherProviderType.OWM_INDIVIDUAL)) {
 			OpenWeatherMapProcessing.requestWeatherDataIndividual(context, latitude, longitude,
-					(RequestOwmIndividual) requestWeatherSources.get(WeatherProviderType.OWM_INDIVIDUAL), multipleRestApiDownloader);
+					(RequestOwmIndividual) requestWeatherSources.get(WeatherProviderType.OWM_INDIVIDUAL), weatherRestApiDownloader);
 		}
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.MET_NORWAY)) {
 			MetNorwayProcessing.getMetNorwayForecasts(latitude.toString(), longitude.toString(),
-					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), multipleRestApiDownloader, context);
+					(RequestMet) requestWeatherSources.get(WeatherProviderType.MET_NORWAY), weatherRestApiDownloader, context);
 		}
 
 		if (requestWeatherSources.containsKey(WeatherProviderType.AQICN)) {
-			AqicnProcessing.getAirQuality(latitude, longitude, multipleRestApiDownloader, context);
+			AqicnProcessing.getAirQuality(latitude, longitude, weatherRestApiDownloader, context);
 		}
 
-		return multipleRestApiDownloader;
+		return weatherRestApiDownloader;
 	}
 
 

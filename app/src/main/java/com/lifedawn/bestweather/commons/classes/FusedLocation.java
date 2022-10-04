@@ -46,12 +46,15 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 
 import org.jetbrains.annotations.NotNull;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -143,15 +146,23 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 						if (locationResult != null) {
 							if (locationResult.getLocations().size() > 0) {
-								final Location location = myLocationCallback.getBestLocation(locationResult);
+								MyApplication.getExecutorService().execute(new Runnable() {
+									@Override
+									public void run() {
+										final Location location = myLocationCallback.getBestLocation(locationResult);
+										final ZoneId zoneId = WeatherResponseProcessor.getZoneId(location.getLatitude(), location.getLongitude());
+										final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
 
-								final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-								editor.putString(context.getString(R.string.pref_key_last_current_location_latitude),
-										String.valueOf(location.getLatitude())).putString(
-										context.getString(R.string.pref_key_last_current_location_longitude),
-										String.valueOf(location.getLongitude())).commit();
+										editor.putString(context.getString(R.string.pref_key_last_current_location_latitude),
+														String.valueOf(location.getLatitude()))
+												.putString(context.getString(R.string.pref_key_last_current_location_longitude),
+														String.valueOf(location.getLongitude()))
+												.putString("zoneId", zoneId.getId())
+												.commit();
 
-								myLocationCallback.onSuccessful(locationResult);
+										myLocationCallback.onSuccessful(locationResult);
+									}
+								});
 							} else {
 								myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
 							}

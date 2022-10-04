@@ -718,7 +718,6 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 		final String zeroRainVolume = "0.0mm";
 		final String zeroSnowVolume = "0.0cm";
-		final String zeroPrecipitationVolume = "0.0mm";
 
 		ZoneId zoneId = ZoneId.of("Asia/Seoul");
 
@@ -800,7 +799,6 @@ public class KmaResponseProcessor extends WeatherResponseProcessor {
 
 		final String zeroRainVolume = "0.0mm";
 		final String zeroSnowVolume = "0.0cm";
-		final String zeroPrecipitationVolume = "0.0mm";
 		final String percent = "%";
 		final ZoneId zoneId = ZoneId.of("Asia/Seoul");
 

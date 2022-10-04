@@ -397,6 +397,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 						editingNotificationDto.setAddressName(selectedFavoriteAddressDto.getAddress());
 						editingNotificationDto.setLatitude(Double.parseDouble(selectedFavoriteAddressDto.getLatitude()));
 						editingNotificationDto.setLongitude(Double.parseDouble(selectedFavoriteAddressDto.getLongitude()));
+						editingNotificationDto.setZoneId(selectedFavoriteAddressDto.getZoneId());
 						editingNotificationDto.setCountryCode(selectedFavoriteAddressDto.getCountryCode());
 						editingNotificationDto.setLocationType(LocationType.SelectedAddress);
 					} else {
@@ -441,7 +442,6 @@ public class DailyNotificationSettingsFragment extends Fragment {
 					}
 				} else {
 					selectedFavoriteLocation = true;
-
 					selectedFavoriteAddressDto = favoriteAddressDto;
 					binding.commons.selectedAddressName.setText(selectedFavoriteAddressDto.getAddress());
 
@@ -449,15 +449,15 @@ public class DailyNotificationSettingsFragment extends Fragment {
 					editingNotificationDto.setAddressName(selectedFavoriteAddressDto.getAddress());
 					editingNotificationDto.setLatitude(Double.parseDouble(selectedFavoriteAddressDto.getLatitude()));
 					editingNotificationDto.setLongitude(Double.parseDouble(selectedFavoriteAddressDto.getLongitude()));
+					editingNotificationDto.setZoneId(selectedFavoriteAddressDto.getZoneId());
 					editingNotificationDto.setCountryCode(selectedFavoriteAddressDto.getCountryCode());
 					editingNotificationDto.setLocationType(LocationType.SelectedAddress);
 				}
 			}
 		});
 
-		String tag = MapFragment.class.getName();
-
+		final String tag = MapFragment.class.getName();
 		getParentFragmentManager().beginTransaction().hide(DailyNotificationSettingsFragment.this).add(R.id.fragment_container,
-				mapFragment, tag).addToBackStack(tag).commit();
+				mapFragment, tag).addToBackStack(tag).commitAllowingStateLoss();
 	}
 }

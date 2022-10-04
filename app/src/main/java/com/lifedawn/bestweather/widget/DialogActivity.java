@@ -163,7 +163,7 @@ public class DialogActivity extends Activity {
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						if (DialogActivity.this.isFinishing()) {
+						if (DialogActivity.this.isFinishing() || DialogActivity.this.isDestroyed()) {
 							return;
 						}
 

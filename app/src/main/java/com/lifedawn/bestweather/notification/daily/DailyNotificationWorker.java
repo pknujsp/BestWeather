@@ -5,14 +5,13 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Location;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.PowerManager;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+import androidx.preference.PreferenceManager;
 import androidx.work.ForegroundInfo;
-import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -34,13 +33,13 @@ import com.lifedawn.bestweather.notification.daily.viewcreator.FirstDailyNotific
 import com.lifedawn.bestweather.notification.daily.viewcreator.FourthDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.SecondDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.ThirdDailyNotificationViewCreator;
-import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationWorker;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -186,6 +185,7 @@ public class DailyNotificationWorker extends Worker {
 		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
 			public void onSuccessful(LocationResult locationResult) {
+				final ZoneId zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(context).getString("zoneId", ""));
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 				final Location location = getBestLocation(locationResult);
 				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
@@ -197,6 +197,7 @@ public class DailyNotificationWorker extends Worker {
 						dailyPushNotificationDto.setCountryCode(address.getCountryCode());
 						dailyPushNotificationDto.setLatitude(address.getLatitude());
 						dailyPushNotificationDto.setLongitude(address.getLongitude());
+						dailyPushNotificationDto.setZoneId(zoneId.getId());
 
 						repository.update(dailyPushNotificationDto, null);
 						loadWeatherData(context, executorService, remoteViews, dailyPushNotificationDto);
@@ -242,7 +243,7 @@ public class DailyNotificationWorker extends Worker {
 		}
 
 		WeatherRequestUtil.loadWeatherData(context, executorService,
-				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), weatherDataTypeSet, new MultipleRestApiDownloader() {
+				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), weatherDataTypeSet, new WeatherRestApiDownloader() {
 					@Override
 					public void onResult() {
 						viewCreator.setResultViews(remoteViews, dailyPushNotificationDto, weatherProviderTypeSet, this, weatherDataTypeSet);
@@ -252,7 +253,7 @@ public class DailyNotificationWorker extends Worker {
 					@Override
 					public void onCanceled() {
 					}
-				}, weatherProviderTypeSet);
+				}, weatherProviderTypeSet, ZoneId.of(dailyPushNotificationDto.getZoneId()));
 
 	}
 

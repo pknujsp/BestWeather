@@ -77,7 +77,6 @@ import com.lifedawn.bestweather.flickr.FlickrImgObj;
 import com.lifedawn.bestweather.flickr.FlickrLoader;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
@@ -95,11 +94,8 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.cur
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
-import com.lifedawn.bestweather.retrofit.util.MultipleRestApiDownloader;
-import com.lifedawn.bestweather.room.callback.DbQueryCallback;
+import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.room.dto.WidgetDto;
-import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
@@ -126,11 +122,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -138,7 +132,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 
@@ -164,8 +157,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private String countryCode;
 	private String addressName;
 	private SharedPreferences sharedPreferences;
+	private ZoneId zoneId;
 
-	private MultipleRestApiDownloader multipleRestApiDownloader;
+	private WeatherRestApiDownloader weatherRestApiDownloader;
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 	private Bundle arguments;
@@ -454,6 +448,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				//최근에 현재위치로 잡힌 위치가 없으므로 현재 위치 요청
 				requestCurrentLocation();
 			} else {
+				zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(getContext())
+						.getString("zoneId", ""));
 				//위/경도에 해당하는 지역명을 불러오고, 날씨 데이터 다운로드
 				//이미 존재하는 날씨 데이터면 다운로드X
 				boolean refresh = !containWeatherData(latitude, longitude);
@@ -478,6 +474,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			addressName = selectedFavoriteAddressDto.getAddress();
 			latitude = Double.parseDouble(selectedFavoriteAddressDto.getLatitude());
 			longitude = Double.parseDouble(selectedFavoriteAddressDto.getLongitude());
+			zoneId = ZoneId.of(selectedFavoriteAddressDto.getZoneId());
 
 			binding.addressName.setText(addressName);
 
@@ -520,8 +517,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	@Override
 	public void onDestroy() {
-		if (multipleRestApiDownloader != null) {
-			multipleRestApiDownloader.cancel();
+		if (weatherRestApiDownloader != null) {
+			weatherRestApiDownloader.cancel();
 		}
 		getLifecycle().removeObserver(locationLifeCycleObserver);
 		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
@@ -594,7 +591,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					});
 				}
 			}
-		}, ZonedDateTime.parse(MyApplication.FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader.getRequestDateTime().toString()));
+		}, ZonedDateTime.parse(MyApplication.FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).weatherRestApiDownloader.getRequestDateTime().toString()));
 	}
 
 	private final FusedLocation.MyLocationCallback MY_LOCATION_CALLBACK = new FusedLocation.MyLocationCallback() {
@@ -603,7 +600,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			//현재 위치 파악 성공
 			//현재 위/경도 좌표를 최근 현재위치의 위/경도로 등록
 			//날씨 데이터 요청
-			onChangedCurrentLocation(getBestLocation(locationResult));
+			final Location location = getBestLocation(locationResult);
+			zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(getContext())
+					.getString("zoneId", ""));
+			onChangedCurrentLocation(location);
 			locationCallbackInMainFragment.onSuccessful(locationResult);
 		}
 
@@ -696,23 +696,22 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void onGeocodingResult(List<Address> addressList) {
 				if (getActivity() != null) {
+					if (addressList.isEmpty()) {
+						//검색 결과가 없으면 주소 정보 미 표시하고 데이터 로드
+						mainWeatherProviderType = getMainWeatherSourceType("");
+						countryCode = "";
+						addressName = getString(R.string.unknown_address);
+					} else {
+						Address address = addressList.get(0);
+						addressName = address.getAddressLine(0);
+						mainWeatherProviderType = getMainWeatherSourceType(address.getCountryCode());
+						countryCode = address.getCountryCode();
+					}
+					final String addressStr = getString(R.string.current_location) + " : " + addressName;
+
 					getActivity().runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							if (addressList.isEmpty()) {
-								//검색 결과가 없으면 주소 정보 미 표시하고 데이터 로드
-								mainWeatherProviderType = getMainWeatherSourceType("");
-								countryCode = "";
-								addressName = getString(R.string.unknown_address);
-							} else {
-								Address address = addressList.get(0);
-								addressName = address.getAddressLine(0);
-								mainWeatherProviderType = getMainWeatherSourceType(address.getCountryCode());
-								countryCode = address.getCountryCode();
-							}
-
-							String addressStr = getString(R.string.current_location) + " : " + addressName;
-							Toast.makeText(getContext(), addressStr, Toast.LENGTH_SHORT).show();
 							binding.addressName.setText(addressStr);
 							weatherViewModel.setCurrentLocationAddressName(addressName);
 
@@ -761,7 +760,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
 					weatherProviderTypeSet.add(mainWeatherProviderType);
 					weatherProviderTypeSet.add(WeatherProviderType.AQICN);
-					setWeatherFragments(weatherProviderTypeSet, MyApplication.FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).multipleRestApiDownloader,
+					setWeatherFragments(weatherProviderTypeSet, MyApplication.FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).weatherRestApiDownloader,
 							latitude, longitude);
 				}
 			});
@@ -794,10 +793,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 				final ResponseResultObj responseResultObj = new ResponseResultObj(weatherProviderTypeSet, requestWeatherSources, mainWeatherProviderType);
 
-				multipleRestApiDownloader = new MultipleRestApiDownloader() {
+				weatherRestApiDownloader = new WeatherRestApiDownloader() {
 					@Override
 					public void onResult() {
-						responseResultObj.multipleRestApiDownloader = this;
+						responseResultObj.weatherRestApiDownloader = this;
 						processOnResult(responseResultObj);
 					}
 
@@ -806,7 +805,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 					}
 				};
-				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleRestApiDownloader);
+
+				weatherRestApiDownloader.setZoneId(zoneId);
+				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, weatherRestApiDownloader);
 			}
 		});
 	}
@@ -827,10 +828,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				setRequestWeatherSourceWithSourceTypes(newWeatherProviderTypeSet, requestWeatherSources);
 
 				final ResponseResultObj responseResultObj = new ResponseResultObj(newWeatherProviderTypeSet, requestWeatherSources, newWeatherProviderType);
-				multipleRestApiDownloader = new MultipleRestApiDownloader() {
+				weatherRestApiDownloader = new WeatherRestApiDownloader() {
 					@Override
 					public void onResult() {
-						responseResultObj.multipleRestApiDownloader = this;
+						responseResultObj.weatherRestApiDownloader = this;
 						processOnResult(responseResultObj);
 					}
 
@@ -839,25 +840,25 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 					}
 				};
-
-				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, multipleRestApiDownloader);
+				weatherRestApiDownloader.setZoneId(zoneId);
+				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, weatherRestApiDownloader);
 			}
 		});
 	}
 
 	private void processOnResult(ResponseResultObj responseResultObj) {
-		Set<Map.Entry<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>>> entrySet =
-				responseResultObj.multipleRestApiDownloader.getResponseMap().entrySet();
+		Set<Map.Entry<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>>> entrySet =
+				responseResultObj.weatherRestApiDownloader.getResponseMap().entrySet();
 		//메인 날씨 제공사의 데이터가 정상이면 메인 날씨 제공사의 프래그먼트들을 설정하고 값을 표시한다.
 		//메인 날씨 제공사의 응답이 불량이면 재 시도, 취소 중 택1 다이얼로그 표시
-		for (Map.Entry<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> entry : entrySet) {
+		for (Map.Entry<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> entry : entrySet) {
 			final WeatherProviderType weatherProviderType = entry.getKey();
 
 			if (weatherProviderType == WeatherProviderType.AQICN) {
 				continue;
 			}
 
-			for (MultipleRestApiDownloader.ResponseResult responseResult : entry.getValue().values()) {
+			for (WeatherRestApiDownloader.ResponseResult responseResult : entry.getValue().values()) {
 				if (!responseResult.isSuccessful()) {
 					if (containWeatherData(latitude, longitude)) {
 						MainThreadWorker.runOnUiThread(new Runnable() {
@@ -934,10 +935,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void run() {
 				//응답 성공 하면
-				final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.multipleRestApiDownloader,
+				final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.weatherRestApiDownloader,
 						responseResultObj.weatherProviderTypeSet, responseResultObj.mainWeatherProviderType);
 				MyApplication.FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
-				setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.multipleRestApiDownloader, latitude, longitude);
+				setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.weatherRestApiDownloader, latitude, longitude);
 			}
 		});
 
@@ -1070,7 +1071,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			@Override
 			public void run() {
 				MainProcessing.reRequestWeatherDataBySameWeatherSourceIfFailed(getContext(), latitude, longitude, responseResultObj.requestWeatherSources,
-						responseResultObj.multipleRestApiDownloader);
+						responseResultObj.weatherRestApiDownloader);
 			}
 		});
 
@@ -1088,7 +1089,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				responseResultObj.requestWeatherSources = newRequestWeatherSources;
 
 				MainProcessing.reRequestWeatherDataByAnotherWeatherSourceIfFailed(getContext(), latitude, longitude,
-						responseResultObj.requestWeatherSources, responseResultObj.multipleRestApiDownloader);
+						responseResultObj.requestWeatherSources, responseResultObj.weatherRestApiDownloader);
 			}
 		});
 
@@ -1151,10 +1152,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 
-	private void setWeatherFragments(Set<WeatherProviderType> weatherProviderTypeSet, MultipleRestApiDownloader multipleRestApiDownloader,
+	private void setWeatherFragments(Set<WeatherProviderType> weatherProviderTypeSet, WeatherRestApiDownloader weatherRestApiDownloader,
 	                                 Double latitude, Double longitude) {
-		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult>> responseMap = multipleRestApiDownloader.getResponseMap();
-		ArrayMap<RetrofitClient.ServiceType, MultipleRestApiDownloader.ResponseResult> arrayMap = null;
+		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
+		ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> arrayMap = null;
 
 		CurrentConditionsDto currentConditionsDto = null;
 		List<HourlyForecastDto> hourlyForecastDtoList = null;
@@ -1168,7 +1169,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		final SunsetriseFragment sunSetRiseFragment = new SunsetriseFragment();
 
 		String currentConditionsWeatherVal = null;
-		ZoneId zoneId = null;
 
 		if (weatherProviderTypeSet.contains(WeatherProviderType.KMA_API)) {
 			arrayMap = responseMap.get(WeatherProviderType.KMA_API);
@@ -1185,7 +1185,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastListByXML(
 					(MidLandFcstResponse) arrayMap.get(RetrofitClient.ServiceType.KMA_MID_LAND_FCST).getResponseObj(),
 					(MidTaResponse) arrayMap.get(RetrofitClient.ServiceType.KMA_MID_TA_FCST).getResponseObj(),
-					Long.parseLong(multipleRestApiDownloader.get("tmFc")));
+					Long.parseLong(weatherRestApiDownloader.get("tmFc")));
 
 			finalDailyForecastList = KmaResponseProcessor.getDailyForecastListByXML(finalDailyForecastList, finalHourlyForecastList);
 
@@ -1203,7 +1203,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			String pty = finalCurrentConditions.getPrecipitationType();
 
 			currentConditionsWeatherVal = pty.equals("0") ? sky + "_sky" : pty + "_pty";
-			zoneId = KmaResponseProcessor.getZoneId();
 			mainWeatherProviderType = WeatherProviderType.KMA_API;
 
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.KMA_WEB)) {
@@ -1226,7 +1225,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			String pty = kmaCurrentConditions.getPty();
 
 			currentConditionsWeatherVal = pty.isEmpty() ? kmaHourlyForecasts.get(0).getWeatherDescription() : pty;
-			zoneId = KmaResponseProcessor.getZoneId();
 			mainWeatherProviderType = WeatherProviderType.KMA_WEB;
 
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.ACCU_WEATHER)) {
@@ -1251,7 +1249,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					accuDailyForecastsResponse.getDailyForecasts());
 
 			currentConditionsWeatherVal = accuCurrentConditionsResponse.getItems().get(0).getWeatherIcon();
-			zoneId = ZonedDateTime.parse(accuCurrentConditionsResponse.getItems().get(0).getLocalObservationDateTime()).getZone();
 			mainWeatherProviderType = WeatherProviderType.ACCU_WEATHER;
 
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_ONECALL)) {
@@ -1260,18 +1257,17 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			OwmOneCallResponse owmOneCallResponse =
 					(OwmOneCallResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponseObj();
 
-			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(getContext(), owmOneCallResponse
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(getContext(), owmOneCallResponse, zoneId
 			);
 
-			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(), owmOneCallResponse
+			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(), owmOneCallResponse, zoneId
 			);
 
-			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(getContext(), owmOneCallResponse
+			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(getContext(), owmOneCallResponse, zoneId
 			);
 
 			currentConditionsWeatherVal = owmOneCallResponse.getCurrent().getWeather().get(0).getId();
 
-			zoneId = OpenWeatherMapResponseProcessor.getZoneId(owmOneCallResponse);
 			mainWeatherProviderType = WeatherProviderType.OWM_ONECALL;
 
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_INDIVIDUAL)) {
@@ -1284,23 +1280,20 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			OwmDailyForecastResponse owmDailyForecastResponse =
 					(OwmDailyForecastResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST).getResponseObj();
 
-			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(getContext(), owmCurrentConditionsResponse
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(getContext(), owmCurrentConditionsResponse, zoneId
 			);
 
 			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(getContext(),
-					owmHourlyForecastResponse);
+					owmHourlyForecastResponse, zoneId);
 
 			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(getContext(),
-					owmDailyForecastResponse);
+					owmDailyForecastResponse, zoneId);
 
 			currentConditionsWeatherVal = owmCurrentConditionsResponse.getWeather().get(0).getId();
 
-			ZoneOffset zoneOffsetSecond = ZoneOffset.ofTotalSeconds(Integer.parseInt(owmCurrentConditionsResponse.getTimezone()));
-			zoneId = zoneOffsetSecond.normalized();
 			mainWeatherProviderType = WeatherProviderType.OWM_INDIVIDUAL;
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.MET_NORWAY)) {
 			arrayMap = responseMap.get(WeatherProviderType.MET_NORWAY);
-			zoneId = MetNorwayResponseProcessor.getZoneId(latitude, longitude);
 
 			LocationForecastResponse locationForecastResponse =
 					(LocationForecastResponse) arrayMap.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST).getResponseObj();
@@ -1319,7 +1312,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			mainWeatherProviderType = WeatherProviderType.MET_NORWAY;
 		}
 
-		MultipleRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherProviderType.AQICN).get(
+		WeatherRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherProviderType.AQICN).get(
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 		AqiCnGeolocalizedFeedResponse airQualityResponse = null;
 
@@ -1399,7 +1392,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				@Override
 				public void run() {
 					changeWeatherDataSourcePicker(countryCode);
-					ZonedDateTime dateTime = multipleRestApiDownloader.getRequestDateTime();
+					ZonedDateTime dateTime = weatherRestApiDownloader.getRequestDateTime();
 					dateTimeFormatter = DateTimeFormatter.ofPattern(
 							MyApplication.VALUE_UNIT_OBJ.getClockUnit() == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
 									getString(R.string.datetime_pattern_clock24), Locale.getDefault());
@@ -1421,7 +1414,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							getString(R.string.tag_detail_current_conditions_fragment));
 					fragmentTransaction.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment));
 					fragmentTransaction.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
-							getString(R.string.tag_sun_set_rise_fragment)).commitNowAllowingStateLoss();
+							getString(R.string.tag_sun_set_rise_fragment)).commitAllowingStateLoss();
 
 					binding.scrollView.setVisibility(View.VISIBLE);
 					ProgressDialog.clearDialogs();
@@ -1516,7 +1509,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	private final static class ResponseResultObj implements Serializable {
-		MultipleRestApiDownloader multipleRestApiDownloader;
+		WeatherRestApiDownloader weatherRestApiDownloader;
 		Set<WeatherProviderType> weatherProviderTypeSet;
 		WeatherProviderType mainWeatherProviderType;
 		ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources;
@@ -1530,13 +1523,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	public static class WeatherResponseObj implements Serializable {
-		final MultipleRestApiDownloader multipleRestApiDownloader;
+		final WeatherRestApiDownloader weatherRestApiDownloader;
 		final Set<WeatherProviderType> requestWeatherProviderTypeSet;
 		final WeatherProviderType requestMainWeatherProviderType;
 		LocalDateTime dataDownloadedDateTime;
 
-		public WeatherResponseObj(MultipleRestApiDownloader multipleRestApiDownloader, Set<WeatherProviderType> requestWeatherProviderTypeSet, WeatherProviderType requestMainWeatherProviderType) {
-			this.multipleRestApiDownloader = multipleRestApiDownloader;
+		public WeatherResponseObj(WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherProviderType> requestWeatherProviderTypeSet, WeatherProviderType requestMainWeatherProviderType) {
+			this.weatherRestApiDownloader = weatherRestApiDownloader;
 			this.requestWeatherProviderTypeSet = requestWeatherProviderTypeSet;
 			this.requestMainWeatherProviderType = requestMainWeatherProviderType;
 

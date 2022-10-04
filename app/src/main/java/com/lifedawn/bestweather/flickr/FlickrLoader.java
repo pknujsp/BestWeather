@@ -226,7 +226,7 @@ public class FlickrLoader {
 												@Override
 												public void run() {
 													Activity activity = (Activity) context;
-													if (!activity.isFinishing()) {
+													if (!activity.isFinishing() && !activity.isDestroyed()) {
 														Glide.with(context).asBitmap().load(backgroundImgUrl)
 																.diskCacheStrategy(DiskCacheStrategy.ALL).into(imgRequestObj.glideTarget);
 													}

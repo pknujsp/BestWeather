@@ -31,6 +31,9 @@ public class FavoriteAddressDto implements Serializable {
 	@ColumnInfo
 	private String longitude;
 
+	@ColumnInfo
+	private String zoneId;
+
 	public Integer getId() {
 		return id;
 	}
@@ -85,5 +88,13 @@ public class FavoriteAddressDto implements Serializable {
 
 	public String getAdmin() {
 		return admin;
+	}
+
+	public void setZoneId(String zoneId) {
+		this.zoneId = zoneId;
+	}
+
+	public String getZoneId() {
+		return zoneId;
 	}
 }

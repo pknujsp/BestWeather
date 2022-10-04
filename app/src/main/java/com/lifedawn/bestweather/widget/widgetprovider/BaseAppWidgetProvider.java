@@ -39,10 +39,6 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 	protected AppWidgetManager appWidgetManager;
 	final String TAG = "WIDGET_PROVIDER";
 
-	protected Class<?> getJobServiceClass() {
-		return null;
-	}
-
 	protected AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId) {
 		return null;
 	}
