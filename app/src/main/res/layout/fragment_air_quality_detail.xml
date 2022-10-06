@@ -1,331 +1,327 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
+    android:orientation="vertical"
     >
 
-    <RelativeLayout
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"
+        />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/root_scroll_View"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/backgroundColor"
-        android:orientation="vertical"
+        android:layout_above="@id/adViewBelowGrid"
+        android:layout_below="@id/toolbar"
+        android:overScrollMode="never"
+        android:scrollbars="none"
         >
 
-        <include
-            android:id="@+id/toolbar"
-            layout="@layout/toolbar"
-            />
-
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/root_scroll_View"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/adViewBelowGrid"
-            android:layout_below="@id/toolbar"
-            android:overScrollMode="never"
-            android:scrollbars="none"
+            android:orientation="vertical"
             >
 
             <LinearLayout
+                style="@style/CardBackground"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:orientation="vertical"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
+                >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/currentAndForecast"
+                    android:textColor="?attr/textColor"
+                    android:textSize="17sp"
+                    />
+
+                <HorizontalScrollView
+                    android:id="@+id/horizontalScrollView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    >
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="8dp"
+                        >
+
+                        <FrameLayout
+                            android:id="@+id/dateRow"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            />
+
+                        <com.lifedawn.bestweather.weathers.view.NotScrolledView
+                            android:id="@+id/pm10NoScrollView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:text="@string/pm10_str"
+                            app:iconSrc="@drawable/pm10"
+                            app:iconVisibility="visible"
+                            />
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/pm10Chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            />
+
+                        <com.lifedawn.bestweather.weathers.view.NotScrolledView
+                            android:id="@+id/pm25NoScrollView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:text="@string/pm25_str"
+                            app:iconSrc="@drawable/pm25"
+                            app:iconVisibility="visible"
+                            />
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/pm25Chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            />
+
+                        <com.lifedawn.bestweather.weathers.view.NotScrolledView
+                            android:id="@+id/o3NoScrollView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="8dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginBottom="8dp"
+                            android:text="@string/o3_str"
+                            app:iconSrc="@drawable/o3"
+                            app:iconVisibility="visible"
+                            />
+
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/o3Chart"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            />
+
+                    </LinearLayout>
+
+                </HorizontalScrollView>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                style="@style/CardBackground"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:clickable="false"
                 android:orientation="vertical"
                 >
 
-                <LinearLayout
-                    style="@style/CardBackground"
+
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:orientation="vertical"
-                    android:paddingLeft="0dp"
-                    android:paddingRight="0dp"
-                    >
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/currentAndForecast"
-                        android:textColor="?attr/textColor"
-                        android:textSize="17sp"
-                        />
-
-                    <HorizontalScrollView
-                        android:id="@+id/horizontalScrollView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:scrollbars="none"
-                        >
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:paddingLeft="8dp"
-                            android:paddingRight="8dp"
-                            >
-
-                            <FrameLayout
-                                android:id="@+id/dateRow"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                />
-
-                            <com.lifedawn.bestweather.weathers.view.NotScrolledView
-                                android:id="@+id/pm10NoScrollView"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginTop="8dp"
-                                android:layout_marginBottom="8dp"
-                                android:text="@string/pm10_str"
-                                app:iconSrc="@drawable/pm10"
-                                app:iconVisibility="visible"
-                                />
-
-                            <com.github.mikephil.charting.charts.BarChart
-                                android:id="@+id/pm10Chart"
-                                android:layout_width="match_parent"
-                                android:layout_height="100dp"
-                                />
-
-                            <com.lifedawn.bestweather.weathers.view.NotScrolledView
-                                android:id="@+id/pm25NoScrollView"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginTop="8dp"
-                                android:layout_marginBottom="8dp"
-                                android:text="@string/pm25_str"
-                                app:iconSrc="@drawable/pm25"
-                                app:iconVisibility="visible"
-                                />
-
-                            <com.github.mikephil.charting.charts.BarChart
-                                android:id="@+id/pm25Chart"
-                                android:layout_width="match_parent"
-                                android:layout_height="100dp"
-                                />
-
-                            <com.lifedawn.bestweather.weathers.view.NotScrolledView
-                                android:id="@+id/o3NoScrollView"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="8dp"
-                                android:layout_marginTop="8dp"
-                                android:layout_marginBottom="8dp"
-                                android:text="@string/o3_str"
-                                app:iconSrc="@drawable/o3"
-                                app:iconVisibility="visible"
-                                />
-
-                            <com.github.mikephil.charting.charts.BarChart
-                                android:id="@+id/o3Chart"
-                                android:layout_width="match_parent"
-                                android:layout_height="100dp"
-                                />
-
-                        </LinearLayout>
-
-                    </HorizontalScrollView>
-
-                </LinearLayout>
-
-
-                <LinearLayout
-                    style="@style/CardBackground"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:clickable="false"
-                    android:orientation="vertical"
-                    >
-
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:gravity="center_vertical"
-                        >
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
-                            android:layout_centerVertical="true"
-                            android:text="@string/current"
-                            android:textColor="?attr/textColor"
-                            android:textSize="17sp"
-                            />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_centerVertical="true"
-                            android:layout_marginRight="8dp"
-                            android:layout_toLeftOf="@id/current_airquality"
-                            android:text="@string/air_quality"
-                            android:textColor="@color/black"
-                            android:textSize="16sp"
-                            />
-
-                        <TextView
-                            android:id="@+id/current_airquality"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
-                            android:text="@string/aqi_1_good"
-                            android:textSize="16sp"
-                            />
-
-                    </RelativeLayout>
-
-                    <androidx.gridlayout.widget.GridLayout
-                        android:id="@+id/grid"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:alignmentMode="alignBounds"
-                        app:columnCount="3"
-                        app:orientation="horizontal"
-                        app:rowOrderPreserved="false"
-                        app:useDefaultMargins="false"
-                        />
-
-                </LinearLayout>
-
-
-                <LinearLayout
-                    style="@style/CardBackground"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginBottom="24dp"
-                    android:clickable="false"
-                    android:orientation="vertical"
+                    android:layout_marginBottom="4dp"
+                    android:gravity="center_vertical"
                     >
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/measuring_station_name"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:text="@string/current"
                         android:textColor="?attr/textColor"
                         android:textSize="17sp"
                         />
 
                     <TextView
-                        android:id="@+id/measuring_station_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:text="measuring_station_name"
-                        android:textColor="?attr/textColor"
-                        android:textSize="15sp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="8dp"
+                        android:layout_toLeftOf="@id/current_airquality"
+                        android:text="@string/air_quality"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
                         />
 
                     <TextView
+                        android:id="@+id/current_airquality"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/distance_to_measuring_station"
-                        android:textColor="?attr/textColor"
-                        android:textSize="17sp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:text="@string/aqi_1_good"
+                        android:textSize="16sp"
                         />
 
-                    <TextView
-                        android:id="@+id/distance_to_measuring_station"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:text="distance_to_measuring_station"
-                        android:textColor="?attr/textColor"
-                        android:textSize="14sp"
-                        />
+                </RelativeLayout>
 
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/updated_time"
-                        android:textColor="?attr/textColor"
-                        android:textSize="17sp"
-                        />
-
-                    <TextView
-                        android:id="@+id/updated_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:text="updated_time"
-                        android:textColor="?attr/textColor"
-                        android:textSize="15sp"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/aqi_grade"
-                        android:textColor="?attr/textColor"
-                        android:textSize="17sp"
-                        />
-
-                    <LinearLayout
-                        android:id="@+id/aqi_grade_info"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:orientation="vertical"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/air_pollution_material_info"
-                        android:textColor="?attr/textColor"
-                        android:textSize="17sp"
-                        />
-
-                    <LinearLayout
-                        android:id="@+id/air_pollution_materials_info"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        />
-
-
-                </LinearLayout>
-
-                <com.google.android.ads.nativetemplates.TemplateView
-                    android:id="@+id/adView"
+                <androidx.gridlayout.widget.GridLayout
+                    android:id="@+id/grid"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginBottom="24dp"
-                    app:gnt_template_type="@layout/gnt_medium_template_view"
+                    android:layout_height="wrap_content"
+                    app:alignmentMode="alignBounds"
+                    app:columnCount="3"
+                    app:orientation="horizontal"
+                    app:rowOrderPreserved="false"
+                    app:useDefaultMargins="false"
                     />
+
             </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
 
 
-        <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/adViewBelowGrid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginTop="@dimen/adViewMargin"
-            ads:adSize="BANNER"
-            ads:adUnitId="@string/BANNER_testUnitId"
-            />
-    </RelativeLayout>
-</layout>
+            <LinearLayout
+                style="@style/CardBackground"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="24dp"
+                android:clickable="false"
+                android:orientation="vertical"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/measuring_station_name"
+                    android:textColor="?attr/textColor"
+                    android:textSize="17sp"
+                    />
+
+                <TextView
+                    android:id="@+id/measuring_station_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="measuring_station_name"
+                    android:textColor="?attr/textColor"
+                    android:textSize="15sp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/distance_to_measuring_station"
+                    android:textColor="?attr/textColor"
+                    android:textSize="17sp"
+                    />
+
+                <TextView
+                    android:id="@+id/distance_to_measuring_station"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="distance_to_measuring_station"
+                    android:textColor="?attr/textColor"
+                    android:textSize="14sp"
+                    />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/updated_time"
+                    android:textColor="?attr/textColor"
+                    android:textSize="17sp"
+                    />
+
+                <TextView
+                    android:id="@+id/updated_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="updated_time"
+                    android:textColor="?attr/textColor"
+                    android:textSize="15sp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/aqi_grade"
+                    android:textColor="?attr/textColor"
+                    android:textSize="17sp"
+                    />
+
+                <LinearLayout
+                    android:id="@+id/aqi_grade_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/air_pollution_material_info"
+                    android:textColor="?attr/textColor"
+                    android:textSize="17sp"
+                    />
+
+                <LinearLayout
+                    android:id="@+id/air_pollution_materials_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    />
+
+
+            </LinearLayout>
+
+            <com.google.android.ads.nativetemplates.TemplateView
+                android:id="@+id/adView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="24dp"
+                app:gnt_template_type="@layout/gnt_medium_template_view"
+                />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+    <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adViewBelowGrid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/adViewMargin"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/BANNER_testUnitId"
+        />
+</RelativeLayout>

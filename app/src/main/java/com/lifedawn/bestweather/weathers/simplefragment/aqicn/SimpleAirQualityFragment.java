@@ -110,7 +110,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 				fragmentManager.beginTransaction().hide(
 						fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
-						detailAirQualityFragment, tag).addToBackStack(tag).commitAllowingStateLoss();
+						detailAirQualityFragment, tag).addToBackStack(tag).commit();
 			}
 		});
 		setValuesToViews();

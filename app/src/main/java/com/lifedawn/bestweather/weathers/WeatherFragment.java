@@ -158,6 +158,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private String addressName;
 	private SharedPreferences sharedPreferences;
 	private ZoneId zoneId;
+	private boolean load;
 
 	private WeatherRestApiDownloader weatherRestApiDownloader;
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
@@ -246,6 +247,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		locationCallbackInMainFragment = weatherViewModel.getLocationCallback();
 
 		arguments = savedInstanceState != null ? savedInstanceState : getArguments();
+		load = arguments.getBoolean("load", false);
 	}
 
 	/**
@@ -386,6 +388,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				.build();
 
 		adLoader.loadAd(adRequest);
+
 		binding.adViewBelowAirQuality.loadAd(adRequest);
 		binding.adViewBelowAirQuality.setAdListener(new AdListener() {
 			@Override
@@ -419,7 +422,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		final FavoriteAddressDto favoriteAddressDto = arguments.containsKey("FavoriteAddressDto") ?
 				(FavoriteAddressDto) arguments.getSerializable("FavoriteAddressDto") : null;
 
-		load(locationType, favoriteAddressDto);
+		if (load) {
+			load = false;
+			arguments.remove("load");
+			setArguments(arguments);
+			load(locationType, favoriteAddressDto);
+		}
 	}
 
 
@@ -751,7 +759,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void reDraw() {
 		//날씨 프래그먼트 다시 그림
 		if (MyApplication.FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString())) {
-			ProgressDialog.show(getActivity(), getString(R.string.refreshing_view), null);
+			ProgressDialog.show(requireActivity(), getString(R.string.refreshing_view), null);
 
 			executorService.execute(new Runnable() {
 				@Override

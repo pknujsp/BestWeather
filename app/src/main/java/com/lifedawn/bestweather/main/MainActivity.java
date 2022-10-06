@@ -46,12 +46,10 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
 	private NetworkStatus networkStatus;
-	private SharedPreferences sharedPreferences;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		setTheme(R.style.AppTheme_Black);
 
@@ -99,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
 		});
 
 		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		if (sharedPreferences.getBoolean(getString(R.string.pref_key_show_intro), true)) {
 			IntroTransactionFragment introTransactionFragment = new IntroTransactionFragment();

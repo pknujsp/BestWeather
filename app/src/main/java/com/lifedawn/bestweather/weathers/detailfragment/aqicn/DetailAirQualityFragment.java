@@ -84,7 +84,6 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 	private Double latitude;
 	private Double longitude;
-
 	private Bundle bundle;
 
 	private int pm10LineColor;
@@ -130,6 +129,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
 		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
@@ -160,14 +160,6 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 			}
 		});
 
-		initBarChart(binding.pm10Chart);
-		initBarChart(binding.pm25Chart);
-		initBarChart(binding.o3Chart);
-
-		setAirPollutionMaterialsInfo();
-		setAqiGradeInfo();
-		setValuesToViews();
-
 		AdRequest adRequest = new AdRequest.Builder().build();
 		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_testUnitId))
 				.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
@@ -186,6 +178,14 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 				}).withNativeAdOptions(new NativeAdOptions.Builder().setRequestCustomMuteThisAd(true).build())
 				.build();
 		adLoader.loadAd(adRequest);
+
+		initBarChart(binding.pm10Chart);
+		initBarChart(binding.pm25Chart);
+		initBarChart(binding.o3Chart);
+
+		setAirPollutionMaterialsInfo();
+		setAqiGradeInfo();
+		setValuesToViews();
 	}
 
 	@Override

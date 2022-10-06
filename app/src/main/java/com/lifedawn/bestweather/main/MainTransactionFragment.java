@@ -267,8 +267,8 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		binding.sideNavMenu.currentLocationLayout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				binding.drawerLayout.closeDrawer(binding.sideNavigation, false);
 				addWeatherFragment(LocationType.CurrentLocation, null);
+				binding.drawerLayout.closeDrawer(binding.sideNavigation);
 			}
 		});
 
@@ -282,13 +282,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 				}
 			}
 		});
-
-
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
 
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
@@ -341,6 +334,11 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 			}
 		});
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
 
 		initializing = false;
 	}
@@ -560,6 +558,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		Bundle bundle = new Bundle();
 		bundle.putSerializable("LocationType", locationType);
 		bundle.putSerializable("FavoriteAddressDto", favoriteAddressDto);
+		bundle.putBoolean("load", true);
 
 		WeatherFragment newWeatherFragment = new WeatherFragment();
 		newWeatherFragment.setArguments(bundle);
