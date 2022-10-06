@@ -10,6 +10,7 @@ import androidx.preference.PreferenceManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
 import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
@@ -40,6 +41,7 @@ public class MyApplication extends Application {
 
 		FavoriteAddressRepository.initialize(getApplicationContext());
 		KmaAreaCodesRepository.initialize(getApplicationContext());
+		TimeZoneIdRepository.Companion.initialize(getApplicationContext());
 		initPreferences();
 		WindUtil.init(getApplicationContext());
 

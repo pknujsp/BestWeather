@@ -96,9 +96,9 @@ public class WeatherResponseProcessor {
 			return TIMEZONE_MAP.get(key);
 		}
 
-		TimeZoneMap map = TimeZoneMap.forRegion(latitude - 5.0,
-				longitude - 5.0, latitude + 5.0
-				, longitude + 5.0);
+		TimeZoneMap map = TimeZoneMap.forRegion(latitude - 4.0,
+				longitude - 4.0, latitude + 4.0
+				, longitude + 4.0);
 
 		ZoneId zoneId = ZoneId.of(map.getOverlappingTimeZone(latitude, longitude).getZoneId());
 		TIMEZONE_MAP.put(key, zoneId);

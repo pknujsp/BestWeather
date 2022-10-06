@@ -609,9 +609,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		@Override
 		public void onFailed(Fail fail) {
-			ProgressDialog.clearDialogs();
-
 			locationCallbackInMainFragment.onFailed(fail);
+			ProgressDialog.clearDialogs();
 
 			if (fail == Fail.DISABLED_GPS) {
 				fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {

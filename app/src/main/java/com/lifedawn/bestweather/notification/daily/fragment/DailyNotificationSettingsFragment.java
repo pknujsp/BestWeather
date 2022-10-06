@@ -453,6 +453,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 					editingNotificationDto.setCountryCode(selectedFavoriteAddressDto.getCountryCode());
 					editingNotificationDto.setLocationType(LocationType.SelectedAddress);
 				}
+				getParentFragmentManager().popBackStack();
 			}
 		});
 

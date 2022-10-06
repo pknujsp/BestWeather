@@ -42,9 +42,7 @@ public class SimpleFavoritesFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
-
-
+		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
 	}
 
 	@Override

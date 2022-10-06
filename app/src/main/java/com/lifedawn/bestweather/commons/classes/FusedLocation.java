@@ -47,8 +47,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto;
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +68,7 @@ import java.util.TimerTask;
 
 public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedListener {
 	private static FusedLocation instance;
+	private TimeZoneIdRepository timeZoneIdRepository;
 	private FusedLocationProviderClient fusedLocationClient;
 	private LocationManager locationManager;
 	private Context context;
@@ -85,6 +89,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		this.context = context;
 		fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+		timeZoneIdRepository = TimeZoneIdRepository.Companion.getINSTANCE();
 	}
 
 	@Override
@@ -150,22 +155,46 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 									@Override
 									public void run() {
 										final Location location = myLocationCallback.getBestLocation(locationResult);
-										final ZoneId zoneId = WeatherResponseProcessor.getZoneId(location.getLatitude(), location.getLongitude());
+
+										final Double latitude = location.getLatitude();
+										final Double longitude = location.getLongitude();
 										final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
 
 										editor.putString(context.getString(R.string.pref_key_last_current_location_latitude),
-														String.valueOf(location.getLatitude()))
+														latitude.toString())
 												.putString(context.getString(R.string.pref_key_last_current_location_longitude),
-														String.valueOf(location.getLongitude()))
-												.putString("zoneId", zoneId.getId())
-												.commit();
+														longitude.toString());
 
-										MainThreadWorker.runOnUiThread(new Runnable() {
+										timeZoneIdRepository.get(latitude, longitude, new DbQueryCallback<TimeZoneIdDto>() {
 											@Override
-											public void run() {
-												myLocationCallback.onSuccessful(locationResult);
+											public void onResultSuccessful(TimeZoneIdDto result) {
+												ZoneId zoneId = ZoneId.of(result.getTimeZoneId());
+												editor.putString("zoneId", zoneId.getId())
+														.commit();
+
+												MainThreadWorker.runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
+														myLocationCallback.onSuccessful(locationResult);
+													}
+												});
+											}
+
+											@Override
+											public void onResultNoData() {
+												ZoneId zoneId = WeatherResponseProcessor.getZoneId(latitude, longitude);
+												timeZoneIdRepository.insert(new TimeZoneIdDto(latitude, longitude, zoneId.getId()));
+												editor.putString("zoneId", zoneId.getId()).commit();
+
+												MainThreadWorker.runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
+														myLocationCallback.onSuccessful(locationResult);
+													}
+												});
 											}
 										});
+
 									}
 								});
 							} else {

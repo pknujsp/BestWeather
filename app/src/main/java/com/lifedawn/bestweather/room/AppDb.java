@@ -7,6 +7,8 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdDao;
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto;
 import com.lifedawn.bestweather.room.dao.AlarmDao;
 import com.lifedawn.bestweather.room.dao.DailyPushNotificationDao;
 import com.lifedawn.bestweather.room.dao.FavoriteAddressDao;
@@ -18,7 +20,8 @@ import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.dto.KmaAreaCodeDto;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 
-@Database(entities = {KmaAreaCodeDto.class, FavoriteAddressDto.class, AlarmDto.class, WidgetDto.class, DailyPushNotificationDto.class},
+@Database(entities = {KmaAreaCodeDto.class, FavoriteAddressDto.class, AlarmDto.class, WidgetDto.class, DailyPushNotificationDto.class,
+		TimeZoneIdDto.class},
 		version = 1, exportSchema =
 		false)
 @TypeConverters(RoomTypeConverter.class)
@@ -28,6 +31,8 @@ public abstract class AppDb extends RoomDatabase {
 	public abstract KmaAreaCodesDao kmaAreaCodesDao();
 
 	public abstract FavoriteAddressDao favoriteAddressDao();
+
+	public abstract TimeZoneIdDao timeZoneIdDao();
 
 	public abstract AlarmDao alarmDao();
 

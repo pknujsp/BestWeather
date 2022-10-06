@@ -507,6 +507,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 					binding.selectedAddressName.setText(newSelectedAddressDto.getAddress());
 				}
+				getSupportFragmentManager().popBackStack();
 			}
 		});
 

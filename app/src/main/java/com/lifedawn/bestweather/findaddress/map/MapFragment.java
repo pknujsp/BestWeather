@@ -71,6 +71,8 @@ import com.lifedawn.bestweather.findaddress.map.interfaces.OnClickedLocationBtnL
 import com.lifedawn.bestweather.findaddress.map.interfaces.OnClickedScrollBtnListener;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto;
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.notification.daily.fragment.DailyNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationSettingsFragment;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -224,72 +226,89 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
-				final ZoneId zoneId = WeatherResponseProcessor.getZoneId(address.getLatitude(), address.getLongitude());
+				final Double latitude = address.getLatitude();
+				final Double longitude = address.getLongitude();
 
 				final FavoriteAddressDto favoriteAddressDto = new FavoriteAddressDto();
 				favoriteAddressDto.setCountryName(address.getCountryName());
 				favoriteAddressDto.setCountryCode(address.getCountryCode() == null ? "" : address.getCountryCode());
 				favoriteAddressDto.setAddress(address.getAddressLine(0));
 				favoriteAddressDto.setAdmin(address.getLocality());
-				favoriteAddressDto.setLatitude(String.valueOf(address.getLatitude()));
-				favoriteAddressDto.setLongitude(String.valueOf(address.getLongitude()));
-				favoriteAddressDto.setZoneId(zoneId.getId());
+				favoriteAddressDto.setLatitude(latitude.toString());
+				favoriteAddressDto.setLongitude(longitude.toString());
 
-				weatherViewModel.contains(favoriteAddressDto.getLatitude(), favoriteAddressDto.getLongitude(),
-						new DbQueryCallback<Boolean>() {
-							@Override
-							public void onResultSuccessful(Boolean contains) {
-								if (contains) {
-									if (getActivity() != null) {
-										MainThreadWorker.runOnUiThread(new Runnable() {
-											@Override
-											public void run() {
-												ProgressDialog.clearDialogs();
-												Toast.makeText(getContext(), R.string.duplicate_address, Toast.LENGTH_SHORT).show();
-											}
-										});
+				TimeZoneIdRepository timeZoneIdRepository = TimeZoneIdRepository.Companion.getINSTANCE();
+				timeZoneIdRepository.get(latitude, longitude, new DbQueryCallback<TimeZoneIdDto>() {
+					@Override
+					public void onResultSuccessful(TimeZoneIdDto result) {
+						ZoneId zoneId = ZoneId.of(result.getTimeZoneId());
+						favoriteAddressDto.setZoneId(zoneId.getId());
+						add(favoriteAddressDto);
+					}
+
+					@Override
+					public void onResultNoData() {
+						ZoneId zoneId = WeatherResponseProcessor.getZoneId(latitude, longitude);
+						favoriteAddressDto.setZoneId(zoneId.getId());
+						add(favoriteAddressDto);
+					}
+				});
+
+
+			}
+		});
+
+	}
+
+	private void add(FavoriteAddressDto favoriteAddressDto) {
+		weatherViewModel.contains(favoriteAddressDto.getLatitude(), favoriteAddressDto.getLongitude(),
+				new DbQueryCallback<Boolean>() {
+					@Override
+					public void onResultSuccessful(Boolean contains) {
+						if (contains) {
+							if (getActivity() != null) {
+								MainThreadWorker.runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										ProgressDialog.clearDialogs();
+										Toast.makeText(getContext(), R.string.duplicate_address, Toast.LENGTH_SHORT).show();
 									}
-								} else {
-									MainThreadWorker.runOnUiThread(new Runnable() {
+								});
+							}
+						} else {
+							MainThreadWorker.runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									//addedNewLocation = true;
+									weatherViewModel.favoriteAddressListLiveData.removeObservers(getViewLifecycleOwner());
+								}
+							});
+
+							weatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
+								@Override
+								public void onResultSuccessful(Long id) {
+									weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 										@Override
-										public void run() {
-											//addedNewLocation = true;
-											weatherViewModel.favoriteAddressListLiveData.removeObservers(getViewLifecycleOwner());
-										}
-									});
+										public void onResultSuccessful(List<FavoriteAddressDto> result) {
+											if (getActivity() != null) {
+												favoriteAddressDto.setId(id.intValue());
 
-									weatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
-										@Override
-										public void onResultSuccessful(Long id) {
-											weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
-												@Override
-												public void onResultSuccessful(List<FavoriteAddressDto> result) {
-													if (getActivity() != null) {
-														favoriteAddressDto.setId(id.intValue());
+												PreferenceManager.getDefaultSharedPreferences(getContext())
+														.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
+																favoriteAddressDto.getId()).commit();
 
-														PreferenceManager.getDefaultSharedPreferences(getContext())
-																.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
-																		favoriteAddressDto.getId()).commit();
+												MainThreadWorker.runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
+														Toast.makeText(getContext(), favoriteAddressDto.getAddress(), Toast.LENGTH_SHORT).show();
 
-														MainThreadWorker.runOnUiThread(new Runnable() {
-															@Override
-															public void run() {
-																ProgressDialog.clearDialogs();
-																Toast.makeText(getContext(), address.getAddressLine(0), Toast.LENGTH_SHORT).show();
-
-																getParentFragmentManager().popBackStack();
-																needsOnResultCallback = true;
-																onResultFavoriteListener.onAddedNewAddress(favoriteAddressDto, result, removedLocation);
-															}
-														});
+														getParentFragmentManager().popBackStack();
+														ProgressDialog.clearDialogs();
+														needsOnResultCallback = true;
+														onResultFavoriteListener.onAddedNewAddress(favoriteAddressDto, result, removedLocation);
 													}
-												}
-
-												@Override
-												public void onResultNoData() {
-
-												}
-											});
+												});
+											}
 										}
 
 										@Override
@@ -298,16 +317,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 										}
 									});
 								}
-							}
 
-							@Override
-							public void onResultNoData() {
+								@Override
+								public void onResultNoData() {
 
-							}
-						});
-			}
-		});
+								}
+							});
+						}
+					}
 
+					@Override
+					public void onResultNoData() {
+
+					}
+				});
 	}
 
 	public enum MarkerType {
@@ -652,7 +675,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 								}
 							}).create().show();
 				} else {
-					getActivity().getSupportFragmentManager().popBackStack();
 					onResultFavoriteListener.onClickedAddress(e);
 				}
 			}

@@ -355,6 +355,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 
 					onSelectedFavoriteLocation(newSelectedAddressDto);
 				}
+				getParentFragmentManager().popBackStack();
+
 			}
 		});
 
