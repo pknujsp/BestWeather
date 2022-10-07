@@ -75,8 +75,11 @@ import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto;
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.notification.daily.fragment.DailyNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationSettingsFragment;
+import com.lifedawn.bestweather.retrofit.responses.freetime.FreeTimeResponse;
+import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
+import com.lifedawn.bestweather.timezone.FreeTimeZoneApi;
 import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -91,6 +94,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import retrofit2.Response;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
@@ -242,15 +247,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 					@Override
 					public void onResultSuccessful(TimeZoneIdDto result) {
 						ZoneId zoneId = ZoneId.of(result.getTimeZoneId());
-						favoriteAddressDto.setZoneId(zoneId.getId());
-						add(favoriteAddressDto);
+						insertZoneId(zoneId, favoriteAddressDto);
 					}
 
 					@Override
 					public void onResultNoData() {
-						ZoneId zoneId = WeatherResponseProcessor.getZoneId(latitude, longitude);
-						favoriteAddressDto.setZoneId(zoneId.getId());
-						add(favoriteAddressDto);
+						FreeTimeZoneApi.Companion.getTimeZone(latitude, longitude, new JsonDownloader() {
+							@Override
+							public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
+								FreeTimeResponse freeTimeDto = (FreeTimeResponse) responseObj;
+								ZoneId zoneId = ZoneId.of(freeTimeDto.getTimezone());
+								insertZoneId(zoneId, favoriteAddressDto);
+
+								timeZoneIdRepository.insert(new TimeZoneIdDto(latitude, longitude, zoneId.getId()));
+							}
+
+							@Override
+							public void onResponseResult(Throwable t) {
+								ZoneId zoneId = WeatherResponseProcessor.getZoneId(latitude, longitude);
+								insertZoneId(zoneId, favoriteAddressDto);
+
+								timeZoneIdRepository.insert(new TimeZoneIdDto(latitude, longitude, zoneId.getId()));
+							}
+						});
+
 					}
 				});
 
@@ -258,6 +278,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 		});
 
+	}
+
+	private void insertZoneId(ZoneId zoneId, FavoriteAddressDto favoriteAddressDto) {
+		favoriteAddressDto.setZoneId(zoneId.getId());
+		add(favoriteAddressDto);
 	}
 
 	private void add(FavoriteAddressDto favoriteAddressDto) {

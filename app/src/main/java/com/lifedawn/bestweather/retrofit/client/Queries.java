@@ -110,4 +110,9 @@ public interface Queries {
 
 	@GET("json")
 	Call<JsonElement> getFindPlaceSearch(@QueryMap(encoded = true) Map<String, String> queryMap);
+
+	//FreeTimeApi
+	// https://timeapi.io/api/TimeZone/coordinate?latitude=38.9&longitude=-77.03
+	@GET("coordinate")
+	Call<JsonElement> getTimeZone(@QueryMap(encoded = true) Map<String, String> queryMap);
 }

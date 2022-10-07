@@ -28,6 +28,9 @@ public class RetrofitClient {
 	public static final String PRO_OPEN_WEATHER_MAP_SERVICE_URL = "https://pro.openweathermap.org/";
 	//flickr
 	public static final String FLICKR_SERVICE_URL = "https://www.flickr.com/services/";
+
+	//freeTimeApi
+	public static final String FREE_TIME_SERVICE_URL = "https://timeapi.io/api/TimeZone/";
 	//google place search
 	public static final String GOOGLE_PLACE_SEARCH_SERVICE_URL = "https://maps.googleapis.com/maps/api/place/textsearch/";
 	public static final String GOOGLE_FIND_PLACE_SERVICE_URL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/";
@@ -56,7 +59,7 @@ public class RetrofitClient {
 		ACCU_CURRENT_CONDITIONS, ACCU_DAILY_FORECAST, ACCU_HOURLY_FORECAST, MET_NORWAY_LOCATION_FORECAST, AQICN_GEOLOCALIZED_FEED,
 		OWM_CURRENT_CONDITIONS,
 		OWM_HOURLY_FORECAST, OWM_DAILY_FORECAST, OWM_ONE_CALL, FLICKR, KMA_WEB_CURRENT_CONDITIONS, KMA_WEB_FORECASTS,
-		GOOGLE_PLACE_SEARCH, GOOGLE_FIND_PLACE
+		GOOGLE_PLACE_SEARCH, GOOGLE_FIND_PLACE, FREE_TIME
 	}
 
 
@@ -149,6 +152,12 @@ public class RetrofitClient {
 								GOOGLE_FIND_PLACE_SERVICE_URL).build();
 				return googleFindPlaceInstance.create(Queries.class);
 
+			case FREE_TIME:
+				Retrofit freeTimeInstance = new Retrofit.Builder().client(client).addConverterFactory(
+								GsonConverterFactory.create()).callbackExecutor(EXECUTOR_SERVICE)
+						.addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
+								FREE_TIME_SERVICE_URL).build();
+				return freeTimeInstance.create(Queries.class);
 
 			default:
 				return null;

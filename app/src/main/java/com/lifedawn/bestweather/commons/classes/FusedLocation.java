@@ -51,7 +51,10 @@ import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto;
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.retrofit.responses.freetime.FreeTimeResponse;
+import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
+import com.lifedawn.bestweather.timezone.FreeTimeZoneApi;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +68,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import retrofit2.Response;
 
 public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedListener {
 	private static FusedLocation instance;
@@ -182,16 +187,25 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 											@Override
 											public void onResultNoData() {
-												ZoneId zoneId = WeatherResponseProcessor.getZoneId(latitude, longitude);
-												timeZoneIdRepository.insert(new TimeZoneIdDto(latitude, longitude, zoneId.getId()));
-												editor.putString("zoneId", zoneId.getId()).commit();
 
-												MainThreadWorker.runOnUiThread(new Runnable() {
+
+												FreeTimeZoneApi.Companion.getTimeZone(latitude, longitude, new JsonDownloader() {
 													@Override
-													public void run() {
-														myLocationCallback.onSuccessful(locationResult);
+													public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
+														FreeTimeResponse freeTimeDto = (FreeTimeResponse) responseObj;
+														ZoneId zoneId = ZoneId.of(freeTimeDto.getTimezone());
+
+														insertZoneId(latitude, longitude, zoneId, editor, myLocationCallback, locationResult);
+													}
+
+													@Override
+													public void onResponseResult(Throwable t) {
+														ZoneId zoneId = WeatherResponseProcessor.getZoneId(latitude, longitude);
+														insertZoneId(latitude, longitude, zoneId, editor, myLocationCallback, locationResult);
 													}
 												});
+
+
 											}
 										});
 
@@ -269,6 +283,19 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				myLocationCallback.onFailed(MyLocationCallback.Fail.DENIED_LOCATION_PERMISSIONS);
 			}
 		}
+	}
+
+	private void insertZoneId(Double latitude, Double longitude, ZoneId zoneId, SharedPreferences.Editor editor,
+	                          MyLocationCallback myLocationCallback, LocationResult locationResult) {
+		timeZoneIdRepository.insert(new TimeZoneIdDto(latitude, longitude, zoneId.getId()));
+		editor.putString("zoneId", zoneId.getId()).commit();
+
+		MainThreadWorker.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				myLocationCallback.onSuccessful(locationResult);
+			}
+		});
 	}
 
 	public boolean checkDefaultPermissions() {
