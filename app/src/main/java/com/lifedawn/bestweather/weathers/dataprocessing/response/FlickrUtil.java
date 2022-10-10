@@ -2,9 +2,10 @@ package com.lifedawn.bestweather.weathers.dataprocessing.response;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FlickrUtil {
-	private static final Map<String, String> WEATHER_GALLERY_ID_MAP = new HashMap<>();
+	private static final Map<String, String> WEATHER_GALLERY_ID_MAP = new ConcurrentHashMap<>();
 
 	private FlickrUtil() {
 	}
@@ -13,8 +14,6 @@ public class FlickrUtil {
 		if (!WEATHER_GALLERY_ID_MAP.isEmpty()) {
 			return;
 		}
-		WEATHER_GALLERY_ID_MAP.clear();
-
 		WEATHER_GALLERY_ID_MAP.put("sunrise clear", "72157719913955346");
 		WEATHER_GALLERY_ID_MAP.put("sunrise partly cloudy", "72157719931023221");
 		WEATHER_GALLERY_ID_MAP.put("sunrise mostly cloudy", "72157719938087287");

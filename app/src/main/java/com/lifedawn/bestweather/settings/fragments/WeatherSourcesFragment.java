@@ -102,5 +102,36 @@ public class WeatherSourcesFragment extends Fragment {
 				sharedPreferences.edit().putBoolean(getString(R.string.pref_key_kma_top_priority), isChecked).commit();
 			}
 		});
+
+
+		binding.accuWeatherLayout.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				binding.accuWeather.setChecked(!binding.accuWeather.isChecked());
+			}
+		});
+
+		binding.owmLayout.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				binding.openWeatherMap.setChecked(!binding.openWeatherMap.isChecked());
+			}
+		});
+
+		binding.yrLayout.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				binding.yr.setChecked(!binding.yr.isChecked());
+			}
+		});
+
+		binding.kmaPriorityLayout.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				binding.kmaTopPriority.setChecked(!binding.kmaTopPriority.isChecked());
+			}
+		});
+
 	}
+
 }

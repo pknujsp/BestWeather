@@ -14,14 +14,15 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import retrofit2.Call;
 import retrofit2.Response;
 
 public abstract class WeatherRestApiDownloader {
 	private final ZonedDateTime requestDateTime = ZonedDateTime.now();
-	private volatile int requestCount;
-	private volatile int responseCount;
+	private int requestCount;
+	private AtomicInteger responseCount = new AtomicInteger(0);
 	private boolean responseCompleted;
 	private ZoneId zoneId;
 
@@ -41,6 +42,10 @@ public abstract class WeatherRestApiDownloader {
 	public WeatherRestApiDownloader setZoneId(ZoneId zoneId) {
 		this.zoneId = zoneId;
 		return this;
+	}
+
+	private synchronized int getResponseCount() {
+		return responseCount.get();
 	}
 
 	public ZoneId getZoneId() {
@@ -72,12 +77,9 @@ public abstract class WeatherRestApiDownloader {
 	}
 
 	public void setResponseCount(int responseCount) {
-		this.responseCount = responseCount;
+		this.responseCount.set(responseCount);
 	}
 
-	public int getResponseCount() {
-		return responseCount;
-	}
 
 	public String get(@NonNull @NotNull String key) {
 		return valueMap.get(key);
@@ -101,7 +103,7 @@ public abstract class WeatherRestApiDownloader {
 	public abstract void onCanceled();
 
 	public void cancel() {
-		responseCount = requestCount + 1000;
+		responseCount.set(10000);
 
 		if (!callMap.isEmpty()) {
 			for (Call<?> call : callMap.values()) {
@@ -113,21 +115,21 @@ public abstract class WeatherRestApiDownloader {
 
 	public void processResult(WeatherProviderType weatherProviderType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
 	                          Response<?> response, Object responseObj, String responseText) {
-		responseCount++;
+		responseCount.incrementAndGet();
 
 		if (!responseMap.containsKey(weatherProviderType)) {
 			responseMap.put(weatherProviderType, new ArrayMap<>());
 		}
 		responseMap.get(weatherProviderType).put(serviceType, new ResponseResult(requestParameter, response, responseObj, responseText));
 
-		if (requestCount == responseCount) {
+		if (requestCount == responseCount.get()) {
 			responseCompleted = true;
 			onResult();
 		}
 	}
 
 	public void processResult(WeatherProviderType weatherProviderType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType, Throwable t) {
-		responseCount++;
+		responseCount.incrementAndGet();
 
 		if (!responseMap.containsKey(weatherProviderType)) {
 			responseMap.put(weatherProviderType, new ArrayMap<>());
@@ -135,7 +137,7 @@ public abstract class WeatherRestApiDownloader {
 
 		responseMap.get(weatherProviderType).put(serviceType, new ResponseResult(requestParameter, t));
 
-		if (requestCount == responseCount) {
+		if (requestCount == responseCount.get()) {
 			responseCompleted = true;
 			onResult();
 		}

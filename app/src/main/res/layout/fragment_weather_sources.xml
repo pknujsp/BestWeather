@@ -1,23 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:paddingRight="16dp"
+            >
 
             <RelativeLayout
                 android:id="@+id/accu_weather_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="24dp"
+                android:layout_marginTop="32dp"
+                >
 
                 <ImageView
                     android:id="@+id/accuicon"
@@ -34,12 +39,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
-                    android:layout_marginTop="32dp"
                     android:layout_toLeftOf="@id/accu_weather"
                     android:layout_toRightOf="@id/accuicon"
                     android:text="@string/accu_weather"
                     android:textColor="@color/black"
-                    android:textSize="22sp" />
+                    android:textSize="22sp"
+                    />
 
                 <TextView
                     android:id="@+id/accu_weather_description"
@@ -50,25 +55,27 @@
                     android:layout_alignLeft="@id/accu_weather_name"
                     android:layout_toLeftOf="@id/accu_weather"
                     android:text="@string/pref_summary_accu_weather"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/accu_weather"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignTop="@id/accu_weather_name"
-                    android:layout_alignBottom="@id/accu_weather_name"
                     android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
                     android:checked="false"
                     android:enabled="false"
-                    android:gravity="center_vertical" />
+                    />
+
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/owm_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="24dp"
+                >
 
                 <ImageView
                     android:id="@+id/owmicon"
@@ -102,16 +109,17 @@
                     android:layout_alignLeft="@id/open_weather_map_name"
                     android:layout_toLeftOf="@id/open_weather_map"
                     android:text="@string/pref_summary_open_weather_map"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/open_weather_map"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignTop="@id/open_weather_map_name"
-                    android:layout_alignBottom="@id/open_weather_map_name"
                     android:layout_alignParentRight="true"
-                    android:gravity="center_vertical" />
+
+                    android:layout_centerVertical="true"
+                    />
 
             </RelativeLayout>
 
@@ -119,7 +127,8 @@
                 android:id="@+id/yr_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="24dp"
+                >
 
                 <ImageView
                     android:id="@+id/yricon"
@@ -153,16 +162,17 @@
                     android:layout_alignLeft="@id/yr_name"
                     android:layout_toLeftOf="@id/yr"
                     android:text="@string/pref_summary_met"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/yr"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignTop="@id/yr_name"
-                    android:layout_alignBottom="@id/yr_name"
                     android:layout_alignParentRight="true"
-                    android:gravity="center_vertical" />
+
+                    android:layout_centerVertical="true"
+                    />
 
             </RelativeLayout>
 
@@ -171,7 +181,8 @@
                 android:id="@+id/kma_priority_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp">
+                android:layout_marginBottom="32dp"
+                >
 
                 <ImageView
                     android:id="@+id/kmaicon"
@@ -193,7 +204,8 @@
 
                     android:text="@string/pref_title_kma_top_priority"
                     android:textColor="@color/black"
-                    android:textSize="17sp" />
+                    android:textSize="17sp"
+                    />
 
                 <TextView
                     android:id="@+id/kma_top_priority_summary"
@@ -204,16 +216,16 @@
                     android:layout_toLeftOf="@id/kma_top_priority"
 
                     android:text="@string/pref_summary_kma_top_priority"
-                    android:textSize="13sp" />
+                    android:textSize="13sp"
+                    />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/kma_top_priority"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignTop="@id/kma_top_priority_title"
-                    android:layout_alignBottom="@id/kma_top_priority_title"
                     android:layout_alignParentRight="true"
-                    android:gravity="center_vertical" />
+                    android:layout_centerVertical="true"
+                    />
 
             </RelativeLayout>
 

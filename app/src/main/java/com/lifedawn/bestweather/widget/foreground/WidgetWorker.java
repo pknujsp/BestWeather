@@ -3,6 +3,7 @@ package com.lifedawn.bestweather.widget.foreground;
 import android.app.Notification;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Location;
 import android.os.Build;
@@ -28,12 +29,18 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto;
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.retrofit.responses.freetime.FreeTimeResponse;
+import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
+import com.lifedawn.bestweather.timezone.FreeTimeZoneApi;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
@@ -68,6 +75,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -75,22 +83,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import retrofit2.Response;
+
 public class WidgetWorker extends Worker {
 	public static final Set<Integer> PROCESSING_WIDGET_ID_SET = new CopyOnWriteArraySet<>();
 
-	private final Map<Integer, WidgetDto> currentLocationWidgetDtoArrayMap = new HashMap<>();
-	private final Map<Integer, WidgetDto> selectedLocationWidgetDtoArrayMap = new HashMap<>();
-	private final Map<Integer, WidgetDto> allWidgetDtoArrayMap = new HashMap<>();
-	private final Map<Integer, Class<?>> allWidgetProviderClassArrayMap = new HashMap<>();
-	private final Map<Integer, RemoteViews> remoteViewsArrayMap = new HashMap<>();
-	private final Map<Integer, WeatherRestApiDownloader> multipleRestApiDownloaderMap = new HashMap<>();
-	private Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new HashMap<>();
+	private final Map<Integer, WidgetDto> currentLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
+	private final Map<Integer, WidgetDto> selectedLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
+	private final Map<Integer, WidgetDto> allWidgetDtoArrayMap = new ConcurrentHashMap<>();
+	private final Map<Integer, Class<?>> allWidgetProviderClassArrayMap = new ConcurrentHashMap<>();
+	private final Map<Integer, RemoteViews> remoteViewsArrayMap = new ConcurrentHashMap<>();
+	private final Map<Integer, WeatherRestApiDownloader> multipleRestApiDownloaderMap = new ConcurrentHashMap<>();
+	private Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new ConcurrentHashMap<>();
 
 	private WeatherRestApiDownloader currentLocationResponseWeatherRestApiDownloader;
-	private final Map<String, WeatherRestApiDownloader> selectedLocationResponseMap = new HashMap<>();
+	private final Map<String, WeatherRestApiDownloader> selectedLocationResponseMap = new ConcurrentHashMap<>();
 
 	private RequestObj currentLocationRequestObj;
-	private final Map<String, RequestObj> selectedLocationRequestMap = new HashMap<>();
+	private final Map<String, RequestObj> selectedLocationRequestMap = new ConcurrentHashMap<>();
 
 	private WidgetRepository widgetRepository;
 	private AppWidgetManager appWidgetManager;
@@ -100,6 +110,8 @@ public class WidgetWorker extends Worker {
 	private int responseCount;
 	private String action;
 	private int appWidgetId;
+
+	private TimeZoneIdRepository timeZoneIdRepository;
 
 
 	public WidgetWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -111,6 +123,8 @@ public class WidgetWorker extends Worker {
 		if (appWidgetManager == null) {
 			appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		}
+
+		timeZoneIdRepository = TimeZoneIdRepository.Companion.getINSTANCE();
 		action = workerParams.getInputData().getString("action");
 		appWidgetId = workerParams.getInputData().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 0);
 
@@ -386,8 +400,7 @@ public class WidgetWorker extends Worker {
 			public void onSuccessful(LocationResult locationResult) {
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 				final Location location = getBestLocation(locationResult);
-				ZoneId zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString("zoneId", ""));
-				currentLocationRequestObj.zoneId = zoneId;
+
 
 				Geocoding.geocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
@@ -396,22 +409,47 @@ public class WidgetWorker extends Worker {
 							onLocationResponse(Fail.FAILED_FIND_LOCATION, null);
 						} else {
 							final Address newAddress = addressList.get(0);
-							final String newAddressName = newAddress.getAddressLine(0);
+							final String addressName = newAddress.getAddressLine(0);
 							currentLocationRequestObj.address = newAddress;
 
-							for (Integer appWidgetId : appWidgetIdSet) {
-								WidgetDto widgetDto = currentLocationWidgetDtoArrayMap.get(appWidgetId);
+							SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
 
-								widgetDto.setAddressName(newAddressName);
-								widgetDto.setCountryCode(newAddress.getCountryCode());
-								widgetDto.setLatitude(newAddress.getLatitude());
-								widgetDto.setLongitude(newAddress.getLongitude());
-								widgetDto.setTimeZoneId(zoneId.getId());
+							timeZoneIdRepository.get(addressName, new DbQueryCallback<TimeZoneIdDto>() {
+								@Override
+								public void onResultSuccessful(TimeZoneIdDto result) {
+									currentLocationRequestObj.zoneId = ZoneId.of(result.getTimeZoneId());
+									editor.putString("zoneId", currentLocationRequestObj.zoneId.getId())
+											.commit();
 
-								widgetRepository.update(widgetDto, null);
-							}
+									onResultCurrentLocation(addressName, newAddress);
+								}
 
-							onLocationResponse(null, newAddressName);
+								@Override
+								public void onResultNoData() {
+									FreeTimeZoneApi.Companion.getTimeZone(location.getLatitude(), location.getLongitude(), new JsonDownloader() {
+										@Override
+										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
+											FreeTimeResponse freeTimeDto = (FreeTimeResponse) responseObj;
+											currentLocationRequestObj.zoneId = ZoneId.of(freeTimeDto.getTimezone());
+											timeZoneIdRepository.insert(new TimeZoneIdDto(addressName, currentLocationRequestObj.zoneId.getId()));
+											editor.putString("zoneId", currentLocationRequestObj.zoneId.getId()).commit();
+											onResultCurrentLocation(addressName, newAddress);
+										}
+
+										@Override
+										public void onResponseResult(Throwable t) {
+											currentLocationRequestObj.zoneId = WeatherResponseProcessor.getZoneId(location.getLatitude(), location.getLongitude());
+
+											timeZoneIdRepository.insert(new TimeZoneIdDto(addressName, currentLocationRequestObj.zoneId.getId()));
+											editor.putString("zoneId", currentLocationRequestObj.zoneId.getId()).commit();
+
+											onResultCurrentLocation(addressName, newAddress);
+										}
+									});
+
+								}
+							});
+
 						}
 					}
 				});
@@ -438,6 +476,22 @@ public class WidgetWorker extends Worker {
 			}
 		}
 
+	}
+
+	private void onResultCurrentLocation(String addressName, Address newAddress) {
+		for (Integer appWidgetId : currentLocationWidgetDtoArrayMap.keySet()) {
+			WidgetDto widgetDto = currentLocationWidgetDtoArrayMap.get(appWidgetId);
+
+			widgetDto.setAddressName(addressName);
+			widgetDto.setCountryCode(newAddress.getCountryCode());
+			widgetDto.setLatitude(newAddress.getLatitude());
+			widgetDto.setLongitude(newAddress.getLongitude());
+			widgetDto.setTimeZoneId(currentLocationRequestObj.zoneId.getId());
+
+			widgetRepository.update(widgetDto, null);
+		}
+
+		onLocationResponse(null, addressName);
 	}
 
 	private void onLocationResponse(@Nullable FusedLocation.MyLocationCallback.Fail fail, @Nullable String addressName) {
@@ -546,9 +600,6 @@ public class WidgetWorker extends Worker {
 			currentLocationRequestObj = null;
 		}
 
-		if (requestCount == ++responseCount) {
-
-		}
 	}
 
 

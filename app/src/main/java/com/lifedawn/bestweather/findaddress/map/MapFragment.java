@@ -243,7 +243,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				favoriteAddressDto.setLongitude(longitude.toString());
 
 				TimeZoneIdRepository timeZoneIdRepository = TimeZoneIdRepository.Companion.getINSTANCE();
-				timeZoneIdRepository.get(latitude, longitude, new DbQueryCallback<TimeZoneIdDto>() {
+				timeZoneIdRepository.get(favoriteAddressDto.getAddress(), new DbQueryCallback<TimeZoneIdDto>() {
 					@Override
 					public void onResultSuccessful(TimeZoneIdDto result) {
 						ZoneId zoneId = ZoneId.of(result.getTimeZoneId());
@@ -257,17 +257,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 							public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
 								FreeTimeResponse freeTimeDto = (FreeTimeResponse) responseObj;
 								ZoneId zoneId = ZoneId.of(freeTimeDto.getTimezone());
-								insertZoneId(zoneId, favoriteAddressDto);
+								timeZoneIdRepository.insert(new TimeZoneIdDto(favoriteAddressDto.getAddress(), zoneId.getId()));
 
-								timeZoneIdRepository.insert(new TimeZoneIdDto(latitude, longitude, zoneId.getId()));
+								insertZoneId(zoneId, favoriteAddressDto);
 							}
 
 							@Override
 							public void onResponseResult(Throwable t) {
 								ZoneId zoneId = WeatherResponseProcessor.getZoneId(latitude, longitude);
-								insertZoneId(zoneId, favoriteAddressDto);
+								timeZoneIdRepository.insert(new TimeZoneIdDto(favoriteAddressDto.getAddress(), zoneId.getId()));
 
-								timeZoneIdRepository.insert(new TimeZoneIdDto(latitude, longitude, zoneId.getId()));
+								insertZoneId(zoneId, favoriteAddressDto);
 							}
 						});
 
@@ -1041,9 +1041,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 	@Override
 	public void onPOIItemSelectedByList(int position) {
-		FragmentManager fragmentManager = getChildFragmentManager();
 		setStateOfBottomSheet(BottomSheetType.SEARCH_LOCATION, BottomSheetBehavior.STATE_COLLAPSED);
-		fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag(FindAddressFragment.class.getName())).addToBackStack(null).commit();
+		FragmentManager fragmentManager = getChildFragmentManager();
+		fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag(getString(R.string.tag_find_address_fragment))).addToBackStack(null).commitAllowingStateLoss();
 
 		//bottomsheet가 아닌 list에서 아이템을 선택한 경우 호출
 		//adapter -> poiitem생성 -> select poiitem -> bottomsheet열고 정보 표시

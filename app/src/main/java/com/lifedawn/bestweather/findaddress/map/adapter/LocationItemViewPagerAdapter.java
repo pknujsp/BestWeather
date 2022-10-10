@@ -71,7 +71,7 @@ public class LocationItemViewPagerAdapter extends RecyclerView.Adapter<LocationI
 		public LocationItemViewHolder(@NonNull View view) {
 			super(view);
 			binding = FoundAddressItemViewpagerBinding.bind(view);
-
+			binding.removeBtn.setVisibility(View.GONE);
 
 			binding.addBtn.setOnClickListener(new View.OnClickListener() {
 				@Override

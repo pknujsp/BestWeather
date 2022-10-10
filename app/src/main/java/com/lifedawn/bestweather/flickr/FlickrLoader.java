@@ -37,10 +37,15 @@ import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.SimpleTimeZone;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -50,8 +55,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class FlickrLoader {
-	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new HashMap<>();
-	private static final Set<ImgRequestObj> IMG_REQUEST_OBJ_SET = new HashSet<>();
+	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new ConcurrentHashMap<>();
+	private static final List<ImgRequestObj> IMG_REQUEST_OBJ_SET = new CopyOnWriteArrayList<>();
 	private static final ExecutorService executorService = Executors.newFixedThreadPool(3);
 
 	private FlickrLoader() {
@@ -222,17 +227,17 @@ public class FlickrLoader {
 												}
 											};
 
-											MainThreadWorker.runOnUiThread(new Runnable() {
-												@Override
-												public void run() {
-													Activity activity = (Activity) context;
-													if (!activity.isFinishing() && !activity.isDestroyed()) {
+											Activity activity = (Activity) context;
+											if (!activity.isFinishing() && !activity.isDestroyed()) {
+												MainThreadWorker.runOnUiThread(new Runnable() {
+													@Override
+													public void run() {
 														Glide.with(context).asBitmap().load(backgroundImgUrl)
 																.diskCacheStrategy(DiskCacheStrategy.ALL).into(imgRequestObj.glideTarget);
 													}
-												}
-											});
 
+												});
+											}
 										}
 
 										@Override

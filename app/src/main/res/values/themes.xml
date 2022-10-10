@@ -14,8 +14,7 @@
         <item name="iconColor">@color/blue</item>
         <item name="progressViewIndicatorColor">@color/blue</item>
         <item name="lineColor">@color/white</item>
-
-
+        
     </style>
 
     <style name="ThemeOverlay.BestWeather.AppWidgetContainer" parent="">

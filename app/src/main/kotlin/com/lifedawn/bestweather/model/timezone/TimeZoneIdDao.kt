@@ -10,9 +10,8 @@ import com.google.firebase.crashlytics.internal.model.CrashlyticsReport
 
 @Dao
 interface TimeZoneIdDao {
-    @Query("SELECT * FROM TimeZoneIdDto WHERE latitude == :latitude AND " +
-            "longitude == :longitude")
-    fun get(latitude: Double, longitude: Double): TimeZoneIdDto
+    @Query("SELECT * FROM TimeZoneIdDto WHERE addressName = :addressName")
+    fun get(addressName: String): TimeZoneIdDto
 
     @Insert(onConflict = ABORT)
     fun insert(timeZoneDto: TimeZoneIdDto)

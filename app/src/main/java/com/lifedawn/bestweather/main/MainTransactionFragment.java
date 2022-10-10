@@ -66,7 +66,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 	private FragmentMainBinding binding;
 	private WeatherViewModel weatherViewModel;
-	private boolean initializing = true;
 	private SharedPreferences sharedPreferences;
 	private List<FavoriteAddressDto> favoriteAddressDtoList = new ArrayList<>();
 	private String currentAddressName;
@@ -85,7 +84,10 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 				getChildFragmentManager().popBackStackImmediate();
 			} else {
 				//closeWindow.clicked(getActivity());
-				onBeforeCloseApp();
+				if (binding.drawerLayout.isDrawerOpen(binding.sideNavigation))
+					binding.drawerLayout.closeDrawer(binding.sideNavigation);
+				else
+					onBeforeCloseApp();
 			}
 		}
 
@@ -283,49 +285,56 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			}
 		});
 
+		weatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), new Observer<List<FavoriteAddressDto>>() {
+			@Override
+			public void onChanged(List<FavoriteAddressDto> favoriteAddressDtoList) {
+				createLocationsList(favoriteAddressDtoList);
+			}
+		});
+
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				MainThreadWorker.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						createLocationsList(result);
+				if (getActivity() != null) {
+					MainThreadWorker.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
 
-						final boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
-						final LocationType lastSelectedLocationType = LocationType.valueOf(
-								sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
-										LocationType.CurrentLocation.name()));
-						setCurrentLocationState(usingCurrentLocation);
+							final boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
+							final LocationType lastSelectedLocationType = LocationType.valueOf(
+									sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
+											LocationType.CurrentLocation.name()));
+							setCurrentLocationState(usingCurrentLocation);
 
-						if (currentAddressName != null) {
-							binding.sideNavMenu.addressName.setText(currentAddressName);
-						}
+							if (currentAddressName != null) {
+								binding.sideNavMenu.addressName.setText(currentAddressName);
+							}
 
-						if (lastSelectedLocationType == LocationType.CurrentLocation) {
-							if (usingCurrentLocation) {
-								addWeatherFragment(lastSelectedLocationType, null);
+							if (lastSelectedLocationType == LocationType.CurrentLocation) {
+								if (usingCurrentLocation) {
+									addWeatherFragment(lastSelectedLocationType, null);
+								} else {
+									if (favoriteAddressDtoList.size() > 0) {
+										binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+									} else {
+										binding.sideNavMenu.favorites.callOnClick();
+									}
+								}
+
 							} else {
-								if (favoriteAddressDtoList.size() > 0) {
-									binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
-								} else {
-									binding.sideNavMenu.favorites.callOnClick();
-								}
-							}
-
-						} else {
-							final int lastSelectedFavoriteId = sharedPreferences.getInt(
-									getString(R.string.pref_key_last_selected_favorite_address_id), -1);
-							if (!clickLocationItemById(lastSelectedFavoriteId)) {
-								if (favoriteAddressDtoList.size() > 0) {
-									binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
-								} else {
-									binding.sideNavMenu.favorites.callOnClick();
+								final int lastSelectedFavoriteId = sharedPreferences.getInt(
+										getString(R.string.pref_key_last_selected_favorite_address_id), -1);
+								if (!clickLocationItemById(lastSelectedFavoriteId)) {
+									if (favoriteAddressDtoList.size() > 0) {
+										binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+									} else {
+										binding.sideNavMenu.favorites.callOnClick();
+									}
 								}
 							}
 						}
-					}
-				});
-
+					});
+				}
 
 			}
 
@@ -340,7 +349,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	public void onStart() {
 		super.onStart();
 
-		initializing = false;
 	}
 
 	public void createLocationsList(List<FavoriteAddressDto> result) {
@@ -536,7 +544,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			Bundle result = new Bundle();
 			result.putBoolean("added", added);
 
-			createLocationsList(newFavoriteAddressDtoList);
 			onRefreshedFavoriteLocationsList(null, result);
 
 			if (added) {
@@ -589,7 +596,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						createLocationsList(result);
 						callback.onResultSuccessful(result);
 					}
 				});

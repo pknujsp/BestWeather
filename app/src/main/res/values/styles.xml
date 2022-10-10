@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="DefaultAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="DefaultAppTheme" parent="Theme.Material3.Light.NoActionBar">
 
     </style>
 
@@ -51,7 +51,7 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
-    <style name="CustomDialog" parent="Theme.AppCompat.Light.Dialog"></style>
+    <style name="CustomDialog" parent="Theme.AppCompat.Light.Dialog" />
 
     <style name="SettingsLabel" parent="Widget.AppCompat.TextView">
         <item name="android:textSize">15sp</item>

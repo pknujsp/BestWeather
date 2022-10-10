@@ -168,44 +168,12 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 										editor.putString(context.getString(R.string.pref_key_last_current_location_latitude),
 														latitude.toString())
 												.putString(context.getString(R.string.pref_key_last_current_location_longitude),
-														longitude.toString());
+														longitude.toString()).commit();
 
-										timeZoneIdRepository.get(latitude, longitude, new DbQueryCallback<TimeZoneIdDto>() {
+										MainThreadWorker.runOnUiThread(new Runnable() {
 											@Override
-											public void onResultSuccessful(TimeZoneIdDto result) {
-												ZoneId zoneId = ZoneId.of(result.getTimeZoneId());
-												editor.putString("zoneId", zoneId.getId())
-														.commit();
-
-												MainThreadWorker.runOnUiThread(new Runnable() {
-													@Override
-													public void run() {
-														myLocationCallback.onSuccessful(locationResult);
-													}
-												});
-											}
-
-											@Override
-											public void onResultNoData() {
-
-
-												FreeTimeZoneApi.Companion.getTimeZone(latitude, longitude, new JsonDownloader() {
-													@Override
-													public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-														FreeTimeResponse freeTimeDto = (FreeTimeResponse) responseObj;
-														ZoneId zoneId = ZoneId.of(freeTimeDto.getTimezone());
-
-														insertZoneId(latitude, longitude, zoneId, editor, myLocationCallback, locationResult);
-													}
-
-													@Override
-													public void onResponseResult(Throwable t) {
-														ZoneId zoneId = WeatherResponseProcessor.getZoneId(latitude, longitude);
-														insertZoneId(latitude, longitude, zoneId, editor, myLocationCallback, locationResult);
-													}
-												});
-
-
+											public void run() {
+												myLocationCallback.onSuccessful(locationResult);
 											}
 										});
 
@@ -285,18 +253,6 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		}
 	}
 
-	private void insertZoneId(Double latitude, Double longitude, ZoneId zoneId, SharedPreferences.Editor editor,
-	                          MyLocationCallback myLocationCallback, LocationResult locationResult) {
-		timeZoneIdRepository.insert(new TimeZoneIdDto(latitude, longitude, zoneId.getId()));
-		editor.putString("zoneId", zoneId.getId()).commit();
-
-		MainThreadWorker.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				myLocationCallback.onSuccessful(locationResult);
-			}
-		});
-	}
 
 	public boolean checkDefaultPermissions() {
 		return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&

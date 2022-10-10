@@ -77,12 +77,15 @@ import com.lifedawn.bestweather.flickr.FlickrImgObj;
 import com.lifedawn.bestweather.flickr.FlickrLoader;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto;
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
+import com.lifedawn.bestweather.retrofit.responses.freetime.FreeTimeResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaCurrentConditions;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaDailyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
@@ -94,14 +97,18 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.cur
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
+import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
+import com.lifedawn.bestweather.timezone.FreeTimeZoneApi;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
@@ -134,6 +141,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import retrofit2.Response;
+
 
 public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadImgOfCurrentConditions, IGps {
 	private ExecutorService postProcessingExecutor = Executors.newSingleThreadExecutor();
@@ -164,6 +173,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 	private Bundle arguments;
+	private TimeZoneIdRepository timeZoneIdRepository;
 
 	public WeatherFragment() {
 	}
@@ -245,6 +255,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		weatherViewModel = new ViewModelProvider(getActivity()).get(WeatherViewModel.class);
 		weatherViewModel.setiLoadImgOfCurrentConditions(this);
 		locationCallbackInMainFragment = weatherViewModel.getLocationCallback();
+
+		timeZoneIdRepository = TimeZoneIdRepository.Companion.getINSTANCE();
 
 		arguments = savedInstanceState != null ? savedInstanceState : getArguments();
 		load = arguments.getBoolean("load", false);
@@ -685,7 +697,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		}
 
 		long dataDownloadedMinutes = TimeUnit.SECONDS.toMinutes(
-				MyApplication.FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).dataDownloadedDateTime.getSecond());
+				MyApplication.FINAL_RESPONSE_MAP.get(latitude.toString() + longitude).dataDownloadedDateTime.getSecond());
 		long now = TimeUnit.SECONDS.toMinutes(LocalDateTime.now().getSecond());
 
 		if (now - dataDownloadedMinutes > 120) {
@@ -708,32 +720,80 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						mainWeatherProviderType = getMainWeatherSourceType("");
 						countryCode = "";
 						addressName = getString(R.string.unknown_address);
+
+						final String addressStr = getString(R.string.current_location) + " : " + addressName;
+						onResultCurrentLocation(addressStr, addressName, refresh);
 					} else {
 						Address address = addressList.get(0);
 						addressName = address.getAddressLine(0);
 						mainWeatherProviderType = getMainWeatherSourceType(address.getCountryCode());
 						countryCode = address.getCountryCode();
-					}
-					final String addressStr = getString(R.string.current_location) + " : " + addressName;
 
-					getActivity().runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							binding.addressName.setText(addressStr);
-							weatherViewModel.setCurrentLocationAddressName(addressName);
+						final String addressStr = getString(R.string.current_location) + " : " + addressName;
 
-							if (refresh) {
-								requestNewData();
-							} else {
-								//이미 데이터가 있으면 다시 그림
-								mainWeatherProviderType = MyApplication.FINAL_RESPONSE_MAP.get(
-										latitude.toString() + longitude.toString()).requestMainWeatherProviderType;
-								reDraw();
+						SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+
+						timeZoneIdRepository.get(addressName, new DbQueryCallback<TimeZoneIdDto>() {
+							@Override
+							public void onResultSuccessful(TimeZoneIdDto result) {
+								zoneId = ZoneId.of(result.getTimeZoneId());
+								editor.putString("zoneId", zoneId.getId())
+										.commit();
+
+								onResultCurrentLocation(addressStr, addressName, refresh);
 							}
 
-						}
-					});
+							@Override
+							public void onResultNoData() {
+								FreeTimeZoneApi.Companion.getTimeZone(latitude, longitude, new JsonDownloader() {
+									@Override
+									public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
+										FreeTimeResponse freeTimeDto = (FreeTimeResponse) responseObj;
+										zoneId = ZoneId.of(freeTimeDto.getTimezone());
+										timeZoneIdRepository.insert(new TimeZoneIdDto(addressName, zoneId.getId()));
+										editor.putString("zoneId", zoneId.getId()).commit();
 
+										onResultCurrentLocation(addressStr, addressName, refresh);
+									}
+
+									@Override
+									public void onResponseResult(Throwable t) {
+										zoneId = WeatherResponseProcessor.getZoneId(latitude, longitude);
+
+										timeZoneIdRepository.insert(new TimeZoneIdDto(addressName, zoneId.getId()));
+										editor.putString("zoneId", zoneId.getId()).commit();
+										onResultCurrentLocation(addressStr, addressName, refresh);
+									}
+								});
+
+
+							}
+						});
+
+
+					}
+
+
+				}
+
+			}
+		});
+	}
+
+	private void onResultCurrentLocation(String addressStr, String addressName, boolean refresh) {
+		requireActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				binding.addressName.setText(addressStr);
+				weatherViewModel.setCurrentLocationAddressName(addressName);
+
+				if (refresh) {
+					requestNewData();
+				} else {
+					//이미 데이터가 있으면 다시 그림
+					mainWeatherProviderType = MyApplication.FINAL_RESPONSE_MAP.get(
+							latitude.toString() + longitude.toString()).requestMainWeatherProviderType;
+					reDraw();
 				}
 
 			}
@@ -953,9 +1013,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
 		FragmentManager fragmentManager = getChildFragmentManager();
+		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
 		if (fragmentManager.findFragmentByTag(AlertFragment.class.getName()) != null) {
-			fragmentManager.beginTransaction().remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName())).commitAllowingStateLoss();
+			fragmentTransaction.remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName()));
 		}
 
 		Bundle bundle = new Bundle();
@@ -966,7 +1027,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		alertFragment.setBtnObjList(btnObjList);
 		alertFragment.setArguments(bundle);
 
-		fragmentManager.beginTransaction().add(binding.fragmentContainer.getId(), alertFragment,
+		fragmentTransaction.add(binding.fragmentContainer.getId(), alertFragment,
 				AlertFragment.class.getName()).commitAllowingStateLoss();
 	}
 
@@ -1404,6 +1465,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							MyApplication.VALUE_UNIT_OBJ.getClockUnit() == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
 									getString(R.string.datetime_pattern_clock24), Locale.getDefault());
 					binding.updatedDatetime.setText(dateTime.format(dateTimeFormatter));
+					binding.scrollView.setVisibility(View.VISIBLE);
 
 					FragmentManager fragmentManager = getChildFragmentManager();
 					FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -1412,18 +1474,18 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						fragmentTransaction.remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName()));
 					}
 
-					fragmentTransaction.replace(binding.simpleCurrentConditions.getId(),
-							simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment));
-					fragmentTransaction.replace(binding.simpleHourlyForecast.getId(), simpleHourlyForecastFragment,
-							getString(R.string.tag_simple_hourly_forecast_fragment));
-					fragmentTransaction.replace(binding.simpleDailyForecast.getId(), simpleDailyForecastFragment, getString(R.string.tag_simple_daily_forecast_fragment));
-					fragmentTransaction.replace(binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
-							getString(R.string.tag_detail_current_conditions_fragment));
-					fragmentTransaction.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment));
-					fragmentTransaction.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
-							getString(R.string.tag_sun_set_rise_fragment)).commitAllowingStateLoss();
+					fragmentTransaction
+							.replace(binding.simpleCurrentConditions.getId(),
+									simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment))
+							.replace(binding.simpleHourlyForecast.getId(), simpleHourlyForecastFragment,
+									getString(R.string.tag_simple_hourly_forecast_fragment))
+							.replace(binding.simpleDailyForecast.getId(), simpleDailyForecastFragment, getString(R.string.tag_simple_daily_forecast_fragment))
+							.replace(binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
+									getString(R.string.tag_detail_current_conditions_fragment))
+							.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment))
+							.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
+									getString(R.string.tag_sun_set_rise_fragment)).commitAllowingStateLoss();
 
-					binding.scrollView.setVisibility(View.VISIBLE);
 					ProgressDialog.clearDialogs();
 				}
 			});

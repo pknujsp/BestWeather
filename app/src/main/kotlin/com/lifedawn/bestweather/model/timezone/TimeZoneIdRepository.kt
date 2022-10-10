@@ -32,9 +32,9 @@ class TimeZoneIdRepository(context: Context) {
     }
 
 
-    fun get(latitude: Double, longitude: Double, callback: DbQueryCallback<TimeZoneIdDto>) {
+    fun get(addressName: String, callback: DbQueryCallback<TimeZoneIdDto>) {
         CoroutineScope(Dispatchers.IO).launch {
-            callback.processResult(dao.get(latitude, longitude))
+            callback.processResult(dao.get(addressName))
         }
     }
 

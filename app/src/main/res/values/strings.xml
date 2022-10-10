@@ -299,7 +299,7 @@
     <string name="check">ok</string>
     <string name="no">no</string>
     <string name="message_needs_location_permission">Location permission required</string>
-    <string name="update_failed">update failed</string>
+    <string name="update_failed">weather data update failed</string>
     <string name="msg_finding_current_location">finding current location</string>
     <string name="msg_refreshing_weather_data">refreshing weather data</string>
     <string name="main_datasource">main weather provider</string>
