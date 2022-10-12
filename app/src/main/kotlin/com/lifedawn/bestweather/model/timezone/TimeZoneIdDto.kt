@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class TimeZoneIdDto(
-        @ColumnInfo(name = "addressName") val latitude: String,
+        @ColumnInfo(name = "latitude") val latitude: Double,
+        @ColumnInfo(name = "longitude") val longitude: Double,
         @ColumnInfo(name = "timeZoneId") val timeZoneId: String
 ) {
     @PrimaryKey(autoGenerate = true)

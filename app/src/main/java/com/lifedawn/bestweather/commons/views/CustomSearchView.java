@@ -129,7 +129,7 @@ public class CustomSearchView extends FrameLayout {
 	}
 
 	public void callOnClickEditText() {
-		binding.edittext.callOnClick();
+		binding.edittext.requestFocusFromTouch();
 	}
 
 	@Override

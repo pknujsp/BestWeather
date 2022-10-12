@@ -412,44 +412,10 @@ public class WidgetWorker extends Worker {
 							final String addressName = newAddress.getAddressLine(0);
 							currentLocationRequestObj.address = newAddress;
 
-							SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-
-							timeZoneIdRepository.get(addressName, new DbQueryCallback<TimeZoneIdDto>() {
-								@Override
-								public void onResultSuccessful(TimeZoneIdDto result) {
-									currentLocationRequestObj.zoneId = ZoneId.of(result.getTimeZoneId());
-									editor.putString("zoneId", currentLocationRequestObj.zoneId.getId())
-											.commit();
-
-									onResultCurrentLocation(addressName, newAddress);
-								}
-
-								@Override
-								public void onResultNoData() {
-									FreeTimeZoneApi.Companion.getTimeZone(location.getLatitude(), location.getLongitude(), new JsonDownloader() {
-										@Override
-										public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-											FreeTimeResponse freeTimeDto = (FreeTimeResponse) responseObj;
-											currentLocationRequestObj.zoneId = ZoneId.of(freeTimeDto.getTimezone());
-											timeZoneIdRepository.insert(new TimeZoneIdDto(addressName, currentLocationRequestObj.zoneId.getId()));
-											editor.putString("zoneId", currentLocationRequestObj.zoneId.getId()).commit();
-											onResultCurrentLocation(addressName, newAddress);
-										}
-
-										@Override
-										public void onResponseResult(Throwable t) {
-											currentLocationRequestObj.zoneId = WeatherResponseProcessor.getZoneId(location.getLatitude(), location.getLongitude());
-
-											timeZoneIdRepository.insert(new TimeZoneIdDto(addressName, currentLocationRequestObj.zoneId.getId()));
-											editor.putString("zoneId", currentLocationRequestObj.zoneId.getId()).commit();
-
-											onResultCurrentLocation(addressName, newAddress);
-										}
-									});
-
-								}
-							});
-
+							final String zoneIdText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+									.getString("zoneId", "");
+							currentLocationRequestObj.zoneId = ZoneId.of(zoneIdText);
+							onResultCurrentLocation(addressName, newAddress);
 						}
 					}
 				});

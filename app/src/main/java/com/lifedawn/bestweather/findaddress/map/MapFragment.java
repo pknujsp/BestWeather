@@ -26,6 +26,7 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -57,8 +58,6 @@ import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
-import com.lifedawn.bestweather.commons.views.CustomEditText;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentMapBinding;
 import com.lifedawn.bestweather.favorites.FavoriteAddressesAdapter;
@@ -71,22 +70,16 @@ import com.lifedawn.bestweather.findaddress.map.interfaces.OnClickedLocationBtnL
 import com.lifedawn.bestweather.findaddress.map.interfaces.OnClickedScrollBtnListener;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto;
-import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.notification.daily.fragment.DailyNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationSettingsFragment;
-import com.lifedawn.bestweather.retrofit.responses.freetime.FreeTimeResponse;
-import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.timezone.FreeTimeZoneApi;
+import com.lifedawn.bestweather.timezone.TimeZoneUtils;
 import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 import com.lifedawn.bestweather.widget.ConfigureWidgetActivity;
 
-import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,8 +87,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import retrofit2.Response;
 
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
@@ -127,7 +118,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	private boolean clickedHeader;
 
 	private Bundle bundle;
-	private boolean needsOnResultCallback = true;
 	private boolean showFavoriteAddBtn;
 
 	public boolean isClickedItem() {
@@ -158,7 +148,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 								MainThreadWorker.runOnUiThread(new Runnable() {
 									@Override
 									public void run() {
-										needsOnResultCallback = true;
 										getParentFragmentManager().popBackStack();
 										onResultFavoriteListener.onResult(result);
 									}
@@ -228,62 +217,27 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	@Override
 	public void onClickedAddress(Address address) {
 		ProgressDialog.show(requireActivity(), getString(R.string.adding_a_new_favorite_location), null);
-		MyApplication.getExecutorService().execute(new Runnable() {
+		final Double latitude = address.getLatitude();
+		final Double longitude = address.getLongitude();
+
+		final FavoriteAddressDto favoriteAddressDto = new FavoriteAddressDto();
+		favoriteAddressDto.setCountryName(address.getCountryName());
+		favoriteAddressDto.setCountryCode(address.getCountryCode() == null ? "" : address.getCountryCode());
+		favoriteAddressDto.setAddress(address.getAddressLine(0));
+		favoriteAddressDto.setAdmin(address.getLocality());
+		favoriteAddressDto.setLatitude(latitude.toString());
+		favoriteAddressDto.setLongitude(longitude.toString());
+
+		TimeZoneUtils.Companion.getTimeZone(latitude, longitude, new TimeZoneUtils.TimeZoneCallback() {
 			@Override
-			public void run() {
-				final Double latitude = address.getLatitude();
-				final Double longitude = address.getLongitude();
-
-				final FavoriteAddressDto favoriteAddressDto = new FavoriteAddressDto();
-				favoriteAddressDto.setCountryName(address.getCountryName());
-				favoriteAddressDto.setCountryCode(address.getCountryCode() == null ? "" : address.getCountryCode());
-				favoriteAddressDto.setAddress(address.getAddressLine(0));
-				favoriteAddressDto.setAdmin(address.getLocality());
-				favoriteAddressDto.setLatitude(latitude.toString());
-				favoriteAddressDto.setLongitude(longitude.toString());
-
-				TimeZoneIdRepository timeZoneIdRepository = TimeZoneIdRepository.Companion.getINSTANCE();
-				timeZoneIdRepository.get(favoriteAddressDto.getAddress(), new DbQueryCallback<TimeZoneIdDto>() {
-					@Override
-					public void onResultSuccessful(TimeZoneIdDto result) {
-						ZoneId zoneId = ZoneId.of(result.getTimeZoneId());
-						insertZoneId(zoneId, favoriteAddressDto);
-					}
-
-					@Override
-					public void onResultNoData() {
-						FreeTimeZoneApi.Companion.getTimeZone(latitude, longitude, new JsonDownloader() {
-							@Override
-							public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-								FreeTimeResponse freeTimeDto = (FreeTimeResponse) responseObj;
-								ZoneId zoneId = ZoneId.of(freeTimeDto.getTimezone());
-								timeZoneIdRepository.insert(new TimeZoneIdDto(favoriteAddressDto.getAddress(), zoneId.getId()));
-
-								insertZoneId(zoneId, favoriteAddressDto);
-							}
-
-							@Override
-							public void onResponseResult(Throwable t) {
-								ZoneId zoneId = WeatherResponseProcessor.getZoneId(latitude, longitude);
-								timeZoneIdRepository.insert(new TimeZoneIdDto(favoriteAddressDto.getAddress(), zoneId.getId()));
-
-								insertZoneId(zoneId, favoriteAddressDto);
-							}
-						});
-
-					}
-				});
-
-
+			public void onResult(@NonNull ZoneId zoneId) {
+				favoriteAddressDto.setZoneId(zoneId.getId());
+				add(favoriteAddressDto);
 			}
 		});
 
 	}
 
-	private void insertZoneId(ZoneId zoneId, FavoriteAddressDto favoriteAddressDto) {
-		favoriteAddressDto.setZoneId(zoneId.getId());
-		add(favoriteAddressDto);
-	}
 
 	private void add(FavoriteAddressDto favoriteAddressDto) {
 		weatherViewModel.contains(favoriteAddressDto.getLatitude(), favoriteAddressDto.getLongitude(),
@@ -304,7 +258,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 							MainThreadWorker.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
-									//addedNewLocation = true;
 									weatherViewModel.favoriteAddressListLiveData.removeObservers(getViewLifecycleOwner());
 								}
 							});
@@ -312,35 +265,33 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 							weatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
 								@Override
 								public void onResultSuccessful(Long id) {
-									weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
-										@Override
-										public void onResultSuccessful(List<FavoriteAddressDto> result) {
-											if (getActivity() != null) {
-												favoriteAddressDto.setId(id.intValue());
+									if (getActivity() != null) {
+										favoriteAddressDto.setId(id.intValue());
 
-												PreferenceManager.getDefaultSharedPreferences(getContext())
-														.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
-																favoriteAddressDto.getId()).commit();
+										PreferenceManager.getDefaultSharedPreferences(getContext())
+												.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
+														favoriteAddressDto.getId()).putString(getString(R.string.pref_key_last_selected_location_type),
+														LocationType.SelectedAddress.name()).commit();
 
-												MainThreadWorker.runOnUiThread(new Runnable() {
-													@Override
-													public void run() {
-														Toast.makeText(getContext(), favoriteAddressDto.getAddress(), Toast.LENGTH_SHORT).show();
 
-														getParentFragmentManager().popBackStack();
-														ProgressDialog.clearDialogs();
-														needsOnResultCallback = true;
-														onResultFavoriteListener.onAddedNewAddress(favoriteAddressDto, result, removedLocation);
-													}
-												});
+										try {
+											Thread.sleep(1000);
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+
+										}
+
+										MainThreadWorker.runOnUiThread(new Runnable() {
+											@Override
+											public void run() {
+												Toast.makeText(getContext(), favoriteAddressDto.getAddress(), Toast.LENGTH_SHORT).show();
+												ProgressDialog.clearDialogs();
+												getParentFragmentManager().popBackStackImmediate();
+
+												onResultFavoriteListener.onAddedNewAddress(favoriteAddressDto, null, removedLocation);
 											}
-										}
-
-										@Override
-										public void onResultNoData() {
-
-										}
-									});
+										});
+									}
 								}
 
 								@Override
@@ -765,8 +716,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 						LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
 						adapterMap.put(MarkerType.LONG_CLICK, adapter);
+
 						adapter.setAddressList(addresses);
 						adapter.setFavoriteAddressSet(favoriteAddressSet);
+
 						adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<Address>() {
 							@Override
 							public void onSelected(Address e, boolean remove) {
@@ -1084,7 +1037,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 							dialogInterface.dismiss();
 
 							if (checkPermissionAndGpsOn()) {
-								needsOnResultCallback = false;
 								getParentFragmentManager().popBackStack();
 								onResultFavoriteListener.onResult(result);
 							}
@@ -1092,10 +1044,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 					}).setNegativeButton(R.string.add_favorite, new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialogInterface, int i) {
-					PreferenceManager.getDefaultSharedPreferences(getContext()).edit()
-							.putString(getString(R.string.pref_key_last_selected_location_type),
-									LocationType.SelectedAddress.name()).commit();
-
 					dialogInterface.dismiss();
 					binding.headerLayout.callOnClickEditText();
 				}
@@ -1108,12 +1056,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}).create().show();
 		} else if (haveFavorites) {
 			getParentFragmentManager().popBackStack();
-			needsOnResultCallback = false;
 			onResultFavoriteListener.onResult(result);
 		} else {
 			if (checkPermissionAndGpsOn()) {
 				getParentFragmentManager().popBackStack();
-				needsOnResultCallback = false;
 				onResultFavoriteListener.onResult(result);
 			}
 		}

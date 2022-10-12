@@ -37,6 +37,7 @@ public class AlertFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 	}
 
 	@Override
@@ -56,7 +57,6 @@ public class AlertFragment extends Fragment {
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 		final int drawableId = bundle.getInt(Constant.DRAWABLE_ID.name());
 		final String message = bundle.getString(Constant.MESSAGE.name());
 
@@ -66,7 +66,7 @@ public class AlertFragment extends Fragment {
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		layoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
-		
+
 		for (BtnObj btnObj : btnObjList) {
 			Button button = new Button(getContext());
 			button.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rounded_btn_background));

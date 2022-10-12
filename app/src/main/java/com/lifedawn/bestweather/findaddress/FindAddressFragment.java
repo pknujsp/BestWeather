@@ -9,7 +9,6 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,8 +20,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
@@ -39,7 +36,6 @@ import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -78,7 +74,7 @@ public class FindAddressFragment extends Fragment {
 				}
 			});
 
-			Geocoding.reverseGeocoding(getContext(), executorService, newText, new Geocoding.ReverseGeocodingCallback() {
+			Geocoding.reverseGeocoding(getContext(), newText, new Geocoding.ReverseGeocodingCallback() {
 				@Override
 				public void onReverseGeocodingResult(List<Address> addressList) {
 					if (getActivity() != null) {

@@ -1,12 +1,8 @@
 package com.lifedawn.bestweather.model.timezone
 
 import android.content.Context
-import androidx.room.Delete
-import androidx.room.Insert
-import com.lifedawn.bestweather.main.MyApplication
 import com.lifedawn.bestweather.room.AppDb
 import com.lifedawn.bestweather.room.callback.DbQueryCallback
-import com.lifedawn.bestweather.room.dao.WidgetDao
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,18 +24,19 @@ class TimeZoneIdRepository(context: Context) {
             }
         }
 
-
     }
 
 
-    fun get(addressName: String, callback: DbQueryCallback<TimeZoneIdDto>) {
+    fun get(lat: Double, lon: Double, callback: DbQueryCallback<TimeZoneIdDto?>) {
         CoroutineScope(Dispatchers.IO).launch {
-            callback.processResult(dao.get(addressName))
+            callback.processResult(dao.get(lat, lon))
         }
     }
 
     fun insert(timeZoneDto: TimeZoneIdDto) {
         CoroutineScope(Dispatchers.IO).launch {
+            if (dao.count() > 100)
+                dao.reset()
             dao.insert(timeZoneDto)
         }
     }
@@ -47,6 +44,13 @@ class TimeZoneIdRepository(context: Context) {
     fun delete(timeZoneDto: TimeZoneIdDto) {
         CoroutineScope(Dispatchers.IO).launch {
             dao.delete(timeZoneDto)
+        }
+    }
+
+    fun reset(callback: DbQueryCallback<Boolean>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            dao.reset()
+            callback.onResultSuccessful(true)
         }
     }
 }

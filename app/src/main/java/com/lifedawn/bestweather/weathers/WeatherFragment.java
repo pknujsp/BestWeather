@@ -77,7 +77,6 @@ import com.lifedawn.bestweather.flickr.FlickrImgObj;
 import com.lifedawn.bestweather.flickr.FlickrLoader;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto;
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
@@ -85,7 +84,6 @@ import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions
 import com.lifedawn.bestweather.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
-import com.lifedawn.bestweather.retrofit.responses.freetime.FreeTimeResponse;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaCurrentConditions;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaDailyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
@@ -97,18 +95,15 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.cur
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
-import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
-import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.timezone.FreeTimeZoneApi;
+import com.lifedawn.bestweather.timezone.TimeZoneUtils;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
@@ -141,8 +136,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import retrofit2.Response;
-
 
 public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadImgOfCurrentConditions, IGps {
 	private ExecutorService postProcessingExecutor = Executors.newSingleThreadExecutor();
@@ -174,9 +167,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 	private Bundle arguments;
 	private TimeZoneIdRepository timeZoneIdRepository;
+	private IWeatherFragment iWeatherFragment;
 
-	public WeatherFragment() {
+	public WeatherFragment(IWeatherFragment iWeatherFragment) {
+		this.iWeatherFragment = iWeatherFragment;
 	}
+
 
 	public WeatherFragment setMenuOnClickListener(View.OnClickListener menuOnClickListener) {
 		this.menuOnClickListener = menuOnClickListener;
@@ -336,12 +332,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 					mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 						@Override
 						public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
-							iRefreshFavoriteLocationListOnSideNav.onResultMapFragment(favoriteAddressDtoList, newFavoriteAddressDto);
+							iRefreshFavoriteLocationListOnSideNav.onResultMapFragment(newFavoriteAddressDto);
 						}
 
 						@Override
 						public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
-							iRefreshFavoriteLocationListOnSideNav.onResultMapFragment(favoriteAddressDtoList, null);
+							iRefreshFavoriteLocationListOnSideNav.onResultMapFragment(null);
 						}
 
 						@Override
@@ -456,6 +452,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		locationType = LocationType.valueOf(bundle.getString(BundleKey.LocationType.name()));
 		this.locationType = locationType;
 
+		final boolean clickGps = arguments.getBoolean("clickGps", false);
+
+
 		if (locationType == LocationType.CurrentLocation) {
 			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
 					getString(R.string.pref_key_last_selected_location_type), locationType.name()).commit();
@@ -467,6 +466,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			if (latitude == 0.0 && longitude == 0.0) {
 				//최근에 현재위치로 잡힌 위치가 없으므로 현재 위치 요청
 				requestCurrentLocation();
+			} else if (clickGps) {
+				binding.mainToolbar.gps.callOnClick();
 			} else {
 				zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(getContext())
 						.getString("zoneId", ""));
@@ -669,7 +670,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						binding.mainToolbar.gps.callOnClick();
+						Bundle argument = new Bundle();
+						argument.putBoolean("clickGps", true);
+
+						iWeatherFragment.addWeatherFragment(locationType, selectedFavoriteAddressDto, argument);
 					}
 				}, getString(R.string.again)));
 				setFailFragment(btnObjList);
@@ -733,43 +737,13 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 						SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
 
-						timeZoneIdRepository.get(addressName, new DbQueryCallback<TimeZoneIdDto>() {
+						TimeZoneUtils.Companion.getTimeZone(latitude, longitude, new TimeZoneUtils.TimeZoneCallback() {
 							@Override
-							public void onResultSuccessful(TimeZoneIdDto result) {
-								zoneId = ZoneId.of(result.getTimeZoneId());
-								editor.putString("zoneId", zoneId.getId())
-										.commit();
-
+							public void onResult(@NonNull ZoneId zoneId) {
+								editor.putString("zoneId", zoneId.getId()).commit();
 								onResultCurrentLocation(addressStr, addressName, refresh);
 							}
-
-							@Override
-							public void onResultNoData() {
-								FreeTimeZoneApi.Companion.getTimeZone(latitude, longitude, new JsonDownloader() {
-									@Override
-									public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-										FreeTimeResponse freeTimeDto = (FreeTimeResponse) responseObj;
-										zoneId = ZoneId.of(freeTimeDto.getTimezone());
-										timeZoneIdRepository.insert(new TimeZoneIdDto(addressName, zoneId.getId()));
-										editor.putString("zoneId", zoneId.getId()).commit();
-
-										onResultCurrentLocation(addressStr, addressName, refresh);
-									}
-
-									@Override
-									public void onResponseResult(Throwable t) {
-										zoneId = WeatherResponseProcessor.getZoneId(latitude, longitude);
-
-										timeZoneIdRepository.insert(new TimeZoneIdDto(addressName, zoneId.getId()));
-										editor.putString("zoneId", zoneId.getId()).commit();
-										onResultCurrentLocation(addressStr, addressName, refresh);
-									}
-								});
-
-
-							}
 						});
-
 
 					}
 
@@ -801,6 +775,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private WeatherProviderType getMainWeatherSourceType(@NonNull String countryCode) {
+		if (arguments.containsKey("anotherProvider")) {
+			WeatherProviderType weatherProviderType = (WeatherProviderType) arguments.getSerializable("anotherProvider");
+			arguments.remove("anotherProvider");
+			return weatherProviderType;
+		}
+
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		WeatherProviderType mainWeatherProviderType = sharedPreferences.getBoolean(getString(R.string.pref_key_met), true) ?
 				WeatherProviderType.MET_NORWAY : WeatherProviderType.OWM_ONECALL;
@@ -985,6 +965,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 									responseResultObj.weatherProviderTypeSet.add(responseResultObj.mainWeatherProviderType);
 									responseResultObj.weatherProviderTypeSet.add(WeatherProviderType.AQICN);
 									reRefreshByAnotherWeatherSource(responseResultObj);
+
+									Bundle argument = new Bundle();
+									argument.putSerializable("anotherProvider", anotherProvider);
+
+									iWeatherFragment.addWeatherFragment(locationType, selectedFavoriteAddressDto, argument);
 								}
 							}, failedDialogItems[index]));
 							index++;
@@ -1012,12 +997,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
-		FragmentManager fragmentManager = getChildFragmentManager();
+		FragmentManager fragmentManager = getParentFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-		if (fragmentManager.findFragmentByTag(AlertFragment.class.getName()) != null) {
-			fragmentTransaction.remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName()));
-		}
 
 		Bundle bundle = new Bundle();
 		bundle.putInt(AlertFragment.Constant.DRAWABLE_ID.name(), R.drawable.error);
@@ -1027,7 +1008,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		alertFragment.setBtnObjList(btnObjList);
 		alertFragment.setArguments(bundle);
 
-		fragmentTransaction.add(binding.fragmentContainer.getId(), alertFragment,
+		fragmentTransaction.replace(R.id.fragment_container, alertFragment,
 				AlertFragment.class.getName()).commitAllowingStateLoss();
 	}
 
@@ -1606,4 +1587,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		}
 	}
 
+	public interface IWeatherFragment {
+		void addWeatherFragment(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto, Bundle arguments);
+	}
 }

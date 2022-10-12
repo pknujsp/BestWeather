@@ -60,7 +60,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MainTransactionFragment extends Fragment implements IRefreshFavoriteLocationListOnSideNav {
+public class MainTransactionFragment extends Fragment implements IRefreshFavoriteLocationListOnSideNav, WeatherFragment.IWeatherFragment {
 	private final int favTypeTagInFavLocItemView = R.id.locationTypeTagInFavLocItemViewInSideNav;
 	private final int favDtoTagInFavLocItemView = R.id.favoriteLocationDtoTagInFavLocItemViewInSideNav;
 
@@ -269,7 +269,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		binding.sideNavMenu.currentLocationLayout.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				addWeatherFragment(LocationType.CurrentLocation, null);
+				addWeatherFragment(LocationType.CurrentLocation, null, null);
 				binding.drawerLayout.closeDrawer(binding.sideNavigation);
 			}
 		});
@@ -285,70 +285,60 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			}
 		});
 
-		weatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), new Observer<List<FavoriteAddressDto>>() {
+
+		weatherViewModel.favoriteAddressListLiveData.observe(requireActivity(), new Observer<List<FavoriteAddressDto>>() {
+			boolean init = true;
+
 			@Override
-			public void onChanged(List<FavoriteAddressDto> favoriteAddressDtoList) {
-				createLocationsList(favoriteAddressDtoList);
-			}
-		});
+			public void onChanged(List<FavoriteAddressDto> result) {
+				createLocationsList(result);
 
-		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
-			@Override
-			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				if (getActivity() != null) {
-					MainThreadWorker.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
+				if (init) {
+					init = false;
 
-							final boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
-							final LocationType lastSelectedLocationType = LocationType.valueOf(
-									sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
-											LocationType.CurrentLocation.name()));
-							setCurrentLocationState(usingCurrentLocation);
+					final boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
+					final LocationType lastSelectedLocationType = LocationType.valueOf(
+							sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
+									LocationType.CurrentLocation.name()));
+					setCurrentLocationState(usingCurrentLocation);
 
-							if (currentAddressName != null) {
-								binding.sideNavMenu.addressName.setText(currentAddressName);
-							}
+					if (currentAddressName != null) {
+						binding.sideNavMenu.addressName.setText(currentAddressName);
+					}
 
-							if (lastSelectedLocationType == LocationType.CurrentLocation) {
-								if (usingCurrentLocation) {
-									addWeatherFragment(lastSelectedLocationType, null);
-								} else {
-									if (favoriteAddressDtoList.size() > 0) {
-										binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
-									} else {
-										binding.sideNavMenu.favorites.callOnClick();
-									}
-								}
-
+					if (lastSelectedLocationType == LocationType.CurrentLocation) {
+						if (usingCurrentLocation) {
+							addWeatherFragment(lastSelectedLocationType, null, null);
+						} else {
+							if (favoriteAddressDtoList.size() > 0) {
+								binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
 							} else {
-								final int lastSelectedFavoriteId = sharedPreferences.getInt(
-										getString(R.string.pref_key_last_selected_favorite_address_id), -1);
-								if (!clickLocationItemById(lastSelectedFavoriteId)) {
-									if (favoriteAddressDtoList.size() > 0) {
-										binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
-									} else {
-										binding.sideNavMenu.favorites.callOnClick();
-									}
-								}
+								binding.sideNavMenu.favorites.callOnClick();
 							}
 						}
-					});
+
+					} else {
+						final int lastSelectedFavoriteId = sharedPreferences.getInt(
+								getString(R.string.pref_key_last_selected_favorite_address_id), -1);
+						if (!clickLocationItemById(lastSelectedFavoriteId)) {
+							if (favoriteAddressDtoList.size() > 0) {
+								binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+							} else {
+								binding.sideNavMenu.favorites.callOnClick();
+							}
+						}
+					}
+
 				}
-
-			}
-
-			@Override
-			public void onResultNoData() {
-
 			}
 		});
+
+
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-
 	}
 
 	public void createLocationsList(List<FavoriteAddressDto> result) {
@@ -432,7 +422,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			@Override
 			public void onClick(View view) {
 				binding.drawerLayout.closeDrawer(binding.sideNavigation);
-				addWeatherFragment(locationType, favoriteAddressDto);
+				addWeatherFragment(locationType, favoriteAddressDto, null);
 			}
 		});
 		locationItemView.setText(favoriteAddressDto.getAddress());
@@ -470,12 +460,12 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 					mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 						@Override
 						public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
-							onResultMapFragment(favoriteAddressDtoList, newFavoriteAddressDto);
+							onResultMapFragment(newFavoriteAddressDto);
 						}
 
 						@Override
 						public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
-							onResultMapFragment(favoriteAddressDtoList, null);
+							onResultMapFragment(null);
 						}
 
 						@Override
@@ -517,57 +507,35 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		}
 	};
 
-	public void onResultMapFragment(List<FavoriteAddressDto> newFavoriteAddressDtoList, @Nullable FavoriteAddressDto newFavoriteAddressDto) {
+	public void onResultMapFragment(@Nullable FavoriteAddressDto newFavoriteAddressDto) {
 		//변경된 위치가 있는지 확인
 		setCurrentLocationState(sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false));
-
 		final boolean added = newFavoriteAddressDto != null;
-		final int addedLocationDtoId = newFavoriteAddressDto != null ? newFavoriteAddressDto.getId() : -1;
 
-		Set<Integer> lastSet = new HashSet<>();
-		Set<Integer> newSet = new HashSet<>();
-
-		for (FavoriteAddressDto favoriteAddressDto : favoriteAddressDtoList) {
-			lastSet.add(favoriteAddressDto.getId());
-		}
-		for (FavoriteAddressDto favoriteAddressDto : newFavoriteAddressDtoList) {
-			newSet.add(favoriteAddressDto.getId());
-		}
-
-		Set<Integer> addedSet = new HashSet<>(newSet);
-		addedSet.removeAll(lastSet);
-		Set<Integer> removedSet = new HashSet<>(lastSet);
-		removedSet.removeAll(newSet);
-
-		if (!addedSet.isEmpty() || !removedSet.isEmpty()) {
+		if (added) {
 			//즐겨찾기 변동 발생
 			Bundle result = new Bundle();
-			result.putBoolean("added", added);
+			result.putBoolean("added", true);
 
 			onRefreshedFavoriteLocationsList(null, result);
-
-			if (added) {
-				for (int i = 0; i < binding.sideNavMenu.favoriteAddressLayout.getChildCount(); i++) {
-					if (((FavoriteAddressDto) binding.sideNavMenu.favoriteAddressLayout.getChildAt(i).getTag(favDtoTagInFavLocItemView))
-							.getId() == addedLocationDtoId) {
-						binding.sideNavMenu.favoriteAddressLayout.getChildAt(i).callOnClick();
-						break;
-					}
-				}
-			}
 		} else {
 			//변동 없음
 			processIfPreviousFragmentIsFavorite();
 		}
 	}
 
-	private void addWeatherFragment(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto) {
-		Bundle bundle = new Bundle();
+	@Override
+	public void addWeatherFragment(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto, @Nullable Bundle arguments) {
+		final Bundle bundle = new Bundle();
+
+		if (arguments != null)
+			bundle.putAll(arguments);
+
 		bundle.putSerializable("LocationType", locationType);
 		bundle.putSerializable("FavoriteAddressDto", favoriteAddressDto);
 		bundle.putBoolean("load", true);
 
-		WeatherFragment newWeatherFragment = new WeatherFragment();
+		WeatherFragment newWeatherFragment = new WeatherFragment(this);
 		newWeatherFragment.setArguments(bundle);
 		newWeatherFragment.setMenuOnClickListener(new View.OnClickListener() {
 			@Override

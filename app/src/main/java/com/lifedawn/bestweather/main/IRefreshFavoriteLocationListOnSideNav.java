@@ -17,5 +17,5 @@ public interface IRefreshFavoriteLocationListOnSideNav extends Serializable {
 
 	void createLocationsList(List<FavoriteAddressDto> result);
 
-	void onResultMapFragment(List<FavoriteAddressDto> newFavoriteAddressDtoList, @Nullable FavoriteAddressDto newFavoriteAddressDto);
+	void onResultMapFragment(@Nullable FavoriteAddressDto newFavoriteAddressDto);
 }

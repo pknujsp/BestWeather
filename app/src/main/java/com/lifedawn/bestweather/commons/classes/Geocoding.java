@@ -4,18 +4,16 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 
-import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.main.MyApplication;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.regex.Pattern;
 
 public class Geocoding {
 
-	public static void reverseGeocoding(Context context, ExecutorService executorService, String query, ReverseGeocodingCallback callback) {
-		executorService.execute(new Runnable() {
+	public static void reverseGeocoding(Context context, String query, ReverseGeocodingCallback callback) {
+		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
 				if (query.isEmpty()) {
@@ -48,7 +46,7 @@ public class Geocoding {
 	}
 
 	public static void geocoding(Context context, Double latitude, Double longitude, GeocodingCallback callback) {
-		new Thread(new Runnable() {
+		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
 				Geocoder geocoder = new Geocoder(context);
@@ -58,9 +56,8 @@ public class Geocoding {
 				} catch (Exception e) {
 
 				}
-
 			}
-		}).start();
+		});
 	}
 
 	public interface GeocodingCallback {

@@ -55,6 +55,7 @@ import com.lifedawn.bestweather.retrofit.responses.freetime.FreeTimeResponse;
 import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.timezone.FreeTimeZoneApi;
+import com.lifedawn.bestweather.timezone.TimeZoneUtils;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 
 import org.jetbrains.annotations.NotNull;
@@ -163,17 +164,11 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 										final Double latitude = location.getLatitude();
 										final Double longitude = location.getLongitude();
-										final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
 
-										editor.putString(context.getString(R.string.pref_key_last_current_location_latitude),
-														latitude.toString())
-												.putString(context.getString(R.string.pref_key_last_current_location_longitude),
-														longitude.toString()).commit();
-
-										MainThreadWorker.runOnUiThread(new Runnable() {
+										TimeZoneUtils.Companion.getTimeZone(latitude, longitude, new TimeZoneUtils.TimeZoneCallback() {
 											@Override
-											public void run() {
-												myLocationCallback.onSuccessful(locationResult);
+											public void onResult(@NonNull ZoneId zoneId) {
+												onResultTimeZone(latitude, longitude, zoneId, myLocationCallback, locationResult);
 											}
 										});
 
@@ -251,6 +246,25 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				myLocationCallback.onFailed(MyLocationCallback.Fail.DENIED_LOCATION_PERMISSIONS);
 			}
 		}
+	}
+
+	private void onResultTimeZone(Double latitude, Double longitude, ZoneId zoneId, MyLocationCallback myLocationCallback,
+	                              LocationResult locationResult) {
+
+		final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+
+		editor.putString(context.getString(R.string.pref_key_last_current_location_latitude),
+						latitude.toString())
+				.putString(context.getString(R.string.pref_key_last_current_location_longitude),
+						longitude.toString())
+				.putString("zoneId", zoneId.getId()).commit();
+
+		MainThreadWorker.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				myLocationCallback.onSuccessful(locationResult);
+			}
+		});
 	}
 
 
