@@ -107,7 +107,7 @@ public class FavoriteLocationItemViewPagerAdapter extends RecyclerView.Adapter<F
 
 			FavoriteAddressDto address = addressList.get(position);
 
-			binding.addressName.setText(address.getAddress());
+			binding.addressName.setText(address.getDisplayName());
 			binding.country.setText(address.getCountryName());
 
 		}

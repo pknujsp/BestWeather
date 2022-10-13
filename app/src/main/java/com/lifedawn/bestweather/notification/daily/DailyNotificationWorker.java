@@ -188,15 +188,13 @@ public class DailyNotificationWorker extends Worker {
 				final ZoneId zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(context).getString("zoneId", ""));
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 				final Location location = getBestLocation(locationResult);
-				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
+				Geocoding.nominatimGeocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
-					public void onGeocodingResult(List<Address> addressList) {
-						final Address address = addressList.get(0);
-
-						dailyPushNotificationDto.setAddressName(address.getAddressLine(0));
-						dailyPushNotificationDto.setCountryCode(address.getCountryCode());
-						dailyPushNotificationDto.setLatitude(address.getLatitude());
-						dailyPushNotificationDto.setLongitude(address.getLongitude());
+					public void onGeocodingResult(Geocoding.AddressDto address) {
+						dailyPushNotificationDto.setAddressName(address.toName());
+						dailyPushNotificationDto.setCountryCode(address.countryCode);
+						dailyPushNotificationDto.setLatitude(address.latitude);
+						dailyPushNotificationDto.setLongitude(address.longitude);
 						dailyPushNotificationDto.setZoneId(zoneId.getId());
 
 						repository.update(dailyPushNotificationDto, null);

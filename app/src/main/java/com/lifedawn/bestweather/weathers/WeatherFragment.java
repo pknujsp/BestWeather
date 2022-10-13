@@ -378,7 +378,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		});
 
 		AdRequest adRequest = new AdRequest.Builder().build();
-		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_testUnitId))
+		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_unitId))
 				.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
 					@Override
 					public void onNativeAdLoaded(NativeAd nativeAd) {
@@ -492,7 +492,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 			mainWeatherProviderType = getMainWeatherSourceType(selectedFavoriteAddressDto.getCountryCode());
 			countryCode = selectedFavoriteAddressDto.getCountryCode();
-			addressName = selectedFavoriteAddressDto.getAddress();
+			addressName = selectedFavoriteAddressDto.getDisplayName();
 			latitude = Double.parseDouble(selectedFavoriteAddressDto.getLatitude());
 			longitude = Double.parseDouble(selectedFavoriteAddressDto.getLongitude());
 			zoneId = ZoneId.of(selectedFavoriteAddressDto.getZoneId());
@@ -716,11 +716,11 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private void requestAddressOfLocation(Double latitude, Double longitude, boolean refresh) {
 		binding.scrollView.setVisibility(View.GONE);
 
-		Geocoding.geocoding(getContext(), latitude, longitude, new Geocoding.GeocodingCallback() {
+		Geocoding.nominatimGeocoding(getContext(), latitude, longitude, new Geocoding.GeocodingCallback() {
 			@Override
-			public void onGeocodingResult(List<Address> addressList) {
+			public void onGeocodingResult(Geocoding.AddressDto address) {
 				if (getActivity() != null) {
-					if (addressList.isEmpty()) {
+					if (address == null) {
 						//검색 결과가 없으면 주소 정보 미 표시하고 데이터 로드
 						mainWeatherProviderType = getMainWeatherSourceType("");
 						countryCode = "";
@@ -729,10 +729,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						final String addressStr = getString(R.string.current_location) + " : " + addressName;
 						onResultCurrentLocation(addressStr, addressName, refresh);
 					} else {
-						Address address = addressList.get(0);
-						addressName = address.getAddressLine(0);
-						mainWeatherProviderType = getMainWeatherSourceType(address.getCountryCode());
-						countryCode = address.getCountryCode();
+						addressName = address.toName();
+						mainWeatherProviderType = getMainWeatherSourceType(address.countryCode);
+						countryCode = address.countryCode;
 
 						final String addressStr = getString(R.string.current_location) + " : " + addressName;
 
@@ -750,7 +749,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 				}
-
 			}
 		});
 	}

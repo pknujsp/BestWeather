@@ -77,7 +77,7 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 		}
 
 		public void onBind() {
-			addressTextView.setText(favoriteAddressDtoList.get(getAdapterPosition()).getAddress());
+			addressTextView.setText(favoriteAddressDtoList.get(getAdapterPosition()).getDisplayName());
 		}
 	}
 

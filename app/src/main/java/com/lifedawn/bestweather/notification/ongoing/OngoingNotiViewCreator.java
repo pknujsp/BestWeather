@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.location.Address;
 import android.location.Location;
 import android.os.Build;
 import android.text.TextPaint;
@@ -103,26 +102,24 @@ public class OngoingNotiViewCreator {
 			public void onSuccessful(LocationResult locationResult) {
 				zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(context).getString("zoneId", ""));
 				final Location location = getBestLocation(locationResult);
-				Geocoding.geocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
+				Geocoding.nominatimGeocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
-					public void onGeocodingResult(List<Address> addressList) {
+					public void onGeocodingResult(Geocoding.AddressDto address) {
 						final SharedPreferences sharedPreferences =
 								context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
 						SharedPreferences.Editor editor = sharedPreferences.edit();
-						Address address = addressList.get(0);
-
 						editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), (float) notificationDataObj.getLatitude())
 								.putFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(),
 										(float) notificationDataObj.getLongitude())
 								.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode())
-								.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getAddressName())
+								.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getDisplayName())
 								.putString(WidgetNotiConstants.Commons.DataKeys.ZONE_ID.name(), notificationDataObj.getZoneId())
 								.commit();
 
-						notificationDataObj.setAddressName(address.getAddressLine(0))
-								.setCountryCode(address.getCountryCode())
-								.setLatitude(address.getLatitude()).setLongitude(address.getLongitude())
-								.setAdmin(address.getAdminArea())
+						notificationDataObj.setDisplayName(address.toName())
+								.setCountryCode(address.countryCode)
+								.setLatitude(address.latitude).setLongitude(address.longitude)
+								.setSimpleName(address.simpleName)
 								.setZoneId(zoneId.getId());
 
 						fusedLocation.cancelNotification(context);
@@ -273,8 +270,8 @@ public class OngoingNotiViewCreator {
 
 	protected void setResultViews(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews, WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader) {
 		ZoneOffset zoneOffset = null;
-		setHeaderViews(collapsedRemoteViews, notificationDataObj.getAddressName(), weatherRestApiDownloader.getRequestDateTime().toString());
-		setHeaderViews(expandedRemoteViews, notificationDataObj.getAddressName(), weatherRestApiDownloader.getRequestDateTime().toString());
+		setHeaderViews(collapsedRemoteViews, notificationDataObj.getDisplayName(), weatherRestApiDownloader.getRequestDateTime().toString());
+		setHeaderViews(expandedRemoteViews, notificationDataObj.getDisplayName(), weatherRestApiDownloader.getRequestDateTime().toString());
 
 		int icon = R.mipmap.ic_launcher_round;
 		String temperature = null;
@@ -524,10 +521,10 @@ public class OngoingNotiViewCreator {
 		notificationDataObj.setDataTypeOfIcon(WidgetNotiConstants.DataTypeOfIcon.valueOf(notiPreferences.getString(WidgetNotiConstants.OngoingNotiAttributes.DATA_TYPE_OF_ICON.name(),
 				WidgetNotiConstants.DataTypeOfIcon.TEMPERATURE.name())));
 
-		notificationDataObj.setAddressName(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), ""));
+		notificationDataObj.setDisplayName(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), ""));
 		notificationDataObj.setLatitude(notiPreferences.getFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), 0f));
 		notificationDataObj.setLongitude(notiPreferences.getFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), 0f));
-		notificationDataObj.setAdmin(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADMIN.name(), ""));
+		notificationDataObj.setSimpleName(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADMIN.name(), ""));
 		notificationDataObj.setCountryCode(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), ""));
 		notificationDataObj.setZoneId(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ZONE_ID.name(), ""));
 	}
@@ -565,11 +562,11 @@ public class OngoingNotiViewCreator {
 		editor.putInt(WidgetNotiConstants.Commons.Attributes.SELECTED_ADDRESS_DTO_ID.name(), notificationDataObj.getSelectedAddressDtoId());
 		editor.putString(WidgetNotiConstants.OngoingNotiAttributes.DATA_TYPE_OF_ICON.name(), notificationDataObj.getDataTypeOfIcon().name());
 
-		editor.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getAddressName());
+		editor.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), notificationDataObj.getDisplayName());
 		editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), (float) notificationDataObj.getLatitude());
 		editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), (float) notificationDataObj.getLongitude());
 		editor.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode());
-		editor.putString(WidgetNotiConstants.Commons.DataKeys.ADMIN.name(), notificationDataObj.getAdmin());
+		editor.putString(WidgetNotiConstants.Commons.DataKeys.ADMIN.name(), notificationDataObj.getSimpleName());
 		editor.putString(WidgetNotiConstants.Commons.DataKeys.ZONE_ID.name(), notificationDataObj.getZoneId());
 		editor.commit();
 	}

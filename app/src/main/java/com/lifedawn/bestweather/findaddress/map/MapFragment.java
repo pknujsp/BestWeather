@@ -26,7 +26,6 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -215,16 +214,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 
 	@Override
-	public void onClickedAddress(Address address) {
+	public void onClickedAddress(Geocoding.AddressDto addressDto) {
 		ProgressDialog.show(requireActivity(), getString(R.string.adding_a_new_favorite_location), null);
-		final Double latitude = address.getLatitude();
-		final Double longitude = address.getLongitude();
+		final Double latitude = addressDto.latitude;
+		final Double longitude = addressDto.longitude;
 
 		final FavoriteAddressDto favoriteAddressDto = new FavoriteAddressDto();
-		favoriteAddressDto.setCountryName(address.getCountryName());
-		favoriteAddressDto.setCountryCode(address.getCountryCode() == null ? "" : address.getCountryCode());
-		favoriteAddressDto.setAddress(address.getAddressLine(0));
-		favoriteAddressDto.setAdmin(address.getLocality());
+		favoriteAddressDto.setCountryName(addressDto.country);
+		favoriteAddressDto.setCountryCode(addressDto.countryCode == null ? "" : addressDto.countryCode);
+		favoriteAddressDto.setDisplayName(addressDto.toName());
+		favoriteAddressDto.setSimpleName(addressDto.simpleName);
 		favoriteAddressDto.setLatitude(latitude.toString());
 		favoriteAddressDto.setLongitude(longitude.toString());
 
@@ -284,7 +283,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 										MainThreadWorker.runOnUiThread(new Runnable() {
 											@Override
 											public void run() {
-												Toast.makeText(getContext(), favoriteAddressDto.getAddress(), Toast.LENGTH_SHORT).show();
+												Toast.makeText(getContext(), favoriteAddressDto.getDisplayName(), Toast.LENGTH_SHORT).show();
 												ProgressDialog.clearDialogs();
 												getParentFragmentManager().popBackStackImmediate();
 
@@ -412,16 +411,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 					findAddressFragment.setOnAddressListListener(new FindAddressFragment.OnAddressListListener() {
 						@Override
-						public void onSearchedAddressList(List<Address> addressList) {
+						public void onSearchedAddressList(List<Geocoding.AddressDto> addressList) {
 							removeMarkers(MarkerType.SEARCH);
 
 							LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
 							adapterMap.put(MarkerType.SEARCH, adapter);
 							adapter.setFavoriteAddressSet(favoriteAddressSet);
 							adapter.setAddressList(addressList);
-							adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<Address>() {
+							adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<Geocoding.AddressDto>() {
 								@Override
-								public void onSelected(Address e, boolean remove) {
+								public void onSelected(Geocoding.AddressDto e, boolean remove) {
 									onClickedAddress(e);
 								}
 							});
@@ -445,7 +444,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 							});
 
 							int i = 0;
-							for (Address address : addressList) {
+							for (Geocoding.AddressDto address : addressList) {
 								addMarker(MarkerType.SEARCH, i++, address);
 							}
 
@@ -621,7 +620,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				if (remove) {
 					new MaterialAlertDialogBuilder(getActivity()).
 							setTitle(R.string.remove)
-							.setMessage(e.getAddress()).
+							.setMessage(e.getDisplayName()).
 							setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
@@ -705,14 +704,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 	private void onLongClicked(LatLng latLng) {
 		collapseAllExpandedBottomSheets();
-		Geocoding.geocoding(getContext(), latLng.latitude, latLng.longitude, new Geocoding.GeocodingCallback() {
+		Geocoding.nominatimGeocoding(getContext(), latLng.latitude, latLng.longitude, new Geocoding.GeocodingCallback() {
 			@Override
-			public void onGeocodingResult(List<Address> addressList) {
+			public void onGeocodingResult(Geocoding.AddressDto addressDto) {
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						List<Address> addresses = new ArrayList<>();
-						addresses.add(addressList.get(0));
+						List<Geocoding.AddressDto> addresses = new ArrayList<>();
+						addresses.add(addressDto);
 
 						LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
 						adapterMap.put(MarkerType.LONG_CLICK, adapter);
@@ -720,9 +719,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 						adapter.setAddressList(addresses);
 						adapter.setFavoriteAddressSet(favoriteAddressSet);
 
-						adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<Address>() {
+						adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<Geocoding.AddressDto>() {
 							@Override
-							public void onSelected(Address e, boolean remove) {
+							public void onSelected(Geocoding.AddressDto e, boolean remove) {
 								onClickedAddress(e);
 							}
 						});
@@ -746,7 +745,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 						});
 
 						removeMarkers(MarkerType.LONG_CLICK);
-						addMarker(MarkerType.LONG_CLICK, 0, addressList.get(0));
+						addMarker(MarkerType.LONG_CLICK, 0, addressDto);
 						showMarkers(MarkerType.LONG_CLICK);
 
 						locationItemBottomSheetViewPager.setTag(MarkerType.LONG_CLICK);
@@ -760,10 +759,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		});
 	}
 
-	private void addMarker(MarkerType markerType, int position, Address address) {
+	private void addMarker(MarkerType markerType, int position, Geocoding.AddressDto address) {
 		Marker marker = googleMap.addMarker(new MarkerOptions()
-				.position(new LatLng(address.getLatitude(), address.getLongitude()))
-				.title(address.getAddressLine(0)));
+				.position(new LatLng(address.latitude, address.longitude))
+				.title(address.toName()));
 		marker.setTag(new MarkerHolder(position, markerType));
 
 		if (!markerMaps.containsKey(markerType)) {
@@ -778,7 +777,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				.anchor(0.5f, 0.5f)
 				.position(new LatLng(Double.parseDouble(favoriteAddressDto.getLatitude()),
 						Double.parseDouble(favoriteAddressDto.getLongitude())))
-				.title(favoriteAddressDto.getAddress());
+				.title(favoriteAddressDto.getDisplayName());
 
 		View view = ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.marker_view, null);
 		TextView tv_marker = view.findViewById(R.id.marker);

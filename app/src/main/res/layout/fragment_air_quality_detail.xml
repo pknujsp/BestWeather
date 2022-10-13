@@ -322,6 +322,6 @@
         android:layout_alignParentBottom="true"
         android:layout_marginTop="@dimen/adViewMargin"
         ads:adSize="BANNER"
-        ads:adUnitId="@string/BANNER_testUnitId"
+        ads:adUnitId="@string/BANNER_unitId"
         />
 </RelativeLayout>

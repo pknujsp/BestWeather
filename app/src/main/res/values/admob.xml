@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="testId" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
-    <string name="appId" translatable="false">ca-app-pub-9376741963653656~8360296974</string>
+    <string name="appId" translatable="false">ca-app-pub-7882946647442603~2004829817</string>
     <string name="BANNER_testUnitId" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="BANNER_unitId" translatable="false">ca-app-pub-9376741963653656/2789487668</string>
+    <string name="BANNER_unitId" translatable="false">ca-app-pub-7882946647442603/2849979959</string>
     <string name="NATIVE_ADVANCE_testUnitId" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
-    <string name="NATIVE_ADVANCE_unitId" translatable="false">ca-app-pub-9376741963653656/2518024922</string>
+    <string name="NATIVE_ADVANCE_unitId" translatable="false">ca-app-pub-7882946647442603/6186589737</string>
 </resources>

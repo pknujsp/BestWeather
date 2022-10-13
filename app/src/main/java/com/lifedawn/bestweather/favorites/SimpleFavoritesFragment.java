@@ -24,7 +24,6 @@ import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -65,7 +64,7 @@ public class SimpleFavoritesFragment extends Fragment {
 			public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {
 				new MaterialAlertDialogBuilder(requireActivity()).
 						setTitle(R.string.remove)
-						.setMessage(favoriteAddressDto.getAddress()).
+						.setMessage(favoriteAddressDto.getDisplayName()).
 						setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {

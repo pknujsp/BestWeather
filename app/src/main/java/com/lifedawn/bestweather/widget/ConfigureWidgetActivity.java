@@ -499,13 +499,13 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 					newSelectedAddressDto = favoriteSelectedAddressDto;
 
 					WidgetDto widgetDto = widgetCreator.getWidgetDto();
-					widgetDto.setAddressName(newSelectedAddressDto.getAddress());
+					widgetDto.setAddressName(newSelectedAddressDto.getDisplayName());
 					widgetDto.setCountryCode(newSelectedAddressDto.getCountryCode());
 					widgetDto.setLatitude(Double.parseDouble(newSelectedAddressDto.getLatitude()));
 					widgetDto.setLongitude(Double.parseDouble(newSelectedAddressDto.getLongitude()));
 					widgetDto.setTimeZoneId(newSelectedAddressDto.getZoneId());
 
-					binding.selectedAddressName.setText(newSelectedAddressDto.getAddress());
+					binding.selectedAddressName.setText(newSelectedAddressDto.getDisplayName());
 				}
 				getSupportFragmentManager().popBackStack();
 			}

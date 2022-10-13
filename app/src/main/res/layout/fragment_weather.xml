@@ -229,7 +229,7 @@
                     android:layout_below="@id/detail_current_conditions"
                     android:layout_marginBottom="24dp"
                     ads:adSize="BANNER"
-                    ads:adUnitId="@string/BANNER_testUnitId"
+                    ads:adUnitId="@string/BANNER_unitId"
                     />
 
                 <androidx.fragment.app.FragmentContainerView
@@ -249,7 +249,7 @@
                     android:layout_below="@id/simple_air_quality"
                     android:layout_marginBottom="24dp"
                     ads:adSize="BANNER"
-                    ads:adUnitId="@string/BANNER_testUnitId"
+                    ads:adUnitId="@string/BANNER_unitId"
                     />
 
                 <androidx.fragment.app.FragmentContainerView

@@ -56,9 +56,7 @@ import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class MainTransactionFragment extends Fragment implements IRefreshFavoriteLocationListOnSideNav, WeatherFragment.IWeatherFragment {
 	private final int favTypeTagInFavLocItemView = R.id.locationTypeTagInFavLocItemViewInSideNav;
@@ -165,7 +163,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
 		}
 
-		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_testUnitId))
+		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_unitId))
 				.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
 					@Override
 					public void onNativeAdLoaded(NativeAd nativeAd) {
@@ -425,7 +423,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 				addWeatherFragment(locationType, favoriteAddressDto, null);
 			}
 		});
-		locationItemView.setText(favoriteAddressDto.getAddress());
+		locationItemView.setText(favoriteAddressDto.getDisplayName());
 		locationItemView.setTag(favDtoTagInFavLocItemView, favoriteAddressDto);
 		locationItemView.setTag(favTypeTagInFavLocItemView, locationType);
 

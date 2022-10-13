@@ -76,7 +76,7 @@ public class FindAddressFragment extends Fragment {
 
 			Geocoding.reverseGeocoding(getContext(), newText, new Geocoding.ReverseGeocodingCallback() {
 				@Override
-				public void onReverseGeocodingResult(List<Address> addressList) {
+				public void onReverseGeocodingResult(List<Geocoding.AddressDto> addressList) {
 					if (getActivity() != null) {
 						MainThreadWorker.runOnUiThread(new Runnable() {
 							@Override
@@ -172,7 +172,6 @@ public class FindAddressFragment extends Fragment {
 			}
 		});
 
-
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
@@ -199,14 +198,14 @@ public class FindAddressFragment extends Fragment {
 
 						addressesAdapter.setOnClickedAddressListener(new FoundAddressesAdapter.OnClickedAddressListener() {
 							@Override
-							public void onClickedAddress(Address address) {
-								onClickedAddressListener.onClickedAddress(address);
+							public void onClickedAddress(Geocoding.AddressDto addressDto) {
+								onClickedAddressListener.onClickedAddress(addressDto);
 							}
 						});
 
 						addressesAdapter.setOnAddressListListener(new OnAddressListListener() {
 							@Override
-							public void onSearchedAddressList(List<Address> addressList) {
+							public void onSearchedAddressList(List<Geocoding.AddressDto> addressList) {
 								onAddressListListener.onSearchedAddressList(addressList);
 							}
 						});
@@ -268,17 +267,17 @@ public class FindAddressFragment extends Fragment {
 		@Override
 		public void onSuccessful(LocationResult locationResult) {
 			final Location location = getBestLocation(locationResult);
-			Geocoding.geocoding(getContext(), location.getLatitude(), location.getLongitude(),
+			Geocoding.nominatimGeocoding(getContext(), location.getLatitude(), location.getLongitude(),
 					new Geocoding.GeocodingCallback() {
 						@Override
-						public void onGeocodingResult(List<Address> addressList) {
+						public void onGeocodingResult(Geocoding.AddressDto addressDto) {
 							MainThreadWorker.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {
 									ProgressDialog.clearDialogs();
 
-									if (addressList.size() > 0) {
-										onClickedAddressListener.onClickedAddress(addressList.get(0));
+									if (addressDto != null) {
+										onClickedAddressListener.onClickedAddress(addressDto);
 									} else {
 										Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
 									}
@@ -330,7 +329,7 @@ public class FindAddressFragment extends Fragment {
 	};
 
 	public interface OnAddressListListener {
-		void onSearchedAddressList(List<Address> addressList);
+		void onSearchedAddressList(List<Geocoding.AddressDto> addressList);
 	}
 
 	public interface OnListListener {

@@ -178,8 +178,8 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		binding.notificationSwitch.setChecked(originalEnabled);
 		if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.SelectedAddress) {
 			originalSelectedFavoriteAddressDto = new FavoriteAddressDto();
-			originalSelectedFavoriteAddressDto.setAddress(ongoingNotiViewCreator.getNotificationDataObj().getAddressName());
-			originalSelectedFavoriteAddressDto.setAdmin(ongoingNotiViewCreator.getNotificationDataObj().getAdmin());
+			originalSelectedFavoriteAddressDto.setDisplayName(ongoingNotiViewCreator.getNotificationDataObj().getDisplayName());
+			originalSelectedFavoriteAddressDto.setSimpleName(ongoingNotiViewCreator.getNotificationDataObj().getSimpleName());
 			originalSelectedFavoriteAddressDto.setCountryCode(ongoingNotiViewCreator.getNotificationDataObj().getCountryCode());
 			originalSelectedFavoriteAddressDto.setLatitude(String.valueOf(ongoingNotiViewCreator.getNotificationDataObj().getLatitude()));
 			originalSelectedFavoriteAddressDto.setLongitude(String.valueOf(ongoingNotiViewCreator.getNotificationDataObj().getLongitude()));
@@ -188,7 +188,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 			selectedFavoriteLocation = true;
 
 			binding.commons.selectedLocationRadio.setChecked(true);
-			binding.commons.selectedAddressName.setText(ongoingNotiViewCreator.getNotificationDataObj().getAddressName());
+			binding.commons.selectedAddressName.setText(ongoingNotiViewCreator.getNotificationDataObj().getDisplayName());
 		} else {
 			binding.commons.currentLocationRadio.setChecked(true);
 		}
@@ -340,12 +340,12 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 					selectedFavoriteLocation = true;
 
 					newSelectedAddressDto = favoriteAddressDto;
-					binding.commons.selectedAddressName.setText(newSelectedAddressDto.getAddress());
+					binding.commons.selectedAddressName.setText(newSelectedAddressDto.getDisplayName());
 
 					SharedPreferences.Editor editor = getContext().getSharedPreferences(notificationType.getPreferenceName(),
 							Context.MODE_PRIVATE).edit();
 
-					editor.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getAddress())
+					editor.putString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), newSelectedAddressDto.getDisplayName())
 							.putFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(),
 									Float.parseFloat(newSelectedAddressDto.getLatitude()))
 							.putFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(),
@@ -370,9 +370,9 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 	public void onSelectedFavoriteLocation(FavoriteAddressDto favoriteAddressDto) {
 		if (!initializing) {
 			originalSelectedFavoriteAddressDto = favoriteAddressDto;
-			ongoingNotiViewCreator.getNotificationDataObj().setAddressName(favoriteAddressDto.getAddress())
+			ongoingNotiViewCreator.getNotificationDataObj().setDisplayName(favoriteAddressDto.getDisplayName())
 					.setCountryCode(favoriteAddressDto.getCountryCode())
-					.setAdmin(favoriteAddressDto.getAdmin())
+					.setSimpleName(favoriteAddressDto.getSimpleName())
 					.setZoneId(favoriteAddressDto.getZoneId())
 					.setLatitude(Float.parseFloat(favoriteAddressDto.getLatitude())).setLongitude(Float.parseFloat(favoriteAddressDto.getLongitude()));
 

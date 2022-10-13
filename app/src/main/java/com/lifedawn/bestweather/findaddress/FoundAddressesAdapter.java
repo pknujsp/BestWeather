@@ -13,8 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.databinding.FoundAddressItemBinding;
-import com.lifedawn.bestweather.retrofit.responses.google.placesearch.GooglePlaceSearchResponse;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Set;
 
 public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAdapter.ViewHolder> implements Filterable {
-	private List<Address> itemList = new ArrayList<>();
-	private List<Address> filteredAddressList = new ArrayList<>();
+	private List<Geocoding.AddressDto> itemList = new ArrayList<>();
+	private List<Geocoding.AddressDto> filteredAddressList = new ArrayList<>();
 	private Set<String> favoriteAddressSet;
 
 	private Filter filter;
@@ -52,7 +52,7 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 		this.onClickedAddressListener = onClickedAddressListener;
 	}
 
-	public void setItemList(List<Address> itemList) {
+	public void setItemList(List<Geocoding.AddressDto> itemList) {
 		this.itemList.clear();
 		this.itemList.addAll(itemList);
 	}
@@ -112,12 +112,12 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 		}
 
 		public void onBind() {
-			Address address = filteredAddressList.get(getBindingAdapterPosition());
+			Geocoding.AddressDto address = filteredAddressList.get(getBindingAdapterPosition());
 
-			binding.country.setText(address.getCountryName());
-			binding.addressName.setText(address.getAddressLine(0));
+			binding.country.setText(address.country);
+			binding.addressName.setText(address.toName());
 
-			if (favoriteAddressSet.contains(address.getLatitude() + "" + address.getLongitude())) {
+			if (favoriteAddressSet.contains(address.latitude + "" + address.longitude)) {
 				binding.addBtn.setClickable(false);
 				binding.addBtn.setText(R.string.duplicate);
 				binding.addBtn.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));
@@ -130,7 +130,7 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 	}
 
 	public interface OnClickedAddressListener {
-		void onClickedAddress(Address address);
+		void onClickedAddress(Geocoding.AddressDto addressDto);
 	}
 
 	private class ListFilter extends Filter {
@@ -143,10 +143,10 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 				filterResults.count = itemList.size();
 				filterResults.values = itemList;
 			} else {
-				List<Address> newAddressList = new ArrayList<>();
+				List<Geocoding.AddressDto> newAddressList = new ArrayList<>();
 
-				for (Address address : itemList) {
-					if (address.getAddressLine(0).contains(constraint.toString())) {
+				for (Geocoding.AddressDto address : itemList) {
+					if (address.displayName.contains(constraint.toString())) {
 						newAddressList.add(address);
 					}
 				}
@@ -159,7 +159,7 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 		@Override
 		protected void publishResults(CharSequence constraint, FilterResults results) {
 			filteredAddressList.clear();
-			filteredAddressList.addAll((Collection<? extends Address>) results.values);
+			filteredAddressList.addAll((Collection<? extends Geocoding.AddressDto>) results.values);
 
 			onAddressListListener.onSearchedAddressList(filteredAddressList);
 			notifyDataSetChanged();

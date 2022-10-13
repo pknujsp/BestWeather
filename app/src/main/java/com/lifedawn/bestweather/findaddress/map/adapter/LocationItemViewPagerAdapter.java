@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.databinding.FoundAddressItemViewpagerBinding;
 import com.lifedawn.bestweather.findaddress.map.interfaces.OnClickedLocationBtnListener;
 import com.lifedawn.bestweather.findaddress.map.interfaces.OnClickedScrollBtnListener;
@@ -20,11 +21,11 @@ import java.util.Set;
 
 public class LocationItemViewPagerAdapter extends RecyclerView.Adapter<LocationItemViewPagerAdapter.LocationItemViewHolder> {
 	private Set<String> favoriteAddressSet;
-	private List<Address> addressList;
-	private OnClickedLocationBtnListener<Address> onClickedLocationBtnListener;
+	private List<Geocoding.AddressDto> addressList;
+	private OnClickedLocationBtnListener<Geocoding.AddressDto> onClickedLocationBtnListener;
 	private OnClickedScrollBtnListener onClickedScrollBtnListener;
 
-	public LocationItemViewPagerAdapter setOnClickedLocationBtnListener(OnClickedLocationBtnListener<Address> onClickedLocationBtnListener) {
+	public LocationItemViewPagerAdapter setOnClickedLocationBtnListener(OnClickedLocationBtnListener<Geocoding.AddressDto> onClickedLocationBtnListener) {
 		this.onClickedLocationBtnListener = onClickedLocationBtnListener;
 		return this;
 	}
@@ -34,12 +35,12 @@ public class LocationItemViewPagerAdapter extends RecyclerView.Adapter<LocationI
 		return this;
 	}
 
-	public LocationItemViewPagerAdapter setAddressList(List<Address> addressList) {
+	public LocationItemViewPagerAdapter setAddressList(List<Geocoding.AddressDto> addressList) {
 		this.addressList = addressList;
 		return this;
 	}
 
-	public List<Address> getAddressList() {
+	public List<Geocoding.AddressDto> getAddressList() {
 		return addressList;
 	}
 
@@ -100,12 +101,12 @@ public class LocationItemViewPagerAdapter extends RecyclerView.Adapter<LocationI
 			String itemPosition = (position + 1) + " / " + getItemCount();
 			binding.itemPosition.setText(itemPosition);
 
-			Address address = addressList.get(position);
+			Geocoding.AddressDto address = addressList.get(position);
 
-			binding.addressName.setText(address.getAddressLine(0));
-			binding.country.setText(address.getCountryName());
+			binding.addressName.setText(address.toName());
+			binding.country.setText(address.country);
 
-			if (favoriteAddressSet.contains(address.getLatitude() + "" + address.getLongitude())) {
+			if (favoriteAddressSet.contains(address.latitude + "" + address.longitude)) {
 				binding.addBtn.setClickable(false);
 				binding.addBtn.setText(R.string.duplicate);
 				binding.addBtn.setBackgroundTintList(ColorStateList.valueOf(Color.GRAY));

@@ -180,18 +180,18 @@ public class AlarmSettingsFragment extends Fragment {
 							}
 						} else {
 							selectedFavoriteLocation = true;
-							binding.location.setText(newSelectedAddressDto.getAddress());
+							binding.location.setText(newSelectedAddressDto.getDisplayName());
 
 							if (newAlarmSession) {
 								newAlarmDto.setAddedLocation(1);
-								newAlarmDto.setLocationAddressName(newSelectedAddressDto.getAddress());
+								newAlarmDto.setLocationAddressName(newSelectedAddressDto.getDisplayName());
 								newAlarmDto.setLocationLatitude(newSelectedAddressDto.getLatitude());
 								newAlarmDto.setLocationLongitude(newSelectedAddressDto.getLongitude());
 								newAlarmDto.setLocationCountryCode(newSelectedAddressDto.getCountryCode());
 								newAlarmDto.setLocationCountryName(newSelectedAddressDto.getCountryName());
 							} else {
 								savedAlarmDto.setAddedLocation(1);
-								savedAlarmDto.setLocationAddressName(newSelectedAddressDto.getAddress());
+								savedAlarmDto.setLocationAddressName(newSelectedAddressDto.getDisplayName());
 								savedAlarmDto.setLocationLatitude(newSelectedAddressDto.getLatitude());
 								savedAlarmDto.setLocationLongitude(newSelectedAddressDto.getLongitude());
 								savedAlarmDto.setLocationCountryCode(newSelectedAddressDto.getCountryCode());

@@ -14,13 +14,13 @@ public class FavoriteAddressDto implements Serializable {
 	private Integer id;
 
 	@ColumnInfo
-	private String address;
+	private String displayName;
 
 	@ColumnInfo
 	private String countryName;
 
 	@ColumnInfo
-	private String admin;
+	private String simpleName;
 
 	@ColumnInfo
 	private String countryCode;
@@ -42,12 +42,12 @@ public class FavoriteAddressDto implements Serializable {
 		this.id = id;
 	}
 
-	public String getAddress() {
-		return address;
+	public String getDisplayName() {
+		return displayName;
 	}
 
-	public void setAddress(String address) {
-		this.address = address;
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 
 	public String getCountryName() {
@@ -82,12 +82,12 @@ public class FavoriteAddressDto implements Serializable {
 		return countryCode;
 	}
 
-	public void setAdmin(String admin) {
-		this.admin = admin;
+	public void setSimpleName(String simpleName) {
+		this.simpleName = simpleName;
 	}
 
-	public String getAdmin() {
-		return admin;
+	public String getSimpleName() {
+		return simpleName;
 	}
 
 	public void setZoneId(String zoneId) {

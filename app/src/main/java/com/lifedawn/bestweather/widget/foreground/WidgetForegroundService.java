@@ -216,12 +216,10 @@ public class WidgetForegroundService extends Service {
 						loadCurrentLocation();
 					} else {
 						selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
-						Address address = new Address(Locale.getDefault());
 
-						address.setLatitude(widgetDto.getLatitude());
-						address.setLongitude(widgetDto.getLongitude());
-						address.setAddressLine(0, widgetDto.getAddressName());
-						address.setCountryCode(widgetDto.getCountryCode());
+						Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(),
+								widgetDto.getLongitude(), widgetDto.getAddressName(), widgetDto.getAddressName(), null,
+								widgetDto.getCountryCode(), null);
 
 						final RequestObj requestObj = new RequestObj(address);
 						requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
@@ -263,12 +261,9 @@ public class WidgetForegroundService extends Service {
 
 							RequestObj requestObj = selectedLocationRequestMap.get(widgetDto.getAddressName());
 							if (requestObj == null) {
-								Address address = new Address(Locale.getDefault());
-
-								address.setLatitude(widgetDto.getLatitude());
-								address.setLongitude(widgetDto.getLongitude());
-								address.setAddressLine(0, widgetDto.getAddressName());
-								address.setCountryCode(widgetDto.getCountryCode());
+								Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(),
+										widgetDto.getLongitude(), widgetDto.getAddressName(), widgetDto.getAddressName(), null,
+										widgetDto.getCountryCode(), null);
 
 								requestObj = new RequestObj(address);
 
@@ -382,18 +377,17 @@ public class WidgetForegroundService extends Service {
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 
 				final Location location = getBestLocation(locationResult);
-				Geocoding.geocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
+				Geocoding.nominatimGeocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
 					@Override
-					public void onGeocodingResult(List<Address> addressList) {
-						if (addressList.isEmpty()) {
+					public void onGeocodingResult(Geocoding.AddressDto address) {
+						if (address == null) {
 							onLocationResponse(Fail.FAILED_FIND_LOCATION, null);
 						} else {
 							final Set<Integer> appWidgetIdSet = currentLocationWidgetDtoArrayMap.keySet();
-							final Address newAddress = addressList.get(0);
-							final String newAddressName = newAddress.getAddressLine(0);
+							final String newAddressName = address.toName();
 
 							if (!currentLocationRequestMap.containsKey(newAddressName)) {
-								currentLocationRequestMap.put(newAddressName, new RequestObj(newAddress));
+								currentLocationRequestMap.put(newAddressName, new RequestObj(address));
 							}
 
 							final RequestObj requestObj = currentLocationRequestMap.get(newAddressName);
@@ -402,9 +396,9 @@ public class WidgetForegroundService extends Service {
 								WidgetDto widgetDto = currentLocationWidgetDtoArrayMap.get(appWidgetId);
 
 								widgetDto.setAddressName(newAddressName);
-								widgetDto.setCountryCode(newAddress.getCountryCode());
-								widgetDto.setLatitude(newAddress.getLatitude());
-								widgetDto.setLongitude(newAddress.getLongitude());
+								widgetDto.setCountryCode(address.countryCode);
+								widgetDto.setLatitude(address.latitude);
+								widgetDto.setLongitude(address.longitude);
 								widgetRepository.update(widgetDto, null);
 
 								requestObj.weatherDataTypeSet.addAll(widgetCreatorMap.get(appWidgetId).getRequestWeatherDataTypeSet());
@@ -505,8 +499,8 @@ public class WidgetForegroundService extends Service {
 				currentLocationResponseMap.put(addressName, weatherRestApiDownloader);
 			}
 
-			WeatherRequestUtil.loadWeatherData(getApplicationContext(), executorService, requestObj.address.getLatitude(),
-					requestObj.address.getLongitude(), requestObj.weatherDataTypeSet, weatherRestApiDownloader,
+			WeatherRequestUtil.loadWeatherData(getApplicationContext(), executorService, requestObj.address.latitude,
+					requestObj.address.longitude, requestObj.weatherDataTypeSet, weatherRestApiDownloader,
 					requestObj.weatherProviderTypeSet, null);
 		}
 
@@ -543,12 +537,12 @@ public class WidgetForegroundService extends Service {
 	}
 
 	private static class RequestObj {
-		final Address address;
+		final Geocoding.AddressDto address;
 		Set<Integer> appWidgetSet = new HashSet<>();
 		Set<WeatherDataType> weatherDataTypeSet = new HashSet<>();
 		Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
 
-		public RequestObj(Address address) {
+		public RequestObj(Geocoding.AddressDto address) {
 			this.address = address;
 		}
 	}

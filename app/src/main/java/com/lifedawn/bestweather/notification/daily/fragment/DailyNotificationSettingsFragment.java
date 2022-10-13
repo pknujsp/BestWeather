@@ -247,8 +247,8 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		} else {
 			if (savedNotificationDto.getLocationType() == LocationType.SelectedAddress) {
 				selectedFavoriteAddressDto = new FavoriteAddressDto();
-				selectedFavoriteAddressDto.setAddress(savedNotificationDto.getAddressName());
-				selectedFavoriteAddressDto.setAdmin(savedNotificationDto.getAdmin());
+				selectedFavoriteAddressDto.setDisplayName(savedNotificationDto.getAddressName());
+				selectedFavoriteAddressDto.setSimpleName(savedNotificationDto.getAdmin());
 				selectedFavoriteAddressDto.setCountryCode(savedNotificationDto.getCountryCode());
 				selectedFavoriteAddressDto.setLatitude(String.valueOf(savedNotificationDto.getLatitude()));
 				selectedFavoriteAddressDto.setLongitude(String.valueOf(savedNotificationDto.getLongitude()));
@@ -394,7 +394,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 					binding.commons.selectedAddressName.setVisibility(View.VISIBLE);
 
 					if (selectedFavoriteLocation) {
-						editingNotificationDto.setAddressName(selectedFavoriteAddressDto.getAddress());
+						editingNotificationDto.setAddressName(selectedFavoriteAddressDto.getDisplayName());
 						editingNotificationDto.setLatitude(Double.parseDouble(selectedFavoriteAddressDto.getLatitude()));
 						editingNotificationDto.setLongitude(Double.parseDouble(selectedFavoriteAddressDto.getLongitude()));
 						editingNotificationDto.setZoneId(selectedFavoriteAddressDto.getZoneId());
@@ -443,10 +443,10 @@ public class DailyNotificationSettingsFragment extends Fragment {
 				} else {
 					selectedFavoriteLocation = true;
 					selectedFavoriteAddressDto = favoriteAddressDto;
-					binding.commons.selectedAddressName.setText(selectedFavoriteAddressDto.getAddress());
+					binding.commons.selectedAddressName.setText(selectedFavoriteAddressDto.getDisplayName());
 
 					//address,latitude,longitude,countryCode
-					editingNotificationDto.setAddressName(selectedFavoriteAddressDto.getAddress());
+					editingNotificationDto.setAddressName(selectedFavoriteAddressDto.getDisplayName());
 					editingNotificationDto.setLatitude(Double.parseDouble(selectedFavoriteAddressDto.getLatitude()));
 					editingNotificationDto.setLongitude(Double.parseDouble(selectedFavoriteAddressDto.getLongitude()));
 					editingNotificationDto.setZoneId(selectedFavoriteAddressDto.getZoneId());

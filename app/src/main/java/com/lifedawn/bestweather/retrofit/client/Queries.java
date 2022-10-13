@@ -115,4 +115,10 @@ public interface Queries {
 	// https://timeapi.io/api/TimeZone/coordinate?latitude=38.9&longitude=-77.03
 	@GET("coordinate")
 	Call<JsonElement> getTimeZone(@QueryMap(encoded = true) Map<String, String> queryMap);
+
+
+	//nominatim reverse geocode
+	//https://nominatim.openstreetmap.org/reverse?format=geojson&lat=44.50155&lon=11.33989
+	@GET("reverse")
+	Call<JsonElement> nominatimReverseGeocode(@QueryMap(encoded = true) Map<String, String> queryMap);
 }
