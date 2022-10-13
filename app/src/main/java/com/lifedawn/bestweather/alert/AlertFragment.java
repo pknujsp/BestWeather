@@ -14,9 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.FragmentAlertBinding;
+import com.lifedawn.bestweather.main.MyApplication;
 
 import java.util.List;
 
@@ -24,6 +27,13 @@ public class AlertFragment extends Fragment {
 	private FragmentAlertBinding binding;
 	private List<BtnObj> btnObjList;
 	private Bundle bundle;
+
+	private View.OnClickListener menuOnClickListener;
+
+	public AlertFragment setMenuOnClickListener(View.OnClickListener menuOnClickListener) {
+		this.menuOnClickListener = menuOnClickListener;
+		return this;
+	}
 
 	public enum Constant {
 		DRAWABLE_ID, MESSAGE
@@ -38,12 +48,26 @@ public class AlertFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
+		HeaderbarStyle.setStyle(HeaderbarStyle.Style.Black, getActivity());
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
 		binding = FragmentAlertBinding.inflate(inflater);
+
+		binding.mainToolbar.gps.setVisibility(View.GONE);
+		binding.mainToolbar.find.setVisibility(View.GONE);
+		binding.mainToolbar.refresh.setVisibility(View.GONE);
+
+		final int statusBarHeight = MyApplication.getStatusBarHeight();
+
+		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.mainToolbar.getRoot().getLayoutParams();
+		layoutParams.topMargin = statusBarHeight;
+		binding.mainToolbar.getRoot().setLayoutParams(layoutParams);
+
+		binding.mainToolbar.openNavigationDrawer.setOnClickListener(menuOnClickListener);
+
 		return binding.getRoot();
 	}
 

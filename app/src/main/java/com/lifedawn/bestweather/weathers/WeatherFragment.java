@@ -238,8 +238,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
-		getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
+		HeaderbarStyle.setStyle(HeaderbarStyle.Style.White, getActivity());
 
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
@@ -541,6 +541,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		if (weatherRestApiDownloader != null) {
 			weatherRestApiDownloader.cancel();
 		}
+
 		getLifecycle().removeObserver(locationLifeCycleObserver);
 		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		super.onDestroy();
@@ -824,8 +825,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 
 	public void requestNewData() {
-		ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
 		binding.scrollView.setVisibility(View.GONE);
+		ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		executorService.execute(new Runnable() {
 			@Override
@@ -861,7 +862,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 	private void requestNewDataWithAnotherWeatherSource(WeatherProviderType newWeatherProviderType, WeatherProviderType lastWeatherProviderType) {
 		binding.scrollView.setVisibility(View.GONE);
-		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
+		ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		executorService.execute(new Runnable() {
 			@Override
@@ -951,7 +952,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								reRefreshBySameWeatherSource(responseResultObj);
+								iWeatherFragment.addWeatherFragment(locationType, selectedFavoriteAddressDto, null);
 							}
 						}, getString(R.string.again)));
 
@@ -960,12 +961,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
 								@Override
 								public void onClick(View v) {
-									responseResultObj.mainWeatherProviderType = anotherProvider;
-									responseResultObj.weatherProviderTypeSet.clear();
-									responseResultObj.weatherProviderTypeSet.add(responseResultObj.mainWeatherProviderType);
-									responseResultObj.weatherProviderTypeSet.add(WeatherProviderType.AQICN);
-									reRefreshByAnotherWeatherSource(responseResultObj);
-
 									Bundle argument = new Bundle();
 									argument.putSerializable("anotherProvider", anotherProvider);
 
@@ -1005,6 +1000,8 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		bundle.putString(AlertFragment.Constant.MESSAGE.name(), getString(R.string.update_failed));
 
 		AlertFragment alertFragment = new AlertFragment();
+
+		alertFragment.setMenuOnClickListener(menuOnClickListener);
 		alertFragment.setBtnObjList(btnObjList);
 		alertFragment.setArguments(bundle);
 

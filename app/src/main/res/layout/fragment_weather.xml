@@ -127,12 +127,12 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:fontFamily="sans-serif-condensed"
+                        android:fontFamily="sans-serif-thin"
                         android:shadowColor="@color/black"
                         android:text="@string/loading"
                         android:textAlignment="center"
                         android:textColor="@color/white"
-                        android:textSize="25sp"
+                        android:textSize="26sp"
                         />
 
 
