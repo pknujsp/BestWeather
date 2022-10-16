@@ -10,6 +10,7 @@ import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
@@ -120,5 +121,6 @@ public interface Queries {
 	//nominatim reverse geocode
 	//https://nominatim.openstreetmap.org/reverse?format=geojson&lat=44.50155&lon=11.33989
 	@GET("reverse")
-	Call<JsonElement> nominatimReverseGeocode(@QueryMap(encoded = true) Map<String, String> queryMap);
+	Call<JsonElement> nominatimReverseGeocode(@QueryMap(encoded = true) Map<String, String> queryMap,
+	                                          @Header("Accept-Language") String lang);
 }

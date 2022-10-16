@@ -20,9 +20,6 @@ import java.util.concurrent.Executors;
 
 public class FavoriteAddressRepository implements FavoriteAddressQuery {
 	private FavoriteAddressDao favoriteAddressDao;
-	private MutableLiveData<FavoriteAddressDto> addAddressesLiveData = new MutableLiveData<>();
-	private MutableLiveData<FavoriteAddressDto> deleteAddressesLiveData = new MutableLiveData<>();
-	private MutableLiveData<List<FavoriteAddressDto>> favoriteAddressesLiveData = new MutableLiveData<>();
 	private ExecutorService executors = MyApplication.getExecutorService();
 
 	private static FavoriteAddressRepository INSTANCE;
@@ -41,10 +38,6 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 		favoriteAddressDao = AppDb.getInstance(context).favoriteAddressDao();
 	}
 
-
-	public MutableLiveData<List<FavoriteAddressDto>> getFavoriteAddressesLiveData() {
-		return favoriteAddressesLiveData;
-	}
 
 	@Override
 	public void getAll(DbQueryCallback<List<FavoriteAddressDto>> callback) {
@@ -99,8 +92,6 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 			public void run() {
 				long id = favoriteAddressDao.add(favoriteAddressDto);
 				callback.processResult(id);
-				addAddressesLiveData.postValue(favoriteAddressDao.get((int) id));
-				favoriteAddressesLiveData.postValue(favoriteAddressDao.getAll());
 			}
 		});
 	}
@@ -111,8 +102,7 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 			@Override
 			public void run() {
 				favoriteAddressDao.delete(favoriteAddressDto);
-				deleteAddressesLiveData.postValue(favoriteAddressDto);
-				favoriteAddressesLiveData.postValue(favoriteAddressDao.getAll());
+
 			}
 		});
 	}
@@ -123,19 +113,9 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 			@Override
 			public void run() {
 				favoriteAddressDao.delete(favoriteAddressDto);
-				deleteAddressesLiveData.postValue(favoriteAddressDto);
-				favoriteAddressesLiveData.postValue(favoriteAddressDao.getAll());
-
 				callback.onResultSuccessful(true);
 			}
 		});
 	}
 
-	public MutableLiveData<FavoriteAddressDto> getAddAddressesLiveData() {
-		return addAddressesLiveData;
-	}
-
-	public MutableLiveData<FavoriteAddressDto> getDeleteAddressesLiveData() {
-		return deleteAddressesLiveData;
-	}
 }

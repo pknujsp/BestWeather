@@ -64,33 +64,30 @@ public class Geocoding {
 	}
 
 	public static void geocoding(Context context, Double latitude, Double longitude, GeocodingCallback callback) {
-		MyApplication.getExecutorService().execute(new Runnable() {
-			@Override
-			public void run() {
-				Geocoder geocoder = new Geocoder(context);
-				try {
-					List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 20);
+		Geocoder geocoder = new Geocoder(context);
+		try {
+			List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 20);
 
-					if (addressList.size() > 0) {
-						AddressDto addressDto = new AddressDto(latitude, longitude, addressList.get(0).getAddressLine(0),
-								addressList.get(0).getAddressLine(0),
-								addressList.get(0).getCountryName(), addressList.get(0).getCountryCode(),
-								addressList.get(0).getAdminArea());
+			if (addressList.size() > 0) {
+				AddressDto addressDto = new AddressDto(latitude, longitude, addressList.get(0).getAddressLine(0),
+						addressList.get(0).getAddressLine(0),
+						addressList.get(0).getCountryName(), addressList.get(0).getCountryCode(),
+						addressList.get(0).getAdminArea());
 
-						callback.onGeocodingResult(addressDto);
-					} else {
-						callback.onGeocodingResult(null);
-					}
-				} catch (Exception e) {
-
-				}
+				callback.onGeocodingResult(addressDto);
+			} else {
+				callback.onGeocodingResult(null);
 			}
-		});
+		} catch (Exception e) {
+
+		}
 	}
 
 	public static void nominatimGeocoding(Context context, Double latitude, Double longitude, GeocodingCallback callback) {
 		ReverseGeocodeParameter parameter = new ReverseGeocodeParameter(latitude, longitude);
-		Call<JsonElement> call = RetrofitClient.getApiService(RetrofitClient.ServiceType.NOMINATIM_REVERSE).nominatimReverseGeocode(parameter.getMap());
+		Call<JsonElement> call =
+				RetrofitClient.getApiService(RetrofitClient.ServiceType.NOMINATIM_REVERSE).nominatimReverseGeocode(parameter.getMap(),
+						MyApplication.locale.toLanguageTag());
 
 		call.enqueue(new Callback<JsonElement>() {
 			@Override

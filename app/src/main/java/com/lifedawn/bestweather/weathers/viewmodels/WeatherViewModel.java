@@ -13,31 +13,30 @@ import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.queryinterfaces.FavoriteAddressQuery;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
+import com.lifedawn.bestweather.weathers.WeatherFragment;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WeatherViewModel extends AndroidViewModel implements FavoriteAddressQuery {
 	private ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions;
 	private FusedLocation.MyLocationCallback locationCallback;
 	private FavoriteAddressRepository favoriteAddressRepository;
 
-	private MutableLiveData<FavoriteAddressDto> addAddressesLiveData;
-	private MutableLiveData<FavoriteAddressDto> deleteAddressesLiveData;
 	private MutableLiveData<String> currentLocationLiveData = new MutableLiveData<>();
-	private MutableLiveData<List<FavoriteAddressDto>> favoriteAddressesLiveData;
+
+	public final Map<String, WeatherFragment.WeatherResponseObj> FINAL_RESPONSE_MAP = new ConcurrentHashMap<>();
 
 	public final LiveData<List<FavoriteAddressDto>> favoriteAddressListLiveData;
 
 	public WeatherViewModel(@NonNull @NotNull Application application) {
 		super(application);
 		favoriteAddressRepository = FavoriteAddressRepository.getINSTANCE();
-		addAddressesLiveData = favoriteAddressRepository.getAddAddressesLiveData();
-		deleteAddressesLiveData = favoriteAddressRepository.getDeleteAddressesLiveData();
-		favoriteAddressesLiveData = favoriteAddressRepository.getFavoriteAddressesLiveData();
 		favoriteAddressListLiveData = favoriteAddressRepository.getAllData();
 	}
 
@@ -53,17 +52,6 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 		return locationCallback;
 	}
 
-	public ILoadImgOfCurrentConditions getiLoadImgOfCurrentConditions() {
-		return iLoadImgOfCurrentConditions;
-	}
-
-	public LiveData<FavoriteAddressDto> getDeleteAddressesLiveData() {
-		return deleteAddressesLiveData;
-	}
-
-	public LiveData<FavoriteAddressDto> getAddAddressesLiveData() {
-		return addAddressesLiveData;
-	}
 
 	@Override
 	public void getAll(DbQueryCallback<List<FavoriteAddressDto>> callback) {
@@ -105,9 +93,6 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 		return currentLocationLiveData;
 	}
 
-	public MutableLiveData<List<FavoriteAddressDto>> getFavoriteAddressesLiveData() {
-		return favoriteAddressesLiveData;
-	}
 
 	public void setCurrentLocationAddressName(String addressName) {
 		currentLocationLiveData.setValue(addressName);

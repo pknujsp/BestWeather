@@ -18,7 +18,7 @@ public class ReverseGeocodeParameter extends RequestParameter {
 		map.put("format", "geojson");
 		map.put("lat", latitude.toString());
 		map.put("lon", longitude.toString());
-		map.put("zoom", "16");
+		map.put("zoom", "14");
 
 
 		return map;

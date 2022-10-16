@@ -103,7 +103,7 @@ public class LocationItemViewPagerAdapter extends RecyclerView.Adapter<LocationI
 
 			Geocoding.AddressDto address = addressList.get(position);
 
-			binding.addressName.setText(address.toName());
+			binding.addressName.setText(address.displayName);
 			binding.country.setText(address.country);
 
 			if (favoriteAddressSet.contains(address.latitude + "" + address.longitude)) {

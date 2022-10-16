@@ -28,8 +28,7 @@ public class MyApplication extends Application {
 	private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(6);
 	private static int statusBarHeight;
 	private static String localeCountryCode;
-	public static final Map<String, WeatherFragment.WeatherResponseObj> FINAL_RESPONSE_MAP = new ConcurrentHashMap<>();
-
+	public static Locale locale;
 
 	@Override
 	public void onTerminate() {
@@ -40,18 +39,11 @@ public class MyApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 
-		FavoriteAddressRepository.initialize(getApplicationContext());
-		KmaAreaCodesRepository.initialize(getApplicationContext());
-		TimeZoneIdRepository.Companion.initialize(getApplicationContext());
-		initPreferences();
-		WindUtil.init(getApplicationContext());
-
 		final int id = getResources().getIdentifier("status_bar_height", "dimen", "android");
 		if (id > 0) {
 			statusBarHeight = getResources().getDimensionPixelSize(id);
 		}
 
-		Locale locale = null;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			locale = getResources().getConfiguration().getLocales().get(0);
 		} else {
@@ -59,6 +51,12 @@ public class MyApplication extends Application {
 		}
 
 		localeCountryCode = locale.getCountry();
+
+		FavoriteAddressRepository.initialize(getApplicationContext());
+		KmaAreaCodesRepository.initialize(getApplicationContext());
+		TimeZoneIdRepository.Companion.initialize(getApplicationContext());
+		initPreferences();
+		WindUtil.init(getApplicationContext());
 	}
 
 
