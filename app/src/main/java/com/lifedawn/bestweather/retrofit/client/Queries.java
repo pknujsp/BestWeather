@@ -123,4 +123,8 @@ public interface Queries {
 	@GET("reverse")
 	Call<JsonElement> nominatimReverseGeocode(@QueryMap(encoded = true) Map<String, String> queryMap,
 	                                          @Header("Accept-Language") String lang);
+
+	// rainviewer
+	@GET("weather-maps.json")
+	Call<JsonElement> getRainViewer();
 }

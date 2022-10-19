@@ -78,6 +78,7 @@ import com.lifedawn.bestweather.flickr.FlickrLoader;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
+import com.lifedawn.bestweather.rainviewer.view.RainViewerFragment;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
@@ -1406,6 +1407,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		simpleAirQualityFragment.setAirQualityDto(airQualityDto)
 				.setAqiCnGeolocalizedFeedResponse(airQualityResponse);
 
+		final RainViewerFragment rainViewerFragment = new RainViewerFragment();
+		rainViewerFragment.setArguments(defaultBundle);
+
 		simpleAirQualityFragment.setArguments(airQualityBundle);
 		sunSetRiseFragment.setArguments(defaultBundle);
 		simpleHourlyForecastFragment.setArguments(hourlyForecastBundle);
@@ -1458,7 +1462,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 									getString(R.string.tag_detail_current_conditions_fragment))
 							.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment))
 							.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
-									getString(R.string.tag_sun_set_rise_fragment)).commitAllowingStateLoss();
+									getString(R.string.tag_sun_set_rise_fragment))
+							.replace(binding.radar.getId(), rainViewerFragment,
+									RainViewerFragment.class.getName())
+							.commitAllowingStateLoss();
 
 					ProgressDialog.clearDialogs();
 				}

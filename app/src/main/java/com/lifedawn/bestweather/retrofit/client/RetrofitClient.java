@@ -36,6 +36,7 @@ public class RetrofitClient {
 	public static final String GOOGLE_FIND_PLACE_SERVICE_URL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/";
 
 	public static final String NOMINATIM_REVERSE_GEOCODE_URL = "https://nominatim.openstreetmap.org/";
+	public static final String RAIN_VIEWER_URL = "https://api.rainviewer.com/public/";
 
 	//service key, token
 	public static final String VILAGE_FCST_INFO_SERVICE_SERVICE_KEY = "T2nJm9zlOA0Z7Dut%2BThT6Jp0Itn0zZw80AUP3uMdOWlZJR1gVPkx9p1t8etuSW1kWsSNrGGHKdxbwr1IUlt%2Baw%3D%3D";
@@ -59,7 +60,7 @@ public class RetrofitClient {
 		ACCU_CURRENT_CONDITIONS, ACCU_DAILY_FORECAST, ACCU_HOURLY_FORECAST, MET_NORWAY_LOCATION_FORECAST, AQICN_GEOLOCALIZED_FEED,
 		OWM_CURRENT_CONDITIONS,
 		OWM_HOURLY_FORECAST, OWM_DAILY_FORECAST, OWM_ONE_CALL, FLICKR, KMA_WEB_CURRENT_CONDITIONS, KMA_WEB_FORECASTS,
-		GOOGLE_PLACE_SEARCH, GOOGLE_FIND_PLACE, FREE_TIME, NOMINATIM_REVERSE
+		GOOGLE_PLACE_SEARCH, GOOGLE_FIND_PLACE, FREE_TIME, NOMINATIM_REVERSE, RAIN_VIEWER
 	}
 
 
@@ -165,6 +166,13 @@ public class RetrofitClient {
 						.addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
 								NOMINATIM_REVERSE_GEOCODE_URL).build();
 				return nominatim.create(Queries.class);
+
+			case RAIN_VIEWER:
+				Retrofit rainViewer = new Retrofit.Builder().client(client).addConverterFactory(
+								GsonConverterFactory.create()).callbackExecutor(EXECUTOR_SERVICE)
+						.addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
+								RAIN_VIEWER_URL).build();
+				return rainViewer.create(Queries.class);
 
 			default:
 				return null;

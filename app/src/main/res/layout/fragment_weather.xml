@@ -221,11 +221,21 @@
                     android:paddingRight="8dp"
                     />
 
+                <androidx.fragment.app.FragmentContainerView
+                    android:id="@+id/radar"
+                    android:layout_width="match_parent"
+                    android:layout_height="210dp"
+                    android:layout_below="@id/detail_current_conditions"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="24dp"
+                    />
+
                 <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/adViewBelowDetailCurrentConditions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/detail_current_conditions"
+                    android:layout_below="@id/radar"
                     android:layout_marginBottom="24dp"
                     ads:adSize="BANNER"
                     ads:adUnitId="@string/BANNER_unitId"
