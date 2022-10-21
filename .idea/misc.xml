@@ -8,6 +8,7 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/blue_skies_gradient.xml" value="0.3785" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/bottomsheet_background.xml" value="0.384" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/card_background.xml" value="0.3764102564102564" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/circle_btn_background.xml" value="0.399" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/day_clear.xml" value="0.2265" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/dialog_background.xml" value="0.3764102564102564" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/drawable/error.xml" value="0.2255" />
@@ -74,10 +75,11 @@
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_main.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_map.xml" value="0.5219721329046088" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_notification.xml" value="0.33" />
-        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_rain_viewer.xml" value="0.22180451127819548" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_rain_viewer.xml" value="0.33" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_search_address.xml" value="0.5536458333333333" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_settings_main.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_simple_favorites.xml" value="0.5" />
+        <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_simple_rain_viewer.xml" value="0.34057971014492755" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_sun_set_rise_notification.xml" value="0.5536458333333333" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_sunsetrise.xml" value="0.17806484295845998" />
         <entry key="..\:/Android/Android Projects/BestWeather/app/src/main/res/layout/fragment_weather.xml" value="0.4" />

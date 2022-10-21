@@ -1,46 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/cardLRPadding"
+    android:paddingRight="@dimen/cardLRPadding"
+    >
 
-
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/forecast_name"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/cardLRPadding"
-        android:paddingRight="@dimen/cardLRPadding"
-        >
+        android:text="forecastName"
+        android:textColor="?attr/textColorInWeatherCard"
+        android:textSize="20sp"
+        />
 
-        <TextView
-            android:id="@+id/forecast_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="forecastName"
-            android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="20sp"
-            />
+    <TextView
+        android:id="@+id/compare_forecast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/forecast_name"
+        android:layout_marginRight="24dp"
+        android:layout_toLeftOf="@id/detail_forecast"
+        android:text="@string/compare"
+        android:textColor="?attr/textColorInWeatherCard"
+        android:textSize="16sp"
+        />
 
-        <TextView
-            android:id="@+id/compare_forecast"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/forecast_name"
-            android:layout_marginRight="24dp"
-            android:layout_toLeftOf="@id/detail_forecast"
-            android:text="@string/compare"
-            android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="16sp"
-            />
+    <TextView
+        android:id="@+id/detail_forecast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/forecast_name"
+        android:layout_alignParentRight="true"
+        android:text="@string/detail"
+        android:textColor="?attr/textColorInWeatherCard"
+        android:textSize="16sp"
+        />
 
-        <TextView
-            android:id="@+id/detail_forecast"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/forecast_name"
-            android:layout_alignParentRight="true"
-            android:text="@string/detail"
-            android:textColor="?attr/textColorInWeatherCard"
-            android:textSize="16sp"
-            />
-
-    </RelativeLayout>
-
-</layout>
+</RelativeLayout>

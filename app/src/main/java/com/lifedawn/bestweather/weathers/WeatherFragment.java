@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -79,6 +80,7 @@ import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.rainviewer.view.RainViewerFragment;
+import com.lifedawn.bestweather.rainviewer.view.SimpleRainViewerFragment;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
@@ -234,6 +236,12 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	};
 
 	@Override
+	public void onAttach(@NonNull Context context) {
+		super.onAttach(context);
+		ProgressDialog.show(requireActivity(), getString(R.string.loading), null);
+	}
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
@@ -315,6 +323,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 				}
 			}
 		});
+
 
 		binding.mainToolbar.find.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -1407,8 +1416,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		simpleAirQualityFragment.setAirQualityDto(airQualityDto)
 				.setAqiCnGeolocalizedFeedResponse(airQualityResponse);
 
-		final RainViewerFragment rainViewerFragment = new RainViewerFragment();
+		final SimpleRainViewerFragment rainViewerFragment = new SimpleRainViewerFragment();
 		rainViewerFragment.setArguments(defaultBundle);
+		rainViewerFragment.getArguments().putBoolean("simpleMode", true);
 
 		simpleAirQualityFragment.setArguments(airQualityBundle);
 		sunSetRiseFragment.setArguments(defaultBundle);
@@ -1464,7 +1474,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 							.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
 									getString(R.string.tag_sun_set_rise_fragment))
 							.replace(binding.radar.getId(), rainViewerFragment,
-									RainViewerFragment.class.getName())
+									SimpleRainViewerFragment.class.getName())
 							.commitAllowingStateLoss();
 
 					ProgressDialog.clearDialogs();

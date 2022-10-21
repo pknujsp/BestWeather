@@ -583,6 +583,9 @@
     <string name="provide">Data</string>
     <string name="close">close</string>
     <string name="adding_a_new_favorite_location">Adding a new favorite location</string>
+    <string name="forecast">forecast</string>
+    <string name="past">past</string>
+    <string name="radar">radar</string>
 
 
 </resources>

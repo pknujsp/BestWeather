@@ -26,7 +26,7 @@ class RainViewerRepository {
     }
 
     fun initMap() {
-        val call = RetrofitClient.getApiService(RetrofitClient.ServiceType.RAIN_VIEWER)
+        RetrofitClient.getApiService(RetrofitClient.ServiceType.RAIN_VIEWER)
                 .rainViewer.enqueue(object : Callback<JsonElement> {
                     override fun onResponse(call: Call<JsonElement>, response: Response<JsonElement>) {
                         if (response.isSuccessful) {

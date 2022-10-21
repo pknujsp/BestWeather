@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
+    >
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/backgroundColor">
+        >
 
-        <RelativeLayout
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/listview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_above="@id/adViewBottom"
+            android:layout_below="@id/toolbar"
+            android:orientation="vertical"
+            />
 
-            <include
-                android:id="@+id/toolbar"
-                layout="@layout/toolbar" />
+        <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adViewBottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="@dimen/adViewMargin"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/BANNER_unitId"
+            />
+    </RelativeLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/listview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_above="@id/adViewBottom"
-                android:layout_below="@id/toolbar"
-                android:orientation="vertical"
-                tools:listitem="@layout/view_hourly_forecast_item_in_linear" />
-
-            <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/adViewBottom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="@dimen/adViewMargin"
-                ads:adSize="BANNER"
-                ads:adUnitId="@string/BANNER_unitId" />
-        </RelativeLayout>
-
-    </FrameLayout>
-</layout>
+</FrameLayout>
