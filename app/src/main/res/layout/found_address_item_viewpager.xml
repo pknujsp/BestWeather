@@ -6,7 +6,7 @@
     android:clickable="true"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="8dp"
+    android:padding="12dp"
     >
 
     <LinearLayout
@@ -63,6 +63,7 @@
             android:id="@+id/addBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="@string/add"
             />
 
@@ -85,8 +86,8 @@
 
             <ImageButton
                 android:id="@+id/left"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
                 android:layout_marginRight="8dp"
                 android:background="?attr/selectableItemBackground"
                 android:scaleType="fitXY"
@@ -95,8 +96,8 @@
 
             <ImageButton
                 android:id="@+id/right"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
                 android:background="?attr/selectableItemBackground"
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_baseline_chevron_right_24"

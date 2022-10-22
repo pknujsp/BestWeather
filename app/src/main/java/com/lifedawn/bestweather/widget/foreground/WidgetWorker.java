@@ -3,8 +3,6 @@ package com.lifedawn.bestweather.widget.foreground;
 import android.app.Notification;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.location.Address;
 import android.location.Location;
 import android.os.Build;
 import android.os.PowerManager;
@@ -29,18 +27,13 @@ import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto;
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.retrofit.responses.freetime.FreeTimeResponse;
-import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
-import com.lifedawn.bestweather.timezone.FreeTimeZoneApi;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
@@ -69,10 +62,8 @@ import com.lifedawn.bestweather.widget.widgetprovider.ThirdWidgetProvider;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -82,8 +73,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import retrofit2.Response;
 
 public class WidgetWorker extends Worker {
 	public static final Set<Integer> PROCESSING_WIDGET_ID_SET = new CopyOnWriteArraySet<>();
@@ -176,7 +165,7 @@ public class WidgetWorker extends Worker {
 					} else {
 						selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
 						Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(), widgetDto.getLongitude(),
-								widgetDto.getAddressName(), widgetDto.getAddressName(), null, widgetDto.getCountryCode(), null);
+								widgetDto.getAddressName(), null, widgetDto.getCountryCode());
 
 						final RequestObj requestObj = new RequestObj(address, ZoneId.of(widgetDto.getTimeZoneId()));
 						requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
@@ -222,7 +211,7 @@ public class WidgetWorker extends Worker {
 							RequestObj requestObj = selectedLocationRequestMap.get(widgetDto.getAddressName());
 							if (requestObj == null) {
 								Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(), widgetDto.getLongitude(),
-										widgetDto.getAddressName(), widgetDto.getAddressName(), null, widgetDto.getCountryCode(), null);
+										widgetDto.getAddressName(), null, widgetDto.getCountryCode());
 
 								requestObj = new RequestObj(address, ZoneId.of(widgetDto.getTimeZoneId()));
 
@@ -394,13 +383,13 @@ public class WidgetWorker extends Worker {
 				final Location location = getBestLocation(locationResult);
 
 
-				Geocoding.nominatimGeocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
+				Geocoding.nominatimReverseGeocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(), new Geocoding.ReverseGeocodingCallback() {
 					@Override
-					public void onGeocodingResult(Geocoding.AddressDto address) {
+					public void onReverseGeocodingResult(Geocoding.AddressDto address) {
 						if (address == null) {
 							onLocationResponse(Fail.FAILED_FIND_LOCATION, null);
 						} else {
-							final String addressName = address.toName();
+							final String addressName = address.displayName;
 							currentLocationRequestObj.address = address;
 
 							final String zoneIdText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())

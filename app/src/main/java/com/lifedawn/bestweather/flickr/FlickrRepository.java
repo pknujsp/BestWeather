@@ -1,12 +1,8 @@
 package com.lifedawn.bestweather.flickr;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Looper;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,7 +13,6 @@ import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
@@ -35,17 +30,12 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -54,23 +44,35 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FlickrLoader {
-	private static final Map<String, FlickrImgObj> BACKGROUND_IMG_MAP = new ConcurrentHashMap<>();
-	private static final List<ImgRequestObj> IMG_REQUEST_OBJ_SET = new CopyOnWriteArrayList<>();
-	private static final ExecutorService executorService = Executors.newFixedThreadPool(3);
+public final class FlickrRepository {
+	private static FlickrRepository INSTANCE;
+	private final ExecutorService executorService = Executors.newFixedThreadPool(4);
+	private final List<ImgRequestData> IMG_REQUEST_OBJ_SET = new CopyOnWriteArrayList<>();
+	private final Map<String, FlickrImgData> BACKGROUND_IMG_MAP = new ConcurrentHashMap<>();
 
-	private FlickrLoader() {
+	public static void initialize() {
+		if (INSTANCE == null) {
+			INSTANCE = new FlickrRepository();
+			FlickrUtil.init();
+		}
 	}
 
-	public static void loadImg(Context context, WeatherProviderType weatherProviderType, String val, Double latitude, Double longitude,
-	                           ZoneId zoneId, String volume, GlideImgCallback glideImgCallback, ZonedDateTime refreshDateTime) {
-		executorService.execute(new Runnable() {
+	public static FlickrRepository getINSTANCE() {
+		return INSTANCE;
+	}
+
+	private FlickrRepository() {
+
+	}
+
+	public void loadImg(Context context, FlickrRequestParameter flickrRequestParameter, GlideImgCallback glideImgCallback) {
+		executorService.submit(new Runnable() {
 			@Override
 			public void run() {
-				FlickrUtil.init();
+				cancelAllRequests(context);
 
-				cancelAllRequest(context);
-				final ZonedDateTime lastRefreshDateTime = refreshDateTime.withZoneSameInstant(zoneId);
+				final ZonedDateTime lastRefreshDateTime =
+						flickrRequestParameter.refreshDateTime.withZoneSameInstant(flickrRequestParameter.zoneId);
 
 				SimpleTimeZone timeZone = new SimpleTimeZone(lastRefreshDateTime.getOffset().getTotalSeconds() * 1000, "");
 				Calendar currentCalendar = Calendar.getInstance(timeZone);
@@ -79,12 +81,13 @@ public class FlickrLoader {
 						lastRefreshDateTime.getSecond());
 
 				SunriseSunsetCalculator sunRiseSunsetCalculator = new SunriseSunsetCalculator(
-						new com.luckycatlabs.sunrisesunset.dto.Location(latitude, longitude), currentCalendar.getTimeZone());
+						new com.luckycatlabs.sunrisesunset.dto.Location(flickrRequestParameter.latitude, flickrRequestParameter.longitude),
+						currentCalendar.getTimeZone());
 				Calendar sunRiseCalendar = sunRiseSunsetCalculator.getOfficialSunriseCalendarForDate(currentCalendar);
 				Calendar sunSetCalendar = sunRiseSunsetCalculator.getOfficialSunsetCalendarForDate(currentCalendar);
 
 				if (sunRiseCalendar == null || sunSetCalendar == null) {
-					glideImgCallback.onLoadedImg(null, false);
+					glideImgCallback.onLoadedImg(new FlickrImgResponse(null, false));
 					return;
 				}
 
@@ -112,37 +115,37 @@ public class FlickrLoader {
 				}
 
 				String weather = null;
-				switch (weatherProviderType) {
+				switch (flickrRequestParameter.weatherProviderType) {
 					case KMA_WEB:
-						String pty = KmaResponseProcessor.convertPtyTextToCode(val);
-						String sky = KmaResponseProcessor.convertSkyTextToCode(val);
+						String pty = KmaResponseProcessor.convertPtyTextToCode(flickrRequestParameter.weatherDescription);
+						String sky = KmaResponseProcessor.convertSkyTextToCode(flickrRequestParameter.weatherDescription);
 						weather = (pty == null) ? KmaResponseProcessor.getSkyFlickrGalleryName(
 								sky) : KmaResponseProcessor.getPtyFlickrGalleryName(pty);
 						break;
 					case KMA_API:
-						String code = val.substring(0, 1);
-						weather = val.contains("_sky") ? KmaResponseProcessor.getSkyFlickrGalleryName(
+						String code = flickrRequestParameter.weatherDescription.substring(0, 1);
+						weather = flickrRequestParameter.weatherDescription.contains("_sky") ? KmaResponseProcessor.getSkyFlickrGalleryName(
 								code) : KmaResponseProcessor.getPtyFlickrGalleryName(code);
 						break;
 					case ACCU_WEATHER:
-						weather = AccuWeatherResponseProcessor.getFlickrGalleryName(val);
+						weather = AccuWeatherResponseProcessor.getFlickrGalleryName(flickrRequestParameter.weatherDescription);
 						break;
 					case OWM_ONECALL:
-						weather = OpenWeatherMapResponseProcessor.getFlickrGalleryName(val);
+						weather = OpenWeatherMapResponseProcessor.getFlickrGalleryName(flickrRequestParameter.weatherDescription);
 						break;
 					case MET_NORWAY:
-						weather = MetNorwayResponseProcessor.getFlickrGalleryName(val);
+						weather = MetNorwayResponseProcessor.getFlickrGalleryName(flickrRequestParameter.weatherDescription);
 						break;
 				}
 
 				final String galleryName = time + " " + weather;
 				// time : sunrise, sunset, day, night
 				// weather : clear, partly cloudy, mostly cloudy, overcast, rain, snow
-				Log.e("flickrGalleryName", galleryName);
 
 				//이미 다운로드 된 이미지가 있으면 다운로드 하지 않음
 				if (BACKGROUND_IMG_MAP.containsKey(galleryName) && BACKGROUND_IMG_MAP.get(galleryName).getImg() != null) {
-					glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), true);
+					glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), true));
+
 				} else {
 					FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
 					photosFromGalleryParameter.setGalleryId(FlickrUtil.getWeatherGalleryId(galleryName));
@@ -150,9 +153,9 @@ public class FlickrLoader {
 					Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
 					Call<JsonElement> call = queries.getPhotosFromGallery(photosFromGalleryParameter.getMap());
 
-					final ImgRequestObj imgRequestObj = new ImgRequestObj();
-					IMG_REQUEST_OBJ_SET.add(imgRequestObj);
-					imgRequestObj.galleryCall = call;
+					final ImgRequestData imgRequestData = new ImgRequestData();
+					IMG_REQUEST_OBJ_SET.add(imgRequestData);
+					imgRequestData.galleryCall = call;
 
 					final String finalTime = time;
 					final String finalWeather = weather;
@@ -160,14 +163,8 @@ public class FlickrLoader {
 					call.enqueue(new Callback<JsonElement>() {
 						@Override
 						public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-							if (Thread.currentThread().equals(Looper.getMainLooper().getThread())) {
-								Log.e("on loadImg", "메인 스레드");
-							} else {
-								Log.e("on loadImg", "백그라운드 스레드");
-							}
-
-							Gson gson = new Gson();
-							final PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body().toString(),
+							final Gson gson = new Gson();
+							final PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body(),
 									PhotosFromGalleryResponse.class);
 
 							if (photosFromGalleryResponse.getStat().equals("ok")) {
@@ -185,12 +182,12 @@ public class FlickrLoader {
 
 									Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
 									Call<JsonElement> getPhotoInfoCall = queries.getGetInfo(getInfoParameter.getMap());
-									imgRequestObj.getPhotoInfoCall = getPhotoInfoCall;
+									imgRequestData.getPhotoInfoCall = getPhotoInfoCall;
 
 									getPhotoInfoCall.enqueue(new Callback<JsonElement>() {
 										@Override
 										public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-											final GetInfoPhotoResponse getInfoPhotoResponse = gson.fromJson(response.body().toString(),
+											final GetInfoPhotoResponse getInfoPhotoResponse = gson.fromJson(response.body(),
 													GetInfoPhotoResponse.class);
 
 											final String backgroundImgUrl =
@@ -200,64 +197,58 @@ public class FlickrLoader {
 															+ (getInfoPhotoResponse.getPhoto().getOriginalsecret() == null ?
 															"_b.jpg" : "_o.jpg");
 
-											final FlickrImgObj flickrImgObj = new FlickrImgObj();
-											BACKGROUND_IMG_MAP.put(galleryName, flickrImgObj);
+											final FlickrImgData flickrImgData = new FlickrImgData();
+											BACKGROUND_IMG_MAP.put(galleryName, flickrImgData);
 
-											flickrImgObj.setPhoto(photo);
-											flickrImgObj.setTime(finalTime);
-											flickrImgObj.setVolume(volume);
-											flickrImgObj.setWeather(finalWeather);
+											flickrImgData.setPhoto(photo);
+											flickrImgData.setTime(finalTime);
+											flickrImgData.setVolume(flickrRequestParameter.precipitationVolume);
+											flickrImgData.setWeather(finalWeather);
 
-											imgRequestObj.glideTarget = new CustomTarget<Bitmap>() {
+											imgRequestData.glideTarget = new CustomTarget<Bitmap>() {
 												@Override
 												public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-													Bitmap res = resource.copy(Bitmap.Config.RGB_565, true);
+													Bitmap res = resource.copy(Bitmap.Config.ARGB_8888, true);
 													BACKGROUND_IMG_MAP.get(galleryName).setImg(res);
-													glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), true);
+													glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), true));
 												}
 
 												@Override
 												public void onLoadCleared(@Nullable Drawable placeholder) {
+													glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
 												}
 
 												@Override
 												public void onLoadFailed(@Nullable Drawable errorDrawable) {
 													super.onLoadFailed(errorDrawable);
-													glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
+													glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
+
 												}
 											};
 
-											Activity activity = (Activity) context;
-											if (!activity.isFinishing() && !activity.isDestroyed()) {
-												MainThreadWorker.runOnUiThread(new Runnable() {
-													@Override
-													public void run() {
-														Glide.with(context).asBitmap().load(backgroundImgUrl)
-																.diskCacheStrategy(DiskCacheStrategy.ALL).into(imgRequestObj.glideTarget);
-													}
-
-												});
-											}
+											Glide.with(context).asBitmap().load(backgroundImgUrl)
+													.diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(imgRequestData.glideTarget);
 										}
 
 										@Override
 										public void onFailure(Call<JsonElement> call, Throwable t) {
-											glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
+											glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
 										}
 									});
 
 								} else {
-									glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
+									glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
+
 								}
 							} else {
-								glideImgCallback.onLoadedImg(BACKGROUND_IMG_MAP.get(galleryName), false);
+								glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
 							}
 
 						}
 
 						@Override
 						public void onFailure(Call<JsonElement> call, Throwable t) {
-							glideImgCallback.onLoadedImg(null, false);
+							glideImgCallback.onLoadedImg(new FlickrImgResponse(null, false));
 						}
 					});
 				}
@@ -266,80 +257,59 @@ public class FlickrLoader {
 
 	}
 
-	public static void cancelAllRequest(Context context) {
-		Glide.with(context).pauseAllRequests();
-
-		for (ImgRequestObj imgRequestObj : IMG_REQUEST_OBJ_SET) {
-			if (imgRequestObj.glideTarget != null) {
-				Glide.with(context).clear(imgRequestObj.glideTarget);
-			} else if (imgRequestObj.getPhotoInfoCall != null) {
-				imgRequestObj.getPhotoInfoCall.cancel();
-			} else if (imgRequestObj.galleryCall != null) {
-				imgRequestObj.galleryCall.cancel();
+	public void cancelAllRequests(Context context) {
+		for (ImgRequestData imgRequestData : IMG_REQUEST_OBJ_SET) {
+			if (imgRequestData.glideTarget != null) {
+				if (imgRequestData.glideTarget.getRequest().isRunning())
+					Glide.with(context).clear(imgRequestData.glideTarget);
+			} else if (imgRequestData.getPhotoInfoCall != null) {
+				imgRequestData.getPhotoInfoCall.cancel();
+			} else if (imgRequestData.galleryCall != null) {
+				imgRequestData.galleryCall.cancel();
 			}
 		}
 
 		IMG_REQUEST_OBJ_SET.clear();
 	}
 
-	private static Bitmap setBrightness(Bitmap src, int value) {
-		// original image size
-		int width = src.getWidth();
-		int height = src.getHeight();
-		// create output bitmap
-		Bitmap bmOut = Bitmap.createBitmap(width, height, src.getConfig());
-		// color information
-		int A, R, G, B;
-		int pixel;
-
-		// scan through all pixels
-		for (int x = 0; x < width; ++x) {
-			for (int y = 0; y < height; ++y) {
-				// get pixel color
-				pixel = src.getPixel(x, y);
-				A = Color.alpha(pixel);
-				R = Color.red(pixel);
-				G = Color.green(pixel);
-				B = Color.blue(pixel);
-
-				// increase/decrease each channel
-				R += value;
-				if (R > 255) {
-					R = 255;
-				} else if (R < 0) {
-					R = 0;
-				}
-
-				G += value;
-				if (G > 255) {
-					G = 255;
-				} else if (G < 0) {
-					G = 0;
-				}
-
-				B += value;
-				if (B > 255) {
-					B = 255;
-				} else if (B < 0) {
-					B = 0;
-				}
-
-				// apply new pixel color to output bitmap
-				bmOut.setPixel(x, y, Color.argb(A, R, G, B));
-			}
-		}
-
-		// return final image
-		return bmOut;
-	}
 
 	public interface GlideImgCallback {
-		void onLoadedImg(FlickrImgObj flickrImgObj, boolean successful);
+		void onLoadedImg(FlickrImgResponse flickrImgResponse);
 	}
 
-	private static class ImgRequestObj {
+	public static class FlickrImgResponse {
+		public final FlickrImgData flickrImgData;
+		public final boolean successful;
+
+		public FlickrImgResponse(FlickrImgData flickrImgData, boolean successful) {
+			this.flickrImgData = flickrImgData;
+			this.successful = successful;
+		}
+	}
+
+	public static class ImgRequestData {
 		Call<JsonElement> galleryCall;
 		Call<JsonElement> getPhotoInfoCall;
 		CustomTarget<Bitmap> glideTarget;
+	}
+
+	public static class FlickrRequestParameter {
+		public final WeatherProviderType weatherProviderType;
+		public final String weatherDescription;
+		public final Double latitude;
+		public final Double longitude;
+		public final ZoneId zoneId;
+		public final String precipitationVolume;
+		public final ZonedDateTime refreshDateTime;
+
+		public FlickrRequestParameter(WeatherProviderType weatherProviderType, String weatherDescription, Double latitude, Double longitude, ZoneId zoneId, String precipitationVolume, ZonedDateTime refreshDateTime) {
+			this.weatherProviderType = weatherProviderType;
+			this.weatherDescription = weatherDescription;
+			this.latitude = latitude;
+			this.longitude = longitude;
+			this.zoneId = zoneId;
+			this.precipitationVolume = precipitationVolume;
+			this.refreshDateTime = refreshDateTime;
+		}
 	}
 }

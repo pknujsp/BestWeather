@@ -20,9 +20,6 @@ public class FavoriteAddressDto implements Serializable {
 	private String countryName;
 
 	@ColumnInfo
-	private String simpleName;
-
-	@ColumnInfo
 	private String countryCode;
 
 	@ColumnInfo
@@ -80,14 +77,6 @@ public class FavoriteAddressDto implements Serializable {
 
 	public String getCountryCode() {
 		return countryCode;
-	}
-
-	public void setSimpleName(String simpleName) {
-		this.simpleName = simpleName;
-	}
-
-	public String getSimpleName() {
-		return simpleName;
 	}
 
 	public void setZoneId(String zoneId) {

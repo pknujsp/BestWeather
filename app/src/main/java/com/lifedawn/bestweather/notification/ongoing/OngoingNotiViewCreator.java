@@ -102,9 +102,9 @@ public class OngoingNotiViewCreator {
 			public void onSuccessful(LocationResult locationResult) {
 				zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(context).getString("zoneId", ""));
 				final Location location = getBestLocation(locationResult);
-				Geocoding.nominatimGeocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
+				Geocoding.nominatimReverseGeocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.ReverseGeocodingCallback() {
 					@Override
-					public void onGeocodingResult(Geocoding.AddressDto address) {
+					public void onReverseGeocodingResult(Geocoding.AddressDto address) {
 						final SharedPreferences sharedPreferences =
 								context.getSharedPreferences(notificationType.getPreferenceName(), Context.MODE_PRIVATE);
 						SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -116,10 +116,9 @@ public class OngoingNotiViewCreator {
 								.putString(WidgetNotiConstants.Commons.DataKeys.ZONE_ID.name(), notificationDataObj.getZoneId())
 								.commit();
 
-						notificationDataObj.setDisplayName(address.toName())
+						notificationDataObj.setDisplayName(address.displayName)
 								.setCountryCode(address.countryCode)
 								.setLatitude(address.latitude).setLongitude(address.longitude)
-								.setSimpleName(address.simpleName)
 								.setZoneId(zoneId.getId());
 
 						fusedLocation.cancelNotification(context);
@@ -524,7 +523,6 @@ public class OngoingNotiViewCreator {
 		notificationDataObj.setDisplayName(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADDRESS_NAME.name(), ""));
 		notificationDataObj.setLatitude(notiPreferences.getFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), 0f));
 		notificationDataObj.setLongitude(notiPreferences.getFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), 0f));
-		notificationDataObj.setSimpleName(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ADMIN.name(), ""));
 		notificationDataObj.setCountryCode(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), ""));
 		notificationDataObj.setZoneId(notiPreferences.getString(WidgetNotiConstants.Commons.DataKeys.ZONE_ID.name(), ""));
 	}
@@ -566,7 +564,6 @@ public class OngoingNotiViewCreator {
 		editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LATITUDE.name(), (float) notificationDataObj.getLatitude());
 		editor.putFloat(WidgetNotiConstants.Commons.DataKeys.LONGITUDE.name(), (float) notificationDataObj.getLongitude());
 		editor.putString(WidgetNotiConstants.Commons.DataKeys.COUNTRY_CODE.name(), notificationDataObj.getCountryCode());
-		editor.putString(WidgetNotiConstants.Commons.DataKeys.ADMIN.name(), notificationDataObj.getSimpleName());
 		editor.putString(WidgetNotiConstants.Commons.DataKeys.ZONE_ID.name(), notificationDataObj.getZoneId());
 		editor.commit();
 	}

@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WeatherViewModel extends AndroidViewModel implements FavoriteAddressQuery {
-	private ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions;
 	private FusedLocation.MyLocationCallback locationCallback;
 	private FavoriteAddressRepository favoriteAddressRepository;
 
@@ -38,10 +37,6 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 		super(application);
 		favoriteAddressRepository = FavoriteAddressRepository.getINSTANCE();
 		favoriteAddressListLiveData = favoriteAddressRepository.getAllData();
-	}
-
-	public void setiLoadImgOfCurrentConditions(ILoadImgOfCurrentConditions iLoadImgOfCurrentConditions) {
-		this.iLoadImgOfCurrentConditions = iLoadImgOfCurrentConditions;
 	}
 
 	public void setLocationCallback(FusedLocation.MyLocationCallback locationCallback) {
@@ -96,10 +91,6 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 
 	public void setCurrentLocationAddressName(String addressName) {
 		currentLocationLiveData.setValue(addressName);
-	}
-
-	public interface ILoadImgOfCurrentConditions extends Serializable {
-		void loadImgOfCurrentConditions(WeatherProviderType weatherProviderType, String val, Double latitude, Double longitude, ZoneId zoneId, String volume);
 	}
 
 }

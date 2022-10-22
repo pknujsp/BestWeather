@@ -1,13 +1,12 @@
 package com.lifedawn.bestweather.flickr;
 
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 
 import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
 
 import java.io.Serializable;
 
-public class FlickrImgObj implements Serializable {
+public class FlickrImgData implements Serializable {
 	private Bitmap img;
 	private String weather;
 	private String time;
@@ -50,7 +49,7 @@ public class FlickrImgObj implements Serializable {
 		return photo;
 	}
 
-	public FlickrImgObj setPhoto(PhotosFromGalleryResponse.Photos.Photo photo) {
+	public FlickrImgData setPhoto(PhotosFromGalleryResponse.Photos.Photo photo) {
 		this.photo = photo;
 		return this;
 	}

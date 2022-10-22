@@ -121,8 +121,12 @@ public interface Queries {
 	//nominatim reverse geocode
 	//https://nominatim.openstreetmap.org/reverse?format=geojson&lat=44.50155&lon=11.33989
 	@GET("reverse")
-	Call<JsonElement> nominatimReverseGeocode(@QueryMap(encoded = true) Map<String, String> queryMap,
-	                                          @Header("Accept-Language") String lang);
+	Call<JsonElement> nominatimReverseGeocode(@QueryMap(encoded = true) Map<String, String> queryMap, @Header("Accept-Language") String lang);
+
+	//nominatim geocode
+	//https://nominatim.openstreetmap.org/search?q=%EB%82%B4%EB%8F%99&format=geojson&addressdetails=1
+	@GET("search")
+	Call<JsonElement> nominatimGeocode(@QueryMap(encoded = true) Map<String, String> queryMap, @Header("Accept-Language") String lang);
 
 	// rainviewer
 	@GET("weather-maps.json")

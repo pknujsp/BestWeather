@@ -20,13 +20,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAdapter.ViewHolder> implements Filterable {
 	private List<Geocoding.AddressDto> itemList = new ArrayList<>();
 	private List<Geocoding.AddressDto> filteredAddressList = new ArrayList<>();
-	private Set<String> favoriteAddressSet;
+	private Set<String> favoriteAddressSet = new HashSet<>();
 
 	private Filter filter;
 	private OnClickedAddressListener onClickedAddressListener;
@@ -34,7 +35,8 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 	private FindAddressFragment.OnListListener onListListener;
 
 	public FoundAddressesAdapter setFavoriteAddressSet(Set<String> favoriteAddressSet) {
-		this.favoriteAddressSet = favoriteAddressSet;
+		this.favoriteAddressSet.clear();
+		this.favoriteAddressSet.addAll(favoriteAddressSet);
 		return this;
 	}
 
@@ -61,7 +63,7 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 	@NotNull
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-		FoundAddressItemBinding binding = FoundAddressItemBinding.inflate(LayoutInflater.from(parent.getContext()), null, false);
+		FoundAddressItemBinding binding = FoundAddressItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
 		binding.getRoot().setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
 				ViewGroup.LayoutParams.WRAP_CONTENT));
 
@@ -107,15 +109,13 @@ public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAd
 				}
 			});
 
-			binding.itemPosition.setVisibility(View.GONE);
-
 		}
 
 		public void onBind() {
 			Geocoding.AddressDto address = filteredAddressList.get(getBindingAdapterPosition());
 
 			binding.country.setText(address.country);
-			binding.addressName.setText(address.toName());
+			binding.addressName.setText(address.displayName);
 
 			if (favoriteAddressSet.contains(address.latitude + "" + address.longitude)) {
 				binding.addBtn.setClickable(false);

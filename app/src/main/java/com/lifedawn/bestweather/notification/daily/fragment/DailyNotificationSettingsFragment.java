@@ -248,7 +248,6 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			if (savedNotificationDto.getLocationType() == LocationType.SelectedAddress) {
 				selectedFavoriteAddressDto = new FavoriteAddressDto();
 				selectedFavoriteAddressDto.setDisplayName(savedNotificationDto.getAddressName());
-				selectedFavoriteAddressDto.setSimpleName(savedNotificationDto.getAdmin());
 				selectedFavoriteAddressDto.setCountryCode(savedNotificationDto.getCountryCode());
 				selectedFavoriteAddressDto.setLatitude(String.valueOf(savedNotificationDto.getLatitude()));
 				selectedFavoriteAddressDto.setLongitude(String.valueOf(savedNotificationDto.getLongitude()));

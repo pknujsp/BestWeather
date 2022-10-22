@@ -28,7 +28,6 @@ public class ProgressDialog {
 
 	public static AlertDialog show(Activity activity, String msg, @Nullable View.OnClickListener cancelOnClickListener) {
 		if (!activity.isFinishing() && activity.isDestroyed()) {
-			clearDialogs();
 			return null;
 		}
 
@@ -54,8 +53,8 @@ public class ProgressDialog {
 			progressView.findViewById(R.id.cancel_btn).setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					dialog.dismiss();
 					cancelOnClickListener.onClick(v);
+					dialog.dismiss();
 				}
 			});
 		}
@@ -65,9 +64,7 @@ public class ProgressDialog {
 	}
 
 	public static void clearDialogs() {
-		int dialogsCount = dialogStack.size();
-
-		for (int i = 0; i < dialogsCount; i++) {
+		for (int i = 0; i < dialogStack.size(); i++) {
 			AlertDialog dialog = dialogStack.pop();
 
 			if (dialog.getWindow() != null) {

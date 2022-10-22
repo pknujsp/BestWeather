@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.notification.daily;
 
 import android.app.Notification;
 import android.content.Context;
-import android.location.Address;
 import android.location.Location;
 import android.os.Build;
 import android.os.PowerManager;
@@ -40,7 +39,6 @@ import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -188,10 +186,10 @@ public class DailyNotificationWorker extends Worker {
 				final ZoneId zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(context).getString("zoneId", ""));
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 				final Location location = getBestLocation(locationResult);
-				Geocoding.nominatimGeocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
+				Geocoding.nominatimReverseGeocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.ReverseGeocodingCallback() {
 					@Override
-					public void onGeocodingResult(Geocoding.AddressDto address) {
-						dailyPushNotificationDto.setAddressName(address.toName());
+					public void onReverseGeocodingResult(Geocoding.AddressDto address) {
+						dailyPushNotificationDto.setAddressName(address.displayName);
 						dailyPushNotificationDto.setCountryCode(address.countryCode);
 						dailyPushNotificationDto.setLatitude(address.latitude);
 						dailyPushNotificationDto.setLongitude(address.longitude);

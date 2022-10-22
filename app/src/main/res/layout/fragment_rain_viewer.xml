@@ -38,8 +38,8 @@
 
         <ImageButton
             android:id="@+id/previous_btn"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
             android:background="@drawable/circle_btn_background"
             android:backgroundTint="#CBFFFFFF"
             android:src="@drawable/ic_baseline_chevron_left_24"
@@ -56,10 +56,11 @@
             android:background="@drawable/rounded_btn_background_no_padding"
             android:backgroundTint="#CCFFFFFF"
             android:clickable="true"
+            android:drawablePadding="6dp"
             android:focusable="true"
             android:gravity="center"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
             android:text="dateTime"
             android:textAlignment="center"
             android:textColor="@color/black"
@@ -69,8 +70,8 @@
 
         <ImageButton
             android:id="@+id/next_btn"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
             android:background="@drawable/circle_btn_background"
             android:backgroundTint="#CCFFFFFF"
             android:src="@drawable/ic_baseline_chevron_right_24"

@@ -65,6 +65,20 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 	private WeatherRestApiDownloader weatherRestApiDownloader;
 
 	@Override
+	public void onAttach(@NonNull Context context) {
+		super.onAttach(context);
+		ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (weatherRestApiDownloader != null) {
+					weatherRestApiDownloader.cancel();
+				}
+				getParentFragmentManager().popBackStack();
+			}
+		});
+	}
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
@@ -547,15 +561,6 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
 			request.put(WeatherProviderType.KMA_WEB, requestKma);
 		}
-		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (weatherRestApiDownloader != null) {
-					weatherRestApiDownloader.cancel();
-				}
-				getParentFragmentManager().popBackStack();
-			}
-		});
 
 		weatherRestApiDownloader = new WeatherRestApiDownloader() {
 			@Override

@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.findaddress;
 
-import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -49,8 +48,7 @@ import java.util.concurrent.ExecutorService;
 
 public class FindAddressFragment extends Fragment {
 	private FragmentFindAddressBinding binding;
-	private FoundAddressesAdapter addressesAdapter;
-	private ExecutorService executorService;
+	private FoundAddressesAdapter addressesAdapter = new FoundAddressesAdapter();
 	private FusedLocation fusedLocation;
 	private NetworkStatus networkStatus;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
@@ -74,9 +72,9 @@ public class FindAddressFragment extends Fragment {
 				}
 			});
 
-			Geocoding.reverseGeocoding(getContext(), newText, new Geocoding.ReverseGeocodingCallback() {
+			Geocoding.nominatimGeocoding(getContext(), newText, new Geocoding.GeocodingCallback() {
 				@Override
-				public void onReverseGeocodingResult(List<Geocoding.AddressDto> addressList) {
+				public void onGeocodingResult(List<Geocoding.AddressDto> addressList) {
 					if (getActivity() != null) {
 						MainThreadWorker.runOnUiThread(new Runnable() {
 							@Override
@@ -126,7 +124,6 @@ public class FindAddressFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		executorService = MyApplication.getExecutorService();
 		bundle = getArguments() != null ? getArguments() : savedInstanceState;
 
 		fusedLocation = FusedLocation.getInstance(getContext());
@@ -172,6 +169,48 @@ public class FindAddressFragment extends Fragment {
 			}
 		});
 
+		addressesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+			@Override
+			public void onChanged() {
+				if (addressesAdapter.getItemCount() == 0) {
+					binding.progressResultView.onFailed(getString(R.string.title_empty_locations));
+				} else {
+					binding.progressResultView.onSuccessful();
+				}
+			}
+		});
+
+		addressesAdapter.setOnClickedAddressListener(new FoundAddressesAdapter.OnClickedAddressListener() {
+			@Override
+			public void onClickedAddress(Geocoding.AddressDto addressDto) {
+				onClickedAddressListener.onClickedAddress(addressDto);
+			}
+		});
+
+		addressesAdapter.setOnAddressListListener(new OnAddressListListener() {
+			@Override
+			public void onSearchedAddressList(List<Geocoding.AddressDto> addressList) {
+				onAddressListListener.onSearchedAddressList(addressList);
+			}
+		});
+
+
+		addressesAdapter.setOnListListener(new OnListListener() {
+			@Override
+			public void onPOIItemSelectedByList(int position) {
+				onListListener.onPOIItemSelectedByList(position);
+			}
+
+			@Override
+			public void onPOIItemSelectedByBottomSheet(int position, MapFragment.MarkerType markerType) {
+
+			}
+		});
+
+		binding.addressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
+		binding.addressList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+		binding.addressList.setAdapter(addressesAdapter);
+
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
@@ -180,55 +219,7 @@ public class FindAddressFragment extends Fragment {
 				for (FavoriteAddressDto favoriteAddressDto : result) {
 					favoriteAddressSet.add(favoriteAddressDto.getLatitude() + favoriteAddressDto.getLongitude());
 				}
-
-				MainThreadWorker.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						addressesAdapter = new FoundAddressesAdapter();
-						addressesAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-							@Override
-							public void onChanged() {
-								if (addressesAdapter.getItemCount() == 0) {
-									binding.progressResultView.onFailed(getString(R.string.title_empty_locations));
-								} else {
-									binding.progressResultView.onSuccessful();
-								}
-							}
-						});
-
-						addressesAdapter.setOnClickedAddressListener(new FoundAddressesAdapter.OnClickedAddressListener() {
-							@Override
-							public void onClickedAddress(Geocoding.AddressDto addressDto) {
-								onClickedAddressListener.onClickedAddress(addressDto);
-							}
-						});
-
-						addressesAdapter.setOnAddressListListener(new OnAddressListListener() {
-							@Override
-							public void onSearchedAddressList(List<Geocoding.AddressDto> addressList) {
-								onAddressListListener.onSearchedAddressList(addressList);
-							}
-						});
-
-						addressesAdapter.setFavoriteAddressSet(favoriteAddressSet);
-
-						addressesAdapter.setOnListListener(new OnListListener() {
-							@Override
-							public void onPOIItemSelectedByList(int position) {
-								onListListener.onPOIItemSelectedByList(position);
-							}
-
-							@Override
-							public void onPOIItemSelectedByBottomSheet(int position, MapFragment.MarkerType markerType) {
-
-							}
-						});
-
-						binding.addressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
-						binding.addressList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-						binding.addressList.setAdapter(addressesAdapter);
-					}
-				});
+				addressesAdapter.setFavoriteAddressSet(favoriteAddressSet);
 			}
 
 			@Override
@@ -267,10 +258,10 @@ public class FindAddressFragment extends Fragment {
 		@Override
 		public void onSuccessful(LocationResult locationResult) {
 			final Location location = getBestLocation(locationResult);
-			Geocoding.nominatimGeocoding(getContext(), location.getLatitude(), location.getLongitude(),
-					new Geocoding.GeocodingCallback() {
+			Geocoding.nominatimReverseGeocoding(getContext(), location.getLatitude(), location.getLongitude(),
+					new Geocoding.ReverseGeocodingCallback() {
 						@Override
-						public void onGeocodingResult(Geocoding.AddressDto addressDto) {
+						public void onReverseGeocodingResult(Geocoding.AddressDto addressDto) {
 							MainThreadWorker.runOnUiThread(new Runnable() {
 								@Override
 								public void run() {

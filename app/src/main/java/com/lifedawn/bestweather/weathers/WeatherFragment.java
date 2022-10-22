@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
@@ -74,12 +74,10 @@ import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
 import com.lifedawn.bestweather.findaddress.map.MapFragment;
-import com.lifedawn.bestweather.flickr.FlickrImgObj;
-import com.lifedawn.bestweather.flickr.FlickrLoader;
+import com.lifedawn.bestweather.flickr.FlickrRepository;
+import com.lifedawn.bestweather.flickr.FlickrViewModel;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
-import com.lifedawn.bestweather.rainviewer.view.RainViewerFragment;
 import com.lifedawn.bestweather.rainviewer.view.SimpleRainViewerFragment;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
@@ -136,11 +134,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
-public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadImgOfCurrentConditions, IGps {
+public class WeatherFragment extends Fragment implements IGps {
 	private ExecutorService executorService = MyApplication.getExecutorService();
 	private DateTimeFormatter dateTimeFormatter;
 
@@ -154,6 +151,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private NetworkStatus networkStatus;
 	private FusedLocation.MyLocationCallback locationCallbackInMainFragment;
 	private WeatherViewController weatherViewController;
+	private FlickrViewModel flickrViewModel;
 
 	private WeatherProviderType mainWeatherProviderType;
 	private Double latitude;
@@ -195,11 +193,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
 		                              @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 			super.onFragmentCreated(fm, f, savedInstanceState);
-
-			if (f instanceof AlertFragment) {
-				onHiddenChanged(true);
-				binding.scrollView.setVisibility(View.GONE);
-			}
 		}
 
 		@Override
@@ -227,11 +220,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		@Override
 		public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
 			super.onFragmentDestroyed(fm, f);
-
-			if (f instanceof AlertFragment) {
-				onHiddenChanged(false);
-				binding.scrollView.setVisibility(View.VISIBLE);
-			}
 		}
 	};
 
@@ -244,9 +232,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
-
 		HeaderbarStyle.setStyle(HeaderbarStyle.Style.White, getActivity());
+
+		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
@@ -256,8 +244,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
-		weatherViewModel.setiLoadImgOfCurrentConditions(this);
 		locationCallbackInMainFragment = weatherViewModel.getLocationCallback();
+
+		flickrViewModel = new ViewModelProvider(this).get(FlickrViewModel.class);
 
 		arguments = savedInstanceState != null ? savedInstanceState : getArguments();
 		load = arguments.getBoolean("load", false);
@@ -375,9 +364,14 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			public void onClick(View v) {
 				if (binding.flickrImageUrl.getTag() != null) {
 					String url = (String) binding.flickrImageUrl.getTag();
-					Intent intent = new Intent(Intent.ACTION_VIEW);
-					intent.setData(Uri.parse(url));
-					startActivity(intent);
+
+					if (url.equals("failed")) {
+						loadImgOfCurrentConditions(flickrViewModel.getLastParameter());
+					} else {
+						Intent intent = new Intent(Intent.ACTION_VIEW);
+						intent.setData(Uri.parse(url));
+						startActivity(intent);
+					}
 				}
 
 			}
@@ -431,10 +425,46 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 			}
 		});
 
+		flickrViewModel.imgLiveData.observe(getViewLifecycleOwner(), new Observer<FlickrRepository.FlickrImgResponse>() {
+			@Override
+			public void onChanged(FlickrRepository.FlickrImgResponse flickrImgResponse) {
+				if (flickrImgResponse.successful) {
+					Glide.with(requireContext()).load(flickrImgResponse.flickrImgData.getImg()).diskCacheStrategy(DiskCacheStrategy.ALL).transition(
+							DrawableTransitionOptions.withCrossFade(300)).into(binding.currentConditionsImg);
+
+					final String text = flickrImgResponse.flickrImgData.getPhoto().getOwner() + "-" + flickrImgResponse.flickrImgData.getPhoto().getTitle();
+					binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
+							ContextCompat.getColor(getContext(), R.color.white)));
+					binding.flickrImageUrl.setTag(flickrImgResponse.flickrImgData.getRealFlickrUrl());
+
+					setBackgroundWeatherView(flickrImgResponse.flickrImgData.getWeather(), flickrImgResponse.flickrImgData.getVolume());
+
+					binding.flickrImageUrl.setVisibility(View.VISIBLE);
+					binding.loadingAnimation.setVisibility(View.GONE);
+				} else {
+					Glide.with(requireContext()).clear(binding.currentConditionsImg);
+
+					final String text = getString(R.string.failed_load_img);
+					binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
+							ContextCompat.getColor(getContext(), R.color.white)));
+					binding.flickrImageUrl.setTag("failed");
+
+					if (flickrImgResponse.flickrImgData != null) {
+						setBackgroundWeatherView(flickrImgResponse.flickrImgData.getWeather(), flickrImgResponse.flickrImgData.getVolume());
+					}
+
+					binding.loadingAnimation.setVisibility(View.GONE);
+					binding.flickrImageUrl.setVisibility(View.VISIBLE);
+				}
+
+			}
+		});
+
 		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
 		final LocationType locationType = (LocationType) arguments.getSerializable("LocationType");
 		final FavoriteAddressDto favoriteAddressDto = arguments.containsKey("FavoriteAddressDto") ?
 				(FavoriteAddressDto) arguments.getSerializable("FavoriteAddressDto") : null;
+
 
 		if (load) {
 			load = false;
@@ -459,7 +489,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		this.locationType = locationType;
 
 		final boolean clickGps = arguments.getBoolean("clickGps", false);
-
 
 		if (locationType == LocationType.CurrentLocation) {
 			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
@@ -555,17 +584,6 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	}
 
 
-	private void setFlickrImgInfo(FlickrImgObj flickrImgInfo) {
-		final String text = flickrImgInfo.getPhoto().getOwner() + "-" + flickrImgInfo.getPhoto().getTitle();
-		binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
-				ContextCompat.getColor(getContext(), R.color.white)));
-		binding.flickrImageUrl.setTag(flickrImgInfo.getRealFlickrUrl());
-		binding.flickrImageUrl.setVisibility(View.VISIBLE);
-		binding.loadingAnimation.setVisibility(View.GONE);
-
-		setBackgroundWeatherView(flickrImgInfo.getWeather(), flickrImgInfo.getVolume());
-	}
-
 	private void setBackgroundWeatherView(String weather, String volume) {
 		if (!PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_show_background_animation), false)) {
 			weatherViewController.setWeatherView(PrecipType.CLEAR, null);
@@ -581,47 +599,10 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		}
 	}
 
-	@Override
-	public void loadImgOfCurrentConditions(WeatherProviderType weatherProviderType, String val, Double latitude, Double longitude,
-	                                       ZoneId zoneId, String volume) {
-		MainThreadWorker.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				binding.loadingAnimation.setVisibility(View.VISIBLE);
-				binding.flickrImageUrl.setVisibility(View.GONE);
-			}
-		});
-
-		FlickrLoader.loadImg(getContext(), weatherProviderType, val, latitude, longitude, zoneId, volume, new FlickrLoader.GlideImgCallback() {
-					@Override
-					public void onLoadedImg(FlickrImgObj flickrImgObj, boolean successful) {
-						if (getActivity() != null && isAdded()) {
-							MainThreadWorker.runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									if (successful) {
-										Glide.with(getContext()).load(flickrImgObj.getImg()).diskCacheStrategy(DiskCacheStrategy.ALL).transition(
-												DrawableTransitionOptions.withCrossFade(300)).into(binding.currentConditionsImg);
-										setFlickrImgInfo(flickrImgObj);
-									} else {
-										Glide.with(getContext()).clear(binding.currentConditionsImg);
-										binding.loadingAnimation.setVisibility(View.GONE);
-										binding.flickrImageUrl.setVisibility(View.VISIBLE);
-										final String text = getString(R.string.error);
-										binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
-												ContextCompat.getColor(getContext(), R.color.white)));
-
-										if (flickrImgObj != null) {
-											setBackgroundWeatherView(flickrImgObj.getWeather(), flickrImgObj.getVolume());
-										}
-									}
-
-								}
-							});
-						}
-					}
-				},
-				ZonedDateTime.parse(weatherViewModel.FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).weatherRestApiDownloader.getRequestDateTime().toString()));
+	public void loadImgOfCurrentConditions(FlickrRepository.FlickrRequestParameter flickrRequestParameter) {
+		binding.loadingAnimation.setVisibility(View.VISIBLE);
+		binding.flickrImageUrl.setVisibility(View.GONE);
+		flickrViewModel.loadImg(flickrRequestParameter);
 	}
 
 	private final FusedLocation.MyLocationCallback MY_LOCATION_CALLBACK = new FusedLocation.MyLocationCallback() {
@@ -724,9 +705,9 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 	private void requestAddressOfLocation(Double latitude, Double longitude, boolean refresh) {
 		binding.scrollView.setVisibility(View.GONE);
 
-		Geocoding.nominatimGeocoding(getContext(), latitude, longitude, new Geocoding.GeocodingCallback() {
+		Geocoding.nominatimReverseGeocoding(getContext(), latitude, longitude, new Geocoding.ReverseGeocodingCallback() {
 			@Override
-			public void onGeocodingResult(Geocoding.AddressDto address) {
+			public void onReverseGeocodingResult(Geocoding.AddressDto address) {
 				if (getActivity() != null) {
 					if (address == null) {
 						//검색 결과가 없으면 주소 정보 미 표시하고 데이터 로드
@@ -737,7 +718,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 						final String addressStr = getString(R.string.current_location) + " : " + addressName;
 						onResultCurrentLocation(addressStr, addressName, refresh);
 					} else {
-						addressName = address.toName();
+						addressName = address.displayName;
 						mainWeatherProviderType = getMainWeatherSourceType(address.countryCode);
 						countryCode = address.countryCode;
 
@@ -1441,19 +1422,23 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 		final String finalPrecipitationVolume = precipitationVolume;
 
 		if (getActivity() != null) {
-			loadImgOfCurrentConditions(mainWeatherProviderType, finalCurrentConditionsWeatherVal, latitude, longitude,
-					finalZoneId, finalPrecipitationVolume);
+			FlickrRepository.FlickrRequestParameter flickrRequestParameter = new FlickrRepository.FlickrRequestParameter(
+					mainWeatherProviderType, finalCurrentConditionsWeatherVal, latitude, longitude,
+					finalZoneId, finalPrecipitationVolume,
+					ZonedDateTime.parse(weatherRestApiDownloader.getRequestDateTime().toString())
+			);
+
+			dateTimeFormatter = DateTimeFormatter.ofPattern(
+					MyApplication.VALUE_UNIT_OBJ.getClockUnit() == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
+							getString(R.string.datetime_pattern_clock24), Locale.getDefault());
 
 			MainThreadWorker.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
+					loadImgOfCurrentConditions(flickrRequestParameter);
+
 					changeWeatherDataSourcePicker(countryCode);
-					ZonedDateTime dateTime = weatherRestApiDownloader.getRequestDateTime();
-					dateTimeFormatter = DateTimeFormatter.ofPattern(
-							MyApplication.VALUE_UNIT_OBJ.getClockUnit() == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
-									getString(R.string.datetime_pattern_clock24), Locale.getDefault());
-					binding.updatedDatetime.setText(dateTime.format(dateTimeFormatter));
-					binding.scrollView.setVisibility(View.VISIBLE);
+					binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(dateTimeFormatter));
 
 					FragmentManager fragmentManager = getChildFragmentManager();
 					FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -1477,6 +1462,7 @@ public class WeatherFragment extends Fragment implements WeatherViewModel.ILoadI
 									SimpleRainViewerFragment.class.getName())
 							.commitAllowingStateLoss();
 
+					binding.scrollView.setVisibility(View.VISIBLE);
 					ProgressDialog.clearDialogs();
 				}
 			});

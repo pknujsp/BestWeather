@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.location.Address;
 import android.location.LocationManager;
 import android.os.Bundle;
 
@@ -104,7 +103,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	protected final Map<MarkerType, RecyclerView.Adapter> adapterMap = new HashMap<>();
 
 	private FusedLocation fusedLocation;
-	private Integer dp48;
+	private int mapPadding;
 
 	private ViewPager2 locationItemBottomSheetViewPager;
 	private boolean removedLocation;
@@ -162,6 +161,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 						getParentFragmentManager().popBackStack();
 					}
 
+				} else {
+					getParentFragmentManager().popBackStack();
 				}
 			}
 
@@ -222,8 +223,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		final FavoriteAddressDto favoriteAddressDto = new FavoriteAddressDto();
 		favoriteAddressDto.setCountryName(addressDto.country);
 		favoriteAddressDto.setCountryCode(addressDto.countryCode == null ? "" : addressDto.countryCode);
-		favoriteAddressDto.setDisplayName(addressDto.toName());
-		favoriteAddressDto.setSimpleName(addressDto.simpleName);
+		favoriteAddressDto.setDisplayName(addressDto.displayName);
 		favoriteAddressDto.setLatitude(latitude.toString());
 		favoriteAddressDto.setLongitude(longitude.toString());
 
@@ -541,10 +541,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	public void onMapReady(@NonNull GoogleMap googleMap) {
 		this.googleMap = googleMap;
 
-		dp48 = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48f, getResources().getDisplayMetrics());
+		mapPadding = MyApplication.getStatusBarHeight() + binding.headerLayout.getBottom() +
+				(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48f, getResources().getDisplayMetrics());
 
-		googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.headerLayout.getBottom() +
-				dp48, 0, 0);
+		googleMap.setPadding(0, mapPadding, 0, mapPadding);
 		googleMap.getUiSettings().setZoomControlsEnabled(true);
 		googleMap.getUiSettings().setRotateGesturesEnabled(false);
 		googleMap.setOnMarkerClickListener(this);
@@ -704,9 +704,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 	private void onLongClicked(LatLng latLng) {
 		collapseAllExpandedBottomSheets();
-		Geocoding.nominatimGeocoding(getContext(), latLng.latitude, latLng.longitude, new Geocoding.GeocodingCallback() {
+		Geocoding.nominatimReverseGeocoding(getContext(), latLng.latitude, latLng.longitude, new Geocoding.ReverseGeocodingCallback() {
 			@Override
-			public void onGeocodingResult(Geocoding.AddressDto addressDto) {
+			public void onReverseGeocodingResult(Geocoding.AddressDto addressDto) {
 				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
@@ -762,7 +762,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	private void addMarker(MarkerType markerType, int position, Geocoding.AddressDto address) {
 		Marker marker = googleMap.addMarker(new MarkerOptions()
 				.position(new LatLng(address.latitude, address.longitude))
-				.title(address.toName()));
+				.title(address.displayName));
 		marker.setTag(new MarkerHolder(position, markerType));
 
 		if (!markerMaps.containsKey(markerType)) {
@@ -896,8 +896,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 				//expanded일때 offset == 1.0, collapsed일때 offset == 0.0
 				//offset에 따라서 버튼들이 이동하고, 지도의 좌표가 변경되어야 한다.
-				googleMap.setPadding(0, MyApplication.getStatusBarHeight() + binding.headerLayout.getBottom() +
-						dp48, 0, translationValue);
+				googleMap.setPadding(0, mapPadding + translationValue, 0, mapPadding + translationValue);
 			}
 		});
 

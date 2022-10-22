@@ -179,7 +179,6 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.SelectedAddress) {
 			originalSelectedFavoriteAddressDto = new FavoriteAddressDto();
 			originalSelectedFavoriteAddressDto.setDisplayName(ongoingNotiViewCreator.getNotificationDataObj().getDisplayName());
-			originalSelectedFavoriteAddressDto.setSimpleName(ongoingNotiViewCreator.getNotificationDataObj().getSimpleName());
 			originalSelectedFavoriteAddressDto.setCountryCode(ongoingNotiViewCreator.getNotificationDataObj().getCountryCode());
 			originalSelectedFavoriteAddressDto.setLatitude(String.valueOf(ongoingNotiViewCreator.getNotificationDataObj().getLatitude()));
 			originalSelectedFavoriteAddressDto.setLongitude(String.valueOf(ongoingNotiViewCreator.getNotificationDataObj().getLongitude()));
@@ -372,7 +371,6 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 			originalSelectedFavoriteAddressDto = favoriteAddressDto;
 			ongoingNotiViewCreator.getNotificationDataObj().setDisplayName(favoriteAddressDto.getDisplayName())
 					.setCountryCode(favoriteAddressDto.getCountryCode())
-					.setSimpleName(favoriteAddressDto.getSimpleName())
 					.setZoneId(favoriteAddressDto.getZoneId())
 					.setLatitude(Float.parseFloat(favoriteAddressDto.getLatitude())).setLongitude(Float.parseFloat(favoriteAddressDto.getLongitude()));
 

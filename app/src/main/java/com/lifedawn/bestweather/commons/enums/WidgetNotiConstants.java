@@ -8,7 +8,7 @@ public class WidgetNotiConstants {
 		}
 
 		public enum DataKeys {
-			ADDRESS_NAME, LATITUDE, LONGITUDE, COUNTRY_CODE, ADMIN, ZONE_ID
+			ADDRESS_NAME, LATITUDE, LONGITUDE, COUNTRY_CODE, ZONE_ID
 		}
 	}
 

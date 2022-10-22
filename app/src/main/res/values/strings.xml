@@ -586,6 +586,7 @@
     <string name="forecast">forecast</string>
     <string name="past">past</string>
     <string name="radar">radar</string>
+    <string name="failed_load_img">failed to load image, retry</string>
 
 
 </resources>

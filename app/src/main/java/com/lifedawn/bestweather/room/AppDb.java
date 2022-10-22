@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.room;
 
 import android.content.Context;
 
+import androidx.room.AutoMigration;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -22,8 +23,7 @@ import com.lifedawn.bestweather.room.dto.WidgetDto;
 
 @Database(entities = {KmaAreaCodeDto.class, FavoriteAddressDto.class, AlarmDto.class, WidgetDto.class, DailyPushNotificationDto.class,
 		TimeZoneIdDto.class},
-		version = 1, exportSchema =
-		false)
+		version = 1, exportSchema = true)
 @TypeConverters(RoomTypeConverter.class)
 public abstract class AppDb extends RoomDatabase {
 	private static volatile AppDb instance = null;
@@ -48,7 +48,4 @@ public abstract class AppDb extends RoomDatabase {
 		return instance;
 	}
 
-	public static void closeInstance() {
-		instance = null;
-	}
 }

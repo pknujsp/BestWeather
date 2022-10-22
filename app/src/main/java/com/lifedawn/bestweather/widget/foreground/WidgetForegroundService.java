@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
-import android.location.Address;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -62,7 +61,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
@@ -218,8 +216,8 @@ public class WidgetForegroundService extends Service {
 						selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
 
 						Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(),
-								widgetDto.getLongitude(), widgetDto.getAddressName(), widgetDto.getAddressName(), null,
-								widgetDto.getCountryCode(), null);
+								widgetDto.getLongitude(), widgetDto.getAddressName(), null,
+								widgetDto.getCountryCode());
 
 						final RequestObj requestObj = new RequestObj(address);
 						requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
@@ -262,8 +260,8 @@ public class WidgetForegroundService extends Service {
 							RequestObj requestObj = selectedLocationRequestMap.get(widgetDto.getAddressName());
 							if (requestObj == null) {
 								Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(),
-										widgetDto.getLongitude(), widgetDto.getAddressName(), widgetDto.getAddressName(), null,
-										widgetDto.getCountryCode(), null);
+										widgetDto.getLongitude(), widgetDto.getAddressName(), null,
+										widgetDto.getCountryCode());
 
 								requestObj = new RequestObj(address);
 
@@ -377,14 +375,14 @@ public class WidgetForegroundService extends Service {
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 
 				final Location location = getBestLocation(locationResult);
-				Geocoding.nominatimGeocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(), new Geocoding.GeocodingCallback() {
+				Geocoding.nominatimReverseGeocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(), new Geocoding.ReverseGeocodingCallback() {
 					@Override
-					public void onGeocodingResult(Geocoding.AddressDto address) {
+					public void onReverseGeocodingResult(Geocoding.AddressDto address) {
 						if (address == null) {
 							onLocationResponse(Fail.FAILED_FIND_LOCATION, null);
 						} else {
 							final Set<Integer> appWidgetIdSet = currentLocationWidgetDtoArrayMap.keySet();
-							final String newAddressName = address.toName();
+							final String newAddressName = address.displayName;
 
 							if (!currentLocationRequestMap.containsKey(newAddressName)) {
 								currentLocationRequestMap.put(newAddressName, new RequestObj(address));

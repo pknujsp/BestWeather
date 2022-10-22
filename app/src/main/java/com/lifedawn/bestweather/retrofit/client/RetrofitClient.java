@@ -1,7 +1,5 @@
 package com.lifedawn.bestweather.retrofit.client;
 
-import com.lifedawn.bestweather.main.MyApplication;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +33,7 @@ public class RetrofitClient {
 	public static final String GOOGLE_PLACE_SEARCH_SERVICE_URL = "https://maps.googleapis.com/maps/api/place/textsearch/";
 	public static final String GOOGLE_FIND_PLACE_SERVICE_URL = "https://maps.googleapis.com/maps/api/place/findplacefromtext/";
 
-	public static final String NOMINATIM_REVERSE_GEOCODE_URL = "https://nominatim.openstreetmap.org/";
+	public static final String NOMINATIM_GEOCODE_URL = "https://nominatim.openstreetmap.org/";
 	public static final String RAIN_VIEWER_URL = "https://api.rainviewer.com/public/";
 
 	//service key, token
@@ -60,7 +58,7 @@ public class RetrofitClient {
 		ACCU_CURRENT_CONDITIONS, ACCU_DAILY_FORECAST, ACCU_HOURLY_FORECAST, MET_NORWAY_LOCATION_FORECAST, AQICN_GEOLOCALIZED_FEED,
 		OWM_CURRENT_CONDITIONS,
 		OWM_HOURLY_FORECAST, OWM_DAILY_FORECAST, OWM_ONE_CALL, FLICKR, KMA_WEB_CURRENT_CONDITIONS, KMA_WEB_FORECASTS,
-		GOOGLE_PLACE_SEARCH, GOOGLE_FIND_PLACE, FREE_TIME, NOMINATIM_REVERSE, RAIN_VIEWER
+		GOOGLE_PLACE_SEARCH, GOOGLE_FIND_PLACE, FREE_TIME, NOMINATIM, RAIN_VIEWER
 	}
 
 
@@ -160,11 +158,11 @@ public class RetrofitClient {
 								FREE_TIME_SERVICE_URL).build();
 				return freeTimeInstance.create(Queries.class);
 
-			case NOMINATIM_REVERSE:
+			case NOMINATIM:
 				Retrofit nominatim = new Retrofit.Builder().client(client).addConverterFactory(
 								GsonConverterFactory.create()).callbackExecutor(EXECUTOR_SERVICE)
 						.addConverterFactory(ScalarsConverterFactory.create()).baseUrl(
-								NOMINATIM_REVERSE_GEOCODE_URL).build();
+								NOMINATIM_GEOCODE_URL).build();
 				return nominatim.create(Queries.class);
 
 			case RAIN_VIEWER:

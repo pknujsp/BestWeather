@@ -5,7 +5,9 @@
     android:layout_height="wrap_content"
     android:background="@color/white"
     android:paddingLeft="16dp"
+    android:paddingTop="4dp"
     android:paddingRight="16dp"
+    android:paddingBottom="4dp"
     >
 
     <RelativeLayout
@@ -44,12 +46,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:fontFamily="sans-serif"
             android:background="?attr/selectableItemBackground"
+            android:fontFamily="sans-serif"
             android:gravity="center_vertical"
-            android:visibility="gone"
             android:text="txt"
             android:textColor="@color/blue"
+            android:visibility="gone"
             />
 
     </RelativeLayout>

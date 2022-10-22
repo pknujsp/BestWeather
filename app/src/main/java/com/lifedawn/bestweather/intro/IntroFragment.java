@@ -39,7 +39,6 @@ import java.util.Map;
 public class IntroFragment extends Fragment {
 	private FragmentIntroBinding binding;
 	private FusedLocation fusedLocation;
-	private SharedPreferences sharedPreferences;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 
 	private FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
@@ -57,7 +56,6 @@ public class IntroFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		fusedLocation = FusedLocation.getInstance(getContext());
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
 		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
@@ -95,7 +93,7 @@ public class IntroFragment extends Fragment {
 					public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
 						final int newFavoriteAddressDtoId = newFavoriteAddressDto.getId();
 
-						sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
+						PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
 								newFavoriteAddressDtoId).putString(getString(R.string.pref_key_last_selected_location_type),
 								LocationType.SelectedAddress.name()).putBoolean(getString(R.string.pref_key_show_intro), false).commit();
 

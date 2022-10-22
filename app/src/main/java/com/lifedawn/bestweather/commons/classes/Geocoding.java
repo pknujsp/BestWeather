@@ -7,9 +7,10 @@ import android.location.Geocoder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.retrofit.parameters.nominatim.GeocodeParameter;
 import com.lifedawn.bestweather.retrofit.parameters.nominatim.ReverseGeocodeParameter;
+import com.lifedawn.bestweather.retrofit.responses.nominatim.GeocodeResponse;
 import com.lifedawn.bestweather.retrofit.responses.nominatim.ReverseGeocodeResponse;
 
 import java.util.ArrayList;
@@ -22,12 +23,12 @@ import retrofit2.Response;
 
 public class Geocoding {
 
-	public static void reverseGeocoding(Context context, String query, ReverseGeocodingCallback callback) {
+	public static void androidGeocoding(Context context, String query, GeocodingCallback callback) {
 		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
 			public void run() {
 				if (query.isEmpty()) {
-					callback.onReverseGeocodingResult(new ArrayList<>());
+					callback.onGeocodingResult(new ArrayList<>());
 					return;
 				}
 
@@ -50,12 +51,12 @@ public class Geocoding {
 
 					List<AddressDto> addressDtoList = new ArrayList<>();
 					for (Address address : addressList) {
-						addressDtoList.add(new AddressDto(address.getLatitude(), address.getLongitude(), address.getAddressLine(0),
+						addressDtoList.add(new AddressDto(address.getLatitude(), address.getLongitude(),
 								address.getAddressLine(0),
-								address.getCountryName(), address.getCountryCode(), address.getAdminArea()));
+								address.getCountryName(), address.getCountryCode()));
 					}
 
-					callback.onReverseGeocodingResult(addressDtoList);
+					callback.onGeocodingResult(addressDtoList);
 				} catch (Exception e) {
 
 				}
@@ -63,30 +64,68 @@ public class Geocoding {
 		});
 	}
 
-	public static void geocoding(Context context, Double latitude, Double longitude, GeocodingCallback callback) {
+	public static void nominatimGeocoding(Context context, String query, GeocodingCallback callback) {
+		GeocodeParameter parameter = new GeocodeParameter(query);
+		Call<JsonElement> call =
+				RetrofitClient.getApiService(RetrofitClient.ServiceType.NOMINATIM).nominatimGeocode(parameter.getMap(),
+						MyApplication.locale.toLanguageTag());
+
+		call.enqueue(new Callback<JsonElement>() {
+			@Override
+			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+				if (response.isSuccessful()) {
+					GeocodeResponse geocodeResponse = new Gson().fromJson(response.body(),
+							GeocodeResponse.class);
+
+					List<AddressDto> addressDtoList = new ArrayList<>();
+
+					for (GeocodeResponse.Features features : geocodeResponse.getFeatures()) {
+						GeocodeResponse.Properties properties = features.getProperties();
+						String editedDisplayName = convertDisplayName(properties.getDisplayName());
+
+						addressDtoList.add(new AddressDto(features.getGeometry().getCoordinates().get(0),
+								features.getGeometry().getCoordinates().get(1),
+								editedDisplayName, properties.getAddress().getCountry(),
+								properties.getAddress().getCountryCode().toUpperCase()
+						));
+					}
+					callback.onGeocodingResult(addressDtoList);
+				} else {
+					androidGeocoding(context, query, callback);
+				}
+			}
+
+			@Override
+			public void onFailure(Call<JsonElement> call, Throwable t) {
+				androidGeocoding(context, query, callback);
+			}
+		});
+	}
+
+	public static void androidReverseGeocoding(Context context, Double latitude, Double longitude, ReverseGeocodingCallback callback) {
 		Geocoder geocoder = new Geocoder(context);
 		try {
 			List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 20);
 
 			if (addressList.size() > 0) {
-				AddressDto addressDto = new AddressDto(latitude, longitude, addressList.get(0).getAddressLine(0),
+				AddressDto addressDto = new AddressDto(latitude, longitude,
 						addressList.get(0).getAddressLine(0),
-						addressList.get(0).getCountryName(), addressList.get(0).getCountryCode(),
-						addressList.get(0).getAdminArea());
+						addressList.get(0).getCountryName(), addressList.get(0).getCountryCode()
+				);
 
-				callback.onGeocodingResult(addressDto);
+				callback.onReverseGeocodingResult(addressDto);
 			} else {
-				callback.onGeocodingResult(null);
+				callback.onReverseGeocodingResult(null);
 			}
 		} catch (Exception e) {
 
 		}
 	}
 
-	public static void nominatimGeocoding(Context context, Double latitude, Double longitude, GeocodingCallback callback) {
+	public static void nominatimReverseGeocoding(Context context, Double latitude, Double longitude, ReverseGeocodingCallback callback) {
 		ReverseGeocodeParameter parameter = new ReverseGeocodeParameter(latitude, longitude);
 		Call<JsonElement> call =
-				RetrofitClient.getApiService(RetrofitClient.ServiceType.NOMINATIM_REVERSE).nominatimReverseGeocode(parameter.getMap(),
+				RetrofitClient.getApiService(RetrofitClient.ServiceType.NOMINATIM).nominatimReverseGeocode(parameter.getMap(),
 						MyApplication.locale.toLanguageTag());
 
 		call.enqueue(new Callback<JsonElement>() {
@@ -97,56 +136,67 @@ public class Geocoding {
 							ReverseGeocodeResponse.class);
 
 					ReverseGeocodeResponse.Properties properties = reverseGeocodeResponse.getFeatures().get(0).getProperties();
-					AddressDto addressDto = new AddressDto(latitude, longitude, properties.getName(),
-							properties.getDisplayName(), properties.getAddress().getCountry(),
-							properties.getAddress().getCountryCode().toUpperCase(),
-							properties.getAddress().getCity() != null ? properties.getAddress().getCity() :
-									properties.getAddress().getState());
 
-					callback.onGeocodingResult(addressDto);
+					String editedDisplayName = convertDisplayName(properties.getDisplayName());
+
+					AddressDto addressDto = new AddressDto(latitude, longitude,
+							editedDisplayName, properties.getAddress().getCountry(),
+							properties.getAddress().getCountryCode().toUpperCase()
+					);
+
+					callback.onReverseGeocodingResult(addressDto);
 				} else {
-					geocoding(context, latitude, longitude, callback);
+					androidReverseGeocoding(context, latitude, longitude, callback);
 				}
 			}
 
 			@Override
 			public void onFailure(Call<JsonElement> call, Throwable t) {
-				geocoding(context, latitude, longitude, callback);
+				androidReverseGeocoding(context, latitude, longitude, callback);
 			}
 		});
 	}
 
-
-	public interface GeocodingCallback {
-		void onGeocodingResult(AddressDto addressDto);
+	private static String convertDisplayName(String originalDisplayName) {
+		String[] separatedDisplayNames = originalDisplayName.split(", ");
+		if (separatedDisplayNames.length > 2) {
+			StringBuilder stringBuilder = new StringBuilder();
+			final int lastIdx = separatedDisplayNames.length - 1;
+			for (int i = 0; i <= lastIdx; i++) {
+				stringBuilder.append(separatedDisplayNames[i]);
+				if (i < lastIdx) {
+					stringBuilder.append(", ");
+				}
+			}
+			return stringBuilder.toString();
+		} else {
+			return originalDisplayName;
+		}
 	}
 
+
 	public interface ReverseGeocodingCallback {
-		void onReverseGeocodingResult(List<AddressDto> addressList);
+		void onReverseGeocodingResult(AddressDto addressDto);
+	}
+
+	public interface GeocodingCallback {
+		void onGeocodingResult(List<AddressDto> addressList);
 	}
 
 	public static class AddressDto {
 		public final Double latitude;
 		public final Double longitude;
-		public final String simpleName;
 		public final String displayName;
 		public final String country;
 		public final String countryCode;
-		public final String cityOrState;
 
-		public AddressDto(Double latitude, Double longitude, String simpleName, String displayName, String country, String countryCode,
-		                  String cityOrState) {
+		public AddressDto(Double latitude, Double longitude, String displayName, String country, String countryCode) {
 			this.latitude = latitude;
 			this.longitude = longitude;
-			this.simpleName = simpleName;
 			this.displayName = displayName;
 			this.country = country;
 			this.countryCode = countryCode;
-			this.cityOrState = cityOrState;
 		}
 
-		public String toName() {
-			return simpleName + ", " + cityOrState + ", " + country;
-		}
 	}
 }
