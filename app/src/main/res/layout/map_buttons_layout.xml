@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    >
+
+    <ImageButton
+        android:id="@+id/current_location_btn"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/circle_btn_background"
+        android:backgroundTint="@color/white"
+        android:elevation="4dp"
+        android:src="@drawable/gps"
+        />
+
+    <ImageButton
+        android:id="@+id/zoom_in_btn"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:background="@drawable/circle_btn_background"
+        android:backgroundTint="@color/white"
+        android:elevation="4dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/add"
+        />
+
+    <ImageButton
+        android:id="@+id/zoom_out_btn"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:background="@drawable/circle_btn_background"
+        android:backgroundTint="@color/white"
+        android:elevation="4dp"
+        android:src="@drawable/subtract"
+        />
+</LinearLayout>

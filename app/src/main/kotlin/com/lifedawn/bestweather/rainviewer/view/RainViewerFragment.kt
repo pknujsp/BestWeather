@@ -10,12 +10,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -23,6 +25,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.classes.FusedLocation
+import com.lifedawn.bestweather.commons.classes.FusedLocation.MyLocationCallback
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker
 import com.lifedawn.bestweather.commons.enums.BundleKey
@@ -73,6 +76,7 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
         if (rainViewerViewModel.simpleMode) {
             binding.toolbar.root.visibility = View.GONE
+            binding.mapButtons.currentLocationBtn.visibility = View.GONE
         } else {
             binding.toolbar.fragmentTitle.text = getString(R.string.radar)
             binding.toolbar.backBtn.setOnClickListener(View.OnClickListener { parentFragmentManager.popBackStack() })
@@ -120,37 +124,53 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
         drawable.setTintList(ColorStateList.valueOf(Color.BLUE))
         val bitmap = drawable.toBitmap(size, size, Bitmap.Config.ARGB_8888)
 
-        marker = MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromBitmap(bitmap)).alpha(0.6f)
+        marker = MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromBitmap(bitmap)).alpha(0.65f)
         addMarker()
 
-        googleMap.uiSettings.isZoomControlsEnabled = true
+        googleMap.uiSettings.isZoomControlsEnabled = false
         googleMap.uiSettings.isRotateGesturesEnabled = false
         googleMap.uiSettings.isScrollGesturesEnabled = !rainViewerViewModel.simpleMode
         googleMap.uiSettings.isZoomGesturesEnabled = !rainViewerViewModel.simpleMode
+        googleMap.uiSettings.isMapToolbarEnabled = false
 
         googleMap.setOnCameraIdleListener(if (rainViewerViewModel.simpleMode) this else null)
 
-        googleMap.setOnMyLocationButtonClickListener {
-            if (!fusedLocation.isOnGps) {
-                fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver) { }
-            }
-            false
-        }
+        binding.mapButtons.zoomInBtn.setOnClickListener { googleMap.animateCamera(CameraUpdateFactory.zoomIn()) }
 
-        try {
-            googleMap.isMyLocationEnabled = !rainViewerViewModel.simpleMode
-        } catch (e: SecurityException) {
-            fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, {
-                if (fusedLocation.checkDefaultPermissions()) {
-                    googleMap.isMyLocationEnabled = true
+        binding.mapButtons.zoomOutBtn.setOnClickListener { googleMap.animateCamera(CameraUpdateFactory.zoomOut()) }
+
+        binding.mapButtons.currentLocationBtn.setOnClickListener(View.OnClickListener {
+            fusedLocation.findCurrentLocation(object : MyLocationCallback {
+                override fun onSuccessful(locationResult: LocationResult) {
+                    val result = getBestLocation(locationResult)
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(result.latitude, result.longitude), 10f))
                 }
-            }) { result -> //gps사용 권한
-                //허가남 : 현재 위치 다시 파악
-                //거부됨 : 작업 취소
-                //계속 거부 체크됨 : 작업 취소
-                googleMap.isMyLocationEnabled = !result.containsValue(false)
-            }
-        }
+
+                override fun onFailed(fail: MyLocationCallback.Fail) {
+                    if (fail == MyLocationCallback.Fail.DISABLED_GPS) {
+                        fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver) {
+                            if (fusedLocation.isOnGps) {
+                                binding.mapButtons.currentLocationBtn.callOnClick()
+                            }
+                        }
+                    } else if (fail == MyLocationCallback.Fail.DENIED_LOCATION_PERMISSIONS) {
+                        fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, {
+                            if (fusedLocation.checkDefaultPermissions()) {
+                                binding.mapButtons.currentLocationBtn.callOnClick()
+                            }
+                        }) { result -> //gps사용 권한
+                            //허가남 : 현재 위치 다시 파악
+                            //거부됨 : 작업 취소
+                            //계속 거부 체크됨 : 작업 취소
+                            if (!result.containsValue(false)) {
+                                binding.mapButtons.currentLocationBtn.callOnClick()
+                            }
+                        }
+                    }
+                }
+            }, false)
+        })
+
 
         rainViewerViewModel.initMapLiveData.observe(viewLifecycleOwner) {
             initialize(it)

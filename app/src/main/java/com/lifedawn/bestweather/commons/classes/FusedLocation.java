@@ -141,10 +141,8 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 					return;
 				}
 
-				LocationRequest locationRequest = LocationRequest.create();
-				locationRequest.setInterval(900);
-				locationRequest.setFastestInterval(200);
-				locationRequest.setPriority(Priority.PRIORITY_HIGH_ACCURACY);
+				LocationRequest locationRequest =
+						new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY).setWaitForAccurateLocation(false).build();
 
 				Timer timer = new Timer();
 
@@ -241,7 +239,6 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 					}
 				});
 
-				Log.e("FusedLocation", "requestLocationUpdates");
 			} else {
 				myLocationCallback.onFailed(MyLocationCallback.Fail.DENIED_LOCATION_PERMISSIONS);
 			}

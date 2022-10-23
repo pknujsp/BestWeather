@@ -91,9 +91,8 @@ public class FindAddressFragment extends Fragment {
 
 		@Override
 		public void onTextSubmit(String text) {
-			if (text.isEmpty()) {
+			if (text.isEmpty())
 				Toast.makeText(getContext(), R.string.empty_search_query, Toast.LENGTH_SHORT).show();
-			}
 		}
 	};
 

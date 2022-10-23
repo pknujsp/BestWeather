@@ -7,18 +7,38 @@
     android:layout_height="match_parent"
     >
 
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:id="@+id/map_layout">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/map_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+        <include
+            layout="@layout/map_buttons_layout"
+            android:id="@+id/map_buttons"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="48dp"
+            android:layout_marginRight="16dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipChildren="false"
         >
-
-        <fragment
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
 
         <com.lifedawn.bestweather.commons.views.CustomSearchView
             android:id="@+id/headerLayout"

@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 
@@ -35,9 +36,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -358,8 +361,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-		mapFragment.getMapAsync(this);
+		SupportMapFragment supportMapFragment = SupportMapFragment.newInstance();
+		getChildFragmentManager().beginTransaction().add(binding.mapFragmentContainer.getId(), supportMapFragment).commitAllowingStateLoss();
+		supportMapFragment.getMapAsync(this);
 
 		setSearchPlacesBottomSheet();
 		setLocationItemsBottomSheet();
@@ -542,11 +546,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		this.googleMap = googleMap;
 
 		mapPadding = MyApplication.getStatusBarHeight() + binding.headerLayout.getBottom() +
-				(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 48f, getResources().getDisplayMetrics());
+				(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
 
-		googleMap.setPadding(0, mapPadding, 0, mapPadding);
-		googleMap.getUiSettings().setZoomControlsEnabled(true);
+		googleMap.getUiSettings().setZoomControlsEnabled(false);
 		googleMap.getUiSettings().setRotateGesturesEnabled(false);
+		googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 		googleMap.setOnMarkerClickListener(this);
 
 		googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -563,54 +567,65 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 		});
 
-		googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-			@Override
-			public boolean onMyLocationButtonClick() {
-				return false;
-			}
-		});
+		binding.mapButtons.zoomInBtn.setOnClickListener((view) -> {
+					googleMap.animateCamera(CameraUpdateFactory.zoomIn());
+				}
+		);
 
-		googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+		binding.mapButtons.zoomOutBtn.setOnClickListener((view) -> {
+					googleMap.animateCamera(CameraUpdateFactory.zoomOut());
+				}
+		);
+
+
+		binding.mapButtons.currentLocationBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public boolean onMyLocationButtonClick() {
-				if (!fusedLocation.isOnGps()) {
-					fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
-						@Override
-						public void onActivityResult(ActivityResult result) {
+			public void onClick(View v) {
+				fusedLocation.findCurrentLocation(new FusedLocation.MyLocationCallback() {
+					@Override
+					public void onSuccessful(LocationResult locationResult) {
+						Location result = getBestLocation(locationResult);
+						googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(result.getLatitude(), result.getLongitude())
+								, 10));
+					}
+
+					@Override
+					public void onFailed(Fail fail) {
+						if (fail == Fail.DISABLED_GPS) {
+							fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
+								@Override
+								public void onActivityResult(ActivityResult result) {
+									if (fusedLocation.isOnGps()) {
+										binding.mapButtons.currentLocationBtn.callOnClick();
+									}
+								}
+							});
+						} else if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
+							fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
+								@Override
+								public void onActivityResult(ActivityResult result) {
+									if (fusedLocation.checkDefaultPermissions()) {
+										binding.mapButtons.currentLocationBtn.callOnClick();
+									}
+								}
+							}, new ActivityResultCallback<Map<String, Boolean>>() {
+								@Override
+								public void onActivityResult(Map<String, Boolean> result) {
+									//gps사용 권한
+									//허가남 : 현재 위치 다시 파악
+									//거부됨 : 작업 취소
+									//계속 거부 체크됨 : 작업 취소
+									if (!result.containsValue(false)) {
+										binding.mapButtons.currentLocationBtn.callOnClick();
+									}
+								}
+							});
+
 						}
-					});
-				}
-				return false;
+					}
+				}, false);
 			}
 		});
-
-
-		try {
-			googleMap.setMyLocationEnabled(true);
-		} catch (SecurityException e) {
-			fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
-				@Override
-				public void onActivityResult(ActivityResult result) {
-					if (fusedLocation.checkDefaultPermissions()) {
-						googleMap.setMyLocationEnabled(true);
-					}
-				}
-			}, new ActivityResultCallback<Map<String, Boolean>>() {
-				@Override
-				public void onActivityResult(Map<String, Boolean> result) {
-					//gps사용 권한
-					//허가남 : 현재 위치 다시 파악
-					//거부됨 : 작업 취소
-					//계속 거부 체크됨 : 작업 취소
-					if (!result.containsValue(false)) {
-						googleMap.setMyLocationEnabled(true);
-					} else {
-						googleMap.setMyLocationEnabled(false);
-					}
-				}
-			});
-
-		}
 
 		FavoriteLocationItemViewPagerAdapter adapter = new FavoriteLocationItemViewPagerAdapter();
 		adapterMap.put(MarkerType.FAVORITE, adapter);
@@ -832,7 +847,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			CameraUpdate cameraUpdate = null;
 
 			if (markerMaps.get(markerType).size() == 1) {
-				cameraUpdate = CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 15);
+				cameraUpdate = CameraUpdateFactory.newLatLngZoom(bounds.getCenter(), 14);
 			} else {
 				cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 36f,
 						getResources().getDisplayMetrics()));
@@ -893,10 +908,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				//expanded일때 offset == 1.0, collapsed일때 offset == 0.0
 				//offset에 따라서 버튼들이 이동하고, 지도의 좌표가 변경되어야 한다.
 				int translationValue = (int) (bottomSheet.getHeight() * slideOffset);
-
-				//expanded일때 offset == 1.0, collapsed일때 offset == 0.0
-				//offset에 따라서 버튼들이 이동하고, 지도의 좌표가 변경되어야 한다.
-				googleMap.setPadding(0, mapPadding + translationValue, 0, mapPadding + translationValue);
+				binding.mapLayout.setPadding(0, 0, 0, translationValue);
 			}
 		});
 

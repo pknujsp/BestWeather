@@ -83,8 +83,8 @@ public class Geocoding {
 						GeocodeResponse.Properties properties = features.getProperties();
 						String editedDisplayName = convertDisplayName(properties.getDisplayName());
 
-						addressDtoList.add(new AddressDto(features.getGeometry().getCoordinates().get(0),
-								features.getGeometry().getCoordinates().get(1),
+						addressDtoList.add(new AddressDto(features.getGeometry().getCoordinates().get(1),
+								features.getGeometry().getCoordinates().get(0),
 								editedDisplayName, properties.getAddress().getCountry(),
 								properties.getAddress().getCountryCode().toUpperCase()
 						));
@@ -161,7 +161,7 @@ public class Geocoding {
 		String[] separatedDisplayNames = originalDisplayName.split(", ");
 		if (separatedDisplayNames.length > 2) {
 			StringBuilder stringBuilder = new StringBuilder();
-			final int lastIdx = separatedDisplayNames.length - 1;
+			final int lastIdx = separatedDisplayNames.length - 2;
 			for (int i = 0; i <= lastIdx; i++) {
 				stringBuilder.append(separatedDisplayNames[i]);
 				if (i < lastIdx) {
