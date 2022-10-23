@@ -3,6 +3,7 @@ package com.lifedawn.bestweather.widget.foreground;
 import android.app.Notification;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.PowerManager;
@@ -11,10 +12,11 @@ import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
 import androidx.work.ForegroundInfo;
-import androidx.work.Worker;
+import androidx.work.ListenableWorker;
 import androidx.work.WorkerParameters;
 
 import com.google.android.gms.location.LocationResult;
@@ -22,9 +24,11 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
@@ -73,8 +77,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class WidgetWorker extends Worker {
+public class WidgetListenableWorker extends ListenableWorker {
 	public static final Set<Integer> PROCESSING_WIDGET_ID_SET = new CopyOnWriteArraySet<>();
 
 	private final Map<Integer, WidgetDto> currentLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
@@ -96,24 +101,21 @@ public class WidgetWorker extends Worker {
 	private static ExecutorService executorService = MyApplication.getExecutorService();
 	private FusedLocation fusedLocation;
 	private int requestCount;
-	private int responseCount;
+	private AtomicInteger responseCount = new AtomicInteger(0);
 	private String action;
 	private int appWidgetId;
 
-	private TimeZoneIdRepository timeZoneIdRepository;
 
-
-	public WidgetWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+	public WidgetListenableWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
 		super(context, workerParams);
 
 		if (widgetRepository == null) {
-			widgetRepository = new WidgetRepository(getApplicationContext());
+			widgetRepository = WidgetRepository.getINSTANCE();
 		}
 		if (appWidgetManager == null) {
 			appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		}
 
-		timeZoneIdRepository = TimeZoneIdRepository.Companion.getINSTANCE();
 		action = workerParams.getInputData().getString("action");
 		appWidgetId = workerParams.getInputData().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 0);
 
@@ -134,124 +136,133 @@ public class WidgetWorker extends Worker {
 
 	@NonNull
 	@Override
-	public Result doWork() {
-		if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_INIT))) {
-			widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
+	public ListenableFuture<Result> startWork() {
+		return CallbackToFutureAdapter.getFuture(completer -> {
+			final BackgroundWorkCallback backgroundWorkCallback = new BackgroundWorkCallback() {
 				@Override
-				public void onResultSuccessful(WidgetDto widgetDto) {
-					AbstractWidgetCreator widgetCreator = createWidgetViewCreator(appWidgetId, widgetDto.getWidgetProviderClassName());
-					WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
-					long widgetRefreshInterval = widgetHelper.getRefreshInterval();
-
-					if (widgetRefreshInterval > 0 && !widgetHelper.isRepeating()) {
-						widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
-					}
-
-					remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),
-							widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
-
-					requestCount = 1;
-					responseCount = 0;
-
-					PROCESSING_WIDGET_ID_SET.add(widgetDto.getAppWidgetId());
-					Log.e("init widgets", widgetDto.getAppWidgetId() + "");
-
-					if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
-						currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
-						allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
-
-						showProgressBar();
-						loadCurrentLocation();
-					} else {
-						selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
-						Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(), widgetDto.getLongitude(),
-								widgetDto.getAddressName(), null, widgetDto.getCountryCode());
-
-						final RequestObj requestObj = new RequestObj(address, ZoneId.of(widgetDto.getTimeZoneId()));
-						requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
-						requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet());
-						requestObj.appWidgetSet.add(widgetDto.getAppWidgetId());
-
-						selectedLocationRequestMap.put(widgetDto.getAddressName(), requestObj);
-						List<String> addressList = new ArrayList<>();
-						addressList.add(widgetDto.getAddressName());
-						allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
-
-						showProgressBar();
-						loadWeatherData(LocationType.SelectedAddress, addressList);
-					}
+				public void onFinished() {
+					completer.set(Result.success());
 				}
+			};
 
-				@Override
-				public void onResultNoData() {
+			if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_INIT))) {
+				widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
+					@Override
+					public void onResultSuccessful(WidgetDto widgetDto) {
+						AbstractWidgetCreator widgetCreator = createWidgetViewCreator(appWidgetId, widgetDto.getWidgetProviderClassName());
+						WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
+						long widgetRefreshInterval = widgetHelper.getRefreshInterval();
 
-				}
-			});
-
-		} else if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
-				@Override
-				public void onResultSuccessful(List<WidgetDto> list) {
-					List<String> addressList = new ArrayList<>();
-
-					for (WidgetDto widgetDto : list) {
-						PROCESSING_WIDGET_ID_SET.add(widgetDto.getAppWidgetId());
-
-						AbstractWidgetCreator widgetCreator = createWidgetViewCreator(widgetDto.getAppWidgetId(),
-								widgetDto.getWidgetProviderClassName());
+						if (widgetRefreshInterval > 0 && !widgetHelper.isRepeating()) {
+							widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
+						}
 
 						remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),
 								widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
 
+						requestCount = 1;
+						PROCESSING_WIDGET_ID_SET.add(widgetDto.getAppWidgetId());
+
 						if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
 							currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
+							allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
+
+							showProgressBar();
+							loadCurrentLocation(backgroundWorkCallback);
 						} else {
 							selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
+							Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(), widgetDto.getLongitude(),
+									widgetDto.getAddressName(), null, widgetDto.getCountryCode());
 
-							RequestObj requestObj = selectedLocationRequestMap.get(widgetDto.getAddressName());
-							if (requestObj == null) {
-								Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(), widgetDto.getLongitude(),
-										widgetDto.getAddressName(), null, widgetDto.getCountryCode());
-
-								requestObj = new RequestObj(address, ZoneId.of(widgetDto.getTimeZoneId()));
-
-								selectedLocationRequestMap.put(widgetDto.getAddressName(), requestObj);
-								addressList.add(widgetDto.getAddressName());
-							}
-
+							final RequestObj requestObj = new RequestObj(address, ZoneId.of(widgetDto.getTimeZoneId()));
 							requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
 							requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet());
 							requestObj.appWidgetSet.add(widgetDto.getAppWidgetId());
+
+							selectedLocationRequestMap.put(widgetDto.getAddressName(), requestObj);
+							List<String> addressList = new ArrayList<>();
+							addressList.add(widgetDto.getAddressName());
+							allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
+
+							showProgressBar();
+							loadWeatherData(LocationType.SelectedAddress, addressList, backgroundWorkCallback);
 						}
 					}
 
-					allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
-					allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
-
-					showProgressBar();
-
-					requestCount = 0;
-					responseCount = 0;
-
-					if (!currentLocationWidgetDtoArrayMap.isEmpty()) {
-						requestCount++;
-						loadCurrentLocation();
+					@Override
+					public void onResultNoData() {
+						backgroundWorkCallback.onFinished();
 					}
-					if (!selectedLocationWidgetDtoArrayMap.isEmpty()) {
-						requestCount += addressList.size();
-						loadWeatherData(LocationType.SelectedAddress, addressList);
+				});
+
+			} else if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
+				widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
+					@Override
+					public void onResultSuccessful(List<WidgetDto> list) {
+						List<String> addressList = new ArrayList<>();
+						for (WidgetDto widgetDto : list) {
+							PROCESSING_WIDGET_ID_SET.add(widgetDto.getAppWidgetId());
+
+							AbstractWidgetCreator widgetCreator = createWidgetViewCreator(widgetDto.getAppWidgetId(),
+									widgetDto.getWidgetProviderClassName());
+
+							remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),
+									widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
+
+							if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
+								currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
+							} else {
+								selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
+
+								RequestObj requestObj = selectedLocationRequestMap.get(widgetDto.getAddressName());
+								if (requestObj == null) {
+									Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(), widgetDto.getLongitude(),
+											widgetDto.getAddressName(), null, widgetDto.getCountryCode());
+
+									requestObj = new RequestObj(address, ZoneId.of(widgetDto.getTimeZoneId()));
+
+									selectedLocationRequestMap.put(widgetDto.getAddressName(), requestObj);
+									addressList.add(widgetDto.getAddressName());
+								}
+
+								requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
+								requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet());
+								requestObj.appWidgetSet.add(widgetDto.getAppWidgetId());
+							}
+						}
+
+						allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
+						allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
+
+						showProgressBar();
+
+						requestCount = 0;
+
+						if (!currentLocationWidgetDtoArrayMap.isEmpty()) {
+							requestCount++;
+							loadCurrentLocation(backgroundWorkCallback);
+						}
+						if (!selectedLocationWidgetDtoArrayMap.isEmpty()) {
+							requestCount += addressList.size();
+							loadWeatherData(LocationType.SelectedAddress, addressList, backgroundWorkCallback);
+						}
+
 					}
 
-				}
+					@Override
+					public void onResultNoData() {
+						backgroundWorkCallback.onFinished();
+					}
+				});
+			} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
+				WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
+				widgetHelper.reDrawWidgets(backgroundWorkCallback);
+			}
 
-				@Override
-				public void onResultNoData() {
+			return backgroundWorkCallback;
+		});
 
-				}
-			});
-		}
 
-		return Result.success();
 	}
 
 	@NonNull
@@ -361,7 +372,7 @@ public class WidgetWorker extends Worker {
 	}
 
 
-	public void loadCurrentLocation() {
+	public void loadCurrentLocation(BackgroundWorkCallback backgroundWorkCallback) {
 		final Set<Integer> appWidgetIdSet = currentLocationWidgetDtoArrayMap.keySet();
 		currentLocationRequestObj = new RequestObj(null, null);
 
@@ -382,12 +393,11 @@ public class WidgetWorker extends Worker {
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 				final Location location = getBestLocation(locationResult);
 
-
 				Geocoding.nominatimReverseGeocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(), new Geocoding.ReverseGeocodingCallback() {
 					@Override
 					public void onReverseGeocodingResult(Geocoding.AddressDto address) {
 						if (address == null) {
-							onLocationResponse(Fail.FAILED_FIND_LOCATION, null);
+							onLocationResponse(Fail.FAILED_FIND_LOCATION, null, backgroundWorkCallback);
 						} else {
 							final String addressName = address.displayName;
 							currentLocationRequestObj.address = address;
@@ -395,7 +405,7 @@ public class WidgetWorker extends Worker {
 							final String zoneIdText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
 									.getString("zoneId", "");
 							currentLocationRequestObj.zoneId = ZoneId.of(zoneIdText);
-							onResultCurrentLocation(addressName, address);
+							onResultCurrentLocation(addressName, address, backgroundWorkCallback);
 						}
 					}
 				});
@@ -404,7 +414,7 @@ public class WidgetWorker extends Worker {
 			@Override
 			public void onFailed(Fail fail) {
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
-				onLocationResponse(fail, null);
+				onLocationResponse(fail, null, backgroundWorkCallback);
 			}
 		};
 
@@ -424,7 +434,7 @@ public class WidgetWorker extends Worker {
 
 	}
 
-	private void onResultCurrentLocation(String addressName, Geocoding.AddressDto newAddress) {
+	private void onResultCurrentLocation(String addressName, Geocoding.AddressDto newAddress, BackgroundWorkCallback backgroundWorkCallback) {
 		for (Integer appWidgetId : currentLocationWidgetDtoArrayMap.keySet()) {
 			WidgetDto widgetDto = currentLocationWidgetDtoArrayMap.get(appWidgetId);
 
@@ -437,14 +447,15 @@ public class WidgetWorker extends Worker {
 			widgetRepository.update(widgetDto, null);
 		}
 
-		onLocationResponse(null, addressName);
+		onLocationResponse(null, addressName, backgroundWorkCallback);
 	}
 
-	private void onLocationResponse(@Nullable FusedLocation.MyLocationCallback.Fail fail, @Nullable String addressName) {
+	private void onLocationResponse(@Nullable FusedLocation.MyLocationCallback.Fail fail, @Nullable String addressName,
+	                                BackgroundWorkCallback backgroundWorkCallback) {
 		if (fail == null) {
 			List<String> addressesList = new ArrayList<>();
 			addressesList.add(addressName);
-			loadWeatherData(LocationType.CurrentLocation, addressesList);
+			loadWeatherData(LocationType.CurrentLocation, addressesList, backgroundWorkCallback);
 		} else {
 			RemoteViewsUtil.ErrorType errorType = null;
 
@@ -464,23 +475,23 @@ public class WidgetWorker extends Worker {
 				allWidgetDtoArrayMap.get(appWidgetId).setLastErrorType(errorType);
 				allWidgetDtoArrayMap.get(appWidgetId).setLoadSuccessful(false);
 			}
-			onResponseResult(LocationType.CurrentLocation, null);
+			onResponseResult(LocationType.CurrentLocation, null, backgroundWorkCallback);
 		}
 
 	}
 
 
-	private void loadWeatherData(LocationType locationType, List<String> addressList) {
+	private void loadWeatherData(LocationType locationType, List<String> addressList, BackgroundWorkCallback backgroundWorkCallback) {
 		for (String addressName : addressList) {
 			WeatherRestApiDownloader weatherRestApiDownloader = new WeatherRestApiDownloader() {
 				@Override
 				public void onResult() {
-					onResponseResult(locationType, addressName);
+					onResponseResult(locationType, addressName, backgroundWorkCallback);
 				}
 
 				@Override
 				public void onCanceled() {
-					onResponseResult(locationType, addressName);
+					onResponseResult(locationType, addressName, backgroundWorkCallback);
 				}
 			};
 
@@ -518,7 +529,7 @@ public class WidgetWorker extends Worker {
 		}
 	}
 
-	private void onResponseResult(LocationType locationType, String addressName) {
+	private void onResponseResult(LocationType locationType, String addressName, BackgroundWorkCallback backgroundWorkCallback) {
 		WeatherRestApiDownloader restApiDownloader = null;
 		Set<Integer> appWidgetIdSet = null;
 
@@ -546,6 +557,10 @@ public class WidgetWorker extends Worker {
 			currentLocationRequestObj = null;
 		}
 
+		responseCount.incrementAndGet();
+		if (responseCount.get() == requestCount) {
+			backgroundWorkCallback.onFinished();
+		}
 	}
 
 

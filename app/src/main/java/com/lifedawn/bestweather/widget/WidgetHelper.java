@@ -11,9 +11,12 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.ArrayMap;
 
+import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
+import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
@@ -67,9 +70,8 @@ public class WidgetHelper {
 				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE) != null;
 	}
 
-	public void reDrawWidgets() {
-		WidgetRepository widgetRepository = new WidgetRepository(context);
-
+	public void reDrawWidgets(@Nullable BackgroundWorkCallback callback) {
+		WidgetRepository widgetRepository = WidgetRepository.getINSTANCE();
 		widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
 			@Override
 			public void onResultSuccessful(List<WidgetDto> result) {
@@ -95,7 +97,7 @@ public class WidgetHelper {
 							return;
 						}
 					}
-					
+
 					int requestCode = 100000;
 					for (Class<?> cls : widgetArrMap.keySet()) {
 						Intent refreshIntent = null;
@@ -133,11 +135,15 @@ public class WidgetHelper {
 
 
 				}
+
+				if (callback != null)
+					callback.onFinished();
 			}
 
 			@Override
 			public void onResultNoData() {
-
+				if (callback != null)
+					callback.onFinished();
 			}
 		});
 	}

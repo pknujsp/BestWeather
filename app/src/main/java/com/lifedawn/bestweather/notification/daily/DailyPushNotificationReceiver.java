@@ -18,8 +18,6 @@ import androidx.work.WorkManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationWorker;
-import com.lifedawn.bestweather.widget.foreground.WidgetWorker;
 
 public class DailyPushNotificationReceiver extends BroadcastReceiver {
 

@@ -30,14 +30,14 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.foreground.WidgetForegroundService;
-import com.lifedawn.bestweather.widget.foreground.WidgetWorker;
+import com.lifedawn.bestweather.widget.foreground.WidgetListenableWorker;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 	protected AppWidgetManager appWidgetManager;
-	final String TAG = "WIDGET_PROVIDER";
+	protected final String TAG = "WIDGET_PROVIDER";
 
 	protected AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId) {
 		return null;
@@ -49,7 +49,7 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 		}
 
 		for (int appWidgetId : appWidgetIds) {
-			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null || WidgetWorker.PROCESSING_WIDGET_ID_SET.contains(appWidgetId)) {
+			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null || WidgetListenableWorker.PROCESSING_WIDGET_ID_SET.contains(appWidgetId)) {
 				continue;
 			}
 
@@ -113,7 +113,7 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
-		WidgetRepository widgetRepository = new WidgetRepository(context);
+		WidgetRepository widgetRepository = WidgetRepository.getINSTANCE();
 		for (int appWidgetId : appWidgetIds) {
 			widgetRepository.delete(appWidgetId, null);
 		}
@@ -132,12 +132,10 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
-		MyApplication.loadValueUnits(context, false);
 		final String action = intent.getAction();
 
 		if (action != null) {
 			Bundle bundle = intent.getExtras();
-			Log.e(TAG, "onReceive : " + action);
 
 			if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_INIT))) {
 				//startService(context, action, argument);
@@ -148,36 +146,7 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 				//startService(context, action, null);
 				startWork(context, action, null);
 			} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-				WidgetRepository widgetRepository = new WidgetRepository(context);
-				final Class<?> widgetProviderClass = getClass();
-				final String widgetProviderClassName = widgetProviderClass.getName();
-
-				widgetRepository.getAll(widgetProviderClassName, new DbQueryCallback<List<WidgetDto>>() {
-					@Override
-					public void onResultSuccessful(List<WidgetDto> result) {
-						appWidgetManager = AppWidgetManager.getInstance(context);
-						WidgetHelper widgetHelper = new WidgetHelper(context);
-						final int[] ids = new int[result.size()];
-
-						int index = 0;
-						for (WidgetDto widgetDto : result) {
-							ids[index++] = widgetDto.getAppWidgetId();
-						}
-
-						reDraw(context, ids, widgetProviderClass);
-
-						final long widgetRefreshInterval = widgetHelper.getRefreshInterval();
-						if (widgetRefreshInterval > 0L && !widgetHelper.isRepeating()) {
-							widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
-						}
-					}
-
-					@Override
-					public void onResultNoData() {
-
-					}
-				});
-
+				startWork(context, action, null);
 			} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW))) {
 				reDraw(context, bundle.getIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS), getClass());
 			}
@@ -217,44 +186,45 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 	}
 
 	protected boolean isWorkRunning(Context context) {
-		WorkManager instance = WorkManager.getInstance(context);
-		ListenableFuture<List<WorkInfo>> statuses = instance.getWorkInfosByTag(WidgetWorker.class.getName());
+		WorkManager workManager = WorkManager.getInstance(context);
+		final String tag = "widget";
+		ListenableFuture<List<WorkInfo>> statuses = workManager.getWorkInfosByTag(tag);
 
 		try {
 			boolean running = false;
 			List<WorkInfo> workInfoList = statuses.get();
 			for (WorkInfo workInfo : workInfoList) {
 				WorkInfo.State state = workInfo.getState();
-				running = state == WorkInfo.State.RUNNING | state == WorkInfo.State.ENQUEUED;
+				running = (state == WorkInfo.State.RUNNING || state == WorkInfo.State.ENQUEUED);
+
+				if (running)
+					break;
 			}
 			return running;
 		} catch (ExecutionException | InterruptedException e) {
-			e.printStackTrace();
 			return false;
 		}
 	}
 
 	protected void startWork(Context context, String action, @Nullable Data data) {
 		if (DeviceUtils.Companion.isScreenOn(context)) {
-			if (isWorkRunning(context)) {
-				Toast.makeText(context, R.string.runningUpdateService, Toast.LENGTH_SHORT).show();
-			} else {
-				Data.Builder dataBuilder = new Data.Builder()
-						.putString("action", action);
+			Data.Builder dataBuilder = new Data.Builder()
+					.putString("action", action);
 
-				if (data != null) {
-					dataBuilder.putAll(data);
-				}
-
-				OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(WidgetWorker.class)
-						.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-						.setInputData(dataBuilder.build())
-						.addTag(WidgetWorker.class.getName())
-						.build();
-
-				WorkManager workManager = WorkManager.getInstance(context);
-				workManager.enqueueUniqueWork(WidgetWorker.class.getName(), ExistingWorkPolicy.KEEP, request);
+			if (data != null) {
+				dataBuilder.putAll(data);
 			}
+
+			final String tag = "widget";
+
+			OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(WidgetListenableWorker.class)
+					.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+					.setInputData(dataBuilder.build())
+					.addTag(tag)
+					.build();
+
+			WorkManager workManager = WorkManager.getInstance(context);
+			workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.APPEND, request);
 		}
 	}
 

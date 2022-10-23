@@ -15,10 +15,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class WidgetRepository {
-	private static WidgetDao widgetDao;
-	private static ExecutorService executorService = MyApplication.getExecutorService();
+	private final WidgetDao widgetDao;
+	private final ExecutorService executorService = MyApplication.getExecutorService();
+	private static WidgetRepository INSTANCE;
 
-	public WidgetRepository(Context context) {
+
+	public static WidgetRepository getINSTANCE() {
+		return INSTANCE;
+	}
+
+	public static void initialize(Context context) {
+		if (INSTANCE == null)
+			INSTANCE = new WidgetRepository(context);
+	}
+
+	private WidgetRepository(Context context) {
 		widgetDao = AppDb.getInstance(context).widgetDao();
 	}
 

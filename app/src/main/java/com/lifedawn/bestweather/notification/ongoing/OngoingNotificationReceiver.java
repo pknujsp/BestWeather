@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -15,11 +14,9 @@ import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.OutOfQuotaPolicy;
 import androidx.work.WorkManager;
-import androidx.work.Worker;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.widget.foreground.WidgetWorker;
 
 public class OngoingNotificationReceiver extends BroadcastReceiver {
 	@Override

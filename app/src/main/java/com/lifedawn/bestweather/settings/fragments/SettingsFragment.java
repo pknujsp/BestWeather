@@ -101,7 +101,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 												.putLong(widgetRefreshIntervalPreference.getKey(), newValue).commit();
 										widgetRefreshIntervalPreference.setValue(newValue);
 
-										WidgetRepository widgetRepository = new WidgetRepository(getContext());
+										WidgetRepository widgetRepository = WidgetRepository.getINSTANCE();
 										widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
 											@Override
 											public void onResultSuccessful(List<WidgetDto> result) {
@@ -199,7 +199,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
 				WidgetHelper widgetHelper = new WidgetHelper(getActivity());
-				widgetHelper.reDrawWidgets();
+				widgetHelper.reDrawWidgets(null);
 				Toast.makeText(getContext(), R.string.pref_title_redraw_widgets, Toast.LENGTH_SHORT).show();
 				return true;
 			}

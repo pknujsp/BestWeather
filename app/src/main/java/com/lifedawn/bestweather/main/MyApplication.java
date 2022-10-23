@@ -15,6 +15,7 @@ import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.rainviewer.model.RainViewerRepository;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
 import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
+import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 
@@ -54,13 +55,16 @@ public class MyApplication extends Application {
 
 		localeCountryCode = locale.getCountry();
 
-		FavoriteAddressRepository.initialize(getApplicationContext());
-		KmaAreaCodesRepository.initialize(getApplicationContext());
-		TimeZoneIdRepository.Companion.initialize(getApplicationContext());
+		Context context = getApplicationContext();
+
+		FavoriteAddressRepository.initialize(context);
+		KmaAreaCodesRepository.initialize(context);
+		TimeZoneIdRepository.Companion.initialize(context);
+		WidgetRepository.initialize(context);
 		FlickrRepository.initialize();
 		RainViewerRepository.Companion.initialize();
+		WindUtil.init(context);
 		initPreferences();
-		WindUtil.init(getApplicationContext());
 	}
 
 

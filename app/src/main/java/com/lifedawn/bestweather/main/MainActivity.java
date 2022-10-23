@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
 	private void initWidgets() {
 		WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
-		widgetHelper.reDrawWidgets();
+		widgetHelper.reDrawWidgets(null);
 	}
 
 }

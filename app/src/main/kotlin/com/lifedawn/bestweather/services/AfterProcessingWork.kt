@@ -44,7 +44,7 @@ class AfterProcessingWork {
 
                     }
 
-                    val widgetRepository = WidgetRepository(context)
+                    val widgetRepository = WidgetRepository.getINSTANCE();
 
                     widgetRepository.getAll(object : DbQueryCallback<List<WidgetDto>> {
                         override fun onResultSuccessful(result: List<WidgetDto>?) {

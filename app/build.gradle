@@ -195,6 +195,10 @@ dependencies {
     // Import aar for native component compilation
     implementation 'com.github.luben:zstd-jni:1.4.9-5@aar'
 
+    implementation "androidx.concurrent:concurrent-futures:1.1.0"
+    // Kotlin
+    implementation "androidx.concurrent:concurrent-futures-ktx:1.1.0"
+
     constraints {
         implementation('androidx.work:work-runtime:2.7.1') {
             because '''androidx.work:work-runtime:2.1.0 pulled from

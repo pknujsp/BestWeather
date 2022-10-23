@@ -513,7 +513,7 @@
     <string name="unregisteredDailyNotification">Daily notification unregistered</string>
     <string name="temp_humidity_str">humidity: 50%</string>
     <string name="updatingWidgets">updating widgets...</string>
-    <string name="runningUpdateService">running updates...</string>
+    <string name="runningUpdateService">already running updates...</string>
     <string name="updatingNotification">updating Notification...</string>
     <string name="data_type_of_icon">DataType Of Icon</string>
     <string name="sun_set_rise_notification">Sun rise/set Notification</string>

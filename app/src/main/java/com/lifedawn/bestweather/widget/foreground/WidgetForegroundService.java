@@ -107,7 +107,7 @@ public class WidgetForegroundService extends Service {
 		showNotification();
 
 		if (widgetRepository == null) {
-			widgetRepository = new WidgetRepository(getApplicationContext());
+			widgetRepository = WidgetRepository.getINSTANCE();
 		}
 		if (appWidgetManager == null) {
 			appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());

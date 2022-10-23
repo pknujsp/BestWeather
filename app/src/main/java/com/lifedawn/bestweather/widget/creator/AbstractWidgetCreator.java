@@ -33,7 +33,7 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.widget.DialogActivity;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
-import com.lifedawn.bestweather.widget.foreground.WidgetWorker;
+import com.lifedawn.bestweather.widget.foreground.WidgetListenableWorker;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -77,7 +77,7 @@ public abstract class AbstractWidgetCreator {
 		clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit();
 		tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 
-		widgetRepository = new WidgetRepository(context);
+		widgetRepository = WidgetRepository.getINSTANCE();
 		appWidgetManager = AppWidgetManager.getInstance(context);
 	}
 
@@ -461,7 +461,7 @@ public abstract class AbstractWidgetCreator {
 		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
-				WidgetWorker.PROCESSING_WIDGET_ID_SET.remove(appWidgetId);
+				WidgetListenableWorker.PROCESSING_WIDGET_ID_SET.remove(appWidgetId);
 				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 			}
 

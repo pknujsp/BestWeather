@@ -21,7 +21,7 @@ class RainViewerViewModel(application: Application) : AndroidViewModel(applicati
     val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd E a hh:mm")
 
     val optionTileSize = 512 // can be 256 or 512.
-    val optionColorScheme = 4 // from 0 to 8. Check the https://rainviewer.com/api/color-schemes.html for additional information
+    val optionColorScheme = 3 // from 0 to 8. Check the https://rainviewer.com/api/color-schemes.html for additional information
     val optionSmoothData = 1 // 0 - not smooth, 1 - smooth
     val optionSnowColors = 1 // 0 - do not show snow colors, 1 - show snow colors
 
