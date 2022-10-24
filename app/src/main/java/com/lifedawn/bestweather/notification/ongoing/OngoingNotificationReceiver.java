@@ -28,7 +28,7 @@ public class OngoingNotificationReceiver extends BroadcastReceiver {
 					.build();
 
 			WorkManager workManager = WorkManager.getInstance(context);
-			workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.APPEND, request);
+			workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.REPLACE, request);
 		}
 	}
 }

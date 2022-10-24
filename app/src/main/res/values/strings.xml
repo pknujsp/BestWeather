@@ -587,6 +587,7 @@
     <string name="past">past</string>
     <string name="radar">radar</string>
     <string name="failed_load_img">failed to load image, retry</string>
+    <string name="com_lifedawn_bestweather_action_RESTART">com_lifedawn_bestweather_action_RESTART</string>
 
 
 </resources>

@@ -12,6 +12,7 @@ import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.flickr.FlickrRepository;
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationRepository;
 import com.lifedawn.bestweather.rainviewer.model.RainViewerRepository;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
 import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
@@ -60,6 +61,7 @@ public class MyApplication extends Application {
 		FavoriteAddressRepository.initialize(context);
 		KmaAreaCodesRepository.initialize(context);
 		TimeZoneIdRepository.Companion.initialize(context);
+		OngoingNotificationRepository.initialize(context);
 		WidgetRepository.initialize(context);
 		FlickrRepository.initialize();
 		RainViewerRepository.Companion.initialize();

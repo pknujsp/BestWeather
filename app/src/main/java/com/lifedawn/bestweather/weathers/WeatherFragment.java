@@ -292,7 +292,6 @@ public class WeatherFragment extends Fragment implements IGps {
 		shimmerLayoutParams.topMargin = topMargin;
 		binding.shimmer.setLayoutParams(shimmerLayoutParams);
 
-		binding.topExtraLayout.setVisibility(View.GONE);
 
 		shimmer(true);
 
@@ -471,32 +470,6 @@ public class WeatherFragment extends Fragment implements IGps {
 			}
 		});
 
-		binding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-			int primaryAddressNameViewBottom;
-			boolean showExtra = false;
-
-			@Override
-			public void onGlobalLayout() {
-				binding.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(this);
-				primaryAddressNameViewBottom = binding.addressName.getBottom();
-				binding.scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-					@Override
-					public void onScrollChange(@NonNull NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-						if (scrollY >= primaryAddressNameViewBottom) {
-							if (!showExtra) {
-								showExtra = true;
-								binding.topExtraLayout.setVisibility(View.VISIBLE);
-							}
-						} else {
-							if (showExtra) {
-								showExtra = false;
-								binding.topExtraLayout.setVisibility(View.GONE);
-							}
-						}
-					}
-				});
-			}
-		});
 
 		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
 		final LocationType locationType = (LocationType) arguments.getSerializable("LocationType");
@@ -574,7 +547,6 @@ public class WeatherFragment extends Fragment implements IGps {
 			zoneId = ZoneId.of(selectedFavoriteAddressDto.getZoneId());
 
 			binding.addressName.setText(addressName);
-			binding.addressNameOnExtra.setText(addressName);
 
 			if (containWeatherData(latitude, longitude)) {
 				if (isOldDownloadedData(latitude, longitude)) {
@@ -787,7 +759,6 @@ public class WeatherFragment extends Fragment implements IGps {
 			@Override
 			public void run() {
 				binding.addressName.setText(addressStr);
-				binding.addressNameOnExtra.setText(addressStr);
 				weatherViewModel.setCurrentLocationAddressName(addressName);
 
 				if (refresh) {
@@ -1472,7 +1443,6 @@ public class WeatherFragment extends Fragment implements IGps {
 				@Override
 				public void run() {
 					loadImgOfCurrentConditions(flickrRequestParameter);
-					binding.topExtraLayout.setVisibility(View.GONE);
 
 					changeWeatherDataSourcePicker(countryCode);
 					binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(dateTimeFormatter));
@@ -1603,7 +1573,7 @@ public class WeatherFragment extends Fragment implements IGps {
 	}
 
 
-	private final static class ResponseResultObj implements Serializable {
+	private static final class ResponseResultObj implements Serializable {
 		WeatherRestApiDownloader weatherRestApiDownloader;
 		Set<WeatherProviderType> weatherProviderTypeSet;
 		WeatherProviderType mainWeatherProviderType;
@@ -1617,7 +1587,7 @@ public class WeatherFragment extends Fragment implements IGps {
 		}
 	}
 
-	public static class WeatherResponseObj implements Serializable {
+	public static final class WeatherResponseObj implements Serializable {
 		final WeatherRestApiDownloader weatherRestApiDownloader;
 		final Set<WeatherProviderType> requestWeatherProviderTypeSet;
 		final WeatherProviderType requestMainWeatherProviderType;

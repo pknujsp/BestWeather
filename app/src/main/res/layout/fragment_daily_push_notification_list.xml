@@ -1,64 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/backgroundColor">
+        >
 
-        <RelativeLayout
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar"
+            />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/root_scroll_View"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar"
+            android:overScrollMode="never"
+            android:scrollbars="none"
+            >
 
-            <include
-                android:id="@+id/toolbar"
-                layout="@layout/toolbar" />
-
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/root_scroll_View"
+            <RelativeLayout
+                android:id="@+id/settings_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/toolbar"
-                android:overScrollMode="never"
-                android:scrollbars="none">
+                >
 
-                <RelativeLayout
-                    android:id="@+id/settings_container"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/notificationList"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentBottom="true"
+                    android:orientation="vertical"
+                    tools:itemCount="3"
+                    tools:listitem="@layout/view_daily_push_notification_item"
+                    />
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/notificationList"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentTop="true"
-                        android:layout_alignParentBottom="true"
-                        android:orientation="vertical"
-                        tools:itemCount="3"
-                        tools:listitem="@layout/view_daily_push_notification_item" />
+                <com.lifedawn.bestweather.commons.views.ProgressResultView
+                    android:id="@+id/progress_result_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    />
 
-                    <com.lifedawn.bestweather.commons.views.ProgressResultView
-                        android:id="@+id/progress_result_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+            </RelativeLayout>
 
-                </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
 
-            </androidx.core.widget.NestedScrollView>
+    </RelativeLayout>
 
-        </RelativeLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/add"
+        />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/addBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|bottom"
-            android:layout_marginRight="24dp"
-            android:layout_marginBottom="24dp"
-            android:src="@drawable/add" />
-
-    </FrameLayout>
-
-
-</layout>
+</FrameLayout>

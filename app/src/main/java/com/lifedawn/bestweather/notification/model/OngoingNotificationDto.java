@@ -1,35 +1,64 @@
 package com.lifedawn.bestweather.notification.model;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
 
-public class NotificationDataObj {
+public class OngoingNotificationDto {
+	@Expose
+	@SerializedName("on")
+	private boolean on;
+	@Expose
+	@SerializedName("locationType")
 	private LocationType locationType;
+	@Expose
+	@SerializedName("weatherProviderType")
 	private WeatherProviderType weatherProviderType;
+	@Expose
+	@SerializedName("topPriorityKma")
 	private boolean topPriorityKma;
+	@Expose
+	@SerializedName("updateIntervalMillis")
 	private long updateIntervalMillis;
-	private int selectedAddressDtoId;
+	@Expose
+	@SerializedName("dataTypeOfIcon")
 	private WidgetNotiConstants.DataTypeOfIcon dataTypeOfIcon;
-
+	@Expose
+	@SerializedName("displayName")
 	private String displayName;
+	@Expose
+	@SerializedName("latitude")
 	private double latitude;
+	@Expose
+	@SerializedName("longitude")
 	private double longitude;
+	@Expose
+	@SerializedName("countryCode")
 	private String countryCode;
+	@Expose
+	@SerializedName("zoneId")
 	private String zoneId;
 
-	public NotificationDataObj setZoneId(String zoneId) {
+	public void setOn(boolean on) {
+		this.on = on;
+	}
+
+	public boolean isOn() {
+		return on;
+	}
+
+	public void setZoneId(String zoneId) {
 		this.zoneId = zoneId;
-		return this;
 	}
 
 	public String getZoneId() {
 		return zoneId;
 	}
 
-	public NotificationDataObj setDataTypeOfIcon(WidgetNotiConstants.DataTypeOfIcon dataTypeOfIcon) {
+	public void setDataTypeOfIcon(WidgetNotiConstants.DataTypeOfIcon dataTypeOfIcon) {
 		this.dataTypeOfIcon = dataTypeOfIcon;
-		return this;
 	}
 
 	public WidgetNotiConstants.DataTypeOfIcon getDataTypeOfIcon() {
@@ -40,54 +69,40 @@ public class NotificationDataObj {
 		return locationType;
 	}
 
-	public NotificationDataObj setLocationType(LocationType locationType) {
+	public void setLocationType(LocationType locationType) {
 		this.locationType = locationType;
-		return this;
 	}
 
 	public WeatherProviderType getWeatherSourceType() {
 		return weatherProviderType;
 	}
 
-	public NotificationDataObj setWeatherSourceType(WeatherProviderType weatherProviderType) {
+	public void setWeatherSourceType(WeatherProviderType weatherProviderType) {
 		this.weatherProviderType = weatherProviderType;
-		return this;
 	}
 
 	public boolean isTopPriorityKma() {
 		return topPriorityKma;
 	}
 
-	public NotificationDataObj setTopPriorityKma(boolean topPriorityKma) {
+	public void setTopPriorityKma(boolean topPriorityKma) {
 		this.topPriorityKma = topPriorityKma;
-		return this;
 	}
 
 	public long getUpdateIntervalMillis() {
 		return updateIntervalMillis;
 	}
 
-	public NotificationDataObj setUpdateIntervalMillis(long updateIntervalMillis) {
+	public void setUpdateIntervalMillis(long updateIntervalMillis) {
 		this.updateIntervalMillis = updateIntervalMillis;
-		return this;
-	}
-
-	public int getSelectedAddressDtoId() {
-		return selectedAddressDtoId;
-	}
-
-	public NotificationDataObj setSelectedAddressDtoId(int selectedAddressDtoId) {
-		this.selectedAddressDtoId = selectedAddressDtoId;
-		return this;
 	}
 
 	public String getDisplayName() {
 		return displayName;
 	}
 
-	public NotificationDataObj setDisplayName(String displayName) {
+	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
-		return this;
 	}
 
 
@@ -95,26 +110,23 @@ public class NotificationDataObj {
 		return latitude;
 	}
 
-	public NotificationDataObj setLatitude(double latitude) {
+	public void setLatitude(double latitude) {
 		this.latitude = latitude;
-		return this;
 	}
 
 	public double getLongitude() {
 		return longitude;
 	}
 
-	public NotificationDataObj setLongitude(double longitude) {
+	public void setLongitude(double longitude) {
 		this.longitude = longitude;
-		return this;
 	}
 
 	public String getCountryCode() {
 		return countryCode;
 	}
 
-	public NotificationDataObj setCountryCode(String countryCode) {
+	public void setCountryCode(String countryCode) {
 		this.countryCode = countryCode;
-		return this;
 	}
 }

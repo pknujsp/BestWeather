@@ -1,96 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     >
 
-    <FrameLayout
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"
+        />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/root_scroll_View"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        android:background="?attr/backgroundColor"
+        android:layout_below="@id/toolbar"
+        android:overScrollMode="never"
+        android:scrollbars="none"
         >
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical"
             >
 
+
             <include
-                android:id="@+id/toolbar"
-                layout="@layout/toolbar"
+                android:id="@+id/ongoing"
+                layout="@layout/custom_on_off_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 />
 
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/root_scroll_View"
+
+            <TextView
+                android:id="@+id/daily"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/toolbar"
-                android:overScrollMode="never"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:scrollbars="none"
-                >
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:text="@string/daily_notification"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    >
+            <TextView
+                android:id="@+id/alarm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="16dp"
+                android:text="@string/alarm"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:visibility="gone"
+                />
 
-                    <TextView
-                        android:id="@+id/always"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="16dp"
-                        android:text="@string/always_notification"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        />
+            <TextView
+                android:id="@+id/sunsetrise"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="16dp"
+                android:text="@string/sun_set_rise_notification"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                android:visibility="gone"
+                />
+        </LinearLayout>
 
-                    <TextView
-                        android:id="@+id/daily"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="16dp"
-                        android:text="@string/daily_notification"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        />
+    </androidx.core.widget.NestedScrollView>
 
-                    <TextView
-                        android:id="@+id/alarm"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="16dp"
-                        android:text="@string/alarm"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        android:visibility="gone"
-                        />
-
-                    <TextView
-                        android:id="@+id/sunsetrise"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="16dp"
-                        android:text="@string/sun_set_rise_notification"
-                        android:textColor="@color/black"
-                        android:textSize="15sp"
-                        android:visibility="gone"
-                        />
-                </LinearLayout>
-
-            </androidx.core.widget.NestedScrollView>
-
-        </RelativeLayout>
-
-    </FrameLayout>
-</layout>
+</RelativeLayout>

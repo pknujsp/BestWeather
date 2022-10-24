@@ -1,6 +1,9 @@
 package com.lifedawn.bestweather.main;
 
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.ads.MobileAds;
@@ -23,13 +27,20 @@ import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
 import com.lifedawn.bestweather.intro.IntroTransactionFragment;
+import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.notification.model.OngoingNotificationDto;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
 import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationReceiver;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationViewModel;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
 	private NetworkStatus networkStatus;
+
+	private OngoingNotificationViewModel ongoingNotificationViewModel;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
 		networkStatus = NetworkStatus.getInstance(getApplicationContext());
 
 		if (networkStatus.networkAvailable()) {
+			ongoingNotificationViewModel = new ViewModelProvider(this).get(OngoingNotificationViewModel.class);
 			processNextStep();
 		} else {
 			new AlertDialog.Builder(this).setTitle(R.string.networkProblem)
@@ -101,11 +113,27 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	private void initOngoingNotifications() {
-		//ongoing notification
-		OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
-		ongoingNotificationHelper.reStartNotification(new BackgroundWorkCallback() {
+		ongoingNotificationViewModel.getOngoingNotificationDto(new DbQueryCallback<OngoingNotificationDto>() {
 			@Override
-			public void onFinished() {
+			public void onResultSuccessful(OngoingNotificationDto result) {
+				if (result.isOn()) {
+					//ongoing notification
+					Intent intent = new Intent(getApplicationContext(), OngoingNotificationReceiver.class);
+					intent.setAction(getString(R.string.com_lifedawn_bestweather_action_RESTART));
+
+					PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), NotificationType.Ongoing.getNotificationId(),
+							intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+					try {
+						pendingIntent.send();
+					} catch (PendingIntent.CanceledException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			@Override
+			public void onResultNoData() {
 
 			}
 		});

@@ -3,11 +3,15 @@ package com.lifedawn.bestweather.notification.ongoing.work;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.app.NotificationCompat;
+import androidx.preference.PreferenceManager;
 import androidx.work.ForegroundInfo;
 import androidx.work.ListenableWorker;
 import androidx.work.WorkerParameters;
@@ -16,12 +20,19 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.notification.model.OngoingNotificationDto;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotiViewCreator;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationProcessor;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationRepository;
+import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.utils.DeviceUtils;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -29,11 +40,11 @@ import java.util.concurrent.TimeoutException;
 
 public class OngoingNotificationListenableWorker extends ListenableWorker {
 	private OngoingNotiViewCreator ongoingNotiViewCreator;
-	private final String action;
+	private final String ACTION;
 
 	public OngoingNotificationListenableWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
 		super(context, workerParams);
-		action = workerParams.getInputData().getString("action");
+		ACTION = workerParams.getInputData().getString("action");
 	}
 
 	@NonNull
@@ -43,41 +54,45 @@ public class OngoingNotificationListenableWorker extends ListenableWorker {
 			final BackgroundWorkCallback backgroundWorkCallback = new BackgroundWorkCallback() {
 				@Override
 				public void onFinished() {
-					completer.set(Result.success());
+					if (!isStopped()) {
+						completer.set(Result.success());
+					}
 				}
 			};
 
-			if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-				OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
-				ongoingNotificationHelper.reStartNotification(backgroundWorkCallback);
-			} else if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-				if (DeviceUtils.Companion.isScreenOn(getApplicationContext())) {
-					ongoingNotiViewCreator = new OngoingNotiViewCreator(getApplicationContext(), null);
-					ongoingNotiViewCreator.loadSavedPreferences();
+			OngoingNotificationRepository repository = OngoingNotificationRepository.getINSTANCE();
+			repository.getOngoingNotificationDto(new DbQueryCallback<OngoingNotificationDto>() {
+				@Override
+				public void onResultSuccessful(OngoingNotificationDto ongoingNotificationDto) {
+					if (ACTION.equals(Intent.ACTION_BOOT_COMPLETED) || ACTION.equals(Intent.ACTION_MY_PACKAGE_REPLACED)
+							|| ACTION.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_RESTART))) {
+						reStartNotification(ongoingNotificationDto, backgroundWorkCallback);
+					} else if (ACTION.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
+						if (ongoingNotificationDto.getUpdateIntervalMillis() > 0) {
+							OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
 
-					if (ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
-						OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
-
-						if (!ongoingNotificationHelper.isRepeating()) {
-							ongoingNotificationHelper.onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
+							if (!ongoingNotificationHelper.isRepeating())
+								ongoingNotificationHelper.onSelectedAutoRefreshInterval(ongoingNotificationDto.getUpdateIntervalMillis());
 						}
-					}
 
-					ongoingNotiViewCreator.initNotification(new BackgroundWorkCallback() {
-						@Override
-						public void onFinished() {
-							if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.CurrentLocation) {
-								NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-								notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
-							}
+						if (DeviceUtils.Companion.isScreenOn(getApplicationContext())) {
+							ongoingNotiViewCreator = new OngoingNotiViewCreator(getApplicationContext(), ongoingNotificationDto);
+							createNotification(ongoingNotificationDto, backgroundWorkCallback);
+						} else {
 							backgroundWorkCallback.onFinished();
 						}
-					});
-				} else {
-					backgroundWorkCallback.onFinished();
+
+					}
 				}
 
-			}
+				@Override
+				public void onResultNoData() {
+					NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+					notificationHelper.cancelNotification(NotificationType.Ongoing.getNotificationId());
+					backgroundWorkCallback.onFinished();
+				}
+			});
+
 
 			return backgroundWorkCallback;
 		});
@@ -138,7 +153,46 @@ public class OngoingNotificationListenableWorker extends ListenableWorker {
 
 	@Override
 	public void onStopped() {
-		super.onStopped();
+		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+		notificationHelper.cancelNotification(NotificationType.Ongoing.getNotificationId());
+	}
+
+
+	public void reStartNotification(OngoingNotificationDto ongoingNotificationDto, @NonNull BackgroundWorkCallback callback) {
+		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+		OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
+
+		if (ongoingNotificationDto.getUpdateIntervalMillis() > 0 && !ongoingNotificationHelper.isRepeating()) {
+			ongoingNotificationHelper.onSelectedAutoRefreshInterval(ongoingNotificationDto.getUpdateIntervalMillis());
+		}
+
+		boolean active = notificationHelper.activeNotification(NotificationType.Ongoing.getNotificationId());
+		if (active) {
+			callback.onFinished();
+		} else {
+			createNotification(ongoingNotificationDto, callback);
+		}
+	}
+
+	private void createNotification(OngoingNotificationDto ongoingNotificationDto, BackgroundWorkCallback callback) {
+		RemoteViews[] remoteViews = ongoingNotiViewCreator.createRemoteViews(false);
+
+		RemoteViews collapsedView = remoteViews[0];
+		RemoteViews expandedView = remoteViews[1];
+
+		RemoteViewsUtil.onBeginProcess(expandedView);
+		RemoteViewsUtil.onBeginProcess(collapsedView);
+
+		OngoingNotificationProcessor processor = OngoingNotificationProcessor.getINSTANCE();
+
+		processor.makeNotification(getApplicationContext(), ongoingNotificationDto, collapsedView, expandedView, R.drawable.refresh, null,
+				false, null);
+
+		if (ongoingNotificationDto.getLocationType() == LocationType.CurrentLocation) {
+			processor.loadCurrentLocation(getApplicationContext(), ongoingNotificationDto, collapsedView, expandedView, callback);
+		} else {
+			processor.loadWeatherData(getApplicationContext(), ongoingNotificationDto, collapsedView, expandedView, callback);
+		}
 	}
 
 }

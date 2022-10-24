@@ -26,6 +26,7 @@
                 android:id="@+id/current_location_radio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:checked="true"
                 android:text="@string/current_location"
                 />
 

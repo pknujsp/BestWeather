@@ -6,14 +6,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
+import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
+import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class OngoingNotificationHelper {
 	private Context context;
@@ -58,31 +65,13 @@ public class OngoingNotificationHelper {
 		}
 	}
 
-	public void reStartNotification(@NonNull BackgroundWorkCallback callback) {
-		SharedPreferences sharedPreferences =
-				PreferenceManager.getDefaultSharedPreferences(context);
 
-		final boolean enabledOngoingNotification = sharedPreferences.getBoolean(NotificationType.Ongoing.getPreferenceName(), false);
 
-		if (enabledOngoingNotification) {
-			NotificationHelper notificationHelper = new NotificationHelper(context);
-			final boolean active = notificationHelper.activeNotification(NotificationType.Ongoing.getNotificationId());
+	public PendingIntent getRefreshPendingIntent() {
+		Intent refreshIntent = new Intent(context, OngoingNotificationReceiver.class);
+		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
-			OngoingNotiViewCreator ongoingNotiViewCreator = new OngoingNotiViewCreator(context, null);
-			ongoingNotiViewCreator.loadPreferences();
-
-			if (ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0 && !isRepeating()) {
-				onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
-			}
-
-			if (active) {
-				callback.onFinished();
-			} else {
-				ongoingNotiViewCreator.initNotification(callback);
-			}
-		} else {
-			callback.onFinished();
-		}
+		return PendingIntent.getBroadcast(context, NotificationType.Ongoing.getNotificationId() + 1, refreshIntent,
+				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 	}
-
 }

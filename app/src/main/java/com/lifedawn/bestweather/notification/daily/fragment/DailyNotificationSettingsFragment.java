@@ -189,7 +189,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 			public void onClick(View v) {
 				if (newNotificationSession) {
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-						NotificationHelper notificationHelper = new NotificationHelper(getContext());
+						NotificationHelper notificationHelper = new NotificationHelper(requireContext().getApplicationContext());
 						NotificationHelper.NotificationObj notificationObj = notificationHelper.getNotificationObj(NotificationType.Daily);
 						notificationHelper.createNotificationChannel(notificationObj);
 					}
