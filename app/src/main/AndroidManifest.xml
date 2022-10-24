@@ -261,25 +261,15 @@
             android:name=".alarm.alarmnotifications.AlarmService"
             android:enabled="true"
             android:exported="true" />
-        <service
-            android:name=".widget.foreground.WidgetForegroundService"
-            android:enabled="true"
-            android:exported="true" />
-        <service
-            android:name=".notification.ongoing.OngoingNotificationForegroundService"
-            android:enabled="true"
-            android:exported="true" />
-        <service
-            android:name=".notification.daily.DailyNotificationForegroundService"
-            android:enabled="true"
-            android:exported="true" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="${ADMOB_APP_ID}" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

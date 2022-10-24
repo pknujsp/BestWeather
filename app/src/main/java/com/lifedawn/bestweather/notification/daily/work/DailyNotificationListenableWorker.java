@@ -1,17 +1,19 @@
-package com.lifedawn.bestweather.notification.daily;
+package com.lifedawn.bestweather.notification.daily.work;
 
 import android.app.Notification;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.PowerManager;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
+import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
 import androidx.work.ForegroundInfo;
-import androidx.work.Worker;
+import androidx.work.ListenableWorker;
 import androidx.work.WorkerParameters;
 
 import com.google.android.gms.location.LocationResult;
@@ -23,9 +25,12 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
+import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FifthDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FirstDailyNotificationViewCreator;
@@ -47,29 +52,45 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class DailyNotificationWorker extends Worker {
-	private DailyPushNotificationRepository repository;
+public class DailyNotificationListenableWorker extends ListenableWorker {
+	private final String action;
+	private final DailyPushNotificationRepository repository;
+	private final int id;
+	private final DailyPushNotificationType dailyPushNotificationType;
 	private AbstractDailyNotiViewCreator viewCreator;
-	private String action;
-	private Integer id;
-	private DailyPushNotificationType dailyPushNotificationType;
 
-	public DailyNotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+	public DailyNotificationListenableWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
 		super(context, workerParams);
-		repository = new DailyPushNotificationRepository(context);
+
 		action = workerParams.getInputData().getString("action");
+		repository = new DailyPushNotificationRepository(getApplicationContext());
 		id = workerParams.getInputData().getInt(BundleKey.dtoId.name(), -1);
 		dailyPushNotificationType = DailyPushNotificationType.valueOf(workerParams.getInputData().getString("DailyPushNotificationType"));
 	}
 
 	@NonNull
 	@Override
-	public Result doWork() {
-		if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			workNotification(getApplicationContext(), Executors.newSingleThreadExecutor(), id, dailyPushNotificationType);
-		}
+	public ListenableFuture<Result> startWork() {
+		return CallbackToFutureAdapter.getFuture(completer -> {
+			final BackgroundWorkCallback backgroundWorkCallback = new BackgroundWorkCallback() {
+				@Override
+				public void onFinished() {
+					completer.set(Result.success());
+				}
+			};
 
-		return Result.success();
+			if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
+				DailyNotificationHelper notiHelper = new DailyNotificationHelper(getApplicationContext());
+				notiHelper.reStartNotifications(backgroundWorkCallback);
+			} else {
+				workNotification(getApplicationContext(), Executors.newSingleThreadExecutor(), id, dailyPushNotificationType, backgroundWorkCallback);
+			}
+
+			return backgroundWorkCallback;
+
+		});
+
+
 	}
 
 	@NonNull
@@ -131,8 +152,8 @@ public class DailyNotificationWorker extends Worker {
 	}
 
 
-	public void workNotification(Context context, ExecutorService executorService, Integer notificationDtoId, DailyPushNotificationType type) {
-		repository = new DailyPushNotificationRepository(context);
+	public void workNotification(Context context, ExecutorService executorService, Integer notificationDtoId,
+	                             DailyPushNotificationType type, BackgroundWorkCallback backgroundWorkCallback) {
 		repository.get(notificationDtoId, new DbQueryCallback<DailyPushNotificationDto>() {
 			@Override
 			public void onResultSuccessful(DailyPushNotificationDto dto) {
@@ -152,23 +173,19 @@ public class DailyNotificationWorker extends Worker {
 					default:
 						viewCreator = new FifthDailyNotificationViewCreator(context);
 				}
-				viewCreator.setBackgroundCallback(new Callback() {
-					@Override
-					public void onResult() {
-					}
-				});
+				viewCreator.setBackgroundCallback(backgroundWorkCallback);
 
 				RemoteViews remoteViews = viewCreator.createRemoteViews(false);
 				if (dto.getLocationType() == LocationType.CurrentLocation) {
-					loadCurrentLocation(context, executorService, remoteViews, dto);
+					loadCurrentLocation(context, executorService, remoteViews, dto, backgroundWorkCallback);
 				} else {
-					loadWeatherData(context, executorService, remoteViews, dto);
+					loadWeatherData(context, executorService, remoteViews, dto, backgroundWorkCallback);
 				}
 			}
 
 			@Override
 			public void onResultNoData() {
-
+				backgroundWorkCallback.onFinished();
 			}
 		});
 
@@ -176,7 +193,7 @@ public class DailyNotificationWorker extends Worker {
 
 
 	public void loadCurrentLocation(Context context, ExecutorService executorService, RemoteViews remoteViews,
-	                                DailyPushNotificationDto dailyPushNotificationDto) {
+	                                DailyPushNotificationDto dailyPushNotificationDto, BackgroundWorkCallback backgroundWorkCallback) {
 		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
 		FusedLocation fusedLocation = FusedLocation.getInstance(context);
 
@@ -196,7 +213,7 @@ public class DailyNotificationWorker extends Worker {
 						dailyPushNotificationDto.setZoneId(zoneId.getId());
 
 						repository.update(dailyPushNotificationDto, null);
-						loadWeatherData(context, executorService, remoteViews, dailyPushNotificationDto);
+						loadWeatherData(context, executorService, remoteViews, dailyPushNotificationDto, backgroundWorkCallback);
 					}
 				});
 			}
@@ -204,7 +221,6 @@ public class DailyNotificationWorker extends Worker {
 			@Override
 			public void onFailed(Fail fail) {
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
-
 				String failText = null;
 
 				if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
@@ -219,6 +235,7 @@ public class DailyNotificationWorker extends Worker {
 
 				viewCreator.makeFailedNotification(dailyPushNotificationDto.getId(), failText);
 				wakeLock();
+				backgroundWorkCallback.onFinished();
 			}
 		};
 
@@ -227,7 +244,7 @@ public class DailyNotificationWorker extends Worker {
 	}
 
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,
-	                            DailyPushNotificationDto dailyPushNotificationDto) {
+	                            DailyPushNotificationDto dailyPushNotificationDto, BackgroundWorkCallback backgroundWorkCallback) {
 		final Set<WeatherDataType> weatherDataTypeSet = viewCreator.getRequestWeatherDataTypeSet();
 		final Set<WeatherProviderType> weatherProviderTypeSet = dailyPushNotificationDto.getWeatherProviderTypeSet();
 
@@ -244,10 +261,12 @@ public class DailyNotificationWorker extends Worker {
 					public void onResult() {
 						viewCreator.setResultViews(remoteViews, dailyPushNotificationDto, weatherProviderTypeSet, this, weatherDataTypeSet);
 						wakeLock();
+						backgroundWorkCallback.onFinished();
 					}
 
 					@Override
 					public void onCanceled() {
+						backgroundWorkCallback.onFinished();
 					}
 				}, weatherProviderTypeSet, ZoneId.of(dailyPushNotificationDto.getZoneId()));
 

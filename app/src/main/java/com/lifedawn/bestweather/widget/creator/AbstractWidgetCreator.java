@@ -33,7 +33,7 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.widget.DialogActivity;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
-import com.lifedawn.bestweather.widget.foreground.WidgetListenableWorker;
+import com.lifedawn.bestweather.widget.work.WidgetListenableWorker;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;

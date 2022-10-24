@@ -14,6 +14,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.IntentUtil;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
@@ -27,7 +28,7 @@ import java.util.Set;
 public abstract class AbstractDailyNotiViewCreator {
 	protected final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	protected Context context;
-	protected Callback callback;
+	protected BackgroundWorkCallback callback;
 	protected ZoneId zoneId;
 
 	public AbstractDailyNotiViewCreator(Context context) {
@@ -38,7 +39,7 @@ public abstract class AbstractDailyNotiViewCreator {
 
 	abstract public RemoteViews createRemoteViews(boolean needTempData);
 
-	public void setBackgroundCallback(Callback callback) {
+	public void setBackgroundCallback(BackgroundWorkCallback callback) {
 		this.callback = callback;
 	}
 
@@ -61,7 +62,7 @@ public abstract class AbstractDailyNotiViewCreator {
 		notificationManager.notify(notificationObj.getNotificationId() + notificationDtoId, notification);
 
 		if (callback != null) {
-			callback.onResult();
+			callback.onFinished();
 		}
 	}
 
@@ -81,7 +82,7 @@ public abstract class AbstractDailyNotiViewCreator {
 		notificationManager.notify(notificationObj.getNotificationId() + notificationDtoId, notification);
 
 		if (callback != null) {
-			callback.onResult();
+			callback.onFinished();
 		}
 	}
 

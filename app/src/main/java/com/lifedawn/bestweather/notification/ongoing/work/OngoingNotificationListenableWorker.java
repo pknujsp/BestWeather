@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.notification.ongoing;
+package com.lifedawn.bestweather.notification.ongoing.work;
 
 import android.app.Notification;
 import android.content.Context;
@@ -6,72 +6,81 @@ import android.content.Intent;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.app.NotificationCompat;
 import androidx.work.ForegroundInfo;
-import androidx.work.Worker;
+import androidx.work.ListenableWorker;
 import androidx.work.WorkerParameters;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.interfaces.Callback;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotiViewCreator;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
+import com.lifedawn.bestweather.utils.DeviceUtils;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class OngoingNotificationWorker extends Worker {
+public class OngoingNotificationListenableWorker extends ListenableWorker {
 	private OngoingNotiViewCreator ongoingNotiViewCreator;
-	private String action;
+	private final String action;
 
-	public OngoingNotificationWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+	public OngoingNotificationListenableWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
 		super(context, workerParams);
 		action = workerParams.getInputData().getString("action");
 	}
 
 	@NonNull
 	@Override
-	public Result doWork() {
-
-		if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-			OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
-			ongoingNotificationHelper.reStartNotification(new Callback() {
+	public ListenableFuture<Result> startWork() {
+		return CallbackToFutureAdapter.getFuture(completer -> {
+			final BackgroundWorkCallback backgroundWorkCallback = new BackgroundWorkCallback() {
 				@Override
-				public void onResult() {
-
+				public void onFinished() {
+					completer.set(Result.success());
 				}
-			});
-		} else if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-			if (DeviceUtils.Companion.isScreenOn(getApplicationContext())) {
-				ongoingNotiViewCreator = new OngoingNotiViewCreator(getApplicationContext(), null);
-				ongoingNotiViewCreator.loadSavedPreferences();
+			};
 
-				if (ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
-					OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
+			if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
+				OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
+				ongoingNotificationHelper.reStartNotification(backgroundWorkCallback);
+			} else if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
+				if (DeviceUtils.Companion.isScreenOn(getApplicationContext())) {
+					ongoingNotiViewCreator = new OngoingNotiViewCreator(getApplicationContext(), null);
+					ongoingNotiViewCreator.loadSavedPreferences();
 
-					if (!ongoingNotificationHelper.isRepeating()) {
-						ongoingNotificationHelper.onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
-					}
-				}
+					if (ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis() > 0) {
+						OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
 
-				ongoingNotiViewCreator.initNotification(new Callback() {
-					@Override
-					public void onResult() {
-						if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.CurrentLocation) {
-							NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-							notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
+						if (!ongoingNotificationHelper.isRepeating()) {
+							ongoingNotificationHelper.onSelectedAutoRefreshInterval(ongoingNotiViewCreator.getNotificationDataObj().getUpdateIntervalMillis());
 						}
 					}
-				});
+
+					ongoingNotiViewCreator.initNotification(new BackgroundWorkCallback() {
+						@Override
+						public void onFinished() {
+							if (ongoingNotiViewCreator.getNotificationDataObj().getLocationType() == LocationType.CurrentLocation) {
+								NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
+								notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
+							}
+							backgroundWorkCallback.onFinished();
+						}
+					});
+				} else {
+					backgroundWorkCallback.onFinished();
+				}
+
 			}
 
-		}
-		return Result.success();
-
+			return backgroundWorkCallback;
+		});
 	}
 
 

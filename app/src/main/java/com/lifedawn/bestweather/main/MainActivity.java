@@ -1,16 +1,9 @@
 package com.lifedawn.bestweather.main;
 
-import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProviderInfo;
-import android.content.ComponentName;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.ArrayMap;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -26,22 +19,13 @@ import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
-import com.lifedawn.bestweather.commons.enums.AppThemes;
-import com.lifedawn.bestweather.commons.interfaces.Callback;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
 import com.lifedawn.bestweather.intro.IntroTransactionFragment;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
 import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
-import com.lifedawn.bestweather.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.room.dto.WidgetDto;
-import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.widget.WidgetHelper;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
@@ -117,9 +101,9 @@ public class MainActivity extends AppCompatActivity {
 	private void initOngoingNotifications() {
 		//ongoing notification
 		OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(getApplicationContext());
-		ongoingNotificationHelper.reStartNotification(new Callback() {
+		ongoingNotificationHelper.reStartNotification(new BackgroundWorkCallback() {
 			@Override
-			public void onResult() {
+			public void onFinished() {
 
 			}
 		});
@@ -127,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
 	public void initDailyNotifications() {
 		DailyNotificationHelper notiHelper = new DailyNotificationHelper(getApplicationContext());
-		notiHelper.reStartNotifications();
+		notiHelper.reStartNotifications(null);
 	}
 
 	private void initWidgets() {

@@ -23,14 +23,12 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
-import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.widget.foreground.WidgetForegroundService;
-import com.lifedawn.bestweather.widget.foreground.WidgetListenableWorker;
+import com.lifedawn.bestweather.widget.work.WidgetListenableWorker;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -138,12 +136,11 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 			Bundle bundle = intent.getExtras();
 
 			if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_INIT))) {
-				//startService(context, action, argument);
 				Data data = new Data.Builder().putInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
 						bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)).build();
 				startWork(context, action, data);
 			} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-				//startService(context, action, null);
+
 				startWork(context, action, null);
 			} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 				startWork(context, action, null);
@@ -155,56 +152,6 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 
 	}
 
-	protected boolean isServiceRunning(Context context) {
-		final String serviceName = WidgetForegroundService.class.getName();
-		ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-		for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-			if (serviceName.equals(service.service.getClassName())) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	protected void startService(Context context, String action, @Nullable Bundle bundle) {
-		if (isServiceRunning(context)) {
-			Toast.makeText(context, R.string.runningUpdateService, Toast.LENGTH_SHORT).show();
-		} else {
-			Intent intent = new Intent(context, WidgetForegroundService.class);
-			intent.setAction(action);
-			if (bundle != null) {
-				intent.putExtras(bundle);
-			}
-
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-				context.startForegroundService(intent);
-			} else {
-				context.startService(intent);
-			}
-		}
-	}
-
-	protected boolean isWorkRunning(Context context) {
-		WorkManager workManager = WorkManager.getInstance(context);
-		final String tag = "widget";
-		ListenableFuture<List<WorkInfo>> statuses = workManager.getWorkInfosByTag(tag);
-
-		try {
-			boolean running = false;
-			List<WorkInfo> workInfoList = statuses.get();
-			for (WorkInfo workInfo : workInfoList) {
-				WorkInfo.State state = workInfo.getState();
-				running = (state == WorkInfo.State.RUNNING || state == WorkInfo.State.ENQUEUED);
-
-				if (running)
-					break;
-			}
-			return running;
-		} catch (ExecutionException | InterruptedException e) {
-			return false;
-		}
-	}
 
 	protected void startWork(Context context, String action, @Nullable Data data) {
 		if (DeviceUtils.Companion.isScreenOn(context)) {

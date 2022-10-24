@@ -25,6 +25,7 @@ import androidx.core.graphics.drawable.IconCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.location.LocationResult;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
@@ -65,7 +66,7 @@ import java.util.concurrent.TimeUnit;
 
 public class OngoingNotiViewCreator {
 	private final int hourlyForecastCount = 8;
-	private Callback callback;
+	private BackgroundWorkCallback callback;
 
 	private final NotificationUpdateCallback notificationUpdateCallback;
 	private final ValueUnits windSpeedUnit;
@@ -224,7 +225,7 @@ public class OngoingNotiViewCreator {
 	}
 
 
-	public void initNotification(Callback callback) {
+	public void initNotification(BackgroundWorkCallback callback) {
 		this.callback = callback;
 		RemoteViews[] remoteViews = createRemoteViews(false);
 
@@ -247,7 +248,7 @@ public class OngoingNotiViewCreator {
 					RemoteViewsUtil.onErrorProcess(collapsedView, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
 					makeNotification(collapsedView, expandedView, R.mipmap.ic_launcher_round, null, true);
 
-					callback.onResult();
+					callback.onFinished();
 				}
 			}
 		}, TimeUnit.SECONDS.toMillis(20L));
@@ -501,7 +502,7 @@ public class OngoingNotiViewCreator {
 				timer = null;
 			}
 			if (callback != null) {
-				callback.onResult();
+				callback.onFinished();
 			}
 		}
 	}

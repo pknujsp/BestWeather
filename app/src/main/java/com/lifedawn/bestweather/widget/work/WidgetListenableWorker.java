@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.widget.foreground;
+package com.lifedawn.bestweather.widget.work;
 
 import android.app.Notification;
 import android.appwidget.AppWidgetManager;
@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.os.PowerManager;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
@@ -24,14 +23,12 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
@@ -102,8 +99,8 @@ public class WidgetListenableWorker extends ListenableWorker {
 	private FusedLocation fusedLocation;
 	private int requestCount;
 	private AtomicInteger responseCount = new AtomicInteger(0);
-	private String action;
-	private int appWidgetId;
+	private final String action;
+	private final int appWidgetId;
 
 
 	public WidgetListenableWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {

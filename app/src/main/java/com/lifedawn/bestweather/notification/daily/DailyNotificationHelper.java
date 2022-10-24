@@ -4,14 +4,13 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 
-import androidx.core.app.AlarmManagerCompat;
+import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.alarm.AlarmReceiver;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
@@ -84,7 +83,7 @@ public class DailyNotificationHelper {
 		}
 	}
 
-	public void reStartNotifications() {
+	public void reStartNotifications(@Nullable BackgroundWorkCallback backgroundWorkCallback) {
 		DailyPushNotificationRepository repository = new DailyPushNotificationRepository(context);
 		repository.getAll(new DbQueryCallback<List<DailyPushNotificationDto>>() {
 			@Override
@@ -98,11 +97,15 @@ public class DailyNotificationHelper {
 						}
 					}
 				}
+
+				if (backgroundWorkCallback != null)
+					backgroundWorkCallback.onFinished();
 			}
 
 			@Override
 			public void onResultNoData() {
-
+				if (backgroundWorkCallback != null)
+					backgroundWorkCallback.onFinished();
 			}
 		});
 	}
