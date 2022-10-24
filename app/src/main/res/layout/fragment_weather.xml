@@ -4,20 +4,78 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
     >
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/root_coordinator_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        >
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/ap_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+            <com.google.android.material.appbar.CollapsingToolbarLayout
+                android:id="@+id/toolbar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:contentScrim="@color/transparent"
+                app:layout_scrollFlags="scroll|exitUntilCollapsed"
+                app:toolbarId="@id/top_extra_layout"
+                >
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/top_extra_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/main_toolbar"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/dialog_background"
+                    android:backgroundTint="#B3FFFFFF"
+                    android:elevation="4dp"
+                    android:padding="12dp"
+                    app:layout_collapseMode="pin"
+                    >
+
+                    <TextView
+                        android:id="@+id/address_name_on_extra"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-condensed-light"
+                        android:text="addressName"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 
     <RelativeLayout
         android:id="@+id/rootSubLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/white"
+        android:clipChildren="false"
         >
 
         <ImageView
             android:id="@+id/current_conditions_img"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/blue_skies_gradient"
             android:scaleType="centerCrop"
             />
 
@@ -40,11 +98,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
-                    android:layout_marginRight="16dp"
                     android:layout_marginBottom="150dp"
                     android:gravity="center_horizontal"
                     android:orientation="vertical"
                     android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
                     >
 
 
@@ -304,5 +362,16 @@
             android:layout_height="@dimen/toolbarHeight"
             android:layout_alignParentTop="true"
             />
+
+
     </RelativeLayout>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <include layout="@layout/fragment_weather_shimmer" />
+    </com.facebook.shimmer.ShimmerFrameLayout>
 </com.github.matteobattilana.weather.WeatherView>

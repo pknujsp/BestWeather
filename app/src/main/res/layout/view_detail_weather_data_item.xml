@@ -19,7 +19,7 @@
         android:layout_marginBottom="2dp"
         android:text="label"
         android:textAlignment="center"
-        android:textColor="#B1B0B0"
+        android:textColor="#BCBABA"
         android:textSize="13sp"
         />
 
@@ -42,7 +42,7 @@
         android:text="value"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:textSize="22sp"
+        android:textSize="24sp"
         />
 
 

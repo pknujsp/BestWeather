@@ -37,7 +37,9 @@ public class MainActivity extends AppCompatActivity {
 
 		setTheme(R.style.AppTheme_Black);
 
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+		binding = ActivityMainBinding.inflate(getLayoutInflater());
+		setContentView(binding.getRoot());
+
 		Window window = getWindow();
 
 		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);

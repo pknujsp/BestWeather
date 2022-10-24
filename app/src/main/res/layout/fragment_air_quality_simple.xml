@@ -1,158 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/forecasts_card_background"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp"
     >
 
+    <include
+        android:id="@+id/weather_card_view_header"
+        layout="@layout/weather_card_header_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        />
+
     <LinearLayout
-        style="@style/forecasts_card_background"
+        android:id="@+id/content_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="12dp"
-        android:paddingBottom="12dp"
+        android:paddingLeft="@dimen/cardLRPadding"
+        android:paddingRight="@dimen/cardLRPadding"
         >
 
-        <include
-            android:id="@+id/weather_card_view_header"
-            layout="@layout/weather_card_header_view"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="4dp"
+            android:text="@string/measuring_station_name"
+            android:textColor="?attr/textColorInWeatherCard"
+            android:textSize="16sp"
             />
 
-        <LinearLayout
-            android:id="@+id/content_container"
+        <TextView
+            android:id="@+id/measuring_station_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="measuring_station_name"
+            android:textColor="?attr/textColorInWeatherCard"
+            android:textSize="14sp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="@string/distance_to_measuring_station"
+            android:textColor="?attr/textColorInWeatherCard"
+            android:textSize="16sp"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/distance_to_measuring_station"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="distance_to_measuring_station"
+            android:textColor="?attr/textColorInWeatherCard"
+            android:textSize="14sp"
+            android:visibility="gone"
+            />
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingLeft="@dimen/cardLRPadding"
-            android:paddingRight="@dimen/cardLRPadding"
+            android:layout_marginBottom="8dp"
             >
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:text="@string/measuring_station_name"
-                android:textColor="?attr/textColorInWeatherCard"
-                android:textSize="16sp"
-                />
-
-            <TextView
-                android:id="@+id/measuring_station_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:text="measuring_station_name"
-                android:textColor="?attr/textColorInWeatherCard"
-                android:textSize="14sp"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:text="@string/distance_to_measuring_station"
-                android:textColor="?attr/textColorInWeatherCard"
-                android:textSize="16sp"
-                android:visibility="gone"
-                />
-
-            <TextView
-                android:id="@+id/distance_to_measuring_station"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="distance_to_measuring_station"
-                android:textColor="?attr/textColorInWeatherCard"
-                android:textSize="14sp"
-                android:visibility="gone"
-                />
-
-
-            <RelativeLayout
+                android:id="@+id/currentLabel"
                 style="@style/sub_title_in_forecast_card"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:gravity="center_vertical"
-                >
-
-                <TextView
-                    style="@style/sub_title_in_forecast_card"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="0dp"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginEnd="0dp"
-                    android:layout_marginBottom="0dp"
-                    android:text="@string/current"
-                    android:textColor="?attr/textColorInWeatherCard"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="8dp"
-                    android:layout_toLeftOf="@id/current_airquality"
-                    android:text="@string/air_quality"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    />
-
-                <TextView
-                    android:id="@+id/current_airquality"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:text="@string/aqi_1_good"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    />
-
-            </RelativeLayout>
-
-            <androidx.gridlayout.widget.GridLayout
-                android:id="@+id/grid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:alignmentMode="alignBounds"
-                app:columnCount="3"
-                app:orientation="horizontal"
-                app:rowOrderPreserved="false"
-                app:useDefaultMargins="false"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginBottom="4dp"
+                android:text="@string/current"
+                android:textColor="?attr/textColorInWeatherCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 />
 
             <TextView
-                style="@style/sub_title_in_forecast_card"
-                android:layout_width="match_parent"
+                android:id="@+id/currentLabel2"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="@string/daily_forecast"
-                android:textColor="?attr/textColorInWeatherCard"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp"
+                android:text="@string/air_quality"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@id/current_airquality"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/currentLabel"
                 />
 
-            <LinearLayout
-                android:id="@+id/forecast"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/current_airquality"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
+                android:layout_centerVertical="true"
+                android:text="@string/aqi_1_good"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/currentLabel2"
+                app:layout_constraintTop_toTopOf="@id/currentLabel2"
                 />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.lifedawn.bestweather.commons.views.ProgressResultView
-            android:id="@+id/progress_result_view"
+        <androidx.gridlayout.widget.GridLayout
+            android:id="@+id/grid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:alignmentMode="alignBounds"
+            app:columnCount="3"
+            app:orientation="horizontal"
+            app:rowOrderPreserved="false"
+            app:useDefaultMargins="false"
             />
 
+        <TextView
+            style="@style/sub_title_in_forecast_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:text="@string/daily_forecast"
+            android:textColor="?attr/textColorInWeatherCard"
+            />
+
+        <LinearLayout
+            android:id="@+id/forecast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            />
 
     </LinearLayout>
-</layout>
+
+    <com.lifedawn.bestweather.commons.views.ProgressResultView
+        android:id="@+id/progress_result_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+
+</LinearLayout>

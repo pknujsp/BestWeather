@@ -76,7 +76,6 @@ public class RetrofitClient {
 			case KMA_MID_TA_FCST:
 				Retrofit midFcstInstance = new Retrofit.Builder().client(client)
 						.baseUrl(MID_FCST_INFO_SERVICE_URL).callbackExecutor(EXECUTOR_SERVICE)
-
 						.addConverterFactory(ScalarsConverterFactory.create())
 						.build();
 				return midFcstInstance.create(Queries.class);

@@ -31,12 +31,13 @@ public class ProgressDialog {
 			return null;
 		}
 
-		clearDialogs();
 
 		View progressView = LayoutInflater.from(activity.getApplicationContext()).inflate(R.layout.progress_view, null);
 		((TextView) progressView.findViewById(R.id.progress_msg)).setText(msg);
 
 		AlertDialog dialog = new AlertDialog.Builder(activity).setCancelable(false).setView(progressView).create();
+
+		clearDialogs();
 		dialog.show();
 
 		Window window = dialog.getWindow();
@@ -60,6 +61,7 @@ public class ProgressDialog {
 		}
 
 		dialogStack.push(dialog);
+
 		return dialog;
 	}
 

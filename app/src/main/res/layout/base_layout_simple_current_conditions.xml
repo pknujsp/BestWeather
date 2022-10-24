@@ -45,7 +45,7 @@
                 android:shadowColor="@color/black"
                 android:text="weather"
                 android:textColor="@color/white"
-                android:textSize="23sp"
+                android:textSize="24sp"
                 />
 
             <TextView
@@ -131,12 +131,9 @@
         android:id="@+id/airQualityLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-
         android:layout_above="@id/humidity"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="6dp"
-
         android:gravity="center_vertical"
         android:orientation="horizontal"
         >

@@ -182,7 +182,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_configure_widget);
+		binding = ActivityConfigureWidgetBinding.inflate(getLayoutInflater());
+		setContentView(binding.getRoot());
 		final Window window = getWindow();
 
 		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);

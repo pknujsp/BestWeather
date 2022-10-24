@@ -37,7 +37,8 @@ public class AlarmActivity extends AppCompatActivity {
 						WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON);
 		super.onCreate(savedInstanceState);
 
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_alarm);
+		binding = ActivityAlarmBinding.inflate(getLayoutInflater());
+		setContentView(binding.getRoot());
 		alarmDtoId = getIntent().getExtras().getInt(BundleKey.dtoId.name());
 
 		alarmOnFragment = new AlarmOnFragment();

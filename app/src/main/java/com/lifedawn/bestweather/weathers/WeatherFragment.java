@@ -17,6 +17,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -29,6 +30,8 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -271,18 +274,6 @@ public class WeatherFragment extends Fragment implements IGps {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentWeatherBinding.inflate(inflater);
-		return binding.getRoot();
-	}
-
-	@SuppressLint("MissingPermission")
-	@Override
-	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-		binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(getContext(), R.color.black_alpha_30), PorterDuff.Mode.DARKEN);
-
-		binding.scrollView.setVisibility(View.GONE);
-		binding.flickrImageUrl.setVisibility(View.GONE);
-		binding.loadingAnimation.setVisibility(View.GONE);
 
 		final int statusBarHeight = MyApplication.getStatusBarHeight();
 
@@ -296,6 +287,26 @@ public class WeatherFragment extends Fragment implements IGps {
 		RelativeLayout.LayoutParams headerLayoutParams = (RelativeLayout.LayoutParams) binding.headerLayout.getLayoutParams();
 		headerLayoutParams.topMargin = topMargin;
 		binding.headerLayout.setLayoutParams(headerLayoutParams);
+
+		FrameLayout.LayoutParams shimmerLayoutParams = (FrameLayout.LayoutParams) binding.shimmer.getLayoutParams();
+		shimmerLayoutParams.topMargin = topMargin;
+		binding.shimmer.setLayoutParams(shimmerLayoutParams);
+
+		binding.topExtraLayout.setVisibility(View.GONE);
+
+		shimmer(true);
+
+		return binding.getRoot();
+	}
+
+	@SuppressLint("MissingPermission")
+	@Override
+	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(getContext(), R.color.black_alpha_30), PorterDuff.Mode.DARKEN);
+
+		binding.flickrImageUrl.setVisibility(View.GONE);
+		binding.loadingAnimation.setVisibility(View.GONE);
 
 		weatherViewController = new WeatherViewController(binding.rootLayout);
 		weatherViewController.setWeatherView(PrecipType.CLEAR, null);
@@ -460,18 +471,48 @@ public class WeatherFragment extends Fragment implements IGps {
 			}
 		});
 
+		binding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			int primaryAddressNameViewBottom;
+			boolean showExtra = false;
+
+			@Override
+			public void onGlobalLayout() {
+				binding.getRoot().getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				primaryAddressNameViewBottom = binding.addressName.getBottom();
+				binding.scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+					@Override
+					public void onScrollChange(@NonNull NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+						if (scrollY >= primaryAddressNameViewBottom) {
+							if (!showExtra) {
+								showExtra = true;
+								binding.topExtraLayout.setVisibility(View.VISIBLE);
+							}
+						} else {
+							if (showExtra) {
+								showExtra = false;
+								binding.topExtraLayout.setVisibility(View.GONE);
+							}
+						}
+					}
+				});
+			}
+		});
+
 		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
 		final LocationType locationType = (LocationType) arguments.getSerializable("LocationType");
 		final FavoriteAddressDto favoriteAddressDto = arguments.containsKey("FavoriteAddressDto") ?
 				(FavoriteAddressDto) arguments.getSerializable("FavoriteAddressDto") : null;
-
 
 		if (load) {
 			load = false;
 			arguments.remove("load");
 			setArguments(arguments);
 			load(locationType, favoriteAddressDto);
+		} else {
+			shimmer(false);
 		}
+
+
 	}
 
 
@@ -533,6 +574,7 @@ public class WeatherFragment extends Fragment implements IGps {
 			zoneId = ZoneId.of(selectedFavoriteAddressDto.getZoneId());
 
 			binding.addressName.setText(addressName);
+			binding.addressNameOnExtra.setText(addressName);
 
 			if (containWeatherData(latitude, longitude)) {
 				if (isOldDownloadedData(latitude, longitude)) {
@@ -703,8 +745,6 @@ public class WeatherFragment extends Fragment implements IGps {
 
 
 	private void requestAddressOfLocation(Double latitude, Double longitude, boolean refresh) {
-		binding.scrollView.setVisibility(View.GONE);
-
 		Geocoding.nominatimReverseGeocoding(getContext(), latitude, longitude, new Geocoding.ReverseGeocodingCallback() {
 			@Override
 			public void onReverseGeocodingResult(Geocoding.AddressDto address) {
@@ -747,6 +787,7 @@ public class WeatherFragment extends Fragment implements IGps {
 			@Override
 			public void run() {
 				binding.addressName.setText(addressStr);
+				binding.addressNameOnExtra.setText(addressStr);
 				weatherViewModel.setCurrentLocationAddressName(addressName);
 
 				if (refresh) {
@@ -812,9 +853,7 @@ public class WeatherFragment extends Fragment implements IGps {
 
 
 	public void requestNewData() {
-		binding.scrollView.setVisibility(View.GONE);
 		ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
-
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -848,9 +887,8 @@ public class WeatherFragment extends Fragment implements IGps {
 	}
 
 	private void requestNewDataWithAnotherWeatherSource(WeatherProviderType newWeatherProviderType, WeatherProviderType lastWeatherProviderType) {
-		binding.scrollView.setVisibility(View.GONE);
+		shimmer(true);
 		ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
-
 		executorService.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -875,6 +913,7 @@ public class WeatherFragment extends Fragment implements IGps {
 
 					}
 				};
+
 				weatherRestApiDownloader.setZoneId(zoneId);
 				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, weatherRestApiDownloader);
 			}
@@ -899,7 +938,7 @@ public class WeatherFragment extends Fragment implements IGps {
 						MainThreadWorker.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
-								binding.scrollView.setVisibility(View.VISIBLE);
+								shimmer(false);
 								Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
 							}
 						});
@@ -956,26 +995,23 @@ public class WeatherFragment extends Fragment implements IGps {
 							}, failedDialogItems[index]));
 							index++;
 						}
-						setFailFragment(btnObjList);
+
+						MainThreadWorker.runOnUiThread(() -> {
+							ProgressDialog.clearDialogs();
+							setFailFragment(btnObjList);
+						});
 					}
 
-					ProgressDialog.clearDialogs();
 					return;
 				}
 			}
 		}
 
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				//응답 성공 하면
-				final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.weatherRestApiDownloader,
-						responseResultObj.weatherProviderTypeSet, responseResultObj.mainWeatherProviderType);
-				weatherViewModel.FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
-				setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.weatherRestApiDownloader, latitude, longitude);
-			}
-		});
-
+		//응답 성공 하면
+		final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.weatherRestApiDownloader,
+				responseResultObj.weatherProviderTypeSet, responseResultObj.mainWeatherProviderType);
+		weatherViewModel.FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
+		setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.weatherRestApiDownloader, latitude, longitude);
 	}
 
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
@@ -991,6 +1027,8 @@ public class WeatherFragment extends Fragment implements IGps {
 		alertFragment.setMenuOnClickListener(menuOnClickListener);
 		alertFragment.setBtnObjList(btnObjList);
 		alertFragment.setArguments(bundle);
+
+		shimmer(false);
 
 		fragmentTransaction.replace(R.id.fragment_container, alertFragment,
 				AlertFragment.class.getName()).commitAllowingStateLoss();
@@ -1098,7 +1136,6 @@ public class WeatherFragment extends Fragment implements IGps {
 
 	private void reRefreshBySameWeatherSource(ResponseResultObj responseResultObj) {
 		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
-		binding.scrollView.setVisibility(View.GONE);
 
 		executorService.execute(new Runnable() {
 			@Override
@@ -1111,7 +1148,6 @@ public class WeatherFragment extends Fragment implements IGps {
 	}
 
 	private void reRefreshByAnotherWeatherSource(ResponseResultObj responseResultObj) {
-		binding.scrollView.setVisibility(View.GONE);
 		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
 
 		executorService.execute(new Runnable() {
@@ -1436,6 +1472,7 @@ public class WeatherFragment extends Fragment implements IGps {
 				@Override
 				public void run() {
 					loadImgOfCurrentConditions(flickrRequestParameter);
+					binding.topExtraLayout.setVisibility(View.GONE);
 
 					changeWeatherDataSourcePicker(countryCode);
 					binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(dateTimeFormatter));
@@ -1462,7 +1499,7 @@ public class WeatherFragment extends Fragment implements IGps {
 									SimpleRainViewerFragment.class.getName())
 							.commitAllowingStateLoss();
 
-					binding.scrollView.setVisibility(View.VISIBLE);
+					shimmer(false);
 					ProgressDialog.clearDialogs();
 				}
 			});
@@ -1551,6 +1588,18 @@ public class WeatherFragment extends Fragment implements IGps {
 
 	public LocationType getLocationType() {
 		return locationType;
+	}
+
+	private void shimmer(boolean showShimmer) {
+		if (showShimmer) {
+			binding.rootSubLayout.setVisibility(View.GONE);
+			binding.shimmer.setVisibility(View.VISIBLE);
+			binding.shimmer.startShimmer();
+		} else {
+			binding.shimmer.setVisibility(View.GONE);
+			binding.shimmer.stopShimmer();
+			binding.rootSubLayout.setVisibility(View.VISIBLE);
+		}
 	}
 
 

@@ -62,7 +62,8 @@ public class DialogActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getWindow().setBackgroundDrawable(new ColorDrawable(0));
-		binding = DataBindingUtil.setContentView(this, R.layout.activity_dialog);
+		binding = ActivityDialogBinding.inflate(getLayoutInflater());
+		setContentView(binding.getRoot());
 
 		Bundle bundle = getIntent().getExtras();
 		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);

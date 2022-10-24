@@ -251,8 +251,9 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		((ImageView) gridItem.findViewById(R.id.label_icon)).setVisibility(View.GONE);
 		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
 		((TextView) gridItem.findViewById(R.id.label)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
-		((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
-		((TextView) gridItem.findViewById(R.id.value_int)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
+		gridItem.findViewById(R.id.value_int).setVisibility(View.GONE);
+		//((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
+		//((TextView) gridItem.findViewById(R.id.value_int)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
 		((TextView) gridItem.findViewById(R.id.value_str)).setText(
 				value == null ? getString(R.string.noData) : AqicnResponseProcessor.getGradeDescription(value));
 		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(

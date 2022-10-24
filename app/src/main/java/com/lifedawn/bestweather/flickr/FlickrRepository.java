@@ -162,88 +162,95 @@ public final class FlickrRepository {
 
 					call.enqueue(new Callback<JsonElement>() {
 						@Override
-						public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-							final Gson gson = new Gson();
-							final PhotosFromGalleryResponse photosFromGalleryResponse = gson.fromJson(response.body(),
-									PhotosFromGalleryResponse.class);
+						public void onResponse(Call<JsonElement> call, Response<JsonElement> photosFromGalleryResponse) {
+							if (photosFromGalleryResponse.isSuccessful()) {
+								final Gson gson = new Gson();
+								final PhotosFromGalleryResponse photosFromGalleryResponseDto = gson.fromJson(photosFromGalleryResponse.body(),
+										PhotosFromGalleryResponse.class);
 
-							if (photosFromGalleryResponse.getStat().equals("ok")) {
-								if (!photosFromGalleryResponse.getPhotos().getTotal().equals("0")) {
-									// https://live.staticflickr.com/65535/50081787401_355bcec912_b.jpg
-									// https://live.staticflickr.com/server/id_secret_size.jpg
-									final int randomIdx =
-											new Random().nextInt(Integer.parseInt(photosFromGalleryResponse.getPhotos().getTotal()));
-									final PhotosFromGalleryResponse.Photos.Photo photo =
-											photosFromGalleryResponse.getPhotos().getPhoto().get(randomIdx);
+								if (photosFromGalleryResponseDto.getStat().equals("ok")) {
+									if (!photosFromGalleryResponseDto.getPhotos().getTotal().equals("0")) {
+										// https://live.staticflickr.com/65535/50081787401_355bcec912_b.jpg
+										// https://live.staticflickr.com/server/id_secret_size.jpg
+										final int randomIdx =
+												new Random().nextInt(Integer.parseInt(photosFromGalleryResponseDto.getPhotos().getTotal()));
+										final PhotosFromGalleryResponse.Photos.Photo photo =
+												photosFromGalleryResponseDto.getPhotos().getPhoto().get(randomIdx);
 
-									final FlickrGetInfoParameter getInfoParameter = new FlickrGetInfoParameter();
-									getInfoParameter.setSecret(photo.getSecret());
-									getInfoParameter.setPhotoId(photo.getId());
+										final FlickrGetInfoParameter getInfoParameter = new FlickrGetInfoParameter();
+										getInfoParameter.setSecret(photo.getSecret());
+										getInfoParameter.setPhotoId(photo.getId());
 
-									Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
-									Call<JsonElement> getPhotoInfoCall = queries.getGetInfo(getInfoParameter.getMap());
-									imgRequestData.getPhotoInfoCall = getPhotoInfoCall;
+										Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
+										Call<JsonElement> getPhotoInfoCall = queries.getGetInfo(getInfoParameter.getMap());
+										imgRequestData.getPhotoInfoCall = getPhotoInfoCall;
 
-									getPhotoInfoCall.enqueue(new Callback<JsonElement>() {
-										@Override
-										public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-											final GetInfoPhotoResponse getInfoPhotoResponse = gson.fromJson(response.body(),
-													GetInfoPhotoResponse.class);
+										getPhotoInfoCall.enqueue(new Callback<JsonElement>() {
+											@Override
+											public void onResponse(Call<JsonElement> call, Response<JsonElement> photoInfoResponse) {
+												if (photoInfoResponse.isSuccessful()) {
+													final GetInfoPhotoResponse getInfoPhotoResponseDto = gson.fromJson(photoInfoResponse.body(),
+															GetInfoPhotoResponse.class);
 
-											final String backgroundImgUrl =
-													"https://live.staticflickr.com/" + photo.getServer() + "/" + photo.getId() + "_"
-															+ (getInfoPhotoResponse.getPhoto().getOriginalsecret() == null ?
-															photo.getSecret() : getInfoPhotoResponse.getPhoto().getOriginalsecret())
-															+ (getInfoPhotoResponse.getPhoto().getOriginalsecret() == null ?
-															"_b.jpg" : "_o.jpg");
+													final String backgroundImgUrl =
+															"https://live.staticflickr.com/" + photo.getServer() + "/" + photo.getId() + "_"
+																	+ (getInfoPhotoResponseDto.getPhoto().getOriginalsecret() == null ?
+																	photo.getSecret() : getInfoPhotoResponseDto.getPhoto().getOriginalsecret())
+																	+ (getInfoPhotoResponseDto.getPhoto().getOriginalsecret() == null ?
+																	"_b.jpg" : "_o.jpg");
 
-											final FlickrImgData flickrImgData = new FlickrImgData();
-											BACKGROUND_IMG_MAP.put(galleryName, flickrImgData);
+													final FlickrImgData flickrImgData = new FlickrImgData();
+													BACKGROUND_IMG_MAP.put(galleryName, flickrImgData);
 
-											flickrImgData.setPhoto(photo);
-											flickrImgData.setTime(finalTime);
-											flickrImgData.setVolume(flickrRequestParameter.precipitationVolume);
-											flickrImgData.setWeather(finalWeather);
+													flickrImgData.setPhoto(photo);
+													flickrImgData.setTime(finalTime);
+													flickrImgData.setVolume(flickrRequestParameter.precipitationVolume);
+													flickrImgData.setWeather(finalWeather);
 
-											imgRequestData.glideTarget = new CustomTarget<Bitmap>() {
-												@Override
-												public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-													Bitmap res = resource.copy(Bitmap.Config.ARGB_8888, true);
-													BACKGROUND_IMG_MAP.get(galleryName).setImg(res);
-													glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), true));
+													imgRequestData.glideTarget = new CustomTarget<Bitmap>() {
+														@Override
+														public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+															Bitmap res = resource.copy(Bitmap.Config.ARGB_8888, true);
+															BACKGROUND_IMG_MAP.get(galleryName).setImg(res);
+															glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), true));
+														}
+
+														@Override
+														public void onLoadCleared(@Nullable Drawable placeholder) {
+															glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
+														}
+
+														@Override
+														public void onLoadFailed(@Nullable Drawable errorDrawable) {
+															super.onLoadFailed(errorDrawable);
+															glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
+
+														}
+													};
+
+													Glide.with(context).asBitmap().load(backgroundImgUrl)
+															.diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(imgRequestData.glideTarget);
+
+												} else {
 												}
+											}
 
-												@Override
-												public void onLoadCleared(@Nullable Drawable placeholder) {
-													glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
-												}
+											@Override
+											public void onFailure(Call<JsonElement> call, Throwable t) {
+												glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
+											}
+										});
 
-												@Override
-												public void onLoadFailed(@Nullable Drawable errorDrawable) {
-													super.onLoadFailed(errorDrawable);
-													glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
+									} else {
+										glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
 
-												}
-											};
-
-											Glide.with(context).asBitmap().load(backgroundImgUrl)
-													.diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(imgRequestData.glideTarget);
-										}
-
-										@Override
-										public void onFailure(Call<JsonElement> call, Throwable t) {
-											glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
-										}
-									});
-
+									}
 								} else {
 									glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
-
 								}
 							} else {
 								glideImgCallback.onLoadedImg(new FlickrImgResponse(BACKGROUND_IMG_MAP.get(galleryName), false));
 							}
-
 						}
 
 						@Override
