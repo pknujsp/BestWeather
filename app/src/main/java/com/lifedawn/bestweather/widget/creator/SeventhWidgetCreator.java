@@ -141,7 +141,7 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 	                       @Nullable Integer parentHeight) {
 		if (!airQualityDto.isSuccessful()) {
 			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-			setRefreshPendingIntent(widgetProviderClass(), remoteViews);
+			setRefreshPendingIntent(remoteViews);
 			return;
 		}
 

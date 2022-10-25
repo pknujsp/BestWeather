@@ -1,25 +1,20 @@
 package com.lifedawn.bestweather.widget.widgetprovider;
 
-import android.app.ActivityManager;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.OutOfQuotaPolicy;
-import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
-import com.google.common.util.concurrent.ListenableFuture;
 import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
@@ -29,9 +24,6 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.work.WidgetListenableWorker;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 	protected AppWidgetManager appWidgetManager;
@@ -47,7 +39,7 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 		}
 
 		for (int appWidgetId : appWidgetIds) {
-			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null || WidgetListenableWorker.PROCESSING_WIDGET_ID_SET.contains(appWidgetId)) {
+			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null) {
 				continue;
 			}
 
@@ -61,10 +53,15 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 								widgetCreator.setDataViewsOfSavedData();
 							} else {
 								RemoteViews remoteViews = widgetCreator.createRemoteViews();
-								widgetCreator.setRefreshPendingIntent(widgetProviderClass, remoteViews);
+								widgetCreator.setRefreshPendingIntent(remoteViews);
 								RemoteViewsUtil.onErrorProcess(remoteViews, context, widgetDto.getLastErrorType());
 								appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
 							}
+						} else {
+							RemoteViews remoteViews = widgetCreator.createRemoteViews();
+							widgetCreator.setRefreshPendingIntent(remoteViews);
+							RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
+							appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
 						}
 					}
 

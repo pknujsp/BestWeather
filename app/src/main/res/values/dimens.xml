@@ -6,7 +6,7 @@
     <dimen name="toolbar_page_title_margin">28dp</dimen>
     <dimen name="toolbar_image_size">28dp</dimen>
     <dimen name="cornerRadius">28dp</dimen>
-    <dimen name="btnCornerRadius">28dp</dimen>
+    <dimen name="btnCornerRadius">40dp</dimen>
     <dimen name="dialogCornerRadius">28dp</dimen>
     <dimen name="widgetCornerRadius">28dp</dimen>
     <dimen name="navigationDrawerCornerRadius">16dp</dimen>

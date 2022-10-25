@@ -11,6 +11,7 @@
     android:paddingBottom="12dp"
     android:text="addressName"
     android:textColor="@color/white"
-    android:textSize="15sp">
+    android:textSize="14sp"
+    >
 
 </TextView>

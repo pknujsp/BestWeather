@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.notification;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,8 +23,7 @@ import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.databinding.FragmentNotificationBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.model.OngoingNotificationDto;
-import com.lifedawn.bestweather.notification.ongoing.OngoingNotiViewCreator;
-import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationReceiver;
+import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationSettingsFragment;
 import com.lifedawn.bestweather.notification.daily.fragment.DailyPushNotificationListFragment;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationViewModel;
@@ -96,12 +94,10 @@ public class NotificationFragment extends Fragment {
 								if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
 									ongoingNotificationDto.setOn(true);
 
-									Intent intent = new Intent(context, OngoingNotificationReceiver.class);
-									intent.setAction(getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-
-									PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
-											NotificationType.Ongoing.getNotificationId(),
-											intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+									OngoingNotificationHelper helper = new OngoingNotificationHelper(context);
+									PendingIntent pendingIntent =
+											helper.createManualPendingIntent(getString(R.string.com_lifedawn_bestweather_action_REFRESH),
+													PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
 									try {
 										pendingIntent.send();

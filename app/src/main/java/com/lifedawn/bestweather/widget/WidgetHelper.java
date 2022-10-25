@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.IntentRequestCodes;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -32,8 +33,7 @@ import java.util.Map;
 
 public class WidgetHelper {
 	private Context context;
-	private AlarmManager alarmManager;
-	private final int AUTO_REFRESH_REQUEST_CODE = 10000;
+	private final AlarmManager alarmManager;
 
 	public WidgetHelper(Context context) {
 		this.context = context;
@@ -48,16 +48,16 @@ public class WidgetHelper {
 			Intent refreshIntent = new Intent(context, FirstWidgetProvider.class);
 			refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
-			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, refreshIntent,
-					PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(context, IntentRequestCodes.WIDGET_AUTO_REFRESH.requestCode, refreshIntent,
+					PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
 			alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + val, val, pendingIntent);
 		}
 	}
 
 	public void cancelAutoRefresh() {
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, FirstWidgetProvider.class),
-				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, IntentRequestCodes.WIDGET_AUTO_REFRESH.requestCode, new Intent(context, FirstWidgetProvider.class),
+				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
 
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
@@ -66,8 +66,8 @@ public class WidgetHelper {
 	}
 
 	public boolean isRepeating() {
-		return PendingIntent.getBroadcast(context, AUTO_REFRESH_REQUEST_CODE, new Intent(context, FirstWidgetProvider.class),
-				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE) != null;
+		return PendingIntent.getBroadcast(context, IntentRequestCodes.WIDGET_AUTO_REFRESH.requestCode, new Intent(context, FirstWidgetProvider.class),
+				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE) != null;
 	}
 
 	public void reDrawWidgets(@Nullable BackgroundWorkCallback callback) {
@@ -98,9 +98,10 @@ public class WidgetHelper {
 						}
 					}
 
-					int requestCode = 100000;
+					int requestCode = 200000;
+					Intent refreshIntent = null;
+
 					for (Class<?> cls : widgetArrMap.keySet()) {
-						Intent refreshIntent = null;
 						try {
 							refreshIntent = new Intent(context, cls);
 							refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW));
@@ -117,10 +118,8 @@ public class WidgetHelper {
 							bundle.putIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
 							refreshIntent.putExtras(bundle);
 
-							PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode++, refreshIntent,
-									PendingIntent.FLAG_MUTABLE);
-							pendingIntent.send();
-
+							PendingIntent.getBroadcast(context, requestCode++, refreshIntent,
+									PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE).send();
 						} catch (PendingIntent.CanceledException e) {
 							e.printStackTrace();
 						}

@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
+    android:clipChildren="false"
     >
 
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/progressbar"
         android:layout_width="match_parent"
-        android:layout_height="22dp"
-        android:layout_marginBottom="8dp"
+        android:layout_height="23dp"
+        app:layout_constraintBottom_toTopOf="@id/status"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/bluedottedprogress"
@@ -22,9 +25,38 @@
         android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
         android:text="text"
         android:textAlignment="center"
         android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progressbar"
+        app:layout_constraintVertical_chainStyle="packed"
         />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_btn_background_no_padding"
+        android:backgroundTint="@color/blue"
+        android:clickable="true"
+        android:gravity="center"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="6dp"
+        android:text="btn"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/status"
+        app:layout_constraintVertical_chainStyle="packed"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

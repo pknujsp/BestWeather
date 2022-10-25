@@ -1,39 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center"
+    android:orientation="horizontal"
     android:paddingLeft="16dp"
     android:paddingTop="12dp"
     android:paddingRight="16dp"
-    android:clickable="true"
-    android:background="?attr/selectableItemBackground"
     android:paddingBottom="12dp"
     >
 
-    <TextView
-        android:id="@+id/address_name"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="8dp"
-        android:layout_toLeftOf="@id/delete"
-        android:fontFamily="sans-serif-light"
-        android:text="addressName"
-        android:textColor="@color/black"
-        android:textSize="15sp"
-        />
+        android:layout_weight="1"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:id="@+id/country_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:fontFamily="sans-serif-light"
+            android:text="country_name"
+            android:textSize="13sp"
+            />
+
+        <TextView
+            android:id="@+id/address_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="address_name"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            />
+
+    </LinearLayout>
 
     <ImageButton
         android:id="@+id/delete"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/circle_btn_background"
+        android:backgroundTint="@color/gray"
         android:src="@drawable/ic_baseline_close_24"
+
+        app:tint="@color/white"
         />
 
-</RelativeLayout>
+    <ImageButton
+        android:id="@+id/marker_on_map"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/circle_btn_background"
+        android:backgroundTint="@color/blue"
+        android:src="@drawable/ic_baseline_map_24"
+        app:tint="@color/white"
+        />
+
+</LinearLayout>

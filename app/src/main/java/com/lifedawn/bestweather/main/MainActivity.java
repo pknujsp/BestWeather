@@ -1,9 +1,7 @@
 package com.lifedawn.bestweather.main;
 
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,7 +11,6 @@ import android.view.WindowManager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
@@ -23,15 +20,12 @@ import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
-import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
 import com.lifedawn.bestweather.intro.IntroTransactionFragment;
-import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.model.OngoingNotificationDto;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
 import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
-import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationReceiver;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationViewModel;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.widget.WidgetHelper;
@@ -60,9 +54,14 @@ public class MainActivity extends AppCompatActivity {
 		HeaderbarStyle.setStyle(HeaderbarStyle.Style.Black, this);
 
 		networkStatus = NetworkStatus.getInstance(getApplicationContext());
+		ongoingNotificationViewModel = new ViewModelProvider(this).get(OngoingNotificationViewModel.class);
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 
 		if (networkStatus.networkAvailable()) {
-			ongoingNotificationViewModel = new ViewModelProvider(this).get(OngoingNotificationViewModel.class);
 			processNextStep();
 		} else {
 			new AlertDialog.Builder(this).setTitle(R.string.networkProblem)
@@ -74,11 +73,6 @@ public class MainActivity extends AppCompatActivity {
 						}
 					}).setCancelable(false).create().show();
 		}
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
 	}
 
 	@Override
@@ -99,15 +93,15 @@ public class MainActivity extends AppCompatActivity {
 
 		if (sharedPreferences.getBoolean(getString(R.string.pref_key_show_intro), true)) {
 			IntroTransactionFragment introTransactionFragment = new IntroTransactionFragment();
-			fragmentTransaction.replace(binding.fragmentContainer.getId(), introTransactionFragment,
-					IntroTransactionFragment.class.getName()).commitAllowingStateLoss();
+			fragmentTransaction.add(binding.fragmentContainer.getId(), introTransactionFragment,
+					IntroTransactionFragment.class.getName()).commitNow();
 		} else {
 			initOngoingNotifications();
 			initDailyNotifications();
 			initWidgets();
 
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
-			fragmentTransaction.replace(binding.fragmentContainer.getId(), mainTransactionFragment,
+			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment,
 					MainTransactionFragment.class.getName()).commitNowAllowingStateLoss();
 		}
 	}
@@ -118,11 +112,9 @@ public class MainActivity extends AppCompatActivity {
 			public void onResultSuccessful(OngoingNotificationDto result) {
 				if (result.isOn()) {
 					//ongoing notification
-					Intent intent = new Intent(getApplicationContext(), OngoingNotificationReceiver.class);
-					intent.setAction(getString(R.string.com_lifedawn_bestweather_action_RESTART));
-
-					PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), NotificationType.Ongoing.getNotificationId(),
-							intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+					OngoingNotificationHelper helper = new OngoingNotificationHelper(getApplicationContext());
+					PendingIntent pendingIntent = helper.createManualPendingIntent(getString(R.string.com_lifedawn_bestweather_action_RESTART),
+							PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
 					try {
 						pendingIntent.send();

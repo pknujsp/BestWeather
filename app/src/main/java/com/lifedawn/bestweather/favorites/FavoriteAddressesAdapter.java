@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.databinding.FavoriteAddressItemBinding;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,7 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 	@NotNull
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-		return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.favorite_address_item, null));
+		return new ViewHolder(FavoriteAddressItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
 	}
 
 	@Override
@@ -51,33 +52,42 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 		return favoriteAddressDtoList;
 	}
 
-	class ViewHolder extends RecyclerView.ViewHolder {
-		private TextView addressTextView;
-		private ImageButton deleteBtn;
+	protected final class ViewHolder extends RecyclerView.ViewHolder {
+		private final FavoriteAddressItemBinding binding;
+		private FavoriteAddressDto favoriteAddressDto;
 
-		public ViewHolder(@NonNull @NotNull View itemView) {
-			super(itemView);
+		public ViewHolder(@NonNull @NotNull FavoriteAddressItemBinding binding) {
+			super(binding.getRoot());
+			this.binding = binding;
 
-			addressTextView = (TextView) itemView.findViewById(R.id.address_name);
-			deleteBtn = (ImageButton) itemView.findViewById(R.id.delete);
-
-			itemView.getRootView().setOnClickListener(new View.OnClickListener() {
+			binding.getRoot().setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					onClickedAddressListener.onClicked(favoriteAddressDtoList.get(getAdapterPosition()));
+					onClickedAddressListener.onClicked(favoriteAddressDtoList.get(getBindingAdapterPosition()));
 				}
 			});
-			deleteBtn.setOnClickListener(new View.OnClickListener() {
+
+			binding.delete.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					int position = getBindingAdapterPosition();
 					onClickedAddressListener.onClickedDelete(favoriteAddressDtoList.get(position), position);
 				}
 			});
+
+			binding.markerOnMap.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					int position = getBindingAdapterPosition();
+					onClickedAddressListener.onShowMarker(favoriteAddressDtoList.get(position), position);
+				}
+			});
 		}
 
 		public void onBind() {
-			addressTextView.setText(favoriteAddressDtoList.get(getAdapterPosition()).getDisplayName());
+			favoriteAddressDto = favoriteAddressDtoList.get(getBindingAdapterPosition());
+			binding.addressName.setText(favoriteAddressDto.getDisplayName());
+			binding.countryName.setText(favoriteAddressDto.getCountryName());
 		}
 	}
 
@@ -85,5 +95,7 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 		void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position);
 
 		void onClicked(FavoriteAddressDto favoriteAddressDto);
+
+		void onShowMarker(FavoriteAddressDto favoriteAddressDto, int position);
 	}
 }

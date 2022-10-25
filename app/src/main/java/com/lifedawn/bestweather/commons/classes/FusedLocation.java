@@ -5,20 +5,15 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-import android.provider.Settings;
-import android.util.Log;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -39,7 +34,6 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.CancellationTokenSource;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -47,55 +41,43 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto;
-import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.retrofit.responses.freetime.FreeTimeResponse;
-import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
-import com.lifedawn.bestweather.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.timezone.FreeTimeZoneApi;
 import com.lifedawn.bestweather.timezone.TimeZoneUtils;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 
 import org.jetbrains.annotations.NotNull;
-import org.xml.sax.helpers.AttributesImpl;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import retrofit2.Response;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedListener {
-	private static FusedLocation instance;
-	private TimeZoneIdRepository timeZoneIdRepository;
+	private static FusedLocation INSTANCE;
 	private FusedLocationProviderClient fusedLocationClient;
 	private LocationManager locationManager;
 	private Context context;
-	private Map<MyLocationCallback, LocationRequestObj> locationRequestObjMap = new HashMap<>();
+	private Map<MyLocationCallback, LocationRequestObj> locationRequestObjMap = new ConcurrentHashMap<>();
 
-	public static FusedLocation getInstance(Context context) {
-		if (instance == null) {
-			instance = new FusedLocation(context);
+	public static FusedLocation getINSTANCE(Context context) {
+		if (INSTANCE == null) {
+			INSTANCE = new FusedLocation(context);
 		}
-		return instance;
+		return INSTANCE;
 	}
 
 	public static void close() {
-		instance = null;
+		INSTANCE = null;
 	}
 
 	private FusedLocation(Context context) {
 		this.context = context;
 		fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		timeZoneIdRepository = TimeZoneIdRepository.Companion.getINSTANCE();
 	}
 
 	@Override
@@ -140,16 +122,18 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 					myLocationCallback.onFailed(MyLocationCallback.Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION);
 					return;
 				}
+				notifyNotification();
+
+				Timer timer = new Timer();
 
 				LocationRequest locationRequest =
 						new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY).setWaitForAccurateLocation(false).build();
-
-				Timer timer = new Timer();
 
 				final LocationCallback locationCallback = new LocationCallback() {
 					@Override
 					public void onLocationResult(@NonNull @NotNull LocationResult locationResult) {
 						timer.cancel();
+						cancelNotification();
 						locationRequestObjMap.remove(myLocationCallback);
 						fusedLocationClient.removeLocationUpdates(this);
 
@@ -197,6 +181,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				timer.schedule(new TimerTask() {
 					@Override
 					public void run() {
+						cancelNotification();
 						locationRequestObjMap.remove(myLocationCallback);
 						cancellationTokenSource.cancel();
 						fusedLocationClient.removeLocationUpdates(locationCallback);
@@ -316,12 +301,10 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		}
 	}
 
-	public boolean availablePlayServices() {
-		return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
-	}
 
 	public void cancel(MyLocationCallback myLocationCallback) {
 		if (locationRequestObjMap.containsKey(myLocationCallback)) {
+			cancelNotification();
 			LocationRequestObj locationRequestObj = locationRequestObjMap.get(myLocationCallback);
 			Objects.requireNonNull(locationRequestObj).timer.cancel();
 
@@ -331,12 +314,11 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 			if (Objects.requireNonNull(locationRequestObj).currentLocationTask != null) {
 				Objects.requireNonNull(locationRequestObj).cancellationTokenSource.cancel();
 			}
-
 			locationRequestObjMap.remove(myLocationCallback);
 		}
 	}
 
-	public void startForeground(Service service) {
+	private void notifyNotification() {
 		NotificationHelper notificationHelper = new NotificationHelper(context);
 		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Location);
 
@@ -350,30 +332,13 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		}
 
 		Notification notification = notificationObj.getNotificationBuilder().build();
-		service.startForeground(NotificationType.Location.getNotificationId(), notification);
+		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+		notificationManager.notify(NotificationType.Location.getNotificationId(), notification);
 	}
 
-	public void startNotification(Context context) {
-		NotificationHelper notificationHelper = new NotificationHelper(context);
-		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.Location);
-
-		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
-		builder.setSmallIcon(R.drawable.location).setContentText(context.getString(R.string.msg_finding_current_location))
-				.setContentTitle(context.getString(R.string.current_location))
-				.setOngoing(false);
-
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-			builder.setPriority(NotificationCompat.PRIORITY_LOW).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-		}
-
-		Notification notification = notificationObj.getNotificationBuilder().build();
-		NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
-		notificationManagerCompat.notify(NotificationType.Location.getNotificationId(), notification);
-	}
-
-	public void cancelNotification(Context context) {
-		NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
-		notificationManagerCompat.cancel(NotificationType.Location.getNotificationId());
+	private void cancelNotification() {
+		NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+		notificationManager.cancel(NotificationType.Location.getNotificationId());
 	}
 
 	public interface MyLocationCallback {

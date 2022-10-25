@@ -17,7 +17,6 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -30,7 +29,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -243,7 +241,7 @@ public class WeatherFragment extends Fragment implements IGps {
 		getLifecycle().addObserver(locationLifeCycleObserver);
 
 		networkStatus = NetworkStatus.getInstance(getContext());
-		fusedLocation = FusedLocation.getInstance(getContext());
+		fusedLocation = FusedLocation.getINSTANCE(getContext());
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
@@ -547,6 +545,7 @@ public class WeatherFragment extends Fragment implements IGps {
 			zoneId = ZoneId.of(selectedFavoriteAddressDto.getZoneId());
 
 			binding.addressName.setText(addressName);
+			binding.countryName.setText(selectedFavoriteAddressDto.getCountryName());
 
 			if (containWeatherData(latitude, longitude)) {
 				if (isOldDownloadedData(latitude, longitude)) {
@@ -721,7 +720,8 @@ public class WeatherFragment extends Fragment implements IGps {
 			@Override
 			public void onReverseGeocodingResult(Geocoding.AddressDto address) {
 				if (getActivity() != null) {
-					if (address == null) {
+
+						/*
 						//검색 결과가 없으면 주소 정보 미 표시하고 데이터 로드
 						mainWeatherProviderType = getMainWeatherSourceType("");
 						countryCode = "";
@@ -729,24 +729,23 @@ public class WeatherFragment extends Fragment implements IGps {
 
 						final String addressStr = getString(R.string.current_location) + " : " + addressName;
 						onResultCurrentLocation(addressStr, addressName, refresh);
-					} else {
-						addressName = address.displayName;
-						mainWeatherProviderType = getMainWeatherSourceType(address.countryCode);
-						countryCode = address.countryCode;
+						*/
 
-						final String addressStr = getString(R.string.current_location) + " : " + addressName;
+					addressName = address.displayName;
+					mainWeatherProviderType = getMainWeatherSourceType(address.countryCode);
+					countryCode = address.countryCode;
 
-						SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+					final String addressStr = getString(R.string.current_location) + " : " + addressName;
 
-						TimeZoneUtils.Companion.getTimeZone(latitude, longitude, new TimeZoneUtils.TimeZoneCallback() {
-							@Override
-							public void onResult(@NonNull ZoneId zoneId) {
-								editor.putString("zoneId", zoneId.getId()).commit();
-								onResultCurrentLocation(addressStr, addressName, refresh);
-							}
-						});
+					SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
 
-					}
+					TimeZoneUtils.Companion.getTimeZone(latitude, longitude, new TimeZoneUtils.TimeZoneCallback() {
+						@Override
+						public void onResult(@NonNull ZoneId zoneId) {
+							editor.putString("zoneId", zoneId.getId()).commit();
+							onResultCurrentLocation(addressStr, address, refresh);
+						}
+					});
 
 
 				}
@@ -754,12 +753,13 @@ public class WeatherFragment extends Fragment implements IGps {
 		});
 	}
 
-	private void onResultCurrentLocation(String addressStr, String addressName, boolean refresh) {
+	private void onResultCurrentLocation(String addressStr, Geocoding.AddressDto addressDto, boolean refresh) {
 		requireActivity().runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
 				binding.addressName.setText(addressStr);
-				weatherViewModel.setCurrentLocationAddressName(addressName);
+				binding.countryName.setText(addressDto.country);
+				weatherViewModel.setCurrentLocationAddressName(addressDto.displayName);
 
 				if (refresh) {
 					requestNewData();
@@ -1467,10 +1467,10 @@ public class WeatherFragment extends Fragment implements IGps {
 									getString(R.string.tag_sun_set_rise_fragment))
 							.replace(binding.radar.getId(), rainViewerFragment,
 									SimpleRainViewerFragment.class.getName())
-							.commitAllowingStateLoss();
+							.commitNow();
 
-					shimmer(false);
 					ProgressDialog.clearDialogs();
+					shimmer(false);
 				}
 			});
 

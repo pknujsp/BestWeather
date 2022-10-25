@@ -26,7 +26,6 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
-import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
@@ -63,7 +62,7 @@ public class DailyNotificationListenableWorker extends ListenableWorker {
 		super(context, workerParams);
 
 		action = workerParams.getInputData().getString("action");
-		repository =  DailyPushNotificationRepository.getINSTANCE();
+		repository = DailyPushNotificationRepository.getINSTANCE();
 		id = workerParams.getInputData().getInt(BundleKey.dtoId.name(), -1);
 		dailyPushNotificationType = DailyPushNotificationType.valueOf(workerParams.getInputData().getString("DailyPushNotificationType"));
 	}
@@ -195,7 +194,7 @@ public class DailyNotificationListenableWorker extends ListenableWorker {
 	public void loadCurrentLocation(Context context, ExecutorService executorService, RemoteViews remoteViews,
 	                                DailyPushNotificationDto dailyPushNotificationDto, BackgroundWorkCallback backgroundWorkCallback) {
 		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-		FusedLocation fusedLocation = FusedLocation.getInstance(context);
+		FusedLocation fusedLocation = FusedLocation.getINSTANCE(context);
 
 		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
@@ -239,7 +238,6 @@ public class DailyNotificationListenableWorker extends ListenableWorker {
 			}
 		};
 
-		fusedLocation.startNotification(getApplicationContext());
 		fusedLocation.findCurrentLocation(locationCallback, true);
 	}
 

@@ -50,9 +50,15 @@ public class IntroTransactionFragment extends Fragment {
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
+
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
 		IntroFragment introFragment = new IntroFragment();
 		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), introFragment,
-				getString(R.string.tag_intro_fragment)).commitAllowingStateLoss();
+				getString(R.string.tag_intro_fragment)).commitNow();
 	}
 
 	@Override

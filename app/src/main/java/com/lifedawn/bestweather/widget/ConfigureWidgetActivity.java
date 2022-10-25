@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
@@ -44,6 +43,7 @@ import com.google.android.material.slider.Slider;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.enums.IntentRequestCodes;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.ActivityConfigureWidgetBinding;
@@ -274,6 +274,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 									PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
 											.edit().putLong(getString(R.string.pref_key_widget_refresh_interval),
 													widgetRefreshIntervalValues[widgetRefreshIntervalValueIndex]).commit();
+
 									WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
 									widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshIntervalValues[widgetRefreshIntervalValueIndex]);
 								}
@@ -289,8 +290,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 								intent.setAction(getString(R.string.com_lifedawn_bestweather_action_INIT));
 								intent.putExtras(initBundle);
 
-								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), appWidgetId, intent,
-										PendingIntent.FLAG_MUTABLE);
+								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), IntentRequestCodes.WIDGET_MANUALLY_REFRESH.requestCode,
+										intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 								try {
 									pendingIntent.send();
 								} catch (PendingIntent.CanceledException e) {
@@ -298,7 +299,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 								}
 
 								finishAndRemoveTask();
-
 							}
 						});
 					}

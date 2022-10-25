@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.enums.IntentRequestCodes;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
@@ -31,34 +32,38 @@ public class DailyNotificationHelper {
 	public PendingIntent getRefreshPendingIntent(DailyPushNotificationDto dailyPushNotificationDto, int flags) {
 		Intent refreshIntent = new Intent(context, DailyPushNotificationReceiver.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
+
 		Bundle bundle = new Bundle();
 		bundle.putInt(BundleKey.dtoId.name(), dailyPushNotificationDto.getId());
 		bundle.putString("time", dailyPushNotificationDto.getAlarmClock());
 		bundle.putString("DailyPushNotificationType", dailyPushNotificationDto.getNotificationType().name());
 
 		refreshIntent.putExtras(bundle);
-		return PendingIntent.getBroadcast(context, dailyPushNotificationDto.getId() + 10000, refreshIntent, flags);
+
+		return PendingIntent.getBroadcast(context, IntentRequestCodes.DAILY_NOTIFICATION.requestCode + dailyPushNotificationDto.getId(),
+				refreshIntent, flags);
 	}
 
 	public void enablePushNotification(DailyPushNotificationDto dailyPushNotificationDto) {
 		LocalTime localTime = LocalTime.parse(dailyPushNotificationDto.getAlarmClock());
 
 		Calendar alarmCalendar = Calendar.getInstance();
+		alarmCalendar.set(Calendar.SECOND, 0);
+		alarmCalendar.set(Calendar.MILLISECOND, 0);
 		alarmCalendar.set(Calendar.HOUR_OF_DAY, localTime.getHour());
 		alarmCalendar.set(Calendar.MINUTE, localTime.getMinute());
 
-		Calendar current = Calendar.getInstance();
+		Calendar now = Calendar.getInstance();
 
-		if (alarmCalendar.before(current)) {
+		if (alarmCalendar.before(now)) {
 			alarmCalendar.add(Calendar.DATE, 1);
 		}
-
 		alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(),
-				getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE));
+				getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
 	}
 
 	public void disablePushNotification(DailyPushNotificationDto dailyPushNotificationDto) {
-		PendingIntent pendingIntent = getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
+		PendingIntent pendingIntent = getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
 		if (pendingIntent != null) {
 			alarmManager.cancel(pendingIntent);
 			pendingIntent.cancel();
@@ -74,13 +79,8 @@ public class DailyNotificationHelper {
 	}
 
 	public boolean isRepeating(DailyPushNotificationDto dailyPushNotificationDto) {
-		PendingIntent pendingIntent = getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
-
-		if (pendingIntent != null) {
-			return true;
-		} else {
-			return false;
-		}
+		PendingIntent pendingIntent = getRefreshPendingIntent(dailyPushNotificationDto, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE);
+		return pendingIntent != null;
 	}
 
 	public void reStartNotifications(@Nullable BackgroundWorkCallback backgroundWorkCallback) {
@@ -90,11 +90,9 @@ public class DailyNotificationHelper {
 			public void onResultSuccessful(List<DailyPushNotificationDto> result) {
 				if (result.size() > 0) {
 					for (DailyPushNotificationDto dto : result) {
-						if (dto.isEnabled()) {
-							if (!isRepeating(dto)) {
-								enablePushNotification(dto);
-							}
-						}
+
+						if (dto.isEnabled() && !isRepeating(dto))
+							enablePushNotification(dto);
 					}
 				}
 

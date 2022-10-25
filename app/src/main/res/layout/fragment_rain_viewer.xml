@@ -15,9 +15,8 @@
         android:layout_alignParentTop="true"
         />
 
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
@@ -90,5 +89,12 @@
             android:src="@drawable/ic_baseline_chevron_right_24"
             />
     </LinearLayout>
+
+    <com.lifedawn.bestweather.commons.views.ProgressResultView
+        android:id="@+id/progress_result_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        />
 
 </RelativeLayout>

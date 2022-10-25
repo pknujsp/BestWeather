@@ -14,7 +14,7 @@
         <item name="iconColor">@color/blue</item>
         <item name="progressViewIndicatorColor">@color/blue</item>
         <item name="lineColor">@color/white</item>
-        
+
     </style>
 
     <style name="ThemeOverlay.BestWeather.AppWidgetContainer" parent="">
@@ -22,4 +22,12 @@
         <item name="appWidgetTextColor">@color/light_blue_50</item>
     </style>
 
+    <style name="DialogActivityTheme" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
 </resources>

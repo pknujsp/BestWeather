@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.intro;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -55,7 +54,7 @@ public class IntroFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		fusedLocation = FusedLocation.getInstance(getContext());
+		fusedLocation = FusedLocation.getINSTANCE(getContext());
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
 		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
@@ -64,13 +63,18 @@ public class IntroFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentIntroBinding.inflate(inflater);
+		binding.getRoot().setPadding(0, MyApplication.getStatusBarHeight(), 0, 0);
+
 		return binding.getRoot();
 	}
 
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		binding.getRoot().setPadding(0, MyApplication.getStatusBarHeight(), 0, 0);
+
+		binding.closeBtn.setOnClickListener(v -> {
+			requireActivity().finish();
+		});
 
 		binding.useCurrentLocation.setOnClickListener(new View.OnClickListener() {
 			@Override

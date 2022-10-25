@@ -1,7 +1,6 @@
 package com.lifedawn.bestweather.widget;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.databinding.DataBindingUtil;
 import androidx.preference.PreferenceManager;
 
 import android.app.Activity;
@@ -9,17 +8,14 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.lifedawn.bestweather.R;
@@ -121,8 +117,7 @@ public class DialogActivity extends Activity {
 		((TextView) dialogView.findViewById(R.id.auto_refresh_interval)).setText(refreshIntervalText);
 		((TextView) dialogView.findViewById(R.id.widgetTypeName)).setText(appWidgetProviderInfo.loadLabel(getPackageManager()));
 
-
-		((Button) dialogView.findViewById(R.id.openAppBtn)).setOnClickListener(new View.OnClickListener() {
+		((TextView) dialogView.findViewById(R.id.openAppBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -134,10 +129,10 @@ public class DialogActivity extends Activity {
 			}
 		});
 
-		((Button) dialogView.findViewById(R.id.updateBtn)).setOnClickListener(new View.OnClickListener() {
+		((TextView) dialogView.findViewById(R.id.updateBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				PendingIntent pendingIntent = widgetCreator.getRefreshPendingIntent(widgetProviderClass);
+				PendingIntent pendingIntent = widgetCreator.getRefreshPendingIntent();
 				try {
 					pendingIntent.send();
 				} catch (PendingIntent.CanceledException e) {
@@ -149,7 +144,7 @@ public class DialogActivity extends Activity {
 			}
 		});
 
-		((Button) dialogView.findViewById(R.id.cancelBtn)).setOnClickListener(new View.OnClickListener() {
+		((TextView) dialogView.findViewById(R.id.cancelBtn)).setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				alertDialog.dismiss();

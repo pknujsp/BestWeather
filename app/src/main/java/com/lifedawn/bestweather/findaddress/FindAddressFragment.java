@@ -32,7 +32,6 @@ import com.lifedawn.bestweather.databinding.FragmentFindAddressBinding;
 import com.lifedawn.bestweather.findaddress.map.BottomSheetType;
 import com.lifedawn.bestweather.findaddress.map.IBottomSheetState;
 import com.lifedawn.bestweather.findaddress.map.MapFragment;
-import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
@@ -43,7 +42,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 
 public class FindAddressFragment extends Fragment {
@@ -125,7 +123,7 @@ public class FindAddressFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		bundle = getArguments() != null ? getArguments() : savedInstanceState;
 
-		fusedLocation = FusedLocation.getInstance(getContext());
+		fusedLocation = FusedLocation.getINSTANCE(getContext());
 		networkStatus = NetworkStatus.getInstance(getContext());
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);

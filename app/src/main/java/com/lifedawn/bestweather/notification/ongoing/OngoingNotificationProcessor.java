@@ -1,7 +1,6 @@
 package com.lifedawn.bestweather.notification.ongoing;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -56,7 +55,7 @@ public class OngoingNotificationProcessor {
 
 	public void loadCurrentLocation(Context context, OngoingNotificationDto ongoingNotificationDto, RemoteViews collapsedRemoteViews,
 	                                RemoteViews expandedRemoteViews, BackgroundWorkCallback backgroundWorkCallback) {
-		FusedLocation fusedLocation = FusedLocation.getInstance(context);
+		FusedLocation fusedLocation = FusedLocation.getINSTANCE(context);
 
 		final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
@@ -72,7 +71,6 @@ public class OngoingNotificationProcessor {
 						ongoingNotificationDto.setLongitude(address.longitude);
 						ongoingNotificationDto.setZoneId(zoneId.getId());
 
-						fusedLocation.cancelNotification(context);
 						loadWeatherData(context, ongoingNotificationDto, collapsedRemoteViews, expandedRemoteViews, backgroundWorkCallback);
 					}
 				});
@@ -100,7 +98,6 @@ public class OngoingNotificationProcessor {
 		};
 
 		if (DeviceUtils.Companion.isScreenOn(context)) {
-			fusedLocation.startNotification(context);
 			fusedLocation.findCurrentLocation(locationCallback, false);
 		} else {
 			LocationResult lastLocation = fusedLocation.getLastCurrentLocation();

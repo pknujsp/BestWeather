@@ -13,10 +13,15 @@ import com.lifedawn.bestweather.databinding.ViewProgressResultBinding;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class ProgressResultView extends FrameLayout implements OnProgressViewListener, CheckSuccess {
 	private ViewProgressResultBinding binding;
-	private View contentView;
+	private List<View> views = new ArrayList<>();
 	private boolean succeed;
+	private boolean btnEnabled;
 
 	public ProgressResultView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -50,35 +55,49 @@ public class ProgressResultView extends FrameLayout implements OnProgressViewLis
 		binding = ViewProgressResultBinding.inflate(LayoutInflater.from(getContext()), this, true);
 	}
 
-	public void setContentView(View contentView) {
-		this.contentView = contentView;
+	public void setContentView(View... contentView) {
+		this.views.addAll(Arrays.asList(contentView));
 		onSuccessful();
+	}
+
+	public void setBtnOnClickListener(View.OnClickListener onClickListener) {
+		binding.btn.setOnClickListener(onClickListener);
+		binding.btn.setVisibility(VISIBLE);
+		btnEnabled = true;
 	}
 
 	@Override
 	public void onSuccessful() {
 		succeed = true;
-		contentView.setVisibility(View.VISIBLE);
+		for (View v : views)
+			v.setVisibility(View.VISIBLE);
 		setVisibility(View.GONE);
 	}
 
 	@Override
 	public void onFailed(@NonNull String text) {
 		succeed = false;
-		contentView.setVisibility(View.GONE);
+		for (View v : views)
+			v.setVisibility(View.VISIBLE);
 		binding.status.setText(text);
-		setVisibility(View.VISIBLE);
 		binding.status.setVisibility(VISIBLE);
 		binding.progressbar.setVisibility(GONE);
+
+		binding.btn.setVisibility(btnEnabled ? View.VISIBLE : View.GONE);
+		setVisibility(View.VISIBLE);
 	}
 
 	@Override
 	public void onStarted() {
 		succeed = false;
-		contentView.setVisibility(View.GONE);
-		setVisibility(View.VISIBLE);
+		for (View v : views)
+			v.setVisibility(View.VISIBLE);
+
+		binding.btn.setVisibility(View.GONE);
 		binding.status.setVisibility(GONE);
 		binding.progressbar.setVisibility(VISIBLE);
+
+		setVisibility(View.VISIBLE);
 	}
 
 

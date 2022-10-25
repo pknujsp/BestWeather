@@ -11,11 +11,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.RelativeLayout
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -43,7 +42,7 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
     private lateinit var binding: FragmentRainViewerBinding
     private lateinit var rainViewerViewModel: RainViewerViewModel
     private lateinit var googleMap: GoogleMap
-    private val fusedLocation = FusedLocation.getInstance(context)
+    private val fusedLocation = FusedLocation.getINSTANCE(context)
     private var locationLifeCycleObserver: LocationLifeCycleObserver? = null
 
     private val timer: Timer = Timer()
@@ -70,6 +69,11 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
                               savedInstanceState: Bundle?): View? {
         binding = FragmentRainViewerBinding.inflate(inflater)
 
+        binding.progressResultView.setContentView(binding.mapButtons.root, binding.controlLayout, binding.mapFragmentContainer)
+        binding.progressResultView.setBtnOnClickListener {
+            rainViewerViewModel.initMap()
+        }
+
         val layoutParams = binding.toolbar.root.layoutParams as RelativeLayout.LayoutParams
         layoutParams.topMargin = MyApplication.getStatusBarHeight()
         binding.toolbar.root.layoutParams = layoutParams
@@ -81,6 +85,7 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
             binding.toolbar.fragmentTitle.text = getString(R.string.radar)
             binding.toolbar.backBtn.setOnClickListener(View.OnClickListener { parentFragmentManager.popBackStack() })
         }
+        binding.datetime.text = null
 
         return binding.root
     }
@@ -95,19 +100,18 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
                 mapContentPadding = (binding.root.height - binding.controlLayout.top + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                         8f, requireContext().resources.displayMetrics)).toInt()
 
-                val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+                val mapFragment = SupportMapFragment()
+                childFragmentManager.beginTransaction().add(binding.mapFragmentContainer.id, mapFragment).commitNow()
                 mapFragment!!.getMapAsync(this@RainViewerFragment)
             }
         })
-
-        binding.datetime.text = null
-
 
     }
 
     private fun addMarker() {
         googleMap.addMarker(marker)
     }
+
 
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
@@ -117,7 +121,6 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
         val latLng = LatLng(rainViewerViewModel.latitude, rainViewerViewModel.longitude)
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6f))
 
         val size = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 26f, resources.displayMetrics).toInt()
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.location)!!
@@ -126,6 +129,8 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
         marker = MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.fromBitmap(bitmap)).alpha(0.65f)
         addMarker()
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 6f))
 
         googleMap.uiSettings.isZoomControlsEnabled = false
         googleMap.uiSettings.isRotateGesturesEnabled = false
@@ -216,6 +221,9 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
             rainViewerViewModel.lastFramePosition = rainViewerResponseDto.radar.past.size - 1
             showFrame(rainViewerViewModel.lastFramePosition)
+            binding.progressResultView.onSuccessful()
+        } else {
+            binding.progressResultView.onFailed(getString(R.string.failed_load_radar_data));
         }
     }
 

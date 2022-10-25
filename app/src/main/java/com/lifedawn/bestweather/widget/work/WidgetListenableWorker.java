@@ -68,7 +68,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -77,8 +76,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class WidgetListenableWorker extends ListenableWorker {
-	public static final Set<Integer> PROCESSING_WIDGET_ID_SET = new CopyOnWriteArraySet<>();
-
 	private final Map<Integer, WidgetDto> currentLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
 	private final Map<Integer, WidgetDto> selectedLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
 	private final Map<Integer, WidgetDto> allWidgetDtoArrayMap = new ConcurrentHashMap<>();
@@ -95,12 +92,12 @@ public class WidgetListenableWorker extends ListenableWorker {
 
 	private WidgetRepository widgetRepository;
 	private AppWidgetManager appWidgetManager;
-	private static ExecutorService executorService = MyApplication.getExecutorService();
+	private ExecutorService executorService = MyApplication.getExecutorService();
 	private FusedLocation fusedLocation;
 	private int requestCount;
 	private AtomicInteger responseCount = new AtomicInteger(0);
-	private final String action;
-	private final int appWidgetId;
+	private final String ACTION;
+	private final int APP_WIDGET_ID;
 
 
 	public WidgetListenableWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
@@ -113,10 +110,9 @@ public class WidgetListenableWorker extends ListenableWorker {
 			appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		}
 
-		action = workerParams.getInputData().getString("action");
-		appWidgetId = workerParams.getInputData().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 0);
+		ACTION = workerParams.getInputData().getString("action");
+		APP_WIDGET_ID = workerParams.getInputData().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 0);
 
-		PROCESSING_WIDGET_ID_SET.clear();
 		currentLocationRequestObj = null;
 		currentLocationWidgetDtoArrayMap.clear();
 
@@ -142,11 +138,11 @@ public class WidgetListenableWorker extends ListenableWorker {
 				}
 			};
 
-			if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_INIT))) {
-				widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
+			if (ACTION.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_INIT))) {
+				widgetRepository.get(APP_WIDGET_ID, new DbQueryCallback<WidgetDto>() {
 					@Override
 					public void onResultSuccessful(WidgetDto widgetDto) {
-						AbstractWidgetCreator widgetCreator = createWidgetViewCreator(appWidgetId, widgetDto.getWidgetProviderClassName());
+						AbstractWidgetCreator widgetCreator = createWidgetViewCreator(APP_WIDGET_ID, widgetDto.getWidgetProviderClassName());
 						WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
 						long widgetRefreshInterval = widgetHelper.getRefreshInterval();
 
@@ -158,7 +154,6 @@ public class WidgetListenableWorker extends ListenableWorker {
 								widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
 
 						requestCount = 1;
-						PROCESSING_WIDGET_ID_SET.add(widgetDto.getAppWidgetId());
 
 						if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
 							currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
@@ -192,13 +187,12 @@ public class WidgetListenableWorker extends ListenableWorker {
 					}
 				});
 
-			} else if (action.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
+			} else if (ACTION.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
 				widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
 					@Override
 					public void onResultSuccessful(List<WidgetDto> list) {
 						List<String> addressList = new ArrayList<>();
 						for (WidgetDto widgetDto : list) {
-							PROCESSING_WIDGET_ID_SET.add(widgetDto.getAppWidgetId());
 
 							AbstractWidgetCreator widgetCreator = createWidgetViewCreator(widgetDto.getAppWidgetId(),
 									widgetDto.getWidgetProviderClassName());
@@ -240,7 +234,7 @@ public class WidgetListenableWorker extends ListenableWorker {
 							loadCurrentLocation(backgroundWorkCallback);
 						}
 						if (!selectedLocationWidgetDtoArrayMap.isEmpty()) {
-							requestCount += addressList.size();
+							requestCount = addressList.size();
 							loadWeatherData(LocationType.SelectedAddress, addressList, backgroundWorkCallback);
 						}
 
@@ -251,7 +245,7 @@ public class WidgetListenableWorker extends ListenableWorker {
 						backgroundWorkCallback.onFinished();
 					}
 				});
-			} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
+			} else if (ACTION.equals(Intent.ACTION_BOOT_COMPLETED) || ACTION.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 				WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
 				widgetHelper.reDrawWidgets(backgroundWorkCallback);
 			}
@@ -317,12 +311,12 @@ public class WidgetListenableWorker extends ListenableWorker {
 
 	@Override
 	public void onStopped() {
-		super.onStopped();
+		WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
+		widgetHelper.reDrawWidgets(null);
 	}
 
 	private void showProgressBar() {
-		final Set<Integer> appWidgetIdSet = allWidgetDtoArrayMap.keySet();
-		for (Integer appWidgetId : appWidgetIdSet) {
+		for (Integer appWidgetId : allWidgetDtoArrayMap.keySet()) {
 			RemoteViews remoteViews = remoteViewsArrayMap.get(appWidgetId);
 			RemoteViewsUtil.onBeginProcess(remoteViews);
 			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
@@ -364,11 +358,6 @@ public class WidgetListenableWorker extends ListenableWorker {
 	}
 
 
-	private void setRefreshPendingIntent(int appWidgetId) {
-		widgetCreatorMap.get(appWidgetId).setRefreshPendingIntent(allWidgetProviderClassArrayMap.get(appWidgetId), remoteViewsArrayMap.get(appWidgetId));
-	}
-
-
 	public void loadCurrentLocation(BackgroundWorkCallback backgroundWorkCallback) {
 		final Set<Integer> appWidgetIdSet = currentLocationWidgetDtoArrayMap.keySet();
 		currentLocationRequestObj = new RequestObj(null, null);
@@ -379,8 +368,6 @@ public class WidgetListenableWorker extends ListenableWorker {
 			currentLocationRequestObj.appWidgetSet.add(appWidgetId);
 		}
 
-		fusedLocation = FusedLocation.getInstance(getApplicationContext());
-		fusedLocation.startNotification(getApplicationContext());
 
 		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
 
@@ -416,6 +403,7 @@ public class WidgetListenableWorker extends ListenableWorker {
 		};
 
 		PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
+		fusedLocation = FusedLocation.getINSTANCE(getApplicationContext());
 
 		if (powerManager.isInteractive()) {
 			fusedLocation.findCurrentLocation(locationCallback, true);

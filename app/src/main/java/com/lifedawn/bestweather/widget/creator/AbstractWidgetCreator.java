@@ -19,6 +19,7 @@ import androidx.preference.PreferenceManager;
 
 import com.google.gson.JsonObject;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.enums.IntentRequestCodes;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
@@ -33,7 +34,7 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.widget.DialogActivity;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
-import com.lifedawn.bestweather.widget.work.WidgetListenableWorker;
+import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -82,35 +83,16 @@ public abstract class AbstractWidgetCreator {
 	}
 
 
-	public void setRefreshPendingIntent(Class<?> widgetProviderClass, RemoteViews remoteViews) {
-		remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent(widgetProviderClass));
+	public void setRefreshPendingIntent(RemoteViews remoteViews) {
+		remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
 	}
 
-	public PendingIntent getRefreshPendingIntent(Class<?> widgetProviderClass) {
-		Intent refreshIntent = new Intent(context, widgetProviderClass);
+	public PendingIntent getRefreshPendingIntent() {
+		Intent refreshIntent = new Intent(context, FirstWidgetProvider.class);
 		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
 
-		if (!pendingIntentCreated(widgetProviderClass)) {
-			return PendingIntent.getBroadcast(context, 1500, refreshIntent,
-					PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
-		} else {
-			return PendingIntent.getBroadcast(context, 1500, refreshIntent,
-					PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
-		}
-	}
-
-	public boolean pendingIntentCreated(Class<?> widgetProviderClass) {
-		Intent refreshIntent = new Intent(context, widgetProviderClass);
-		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-
-		PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1500, refreshIntent,
-				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
-
-		if (pendingIntent != null) {
-			return true;
-		} else {
-			return false;
-		}
+		return PendingIntent.getBroadcast(context, IntentRequestCodes.WIDGET_MANUALLY_REFRESH.requestCode, refreshIntent,
+				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 	}
 
 	public WidgetDto loadDefaultSettings() {
@@ -442,9 +424,8 @@ public abstract class AbstractWidgetCreator {
 	public void setResultViews(int appWidgetId, RemoteViews remoteViews,
 	                           @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader,
 	                           @Nullable ZoneId zoneId) {
-		if (!widgetDto.isInitialized()) {
+		if (!widgetDto.isInitialized())
 			widgetDto.setInitialized(true);
-		}
 
 		if (widgetDto.isLoadSuccessful()) {
 			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
@@ -455,14 +436,13 @@ public abstract class AbstractWidgetCreator {
 			}
 
 			RemoteViewsUtil.onErrorProcess(remoteViews, context, widgetDto.getLastErrorType());
-			setRefreshPendingIntent(widgetProviderClass(), remoteViews);
+			setRefreshPendingIntent(remoteViews);
 		}
 
 		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
-				WidgetListenableWorker.PROCESSING_WIDGET_ID_SET.remove(appWidgetId);
-				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+				appWidgetManager.updateAppWidget(result.getAppWidgetId(), remoteViews);
 			}
 
 			@Override

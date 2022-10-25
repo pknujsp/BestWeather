@@ -40,7 +40,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -331,7 +330,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, true);
 
-		fusedLocation = FusedLocation.getInstance(getContext());
+		fusedLocation = FusedLocation.getINSTANCE(getContext());
 
 		bundle = getArguments() != null ? getArguments() : savedInstanceState;
 		requestFragment = bundle.getString(BundleKey.RequestFragment.name());
@@ -504,6 +503,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 							onResultFavoriteListener.onClickedAddress(favoriteAddressDto);
 						}
 
+					}
+
+					@Override
+					public void onShowMarker(FavoriteAddressDto favoriteAddressDto, int position) {
+						setStateOfBottomSheet(BottomSheetType.FAVORITES, BottomSheetBehavior.STATE_COLLAPSED);
+						getChildFragmentManager().popBackStack();
+
+						Marker marker = markerMaps.get(MarkerType.FAVORITE).get(position);
+						onMarkerClick(marker);
 					}
 				});
 
