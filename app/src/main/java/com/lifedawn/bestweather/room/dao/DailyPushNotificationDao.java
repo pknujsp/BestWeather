@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.room.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -16,6 +17,9 @@ import java.util.List;
 public interface DailyPushNotificationDao {
 	@Query("SELECT * FROM daily_push_notifications_table")
 	List<DailyPushNotificationDto> getAll();
+
+	@Query("SELECT * FROM daily_push_notifications_table")
+	LiveData<List<DailyPushNotificationDto>> list();
 
 	@Query("SELECT count(*) FROM daily_push_notifications_table")
 	int size();

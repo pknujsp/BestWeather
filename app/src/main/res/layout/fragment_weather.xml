@@ -143,8 +143,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/headerLayout"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
+                    android:layout_marginLeft="@dimen/weather_fragment_lr_margin"
+                    android:layout_marginRight="@dimen/weather_fragment_lr_margin"
                     android:layout_marginBottom="8dp"
                     />
 
@@ -157,7 +157,7 @@
                     android:gravity="center_vertical|right"
                     android:orientation="horizontal"
                     android:paddingLeft="72dp"
-                    android:paddingRight="24dp"
+                    android:paddingRight="16dp"
                     >
 
                     <TextView

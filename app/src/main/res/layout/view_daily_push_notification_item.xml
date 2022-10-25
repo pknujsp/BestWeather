@@ -1,84 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_layout"
+    style="@style/ListItemBackground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:paddingLeft="16dp"
+    android:paddingTop="8dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="8dp"
+    >
 
-    <FrameLayout
-        android:id="@+id/root_layout"
-        style="@style/ListItemBackground"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:paddingLeft="16dp"
-        android:paddingTop="8dp"
-        android:paddingRight="16dp"
-        android:paddingBottom="8dp">
+        android:layout_height="match_parent"
+        >
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/switchLayout"
+            android:orientation="vertical"
+            >
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:layout_toLeftOf="@id/switchLayout"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/hours"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
-                    android:text="07:00"
-                    android:textSize="28sp" />
-
-                <TextView
-                    android:id="@+id/notificationType"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="2dp"
-                    android:text="NotificationType"
-                    android:textColor="@color/blue"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/location"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableLeft="@drawable/location"
-                    android:gravity="center_vertical"
-                    android:text="Seoul, SouthKorea"
-                    android:textSize="14sp" />
-
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:id="@+id/switchLayout"
+            <TextView
+                android:id="@+id/hours"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_marginBottom="2dp"
+                android:text="07:00"
+                android:textSize="29sp"
+                />
+
+            <TextView
+                android:id="@+id/notificationType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                android:text="NotificationType"
+                android:textColor="@color/blue"
+                android:textSize="14sp"
+                />
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/location"
+                android:gravity="center_vertical"
+                android:text="Seoul, SouthKorea"
+                android:textSize="14sp"
+                />
+
+        </LinearLayout>
 
 
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/notiSwitch"
-                    android:checked="false"
-                    style="@style/Switch" />
+        <LinearLayout
+            android:id="@+id/switchLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            >
 
-                <ImageButton
-                    android:id="@+id/control"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:src="@drawable/more_horizontal" />
 
-            </LinearLayout>
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/notiSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                app:showText="false"
+                />
 
-        </RelativeLayout>
+            <ImageButton
+                android:id="@+id/control"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:src="@drawable/more_horizontal"
+                />
 
-    </FrameLayout>
-</layout>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</FrameLayout>

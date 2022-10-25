@@ -84,7 +84,7 @@ public class DailyNotificationHelper {
 	}
 
 	public void reStartNotifications(@Nullable BackgroundWorkCallback backgroundWorkCallback) {
-		DailyPushNotificationRepository repository = new DailyPushNotificationRepository(context);
+		DailyPushNotificationRepository repository = DailyPushNotificationRepository.getINSTANCE();
 		repository.getAll(new DbQueryCallback<List<DailyPushNotificationDto>>() {
 			@Override
 			public void onResultSuccessful(List<DailyPushNotificationDto> result) {

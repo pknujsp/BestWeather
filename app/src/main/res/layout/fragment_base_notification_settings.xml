@@ -35,7 +35,7 @@
                 android:id="@+id/preview_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="6dp"
+                android:layout_margin="4dp"
                 android:clickable="false"
                 android:clipChildren="false"
                 android:focusable="false"
@@ -102,6 +102,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
         android:text="@string/save"
         />
 

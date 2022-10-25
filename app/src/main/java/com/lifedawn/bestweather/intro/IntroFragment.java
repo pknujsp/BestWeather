@@ -114,7 +114,7 @@ public class IntroFragment extends Fragment {
 				});
 
 				getParentFragmentManager().beginTransaction().hide(IntroFragment.this).add(R.id.fragment_container, mapFragment,
-						MapFragment.class.getName()).addToBackStack(MapFragment.class.getName()).commitAllowingStateLoss();
+						MapFragment.class.getName()).addToBackStack(MapFragment.class.getName()).setPrimaryNavigationFragment(mapFragment).commitAllowingStateLoss();
 			}
 		});
 	}

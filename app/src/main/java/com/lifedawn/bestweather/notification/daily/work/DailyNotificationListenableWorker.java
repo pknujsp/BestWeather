@@ -63,7 +63,7 @@ public class DailyNotificationListenableWorker extends ListenableWorker {
 		super(context, workerParams);
 
 		action = workerParams.getInputData().getString("action");
-		repository = new DailyPushNotificationRepository(getApplicationContext());
+		repository =  DailyPushNotificationRepository.getINSTANCE();
 		id = workerParams.getInputData().getInt(BundleKey.dtoId.name(), -1);
 		dailyPushNotificationType = DailyPushNotificationType.valueOf(workerParams.getInputData().getString("DailyPushNotificationType"));
 	}

@@ -14,6 +14,7 @@ import com.lifedawn.bestweather.flickr.FlickrRepository;
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationRepository;
 import com.lifedawn.bestweather.rainviewer.model.RainViewerRepository;
+import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
 import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
@@ -64,6 +65,7 @@ public class MyApplication extends Application {
 		OngoingNotificationRepository.initialize(context);
 		WidgetRepository.initialize(context);
 		FlickrRepository.initialize();
+		DailyPushNotificationRepository.initialize(context);
 		RainViewerRepository.Companion.initialize();
 		WindUtil.init(context);
 		initPreferences();

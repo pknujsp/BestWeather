@@ -3,6 +3,7 @@ package com.lifedawn.bestweather.room.repository;
 import android.content.Context;
 
 import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
 
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
@@ -16,13 +17,26 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DailyPushNotificationRepository {
-	private Context context;
+	private static DailyPushNotificationRepository INSTANCE;
+
+	public static DailyPushNotificationRepository getINSTANCE() {
+		return INSTANCE;
+	}
+
+	public static void initialize(Context context) {
+		if (INSTANCE == null)
+			INSTANCE = new DailyPushNotificationRepository(context);
+	}
+
 	private DailyPushNotificationDao dailyPushNotificationDao;
 	private ExecutorService executorService = MyApplication.getExecutorService();
 
-	public DailyPushNotificationRepository(Context context) {
-		this.context = context;
+	private DailyPushNotificationRepository(Context context) {
 		dailyPushNotificationDao = AppDb.getInstance(context).dailyPushNotificationDao();
+	}
+
+	public LiveData<List<DailyPushNotificationDto>> listLiveData() {
+		return dailyPushNotificationDao.list();
 	}
 
 

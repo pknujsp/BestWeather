@@ -93,7 +93,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 
 		dailyNotificationHelper = new DailyNotificationHelper(getActivity().getApplicationContext());
-		repository = new DailyPushNotificationRepository(getContext());
+		repository =  DailyPushNotificationRepository.getINSTANCE();
 		mainWeatherProviderType = WeatherRequestUtil.getMainWeatherSourceType(getContext(), null);
 
 		bundle = getArguments() != null ? getArguments() : savedInstanceState;

@@ -281,6 +281,9 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 	}
 
 	protected void initLocation() {
+		binding.commons.changeAddressBtn.setVisibility(View.GONE);
+		binding.commons.selectedAddressName.setVisibility(View.GONE);
+
 		binding.commons.locationRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -298,6 +301,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 					} else {
 						openFavoritesFragment();
 					}
+
 				}
 			}
 		});

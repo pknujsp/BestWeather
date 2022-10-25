@@ -353,7 +353,7 @@ public class WeatherFragment extends Fragment implements IGps {
 
 					getParentFragmentManager().beginTransaction().hide(WeatherFragment.this).add(R.id.fragment_container,
 							mapFragment, MapFragment.class.getName()).addToBackStack(
-							MapFragment.class.getName()).commitAllowingStateLoss();
+							MapFragment.class.getName()).setPrimaryNavigationFragment(mapFragment).commitAllowingStateLoss();
 				}
 			}
 		});

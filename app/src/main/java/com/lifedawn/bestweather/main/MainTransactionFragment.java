@@ -121,7 +121,8 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 					if (newUsingCurrentLocation) {
 						//날씨 프래그먼트 다시 그림
 						WeatherFragment weatherFragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName());
-						weatherFragment.reDraw();
+						if (weatherFragment != null)
+							weatherFragment.reDraw();
 					} else {
 						//현재 위치 사용을 끈 경우
 						if (lastSelectedLocationType == LocationType.CurrentLocation) {
@@ -133,13 +134,15 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 						} else {
 							//날씨 프래그먼트 다시 그림
 							WeatherFragment weatherFragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName());
-							weatherFragment.reDraw();
+							if (weatherFragment != null)
+								weatherFragment.reDraw();
 						}
 					}
 				} else {
 					//날씨 프래그먼트 다시 그림
 					WeatherFragment weatherFragment = (WeatherFragment) getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName());
-					weatherFragment.reDraw();
+					if (weatherFragment != null)
+						weatherFragment.reDraw();
 				}
 
 				originalUsingCurrentLocation = newUsingCurrentLocation;
@@ -475,30 +478,24 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 					final String tag = MapFragment.class.getName();
 
 					FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-					if (getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName()) != null) {
-						transaction.hide(getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName()));
-					}
-
-					transaction.add(
+					transaction.hide(getChildFragmentManager().getPrimaryNavigationFragment()).add(
 							binding.fragmentContainer.getId(), mapFragment,
-							tag).addToBackStack(tag).commitAllowingStateLoss();
+							tag).addToBackStack(tag).setPrimaryNavigationFragment(mapFragment).commitAllowingStateLoss();
 					break;
 				case R.id.settings:
 					SettingsMainFragment settingsMainFragment = new SettingsMainFragment();
-					getChildFragmentManager().beginTransaction().hide(
-							getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName())).add(
+					getChildFragmentManager().beginTransaction().hide(getChildFragmentManager().getPrimaryNavigationFragment()).add(
 							binding.fragmentContainer.getId(), settingsMainFragment,
 							getString(R.string.tag_settings_main_fragment)).addToBackStack(
-							getString(R.string.tag_settings_main_fragment)).commitAllowingStateLoss();
+							getString(R.string.tag_settings_main_fragment)).setPrimaryNavigationFragment(settingsMainFragment).commitAllowingStateLoss();
 					break;
 				case R.id.notificationAlarmSettings:
 					NotificationFragment notificationFragment = new NotificationFragment();
-					String favTag = NotificationFragment.class.getName();
+					String notiTag = NotificationFragment.class.getName();
 
-					getChildFragmentManager().beginTransaction().hide(
-							getChildFragmentManager().findFragmentByTag(WeatherFragment.class.getName())).add(
+					getChildFragmentManager().beginTransaction().hide(getChildFragmentManager().getPrimaryNavigationFragment()).add(
 							binding.fragmentContainer.getId(), notificationFragment,
-							favTag).addToBackStack(favTag).commitAllowingStateLoss();
+							notiTag).addToBackStack(notiTag).setPrimaryNavigationFragment(notificationFragment).commitAllowingStateLoss();
 					break;
 			}
 			binding.drawerLayout.closeDrawer(binding.sideNavigation, false);
@@ -551,7 +548,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		});
 
 		getChildFragmentManager().beginTransaction().replace(binding.fragmentContainer.getId(), newWeatherFragment,
-				WeatherFragment.class.getName()).commitAllowingStateLoss();
+				WeatherFragment.class.getName()).setPrimaryNavigationFragment(newWeatherFragment).commitAllowingStateLoss();
 	}
 
 	@Override

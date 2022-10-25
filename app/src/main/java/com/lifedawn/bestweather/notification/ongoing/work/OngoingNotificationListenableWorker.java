@@ -66,6 +66,7 @@ public class OngoingNotificationListenableWorker extends ListenableWorker {
 				public void onResultSuccessful(OngoingNotificationDto ongoingNotificationDto) {
 					if (ACTION.equals(Intent.ACTION_BOOT_COMPLETED) || ACTION.equals(Intent.ACTION_MY_PACKAGE_REPLACED)
 							|| ACTION.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_RESTART))) {
+						ongoingNotiViewCreator = new OngoingNotiViewCreator(getApplicationContext(), ongoingNotificationDto);
 						reStartNotification(ongoingNotificationDto, backgroundWorkCallback);
 					} else if (ACTION.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
 						if (ongoingNotificationDto.getUpdateIntervalMillis() > 0) {
