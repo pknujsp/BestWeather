@@ -74,7 +74,7 @@ public class ThirdWidgetCreator extends AbstractWidgetCreator {
 
 		return set;
 	}
-	
+
 
 	@Override
 	public Class<?> widgetProviderClass() {
