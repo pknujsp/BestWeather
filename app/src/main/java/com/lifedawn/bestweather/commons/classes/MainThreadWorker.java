@@ -9,7 +9,10 @@ public class MainThreadWorker {
 	private final static Handler handler = new Handler(Looper.getMainLooper());
 
 	public static void runOnUiThread(Runnable action) {
-		handler.post(action);
+		if (Thread.currentThread() == Looper.getMainLooper().getThread())
+			action.run();
+		else
+			handler.post(action);
 	}
 
 }

@@ -119,6 +119,7 @@ import com.lifedawn.bestweather.weathers.simplefragment.currentconditions.Simple
 import com.lifedawn.bestweather.weathers.simplefragment.dailyforecast.SimpleDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.hourlyforecast.SimpleHourlyForecastFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.SunsetriseFragment;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -139,12 +140,8 @@ import java.util.concurrent.TimeUnit;
 
 
 public class WeatherFragment extends Fragment implements IGps {
-	private ExecutorService executorService = MyApplication.getExecutorService();
-	private DateTimeFormatter dateTimeFormatter;
-
+	private final ExecutorService executorService = MyApplication.getExecutorService();
 	private FragmentWeatherBinding binding;
-	private FavoriteAddressDto selectedFavoriteAddressDto;
-	private LocationType locationType;
 	private WeatherViewModel weatherViewModel;
 	private OnResultFragmentListener onResultFragmentListener;
 	private View.OnClickListener menuOnClickListener;
@@ -153,21 +150,11 @@ public class WeatherFragment extends Fragment implements IGps {
 	private FusedLocation.MyLocationCallback locationCallbackInMainFragment;
 	private WeatherViewController weatherViewController;
 	private FlickrViewModel flickrViewModel;
-
-	private WeatherProviderType mainWeatherProviderType;
-	private Double latitude;
-	private Double longitude;
-	private String countryCode;
-	private String addressName;
-	private SharedPreferences sharedPreferences;
-	private ZoneId zoneId;
-	private boolean load;
-
-	private WeatherRestApiDownloader weatherRestApiDownloader;
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
-	private Bundle arguments;
 	private final IWeatherFragment iWeatherFragment;
+
+	private WeatherFragmentViewModel weatherFragmentViewModel;
 
 	public WeatherFragment(IWeatherFragment iWeatherFragment) {
 		this.iWeatherFragment = iWeatherFragment;
@@ -242,15 +229,16 @@ public class WeatherFragment extends Fragment implements IGps {
 
 		networkStatus = NetworkStatus.getInstance(getContext());
 		fusedLocation = new FusedLocation(requireContext().getApplicationContext());
+		weatherFragmentViewModel = new ViewModelProvider(this).get(WeatherFragmentViewModel.class);
 
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
 		locationCallbackInMainFragment = weatherViewModel.getLocationCallback();
 
 		flickrViewModel = new ViewModelProvider(this).get(FlickrViewModel.class);
 
-		arguments = savedInstanceState != null ? savedInstanceState : getArguments();
-		load = arguments.getBoolean("load", false);
+		if (getArguments() != null)
+			weatherFragmentViewModel.arguments = getArguments();
+		weatherFragmentViewModel.load = weatherFragmentViewModel.arguments.getBoolean("load", false);
 	}
 
 	/**
@@ -471,19 +459,25 @@ public class WeatherFragment extends Fragment implements IGps {
 
 
 		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
-		final LocationType locationType = (LocationType) arguments.getSerializable("LocationType");
-		final FavoriteAddressDto favoriteAddressDto = arguments.containsKey("FavoriteAddressDto") ?
-				(FavoriteAddressDto) arguments.getSerializable("FavoriteAddressDto") : null;
+		final LocationType locationType = (LocationType) weatherFragmentViewModel.arguments.getSerializable("LocationType");
+		final FavoriteAddressDto favoriteAddressDto = weatherFragmentViewModel.arguments.containsKey("FavoriteAddressDto") ?
+				(FavoriteAddressDto) weatherFragmentViewModel.arguments.getSerializable("FavoriteAddressDto") : null;
 
-		if (load) {
-			load = false;
-			arguments.remove("load");
-			setArguments(arguments);
+		weatherFragmentViewModel.weatherDataLiveData.observe(getViewLifecycleOwner(), new Observer<ResponseResultObj>() {
+			@Override
+			public void onChanged(ResponseResultObj responseResultObj) {
+				if (responseResultObj != null)
+					processOnResult(responseResultObj);
+			}
+		});
+
+		if (weatherFragmentViewModel.load) {
+			weatherFragmentViewModel.load = false;
+			weatherFragmentViewModel.arguments.remove("load");
 			load(locationType, favoriteAddressDto);
 		} else {
 			shimmer(false);
 		}
-
 
 	}
 
@@ -499,63 +493,66 @@ public class WeatherFragment extends Fragment implements IGps {
 		bundle.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
 
 		locationType = LocationType.valueOf(bundle.getString(BundleKey.LocationType.name()));
-		this.locationType = locationType;
+		weatherFragmentViewModel.locationType = locationType;
 
-		final boolean clickGps = arguments.getBoolean("clickGps", false);
+		final boolean clickGps = weatherFragmentViewModel.arguments.getBoolean("clickGps", false);
 
 		if (locationType == LocationType.CurrentLocation) {
+			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
 					getString(R.string.pref_key_last_selected_location_type), locationType.name()).commit();
 
 			LocationResult locationResult = fusedLocation.getLastCurrentLocation();
-			latitude = locationResult.getLocations().get(0).getLatitude();
-			longitude = locationResult.getLocations().get(0).getLongitude();
+			weatherFragmentViewModel.latitude = locationResult.getLocations().get(0).getLatitude();
+			weatherFragmentViewModel.longitude = locationResult.getLocations().get(0).getLongitude();
 
-			if (latitude == 0.0 && longitude == 0.0) {
+			if (weatherFragmentViewModel.latitude == 0.0 && weatherFragmentViewModel.longitude == 0.0) {
 				//최근에 현재위치로 잡힌 위치가 없으므로 현재 위치 요청
 				requestCurrentLocation();
 			} else if (clickGps) {
 				binding.mainToolbar.gps.callOnClick();
 			} else {
-				zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(getContext())
+				weatherFragmentViewModel.zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(getContext())
 						.getString("zoneId", ""));
 				//위/경도에 해당하는 지역명을 불러오고, 날씨 데이터 다운로드
 				//이미 존재하는 날씨 데이터면 다운로드X
-				boolean refresh = !containWeatherData(latitude, longitude);
+				boolean refresh = !weatherFragmentViewModel.containWeatherData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
 
-				if (isOldDownloadedData(latitude, longitude)) {
-					removeOldDownloadedData(latitude, longitude);
+				if (weatherFragmentViewModel.isOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
 					refresh = true;
+					weatherFragmentViewModel.removeOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
 				}
 
-				requestAddressOfLocation(latitude, longitude, refresh);
+				requestAddressOfLocation(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude, refresh);
 			}
 		} else {
-			selectedFavoriteAddressDto = (FavoriteAddressDto) bundle.getSerializable(
+			weatherFragmentViewModel.selectedFavoriteAddressDto = (FavoriteAddressDto) bundle.getSerializable(
 					BundleKey.SelectedAddressDto.name());
 
+			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
-					selectedFavoriteAddressDto.getId()).putString(getString(R.string.pref_key_last_selected_location_type),
+					weatherFragmentViewModel.selectedFavoriteAddressDto.getId()).putString(getString(R.string.pref_key_last_selected_location_type),
 					locationType.name()).commit();
 
-			mainWeatherProviderType = getMainWeatherSourceType(selectedFavoriteAddressDto.getCountryCode());
-			countryCode = selectedFavoriteAddressDto.getCountryCode();
-			addressName = selectedFavoriteAddressDto.getDisplayName();
-			latitude = Double.parseDouble(selectedFavoriteAddressDto.getLatitude());
-			longitude = Double.parseDouble(selectedFavoriteAddressDto.getLongitude());
-			zoneId = ZoneId.of(selectedFavoriteAddressDto.getZoneId());
+			weatherFragmentViewModel.mainWeatherProviderType =
+					weatherFragmentViewModel.getMainWeatherSourceType(weatherFragmentViewModel.selectedFavoriteAddressDto.getCountryCode());
+			weatherFragmentViewModel.countryCode = weatherFragmentViewModel.selectedFavoriteAddressDto.getCountryCode();
+			weatherFragmentViewModel.addressName = weatherFragmentViewModel.selectedFavoriteAddressDto.getDisplayName();
+			weatherFragmentViewModel.latitude = Double.parseDouble(weatherFragmentViewModel.selectedFavoriteAddressDto.getLatitude());
+			weatherFragmentViewModel.longitude = Double.parseDouble(weatherFragmentViewModel.selectedFavoriteAddressDto.getLongitude());
+			weatherFragmentViewModel.zoneId = ZoneId.of(weatherFragmentViewModel.selectedFavoriteAddressDto.getZoneId());
 
-			binding.addressName.setText(addressName);
-			binding.countryName.setText(selectedFavoriteAddressDto.getCountryName());
+			binding.addressName.setText(weatherFragmentViewModel.addressName);
+			binding.countryName.setText(weatherFragmentViewModel.selectedFavoriteAddressDto.getCountryName());
 
-			if (containWeatherData(latitude, longitude)) {
-				if (isOldDownloadedData(latitude, longitude)) {
-					removeOldDownloadedData(latitude, longitude);
+			if (weatherFragmentViewModel.containWeatherData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
+				if (weatherFragmentViewModel.isOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
+					weatherFragmentViewModel.removeOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
 					requestNewData();
 				} else {
 					//기존 데이터 표시
-					mainWeatherProviderType =
-							weatherViewModel.FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).requestMainWeatherProviderType;
+					weatherFragmentViewModel.mainWeatherProviderType =
+							WeatherFragmentViewModel.FINAL_RESPONSE_MAP.get(weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString()).requestMainWeatherProviderType;
 					reDraw();
 				}
 			} else {
@@ -565,11 +562,6 @@ public class WeatherFragment extends Fragment implements IGps {
 
 	}
 
-	@Override
-	public void onSaveInstanceState(@NonNull Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putAll(arguments);
-	}
 
 	@Override
 	public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
@@ -588,8 +580,8 @@ public class WeatherFragment extends Fragment implements IGps {
 
 	@Override
 	public void onDestroy() {
-		if (weatherRestApiDownloader != null) {
-			weatherRestApiDownloader.cancel();
+		if (weatherFragmentViewModel.weatherRestApiDownloader != null) {
+			weatherFragmentViewModel.weatherRestApiDownloader.cancel();
 		}
 
 		getLifecycle().removeObserver(locationLifeCycleObserver);
@@ -626,7 +618,7 @@ public class WeatherFragment extends Fragment implements IGps {
 			//현재 위/경도 좌표를 최근 현재위치의 위/경도로 등록
 			//날씨 데이터 요청
 			final Location location = getBestLocation(locationResult);
-			zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(getContext())
+			weatherFragmentViewModel.zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(getContext())
 					.getString("zoneId", ""));
 			onChangedCurrentLocation(location);
 			locationCallbackInMainFragment.onSuccessful(locationResult);
@@ -677,9 +669,10 @@ public class WeatherFragment extends Fragment implements IGps {
 						Bundle argument = new Bundle();
 						argument.putBoolean("clickGps", true);
 
-						iWeatherFragment.addWeatherFragment(locationType, selectedFavoriteAddressDto, argument);
+						iWeatherFragment.addWeatherFragment(weatherFragmentViewModel.locationType, weatherFragmentViewModel.selectedFavoriteAddressDto, argument);
 					}
 				}, getString(R.string.again)));
+				shimmer(false);
 				setFailFragment(btnObjList);
 			}
 
@@ -691,52 +684,17 @@ public class WeatherFragment extends Fragment implements IGps {
 		binding.mainToolbar.gps.callOnClick();
 	}
 
-	private boolean containWeatherData(Double latitude, Double longitude) {
-		return weatherViewModel.FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString());
-	}
-
-	private void removeOldDownloadedData(Double latitude, Double longitude) {
-		weatherViewModel.FINAL_RESPONSE_MAP.remove(latitude.toString() + longitude.toString());
-	}
-
-	private boolean isOldDownloadedData(Double latitude, Double longitude) {
-		if (!weatherViewModel.FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString())) {
-			return false;
-		}
-
-		long dataDownloadedMinutes = TimeUnit.SECONDS.toMinutes(
-				weatherViewModel.FINAL_RESPONSE_MAP.get(latitude.toString() + longitude).dataDownloadedDateTime.getSecond());
-		long now = TimeUnit.SECONDS.toMinutes(LocalDateTime.now().getSecond());
-
-		if (now - dataDownloadedMinutes > 120) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 
 	private void requestAddressOfLocation(Double latitude, Double longitude, boolean refresh) {
 		Geocoding.nominatimReverseGeocoding(getContext(), latitude, longitude, new Geocoding.ReverseGeocodingCallback() {
 			@Override
 			public void onReverseGeocodingResult(Geocoding.AddressDto address) {
 				if (getActivity() != null) {
+					weatherFragmentViewModel.addressName = address.displayName;
+					weatherFragmentViewModel.mainWeatherProviderType = weatherFragmentViewModel.getMainWeatherSourceType(address.countryCode);
+					weatherFragmentViewModel.countryCode = address.countryCode;
 
-						/*
-						//검색 결과가 없으면 주소 정보 미 표시하고 데이터 로드
-						mainWeatherProviderType = getMainWeatherSourceType("");
-						countryCode = "";
-						addressName = getString(R.string.unknown_address);
-
-						final String addressStr = getString(R.string.current_location) + " : " + addressName;
-						onResultCurrentLocation(addressStr, addressName, refresh);
-						*/
-
-					addressName = address.displayName;
-					mainWeatherProviderType = getMainWeatherSourceType(address.countryCode);
-					countryCode = address.countryCode;
-
-					final String addressStr = getString(R.string.current_location) + " : " + addressName;
+					final String addressStr = getString(R.string.current_location) + " : " + weatherFragmentViewModel.addressName;
 
 					SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
 
@@ -766,8 +724,8 @@ public class WeatherFragment extends Fragment implements IGps {
 					requestNewData();
 				} else {
 					//이미 데이터가 있으면 다시 그림
-					mainWeatherProviderType = weatherViewModel.FINAL_RESPONSE_MAP.get(
-							latitude.toString() + longitude.toString()).requestMainWeatherProviderType;
+					weatherFragmentViewModel.mainWeatherProviderType = WeatherFragmentViewModel.FINAL_RESPONSE_MAP.get(
+							weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString()).requestMainWeatherProviderType;
 					reDraw();
 				}
 
@@ -775,41 +733,19 @@ public class WeatherFragment extends Fragment implements IGps {
 		});
 	}
 
-	private WeatherProviderType getMainWeatherSourceType(@NonNull String countryCode) {
-		if (arguments.containsKey("anotherProvider")) {
-			WeatherProviderType weatherProviderType = (WeatherProviderType) arguments.getSerializable("anotherProvider");
-			arguments.remove("anotherProvider");
-			return weatherProviderType;
-		}
-
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-		WeatherProviderType mainWeatherProviderType = sharedPreferences.getBoolean(getString(R.string.pref_key_met), true) ?
-				WeatherProviderType.MET_NORWAY : WeatherProviderType.OWM_ONECALL;
-
-		if (countryCode != null && countryCode.equals("KR")) {
-			boolean kmaIsTopPriority = sharedPreferences.getBoolean(getString(R.string.pref_key_kma_top_priority), true);
-			if (kmaIsTopPriority) {
-				mainWeatherProviderType = WeatherProviderType.KMA_WEB;
-			}
-		}
-
-		return mainWeatherProviderType;
-	}
-
-
 	public void reDraw() {
 		//날씨 프래그먼트 다시 그림
-		if (weatherViewModel.FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString())) {
+		if (WeatherFragmentViewModel.FINAL_RESPONSE_MAP.containsKey(weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString())) {
 			ProgressDialog.show(requireActivity(), getString(R.string.refreshing_view), null);
 
 			executorService.execute(new Runnable() {
 				@Override
 				public void run() {
 					Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
-					weatherProviderTypeSet.add(mainWeatherProviderType);
+					weatherProviderTypeSet.add(weatherFragmentViewModel.mainWeatherProviderType);
 					weatherProviderTypeSet.add(WeatherProviderType.AQICN);
-					setWeatherFragments(weatherProviderTypeSet, weatherViewModel.FINAL_RESPONSE_MAP.get(latitude.toString() + longitude.toString()).weatherRestApiDownloader,
-							latitude, longitude);
+					setWeatherFragments(weatherProviderTypeSet, WeatherFragmentViewModel.FINAL_RESPONSE_MAP.get(weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString()).weatherRestApiDownloader,
+							weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
 				}
 			});
 
@@ -817,79 +753,22 @@ public class WeatherFragment extends Fragment implements IGps {
 	}
 
 	public void onChangedCurrentLocation(Location currentLocation) {
-		this.latitude = currentLocation.getLatitude();
-		this.longitude = currentLocation.getLongitude();
-		weatherViewModel.FINAL_RESPONSE_MAP.remove(latitude.toString() + longitude.toString());
-		requestAddressOfLocation(latitude, longitude, true);
+		weatherFragmentViewModel.latitude = currentLocation.getLatitude();
+		weatherFragmentViewModel.longitude = currentLocation.getLongitude();
+		WeatherFragmentViewModel.FINAL_RESPONSE_MAP.remove(weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString());
+		requestAddressOfLocation(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude, true);
 	}
 
 
 	public void requestNewData() {
 		ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				//메인 날씨 제공사만 요청
-				final Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
-				weatherProviderTypeSet.add(mainWeatherProviderType);
-				weatherProviderTypeSet.add(WeatherProviderType.AQICN);
-
-				ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
-				setRequestWeatherSourceWithSourceTypes(weatherProviderTypeSet, requestWeatherSources);
-
-				final ResponseResultObj responseResultObj = new ResponseResultObj(weatherProviderTypeSet, requestWeatherSources, mainWeatherProviderType);
-
-				weatherRestApiDownloader = new WeatherRestApiDownloader() {
-					@Override
-					public void onResult() {
-						responseResultObj.weatherRestApiDownloader = this;
-						processOnResult(responseResultObj);
-					}
-
-					@Override
-					public void onCanceled() {
-
-					}
-				};
-
-				weatherRestApiDownloader.setZoneId(zoneId);
-				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, weatherRestApiDownloader);
-			}
-		});
+		weatherFragmentViewModel.requestNewData();
 	}
 
 	private void requestNewDataWithAnotherWeatherSource(WeatherProviderType newWeatherProviderType, WeatherProviderType lastWeatherProviderType) {
-		shimmer(true);
 		ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
-				//메인 날씨 제공사만 요청
-				Set<WeatherProviderType> newWeatherProviderTypeSet = new HashSet<>();
-				newWeatherProviderTypeSet.add(newWeatherProviderType);
-				newWeatherProviderTypeSet.add(WeatherProviderType.AQICN);
-
-				setRequestWeatherSourceWithSourceTypes(newWeatherProviderTypeSet, requestWeatherSources);
-
-				final ResponseResultObj responseResultObj = new ResponseResultObj(newWeatherProviderTypeSet, requestWeatherSources, newWeatherProviderType);
-				weatherRestApiDownloader = new WeatherRestApiDownloader() {
-					@Override
-					public void onResult() {
-						responseResultObj.weatherRestApiDownloader = this;
-						processOnResult(responseResultObj);
-					}
-
-					@Override
-					public void onCanceled() {
-
-					}
-				};
-
-				weatherRestApiDownloader.setZoneId(zoneId);
-				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, requestWeatherSources, weatherRestApiDownloader);
-			}
-		});
+		shimmer(true);
+		weatherFragmentViewModel.requestNewDataWithAnotherWeatherSource(newWeatherProviderType, lastWeatherProviderType);
 	}
 
 	private void processOnResult(ResponseResultObj responseResultObj) {
@@ -906,7 +785,7 @@ public class WeatherFragment extends Fragment implements IGps {
 
 			for (WeatherRestApiDownloader.ResponseResult responseResult : entry.getValue().values()) {
 				if (!responseResult.isSuccessful()) {
-					if (containWeatherData(latitude, longitude)) {
+					if (weatherFragmentViewModel.containWeatherData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
 						MainThreadWorker.runOnUiThread(new Runnable() {
 							@Override
 							public void run() {
@@ -919,8 +798,8 @@ public class WeatherFragment extends Fragment implements IGps {
 						//다시시도, 취소 중 택1
 						List<AlertFragment.BtnObj> btnObjList = new ArrayList<>();
 
-						Set<WeatherProviderType> otherTypes = getOtherWeatherSourceTypes(weatherProviderType,
-								mainWeatherProviderType);
+						Set<WeatherProviderType> otherTypes = weatherFragmentViewModel.getOtherWeatherSourceTypes(weatherProviderType,
+								weatherFragmentViewModel.mainWeatherProviderType);
 
 						final String[] failedDialogItems = new String[otherTypes.size()];
 						final WeatherProviderType[] weatherProviderTypeArr = new WeatherProviderType[otherTypes.size()];
@@ -950,7 +829,7 @@ public class WeatherFragment extends Fragment implements IGps {
 						btnObjList.add(new AlertFragment.BtnObj(new View.OnClickListener() {
 							@Override
 							public void onClick(View v) {
-								iWeatherFragment.addWeatherFragment(locationType, selectedFavoriteAddressDto, null);
+								iWeatherFragment.addWeatherFragment(weatherFragmentViewModel.locationType, weatherFragmentViewModel.selectedFavoriteAddressDto, null);
 							}
 						}, getString(R.string.again)));
 
@@ -962,13 +841,14 @@ public class WeatherFragment extends Fragment implements IGps {
 									Bundle argument = new Bundle();
 									argument.putSerializable("anotherProvider", anotherProvider);
 
-									iWeatherFragment.addWeatherFragment(locationType, selectedFavoriteAddressDto, argument);
+									iWeatherFragment.addWeatherFragment(weatherFragmentViewModel.locationType, weatherFragmentViewModel.selectedFavoriteAddressDto, argument);
 								}
 							}, failedDialogItems[index]));
 							index++;
 						}
 
 						MainThreadWorker.runOnUiThread(() -> {
+							shimmer(false);
 							ProgressDialog.clearDialogs();
 							setFailFragment(btnObjList);
 						});
@@ -982,8 +862,8 @@ public class WeatherFragment extends Fragment implements IGps {
 		//응답 성공 하면
 		final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.weatherRestApiDownloader,
 				responseResultObj.weatherProviderTypeSet, responseResultObj.mainWeatherProviderType);
-		weatherViewModel.FINAL_RESPONSE_MAP.put(latitude.toString() + longitude.toString(), weatherResponseObj);
-		setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.weatherRestApiDownloader, latitude, longitude);
+		WeatherFragmentViewModel.FINAL_RESPONSE_MAP.put(weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString(), weatherResponseObj);
+		setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.weatherRestApiDownloader, weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
 	}
 
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
@@ -1000,196 +880,8 @@ public class WeatherFragment extends Fragment implements IGps {
 		alertFragment.setBtnObjList(btnObjList);
 		alertFragment.setArguments(bundle);
 
-		shimmer(false);
-
 		fragmentTransaction.replace(R.id.fragment_container, alertFragment,
-				AlertFragment.class.getName()).commitAllowingStateLoss();
-	}
-
-	/**
-	 * kma, accu, owm
-	 * 요청 : kma, 현재 : owm ->  accu
-	 * 요청 : kma, 현재 : accu ->  owm
-	 * 요청 : kma, 현재 : kma ->  owm, accu
-	 * <p>
-	 * 요청 : accu, 현재 : accu ->  owm
-	 * 요청 : accu, 현재 : accu ->  owm, kma (only kr)
-	 * 요청 : accu, 현재 : owm ->  미 표시
-	 * 요청 : accu, 현재 : owm ->  kma (only kr)
-	 * 요청 : accu, 현재 : kma ->  owm
-	 * <p>
-	 * 요청 : owm, 현재 : owm ->  accu
-	 * 요청 : owm, 현재 : owm ->  accu, kma (only kr)
-	 * 요청 : owm, 현재 : accu ->  미 표시
-	 * 요청 : owm, 현재 : accu ->  kma (only kr)
-	 * 요청 : owm, 현재 : kma ->  accu
-	 */
-	private Set<WeatherProviderType> getOtherWeatherSourceTypes(WeatherProviderType requestWeatherProviderType,
-	                                                            WeatherProviderType lastWeatherProviderType) {
-		Set<WeatherProviderType> others = new HashSet<>();
-
-		if (requestWeatherProviderType == WeatherProviderType.KMA_WEB) {
-
-			if (lastWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
-				others.add(WeatherProviderType.MET_NORWAY);
-			} else if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
-				others.add(WeatherProviderType.OWM_ONECALL);
-			} else {
-				others.add(WeatherProviderType.OWM_ONECALL);
-				others.add(WeatherProviderType.MET_NORWAY);
-			}
-		} else if (requestWeatherProviderType == WeatherProviderType.KMA_API) {
-
-			if (lastWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
-				others.add(WeatherProviderType.MET_NORWAY);
-			} else if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
-				others.add(WeatherProviderType.OWM_ONECALL);
-			} else {
-				others.add(WeatherProviderType.OWM_ONECALL);
-				others.add(WeatherProviderType.MET_NORWAY);
-			}
-		} else if (requestWeatherProviderType == WeatherProviderType.MET_NORWAY) {
-
-			if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
-				if (countryCode != null && countryCode.equals("KR")) {
-					others.add(WeatherProviderType.OWM_ONECALL);
-					others.add(WeatherProviderType.KMA_WEB);
-				} else {
-					others.add(WeatherProviderType.OWM_ONECALL);
-				}
-			} else if (lastWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
-				if (countryCode != null && countryCode.equals("KR")) {
-
-					others.add(WeatherProviderType.KMA_WEB);
-				}
-			} else {
-				others.add(WeatherProviderType.OWM_ONECALL);
-			}
-		} else if (requestWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
-
-			if (lastWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
-				if (countryCode != null && countryCode.equals("KR")) {
-
-					others.add(WeatherProviderType.MET_NORWAY);
-					others.add(WeatherProviderType.KMA_WEB);
-				} else {
-					others.add(WeatherProviderType.MET_NORWAY);
-				}
-			} else if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
-				if (countryCode != null && countryCode.equals("KR")) {
-
-					others.add(WeatherProviderType.KMA_WEB);
-				}
-			} else {
-				others.add(WeatherProviderType.MET_NORWAY);
-			}
-		} else if (requestWeatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
-
-			if (lastWeatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
-				if (countryCode != null && countryCode.equals("KR")) {
-
-					others.add(WeatherProviderType.MET_NORWAY);
-					others.add(WeatherProviderType.KMA_WEB);
-				} else {
-					others.add(WeatherProviderType.MET_NORWAY);
-				}
-			} else if (lastWeatherProviderType == WeatherProviderType.MET_NORWAY) {
-				if (countryCode != null && countryCode.equals("KR")) {
-
-					others.add(WeatherProviderType.KMA_WEB);
-				}
-			} else {
-				others.add(WeatherProviderType.MET_NORWAY);
-			}
-		}
-
-		return others;
-	}
-
-	private void reRefreshBySameWeatherSource(ResponseResultObj responseResultObj) {
-		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
-
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				MainProcessing.reRequestWeatherDataBySameWeatherSourceIfFailed(getContext(), latitude, longitude, responseResultObj.requestWeatherSources,
-						responseResultObj.weatherRestApiDownloader);
-			}
-		});
-
-	}
-
-	private void reRefreshByAnotherWeatherSource(ResponseResultObj responseResultObj) {
-		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), null);
-
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				ArrayMap<WeatherProviderType, RequestWeatherSource> newRequestWeatherSources = new ArrayMap<>();
-				setRequestWeatherSourceWithSourceTypes(responseResultObj.weatherProviderTypeSet, newRequestWeatherSources);
-				responseResultObj.requestWeatherSources = newRequestWeatherSources;
-
-				MainProcessing.reRequestWeatherDataByAnotherWeatherSourceIfFailed(getContext(), latitude, longitude,
-						responseResultObj.requestWeatherSources, responseResultObj.weatherRestApiDownloader);
-			}
-		});
-
-	}
-
-	private void setRequestWeatherSourceWithSourceTypes(Set<WeatherProviderType> weatherProviderTypeSet,
-	                                                    ArrayMap<WeatherProviderType, RequestWeatherSource> newRequestWeatherSources) {
-		if (weatherProviderTypeSet.contains(WeatherProviderType.KMA_WEB)) {
-			RequestKma requestKma = new RequestKma();
-			requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST).addRequestServiceType(
-							RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).addRequestServiceType(
-							RetrofitClient.ServiceType.KMA_VILAGE_FCST).addRequestServiceType(
-							RetrofitClient.ServiceType.KMA_MID_LAND_FCST).addRequestServiceType(RetrofitClient.ServiceType.KMA_MID_TA_FCST)
-					.addRequestServiceType(RetrofitClient.ServiceType.KMA_YESTERDAY_ULTRA_SRT_NCST);
-			newRequestWeatherSources.put(WeatherProviderType.KMA_WEB, requestKma);
-		}
-		if (weatherProviderTypeSet.contains(WeatherProviderType.KMA_WEB)) {
-			RequestKma requestKma = new RequestKma();
-			requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS).addRequestServiceType(
-					RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
-			newRequestWeatherSources.put(WeatherProviderType.KMA_WEB, requestKma);
-		}
-		if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_ONECALL)) {
-			RequestOwmOneCall requestOwmOneCall = new RequestOwmOneCall();
-			requestOwmOneCall.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
-			Set<OneCallParameter.OneCallApis> excludes = new HashSet<>();
-			excludes.add(OneCallParameter.OneCallApis.minutely);
-			excludes.add(OneCallParameter.OneCallApis.alerts);
-			requestOwmOneCall.setExcludeApis(excludes);
-
-			newRequestWeatherSources.put(WeatherProviderType.OWM_ONECALL, requestOwmOneCall);
-		}
-		if (weatherProviderTypeSet.contains(WeatherProviderType.MET_NORWAY)) {
-			RequestMet requestMet = new RequestMet();
-			requestMet.addRequestServiceType(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
-
-			newRequestWeatherSources.put(WeatherProviderType.MET_NORWAY, requestMet);
-		}
-		if (weatherProviderTypeSet.contains(WeatherProviderType.ACCU_WEATHER)) {
-			RequestAccu requestAccu = new RequestAccu();
-			requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).addRequestServiceType(
-					RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST).addRequestServiceType(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST);
-
-			newRequestWeatherSources.put(WeatherProviderType.ACCU_WEATHER, requestAccu);
-		}
-		if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_INDIVIDUAL)) {
-			RequestOwmIndividual requestOwmIndividual = new RequestOwmIndividual();
-			requestOwmIndividual.addRequestServiceType(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS).addRequestServiceType(
-					RetrofitClient.ServiceType.OWM_HOURLY_FORECAST).addRequestServiceType(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
-
-			newRequestWeatherSources.put(WeatherProviderType.OWM_INDIVIDUAL, requestOwmIndividual);
-		}
-		if (weatherProviderTypeSet.contains(WeatherProviderType.AQICN)) {
-			RequestAqicn requestAqicn = new RequestAqicn();
-			requestAqicn.addRequestServiceType(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
-
-			newRequestWeatherSources.put(WeatherProviderType.AQICN, requestAqicn);
-		}
-
+				AlertFragment.class.getName()).setPrimaryNavigationFragment(alertFragment).commitNow();
 	}
 
 
@@ -1244,7 +936,7 @@ public class WeatherFragment extends Fragment implements IGps {
 			String pty = finalCurrentConditions.getPrecipitationType();
 
 			currentConditionsWeatherVal = pty.equals("0") ? sky + "_sky" : pty + "_pty";
-			mainWeatherProviderType = WeatherProviderType.KMA_API;
+			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.KMA_API;
 
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.KMA_WEB)) {
 			arrayMap = responseMap.get(WeatherProviderType.KMA_WEB);
@@ -1266,7 +958,7 @@ public class WeatherFragment extends Fragment implements IGps {
 			String pty = kmaCurrentConditions.getPty();
 
 			currentConditionsWeatherVal = pty.isEmpty() ? kmaHourlyForecasts.get(0).getWeatherDescription() : pty;
-			mainWeatherProviderType = WeatherProviderType.KMA_WEB;
+			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.KMA_WEB;
 
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.ACCU_WEATHER)) {
 			arrayMap = responseMap.get(WeatherProviderType.ACCU_WEATHER);
@@ -1290,7 +982,7 @@ public class WeatherFragment extends Fragment implements IGps {
 					accuDailyForecastsResponse.getDailyForecasts());
 
 			currentConditionsWeatherVal = accuCurrentConditionsResponse.getItems().get(0).getWeatherIcon();
-			mainWeatherProviderType = WeatherProviderType.ACCU_WEATHER;
+			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.ACCU_WEATHER;
 
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_ONECALL)) {
 			arrayMap = responseMap.get(WeatherProviderType.OWM_ONECALL);
@@ -1298,18 +990,18 @@ public class WeatherFragment extends Fragment implements IGps {
 			OwmOneCallResponse owmOneCallResponse =
 					(OwmOneCallResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponseObj();
 
-			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(getContext(), owmOneCallResponse, zoneId
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(getContext(), owmOneCallResponse, weatherFragmentViewModel.zoneId
 			);
 
-			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(), owmOneCallResponse, zoneId
+			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(), owmOneCallResponse, weatherFragmentViewModel.zoneId
 			);
 
-			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(getContext(), owmOneCallResponse, zoneId
+			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(getContext(), owmOneCallResponse, weatherFragmentViewModel.zoneId
 			);
 
 			currentConditionsWeatherVal = owmOneCallResponse.getCurrent().getWeather().get(0).getId();
 
-			mainWeatherProviderType = WeatherProviderType.OWM_ONECALL;
+			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.OWM_ONECALL;
 
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_INDIVIDUAL)) {
 			arrayMap = responseMap.get(WeatherProviderType.OWM_INDIVIDUAL);
@@ -1321,18 +1013,18 @@ public class WeatherFragment extends Fragment implements IGps {
 			OwmDailyForecastResponse owmDailyForecastResponse =
 					(OwmDailyForecastResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST).getResponseObj();
 
-			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(getContext(), owmCurrentConditionsResponse, zoneId
+			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(getContext(), owmCurrentConditionsResponse, weatherFragmentViewModel.zoneId
 			);
 
 			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(getContext(),
-					owmHourlyForecastResponse, zoneId);
+					owmHourlyForecastResponse, weatherFragmentViewModel.zoneId);
 
 			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(getContext(),
-					owmDailyForecastResponse, zoneId);
+					owmDailyForecastResponse, weatherFragmentViewModel.zoneId);
 
 			currentConditionsWeatherVal = owmCurrentConditionsResponse.getWeather().get(0).getId();
 
-			mainWeatherProviderType = WeatherProviderType.OWM_INDIVIDUAL;
+			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.OWM_INDIVIDUAL;
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.MET_NORWAY)) {
 			arrayMap = responseMap.get(WeatherProviderType.MET_NORWAY);
 
@@ -1340,17 +1032,17 @@ public class WeatherFragment extends Fragment implements IGps {
 					(LocationForecastResponse) arrayMap.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST).getResponseObj();
 
 			currentConditionsDto = MetNorwayResponseProcessor.makeCurrentConditionsDto(getContext(), locationForecastResponse
-					, zoneId);
+					, weatherFragmentViewModel.zoneId);
 
-			hourlyForecastDtoList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(getContext(), locationForecastResponse, zoneId);
+			hourlyForecastDtoList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(getContext(), locationForecastResponse, weatherFragmentViewModel.zoneId);
 
-			dailyForecastDtoList = MetNorwayResponseProcessor.makeDailyForecastDtoList(getContext(), locationForecastResponse, zoneId);
+			dailyForecastDtoList = MetNorwayResponseProcessor.makeDailyForecastDtoList(getContext(), locationForecastResponse, weatherFragmentViewModel.zoneId);
 
 			currentConditionsWeatherVal = locationForecastResponse.getProperties().getTimeSeries().get(0)
 					.getData().getNext_1_hours().getSummary().getSymbolCode().replace("day", "").replace("night", "")
 					.replace("_", "");
 
-			mainWeatherProviderType = WeatherProviderType.MET_NORWAY;
+			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.MET_NORWAY;
 		}
 
 		WeatherRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherProviderType.AQICN).get(
@@ -1362,15 +1054,15 @@ public class WeatherFragment extends Fragment implements IGps {
 		}
 
 		final AirQualityDto airQualityDto = AqicnResponseProcessor.makeAirQualityDto(airQualityResponse,
-				ZonedDateTime.now(zoneId).getOffset());
+				ZonedDateTime.now(weatherFragmentViewModel.zoneId).getOffset());
 
 		final Bundle defaultBundle = new Bundle();
-		defaultBundle.putDouble(BundleKey.Latitude.name(), this.latitude);
-		defaultBundle.putDouble(BundleKey.Longitude.name(), this.longitude);
-		defaultBundle.putString(BundleKey.AddressName.name(), addressName);
-		defaultBundle.putString(BundleKey.CountryCode.name(), countryCode);
-		defaultBundle.putSerializable(BundleKey.WeatherProvider.name(), mainWeatherProviderType);
-		defaultBundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
+		defaultBundle.putDouble(BundleKey.Latitude.name(), weatherFragmentViewModel.latitude);
+		defaultBundle.putDouble(BundleKey.Longitude.name(), weatherFragmentViewModel.longitude);
+		defaultBundle.putString(BundleKey.AddressName.name(), weatherFragmentViewModel.addressName);
+		defaultBundle.putString(BundleKey.CountryCode.name(), weatherFragmentViewModel.countryCode);
+		defaultBundle.putSerializable(BundleKey.WeatherProvider.name(), weatherFragmentViewModel.mainWeatherProviderType);
+		defaultBundle.putSerializable(BundleKey.TimeZone.name(), weatherFragmentViewModel.zoneId);
 
 		// simple current conditions ------------------------------------------------------------------------------------------------------
 		final Bundle simpleCurrentConditionsBundle = new Bundle();
@@ -1417,7 +1109,7 @@ public class WeatherFragment extends Fragment implements IGps {
 		detailCurrentConditionsFragment.setArguments(detailCurrentConditionsBundle);
 
 		final String finalCurrentConditionsWeatherVal = currentConditionsWeatherVal;
-		final ZoneId finalZoneId = zoneId;
+		final ZoneId finalZoneId = weatherFragmentViewModel.zoneId;
 
 		String precipitationVolume = null;
 		if (currentConditionsDto.isHasPrecipitationVolume()) {
@@ -1431,48 +1123,40 @@ public class WeatherFragment extends Fragment implements IGps {
 
 		if (getActivity() != null) {
 			FlickrRepository.FlickrRequestParameter flickrRequestParameter = new FlickrRepository.FlickrRequestParameter(
-					mainWeatherProviderType, finalCurrentConditionsWeatherVal, latitude, longitude,
+					weatherFragmentViewModel.mainWeatherProviderType, finalCurrentConditionsWeatherVal, latitude, longitude,
 					finalZoneId, finalPrecipitationVolume,
 					ZonedDateTime.parse(weatherRestApiDownloader.getRequestDateTime().toString())
 			);
 
-			dateTimeFormatter = DateTimeFormatter.ofPattern(
+			weatherFragmentViewModel.dateTimeFormatter = DateTimeFormatter.ofPattern(
 					MyApplication.VALUE_UNIT_OBJ.getClockUnit() == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
 							getString(R.string.datetime_pattern_clock24), Locale.getDefault());
 
-			MainThreadWorker.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					loadImgOfCurrentConditions(flickrRequestParameter);
+			MainThreadWorker.runOnUiThread(() -> {
+				changeWeatherDataSourcePicker(weatherFragmentViewModel.countryCode);
+				binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(weatherFragmentViewModel.dateTimeFormatter));
 
-					changeWeatherDataSourcePicker(countryCode);
-					binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(dateTimeFormatter));
+				FragmentManager fragmentManager = getChildFragmentManager();
+				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-					FragmentManager fragmentManager = getChildFragmentManager();
-					FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+				fragmentTransaction
+						.replace(binding.simpleCurrentConditions.getId(),
+								simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment))
+						.replace(binding.simpleHourlyForecast.getId(), simpleHourlyForecastFragment,
+								getString(R.string.tag_simple_hourly_forecast_fragment))
+						.replace(binding.simpleDailyForecast.getId(), simpleDailyForecastFragment, getString(R.string.tag_simple_daily_forecast_fragment))
+						.replace(binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
+								getString(R.string.tag_detail_current_conditions_fragment))
+						.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment))
+						.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
+								getString(R.string.tag_sun_set_rise_fragment))
+						.replace(binding.radar.getId(), rainViewerFragment,
+								SimpleRainViewerFragment.class.getName())
+						.commitNow();
 
-					if (fragmentManager.findFragmentByTag(AlertFragment.class.getName()) != null) {
-						fragmentTransaction.remove(fragmentManager.findFragmentByTag(AlertFragment.class.getName()));
-					}
-
-					fragmentTransaction
-							.replace(binding.simpleCurrentConditions.getId(),
-									simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment))
-							.replace(binding.simpleHourlyForecast.getId(), simpleHourlyForecastFragment,
-									getString(R.string.tag_simple_hourly_forecast_fragment))
-							.replace(binding.simpleDailyForecast.getId(), simpleDailyForecastFragment, getString(R.string.tag_simple_daily_forecast_fragment))
-							.replace(binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
-									getString(R.string.tag_detail_current_conditions_fragment))
-							.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment))
-							.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
-									getString(R.string.tag_sun_set_rise_fragment))
-							.replace(binding.radar.getId(), rainViewerFragment,
-									SimpleRainViewerFragment.class.getName())
-							.commitNow();
-
-					ProgressDialog.clearDialogs();
-					shimmer(false);
-				}
+				loadImgOfCurrentConditions(flickrRequestParameter);
+				shimmer(false);
+				ProgressDialog.clearDialogs();
 			});
 
 		}
@@ -1481,7 +1165,7 @@ public class WeatherFragment extends Fragment implements IGps {
 	private void changeWeatherDataSourcePicker(String countryCode) {
 		String provide = getString(R.string.provide) + " : ";
 
-		switch (mainWeatherProviderType) {
+		switch (weatherFragmentViewModel.mainWeatherProviderType) {
 			case KMA_WEB:
 			case KMA_API:
 				binding.weatherDataSourceName.setText(new String(provide + getString(R.string.kma)));
@@ -1502,64 +1186,54 @@ public class WeatherFragment extends Fragment implements IGps {
 				break;
 		}
 
-		binding.weatherDataSourceLayout.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				CharSequence[] items = new CharSequence[countryCode != null && countryCode.equals("KR") ? 3 : 2];
-				int checkedItemIdx = 0;
+		binding.weatherDataSourceLayout.setOnClickListener(view -> {
+			CharSequence[] items = new CharSequence[countryCode != null && countryCode.equals("KR") ? 3 : 2];
+			int checkedItemIdx = 0;
 
-				if (countryCode != null && countryCode.equals("KR")) {
-					items[0] = getString(R.string.kma);
-					items[1] = getString(R.string.owm);
-					items[2] = getString(R.string.met);
+			if (countryCode != null && countryCode.equals("KR")) {
+				items[0] = getString(R.string.kma);
+				items[1] = getString(R.string.owm);
+				items[2] = getString(R.string.met);
 
-					if (mainWeatherProviderType == WeatherProviderType.KMA_WEB) {
-						checkedItemIdx = 0;
-					} else if (mainWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
-						checkedItemIdx = 1;
-					} else {
-						checkedItemIdx = 2;
-					}
+				if (weatherFragmentViewModel.mainWeatherProviderType == WeatherProviderType.KMA_WEB) {
+					checkedItemIdx = 0;
+				} else if (weatherFragmentViewModel.mainWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
+					checkedItemIdx = 1;
 				} else {
-					items[0] = getString(R.string.owm);
-					items[1] = getString(R.string.met);
-
-					if (mainWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
-						checkedItemIdx = 0;
-					} else {
-						checkedItemIdx = 1;
-					}
+					checkedItemIdx = 2;
 				}
-				final int finalCheckedItemIdx = checkedItemIdx;
+			} else {
+				items[0] = getString(R.string.owm);
+				items[1] = getString(R.string.met);
 
-				new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.title_pick_weather_data_source).setSingleChoiceItems(items,
-						checkedItemIdx, new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialogInterface, int index) {
-								WeatherProviderType lastWeatherProviderType = mainWeatherProviderType;
-								WeatherProviderType newWeatherProviderType;
-
-								if (finalCheckedItemIdx != index) {
-									if (items[index].equals(getString(R.string.kma))) {
-										newWeatherProviderType = WeatherProviderType.KMA_WEB;
-									} else if (items[index].equals(getString(R.string.met))) {
-										newWeatherProviderType = WeatherProviderType.MET_NORWAY;
-									} else {
-										newWeatherProviderType = WeatherProviderType.OWM_ONECALL;
-									}
-									requestNewDataWithAnotherWeatherSource(newWeatherProviderType, lastWeatherProviderType);
-								}
-								dialogInterface.dismiss();
-							}
-						}).create().show();
+				if (weatherFragmentViewModel.mainWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
+					checkedItemIdx = 0;
+				} else {
+					checkedItemIdx = 1;
+				}
 			}
+			final int finalCheckedItemIdx = checkedItemIdx;
+
+			new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.title_pick_weather_data_source).setSingleChoiceItems(items,
+					checkedItemIdx, (dialogInterface, index) -> {
+						WeatherProviderType lastWeatherProviderType = weatherFragmentViewModel.mainWeatherProviderType;
+						WeatherProviderType newWeatherProviderType;
+
+						if (finalCheckedItemIdx != index) {
+							if (items[index].equals(getString(R.string.kma))) {
+								newWeatherProviderType = WeatherProviderType.KMA_WEB;
+							} else if (items[index].equals(getString(R.string.met))) {
+								newWeatherProviderType = WeatherProviderType.MET_NORWAY;
+							} else {
+								newWeatherProviderType = WeatherProviderType.OWM_ONECALL;
+							}
+							requestNewDataWithAnotherWeatherSource(newWeatherProviderType, lastWeatherProviderType);
+						}
+						dialogInterface.dismiss();
+					}).create().show();
 		});
 	}
 
-
-	public LocationType getLocationType() {
-		return locationType;
-	}
 
 	private void shimmer(boolean showShimmer) {
 		if (showShimmer) {
@@ -1574,11 +1248,11 @@ public class WeatherFragment extends Fragment implements IGps {
 	}
 
 
-	private static final class ResponseResultObj implements Serializable {
-		WeatherRestApiDownloader weatherRestApiDownloader;
-		Set<WeatherProviderType> weatherProviderTypeSet;
-		WeatherProviderType mainWeatherProviderType;
-		ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources;
+	public static final class ResponseResultObj implements Serializable {
+		public WeatherRestApiDownloader weatherRestApiDownloader;
+		public Set<WeatherProviderType> weatherProviderTypeSet;
+		public WeatherProviderType mainWeatherProviderType;
+		public ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources;
 
 		public ResponseResultObj(Set<WeatherProviderType> weatherProviderTypeSet,
 		                         ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources, WeatherProviderType mainWeatherProviderType) {
@@ -1589,10 +1263,10 @@ public class WeatherFragment extends Fragment implements IGps {
 	}
 
 	public static final class WeatherResponseObj implements Serializable {
-		final WeatherRestApiDownloader weatherRestApiDownloader;
-		final Set<WeatherProviderType> requestWeatherProviderTypeSet;
-		final WeatherProviderType requestMainWeatherProviderType;
-		LocalDateTime dataDownloadedDateTime;
+		public final WeatherRestApiDownloader weatherRestApiDownloader;
+		public final Set<WeatherProviderType> requestWeatherProviderTypeSet;
+		public final WeatherProviderType requestMainWeatherProviderType;
+		public LocalDateTime dataDownloadedDateTime;
 
 		public WeatherResponseObj(WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherProviderType> requestWeatherProviderTypeSet, WeatherProviderType requestMainWeatherProviderType) {
 			this.weatherRestApiDownloader = weatherRestApiDownloader;

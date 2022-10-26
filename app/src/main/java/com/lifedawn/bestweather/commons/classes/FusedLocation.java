@@ -57,6 +57,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 	private FusedLocationProviderClient fusedLocationClient;
 	private LocationManager locationManager;
 	private Context context;
+	private NetworkStatus networkStatus;
 	private Map<MyLocationCallback, LocationRequestObj> locationRequestObjMap = new ConcurrentHashMap<>();
 	private TimerTask timerTask;
 	private Timer timer = new Timer();
@@ -65,6 +66,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		this.context = context;
 		fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+		networkStatus = NetworkStatus.getInstance(context);
 	}
 
 	@Override
@@ -104,17 +106,15 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 			myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
 		} else {
 			if (checkDefaultPermissions()) {
-
 				if (isBackground && !checkBackgroundLocationPermission()) {
 					myLocationCallback.onFailed(MyLocationCallback.Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION);
 					return;
 				}
 				notifyNotification();
-
 				CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
 				LocationRequest locationRequest =
-						new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY).setWaitForAccurateLocation(false).build();
+						new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY).build();
 
 				final LocationCallback locationCallback = new LocationCallback() {
 					@Override
@@ -133,12 +133,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 								final Double latitude = location.getLatitude();
 								final Double longitude = location.getLongitude();
 
-								TimeZoneUtils.Companion.getTimeZone(latitude, longitude, new TimeZoneUtils.TimeZoneCallback() {
-									@Override
-									public void onResult(@NonNull ZoneId zoneId) {
-										onResultTimeZone(latitude, longitude, zoneId, myLocationCallback, locationResult);
-									}
-								});
+								TimeZoneUtils.Companion.getTimeZone(latitude, longitude, zoneId -> onResultTimeZone(latitude, longitude, zoneId, myLocationCallback, locationResult));
 
 							} else {
 								myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
@@ -264,7 +259,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 	}
 
 	public boolean isOnNetwork() {
-		return locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+		return networkStatus.networkAvailable();
 	}
 
 	public void onDisabledGps(Activity activity, LocationLifeCycleObserver locationLifeCycleObserver,

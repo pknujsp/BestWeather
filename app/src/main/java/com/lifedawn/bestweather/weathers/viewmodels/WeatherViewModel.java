@@ -29,7 +29,6 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 
 	private MutableLiveData<String> currentLocationLiveData = new MutableLiveData<>();
 
-	public final Map<String, WeatherFragment.WeatherResponseObj> FINAL_RESPONSE_MAP = new ConcurrentHashMap<>();
 
 	public final LiveData<List<FavoriteAddressDto>> favoriteAddressListLiveData;
 

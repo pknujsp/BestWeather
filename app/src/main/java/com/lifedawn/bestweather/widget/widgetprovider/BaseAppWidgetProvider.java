@@ -15,6 +15,7 @@ import androidx.work.OutOfQuotaPolicy;
 import androidx.work.WorkManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
@@ -22,6 +23,8 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.work.WidgetListenableWorker;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 
@@ -82,18 +85,39 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
+		super.onDeleted(context, appWidgetIds);
+
+		final BackgroundWorkCallback backgroundWorkCallback = new BackgroundWorkCallback() {
+			final int allDeletedCount = appWidgetIds.length;
+			final AtomicInteger deletedCount = new AtomicInteger(0);
+
+			@Override
+			public void onFinished() {
+				if (deletedCount.getAndIncrement() == allDeletedCount) {
+					AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+
+					if (appWidgetManager.getInstalledProviders().isEmpty()) {
+						WidgetHelper widgetHelper = new WidgetHelper(context);
+						widgetHelper.cancelAutoRefresh();
+					}
+				}
+			}
+		};
+
 		WidgetRepository widgetRepository = WidgetRepository.getINSTANCE();
 		for (int appWidgetId : appWidgetIds)
-			widgetRepository.delete(appWidgetId, null);
+			widgetRepository.delete(appWidgetId, new DbQueryCallback<Boolean>() {
+				@Override
+				public void onResultSuccessful(Boolean result) {
+					backgroundWorkCallback.onFinished();
+				}
 
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+				@Override
+				public void onResultNoData() {
 
-		if (appWidgetManager.getInstalledProviders().isEmpty()) {
-			WidgetHelper widgetHelper = new WidgetHelper(context);
-			widgetHelper.cancelAutoRefresh();
-		}
+				}
+			});
 
-		super.onDeleted(context, appWidgetIds);
 	}
 
 
@@ -109,10 +133,10 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 						bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)).build();
 				startWork(context, action, data);
 			} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-
 				startWork(context, action, null);
 			} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-				startWork(context, action, null);
+				WidgetHelper widgetHelper = new WidgetHelper(context);
+				widgetHelper.reDrawWidgets(null);
 			} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW))) {
 				int[] arr = bundle.getIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS);
 				drawWidgets(context, AppWidgetManager.getInstance(context), arr);

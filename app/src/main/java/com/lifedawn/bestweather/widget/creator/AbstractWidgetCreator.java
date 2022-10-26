@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.widget.creator;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -217,7 +216,7 @@ public abstract class AbstractWidgetCreator {
 	protected void setBackgroundAlpha(RemoteViews remoteViews, int backgroundAlpha) {
 		float opacity = widgetDto.getBackgroundAlpha() / 100f;
 		int newBackgroundColor = (int) (opacity * 0xFF) << 24 | AppTheme.getColor(context, R.color.widgetBackgroundColor);
-		remoteViews.setInt(R.id.content_container, "setBackgroundColor", newBackgroundColor);
+		remoteViews.setInt(R.id.root_layout, "setBackgroundColor", newBackgroundColor);
 	}
 
 
@@ -454,40 +453,33 @@ public abstract class AbstractWidgetCreator {
 
 		Bitmap viewBmp = rootLayout.getDrawingCache();
 		remoteViews.setImageViewBitmap(R.id.bitmapValuesView, viewBmp);
+
 		return viewBmp;
 	}
 
 	protected final RemoteViews createBaseRemoteViews() {
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		int layoutId = appWidgetManager.getAppWidgetInfo(appWidgetId).initialLayout;
-
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), layoutId);
-		RemoteViewsUtil.onBeginProcess(remoteViews);
+		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_widget);
 		return remoteViews;
 	}
 
-	public void setResultViews(int appWidgetId, RemoteViews remoteViews,
+	public void setResultViews(int appWidgetId,
 	                           @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader,
 	                           @Nullable ZoneId zoneId) {
 		if (!widgetDto.isInitialized())
 			widgetDto.setInitialized(true);
 
 		if (widgetDto.isLoadSuccessful()) {
-			RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 			widgetDto.setLastErrorType(null);
 		} else {
-			if (widgetDto.getLastErrorType() == null) {
+			if (widgetDto.getLastErrorType() == null)
 				widgetDto.setLastErrorType(RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-			}
 
-			RemoteViewsUtil.onErrorProcess(remoteViews, context, widgetDto.getLastErrorType());
-			setRefreshPendingIntent(remoteViews);
 		}
 
 		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
-				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+				appWidgetManager.updateAppWidget(appWidgetId, createRemoteViews());
 			}
 
 			@Override

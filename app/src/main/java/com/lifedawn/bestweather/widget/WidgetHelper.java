@@ -3,13 +3,10 @@ package com.lifedawn.bestweather.widget;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProviderInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.ArrayMap;
 
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
@@ -17,19 +14,12 @@ import androidx.preference.PreferenceManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.IntentRequestCodes;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
-import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
-import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class WidgetHelper {
 	private Context context;
@@ -70,68 +60,37 @@ public class WidgetHelper {
 				PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_IMMUTABLE) != null;
 	}
 
-	public void reDrawWidgets(@Nullable BackgroundWorkCallback callback) {
+	public void reDrawWidgets(@Nullable BackgroundWorkCallback callback, int... appWidgetIds) {
 		WidgetRepository widgetRepository = WidgetRepository.getINSTANCE();
 		widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
 			@Override
 			public void onResultSuccessful(List<WidgetDto> result) {
 				if (result.size() > 0) {
-					Map<Class<?>, List<Integer>> widgetArrMap = new HashMap<>();
-					Map<Integer, WidgetDto> widgetDtoMap = new HashMap<>();
-					AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-
-					for (WidgetDto widgetDto : result) {
-						final AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(widgetDto.getAppWidgetId());
-						ComponentName componentName = appWidgetProviderInfo.provider;
-						final String providerClassName = componentName.getClassName();
-						try {
-							Class<?> cls = Class.forName(providerClassName);
-
-							if (!widgetArrMap.containsKey(cls)) {
-								widgetArrMap.put(cls, new ArrayList<>());
-							}
-							widgetArrMap.get(cls).add(widgetDto.getAppWidgetId());
-							widgetDtoMap.put(widgetDto.getAppWidgetId(), widgetDto);
-						} catch (ClassNotFoundException e) {
-							e.printStackTrace();
-							return;
-						}
-					}
+					long widgetRefreshInterval = getRefreshInterval();
+					if (widgetRefreshInterval > 0L && !isRepeating())
+						onSelectedAutoRefreshInterval(widgetRefreshInterval);
 
 					int requestCode = 200000;
-					Intent refreshIntent = null;
 
-					for (Class<?> cls : widgetArrMap.keySet()) {
-						try {
-							refreshIntent = new Intent(context, cls);
-							refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW));
+					Intent refreshIntent = new Intent(context, FirstWidgetProvider.class);
+					refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW));
 
-							Bundle bundle = new Bundle();
-							List<Integer> idList = widgetArrMap.get(cls);
-
-							int[] ids = new int[idList.size()];
-							int i = 0;
-							for (Integer id : idList) {
-								ids[i++] = id;
-							}
-
-							bundle.putIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-							refreshIntent.putExtras(bundle);
-
-							PendingIntent.getBroadcast(context, requestCode++, refreshIntent,
-									PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE).send();
-						} catch (PendingIntent.CanceledException e) {
-							e.printStackTrace();
-						}
+					Bundle bundle = new Bundle();
+					final int[] ids = new int[result.size()];
+					int idx = 0;
+					for (WidgetDto widgetDto : result) {
+						ids[idx++] = widgetDto.getAppWidgetId();
 					}
 
-					long widgetRefreshInterval = getRefreshInterval();
-					if (widgetRefreshInterval > 0L) {
-						if (!isRepeating()) {
-							onSelectedAutoRefreshInterval(widgetRefreshInterval);
-						}
-					}
+					bundle.putIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+					refreshIntent.putExtras(bundle);
 
+					try {
+						PendingIntent.getBroadcast(context, requestCode, refreshIntent,
+								PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE).send();
+					} catch (PendingIntent.CanceledException e) {
+						e.printStackTrace();
+					}
 
 				}
 

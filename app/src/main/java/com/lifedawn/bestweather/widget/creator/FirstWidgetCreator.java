@@ -182,14 +182,14 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	@Override
-	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, ZoneId zoneId) {
+	public void setResultViews(int appWidgetId, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, ZoneId zoneId) {
 		this.zoneId = zoneId;
 		ZoneOffset zoneOffset = null;
 
 		final WeatherProviderType weatherProviderType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet());
 		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, weatherRestApiDownloader,
 				weatherProviderType, zoneId);
-		AirQualityDto airQualityDto = null;
+
 		boolean successful = currentConditionsDto != null;
 
 		if (successful) {
@@ -197,24 +197,13 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 			zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 
 			widgetDto.setTimeZoneId(zoneId.getId());
-			setClockTimeZone(remoteViews);
-
-			airQualityDto = WeatherResponseProcessor.getAirQualityDto(weatherRestApiDownloader,
-					zoneOffset);
-			if (airQualityDto == null) {
-				airQualityDto = new AirQualityDto();
-				airQualityDto.setAqi(-1);
-			}
-
-			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto,
-					currentConditionsDto, null);
 
 			makeResponseTextToJson(weatherRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherProviderTypeSet(), widgetDto, zoneOffset);
 		}
 
 		widgetDto.setLoadSuccessful(successful);
 
-		super.setResultViews(appWidgetId, remoteViews, weatherRestApiDownloader, zoneId);
+		super.setResultViews(appWidgetId, weatherRestApiDownloader, zoneId);
 	}
 
 	@Override

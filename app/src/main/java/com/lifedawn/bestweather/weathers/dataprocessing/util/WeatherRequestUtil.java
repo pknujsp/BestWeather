@@ -62,9 +62,9 @@ public class WeatherRequestUtil {
 				MetNorwayResponseProcessor.init(context);
 				break;
 		}
-		if (aqi) {
+		if (aqi)
 			AqicnResponseProcessor.init(context);
-		}
+
 	}
 
 	public static void setRequestWeatherSourceWithSourceType(Set<WeatherProviderType> weatherProviderTypeSet,

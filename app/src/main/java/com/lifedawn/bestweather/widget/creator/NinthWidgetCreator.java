@@ -68,7 +68,6 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 
-
 	@Override
 	public Class<?> widgetProviderClass() {
 		return NinthWidgetProvider.class;
@@ -138,7 +137,6 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 			((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(hourlyForecastDtoList.get(cell).getWeatherIcon());
 
 
-
 			view.findViewById(R.id.temperature).setVisibility(View.GONE);
 			view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
 
@@ -202,12 +200,11 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 				hourlyForecastDtoList, null);
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		appWidgetManager.updateAppWidget(appWidgetId,
-				remoteViews);
+		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 
 	@Override
-	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, ZoneId zoneId) {
+	public void setResultViews(int appWidgetId, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, ZoneId zoneId) {
 		this.zoneId = zoneId;
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, weatherRestApiDownloader,
 				WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet()), zoneId);
@@ -218,16 +215,10 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 			widgetDto.setTimeZoneId(zoneId.getId());
 			widgetDto.setLastRefreshDateTime(weatherRestApiDownloader.getRequestDateTime().toString());
 
-			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
-					hourlyForecastDtoList, new OnDrawBitmapCallback() {
-						@Override
-						public void onCreatedBitmap(Bitmap bitmap) {
-
-						}
-					});
 			makeResponseTextToJson(weatherRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherProviderTypeSet(), widgetDto, zoneOffset);
 		}
+
 		widgetDto.setLoadSuccessful(successful);
-		super.setResultViews(appWidgetId, remoteViews, weatherRestApiDownloader, zoneId);
+		super.setResultViews(appWidgetId, weatherRestApiDownloader, zoneId);
 	}
 }

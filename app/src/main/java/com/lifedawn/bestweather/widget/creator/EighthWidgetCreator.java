@@ -65,7 +65,6 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 
-
 	@Override
 	public Class<?> widgetProviderClass() {
 		return EighthWidgetProvider.class;
@@ -159,9 +158,8 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 	public void setDataViewsOfSavedData() {
 		WeatherProviderType weatherProviderType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet());
 
-		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
+		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR"))
 			weatherProviderType = WeatherProviderType.KMA_WEB;
-		}
 
 		RemoteViews remoteViews = createRemoteViews();
 		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
@@ -186,7 +184,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 	@Override
-	public void setResultViews(int appWidgetId, RemoteViews remoteViews, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, ZoneId zoneId) {
+	public void setResultViews(int appWidgetId, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, ZoneId zoneId) {
 		this.zoneId = zoneId;
 		final WeatherProviderType mainWeatherProviderType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet());
 
@@ -195,7 +193,6 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, weatherRestApiDownloader,
 				mainWeatherProviderType, this.zoneId);
 
-		AirQualityDto airQualityDto = null;
 		final boolean successful = currentConditionsDto != null && !hourlyForecastDtoList.isEmpty();
 
 		if (successful) {
@@ -203,21 +200,11 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 			widgetDto.setTimeZoneId(zoneId.getId());
 			widgetDto.setLastRefreshDateTime(weatherRestApiDownloader.getRequestDateTime().toString());
 
-			airQualityDto = WeatherResponseProcessor.getAirQualityDto(weatherRestApiDownloader, zoneOffset);
-
-			setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto,
-					hourlyForecastDtoList, null, airQualityDto, new OnDrawBitmapCallback() {
-
-						@Override
-						public void onCreatedBitmap(Bitmap bitmap) {
-
-						}
-					});
 			makeResponseTextToJson(weatherRestApiDownloader, getRequestWeatherDataTypeSet(), widgetDto.getWeatherProviderTypeSet(), widgetDto, zoneOffset);
 		}
 
 		widgetDto.setLoadSuccessful(successful);
-		super.setResultViews(appWidgetId, remoteViews, weatherRestApiDownloader, zoneId);
+		super.setResultViews(appWidgetId, weatherRestApiDownloader, zoneId);
 	}
 
 }

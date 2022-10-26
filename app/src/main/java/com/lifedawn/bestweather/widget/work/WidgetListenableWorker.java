@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
-import android.os.PowerManager;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
@@ -35,7 +34,6 @@ import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
-import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
@@ -81,9 +79,9 @@ public class WidgetListenableWorker extends ListenableWorker {
 	private final Map<Integer, WidgetDto> selectedLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
 	private final Map<Integer, WidgetDto> allWidgetDtoArrayMap = new ConcurrentHashMap<>();
 	private final Map<Integer, Class<?>> allWidgetProviderClassArrayMap = new ConcurrentHashMap<>();
-	private final Map<Integer, RemoteViews> remoteViewsArrayMap = new ConcurrentHashMap<>();
+	//private final Map<Integer, RemoteViews> remoteViewsArrayMap = new ConcurrentHashMap<>();
 	private final Map<Integer, WeatherRestApiDownloader> multipleRestApiDownloaderMap = new ConcurrentHashMap<>();
-	private Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new ConcurrentHashMap<>();
+	private final Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new ConcurrentHashMap<>();
 
 	private WeatherRestApiDownloader currentLocationResponseWeatherRestApiDownloader;
 	private final Map<String, WeatherRestApiDownloader> selectedLocationResponseMap = new ConcurrentHashMap<>();
@@ -93,10 +91,10 @@ public class WidgetListenableWorker extends ListenableWorker {
 
 	private WidgetRepository widgetRepository;
 	private AppWidgetManager appWidgetManager;
-	private ExecutorService executorService = MyApplication.getExecutorService();
+	private final ExecutorService executorService = MyApplication.getExecutorService();
 	private FusedLocation fusedLocation;
 	private int requestCount;
-	private AtomicInteger responseCount = new AtomicInteger(0);
+	private final AtomicInteger responseCount = new AtomicInteger(0);
 	private final String ACTION;
 	private final int APP_WIDGET_ID;
 
@@ -123,7 +121,7 @@ public class WidgetListenableWorker extends ListenableWorker {
 		allWidgetDtoArrayMap.clear();
 		allWidgetProviderClassArrayMap.clear();
 
-		remoteViewsArrayMap.clear();
+		//remoteViewsArrayMap.clear();
 		multipleRestApiDownloaderMap.clear();
 		widgetCreatorMap.clear();
 	}
@@ -146,8 +144,8 @@ public class WidgetListenableWorker extends ListenableWorker {
 							widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
 						}
 
-						remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),
-								widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
+						//remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),
+						//widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
 						requestCount = 1;
 
 						if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
@@ -192,8 +190,8 @@ public class WidgetListenableWorker extends ListenableWorker {
 							AbstractWidgetCreator widgetCreator = createWidgetViewCreator(widgetDto.getAppWidgetId(),
 									widgetDto.getWidgetProviderClassName());
 
-							remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),
-									widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
+							//remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),
+							//		widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
 
 							if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
 								currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
@@ -240,9 +238,6 @@ public class WidgetListenableWorker extends ListenableWorker {
 						backgroundWorkCallback.onFinished();
 					}
 				});
-			} else if (ACTION.equals(Intent.ACTION_BOOT_COMPLETED) || ACTION.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-				WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
-				widgetHelper.reDrawWidgets(backgroundWorkCallback);
 			}
 
 			return backgroundWorkCallback;
@@ -311,11 +306,12 @@ public class WidgetListenableWorker extends ListenableWorker {
 	}
 
 	private void showProgressBar() {
-		for (Integer appWidgetId : allWidgetDtoArrayMap.keySet()) {
-			RemoteViews remoteViews = remoteViewsArrayMap.get(appWidgetId);
-			RemoteViewsUtil.onBeginProcess(remoteViews);
-			appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-		}
+		AbstractWidgetCreator tempWidgetCreator = new EighthWidgetCreator(getApplicationContext(), null, 0);
+		RemoteViews tempRemoteViews = tempWidgetCreator.createRemoteViews();
+
+		for (Integer appWidgetId : allWidgetDtoArrayMap.keySet())
+			appWidgetManager.updateAppWidget(appWidgetId, tempRemoteViews);
+
 	}
 
 
@@ -510,7 +506,7 @@ public class WidgetListenableWorker extends ListenableWorker {
 
 			AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);
 			widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
-			widgetCreator.setResultViews(appWidgetId, remoteViewsArrayMap.get(appWidgetId),
+			widgetCreator.setResultViews(appWidgetId,
 					multipleRestApiDownloaderMap.get(appWidgetId), restApiDownloader.getZoneId());
 		}
 
@@ -521,8 +517,7 @@ public class WidgetListenableWorker extends ListenableWorker {
 			currentLocationRequestObj = null;
 		}
 
-		responseCount.incrementAndGet();
-		if (responseCount.get() == requestCount) {
+		if (responseCount.incrementAndGet() == requestCount) {
 			backgroundWorkCallback.onFinished();
 		}
 	}

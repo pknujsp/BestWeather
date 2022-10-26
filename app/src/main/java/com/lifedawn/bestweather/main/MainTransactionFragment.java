@@ -275,14 +275,11 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			}
 		});
 
-		weatherViewModel.getCurrentLocationLiveData().observe(getViewLifecycleOwner(), new Observer<String>() {
-			@Override
-			public void onChanged(String addressName) {
-				currentAddressName = addressName;
+		weatherViewModel.getCurrentLocationLiveData().observe(getViewLifecycleOwner(), addressName -> {
+			currentAddressName = addressName;
 
-				if (currentAddressName != null) {
-					binding.sideNavMenu.addressName.setText(currentAddressName);
-				}
+			if (currentAddressName != null) {
+				binding.sideNavMenu.addressName.setText(currentAddressName);
 			}
 		});
 

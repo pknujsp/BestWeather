@@ -19,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class NetworkStatus {
 	private static NetworkStatus instance;
-	private ConnectivityManager connectivityManager;
-	private NetworkRequest networkRequest;
+	private final ConnectivityManager connectivityManager;
+	private final NetworkRequest networkRequest;
 
 	public static NetworkStatus getInstance(Context context) {
 		if (instance == null) {
@@ -29,7 +29,7 @@ public class NetworkStatus {
 		return instance;
 	}
 
-	public NetworkStatus(Context context) {
+	private NetworkStatus(Context context) {
 		NetworkRequest.Builder builder = new NetworkRequest.Builder();
 		builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI);
 		builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR);
@@ -52,8 +52,7 @@ public class NetworkStatus {
 
 
 	public boolean networkAvailable() {
-		NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-		return activeNetwork != null;
+		return connectivityManager.getActiveNetworkInfo() != null;
 	}
 
 }
