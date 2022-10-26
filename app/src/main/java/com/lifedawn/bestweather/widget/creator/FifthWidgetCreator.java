@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.widget.creator;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,15 +40,8 @@ import java.util.List;
 import java.util.Set;
 
 public class FifthWidgetCreator extends AbstractWidgetCreator {
-	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 
-	private int addressTextSize;
-	private int refreshDateTimeTextSize;
-	private int hourTextSize;
-	private int tempTextSize;
-	private int popTextSize;
-	private int rainVolumeTextSize;
-	private int snowVolumeTextSize;
+
 
 	private final int cellCount = 9;
 
@@ -79,45 +71,12 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 	}
 
 
-	@Override
-	public RemoteViews createRemoteViews() {
-		RemoteViews remoteViews = createBaseRemoteViews();
-		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
-
-		return remoteViews;
-	}
 
 	@Override
 	public Class<?> widgetProviderClass() {
 		return FifthWidgetProvider.class;
 	}
 
-	@Override
-	public void setTextSize(int amount) {
-		final int absSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, Math.abs(amount),
-				context.getResources().getDisplayMetrics());
-		final int extraSize = amount >= 0 ? absSize : absSize * -1;
-
-		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInCommonWidgetHeader) + extraSize;
-		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshDateTimeTextSizeInCommonWidgetHeader) + extraSize;
-		hourTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTimeTextSizeInSimpleWidgetForecastItem) + extraSize;
-		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInSimpleWidgetForecastItem) + extraSize;
-		popTextSize = context.getResources().getDimensionPixelSize(R.dimen.popTextSizeInSimpleWidgetForecastItem) + extraSize;
-		rainVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.rainVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
-		snowVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.snowVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
-	}
-
-
-	public View makeHeaderViews(LayoutInflater layoutInflater, String addressName, String lastRefreshDateTime) {
-		View view = layoutInflater.inflate(R.layout.header_view_in_widget, null, false);
-		((TextView) view.findViewById(R.id.address)).setText(addressName);
-		((TextView) view.findViewById(R.id.refresh)).setText(ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-
-		((TextView) view.findViewById(R.id.address)).setTextSize(TypedValue.COMPLEX_UNIT_PX, addressTextSize);
-		((TextView) view.findViewById(R.id.refresh)).setTextSize(TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
-
-		return view;
-	}
 
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, CurrentConditionsDto currentConditionsDto,
 	                         List<HourlyForecastDto> hourlyForecastDtoList, OnDrawBitmapCallback onDrawBitmapCallback) {
@@ -195,7 +154,7 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 					rain = hourlyForecastDtoList.get(cell).isHasRain() ? hourlyForecastDtoList.get(cell).getRainVolume() :
 							hourlyForecastDtoList.get(cell).getPrecipitationVolume();
 					((TextView) view.findViewById(R.id.rainVolume)).setText(rain.replace(mm, "").replace(cm, ""));
-					((TextView) view.findViewById(R.id.rainVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, rainVolumeTextSize);
+
 				} else {
 					view.findViewById(R.id.rainVolumeLayout).setVisibility(View.INVISIBLE);
 				}
@@ -207,7 +166,7 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 				if (hourlyForecastDtoList.get(cell).isHasSnow()) {
 					((TextView) view.findViewById(R.id.snowVolume)).setText(hourlyForecastDtoList.get(cell).getSnowVolume().replace(mm
 							, "").replace(cm, ""));
-					((TextView) view.findViewById(R.id.snowVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, snowVolumeTextSize);
+
 				} else {
 					view.findViewById(R.id.snowVolumeLayout).setVisibility(View.INVISIBLE);
 				}
@@ -215,8 +174,6 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 				view.findViewById(R.id.snowVolumeLayout).setVisibility(View.GONE);
 			}
 
-			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourTextSize);
-			((TextView) view.findViewById(R.id.pop)).setTextSize(TypedValue.COMPLEX_UNIT_PX, popTextSize);
 
 			view.findViewById(R.id.temperature).setVisibility(View.GONE);
 			view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
@@ -236,7 +193,6 @@ public class FifthWidgetCreator extends AbstractWidgetCreator {
 		tempRowLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 
 		DetailSingleTemperatureView detailSingleTemperatureView = new DetailSingleTemperatureView(context, tempList);
-		detailSingleTemperatureView.setTempTextSizePx(tempTextSize);
 
 		rootLayout.addView(headerView, headerViewLayoutParams);
 		rootLayout.addView(hourAndIconLinearLayout, hourAndIconRowLayoutParams);

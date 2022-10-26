@@ -55,7 +55,7 @@ public class OngoingNotificationProcessor {
 
 	public void loadCurrentLocation(Context context, OngoingNotificationDto ongoingNotificationDto, RemoteViews collapsedRemoteViews,
 	                                RemoteViews expandedRemoteViews, BackgroundWorkCallback backgroundWorkCallback) {
-		FusedLocation fusedLocation = FusedLocation.getINSTANCE(context);
+		FusedLocation fusedLocation = new FusedLocation(context);
 
 		final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override
@@ -180,9 +180,10 @@ public class OngoingNotificationProcessor {
 
 					TextPaint textPaint = new TextPaint();
 					textPaint.setColor(Color.WHITE);
-					textPaint.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
+					textPaint.setTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
 					textPaint.setTextAlign(Paint.Align.CENTER);
 					textPaint.setTextScaleX(0.9f);
+					textPaint.setAntiAlias(true);
 					textPaint.setTextSize(textSize);
 
 					Rect textRect = new Rect();

@@ -72,7 +72,7 @@ public class DailyPushNotificationListFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		repository = DailyPushNotificationRepository.getINSTANCE();
 		dailyNotificationHelper = new DailyNotificationHelper(getContext());
-		dailyNotificationViewModel = new ViewModelProvider(requireActivity()).get(DailyNotificationViewModel.class);
+		dailyNotificationViewModel = new ViewModelProvider(this).get(DailyNotificationViewModel.class);
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.widget.creator;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,26 +42,12 @@ import java.util.List;
 import java.util.Set;
 
 public class SecondWidgetCreator extends AbstractWidgetCreator {
-	private final DateTimeFormatter refreshDateTimeFormatter;
 
-	private int addressTextSize;
-	private int refreshDateTimeTextSize;
-	private int hourTextSize;
-	private int tempTextSize;
-	private int popTextSize;
-	private int rainVolumeTextSize;
-	private int snowVolumeTextSize;
-	private int currentPrecipitationTextSize;
-	private int currentAirQualityTextSize;
-	private int currentLabelTextSize;
-	private int currentTempTextSize;
-	private int currentAirQualityLabelTextSize;
 
 	private final int cellCount = 7;
 
 	public SecondWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
-		refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	}
 
 	@Override
@@ -87,37 +72,11 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		return remoteViews;
 	}
 
-	@Override
-	public RemoteViews createRemoteViews() {
-		RemoteViews remoteViews = createBaseRemoteViews();
-		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 
-		return remoteViews;
-	}
 
 	@Override
 	public Class<?> widgetProviderClass() {
 		return SecondWidgetProvider.class;
-	}
-
-	@Override
-	public void setTextSize(int amount) {
-		final int absSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, Math.abs(amount),
-				context.getResources().getDisplayMetrics());
-		final int extraSize = amount >= 0 ? absSize : absSize * -1;
-
-		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInCommonWidgetHeader) + extraSize;
-		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshDateTimeTextSizeInCommonWidgetHeader) + extraSize;
-		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInSimpleWidgetForecastItem) + extraSize;
-		hourTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTimeTextSizeInSimpleWidgetForecastItem) + extraSize;
-		popTextSize = context.getResources().getDimensionPixelSize(R.dimen.popTextSizeInSimpleWidgetForecastItem) + extraSize;
-		rainVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.rainVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
-		snowVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.snowVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
-		currentPrecipitationTextSize = context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
-		currentAirQualityTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
-		currentAirQualityLabelTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
-		currentLabelTextSize = context.getResources().getDimensionPixelSize(R.dimen.currentLabelTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
-		currentTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInCurrentConditionsViewForSimpleWidget) + extraSize;
 	}
 
 
@@ -136,32 +95,15 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		((TextView) view.findViewById(R.id.precipitation)).setText(precipitation);
 
 		String airQuality = null;
-		if (airQualityDto.isSuccessful()) {
+		if (airQualityDto.isSuccessful())
 			airQuality = AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
-		} else {
+		else
 			airQuality = context.getString(R.string.noData);
-		}
+
 		((TextView) view.findViewById(R.id.airQuality)).setText(airQuality);
-
-		((TextView) view.findViewById(R.id.currentLabel)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentLabelTextSize);
-		((TextView) view.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
-		((TextView) view.findViewById(R.id.precipitation)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentPrecipitationTextSize);
-		((TextView) view.findViewById(R.id.airQuality)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentAirQualityTextSize);
-		((TextView) view.findViewById(R.id.airQualityLabel)).setTextSize(TypedValue.COMPLEX_UNIT_PX, currentAirQualityLabelTextSize);
-
 		return view;
 	}
 
-
-	public View makeHeaderViews(LayoutInflater layoutInflater, String addressName, String lastRefreshDateTime) {
-		View view = layoutInflater.inflate(R.layout.header_view_in_widget, null, false);
-		((TextView) view.findViewById(R.id.address)).setText(addressName);
-		((TextView) view.findViewById(R.id.refresh)).setText(ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-		((TextView) view.findViewById(R.id.address)).setTextSize(TypedValue.COMPLEX_UNIT_PX, addressTextSize);
-		((TextView) view.findViewById(R.id.refresh)).setTextSize(TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
-
-		return view;
-	}
 
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, AirQualityDto airQualityDto, CurrentConditionsDto currentConditionsDto,
 	                         List<HourlyForecastDto> hourlyForecastDtoList, OnDrawBitmapCallback onDrawBitmapCallback) {
@@ -174,7 +116,6 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 	                       List<HourlyForecastDto> hourlyForecastDtoList, @Nullable OnDrawBitmapCallback onDrawBitmapCallback,
 	                       @Nullable Integer parentWidth, @Nullable Integer parentHeight) {
 		LayoutInflater layoutInflater = LayoutInflater.from(context);
-
 		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
 		headerView.setId(R.id.header);
 
@@ -228,7 +169,7 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 
 					((TextView) view.findViewById(R.id.rainVolume)).setText(rain.replace(mm
 							, "").replace(cm, ""));
-					((TextView) view.findViewById(R.id.rainVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, rainVolumeTextSize);
+
 				} else {
 					view.findViewById(R.id.rainVolumeLayout).setVisibility(View.INVISIBLE);
 				}
@@ -240,7 +181,7 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 				if (hourlyForecastDtoList.get(cell).isHasSnow()) {
 					((TextView) view.findViewById(R.id.snowVolume)).setText(hourlyForecastDtoList.get(cell).getSnowVolume().replace(mm
 							, "").replace(cm, ""));
-					((TextView) view.findViewById(R.id.snowVolume)).setTextSize(TypedValue.COMPLEX_UNIT_PX, snowVolumeTextSize);
+
 				} else {
 					view.findViewById(R.id.snowVolumeLayout).setVisibility(View.INVISIBLE);
 				}
@@ -248,8 +189,6 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 				view.findViewById(R.id.snowVolumeLayout).setVisibility(View.GONE);
 			}
 
-			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourTextSize);
-			((TextView) view.findViewById(R.id.pop)).setTextSize(TypedValue.COMPLEX_UNIT_PX, popTextSize);
 
 			view.findViewById(R.id.temperature).setVisibility(View.GONE);
 			view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
@@ -275,7 +214,7 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		tempRowLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 
 		DetailSingleTemperatureView detailSingleTemperatureView = new DetailSingleTemperatureView(context, tempList);
-		detailSingleTemperatureView.setTempTextSizePx(tempTextSize);
+
 
 		RelativeLayout rootLayout = new RelativeLayout(context);
 

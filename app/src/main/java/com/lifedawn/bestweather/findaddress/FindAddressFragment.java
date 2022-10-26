@@ -123,7 +123,7 @@ public class FindAddressFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		bundle = getArguments() != null ? getArguments() : savedInstanceState;
 
-		fusedLocation = FusedLocation.getINSTANCE(getContext());
+		fusedLocation = new FusedLocation(requireContext().getApplicationContext());
 		networkStatus = NetworkStatus.getInstance(getContext());
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);

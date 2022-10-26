@@ -241,7 +241,7 @@ public class WeatherFragment extends Fragment implements IGps {
 		getLifecycle().addObserver(locationLifeCycleObserver);
 
 		networkStatus = NetworkStatus.getInstance(getContext());
-		fusedLocation = FusedLocation.getINSTANCE(getContext());
+		fusedLocation = new FusedLocation(requireContext().getApplicationContext());
 
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
 		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
@@ -335,6 +335,7 @@ public class WeatherFragment extends Fragment implements IGps {
 					mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 						@Override
 						public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
+							getParentFragmentManager().popBackStack();
 							iRefreshFavoriteLocationListOnSideNav.onResultMapFragment(newFavoriteAddressDto);
 						}
 

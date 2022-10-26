@@ -48,8 +48,8 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/loadingAnimation"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
@@ -272,12 +272,12 @@
         </androidx.core.widget.NestedScrollView>
 
         <Button
-            android:id="@+id/check"
+            android:id="@+id/save"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:layout_marginHorizontal="16dp"
             android:layout_marginVertical="8dp"
-            android:layout_alignParentBottom="true"
             android:text="@string/create_widget"
             />
 

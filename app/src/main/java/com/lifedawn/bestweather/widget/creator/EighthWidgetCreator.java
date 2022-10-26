@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.widget.creator;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -29,28 +28,11 @@ import com.lifedawn.bestweather.widget.widgetprovider.EighthWidgetProvider;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class EighthWidgetCreator extends AbstractWidgetCreator {
-	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
-
-	private int addressTextSize;
-	private int refreshDateTimeTextSize;
-	private int dateClockTextSize;
-	private int timeClockTextSize;
-	private int forecastDateTimeTextSize;
-	private int forecastTempTextSize;
-	private int currentWindDirectionTextSize;
-	private int currentWindSpeedTextSize;
-	private int currentTempTextSize;
-	private int currentPrecipitationTextSize;
-	private int currentAirQualityTextSize;
-	private int currentFeelsLikeTempTextSize;
-	private int forecastPopTextSize;
-
 	private final int hourlyForecastCount = 7;
 	private final int dailyForecastCount = 3;
 
@@ -82,41 +64,11 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		return remoteViews;
 	}
 
-	@Override
-	public RemoteViews createRemoteViews() {
-		RemoteViews remoteViews = createBaseRemoteViews();
-		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 
-		return remoteViews;
-	}
 
 	@Override
 	public Class<?> widgetProviderClass() {
 		return EighthWidgetProvider.class;
-	}
-
-	@Override
-	public void setTextSize(int amount) {
-		final int absSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, Math.abs(amount),
-				context.getResources().getDisplayMetrics());
-		final int extraSize = amount >= 0 ? absSize : absSize * -1;
-
-		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInCommonWidgetHeader) + extraSize;
-		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshDateTimeTextSizeInCommonWidgetHeader) + extraSize;
-
-		forecastDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTimeTextSizeInSimpleWidgetForecastItem) + extraSize;
-		forecastTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInSimpleWidgetForecastItem) + extraSize;
-		forecastPopTextSize = context.getResources().getDimensionPixelSize(R.dimen.popTextSizeInSimpleWidgetForecastItem) + extraSize;
-
-		dateClockTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateClockTextSizeInEighthWidget) + extraSize;
-		timeClockTextSize = context.getResources().getDimensionPixelSize(R.dimen.timeClockTextSizeInEighthWidget) + extraSize;
-
-		currentTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInEighthWidget) + extraSize;
-		currentFeelsLikeTempTextSize = context.getResources().getDimensionPixelSize(R.dimen.feelsLikeTempTextSizeInEighthWidget) + extraSize;
-		currentPrecipitationTextSize = context.getResources().getDimensionPixelSize(R.dimen.precipitationTextSizeInEighthWidget) + extraSize;
-		currentAirQualityTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInEighthWidget) + extraSize;
-		currentWindDirectionTextSize = context.getResources().getDimensionPixelSize(R.dimen.windDirectionTextSizeInEighthWidget) + extraSize;
-		currentWindSpeedTextSize = context.getResources().getDimensionPixelSize(R.dimen.windSpeedTextSizeInEighthWidget) + extraSize;
 	}
 
 
@@ -134,15 +86,11 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 
 		valuesRemoteViews.setTextViewText(R.id.address, addressName);
 		valuesRemoteViews.setTextViewText(R.id.refresh, ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-		valuesRemoteViews.setTextViewTextSize(R.id.address, TypedValue.COMPLEX_UNIT_PX, addressTextSize);
-		valuesRemoteViews.setTextViewTextSize(R.id.refresh, TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
 
 		ZoneId clockZoneId = ZoneId.systemDefault();
 
 		valuesRemoteViews.setString(R.id.timeClock, "setTimeZone", clockZoneId.getId());
 		valuesRemoteViews.setString(R.id.dateClock, "setTimeZone", clockZoneId.getId());
-		valuesRemoteViews.setTextViewTextSize(R.id.timeClock, TypedValue.COMPLEX_UNIT_PX, timeClockTextSize);
-		valuesRemoteViews.setTextViewTextSize(R.id.dateClock, TypedValue.COMPLEX_UNIT_PX, dateClockTextSize);
 
 		//현재 날씨------------------------------------------------------
 		valuesRemoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp().replace(tempDegree, "°"));
@@ -164,9 +112,6 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		}
 
 		valuesRemoteViews.setTextViewText(R.id.airQuality, airQuality);
-		valuesRemoteViews.setTextViewTextSize(R.id.temperature, TypedValue.COMPLEX_UNIT_PX, currentTempTextSize);
-		valuesRemoteViews.setTextViewTextSize(R.id.precipitation, TypedValue.COMPLEX_UNIT_PX, currentPrecipitationTextSize);
-		valuesRemoteViews.setTextViewTextSize(R.id.airQuality, TypedValue.COMPLEX_UNIT_PX, currentAirQualityTextSize);
 
 		/*
 		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("E");
@@ -202,7 +147,7 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		remoteViews.removeAllViews(R.id.noBitmapValuesView);
 		remoteViews.addView(R.id.noBitmapValuesView, valuesRemoteViews);
 		remoteViews.setViewVisibility(R.id.noBitmapValuesView, View.VISIBLE);
-		remoteViews.setViewVisibility(R.id.valuesView, View.GONE);
+		remoteViews.setViewVisibility(R.id.bitmapValuesView, View.GONE);
 	}
 
 	@Override

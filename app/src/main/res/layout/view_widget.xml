@@ -7,55 +7,57 @@
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    >
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/content_container"
         style="@style/WidgetBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="center"
         android:gravity="center"
-        android:orientation="vertical">
+        >
 
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/valuesLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
             android:visibility="gone"
-            android:orientation="vertical">
+            >
 
             <FrameLayout
                 android:id="@+id/noBitmapValuesView"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:visibility="gone" />
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                />
 
             <ImageView
-                android:id="@+id/valuesView"
+                android:id="@+id/bitmapValuesView"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                tools:ignore="ContentDescription" />
+                android:layout_height="match_parent"
+                tools:ignore="ContentDescription"
+                />
 
-        </LinearLayout>
+        </FrameLayout>
 
         <ProgressBar
             android:id="@+id/progressbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:indeterminate="true"
-            android:indeterminateTint="@color/blue"/>
+            android:indeterminateTint="@color/blue"
+            />
 
         <include
             layout="@layout/layout_warning_for_remoteviews"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
+            android:visibility="gone"
+            />
 
-    </LinearLayout>
+    </FrameLayout>
 
 </FrameLayout>

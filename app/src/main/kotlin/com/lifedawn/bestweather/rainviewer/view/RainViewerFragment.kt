@@ -42,7 +42,7 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
     private lateinit var binding: FragmentRainViewerBinding
     private lateinit var rainViewerViewModel: RainViewerViewModel
     private lateinit var googleMap: GoogleMap
-    private val fusedLocation = FusedLocation.getINSTANCE(context)
+    private lateinit var fusedLocation: FusedLocation
     private var locationLifeCycleObserver: LocationLifeCycleObserver? = null
 
     private val timer: Timer = Timer()
@@ -58,6 +58,7 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
         locationLifeCycleObserver = LocationLifeCycleObserver(requireActivity().activityResultRegistry, requireActivity())
         lifecycle.addObserver(locationLifeCycleObserver!!)
 
+        fusedLocation = FusedLocation(requireContext().applicationContext)
         arguments?.apply {
             rainViewerViewModel.latitude = getDouble(BundleKey.Latitude.name)
             rainViewerViewModel.longitude = getDouble(BundleKey.Longitude.name)

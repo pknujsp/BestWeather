@@ -96,12 +96,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
-		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getParentFragmentManager().popBackStackImmediate();
-			}
-		});
+		binding.toolbar.backBtn.setOnClickListener(v -> getParentFragmentManager().popBackStackImmediate());
 		binding.toolbar.fragmentTitle.setText(R.string.always_notification);
 		if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_met), true)) {
 			binding.commons.metNorwayRadio.setChecked(true);
@@ -139,66 +134,74 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+
+
+		binding.saveBtn.setOnClickListener(v -> {
+			ongoingNotificationViewModel.save(ongoingNotificationDto, () -> MainThreadWorker.runOnUiThread(() -> {
+				// 저장된 알림 데이터가 있으면 알림 표시
+				Context context = requireContext().getApplicationContext();
+
+				if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
+					OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(context);
+					PendingIntent pendingIntent =
+							ongoingNotificationHelper.createManualPendingIntent(getString(R.string.com_lifedawn_bestweather_action_REFRESH), PendingIntent.FLAG_UPDATE_CURRENT |
+									PendingIntent.FLAG_IMMUTABLE);
+					try {
+						pendingIntent.send();
+						getParentFragmentManager().popBackStack();
+					} catch (PendingIntent.CanceledException e) {
+						e.printStackTrace();
+					}
+				} else {
+					ongoingNotificationViewModel.remove();
+					Toast.makeText(getContext(), R.string.disabledNotification, Toast.LENGTH_SHORT).show();
+					startActivity(IntentUtil.getNotificationSettingsIntent(getActivity()));
+				}
+
+			}));
+		});
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+
 		ongoingNotificationViewModel.getOngoingNotificationDto(new DbQueryCallback<OngoingNotificationDto>() {
 			@Override
 			public void onResultSuccessful(OngoingNotificationDto originalDto) {
-				ongoingNotificationDto = originalDto;
+				MainThreadWorker.runOnUiThread(() -> {
+					ongoingNotificationDto = originalDto;
 
-				if (originalDto.getLocationType() == LocationType.SelectedAddress) {
-					originalSelectedFavoriteAddressDto = new FavoriteAddressDto();
-					originalSelectedFavoriteAddressDto.setDisplayName(ongoingNotificationDto.getDisplayName());
-					originalSelectedFavoriteAddressDto.setCountryCode(ongoingNotificationDto.getCountryCode());
-					originalSelectedFavoriteAddressDto.setLatitude(String.valueOf(ongoingNotificationDto.getLatitude()));
-					originalSelectedFavoriteAddressDto.setLongitude(String.valueOf(ongoingNotificationDto.getLongitude()));
-					originalSelectedFavoriteAddressDto.setZoneId(ongoingNotificationDto.getZoneId());
+					if (originalDto.getLocationType() == LocationType.SelectedAddress) {
+						originalSelectedFavoriteAddressDto = new FavoriteAddressDto();
+						originalSelectedFavoriteAddressDto.setDisplayName(ongoingNotificationDto.getDisplayName());
+						originalSelectedFavoriteAddressDto.setCountryCode(ongoingNotificationDto.getCountryCode());
+						originalSelectedFavoriteAddressDto.setLatitude(String.valueOf(ongoingNotificationDto.getLatitude()));
+						originalSelectedFavoriteAddressDto.setLongitude(String.valueOf(ongoingNotificationDto.getLongitude()));
+						originalSelectedFavoriteAddressDto.setZoneId(ongoingNotificationDto.getZoneId());
 
-					selectedFavoriteLocation = true;
+						selectedFavoriteLocation = true;
 
-					binding.commons.selectedAddressName.setText(ongoingNotificationDto.getDisplayName());
-					binding.commons.selectedLocationRadio.setChecked(true);
-				} else {
-					binding.commons.currentLocationRadio.setChecked(true);
-				}
+						binding.commons.selectedAddressName.setText(ongoingNotificationDto.getDisplayName());
+						binding.commons.selectedLocationRadio.setChecked(true);
+					} else {
+						binding.commons.currentLocationRadio.setChecked(true);
+					}
 
-				init();
+					init();
+
+
+				});
+
 			}
 
 			@Override
 			public void onResultNoData() {
-				ongoingNotificationDto = createDefaultDto();
-				init();
+				MainThreadWorker.runOnUiThread(() -> {
+					ongoingNotificationDto = createDefaultDto();
+					init();
+				});
 			}
-		});
-
-		binding.saveBtn.setOnClickListener(v -> {
-			ongoingNotificationViewModel.save(ongoingNotificationDto, new BackgroundWorkCallback() {
-				@Override
-				public void onFinished() {
-					MainThreadWorker.runOnUiThread(() -> {
-						// 저장된 알림 데이터가 있으면 알림 표시
-						Context context = requireContext().getApplicationContext();
-
-						if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-							OngoingNotificationHelper ongoingNotificationHelper = new OngoingNotificationHelper(context);
-							PendingIntent pendingIntent =
-									ongoingNotificationHelper.createManualPendingIntent(getString(R.string.com_lifedawn_bestweather_action_REFRESH), PendingIntent.FLAG_UPDATE_CURRENT |
-											PendingIntent.FLAG_IMMUTABLE);
-							try {
-								pendingIntent.send();
-								getParentFragmentManager().popBackStack();
-							} catch (PendingIntent.CanceledException e) {
-								e.printStackTrace();
-							}
-						} else {
-							ongoingNotificationViewModel.remove();
-							Toast.makeText(getContext(), R.string.disabledNotification, Toast.LENGTH_SHORT).show();
-							startActivity(IntentUtil.getNotificationSettingsIntent(getActivity()));
-						}
-
-					});
-
-				}
-			});
 		});
 	}
 
@@ -256,55 +259,40 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 
 
 	protected void initWeatherProvider() {
-		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				WeatherProviderType checkedWeatherProviderType = checkedId == R.id.met_norway_radio ? WeatherProviderType.MET_NORWAY :
-						WeatherProviderType.OWM_ONECALL;
-				onCheckedWeatherProvider(checkedWeatherProviderType);
-			}
+		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+			WeatherProviderType checkedWeatherProviderType = checkedId == R.id.met_norway_radio ? WeatherProviderType.MET_NORWAY :
+					WeatherProviderType.OWM_ONECALL;
+			onCheckedWeatherProvider(checkedWeatherProviderType);
 		});
 
-		binding.commons.kmaTopPrioritySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				ongoingNotificationDto.setTopPriorityKma(isChecked);
-			}
-		});
+		binding.commons.kmaTopPrioritySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> ongoingNotificationDto.setTopPriorityKma(isChecked));
 	}
 
 	protected void initLocation() {
 		binding.commons.changeAddressBtn.setVisibility(View.GONE);
 		binding.commons.selectedAddressName.setVisibility(View.GONE);
 
-		binding.commons.locationRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				if (checkedId == binding.commons.currentLocationRadio.getId() && binding.commons.currentLocationRadio.isChecked()) {
-					binding.commons.changeAddressBtn.setVisibility(View.GONE);
-					binding.commons.selectedAddressName.setVisibility(View.GONE);
+		binding.commons.locationRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+			if (checkedId == binding.commons.currentLocationRadio.getId() && binding.commons.currentLocationRadio.isChecked()) {
+				binding.commons.changeAddressBtn.setVisibility(View.GONE);
+				binding.commons.selectedAddressName.setVisibility(View.GONE);
 
-					onSelectedCurrentLocation();
-				} else if (checkedId == binding.commons.selectedLocationRadio.getId() && binding.commons.selectedLocationRadio.isChecked()) {
-					binding.commons.changeAddressBtn.setVisibility(View.VISIBLE);
-					binding.commons.selectedAddressName.setVisibility(View.VISIBLE);
+				ongoingNotificationDto.setLocationType(LocationType.CurrentLocation);
 
-					if (selectedFavoriteLocation) {
-						onSelectedFavoriteLocation(originalSelectedFavoriteAddressDto);
-					} else {
-						openFavoritesFragment();
-					}
+			} else if (checkedId == binding.commons.selectedLocationRadio.getId() && binding.commons.selectedLocationRadio.isChecked()) {
+				binding.commons.changeAddressBtn.setVisibility(View.VISIBLE);
+				binding.commons.selectedAddressName.setVisibility(View.VISIBLE);
 
+				if (selectedFavoriteLocation) {
+					onSelectedFavoriteLocation(originalSelectedFavoriteAddressDto);
+				} else {
+					openFavoritesFragment();
 				}
+
 			}
 		});
 
-		binding.commons.changeAddressBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				openFavoritesFragment();
-			}
-		});
+		binding.commons.changeAddressBtn.setOnClickListener(v -> openFavoritesFragment());
 	}
 
 	protected void openFavoritesFragment() {
@@ -336,14 +324,14 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 					binding.commons.selectedAddressName.setText(newSelectedAddressDto.getDisplayName());
 
 					onSelectedFavoriteLocation(newSelectedAddressDto);
+					getParentFragmentManager().popBackStack();
 				}
-				getParentFragmentManager().popBackStack();
 			}
 		});
 
 		String tag = MapFragment.class.getName();
 		getParentFragmentManager().beginTransaction().hide(OngoingNotificationSettingsFragment.this).add(R.id.fragment_container,
-				mapFragment, tag).addToBackStack(tag).commitAllowingStateLoss();
+				mapFragment, tag).addToBackStack(tag).commit();
 	}
 
 
@@ -360,9 +348,6 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 
 	}
 
-	public void onSelectedCurrentLocation() {
-		ongoingNotificationDto.setLocationType(LocationType.CurrentLocation);
-	}
 
 	@Override
 	public void updateNotification(RemoteViews remoteViews) {

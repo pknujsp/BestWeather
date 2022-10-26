@@ -2,6 +2,8 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProviderInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -9,10 +11,12 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.ArrayMap;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
@@ -34,16 +38,30 @@ import com.lifedawn.bestweather.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.widget.DialogActivity;
 import com.lifedawn.bestweather.widget.OnDrawBitmapCallback;
+import com.lifedawn.bestweather.widget.widgetprovider.EighthWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.EleventhWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FifthWidgetProvider;
 import com.lifedawn.bestweather.widget.widgetprovider.FirstWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.FourthWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.NinthWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SecondWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SeventhWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.SixthWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.TenthWidgetProvider;
+import com.lifedawn.bestweather.widget.widgetprovider.ThirdWidgetProvider;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Set;
 
 import static android.view.View.MeasureSpec.EXACTLY;
 
 public abstract class AbstractWidgetCreator {
+	protected final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
+
 	protected final int appWidgetId;
 	protected final ValueUnits tempUnit;
 	protected final ValueUnits clockUnit;
@@ -59,8 +77,38 @@ public abstract class AbstractWidgetCreator {
 
 	public AbstractWidgetCreator setWidgetDto(WidgetDto widgetDto) {
 		this.widgetDto = widgetDto;
-		setTextSize(widgetDto.getTextSizeAmount());
 		return this;
+	}
+
+	public static AbstractWidgetCreator getInstance(AppWidgetManager appWidgetManager, Context context, int appWidgetId) {
+		AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId);
+		final String providerClassName = appWidgetProviderInfo.provider.getClassName();
+
+		if (providerClassName.equals(FirstWidgetProvider.class.getName())) {
+			return new FirstWidgetCreator(context, null, appWidgetId);
+		} else if (providerClassName.equals(SecondWidgetProvider.class.getName())) {
+			return new SecondWidgetCreator(context, null, appWidgetId);
+		} else if (providerClassName.equals(ThirdWidgetProvider.class.getName())) {
+			return new ThirdWidgetCreator(context, null, appWidgetId);
+		} else if (providerClassName.equals(FourthWidgetProvider.class.getName())) {
+			return new FourthWidgetCreator(context, null, appWidgetId);
+		} else if (providerClassName.equals(FifthWidgetProvider.class.getName())) {
+			return new FifthWidgetCreator(context, null, appWidgetId);
+		} else if (providerClassName.equals(SixthWidgetProvider.class.getName())) {
+			return new SixthWidgetCreator(context, null, appWidgetId);
+		} else if (providerClassName.equals(SeventhWidgetProvider.class.getName())) {
+			return new SeventhWidgetCreator(context, null, appWidgetId);
+		} else if (providerClassName.equals(EighthWidgetProvider.class.getName())) {
+			return new EighthWidgetCreator(context, null, appWidgetId);
+		} else if (providerClassName.equals(NinthWidgetProvider.class.getName())) {
+			return new NinthWidgetCreator(context, null, appWidgetId);
+		} else if (providerClassName.equals(TenthWidgetProvider.class.getName())) {
+			return new TenthWidgetCreator(context, null, appWidgetId);
+		} else if (providerClassName.equals(EleventhWidgetProvider.class.getName())) {
+			return new EleventhWidgetCreator(context, null, appWidgetId);
+		} else {
+			return null;
+		}
 	}
 
 	public abstract RemoteViews createTempViews(Integer parentWidth, Integer parentHeight);
@@ -113,7 +161,6 @@ public abstract class AbstractWidgetCreator {
 			widgetDto.getWeatherProviderTypeSet().add(WeatherProviderType.AQICN);
 		}
 
-		setTextSize(widgetDto.getTextSizeAmount());
 		return widgetDto;
 	}
 
@@ -123,9 +170,6 @@ public abstract class AbstractWidgetCreator {
 			public void onResultSuccessful(WidgetDto result) {
 				widgetDto = result;
 
-				if (widgetDto != null) {
-					setTextSize(widgetDto.getTextSizeAmount());
-				}
 				if (callback != null) {
 					callback.onResultSuccessful(widgetDto);
 				}
@@ -185,7 +229,8 @@ public abstract class AbstractWidgetCreator {
 		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 		intent.putExtras(bundle);
 
-		return PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+		return PendingIntent.getActivity(context, IntentRequestCodes.CLICK_WIDGET.requestCode, intent,
+				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 	}
 
 	protected int getWidgetSizeInDp(AppWidgetManager appWidgetManager, String key) {
@@ -368,7 +413,7 @@ public abstract class AbstractWidgetCreator {
 	}
 
 	public void drawBitmap(RemoteViews remoteViews, Bitmap bitmap) {
-		remoteViews.setImageViewBitmap(R.id.valuesView, bitmap);
+		remoteViews.setImageViewBitmap(R.id.bitmapValuesView, bitmap);
 	}
 
 	protected final Bitmap drawBitmap(ViewGroup rootLayout, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, RemoteViews remoteViews,
@@ -408,7 +453,7 @@ public abstract class AbstractWidgetCreator {
 		rootLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
 		Bitmap viewBmp = rootLayout.getDrawingCache();
-		remoteViews.setImageViewBitmap(R.id.valuesView, viewBmp);
+		remoteViews.setImageViewBitmap(R.id.bitmapValuesView, viewBmp);
 		return viewBmp;
 	}
 
@@ -442,7 +487,7 @@ public abstract class AbstractWidgetCreator {
 		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
-				appWidgetManager.updateAppWidget(result.getAppWidgetId(), remoteViews);
+				appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 			}
 
 			@Override
@@ -462,11 +507,22 @@ public abstract class AbstractWidgetCreator {
 		return layoutParams;
 	}
 
-	abstract public RemoteViews createRemoteViews();
+	protected View makeHeaderViews(LayoutInflater layoutInflater, String addressName, String lastRefreshDateTime) {
+		View view = layoutInflater.inflate(R.layout.header_view_in_widget, null, false);
+		((TextView) view.findViewById(R.id.address)).setText(addressName);
+		((TextView) view.findViewById(R.id.refresh)).setText(ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
+
+		return view;
+	}
+
+	public RemoteViews createRemoteViews() {
+		RemoteViews remoteViews = createBaseRemoteViews();
+		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
+
+		return remoteViews;
+	}
 
 	abstract public Class<?> widgetProviderClass();
-
-	abstract public void setTextSize(int amount);
 
 	abstract public void setDisplayClock(boolean displayClock);
 

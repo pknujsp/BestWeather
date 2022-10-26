@@ -51,12 +51,9 @@ public class OngoingNotificationListenableWorker extends ListenableWorker {
 	@Override
 	public ListenableFuture<Result> startWork() {
 		return CallbackToFutureAdapter.getFuture(completer -> {
-			final BackgroundWorkCallback backgroundWorkCallback = new BackgroundWorkCallback() {
-				@Override
-				public void onFinished() {
-					if (!isStopped()) {
-						completer.set(Result.success());
-					}
+			final BackgroundWorkCallback backgroundWorkCallback = () -> {
+				if (!isStopped()) {
+					completer.set(Result.success());
 				}
 			};
 

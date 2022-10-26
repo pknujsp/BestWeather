@@ -38,7 +38,7 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 					.putString("action", action)
 					.build();
 
-			final String tag = DailyNotificationListenableWorker.class.getName();
+			final String tag = DailyNotificationListenableWorker.class.getName() + action;
 
 			OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(DailyNotificationListenableWorker.class)
 					.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
@@ -47,7 +47,7 @@ public class DailyPushNotificationReceiver extends BroadcastReceiver {
 					.build();
 
 			WorkManager workManager = WorkManager.getInstance(context);
-			workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.APPEND, request);
+			workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.REPLACE, request);
 		}
 	}
 

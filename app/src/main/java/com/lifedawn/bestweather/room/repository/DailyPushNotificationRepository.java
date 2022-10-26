@@ -19,6 +19,9 @@ import java.util.concurrent.Executors;
 public class DailyPushNotificationRepository {
 	private static DailyPushNotificationRepository INSTANCE;
 
+	private final DailyPushNotificationDao dailyPushNotificationDao;
+	private final ExecutorService executorService = MyApplication.getExecutorService();
+
 	public static DailyPushNotificationRepository getINSTANCE() {
 		return INSTANCE;
 	}
@@ -28,8 +31,6 @@ public class DailyPushNotificationRepository {
 			INSTANCE = new DailyPushNotificationRepository(context);
 	}
 
-	private DailyPushNotificationDao dailyPushNotificationDao;
-	private ExecutorService executorService = MyApplication.getExecutorService();
 
 	private DailyPushNotificationRepository(Context context) {
 		dailyPushNotificationDao = AppDb.getInstance(context).dailyPushNotificationDao();

@@ -20,12 +20,10 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.internal.ConnectionCallbacks;
 import com.google.android.gms.common.api.internal.OnConnectionFailedListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -40,7 +38,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.timezone.TimeZoneUtils;
@@ -57,24 +54,14 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedListener {
-	private static FusedLocation INSTANCE;
 	private FusedLocationProviderClient fusedLocationClient;
 	private LocationManager locationManager;
 	private Context context;
 	private Map<MyLocationCallback, LocationRequestObj> locationRequestObjMap = new ConcurrentHashMap<>();
+	private TimerTask timerTask;
+	private Timer timer = new Timer();
 
-	public static FusedLocation getINSTANCE(Context context) {
-		if (INSTANCE == null) {
-			INSTANCE = new FusedLocation(context);
-		}
-		return INSTANCE;
-	}
-
-	public static void close() {
-		INSTANCE = null;
-	}
-
-	private FusedLocation(Context context) {
+	public FusedLocation(Context context) {
 		this.context = context;
 		fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -124,7 +111,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				}
 				notifyNotification();
 
-				Timer timer = new Timer();
+				CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
 				LocationRequest locationRequest =
 						new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY).setWaitForAccurateLocation(false).build();
@@ -132,30 +119,27 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				final LocationCallback locationCallback = new LocationCallback() {
 					@Override
 					public void onLocationResult(@NonNull @NotNull LocationResult locationResult) {
-						timer.cancel();
+						if (timerTask != null)
+							timerTask.cancel();
+
 						cancelNotification();
 						locationRequestObjMap.remove(myLocationCallback);
 						fusedLocationClient.removeLocationUpdates(this);
 
 						if (locationResult != null) {
 							if (locationResult.getLocations().size() > 0) {
-								MyApplication.getExecutorService().execute(new Runnable() {
+								final Location location = myLocationCallback.getBestLocation(locationResult);
+
+								final Double latitude = location.getLatitude();
+								final Double longitude = location.getLongitude();
+
+								TimeZoneUtils.Companion.getTimeZone(latitude, longitude, new TimeZoneUtils.TimeZoneCallback() {
 									@Override
-									public void run() {
-										final Location location = myLocationCallback.getBestLocation(locationResult);
-
-										final Double latitude = location.getLatitude();
-										final Double longitude = location.getLongitude();
-
-										TimeZoneUtils.Companion.getTimeZone(latitude, longitude, new TimeZoneUtils.TimeZoneCallback() {
-											@Override
-											public void onResult(@NonNull ZoneId zoneId) {
-												onResultTimeZone(latitude, longitude, zoneId, myLocationCallback, locationResult);
-											}
-										});
-
+									public void onResult(@NonNull ZoneId zoneId) {
+										onResultTimeZone(latitude, longitude, zoneId, myLocationCallback, locationResult);
 									}
 								});
+
 							} else {
 								myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
 							}
@@ -170,7 +154,19 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 					}
 				};
 
-				CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+				timerTask = new TimerTask() {
+					@Override
+					public void run() {
+						cancelNotification();
+						locationRequestObjMap.remove(myLocationCallback);
+						cancellationTokenSource.cancel();
+						fusedLocationClient.removeLocationUpdates(locationCallback);
+
+						MainThreadWorker.runOnUiThread(() -> {
+							myLocationCallback.onFailed(MyLocationCallback.Fail.TIME_OUT);
+						});
+					}
+				};
 
 				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 				ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -178,16 +174,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 				final LocationRequestObj locationRequestObj = new LocationRequestObj();
 				locationRequestObjMap.put(myLocationCallback, locationRequestObj);
 
-				timer.schedule(new TimerTask() {
-					@Override
-					public void run() {
-						cancelNotification();
-						locationRequestObjMap.remove(myLocationCallback);
-						cancellationTokenSource.cancel();
-						fusedLocationClient.removeLocationUpdates(locationCallback);
-						myLocationCallback.onFailed(MyLocationCallback.Fail.TIME_OUT);
-					}
-				}, 6000L);
+				timer.schedule(timerTask, 6000L);
 
 				@SuppressLint("MissingPermission")
 				Task<Location> currentLocationTask = fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY,
@@ -195,7 +182,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 				locationRequestObj.currentLocationTask = currentLocationTask;
 				locationRequestObj.cancellationTokenSource = cancellationTokenSource;
-				locationRequestObj.timer = timer;
+
 
 				currentLocationTask.addOnSuccessListener(new OnSuccessListener<Location>() {
 					@SuppressLint("MissingPermission")
@@ -211,13 +198,24 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 								List<Location> locations = new ArrayList<>();
 								locations.add(location);
 
-								final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-								editor.putString(context.getString(R.string.pref_key_last_current_location_latitude),
-										String.valueOf(location.getLatitude())).putString(
-										context.getString(R.string.pref_key_last_current_location_longitude),
-										String.valueOf(location.getLongitude())).commit();
+								final Double latitude = location.getLatitude();
+								final Double longitude = location.getLongitude();
 
-								locationCallback.onLocationResult(LocationResult.create(locations));
+								TimeZoneUtils.Companion.getTimeZone(latitude, longitude, new TimeZoneUtils.TimeZoneCallback() {
+									@Override
+									public void onResult(@NonNull ZoneId zoneId) {
+										onResultTimeZone(latitude, longitude, zoneId, new MyLocationCallback() {
+											@Override
+											public void onSuccessful(LocationResult locationResult) {
+												locationCallback.onLocationResult(locationResult);
+											}
+
+											@Override
+											public void onFailed(Fail fail) {
+											}
+										}, LocationResult.create(locations));
+									}
+								});
 							}
 						}
 
@@ -232,9 +230,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 
 	private void onResultTimeZone(Double latitude, Double longitude, ZoneId zoneId, MyLocationCallback myLocationCallback,
 	                              LocationResult locationResult) {
-
 		final SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-
 		editor.putString(context.getString(R.string.pref_key_last_current_location_latitude),
 						latitude.toString())
 				.putString(context.getString(R.string.pref_key_last_current_location_longitude),
@@ -306,7 +302,8 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		if (locationRequestObjMap.containsKey(myLocationCallback)) {
 			cancelNotification();
 			LocationRequestObj locationRequestObj = locationRequestObjMap.get(myLocationCallback);
-			Objects.requireNonNull(locationRequestObj).timer.cancel();
+			if (timerTask != null)
+				timerTask.cancel();
 
 			if (Objects.requireNonNull(locationRequestObj).locationCallback != null) {
 				fusedLocationClient.removeLocationUpdates(locationRequestObj.locationCallback);
@@ -369,6 +366,5 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 		LocationCallback locationCallback;
 		Task<Location> currentLocationTask;
 		CancellationTokenSource cancellationTokenSource;
-		Timer timer;
 	}
 }

@@ -35,6 +35,7 @@ import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
+import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
@@ -131,12 +132,7 @@ public class WidgetListenableWorker extends ListenableWorker {
 	@Override
 	public ListenableFuture<Result> startWork() {
 		return CallbackToFutureAdapter.getFuture(completer -> {
-			final BackgroundWorkCallback backgroundWorkCallback = new BackgroundWorkCallback() {
-				@Override
-				public void onFinished() {
-					completer.set(Result.success());
-				}
-			};
+			final BackgroundWorkCallback backgroundWorkCallback = () -> completer.set(Result.success());
 
 			if (ACTION.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_INIT))) {
 				widgetRepository.get(APP_WIDGET_ID, new DbQueryCallback<WidgetDto>() {
@@ -152,7 +148,6 @@ public class WidgetListenableWorker extends ListenableWorker {
 
 						remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),
 								widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
-
 						requestCount = 1;
 
 						if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
@@ -311,8 +306,8 @@ public class WidgetListenableWorker extends ListenableWorker {
 
 	@Override
 	public void onStopped() {
-		WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
-		widgetHelper.reDrawWidgets(null);
+		// WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
+		// widgetHelper.reDrawWidgets(null);
 	}
 
 	private void showProgressBar() {
@@ -368,7 +363,6 @@ public class WidgetListenableWorker extends ListenableWorker {
 			currentLocationRequestObj.appWidgetSet.add(appWidgetId);
 		}
 
-
 		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
 
 		final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
@@ -402,21 +396,8 @@ public class WidgetListenableWorker extends ListenableWorker {
 			}
 		};
 
-		PowerManager powerManager = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
-		fusedLocation = FusedLocation.getINSTANCE(getApplicationContext());
-
-		if (powerManager.isInteractive()) {
-			fusedLocation.findCurrentLocation(locationCallback, true);
-		} else {
-			LocationResult lastLocation = fusedLocation.getLastCurrentLocation();
-			if (lastLocation.getLocations().get(0).getLatitude() == 0.0 ||
-					lastLocation.getLocations().get(0).getLongitude() == 0.0) {
-				fusedLocation.findCurrentLocation(locationCallback, true);
-			} else {
-				locationCallback.onSuccessful(lastLocation);
-			}
-		}
-
+		fusedLocation = new FusedLocation(getApplicationContext());
+		fusedLocation.findCurrentLocation(locationCallback, true);
 	}
 
 	private void onResultCurrentLocation(String addressName, Geocoding.AddressDto newAddress, BackgroundWorkCallback backgroundWorkCallback) {
@@ -454,9 +435,7 @@ public class WidgetListenableWorker extends ListenableWorker {
 				errorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA;
 			}
 
-			final Set<Integer> appWidgetIdSet = currentLocationWidgetDtoArrayMap.keySet();
-
-			for (Integer appWidgetId : appWidgetIdSet) {
+			for (Integer appWidgetId : currentLocationWidgetDtoArrayMap.keySet()) {
 				allWidgetDtoArrayMap.get(appWidgetId).setLastErrorType(errorType);
 				allWidgetDtoArrayMap.get(appWidgetId).setLoadSuccessful(false);
 			}

@@ -15,7 +15,7 @@
         android:id="@+id/root_scroll_View"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/check"
+        android:layout_above="@id/save"
         android:layout_below="@id/toolbar"
         android:overScrollMode="never"
         android:paddingHorizontal="16dp"
@@ -80,7 +80,7 @@
                                 android:clickable="true"
                                 android:text="07:00"
                                 android:textColor="@color/blue"
-                                android:textSize="22sp"
+                                android:textSize="23sp"
                                 />
 
                         </LinearLayout>
@@ -118,7 +118,7 @@
     </androidx.core.widget.NestedScrollView>
 
     <Button
-        android:id="@+id/check"
+        android:id="@+id/save"
         android:layout_marginTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

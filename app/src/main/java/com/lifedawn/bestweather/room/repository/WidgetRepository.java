@@ -19,7 +19,6 @@ public class WidgetRepository {
 	private final ExecutorService executorService = MyApplication.getExecutorService();
 	private static WidgetRepository INSTANCE;
 
-
 	public static WidgetRepository getINSTANCE() {
 		return INSTANCE;
 	}

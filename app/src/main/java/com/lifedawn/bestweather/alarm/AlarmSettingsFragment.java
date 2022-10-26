@@ -376,7 +376,7 @@ public class AlarmSettingsFragment extends Fragment {
 			}
 		});
 
-		binding.check.setOnClickListener(new View.OnClickListener() {
+		binding.save.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (!binding.sunday.isChecked() && !binding.monday.isChecked() &&

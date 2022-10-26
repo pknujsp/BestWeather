@@ -54,7 +54,8 @@ public class IntroFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		fusedLocation = FusedLocation.getINSTANCE(getContext());
+		
+		fusedLocation = new FusedLocation(requireContext().getApplicationContext());
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
 		getParentFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
@@ -95,6 +96,7 @@ public class IntroFragment extends Fragment {
 				mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 					@Override
 					public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
+						getParentFragmentManager().popBackStackImmediate();
 						final int newFavoriteAddressDtoId = newFavoriteAddressDto.getId();
 
 						PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),

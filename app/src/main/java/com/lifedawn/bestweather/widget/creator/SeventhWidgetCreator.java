@@ -39,19 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 public class SeventhWidgetCreator extends AbstractWidgetCreator {
-	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
 	private final DateTimeFormatter forecastDateFormatter = DateTimeFormatter.ofPattern("E");
-
-	private int addressTextSize;
-	private int refreshDateTimeTextSize;
-	private int stationNameTextSize;
-	private int simpleAirQualityTextSize;
-	private int currentParticleNameTextSize;
-	private int currentGradeValueTextSize;
-	private int currentGradeDescriptionTextSize;
-	private int forecastParticleNameTextSize;
-	private int forecastGradeDescriptionTextSize;
-	private int forecastDateTextSize;
 
 	public SeventhWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
@@ -84,51 +72,13 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		return remoteViews;
 	}
 
-	@Override
-	public RemoteViews createRemoteViews() {
-		RemoteViews remoteViews = createBaseRemoteViews();
-		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 
-		return remoteViews;
-	}
 
 	@Override
 	public Class<?> widgetProviderClass() {
 		return SeventhWidgetProvider.class;
 	}
 
-	@Override
-	public void setTextSize(int amount) {
-		final int absSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, Math.abs(amount),
-				context.getResources().getDisplayMetrics());
-		final int extraSize = amount >= 0 ? absSize : absSize * -1;
-
-		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInCommonWidgetHeader) + extraSize;
-		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshDateTimeTextSizeInCommonWidgetHeader) + extraSize;
-
-		stationNameTextSize = context.getResources().getDimensionPixelSize(R.dimen.stationNameTextSizeInSeventhWidget) + extraSize;
-		simpleAirQualityTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInSeventhWidget) + extraSize;
-
-		currentParticleNameTextSize = context.getResources().getDimensionPixelSize(R.dimen.labelTextSizeInSimpleAirQualityItem) + extraSize;
-		currentGradeValueTextSize = context.getResources().getDimensionPixelSize(R.dimen.gradeValueTextSizeInSimpleAirQualityItem) + extraSize;
-		currentGradeDescriptionTextSize = context.getResources().getDimensionPixelSize(R.dimen.gradeDescriptionTextSizeInAirQualityItem) + extraSize;
-
-		forecastParticleNameTextSize = context.getResources().getDimensionPixelSize(R.dimen.particleNameTextSizeInLinearDailyAqiForecastItem) + extraSize;
-		forecastGradeDescriptionTextSize = context.getResources().getDimensionPixelSize(R.dimen.particleNameTextSizeInLinearDailyAqiForecastItem) + extraSize;
-		forecastDateTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTextSizeInLinearDailyAqiForecastItem) + extraSize;
-	}
-
-
-	public View makeHeaderViews(LayoutInflater layoutInflater, String addressName, String lastRefreshDateTime) {
-		View view = layoutInflater.inflate(R.layout.header_view_in_widget, null, false);
-		((TextView) view.findViewById(R.id.address)).setText(addressName);
-		((TextView) view.findViewById(R.id.refresh)).setText(ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-
-		((TextView) view.findViewById(R.id.address)).setTextSize(TypedValue.COMPLEX_UNIT_PX, addressTextSize);
-		((TextView) view.findViewById(R.id.refresh)).setTextSize(TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
-
-		return view;
-	}
 
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                         AirQualityDto airQualityDto, OnDrawBitmapCallback onDrawBitmapCallback) {
@@ -155,13 +105,12 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 
 		String stationName = context.getString(R.string.measuring_station_name) + ": " + airQualityDto.getCityName();
 		((TextView) seventhView.findViewById(R.id.measuring_station_name)).setText(stationName);
-		((TextView) seventhView.findViewById(R.id.measuring_station_name)).setTextSize(TypedValue.COMPLEX_UNIT_PX, stationNameTextSize);
+
 
 		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
 
 		((TextView) seventhView.findViewById(R.id.airQuality)).setText(airQuality);
 
-		((TextView) seventhView.findViewById(R.id.airQuality)).setTextSize(TypedValue.COMPLEX_UNIT_PX, simpleAirQualityTextSize);
 
 		GridLayout gridLayout = seventhView.findViewById(R.id.airQualityGrid);
 
@@ -201,11 +150,6 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		TextView pm25TextView = forecastItemView.findViewById(R.id.pm25);
 		TextView o3TextView = forecastItemView.findViewById(R.id.o3);
 
-		dateTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, forecastDateTextSize);
-		pm10TextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, forecastParticleNameTextSize);
-		pm25TextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, forecastParticleNameTextSize);
-		o3TextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, forecastParticleNameTextSize);
-
 		dateTextView.setText(null);
 		pm10TextView.setText(context.getString(R.string.pm10_str));
 		pm25TextView.setText(context.getString(R.string.pm25_str));
@@ -231,10 +175,6 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 			pm25TextView = forecastItemView.findViewById(R.id.pm25);
 			o3TextView = forecastItemView.findViewById(R.id.o3);
 
-			dateTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, forecastDateTextSize);
-			pm10TextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, forecastParticleNameTextSize);
-			pm25TextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, forecastParticleNameTextSize);
-			o3TextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, forecastParticleNameTextSize);
 
 			dateTextView.setText(item.getDate() == null ? context.getString(R.string.current) : item.getDate().format(forecastDateFormatter));
 			if (item.isHasPm10()) {
@@ -282,9 +222,6 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		gradeValueTextView.setText(gradeValue);
 		gradeDescriptionTextView.setText(gradeDescription);
 
-		labelTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, currentParticleNameTextSize);
-		gradeValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, currentGradeValueTextSize);
-		gradeDescriptionTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, currentGradeDescriptionTextSize);
 
 		int cellCount = gridLayout.getChildCount();
 		int row = cellCount / gridLayout.getColumnCount();
@@ -318,8 +255,7 @@ public class SeventhWidgetCreator extends AbstractWidgetCreator {
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
 				airQualityDto, null);
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		appWidgetManager.updateAppWidget(appWidgetId,
-				remoteViews);
+		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 
 	@Override

@@ -194,7 +194,7 @@ public class DailyNotificationListenableWorker extends ListenableWorker {
 	public void loadCurrentLocation(Context context, ExecutorService executorService, RemoteViews remoteViews,
 	                                DailyPushNotificationDto dailyPushNotificationDto, BackgroundWorkCallback backgroundWorkCallback) {
 		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-		FusedLocation fusedLocation = FusedLocation.getINSTANCE(context);
+		FusedLocation fusedLocation = new FusedLocation(context);
 
 		FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
 			@Override

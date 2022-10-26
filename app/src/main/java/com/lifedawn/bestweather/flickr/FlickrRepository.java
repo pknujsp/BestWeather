@@ -228,8 +228,7 @@ public final class FlickrRepository {
 														}
 													};
 
-													Glide.with(context).asBitmap().load(backgroundImgUrl)
-															.diskCacheStrategy(DiskCacheStrategy.AUTOMATIC).into(imgRequestData.glideTarget);
+													Glide.with(context).asBitmap().load(backgroundImgUrl).into(imgRequestData.glideTarget);
 
 												} else {
 												}

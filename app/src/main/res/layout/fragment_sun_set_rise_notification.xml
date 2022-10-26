@@ -1,90 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/backgroundColor"
     >
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/backgroundColor"
         >
 
-        <RelativeLayout
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar"
+            />
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/root_scroll_View"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_below="@id/toolbar"
+            android:clipToPadding="true"
+            android:overScrollMode="never"
+            android:paddingHorizontal="16dp"
+            android:scrollbars="none"
             >
 
-            <include
-                android:id="@+id/toolbar"
-                layout="@layout/toolbar"
-                />
-
-            <androidx.core.widget.NestedScrollView
-                android:id="@+id/root_scroll_View"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@id/toolbar"
-                android:clipToPadding="true"
-                android:overScrollMode="never"
-                android:paddingHorizontal="16dp"
-                android:scrollbars="none"
+                android:orientation="vertical"
                 >
 
-                <LinearLayout
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/sunRiseSwitch"
+                    style="@style/Switch"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    >
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/use_sun_rise_notification"
+                    />
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/sunRiseSwitch"
-                        style="@style/Switch"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:checked="true"
-                        android:text="@string/use_sun_rise_notification"
-                        />
-
-                    <TextView
-                        android:id="@+id/sunrise_time"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:gravity="right"
-                        android:text="10분전에 알림"
-                        />
+                <TextView
+                    android:id="@+id/sunrise_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:gravity="right"
+                    android:text="10분전에 알림"
+                    />
 
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/sunSetSwitch"
-                        style="@style/Switch"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:checked="true"
-                        android:text="@string/use_sun_set_notification"
-                        />
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/sunSetSwitch"
+                    style="@style/Switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="@string/use_sun_set_notification"
+                    />
 
-                    <TextView
-                        android:id="@+id/sunset_time"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:gravity="right"
-                        android:text="10분전에 알림"
-                        />
-
-
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/sunset_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:gravity="right"
+                    android:text="10분전에 알림"
+                    />
 
 
-            </androidx.core.widget.NestedScrollView>
-
-        </RelativeLayout>
-
-    </FrameLayout>
+            </LinearLayout>
 
 
-</layout>
+        </androidx.core.widget.NestedScrollView>
+
+    </RelativeLayout>
+
+</FrameLayout>

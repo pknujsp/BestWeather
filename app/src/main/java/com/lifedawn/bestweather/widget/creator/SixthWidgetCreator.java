@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.widget.creator;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,24 +34,12 @@ import com.lifedawn.bestweather.widget.widgetprovider.SixthWidgetProvider;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class SixthWidgetCreator extends AbstractWidgetCreator {
-	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
-
-	private int addressTextSize;
-	private int refreshDateTimeTextSize;
-	private int precipitationTextSize;
-	private int stationNameTextSize;
-	private int tempTextSize;
-	private int simpleAirQualityTextSize;
-	private int particleNameTextSize;
-	private int gradeValueTextSize;
-	private int gradeDescriptionTextSize;
 
 	public SixthWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
 		super(context, widgetUpdateCallback, appWidgetId);
@@ -70,13 +57,6 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 		return remoteViews;
 	}
 
-	@Override
-	public RemoteViews createRemoteViews() {
-		RemoteViews remoteViews = createBaseRemoteViews();
-		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
-
-		return remoteViews;
-	}
 
 	@Override
 	public Class<?> widgetProviderClass() {
@@ -92,35 +72,6 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 		return set;
 	}
 
-
-	@Override
-	public void setTextSize(int amount) {
-		final int absSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, Math.abs(amount),
-				context.getResources().getDisplayMetrics());
-		final int extraSize = amount >= 0 ? absSize : absSize * -1;
-
-		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInCommonWidgetHeader) + extraSize;
-		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshDateTimeTextSizeInCommonWidgetHeader) + extraSize;
-		precipitationTextSize = context.getResources().getDimensionPixelSize(R.dimen.precipitationtTextSizeInSixthWidget) + extraSize;
-		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInSixthWidget) + extraSize;
-		simpleAirQualityTextSize = context.getResources().getDimensionPixelSize(R.dimen.airQualityTextSizeInSixthWidget) + extraSize;
-		particleNameTextSize = context.getResources().getDimensionPixelSize(R.dimen.labelTextSizeInAirQualityItem) + extraSize;
-		gradeValueTextSize = context.getResources().getDimensionPixelSize(R.dimen.gradeValueTextSizeInAirQualityItem) + extraSize;
-		gradeDescriptionTextSize = context.getResources().getDimensionPixelSize(R.dimen.gradeDescriptionTextSizeInAirQualityItem) + extraSize;
-		stationNameTextSize = context.getResources().getDimensionPixelSize(R.dimen.stationNameTextSizeInSixthWidget) + extraSize;
-	}
-
-
-	public View makeHeaderViews(LayoutInflater layoutInflater, String addressName, String lastRefreshDateTime) {
-		View view = layoutInflater.inflate(R.layout.header_view_in_widget, null, false);
-		((TextView) view.findViewById(R.id.address)).setText(addressName);
-		((TextView) view.findViewById(R.id.refresh)).setText(ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-
-		((TextView) view.findViewById(R.id.address)).setTextSize(TypedValue.COMPLEX_UNIT_PX, addressTextSize);
-		((TextView) view.findViewById(R.id.refresh)).setTextSize(TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
-
-		return view;
-	}
 
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime, CurrentConditionsDto currentConditionsDto,
 	                         AirQualityDto airQualityDto, OnDrawBitmapCallback onDrawBitmapCallback) {
@@ -141,11 +92,7 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 
 		String stationName = context.getString(R.string.measuring_station_name) + ": " + airQualityDto.getCityName();
 		((TextView) sixWidgetView.findViewById(R.id.measuring_station_name)).setText(stationName);
-		((TextView) sixWidgetView.findViewById(R.id.measuring_station_name)).setTextSize(TypedValue.COMPLEX_UNIT_PX, stationNameTextSize);
 
-		((TextView) sixWidgetView.findViewById(R.id.temperature)).setTextSize(TypedValue.COMPLEX_UNIT_PX, tempTextSize);
-		((TextView) sixWidgetView.findViewById(R.id.precipitation)).setTextSize(TypedValue.COMPLEX_UNIT_PX, precipitationTextSize);
-		((TextView) sixWidgetView.findViewById(R.id.airQuality)).setTextSize(TypedValue.COMPLEX_UNIT_PX, simpleAirQualityTextSize);
 
 		((TextView) sixWidgetView.findViewById(R.id.temperature)).setText(currentConditionsDto.getTemp());
 		((ImageView) sixWidgetView.findViewById(R.id.weatherIcon)).setImageResource(currentConditionsDto.getWeatherIcon());
@@ -246,9 +193,6 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 		gradeValueTextView.setText(gradeValue);
 		gradeDescriptionTextView.setText(gradeDescription);
 
-		labelTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, particleNameTextSize);
-		gradeValueTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, gradeValueTextSize);
-		gradeDescriptionTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, gradeDescriptionTextSize);
 
 		int cellCount = gridLayout.getChildCount();
 		int row = cellCount / gridLayout.getColumnCount();

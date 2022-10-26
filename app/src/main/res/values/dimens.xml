@@ -84,7 +84,7 @@
     <dimen name="precipitationTextSizeInCurrent">12sp</dimen>
     <dimen name="dateTextSizeInClock">14sp</dimen>
     <dimen name="timeTextSizeInClock">21sp</dimen>
-    <dimen name="btnSizeInToolbar">24dp</dimen>
+    <dimen name="btnSizeInToolbar">26dp</dimen>
     <dimen name="searchviewPaddingHorizontal">16dp</dimen>
     <dimen name="searchviewPaddingVertical">8dp</dimen>
     <dimen name="defaultImageSizeInDrawableWithText">18dp</dimen>

@@ -5,14 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.widget.creator.EighthWidgetCreator;
-
 public class EighthWidgetProvider extends BaseAppWidgetProvider {
-	@Override
-	protected AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId) {
-		return new EighthWidgetCreator(context,null,appWidgetId);
-	}
 
 	@Override
 	public void onEnabled(Context context) {

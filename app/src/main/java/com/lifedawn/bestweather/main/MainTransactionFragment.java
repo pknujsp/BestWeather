@@ -225,7 +225,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 				if (fail == Fail.FAILED_FIND_LOCATION) {
 					//기존의 현재 위치 값이 없으면 즐겨찾기로 이동
 					Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
-					LocationResult locationResult = FusedLocation.getINSTANCE(getContext()).getLastCurrentLocation();
+					LocationResult locationResult = new FusedLocation(requireContext().getApplicationContext()).getLastCurrentLocation();
 
 					if (locationResult.getLocations().get(0).getLatitude() == 0.0 ||
 							locationResult.getLocations().get(0).getLongitude() == 0.0) {
@@ -461,6 +461,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 					mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 						@Override
 						public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
+							getChildFragmentManager().popBackStackImmediate();
 							onResultMapFragment(newFavoriteAddressDto);
 						}
 

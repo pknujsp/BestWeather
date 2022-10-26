@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.widget.creator;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,15 +39,6 @@ import java.util.List;
 import java.util.Set;
 
 public class NinthWidgetCreator extends AbstractWidgetCreator {
-	private final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
-
-	private int addressTextSize;
-	private int refreshDateTimeTextSize;
-	private int hourTextSize;
-	private int tempTextSize;
-	private int popTextSize;
-	private int rainVolumeTextSize;
-	private int snowVolumeTextSize;
 
 	private final int hourGap = 3;
 	private final int maxHoursCount = 13;
@@ -77,45 +67,13 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 		return remoteViews;
 	}
 
-	@Override
-	public RemoteViews createRemoteViews() {
-		RemoteViews remoteViews = createBaseRemoteViews();
-		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
 
-		return remoteViews;
-	}
 
 	@Override
 	public Class<?> widgetProviderClass() {
 		return NinthWidgetProvider.class;
 	}
 
-	@Override
-	public void setTextSize(int amount) {
-		final int absSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, Math.abs(amount),
-				context.getResources().getDisplayMetrics());
-		final int extraSize = amount >= 0 ? absSize : absSize * -1;
-
-		addressTextSize = context.getResources().getDimensionPixelSize(R.dimen.addressTextSizeInCommonWidgetHeader) + extraSize;
-		refreshDateTimeTextSize = context.getResources().getDimensionPixelSize(R.dimen.refreshDateTimeTextSizeInCommonWidgetHeader) + extraSize;
-		hourTextSize = context.getResources().getDimensionPixelSize(R.dimen.dateTimeTextSizeInSimpleWidgetForecastItem) + extraSize;
-		tempTextSize = context.getResources().getDimensionPixelSize(R.dimen.tempTextSizeInSimpleWidgetForecastItem) + extraSize;
-		popTextSize = context.getResources().getDimensionPixelSize(R.dimen.popTextSizeInSimpleWidgetForecastItem) + extraSize;
-		rainVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.rainVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
-		snowVolumeTextSize = context.getResources().getDimensionPixelSize(R.dimen.snowVolumeTextSizeInSimpleWidgetForecastItem) + extraSize;
-	}
-
-
-	public View makeHeaderViews(LayoutInflater layoutInflater, String addressName, String lastRefreshDateTime) {
-		View view = layoutInflater.inflate(R.layout.header_view_in_widget, null, false);
-		((TextView) view.findViewById(R.id.address)).setText(addressName);
-		((TextView) view.findViewById(R.id.refresh)).setText(ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-
-		((TextView) view.findViewById(R.id.address)).setTextSize(TypedValue.COMPLEX_UNIT_PX, addressTextSize);
-		((TextView) view.findViewById(R.id.refresh)).setTextSize(TypedValue.COMPLEX_UNIT_PX, refreshDateTimeTextSize);
-
-		return view;
-	}
 
 	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
 	                         List<HourlyForecastDto> hourlyForecastDtoList, OnDrawBitmapCallback onDrawBitmapCallback) {
@@ -179,7 +137,7 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 
 			((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(hourlyForecastDtoList.get(cell).getWeatherIcon());
 
-			((TextView) view.findViewById(R.id.dateTime)).setTextSize(TypedValue.COMPLEX_UNIT_PX, hourTextSize);
+
 
 			view.findViewById(R.id.temperature).setVisibility(View.GONE);
 			view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
@@ -205,7 +163,7 @@ public class NinthWidgetCreator extends AbstractWidgetCreator {
 		tempRowLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
 
 		DetailSingleTemperatureView detailSingleTemperatureView = new DetailSingleTemperatureView(context, tempList);
-		detailSingleTemperatureView.setTempTextSizePx(tempTextSize);
+
 
 		rootLayout.addView(headerView, headerViewLayoutParams);
 		rootLayout.addView(hourAndIconLinearLayout, hourAndIconRowLayoutParams);

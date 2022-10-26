@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -15,7 +14,6 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.OutOfQuotaPolicy;
 import androidx.work.WorkManager;
 
-import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
@@ -26,42 +24,26 @@ import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.work.WidgetListenableWorker;
 
 public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
-	protected AppWidgetManager appWidgetManager;
-	protected final String TAG = "WIDGET_PROVIDER";
 
-	protected AbstractWidgetCreator getWidgetCreatorInstance(Context context, int appWidgetId) {
-		return null;
-	}
-
-	protected void reDraw(Context context, int[] appWidgetIds, Class<?> widgetProviderClass) {
-		if (appWidgetManager == null) {
-			appWidgetManager = AppWidgetManager.getInstance(context);
-		}
-
+	protected void drawWidgets(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		for (int appWidgetId : appWidgetIds) {
-			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null) {
+			if (appWidgetManager.getAppWidgetInfo(appWidgetId) == null)
 				continue;
-			}
 
-			AbstractWidgetCreator widgetCreator = getWidgetCreatorInstance(context, appWidgetId);
+			AbstractWidgetCreator widgetCreator = AbstractWidgetCreator.getInstance(appWidgetManager, context, appWidgetId);
 			widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
 				@Override
 				public void onResultSuccessful(WidgetDto widgetDto) {
 					if (widgetDto != null) {
 						if (widgetDto.isInitialized()) {
-							if (widgetDto.isLoadSuccessful()) {
+							if (widgetDto.isLoadSuccessful())
 								widgetCreator.setDataViewsOfSavedData();
-							} else {
+							else {
 								RemoteViews remoteViews = widgetCreator.createRemoteViews();
 								widgetCreator.setRefreshPendingIntent(remoteViews);
 								RemoteViewsUtil.onErrorProcess(remoteViews, context, widgetDto.getLastErrorType());
 								appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
 							}
-						} else {
-							RemoteViews remoteViews = widgetCreator.createRemoteViews();
-							widgetCreator.setRefreshPendingIntent(remoteViews);
-							RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-							appWidgetManager.updateAppWidget(widgetCreator.getAppWidgetId(), remoteViews);
 						}
 					}
 
@@ -81,19 +63,11 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
 		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
-		Log.e(TAG, "onAppWidgetOptionsChanged");
-		reDraw(context, new int[]{appWidgetId}, getClass());
 	}
 
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		super.onUpdate(context, appWidgetManager, appWidgetIds);
-		Log.e(TAG, "onUpdate");
-
-		for (int appWidgetId : appWidgetIds) {
-			Log.e(TAG, "onUpdate : " + appWidgetId);
-		}
-		reDraw(context, appWidgetIds, getClass());
+		drawWidgets(context, appWidgetManager, appWidgetIds);
 	}
 
 	@Override
@@ -109,11 +83,10 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 	@Override
 	public void onDeleted(Context context, int[] appWidgetIds) {
 		WidgetRepository widgetRepository = WidgetRepository.getINSTANCE();
-		for (int appWidgetId : appWidgetIds) {
+		for (int appWidgetId : appWidgetIds)
 			widgetRepository.delete(appWidgetId, null);
-		}
 
-		appWidgetManager = AppWidgetManager.getInstance(context);
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
 
 		if (appWidgetManager.getInstalledProviders().isEmpty()) {
 			WidgetHelper widgetHelper = new WidgetHelper(context);
@@ -131,7 +104,6 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 
 		if (action != null) {
 			Bundle bundle = intent.getExtras();
-
 			if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_INIT))) {
 				Data data = new Data.Builder().putInt(AppWidgetManager.EXTRA_APPWIDGET_ID,
 						bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)).build();
@@ -142,35 +114,31 @@ public abstract class BaseAppWidgetProvider extends AppWidgetProvider {
 			} else if (action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
 				startWork(context, action, null);
 			} else if (action.equals(context.getString(R.string.com_lifedawn_bestweather_action_REDRAW))) {
-				reDraw(context, bundle.getIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS), getClass());
+				int[] arr = bundle.getIntArray(AppWidgetManager.EXTRA_APPWIDGET_IDS);
+				drawWidgets(context, AppWidgetManager.getInstance(context), arr);
 			}
-
 		}
 
 	}
 
 
 	protected void startWork(Context context, String action, @Nullable Data data) {
-		if (DeviceUtils.Companion.isScreenOn(context)) {
-			Data.Builder dataBuilder = new Data.Builder()
-					.putString("action", action);
+		Data.Builder dataBuilder = new Data.Builder()
+				.putString("action", action);
 
-			if (data != null) {
-				dataBuilder.putAll(data);
-			}
+		if (data != null)
+			dataBuilder.putAll(data);
 
-			final String tag = "widget";
+		final String tag = "widget" + action;
 
-			OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(WidgetListenableWorker.class)
-					.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-					.setInputData(dataBuilder.build())
-					.addTag(tag)
-					.build();
+		OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(WidgetListenableWorker.class)
+				.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+				.setInputData(dataBuilder.build())
+				.addTag(tag)
+				.build();
 
-			WorkManager workManager = WorkManager.getInstance(context);
-			workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.APPEND, request);
-		}
+		WorkManager workManager = WorkManager.getInstance(context);
+		workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.APPEND_OR_REPLACE, request);
 	}
-
 
 }

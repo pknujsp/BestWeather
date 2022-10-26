@@ -19,7 +19,7 @@ public class OngoingNotificationReceiver extends BroadcastReceiver {
 
 		if (action != null) {
 			Data data = new Data.Builder().putString("action", action).build();
-			final String tag = "ongoing_notification";
+			final String tag = "ongoing_notification" + action;
 
 			OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(OngoingNotificationListenableWorker.class)
 					.setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
@@ -28,9 +28,8 @@ public class OngoingNotificationReceiver extends BroadcastReceiver {
 					.build();
 
 			WorkManager workManager = WorkManager.getInstance(context);
-			workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.APPEND, request);
+			workManager.enqueueUniqueWork(tag, ExistingWorkPolicy.REPLACE, request);
 		}
 
 	}
-
 }

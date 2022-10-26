@@ -8,6 +8,7 @@ import android.widget.RemoteViews;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.IntentUtil;
+import com.lifedawn.bestweather.commons.enums.IntentRequestCodes;
 
 public class RemoteViewsUtil {
 
@@ -38,8 +39,8 @@ public class RemoteViewsUtil {
 		switch (errorType) {
 			case GPS_OFF:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.request_to_make_gps_on));
-				remoteViews.setOnClickPendingIntent(R.id.btn2, PendingIntent.getActivity(context, 0,
-						IntentUtil.getLocationSettingsIntent(), PendingIntent.FLAG_MUTABLE));
+				remoteViews.setOnClickPendingIntent(R.id.btn2, PendingIntent.getActivity(context, IntentRequestCodes.GPS.requestCode,
+						IntentUtil.getLocationSettingsIntent(), PendingIntent.FLAG_IMMUTABLE));
 				btn2Text = context.getString(R.string.enable_gps);
 				break;
 			case FAILED_LOAD_WEATHER_DATA:
@@ -47,8 +48,8 @@ public class RemoteViewsUtil {
 				break;
 			case DENIED_GPS_PERMISSIONS:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.message_needs_location_permission));
-				remoteViews.setOnClickPendingIntent(R.id.btn2, PendingIntent.getActivity(context, 0,
-						IntentUtil.getAppSettingsIntent(context), PendingIntent.FLAG_MUTABLE));
+				remoteViews.setOnClickPendingIntent(R.id.btn2, PendingIntent.getActivity(context, IntentRequestCodes.PERMISSION.requestCode,
+						IntentUtil.getAppSettingsIntent(context), PendingIntent.FLAG_IMMUTABLE));
 				btn2Text = context.getString(R.string.check_permission);
 				break;
 			case UNAVAILABLE_NETWORK:
@@ -57,9 +58,9 @@ public class RemoteViewsUtil {
 			case DENIED_BACKGROUND_LOCATION_PERMISSION:
 				remoteViews.setTextViewText(R.id.warning, context.getString(R.string.uncheckedAllowAllTheTime));
 				remoteViews.setOnClickPendingIntent(R.id.btn2,
-						PendingIntent.getActivity(context, 0,
+						PendingIntent.getActivity(context, IntentRequestCodes.PERMISSION.requestCode,
 								IntentUtil.getAppSettingsIntent(context),
-								PendingIntent.FLAG_MUTABLE));
+								PendingIntent.FLAG_IMMUTABLE));
 				btn2Text = context.getString(R.string.check_permission);
 				break;
 		}

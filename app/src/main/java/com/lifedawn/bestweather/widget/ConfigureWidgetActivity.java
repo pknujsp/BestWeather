@@ -133,16 +133,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	};
 
 
-	private boolean isReadStoragePermissionGranted() {
-		if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-				== PackageManager.PERMISSION_GRANTED) {
-			return true;
-		} else {
-			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
-			return false;
-		}
-	}
-
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -161,22 +151,24 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	}
 
 	private void setBackgroundImg() {
-		if (isReadStoragePermissionGranted()) {
-			MyApplication.getExecutorService().execute(new Runnable() {
-				@Override
-				public void run() {
-					WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
-					Drawable wallpaperDrawable = wallpaperManager.getDrawable();
-					MainThreadWorker.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							Glide.with(ConfigureWidgetActivity.this).load(wallpaperDrawable).into(binding.wallpaper);
-							binding.loadingAnimation.setVisibility(View.GONE);
-						}
+		if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+				== PackageManager.PERMISSION_GRANTED) {
+			MyApplication.getExecutorService().execute(() -> {
+				WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
+				Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+
+				if (!isFinishing()) {
+					MainThreadWorker.runOnUiThread(() -> {
+						Glide.with(ConfigureWidgetActivity.this).load(wallpaperDrawable).into(binding.wallpaper);
+						binding.loadingAnimation.setVisibility(View.GONE);
 					});
 				}
 			});
+		} else {
+			ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
+
 		}
+
 	}
 
 	@Override
@@ -184,13 +176,6 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		super.onCreate(savedInstanceState);
 		binding = ActivityConfigureWidgetBinding.inflate(getLayoutInflater());
 		setContentView(binding.getRoot());
-		final Window window = getWindow();
-
-		window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.setStatusBarColor(Color.TRANSPARENT);
-		window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-				View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
 
 		binding.displayDatetimeSwitch.setVisibility(View.GONE);
 		binding.displayLocalDatetimeSwitch.setVisibility(View.GONE);
@@ -261,57 +246,50 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 
 		binding.currentLocationRadio.setChecked(true);
 
-		binding.check.setOnClickListener(new View.OnClickListener() {
+		binding.save.setOnClickListener(v -> widgetCreator.saveSettings(widgetDto, new DbQueryCallback<WidgetDto>() {
 			@Override
-			public void onClick(View v) {
-				widgetCreator.saveSettings(widgetDto, new DbQueryCallback<WidgetDto>() {
+			public void onResultSuccessful(WidgetDto result) {
+				MainThreadWorker.runOnUiThread(new Runnable() {
 					@Override
-					public void onResultSuccessful(WidgetDto result) {
-						MainThreadWorker.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								if (originalWidgetRefreshIntervalValueIndex != widgetRefreshIntervalValueIndex) {
-									PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-											.edit().putLong(getString(R.string.pref_key_widget_refresh_interval),
-													widgetRefreshIntervalValues[widgetRefreshIntervalValueIndex]).commit();
+					public void run() {
+						if (originalWidgetRefreshIntervalValueIndex != widgetRefreshIntervalValueIndex) {
+							PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+									.edit().putLong(getString(R.string.pref_key_widget_refresh_interval),
+											widgetRefreshIntervalValues[widgetRefreshIntervalValueIndex]).commit();
 
-									WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
-									widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshIntervalValues[widgetRefreshIntervalValueIndex]);
-								}
+							WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
+							widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshIntervalValues[widgetRefreshIntervalValueIndex]);
+						}
 
-								Intent resultValue = new Intent();
-								resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-								setResult(RESULT_OK, resultValue);
+						Intent resultValue = new Intent();
+						resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+						setResult(RESULT_OK, resultValue);
 
-								Bundle initBundle = new Bundle();
-								initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+						Bundle initBundle = new Bundle();
+						initBundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
 
-								Intent intent = new Intent(getApplicationContext(), widgetCreator.widgetProviderClass());
-								intent.setAction(getString(R.string.com_lifedawn_bestweather_action_INIT));
-								intent.putExtras(initBundle);
+						Intent intent = new Intent(getApplicationContext(), widgetCreator.widgetProviderClass());
+						intent.setAction(getString(R.string.com_lifedawn_bestweather_action_INIT));
+						intent.putExtras(initBundle);
 
-								PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), IntentRequestCodes.WIDGET_MANUALLY_REFRESH.requestCode,
-										intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-								try {
-									pendingIntent.send();
-								} catch (PendingIntent.CanceledException e) {
-									e.printStackTrace();
-								}
+						PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), IntentRequestCodes.WIDGET_MANUALLY_REFRESH.requestCode,
+								intent, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+						try {
+							pendingIntent.send();
+						} catch (PendingIntent.CanceledException e) {
+							e.printStackTrace();
+						}
 
-								finishAndRemoveTask();
-							}
-						});
-					}
-
-					@Override
-					public void onResultNoData() {
-
+						finishAndRemoveTask();
 					}
 				});
+			}
 
+			@Override
+			public void onResultNoData() {
 
 			}
-		});
+		}));
 
 
 		binding.getRoot().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -440,33 +418,28 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	}
 
 	private void initLocation() {
-		binding.locationRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(RadioGroup group, int checkedId) {
-				if (checkedId == binding.currentLocationRadio.getId() && binding.currentLocationRadio.isChecked()) {
-					binding.changeAddressBtn.setVisibility(View.GONE);
-					binding.selectedAddressName.setVisibility(View.GONE);
+		binding.changeAddressBtn.setVisibility(View.GONE);
+		binding.selectedAddressName.setVisibility(View.GONE);
 
-					widgetDto.setLocationType(LocationType.CurrentLocation);
-				} else if (checkedId == binding.selectedLocationRadio.getId() && binding.selectedLocationRadio.isChecked()) {
-					binding.changeAddressBtn.setVisibility(View.VISIBLE);
-					binding.selectedAddressName.setVisibility(View.VISIBLE);
+		binding.locationRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+			if (checkedId == binding.currentLocationRadio.getId() && binding.currentLocationRadio.isChecked()) {
+				binding.changeAddressBtn.setVisibility(View.GONE);
+				binding.selectedAddressName.setVisibility(View.GONE);
 
-					widgetDto.setLocationType(LocationType.SelectedAddress);
+				widgetDto.setLocationType(LocationType.CurrentLocation);
+			} else if (checkedId == binding.selectedLocationRadio.getId() && binding.selectedLocationRadio.isChecked()) {
+				binding.changeAddressBtn.setVisibility(View.VISIBLE);
+				binding.selectedAddressName.setVisibility(View.VISIBLE);
 
-					if (!selectedFavoriteLocation) {
-						openFavoritesFragment();
-					}
+				widgetDto.setLocationType(LocationType.SelectedAddress);
+
+				if (!selectedFavoriteLocation) {
+					openFavoritesFragment();
 				}
 			}
 		});
 
-		binding.changeAddressBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				openFavoritesFragment();
-			}
-		});
+		binding.changeAddressBtn.setOnClickListener(v -> openFavoritesFragment());
 
 	}
 
@@ -479,7 +452,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 		mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 			@Override
 			public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
-
+				onClickedAddress(newFavoriteAddressDto);
+				getSupportFragmentManager().popBackStack();
 			}
 
 			@Override
@@ -507,8 +481,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 					widgetDto.setTimeZoneId(newSelectedAddressDto.getZoneId());
 
 					binding.selectedAddressName.setText(newSelectedAddressDto.getDisplayName());
+					getSupportFragmentManager().popBackStack();
 				}
-				getSupportFragmentManager().popBackStack();
 			}
 		});
 
@@ -518,8 +492,8 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	}
 
 	private void setTextSizeInWidget(int value) {
-		widgetCreator.setTextSize(value);
-		updatePreview();
+		//widgetCreator.setTextSize(value);
+		//updatePreview();
 	}
 
 	private void setBackgroundAlpha(int alpha) {
