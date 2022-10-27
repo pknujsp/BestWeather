@@ -55,6 +55,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.view.View.MeasureSpec.EXACTLY;
 
@@ -73,6 +75,13 @@ public abstract class AbstractWidgetCreator {
 	protected WidgetDto widgetDto;
 	protected WidgetRepository widgetRepository;
 	protected AppWidgetManager appWidgetManager;
+
+	protected RemoteViewsCallback remoteViewsCallback;
+
+	public AbstractWidgetCreator setRemoteViewsCallback(RemoteViewsCallback remoteViewsCallback) {
+		this.remoteViewsCallback = remoteViewsCallback;
+		return this;
+	}
 
 	public AbstractWidgetCreator setWidgetDto(WidgetDto widgetDto) {
 		this.widgetDto = widgetDto;
@@ -411,9 +420,6 @@ public abstract class AbstractWidgetCreator {
 		widgetDto.setResponseText(rootJsonObject.toString());
 	}
 
-	public void drawBitmap(RemoteViews remoteViews, Bitmap bitmap) {
-		remoteViews.setImageViewBitmap(R.id.bitmapValuesView, bitmap);
-	}
 
 	protected final Bitmap drawBitmap(ViewGroup rootLayout, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, RemoteViews remoteViews,
 	                                  @Nullable Integer parentWidth, @Nullable Integer parentHeight) {
@@ -442,24 +448,30 @@ public abstract class AbstractWidgetCreator {
 			onDrawBitmapCallback.onCreatedBitmap(viewBmp);
 		}
 
+
 		return viewBmp;
 	}
 
 	protected final Bitmap drawBitmap(ViewGroup rootLayout, RemoteViews remoteViews) {
 		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());
 
+		rootLayout.setDrawingCacheEnabled(false);
+		rootLayout.destroyDrawingCache();
+
 		rootLayout.setDrawingCacheEnabled(true);
 		rootLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
 
+		rootLayout.buildDrawingCache();
+
 		Bitmap viewBmp = rootLayout.getDrawingCache();
+
 		remoteViews.setImageViewBitmap(R.id.bitmapValuesView, viewBmp);
 
 		return viewBmp;
 	}
 
 	protected final RemoteViews createBaseRemoteViews() {
-		RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.view_widget);
-		return remoteViews;
+		return new RemoteViews(context.getPackageName(), R.layout.view_widget);
 	}
 
 	public void setResultViews(int appWidgetId,
@@ -473,13 +485,13 @@ public abstract class AbstractWidgetCreator {
 		} else {
 			if (widgetDto.getLastErrorType() == null)
 				widgetDto.setLastErrorType(RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-
 		}
 
 		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
-				appWidgetManager.updateAppWidget(appWidgetId, createRemoteViews());
+				//appWidgetManager.updateAppWidget(appWidgetId, createRemoteViews());
+				remoteViewsCallback.onResult(result.getAppWidgetId(), createRemoteViews());
 			}
 
 			@Override
@@ -510,7 +522,6 @@ public abstract class AbstractWidgetCreator {
 	public RemoteViews createRemoteViews() {
 		RemoteViews remoteViews = createBaseRemoteViews();
 		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
-
 		return remoteViews;
 	}
 
@@ -532,5 +543,23 @@ public abstract class AbstractWidgetCreator {
 
 	public interface WidgetUpdateCallback {
 		void updatePreview();
+	}
+
+	public static abstract class RemoteViewsCallback {
+		private final int requestCount;
+		private final AtomicInteger responseCount = new AtomicInteger(0);
+		private final Map<Integer, RemoteViews> remoteViewsMap = new ConcurrentHashMap<>();
+
+		public RemoteViewsCallback(int requestCount) {
+			this.requestCount = requestCount;
+		}
+
+		private void onResult(int id, RemoteViews remoteViews) {
+			remoteViewsMap.put(id, remoteViews);
+			if (responseCount.incrementAndGet() == requestCount)
+				onFinished(remoteViewsMap);
+		}
+
+		abstract protected void onFinished(Map<Integer, RemoteViews> remoteViewsMap);
 	}
 }

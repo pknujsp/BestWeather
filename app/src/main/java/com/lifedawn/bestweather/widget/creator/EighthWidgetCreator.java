@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -162,7 +161,6 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 			weatherProviderType = WeatherProviderType.KMA_WEB;
 
 		RemoteViews remoteViews = createRemoteViews();
-		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
@@ -180,6 +178,8 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 				hourlyForecastDtoList, null, airQualityDto, null);
 
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 

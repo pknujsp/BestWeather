@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,7 +70,6 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 				WeatherResponseProcessor.getTempHourlyForecastDtoList(context, cellCount), null, parentWidth, parentHeight);
 		return remoteViews;
 	}
-
 
 
 	@Override
@@ -242,7 +240,6 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, true, context);
 
 		RemoteViews remoteViews = createRemoteViews();
-		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 
 		zoneId = ZoneId.of(widgetDto.getTimeZoneId());
 
@@ -257,6 +254,8 @@ public class SecondWidgetCreator extends AbstractWidgetCreator {
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto, currentConditionsDto,
 				hourlyForecastDtoList, null);
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		appWidgetManager.updateAppWidget(appWidgetId,
 				remoteViews);
 	}

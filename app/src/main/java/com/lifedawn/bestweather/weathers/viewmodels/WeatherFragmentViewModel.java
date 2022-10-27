@@ -38,10 +38,15 @@ import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -335,12 +340,10 @@ public class WeatherFragmentViewModel extends AndroidViewModel {
 		if (!FINAL_RESPONSE_MAP.containsKey(latitude.toString() + longitude.toString()))
 			return false;
 
-
-		long dataDownloadedMinutes = TimeUnit.SECONDS.toMinutes(
-				FINAL_RESPONSE_MAP.get(latitude.toString() + longitude).dataDownloadedDateTime.getSecond());
-		long now = TimeUnit.SECONDS.toMinutes(LocalDateTime.now().getSecond());
-
-		return now - dataDownloadedMinutes > 120;
+		long diff = ChronoUnit.MINUTES.between(
+				FINAL_RESPONSE_MAP.get(latitude.toString() + longitude).dataDownloadedDateTime,
+				LocalDateTime.now());
+		return diff >= 30;
 	}
 
 

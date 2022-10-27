@@ -1,16 +1,20 @@
 package com.lifedawn.bestweather.main;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import androidx.core.splashscreen.SplashScreen;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
@@ -33,17 +37,34 @@ import com.lifedawn.bestweather.widget.WidgetHelper;
 public class MainActivity extends AppCompatActivity {
 	private ActivityMainBinding binding;
 	private NetworkStatus networkStatus;
-
+	private InitViewModel initViewModel;
 	private OngoingNotificationViewModel ongoingNotificationViewModel;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		final SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
 		super.onCreate(savedInstanceState);
-
-		setTheme(R.style.AppTheme_Black);
 
 		binding = ActivityMainBinding.inflate(getLayoutInflater());
 		setContentView(binding.getRoot());
+
+		initViewModel = new ViewModelProvider(this).get(InitViewModel.class);
+		final View content = findViewById(android.R.id.content);
+		content.getViewTreeObserver().addOnPreDrawListener(
+				new ViewTreeObserver.OnPreDrawListener() {
+					@Override
+					public boolean onPreDraw() {
+						// Check if the initial data is ready.
+						if (initViewModel.ready) {
+							// The content is ready; start drawing.
+							content.getViewTreeObserver().removeOnPreDrawListener(this);
+							return true;
+						} else {
+							// The content is not ready; suspend.
+							return false;
+						}
+					}
+				});
 
 		Window window = getWindow();
 
@@ -95,15 +116,19 @@ public class MainActivity extends AppCompatActivity {
 			IntroTransactionFragment introTransactionFragment = new IntroTransactionFragment();
 			fragmentTransaction.add(binding.fragmentContainer.getId(), introTransactionFragment,
 					IntroTransactionFragment.class.getName()).commitNow();
+
 		} else {
 			initOngoingNotifications();
 			initDailyNotifications();
-			initWidgets();
+			//initWidgets();
+
 
 			MainTransactionFragment mainTransactionFragment = new MainTransactionFragment();
 			fragmentTransaction.add(binding.fragmentContainer.getId(), mainTransactionFragment,
-					MainTransactionFragment.class.getName()).commitNowAllowingStateLoss();
+					MainTransactionFragment.class.getName()).commitNow();
+
 		}
+
 	}
 
 	private void initOngoingNotifications() {

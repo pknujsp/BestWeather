@@ -26,19 +26,17 @@
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="15sp"
+        android:visibility="gone"
         />
 
-    <TextView
+    <Button
         android:id="@+id/cancel_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_btn_background"
-        android:clickable="true"
         android:gravity="center"
         android:text="@string/cancel"
         android:textAlignment="center"
-        android:textColor="@color/white"
         />
 
 </LinearLayout>

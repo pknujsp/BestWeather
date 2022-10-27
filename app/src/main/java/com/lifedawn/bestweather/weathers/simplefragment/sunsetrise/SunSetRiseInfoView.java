@@ -66,7 +66,7 @@ public class SunSetRiseInfoView extends View {
 		typeTextPaint.getTextBounds(type, 0, type.length(), typeTextRect);
 
 		ValueUnits clockUnit =
-				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(getContext()).getString(getContext().getString(R.string.pref_key_unit_clock),
+				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(getContext()).getString(getContext().getString(R.string.pref_key_unit_clock),
 						ValueUnits.clock12.name()));
 
 		dateTimeFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12

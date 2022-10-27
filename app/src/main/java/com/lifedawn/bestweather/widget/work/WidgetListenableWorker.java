@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.widget.work;
 import android.app.Notification;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Build;
 import android.widget.RemoteViews;
@@ -13,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
+import androidx.work.Data;
 import androidx.work.ForegroundInfo;
 import androidx.work.ListenableWorker;
 import androidx.work.WorkerParameters;
@@ -72,14 +72,13 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class WidgetListenableWorker extends ListenableWorker {
 	private final Map<Integer, WidgetDto> currentLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
 	private final Map<Integer, WidgetDto> selectedLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
 	private final Map<Integer, WidgetDto> allWidgetDtoArrayMap = new ConcurrentHashMap<>();
-	private final Map<Integer, Class<?>> allWidgetProviderClassArrayMap = new ConcurrentHashMap<>();
-	//private final Map<Integer, RemoteViews> remoteViewsArrayMap = new ConcurrentHashMap<>();
 	private final Map<Integer, WeatherRestApiDownloader> multipleRestApiDownloaderMap = new ConcurrentHashMap<>();
 	private final Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new ConcurrentHashMap<>();
 
@@ -98,9 +97,12 @@ public class WidgetListenableWorker extends ListenableWorker {
 	private final String ACTION;
 	private final int APP_WIDGET_ID;
 
+	public static AtomicBoolean processing = new AtomicBoolean(false);
+
 
 	public WidgetListenableWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
 		super(context, workerParams);
+		processing.set(true);
 
 		if (widgetRepository == null) {
 			widgetRepository = WidgetRepository.getINSTANCE();
@@ -109,8 +111,9 @@ public class WidgetListenableWorker extends ListenableWorker {
 			appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
 		}
 
-		ACTION = workerParams.getInputData().getString("action");
-		APP_WIDGET_ID = workerParams.getInputData().getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 0);
+		Data parameterData = workerParams.getInputData();
+		ACTION = parameterData.getString("action");
+		APP_WIDGET_ID = parameterData.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 0);
 
 		currentLocationRequestObj = null;
 		currentLocationWidgetDtoArrayMap.clear();
@@ -119,9 +122,7 @@ public class WidgetListenableWorker extends ListenableWorker {
 		selectedLocationResponseMap.clear();
 		selectedLocationWidgetDtoArrayMap.clear();
 		allWidgetDtoArrayMap.clear();
-		allWidgetProviderClassArrayMap.clear();
 
-		//remoteViewsArrayMap.clear();
 		multipleRestApiDownloaderMap.clear();
 		widgetCreatorMap.clear();
 	}
@@ -129,8 +130,14 @@ public class WidgetListenableWorker extends ListenableWorker {
 	@NonNull
 	@Override
 	public ListenableFuture<Result> startWork() {
+		processing.set(true);
+
+
 		return CallbackToFutureAdapter.getFuture(completer -> {
-			final BackgroundWorkCallback backgroundWorkCallback = () -> completer.set(Result.success());
+			final BackgroundWorkCallback backgroundWorkCallback = () -> {
+				completer.set(Result.success());
+			};
+
 
 			if (ACTION.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_INIT))) {
 				widgetRepository.get(APP_WIDGET_ID, new DbQueryCallback<WidgetDto>() {
@@ -144,10 +151,24 @@ public class WidgetListenableWorker extends ListenableWorker {
 							widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
 						}
 
-						//remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),
-						//widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
 						requestCount = 1;
 
+						final AbstractWidgetCreator.RemoteViewsCallback remoteViewsCallback =
+								new AbstractWidgetCreator.RemoteViewsCallback(requestCount) {
+
+									@Override
+									protected void onFinished(Map<Integer, RemoteViews> remoteViewsMap) {
+										processing.set(false);
+
+
+										for (int id : remoteViewsMap.keySet()) {
+											appWidgetManager.updateAppWidget(id, remoteViewsMap.get(id));
+										}
+										backgroundWorkCallback.onFinished();
+									}
+								};
+
+						widgetCreator.setRemoteViewsCallback(remoteViewsCallback);
 						if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
 							currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
 							allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
@@ -185,13 +206,26 @@ public class WidgetListenableWorker extends ListenableWorker {
 					@Override
 					public void onResultSuccessful(List<WidgetDto> list) {
 						List<String> addressList = new ArrayList<>();
-						for (WidgetDto widgetDto : list) {
 
+						final AbstractWidgetCreator.RemoteViewsCallback remoteViewsCallback =
+								new AbstractWidgetCreator.RemoteViewsCallback(list.size()) {
+
+									@Override
+									protected void onFinished(Map<Integer, RemoteViews> remoteViewsMap) {
+										processing.set(false);
+
+										for (int id : remoteViewsMap.keySet()) {
+											appWidgetManager.updateAppWidget(id, remoteViewsMap.get(id));
+										}
+										backgroundWorkCallback.onFinished();
+									}
+								};
+
+
+						for (WidgetDto widgetDto : list) {
 							AbstractWidgetCreator widgetCreator = createWidgetViewCreator(widgetDto.getAppWidgetId(),
 									widgetDto.getWidgetProviderClassName());
-
-							//remoteViewsArrayMap.put(widgetDto.getAppWidgetId(),
-							//		widgetCreatorMap.get(widgetDto.getAppWidgetId()).createRemoteViews());
+							widgetCreator.setRemoteViewsCallback(remoteViewsCallback);
 
 							if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
 								currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
@@ -239,7 +273,6 @@ public class WidgetListenableWorker extends ListenableWorker {
 					}
 				});
 			}
-
 			return backgroundWorkCallback;
 		});
 
@@ -299,8 +332,11 @@ public class WidgetListenableWorker extends ListenableWorker {
 		};
 	}
 
+
 	@Override
 	public void onStopped() {
+		processing.set(false);
+
 		// WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
 		// widgetHelper.reDrawWidgets(null);
 	}
@@ -311,7 +347,6 @@ public class WidgetListenableWorker extends ListenableWorker {
 
 		for (Integer appWidgetId : allWidgetDtoArrayMap.keySet())
 			appWidgetManager.updateAppWidget(appWidgetId, tempRemoteViews);
-
 	}
 
 
@@ -342,7 +377,6 @@ public class WidgetListenableWorker extends ListenableWorker {
 			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), null, appWidgetId);
 		}
 
-		allWidgetProviderClassArrayMap.put(appWidgetId, widgetCreator.widgetProviderClass());
 		widgetCreatorMap.put(appWidgetId, widgetCreator);
 
 		return widgetCreator;
@@ -517,9 +551,12 @@ public class WidgetListenableWorker extends ListenableWorker {
 			currentLocationRequestObj = null;
 		}
 
+		/*
 		if (responseCount.incrementAndGet() == requestCount) {
 			backgroundWorkCallback.onFinished();
 		}
+
+		 */
 	}
 
 

@@ -10,15 +10,18 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.FragmentIntroTransactionBinding;
+import com.lifedawn.bestweather.main.InitViewModel;
 import com.lifedawn.bestweather.main.MyApplication;
 
 import org.jetbrains.annotations.NotNull;
 
 public class IntroTransactionFragment extends Fragment {
 	private FragmentIntroTransactionBinding binding;
+
 	private OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
 		@Override
 		public void handleOnBackPressed() {

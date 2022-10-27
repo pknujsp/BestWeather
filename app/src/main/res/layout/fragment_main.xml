@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@drawable/navigation_drawer_background"
+        android:backgroundTint="@color/white"
         >
 
         <androidx.core.widget.NestedScrollView

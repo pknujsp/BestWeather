@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.ArrayMap;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -83,7 +82,6 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 				null, parentWidth, parentHeight);
 		return remoteViews;
 	}
-
 
 
 	@Override
@@ -305,7 +303,7 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 	@Override
 	public void setDataViewsOfSavedData() {
 		RemoteViews remoteViews = createRemoteViews();
-		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 
 		zoneId = ZoneId.of(widgetDto.getTimeZoneId());
 
@@ -325,6 +323,8 @@ public class EleventhWidgetCreator extends AbstractWidgetCreator {
 				weatherSourceTypeListArrayMap, null);
 
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
 	}
 

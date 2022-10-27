@@ -177,7 +177,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		clockPreference.setKey(getString(R.string.pref_key_unit_clock));
 		clockPreference.setTitle(R.string.pref_title_unit_clock);
 		clockPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
-		clockPreference.setUnit(ValueUnits.enumOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), "")));
+		clockPreference.setUnit(ValueUnits.valueOf(sharedPreferences.getString(getString(R.string.pref_key_unit_clock), "")));
 		clockPreference.setIconSpaceReserved(false);
 
 		clockPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -215,7 +215,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 	}
 
 	private int getCheckedItem(ValueType valueType, String key) {
-		ValueUnits valueUnit = ValueUnits.enumOf(sharedPreferences.getString(key, ""));
+		ValueUnits valueUnit = ValueUnits.valueOf(sharedPreferences.getString(key, ""));
 
 		switch (valueType) {
 			case temp:

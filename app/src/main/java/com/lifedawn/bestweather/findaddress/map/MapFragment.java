@@ -450,6 +450,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				}
 
 				final SimpleFavoritesFragment simpleFavoritesFragment = new SimpleFavoritesFragment();
+				Bundle bundle = new Bundle();
+				bundle.putBoolean("showCheckBtn", showFavoriteAddBtn);
+				simpleFavoritesFragment.setArguments(bundle);
+
 				simpleFavoritesFragment.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
 					@Override
 					public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {

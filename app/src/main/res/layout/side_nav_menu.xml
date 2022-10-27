@@ -3,12 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <LinearLayout
         android:id="@+id/current_location_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:background="@drawable/rectangle_btn_background"
         android:backgroundTint="@color/favorite_location_background_color"
         android:clickable="true"
@@ -16,8 +18,8 @@
         android:paddingLeft="16dp"
         android:paddingTop="12dp"
         android:paddingRight="16dp"
-        android:layout_marginBottom="12dp"
-        android:paddingBottom="12dp">
+        android:paddingBottom="12dp"
+        >
 
         <TextView
             android:layout_width="wrap_content"
@@ -29,7 +31,8 @@
             android:text="@string/current_location"
             android:textColor="@color/white"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            />
 
         <TextView
             android:id="@+id/address_name"
@@ -37,7 +40,8 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-light"
             android:textColor="@color/white"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            />
 
     </LinearLayout>
 
@@ -45,23 +49,46 @@
         android:id="@+id/favorite_address_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipChildren="false"
         android:layout_marginBottom="12dp"
+        android:clipChildren="false"
         android:clipToPadding="false"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        />
 
     <TextView
         android:id="@+id/favorites"
         style="@style/TextViewInSideNav"
-        android:text="@string/favorite" />
+        android:text="@string/favorite"
+        />
 
     <TextView
         android:id="@+id/notificationAlarmSettings"
         style="@style/TextViewInSideNav"
-        android:text="@string/notificationAndAlarm" />
+        android:text="@string/notificationAndAlarm"
+        />
 
     <TextView
         android:id="@+id/settings"
         style="@style/TextViewInSideNav"
-        android:text="@string/settings" />
+        android:text="@string/settings"
+        />
+
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="36dp"
+        android:scaleType="fitXY"
+        android:src="@mipmap/ic_launcher_foreground"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/app_name"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        />
 </LinearLayout>

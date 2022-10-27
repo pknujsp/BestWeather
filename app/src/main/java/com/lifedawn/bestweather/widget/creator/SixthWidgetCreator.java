@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.widget.creator;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -223,7 +222,6 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 		zoneId = ZoneId.of(widgetDto.getTimeZoneId());
 
 		RemoteViews remoteViews = createRemoteViews();
-		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 
 		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
 
@@ -234,6 +232,8 @@ public class SixthWidgetCreator extends AbstractWidgetCreator {
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), currentConditionsDto,
 				airQualityDto, null);
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		appWidgetManager.updateAppWidget(appWidgetId,
 				remoteViews);
 	}

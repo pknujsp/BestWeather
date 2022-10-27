@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentIntroBinding;
 import com.lifedawn.bestweather.findaddress.map.MapFragment;
+import com.lifedawn.bestweather.main.InitViewModel;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -37,6 +39,7 @@ import java.util.Map;
 
 public class IntroFragment extends Fragment {
 	private FragmentIntroBinding binding;
+	private InitViewModel initViewModel;
 	private FusedLocation fusedLocation;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 
@@ -54,7 +57,8 @@ public class IntroFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		initViewModel = new ViewModelProvider(requireActivity()).get(InitViewModel.class);
+
 		fusedLocation = new FusedLocation(requireContext().getApplicationContext());
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
@@ -123,6 +127,12 @@ public class IntroFragment extends Fragment {
 						MapFragment.class.getName()).addToBackStack(MapFragment.class.getName()).setPrimaryNavigationFragment(mapFragment).commitAllowingStateLoss();
 			}
 		});
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		initViewModel.ready = true;
 	}
 
 	@Override

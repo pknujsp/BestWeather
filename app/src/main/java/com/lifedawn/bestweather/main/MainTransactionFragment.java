@@ -67,6 +67,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	private SharedPreferences sharedPreferences;
 	private List<FavoriteAddressDto> favoriteAddressDtoList = new ArrayList<>();
 	private String currentAddressName;
+	private InitViewModel initViewModel;
 
 	private final CloseWindow closeWindow = new CloseWindow(new CloseWindow.OnBackKeyDoubleClickedListener() {
 		@Override
@@ -81,7 +82,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			if (getChildFragmentManager().getBackStackEntryCount() > 0) {
 				getChildFragmentManager().popBackStackImmediate();
 			} else {
-				//closeWindow.clicked(getActivity());
 				if (binding.drawerLayout.isDrawerOpen(binding.sideNavigation))
 					binding.drawerLayout.closeDrawer(binding.sideNavigation);
 				else
@@ -102,6 +102,13 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			if (f instanceof SettingsMainFragment) {
 				originalUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
 			}
+		}
+
+		@Override
+		public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
+			super.onFragmentStarted(fm, f);
+			if (!initViewModel.ready)
+				initViewModel.ready = true;
 		}
 
 		@Override
@@ -212,7 +219,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-
+		initViewModel = new ViewModelProvider(requireActivity()).get(InitViewModel.class);
 		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
 		weatherViewModel.setLocationCallback(new FusedLocation.MyLocationCallback() {
 			@Override
@@ -241,6 +248,16 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentMainBinding.inflate(inflater);
+
+		binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
+		binding.sideNavMenu.favorites.setOnClickListener(sideNavOnClickListener);
+		binding.sideNavMenu.settings.setOnClickListener(sideNavOnClickListener);
+		binding.sideNavMenu.notificationAlarmSettings.setOnClickListener(sideNavOnClickListener);
+
+		int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
+		binding.sideNavMenu.currentLocationLayout.setPadding(padding, MyApplication.getStatusBarHeight() + padding, padding,
+				padding);
 		return binding.getRoot();
 	}
 
@@ -257,15 +274,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			currentAddressName = savedInstanceState.getString("currentAddressName");
 		}
 
-		binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-
-		binding.sideNavMenu.favorites.setOnClickListener(sideNavOnClickListener);
-		binding.sideNavMenu.settings.setOnClickListener(sideNavOnClickListener);
-		binding.sideNavMenu.notificationAlarmSettings.setOnClickListener(sideNavOnClickListener);
-
-		int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
-		binding.sideNavMenu.currentLocationLayout.setPadding(padding, MyApplication.getStatusBarHeight() + padding, padding,
-				padding);
 
 		binding.sideNavMenu.currentLocationLayout.setOnClickListener(new View.OnClickListener() {
 			@Override

@@ -99,7 +99,9 @@ import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hou
 import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
+import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.timezone.TimeZoneUtils;
+import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
@@ -273,11 +275,6 @@ public class WeatherFragment extends Fragment implements IGps {
 		RelativeLayout.LayoutParams headerLayoutParams = (RelativeLayout.LayoutParams) binding.headerLayout.getLayoutParams();
 		headerLayoutParams.topMargin = topMargin;
 		binding.headerLayout.setLayoutParams(headerLayoutParams);
-
-		FrameLayout.LayoutParams shimmerLayoutParams = (FrameLayout.LayoutParams) binding.shimmer.getLayoutParams();
-		shimmerLayoutParams.topMargin = topMargin;
-		binding.shimmer.setLayoutParams(shimmerLayoutParams);
-
 
 		shimmer(true);
 
@@ -466,8 +463,9 @@ public class WeatherFragment extends Fragment implements IGps {
 		weatherFragmentViewModel.weatherDataLiveData.observe(getViewLifecycleOwner(), new Observer<ResponseResultObj>() {
 			@Override
 			public void onChanged(ResponseResultObj responseResultObj) {
-				if (responseResultObj != null)
+				if (responseResultObj != null) {
 					processOnResult(responseResultObj);
+				}
 			}
 		});
 
@@ -1237,9 +1235,9 @@ public class WeatherFragment extends Fragment implements IGps {
 
 	private void shimmer(boolean showShimmer) {
 		if (showShimmer) {
+			binding.shimmer.startShimmer();
 			binding.rootSubLayout.setVisibility(View.GONE);
 			binding.shimmer.setVisibility(View.VISIBLE);
-			binding.shimmer.startShimmer();
 		} else {
 			binding.shimmer.setVisibility(View.GONE);
 			binding.shimmer.stopShimmer();

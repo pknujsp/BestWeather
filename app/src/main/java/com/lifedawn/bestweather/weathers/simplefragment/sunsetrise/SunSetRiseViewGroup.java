@@ -125,7 +125,7 @@ public class SunSetRiseViewGroup extends FrameLayout {
 		current = context.getString(R.string.current);
 
 		ValueUnits clockUnit =
-				ValueUnits.enumOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock),
+				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock),
 						ValueUnits.clock12.name()));
 		String dateTimeFormat = clockUnit == ValueUnits.clock12
 				? context.getString(R.string.datetime_pattern_clock12) : context.getString(R.string.datetime_pattern_clock24);

@@ -26,11 +26,11 @@ public class ProgressDialog {
 	private ProgressDialog() {
 	}
 
-	public static AlertDialog show(Activity activity, String msg, @Nullable View.OnClickListener cancelOnClickListener) {
+	public static void show(Activity activity, String msg, @Nullable View.OnClickListener cancelOnClickListener) {
 		if (!activity.isFinishing() && activity.isDestroyed()) {
-			return null;
-		}
-
+			return;
+		} else if (dialogStack.size() > 0)
+			return;
 
 		View progressView = LayoutInflater.from(activity.getApplicationContext()).inflate(R.layout.progress_view, null);
 		((TextView) progressView.findViewById(R.id.progress_msg)).setText(msg);
@@ -61,8 +61,6 @@ public class ProgressDialog {
 		}
 
 		dialogStack.push(dialog);
-
-		return dialog;
 	}
 
 	public static void clearDialogs() {

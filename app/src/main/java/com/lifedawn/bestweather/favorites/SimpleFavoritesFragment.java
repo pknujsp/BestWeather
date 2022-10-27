@@ -29,9 +29,10 @@ import java.util.List;
 
 public class SimpleFavoritesFragment extends Fragment {
 	private FragmentSimpleFavoritesBinding binding;
-	private FavoriteAddressesAdapter adapter = new FavoriteAddressesAdapter();
+	private FavoriteAddressesAdapter adapter;
 	private WeatherViewModel weatherViewModel;
 	private FavoriteAddressesAdapter.OnClickedAddressListener onClickedAddressListener;
+	private Bundle bundle;
 
 	public SimpleFavoritesFragment setOnClickedAddressListener(FavoriteAddressesAdapter.OnClickedAddressListener onClickedAddressListener) {
 		this.onClickedAddressListener = onClickedAddressListener;
@@ -42,6 +43,10 @@ public class SimpleFavoritesFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
+
+		bundle = getArguments() != null ? getArguments() : savedInstanceState;
+		boolean showCheckBtn = bundle.getBoolean("showCheckBtn", false);
+		adapter = new FavoriteAddressesAdapter(showCheckBtn);
 	}
 
 	@Override
@@ -49,6 +54,12 @@ public class SimpleFavoritesFragment extends Fragment {
 	                         Bundle savedInstanceState) {
 		binding = FragmentSimpleFavoritesBinding.inflate(inflater);
 		return binding.getRoot();
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(bundle);
 	}
 
 	@Override

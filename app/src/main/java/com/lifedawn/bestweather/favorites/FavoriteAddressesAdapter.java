@@ -21,6 +21,11 @@ import java.util.List;
 public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddressesAdapter.ViewHolder> {
 	private List<FavoriteAddressDto> favoriteAddressDtoList = new ArrayList<>();
 	private OnClickedAddressListener onClickedAddressListener;
+	private final boolean showCheckBtn;
+
+	public FavoriteAddressesAdapter(boolean showCheckBtn) {
+		this.showCheckBtn = showCheckBtn;
+	}
 
 	public void setOnClickedAddressListener(OnClickedAddressListener onClickedAddressListener) {
 		this.onClickedAddressListener = onClickedAddressListener;
@@ -59,8 +64,10 @@ public class FavoriteAddressesAdapter extends RecyclerView.Adapter<FavoriteAddre
 		public ViewHolder(@NonNull @NotNull FavoriteAddressItemBinding binding) {
 			super(binding.getRoot());
 			this.binding = binding;
+			if (!showCheckBtn)
+				binding.check.setVisibility(View.GONE);
 
-			binding.getRoot().setOnClickListener(new View.OnClickListener() {
+			binding.check.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
 					onClickedAddressListener.onClicked(favoriteAddressDtoList.get(getBindingAdapterPosition()));

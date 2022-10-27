@@ -166,7 +166,6 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, true, context);
 
 		RemoteViews remoteViews = createRemoteViews();
-		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
 
 		zoneId = ZoneId.of(widgetDto.getTimeZoneId());
 
@@ -177,6 +176,8 @@ public class FirstWidgetCreator extends AbstractWidgetCreator {
 
 		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(), airQualityDto, currentConditionsDto, null);
 		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
+
 		appWidgetManager.updateAppWidget(appWidgetId,
 				remoteViews);
 	}
