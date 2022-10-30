@@ -238,9 +238,17 @@ public class WeatherFragment extends Fragment implements IGps {
 
 		flickrViewModel = new ViewModelProvider(this).get(FlickrViewModel.class);
 
+		weatherFragmentViewModel.arguments = getArguments() == null ? savedInstanceState : getArguments();
+
+		if (weatherFragmentViewModel.arguments.getBoolean("load", false)) {
+			weatherFragmentViewModel.load = true;
+			weatherFragmentViewModel.arguments.putBoolean("load", false);
+		} else {
+			weatherFragmentViewModel.load = false;
+		}
+
 		if (getArguments() != null)
-			weatherFragmentViewModel.arguments = getArguments();
-		weatherFragmentViewModel.load = weatherFragmentViewModel.arguments.getBoolean("load", false);
+			getArguments().putBoolean("load", false);
 	}
 
 	/**
@@ -279,6 +287,12 @@ public class WeatherFragment extends Fragment implements IGps {
 		shimmer(true);
 
 		return binding.getRoot();
+	}
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(weatherFragmentViewModel.arguments);
 	}
 
 	@SuppressLint("MissingPermission")
@@ -423,6 +437,7 @@ public class WeatherFragment extends Fragment implements IGps {
 			@Override
 			public void onChanged(FlickrRepository.FlickrImgResponse flickrImgResponse) {
 				if (flickrImgResponse.successful) {
+					changeTextColor(Color.WHITE);
 					Glide.with(requireContext()).load(flickrImgResponse.flickrImgData.getImg()).diskCacheStrategy(DiskCacheStrategy.ALL).transition(
 							DrawableTransitionOptions.withCrossFade(300)).into(binding.currentConditionsImg);
 
@@ -436,11 +451,12 @@ public class WeatherFragment extends Fragment implements IGps {
 					binding.flickrImageUrl.setVisibility(View.VISIBLE);
 					binding.loadingAnimation.setVisibility(View.GONE);
 				} else {
+					changeTextColor(Color.BLACK);
 					Glide.with(requireContext()).clear(binding.currentConditionsImg);
 
 					final String text = getString(R.string.failed_load_img);
 					binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
-							ContextCompat.getColor(getContext(), R.color.white)));
+							ContextCompat.getColor(getContext(), R.color.black)));
 					binding.flickrImageUrl.setTag("failed");
 
 					if (flickrImgResponse.flickrImgData != null) {
@@ -470,8 +486,6 @@ public class WeatherFragment extends Fragment implements IGps {
 		});
 
 		if (weatherFragmentViewModel.load) {
-			weatherFragmentViewModel.load = false;
-			weatherFragmentViewModel.arguments.remove("load");
 			load(locationType, favoriteAddressDto);
 		} else {
 			shimmer(false);
@@ -560,22 +574,6 @@ public class WeatherFragment extends Fragment implements IGps {
 
 	}
 
-
-	@Override
-	public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-		super.onViewStateRestored(savedInstanceState);
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-	}
-
-	@Override
-	public void onStop() {
-		super.onStop();
-	}
-
 	@Override
 	public void onDestroy() {
 		if (weatherFragmentViewModel.weatherRestApiDownloader != null) {
@@ -626,6 +624,7 @@ public class WeatherFragment extends Fragment implements IGps {
 		public void onFailed(Fail fail) {
 			locationCallbackInMainFragment.onFailed(fail);
 			ProgressDialog.clearDialogs();
+			shimmer(false);
 
 			if (fail == Fail.DISABLED_GPS) {
 				fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
@@ -670,7 +669,6 @@ public class WeatherFragment extends Fragment implements IGps {
 						iWeatherFragment.addWeatherFragment(weatherFragmentViewModel.locationType, weatherFragmentViewModel.selectedFavoriteAddressDto, argument);
 					}
 				}, getString(R.string.again)));
-				shimmer(false);
 				setFailFragment(btnObjList);
 			}
 
@@ -765,7 +763,6 @@ public class WeatherFragment extends Fragment implements IGps {
 
 	private void requestNewDataWithAnotherWeatherSource(WeatherProviderType newWeatherProviderType, WeatherProviderType lastWeatherProviderType) {
 		ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), null);
-		shimmer(true);
 		weatherFragmentViewModel.requestNewDataWithAnotherWeatherSource(newWeatherProviderType, lastWeatherProviderType);
 	}
 
@@ -788,6 +785,7 @@ public class WeatherFragment extends Fragment implements IGps {
 							@Override
 							public void run() {
 								shimmer(false);
+								ProgressDialog.clearDialogs();
 								Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
 							}
 						});
@@ -1232,6 +1230,13 @@ public class WeatherFragment extends Fragment implements IGps {
 		});
 	}
 
+	private void changeTextColor(int color) {
+		binding.weatherDataSourceName.setTextColor(color);
+		binding.updatedDatetimeLabel.setTextColor(color);
+		binding.updatedDatetime.setTextColor(color);
+		binding.countryName.setTextColor(color);
+		binding.addressName.setTextColor(color);
+	}
 
 	private void shimmer(boolean showShimmer) {
 		if (showShimmer) {

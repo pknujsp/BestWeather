@@ -67,7 +67,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel {
 	public String addressName;
 	public SharedPreferences sharedPreferences;
 	public ZoneId zoneId;
-	public boolean load;
+	public boolean load = true;
 
 	public WeatherRestApiDownloader weatherRestApiDownloader;
 	public Bundle arguments;
