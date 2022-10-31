@@ -24,7 +24,7 @@ import retrofit2.Response;
 public class Geocoding {
 
 	public static void androidGeocoding(Context context, String query, GeocodingCallback callback) {
-		MyApplication.getExecutorService().execute(new Runnable() {
+		MyApplication.getExecutorService().submit(new Runnable() {
 			@Override
 			public void run() {
 				if (query.isEmpty()) {

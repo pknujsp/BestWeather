@@ -14,6 +14,7 @@ import android.widget.RelativeLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Transformations.map
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationResult
@@ -40,7 +41,7 @@ import java.util.*
 
 class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
     private lateinit var binding: FragmentRainViewerBinding
-    private lateinit var rainViewerViewModel: RainViewerViewModel
+    private val rainViewerViewModel: RainViewerViewModel by viewModels()
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocation: FusedLocation
     private var locationLifeCycleObserver: LocationLifeCycleObserver? = null
@@ -53,7 +54,6 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        rainViewerViewModel = ViewModelProvider(this)[RainViewerViewModel::class.java]
 
         locationLifeCycleObserver = LocationLifeCycleObserver(requireActivity().activityResultRegistry, requireActivity())
         lifecycle.addObserver(locationLifeCycleObserver!!)
@@ -84,7 +84,7 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
             binding.mapButtons.currentLocationBtn.visibility = View.GONE
         } else {
             binding.toolbar.fragmentTitle.text = getString(R.string.radar)
-            binding.toolbar.backBtn.setOnClickListener(View.OnClickListener { parentFragmentManager.popBackStack() })
+            binding.toolbar.backBtn.setOnClickListener { view -> parentFragmentManager.popBackStack() }
         }
         binding.datetime.text = null
 

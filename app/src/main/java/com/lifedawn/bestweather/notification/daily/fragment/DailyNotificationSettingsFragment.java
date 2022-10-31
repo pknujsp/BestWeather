@@ -16,8 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
-import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.RemoteViews;
 import android.widget.SpinnerAdapter;
@@ -35,7 +33,6 @@ import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.notification.daily.viewcreator.AbstractDailyNotiViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.FifthDailyNotificationViewCreator;
@@ -86,7 +83,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		if (getArguments() != null)
 			viewModel.setBundle(getArguments());
 
-		viewModel.setNewNotificationSession(viewModel.getBundle().getBoolean(BundleKey.NewSession.name()));
+		viewModel.setNotificationSession(viewModel.getBundle().getBoolean(BundleKey.NewSession.name()));
 	}
 
 

@@ -32,7 +32,7 @@ public class KmaAreaCodesRepository implements KmaAreaCodesQuery {
 
 	@Override
 	public void getAreaCodes(double latitude, double longitude, DbQueryCallback<List<KmaAreaCodeDto>> callback) {
-		MyApplication.getExecutorService().execute(new Runnable() {
+		MyApplication.getExecutorService().submit(new Runnable() {
 			@Override
 			public void run() {
 				List<KmaAreaCodeDto> list = dao.getAreaCodes(latitude, longitude);

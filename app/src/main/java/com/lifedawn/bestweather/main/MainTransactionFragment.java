@@ -538,23 +538,12 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 		WeatherFragment newWeatherFragment = new WeatherFragment(this);
 		newWeatherFragment.setArguments(bundle);
-		newWeatherFragment.setMenuOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				binding.drawerLayout.openDrawer(binding.sideNavigation);
-			}
-		});
+		newWeatherFragment.setMenuOnClickListener(v -> binding.drawerLayout.openDrawer(binding.sideNavigation));
 
 		newWeatherFragment.setiRefreshFavoriteLocationListOnSideNav((IRefreshFavoriteLocationListOnSideNav) this);
-		newWeatherFragment.setOnResultFragmentListener(new OnResultFragmentListener() {
-			@Override
-			public void onResultFragment(Bundle result) {
-
-			}
-		});
 
 		getChildFragmentManager().beginTransaction().replace(binding.fragmentContainer.getId(), newWeatherFragment,
-				WeatherFragment.class.getName()).setPrimaryNavigationFragment(newWeatherFragment).commitAllowingStateLoss();
+				WeatherFragment.class.getName()).setPrimaryNavigationFragment(newWeatherFragment).commit();
 	}
 
 	@Override
@@ -562,12 +551,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				MainThreadWorker.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						callback.onResultSuccessful(result);
-					}
-				});
+				MainThreadWorker.runOnUiThread(() -> callback.onResultSuccessful(result));
 			}
 
 			@Override

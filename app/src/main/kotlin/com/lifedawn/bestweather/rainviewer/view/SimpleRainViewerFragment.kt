@@ -22,32 +22,31 @@ class SimpleRainViewerFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = FragmentSimpleRainViewerBinding.inflate(inflater)
+
+        binding.weatherCardViewHeader.forecastName.setText(R.string.radar)
+        binding.weatherCardViewHeader.compareForecast.visibility = View.GONE
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.weatherCardViewHeader.forecastName.setText(R.string.radar)
-        binding.weatherCardViewHeader.compareForecast.visibility = View.GONE
 
         val rainViewerFragment = RainViewerFragment()
         rainViewerFragment.arguments = bundle
 
-        childFragmentManager.beginTransaction().replace(binding.fragmentContainer.id, rainViewerFragment).commitAllowingStateLoss()
+        childFragmentManager.beginTransaction().replace(binding.fragmentContainer.id, rainViewerFragment).commit()
 
         binding.weatherCardViewHeader.detailForecast.setOnClickListener {
             val detailRainViewerFragment = RainViewerFragment()
-            val argument = Bundle()
-            argument.putAll(bundle)
-            argument.putBoolean("simpleMode", false)
-            detailRainViewerFragment.arguments = argument
-
+            detailRainViewerFragment.arguments = Bundle().apply {
+                putAll(bundle)
+                putBoolean("simpleMode", false)
+            }
 
             val fragmentManager = requireParentFragment().parentFragmentManager
-            fragmentManager.beginTransaction().hide(fragmentManager.findFragmentByTag(WeatherFragment::class.java.name)!!)
+            fragmentManager.beginTransaction().hide(fragmentManager.primaryNavigationFragment!!)
                     .add(R.id.fragment_container, detailRainViewerFragment, RainViewerFragment::class.simpleName).addToBackStack(
-                            RainViewerFragment::class.simpleName
-                    ).commitAllowingStateLoss()
+                            RainViewerFragment::class.simpleName).commit()
         }
     }
 

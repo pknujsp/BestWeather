@@ -177,7 +177,7 @@
         android:id="@+id/dailyForecast"
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        android:layout_marginTop="@dimen/weather_fragment_bottom_margin"
+        android:layout_marginTop="@dimen/weather_fragment_top_margin"
         android:background="@drawable/card_background"
         android:backgroundTint="@color/cardview_shadow_start_color"
         app:layout_constraintEnd_toEndOf="parent"

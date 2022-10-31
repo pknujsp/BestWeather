@@ -153,7 +153,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 	private void setBackgroundImg() {
 		if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
 				== PackageManager.PERMISSION_GRANTED) {
-			MyApplication.getExecutorService().execute(() -> {
+			MyApplication.getExecutorService().submit(() -> {
 				WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
 				Drawable wallpaperDrawable = wallpaperManager.getDrawable();
 

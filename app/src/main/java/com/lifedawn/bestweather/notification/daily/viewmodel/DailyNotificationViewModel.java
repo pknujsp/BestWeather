@@ -83,7 +83,7 @@ public class DailyNotificationViewModel extends AndroidViewModel {
 		return newNotificationSession;
 	}
 
-	public DailyNotificationViewModel setNewNotificationSession(boolean newNotificationSession) {
+	public void setNotificationSession(boolean newNotificationSession) {
 		this.newNotificationSession = newNotificationSession;
 		if (newNotificationSession) {
 			newNotificationDto = new DailyPushNotificationDto();
@@ -95,7 +95,8 @@ public class DailyNotificationViewModel extends AndroidViewModel {
 
 			editingNotificationDto = newNotificationDto;
 		} else {
-			editingNotificationDto = (DailyPushNotificationDto) bundle.getSerializable("dto");
+			savedNotificationDto = (DailyPushNotificationDto) bundle.getSerializable("dto");
+			editingNotificationDto = savedNotificationDto;
 
 			if (editingNotificationDto.getLocationType() == LocationType.SelectedAddress) {
 				selectedFavoriteAddressDto = new FavoriteAddressDto();
@@ -107,7 +108,6 @@ public class DailyNotificationViewModel extends AndroidViewModel {
 				selectedFavoriteLocation = true;
 			}
 		}
-		return this;
 	}
 
 	public boolean isSelectedFavoriteLocation() {

@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
 		initViewModel = new ViewModelProvider(this).get(InitViewModel.class);
 		final View content = findViewById(android.R.id.content);
+
 		content.getViewTreeObserver().addOnPreDrawListener(
 				new ViewTreeObserver.OnPreDrawListener() {
 					@Override

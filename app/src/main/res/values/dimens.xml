@@ -218,7 +218,7 @@
     <dimen name="yesterdayTempTextSizeInSixWidget">14sp</dimen>
     <dimen name="feelsLikeTempTextSizeInThirdWidget">18sp</dimen>
     <dimen name="adViewMargin">6dp</dimen>
-    <dimen name="weather_fragment_bottom_margin">24dp</dimen>
+    <dimen name="weather_fragment_top_margin">24dp</dimen>
     <dimen name="weather_fragment_lr_margin">8dp</dimen>
 
 </resources>
