@@ -108,6 +108,12 @@ public class AlertFragment extends Fragment {
 		super.onDestroy();
 	}
 
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
+
 	public static class BtnObj {
 		final View.OnClickListener onClickListener;
 		final String text;

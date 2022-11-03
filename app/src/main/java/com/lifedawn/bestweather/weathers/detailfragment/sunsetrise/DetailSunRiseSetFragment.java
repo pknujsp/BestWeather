@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.weathers.detailfragment.sunsetrise;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
@@ -93,7 +95,13 @@ public class DetailSunRiseSetFragment extends Fragment {
 		outState.putAll(bundle);
 	}
 
-	@SuppressLint("ClickableViewAccessibility")
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
+
+	@SuppressLint({"ClickableViewAccessibility", "MissingPermission"})
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);

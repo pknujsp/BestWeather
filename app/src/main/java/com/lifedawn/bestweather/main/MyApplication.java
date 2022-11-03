@@ -8,6 +8,7 @@ import android.os.Build;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.WeatherValueLabels;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.flickr.FlickrRepository;
@@ -68,8 +69,10 @@ public class MyApplication extends Application {
 		DailyPushNotificationRepository.initialize(context);
 		RainViewerRepository.Companion.initialize();
 		WindUtil.init(context);
+		WeatherValueLabels.Companion.load(context);
 		initPreferences();
 	}
+
 
 
 	private void initPreferences() {

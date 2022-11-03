@@ -34,6 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_btn_background"
         android:gravity="center"
         android:text="@string/cancel"
         android:textAlignment="center"

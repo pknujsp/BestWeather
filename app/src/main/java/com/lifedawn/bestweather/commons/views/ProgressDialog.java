@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.databinding.ProgressViewBinding;
 import com.lifedawn.bestweather.widget.DialogActivity;
 
 import java.util.Stack;
@@ -32,10 +33,10 @@ public class ProgressDialog {
 		} else if (dialogStack.size() > 0)
 			return;
 
-		View progressView = LayoutInflater.from(activity.getApplicationContext()).inflate(R.layout.progress_view, null);
-		((TextView) progressView.findViewById(R.id.progress_msg)).setText(msg);
+		ProgressViewBinding binding = ProgressViewBinding.inflate(activity.getLayoutInflater());
+		binding.progressMsg.setText(msg);
 
-		AlertDialog dialog = new AlertDialog.Builder(activity).setCancelable(false).setView(progressView).create();
+		AlertDialog dialog = new AlertDialog.Builder(activity).setCancelable(false).setView(binding.getRoot()).create();
 
 		clearDialogs();
 		dialog.show();
@@ -49,14 +50,11 @@ public class ProgressDialog {
 		}
 
 		if (cancelOnClickListener == null) {
-			progressView.findViewById(R.id.cancel_btn).setVisibility(View.GONE);
+			binding.cancelBtn.setVisibility(View.GONE);
 		} else {
-			progressView.findViewById(R.id.cancel_btn).setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					cancelOnClickListener.onClick(v);
-					dialog.dismiss();
-				}
+			binding.cancelBtn.setOnClickListener(v -> {
+				cancelOnClickListener.onClick(v);
+				dialog.dismiss();
 			});
 		}
 

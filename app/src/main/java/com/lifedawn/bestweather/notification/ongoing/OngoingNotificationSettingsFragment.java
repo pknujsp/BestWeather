@@ -227,6 +227,13 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		super.onDestroy();
 	}
 
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
+
+
 	protected void initAutoRefreshInterval() {
 		binding.commons.autoRefreshIntervalSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 

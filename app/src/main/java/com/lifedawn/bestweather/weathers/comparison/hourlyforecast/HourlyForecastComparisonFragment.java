@@ -62,13 +62,11 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 	@Override
 	public void onAttach(@NonNull Context context) {
 		super.onAttach(context);
-		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (weatherRestApiDownloader != null) {
-					weatherRestApiDownloader.cancel();
-				}
-				getParentFragmentManager().popBackStack();
+		ProgressDialog.show(getActivity(), getString(R.string.msg_refreshing_weather_data), v -> {
+			getParentFragmentManager().popBackStackImmediate();
+
+			if (weatherRestApiDownloader != null) {
+				weatherRestApiDownloader.cancel();
 			}
 		});
 	}
@@ -523,11 +521,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		};
 		weatherRestApiDownloader.setZoneId(zoneId);
 
-		MyApplication.getExecutorService().execute(new Runnable() {
-			@Override
-			public void run() {
-				MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, weatherRestApiDownloader);
-			}
+		MyApplication.getExecutorService().submit(() -> {
+			MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, weatherRestApiDownloader);
 		});
 	}
 

@@ -62,12 +62,6 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	@Override
 	public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		binding = DialogFragmentDetailForecastBinding.inflate(inflater);
-		return binding.getRoot();
-	}
-
-	@Override
-	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
 		final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
 
 		binding.detailForecastViewPager.setOffscreenPageLimit(2);
@@ -89,6 +83,13 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 				super.onPageSelected(position);
 			}
 		});
+
+		return binding.getRoot();
+	}
+
+	@Override
+	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
 	}
 
 	protected void setTabCustomView() {
@@ -115,4 +116,9 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 		super.onDestroy();
 	}
 
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
 }

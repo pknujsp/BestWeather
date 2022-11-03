@@ -40,7 +40,8 @@ import java.time.ZonedDateTime
 import java.util.*
 
 class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
-    private lateinit var binding: FragmentRainViewerBinding
+    private var _binding: FragmentRainViewerBinding? = null
+    private val binding get() = _binding!!
     private val rainViewerViewModel: RainViewerViewModel by viewModels()
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocation: FusedLocation
@@ -68,7 +69,7 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = FragmentRainViewerBinding.inflate(inflater)
+        _binding = FragmentRainViewerBinding.inflate(inflater)
 
         binding.progressResultView.setContentView(binding.mapButtons.root, binding.controlLayout, binding.mapFragmentContainer)
         binding.progressResultView.setBtnOnClickListener {
@@ -107,6 +108,11 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
             }
         })
 
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun addMarker() {

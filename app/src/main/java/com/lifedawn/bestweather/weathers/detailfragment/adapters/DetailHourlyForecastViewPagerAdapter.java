@@ -18,9 +18,12 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
+import com.lifedawn.bestweather.commons.classes.WeatherValueLabels;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.enums.WeatherValueType;
 import com.lifedawn.bestweather.databinding.HeaderviewDetailHourlyforecastBinding;
 import com.lifedawn.bestweather.databinding.ItemviewDetailForecastBinding;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.detailfragment.dto.GridItemDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
@@ -32,22 +35,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<DetailHourlyForecastViewPagerAdapter.ViewHolder> {
-	private Context context;
 	private LayoutInflater layoutInflater;
 	private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
 	private DateTimeFormatter hoursFormatter;
 	private final String feelsLikeTempLabel;
+	private final Context context;
+	private final String noData;
 
 	private List<HourlyForecastDto> hourlyForecastDtoList;
 
 	public DetailHourlyForecastViewPagerAdapter(Context context) {
 		this.context = context;
-		layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		ValueUnits clockUnit =
-				ValueUnits.valueOf(PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_unit_clock),
-						ValueUnits.clock24.name()));
+		layoutInflater = LayoutInflater.from(context);
+		ValueUnits clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit();
 		hoursFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "h a" : "H");
 		feelsLikeTempLabel = context.getString(R.string.feelsLike) + ": ";
+		noData = context.getString(R.string.noData);
 	}
 
 	public DetailHourlyForecastViewPagerAdapter setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
@@ -59,7 +62,8 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 	@NotNull
 	@Override
 	public DetailHourlyForecastViewPagerAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-		return new ViewHolder(layoutInflater.inflate(R.layout.itemview_detail_forecast, parent, false));
+		return new ViewHolder(ItemviewDetailForecastBinding.inflate(layoutInflater, parent, false),
+				HeaderviewDetailHourlyforecastBinding.inflate(layoutInflater, null, false));
 	}
 
 	@Override
@@ -78,14 +82,14 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 		return hourlyForecastDtoList.size();
 	}
 
-	class ViewHolder extends RecyclerView.ViewHolder {
-		private ItemviewDetailForecastBinding binding;
-		private HeaderviewDetailHourlyforecastBinding headerBinding;
+	protected class ViewHolder extends RecyclerView.ViewHolder {
+		private final ItemviewDetailForecastBinding binding;
+		private final HeaderviewDetailHourlyforecastBinding headerBinding;
 
-		public ViewHolder(@NonNull @NotNull View itemView) {
-			super(itemView);
-			binding = ItemviewDetailForecastBinding.bind(itemView);
-			headerBinding = HeaderviewDetailHourlyforecastBinding.inflate(layoutInflater, null, false);
+		public ViewHolder(ItemviewDetailForecastBinding binding, HeaderviewDetailHourlyforecastBinding headerBinding) {
+			super(binding.getRoot());
+			this.binding = binding;
+			this.headerBinding = headerBinding;
 			binding.header.addView(headerBinding.getRoot());
 		}
 
@@ -113,7 +117,6 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 				headerBinding.hours.setText(hourlyForecastDto.getHours().format(hoursFormatter));
 			}
 
-
 			headerBinding.weatherIcon.setImageResource(hourlyForecastDto.getWeatherIcon());
 			headerBinding.temp.setText(hourlyForecastDto.getTemp());
 			headerBinding.feelsLikeTemp.setText(new String(feelsLikeTempLabel + hourlyForecastDto.getFeelsLikeTemp()));
@@ -126,45 +129,55 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			List<GridItemDto> gridItemDtos = new ArrayList<>();
 
 			if (hourlyForecastDto.getPrecipitationType() != null) {
-				gridItemDtos.add(new GridItemDto(context.getString(R.string.precipitation_type),
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.precipitationType),
 						hourlyForecastDto.getPrecipitationType(),
 						ContextCompat.getDrawable(context, hourlyForecastDto.getPrecipitationTypeIcon())));
 			}
 
-			gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_direction), hourlyForecastDto.getWindDirection() == null ?
-					context.getString(R.string.noData) : hourlyForecastDto.getWindDirection(),
+			gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windDirection),
+					hourlyForecastDto.getWindDirection() == null ?
+							noData : hourlyForecastDto.getWindDirection(),
 					ContextCompat.getDrawable(context, R.drawable.arrow), hourlyForecastDto.getWindDirectionVal() + 180));
 
-			gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_speed), hourlyForecastDto.getWindSpeed() == null ?
-					context.getString(R.string.noData) : hourlyForecastDto.getWindSpeed(), null));
+			gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windSpeed),
+					hourlyForecastDto.getWindSpeed() == null ?
+							noData : hourlyForecastDto.getWindSpeed(), null));
 
-			gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_strength), hourlyForecastDto.getWindStrength() == null ?
-					context.getString(R.string.noData) : hourlyForecastDto.getWindStrength(), null));
+			gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windStrength),
+					hourlyForecastDto.getWindStrength() == null ?
+							noData : hourlyForecastDto.getWindStrength(), null));
 
 			if (hourlyForecastDto.getWindGust() != null) {
-				gridItemDtos.add(new GridItemDto(context.getString(R.string.wind_gust), hourlyForecastDto.getWindGust(), null));
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windGust),
+						hourlyForecastDto.getWindGust(), null));
 			}
 			if (hourlyForecastDto.getPressure() != null) {
-				gridItemDtos.add(new GridItemDto(context.getString(R.string.pressure), hourlyForecastDto.getPressure(), null));
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pressure),
+						hourlyForecastDto.getPressure(), null));
 			}
 
 			if (hourlyForecastDto.getHumidity() != null) {
-				gridItemDtos.add(new GridItemDto(context.getString(R.string.humidity), hourlyForecastDto.getHumidity(), null));
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.humidity),
+						hourlyForecastDto.getHumidity(), null));
 			}
 
 			//나머지 - 돌풍, 기압, 이슬점, 운량, 시정, 자외선, 체감기온
 
 			if (hourlyForecastDto.getDewPointTemp() != null) {
-				gridItemDtos.add(new GridItemDto(context.getString(R.string.dew_point), hourlyForecastDto.getDewPointTemp(), null));
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.dewPoint),
+						hourlyForecastDto.getDewPointTemp(), null));
 			}
 			if (hourlyForecastDto.getCloudiness() != null) {
-				gridItemDtos.add(new GridItemDto(context.getString(R.string.cloud_cover), hourlyForecastDto.getCloudiness(), null));
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.cloudiness),
+						hourlyForecastDto.getCloudiness(), null));
 			}
 			if (hourlyForecastDto.getVisibility() != null) {
-				gridItemDtos.add(new GridItemDto(context.getString(R.string.visibility), hourlyForecastDto.getVisibility(), null));
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.visibility),
+						hourlyForecastDto.getVisibility(), null));
 			}
 			if (hourlyForecastDto.getUvIndex() != null) {
-				gridItemDtos.add(new GridItemDto(context.getString(R.string.uv_index), hourlyForecastDto.getUvIndex(), null));
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.uvIndex),
+						hourlyForecastDto.getUvIndex(), null));
 			}
 
 			addGridItems(gridItemDtos);
@@ -174,9 +187,8 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			View gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 			final int blueColor = ContextCompat.getColor(context, R.color.blue);
 
-
 			//강수확률
-			((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.probability_of_precipitation));
+			((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pop));
 			((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPop() == null ? "-" : hourlyForecastDto.getPop());
 			((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 			gridItem.findViewById(R.id.label_icon).setVisibility(View.GONE);
@@ -186,7 +198,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasPor()) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.probability_of_rain));
+				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.por));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPor());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 
@@ -199,7 +211,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasPos()) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.probability_of_snow));
+				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pos));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPos());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 
@@ -212,7 +224,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasPrecipitation() && hourlyForecastDto.getPrecipitationVolume() != null) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.precipitation_volume_of_grid));
+				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.precipitationVolume));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPrecipitationVolume());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 
@@ -225,7 +237,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasRain()) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.rain_volume_of_grid));
+				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.rainVolume));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getRainVolume());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 
@@ -238,7 +250,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasSnow()) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(context.getString(R.string.snow_volume_of_grid));
+				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.snowVolume));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getSnowVolume());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 

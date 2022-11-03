@@ -11,8 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.databinding.TabForecastItemBinding;
 import com.lifedawn.bestweather.weathers.detailfragment.adapters.DetailDailyForecastViewPagerAdapter;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
@@ -25,7 +27,6 @@ import java.util.List;
 
 public class DetailDailyForecastDialogFragment extends BaseDetailDialogFragment {
 	private static List<DailyForecastDto> dailyForecastDtoList;
-	private LayoutInflater layoutInflater;
 
 	public static void setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
 		DetailDailyForecastDialogFragment.dailyForecastDtoList = dailyForecastDtoList;
@@ -65,38 +66,31 @@ public class DetailDailyForecastDialogFragment extends BaseDetailDialogFragment 
 	protected void setTabCustomView() {
 		super.setTabCustomView();
 
-		layoutInflater = getLayoutInflater();
-		ImageView leftIcon = null;
-		ImageView rightIcon = null;
-		TextView temp = null;
-		TextView dateTime = null;
+		LayoutInflater layoutInflater = getLayoutInflater();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E");
 		final String divider = " / ";
 
 		int index = 0;
+		TabForecastItemBinding tabItemBinding = null;
+
 		for (DailyForecastDto item : dailyForecastDtoList) {
-			LinearLayout itemView = (LinearLayout) layoutInflater.inflate(R.layout.tab_forecast_item, binding.tabLayout, false);
+			tabItemBinding = TabForecastItemBinding.inflate(layoutInflater, binding.tabLayout, false);
 
-			leftIcon = (ImageView) itemView.findViewById(R.id.left_weather_icon);
-			rightIcon = (ImageView) itemView.findViewById(R.id.right_weather_icon);
-			temp = (TextView) itemView.findViewById(R.id.temp);
-			dateTime = (TextView) itemView.findViewById(R.id.dateTime);
-
-			dateTime.setText(item.getDate().format(dateTimeFormatter));
-			temp.setText(new String(item.getMinTemp() + divider + item.getMaxTemp()));
+			tabItemBinding.dateTime.setText(item.getDate().format(dateTimeFormatter));
+			tabItemBinding.temp.setText(new String(item.getMinTemp() + divider + item.getMaxTemp()));
 
 			if (item.getValuesList().size() == 1) {
-				leftIcon.setImageResource(item.getValuesList().get(0).getWeatherIcon());
-				rightIcon.setVisibility(View.GONE);
+				Glide.with(tabItemBinding.leftWeatherIcon).load(item.getValuesList().get(0).getWeatherIcon()).into(tabItemBinding.leftWeatherIcon);
+				tabItemBinding.rightWeatherIcon.setVisibility(View.GONE);
 			} else if (item.getValuesList().size() == 2) {
-				leftIcon.setImageResource(item.getValuesList().get(0).getWeatherIcon());
-				rightIcon.setImageResource(item.getValuesList().get(1).getWeatherIcon());
+				Glide.with(tabItemBinding.leftWeatherIcon).load(item.getValuesList().get(0).getWeatherIcon()).into(tabItemBinding.leftWeatherIcon);
+				Glide.with(tabItemBinding.rightWeatherIcon).load(item.getValuesList().get(1).getWeatherIcon()).into(tabItemBinding.rightWeatherIcon);
 			} else if (item.getValuesList().size() == 4) {
-				leftIcon.setImageResource(item.getValuesList().get(1).getWeatherIcon());
-				rightIcon.setImageResource(item.getValuesList().get(2).getWeatherIcon());
+				Glide.with(tabItemBinding.leftWeatherIcon).load(item.getValuesList().get(1).getWeatherIcon()).into(tabItemBinding.leftWeatherIcon);
+				Glide.with(tabItemBinding.rightWeatherIcon).load(item.getValuesList().get(2).getWeatherIcon()).into(tabItemBinding.rightWeatherIcon);
 			}
 
-			binding.tabLayout.getTabAt(index++).setCustomView(itemView);
+			binding.tabLayout.getTabAt(index++).setCustomView(tabItemBinding.getRoot());
 		}
 		binding.tabLayout.selectTab(binding.tabLayout.getTabAt(firstSelectedPosition));
 

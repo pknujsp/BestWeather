@@ -1,40 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    android:orientation="vertical"
     >
 
-    <LinearLayout
-        android:id="@+id/root_layout"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        app:tabGravity="center"
+        app:tabIndicator="@drawable/tabindicator"
+        app:tabIndicatorHeight="2dp"
+        app:tabMode="scrollable"
+        />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/detailForecastViewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/transparent"
-        android:orientation="vertical"
-        >
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingLeft="36dp"
+        android:paddingTop="42dp"
+        android:paddingRight="36dp"
+        android:paddingBottom="42dp"
+        />
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            app:tabGravity="center"
-            app:tabIndicator="@drawable/tabindicator"
-            app:tabIndicatorHeight="2dp"
-            app:tabMode="scrollable"
-            />
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/detailForecastViewPager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:orientation="horizontal"
-            android:paddingLeft="36dp"
-            android:paddingTop="42dp"
-            android:paddingRight="36dp"
-            android:paddingBottom="42dp"
-            />
-
-    </LinearLayout>
-
-</layout>
+</LinearLayout>

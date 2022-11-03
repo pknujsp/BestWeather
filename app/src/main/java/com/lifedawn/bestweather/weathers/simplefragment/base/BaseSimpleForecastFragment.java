@@ -111,6 +111,13 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	}
 
 	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
+
+
+	@Override
 	public void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putAll(bundle);

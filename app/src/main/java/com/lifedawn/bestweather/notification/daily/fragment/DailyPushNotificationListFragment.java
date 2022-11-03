@@ -209,6 +209,13 @@ public class DailyPushNotificationListFragment extends Fragment {
 	}
 
 	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
+
+
+	@Override
 	public void onHiddenChanged(boolean hidden) {
 		super.onHiddenChanged(hidden);
 	}

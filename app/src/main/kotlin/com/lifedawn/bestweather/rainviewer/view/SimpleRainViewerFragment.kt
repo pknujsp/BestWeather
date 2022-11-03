@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.rainviewer.view
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,10 +9,12 @@ import androidx.fragment.app.Fragment
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.databinding.FragmentSimpleRainViewerBinding
 import com.lifedawn.bestweather.weathers.WeatherFragment
+import java.lang.ref.WeakReference
 
 
 class SimpleRainViewerFragment : Fragment() {
-    private lateinit var binding: FragmentSimpleRainViewerBinding
+    private var _binding: FragmentSimpleRainViewerBinding? = null
+    private val binding get() = _binding!!
     private lateinit var bundle: Bundle
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +24,7 @@ class SimpleRainViewerFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = FragmentSimpleRainViewerBinding.inflate(inflater)
+        _binding = FragmentSimpleRainViewerBinding.inflate(inflater)
 
         binding.weatherCardViewHeader.forecastName.setText(R.string.radar)
         binding.weatherCardViewHeader.compareForecast.visibility = View.GONE
@@ -53,5 +56,10 @@ class SimpleRainViewerFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putAll(bundle)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

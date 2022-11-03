@@ -11,12 +11,12 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.ads.AdRequest;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
@@ -30,7 +30,6 @@ import com.lifedawn.bestweather.databinding.ViewDetailHourlyForecastListBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
-import com.lifedawn.bestweather.weathers.view.DoubleWeatherIconView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -97,6 +96,12 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	@Override
 	public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		binding = BaseLayoutDetailForecastBinding.inflate(inflater);
+		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				getParentFragmentManager().popBackStackImmediate();
+			}
+		});
 		return binding.getRoot();
 	}
 
@@ -112,13 +117,6 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		AdRequest adRequest = new AdRequest.Builder().build();
 		binding.adViewBottom.loadAd(adRequest);
 
-		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getParentFragmentManager().popBackStackImmediate();
-			}
-		});
-
 		setDataViewsByList();
 	}
 
@@ -126,6 +124,12 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	public void onDestroy() {
 		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		super.onDestroy();
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
 	}
 
 	@Override
@@ -144,37 +148,28 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 
 	public static class HourlyForecastListAdapter extends RecyclerView.Adapter<HourlyForecastListAdapter.ViewHolder> {
 		private List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
-		private Context context;
 		private OnClickedListViewItemListener<Integer> onClickedForecastItem;
 		private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
 		private DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("H");
 		private final String tempDegree;
 		private final String degree = "°";
-		private ShowDataType showDataType;
+		private final ShowDataType showDataType;
 
-		enum ShowDataType {
+		public enum ShowDataType {
 			Precipitation, Humidity, Wind
 		}
 
-		public HourlyForecastListAdapter(Context context, @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
-			this.context = context;
+		public HourlyForecastListAdapter(@Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem, ShowDataType showDataType) {
 			this.onClickedForecastItem = onClickedForecastItem;
 			tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
+			setHasStableIds(true);
 
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-			final int selectedItem = sharedPreferences.getInt(context.getString(R.string.pref_key_detail_hourly_forecast_show_data), 0);
+			this.showDataType = showDataType;
+		}
 
-			switch (selectedItem) {
-				case 0:
-					showDataType = ShowDataType.Precipitation;
-					break;
-				case 1:
-					showDataType = ShowDataType.Wind;
-					break;
-				case 2:
-					showDataType = ShowDataType.Humidity;
-					break;
-			}
+		@Override
+		public long getItemId(int position) {
+			return (long) position;
 		}
 
 		public void setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
@@ -185,7 +180,8 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		@NotNull
 		@Override
 		public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-			return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.view_detail_hourly_forecast_list, null, false));
+			return new ViewHolder(
+					ViewDetailHourlyForecastListBinding.inflate(LayoutInflater.from(parent.getContext())));
 		}
 
 		@Override
@@ -194,28 +190,39 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		}
 
 		@Override
+		public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
+			super.onViewDetachedFromWindow(holder);
+			Glide.with(holder.itemView.getContext()).clear(holder.binding.weatherIcon);
+		}
+
+		@Override
 		public int getItemCount() {
 			return hourlyForecastDtoList.size();
 		}
 
-		public class ViewHolder extends RecyclerView.ViewHolder {
-			private ViewDetailHourlyForecastListBinding binding;
+		private class ViewHolder extends RecyclerView.ViewHolder {
+			private final ViewDetailHourlyForecastListBinding binding;
+			private final String noData;
 
-			public ViewHolder(@NonNull @NotNull View itemView) {
-				super(itemView);
-				binding = ViewDetailHourlyForecastListBinding.bind(itemView);
-				binding.getRoot().setOnClickListener(new View.OnClickListener() {
+			public ViewHolder(@NonNull @NotNull ViewDetailHourlyForecastListBinding binding) {
+				super(binding.getRoot());
+				this.binding = binding;
+				this.binding.getRoot().setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						onClickedForecastItem.onClickedItem(getBindingAdapterPosition());
 					}
 				});
+				noData = binding.getRoot().getContext().getString(R.string.noData);
 			}
 
 			public void onBind(HourlyForecastDto hourlyForecastDto) {
 				binding.date.setText(hourlyForecastDto.getHours().format(dateFormatter));
 				binding.hours.setText(hourlyForecastDto.getHours().format(hourFormatter));
-				binding.weatherIcon.setImageResource(hourlyForecastDto.getWeatherIcon());
+
+				Glide.with(binding.weatherIcon).load(hourlyForecastDto.getWeatherIcon())
+						.into(binding.weatherIcon);
+
 				binding.temp.setText(hourlyForecastDto.getTemp().replace(tempDegree, degree));
 				binding.pop.setText(hourlyForecastDto.getPop() == null ? "-" : hourlyForecastDto.getPop());
 
@@ -246,9 +253,9 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 					binding.bottomIcon.setRotation(hourlyForecastDto.getWindDirectionVal() + 180);
 
 					binding.rainVolume.setText(hourlyForecastDto.getWindSpeed() == null ?
-							context.getString(R.string.noData) : hourlyForecastDto.getWindSpeed());
+							noData : hourlyForecastDto.getWindSpeed());
 					binding.snowVolume.setText(hourlyForecastDto.getWindDirection() == null ?
-							context.getString(R.string.noData) : hourlyForecastDto.getWindDirection());
+							noData : hourlyForecastDto.getWindDirection());
 
 					binding.rainVolumeLayout.setVisibility(View.VISIBLE);
 					binding.snowVolumeLayout.setVisibility(View.VISIBLE);
@@ -268,7 +275,6 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 
 	public static class DailyForecastListAdapter extends RecyclerView.Adapter<DailyForecastListAdapter.ViewHolder> {
 		private List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
-		private Context context;
 		private OnClickedListViewItemListener<Integer> onClickedForecastItem;
 		private final String tempDegree;
 		private final String degree = "°";
@@ -278,10 +284,9 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
 		private DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
 
-		public DailyForecastListAdapter(Context context,
-		                                @Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
-			this.context = context;
+		public DailyForecastListAdapter(@Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
 			this.onClickedForecastItem = onClickedForecastItem;
+			setHasStableIds(true);
 			tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		}
 
@@ -290,11 +295,17 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 			this.hasPrecipitationVolume = hasPrecipitationVolume;
 		}
 
+		@Override
+		public long getItemId(int position) {
+			return (long) position;
+		}
+
 		@NonNull
 		@NotNull
 		@Override
 		public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-			return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.view_detail_daily_forecast_list, null, false));
+			return new ViewHolder(ViewDetailDailyForecastListBinding.
+					inflate(LayoutInflater.from(parent.getContext()), parent, false));
 		}
 
 		@Override
@@ -304,22 +315,27 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		}
 
 		@Override
+		public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
+			super.onViewDetachedFromWindow(holder);
+			Context context = holder.binding.getRoot().getContext();
+
+			Glide.with(context).clear(holder.binding.leftWeatherIcon);
+			Glide.with(context).clear(holder.binding.rightWeatherIcon);
+		}
+
+		@Override
 		public int getItemCount() {
 			return dailyForecastDtoList.size();
 		}
 
-		public class ViewHolder extends RecyclerView.ViewHolder {
-			private ViewDetailDailyForecastListBinding binding;
+		private class ViewHolder extends RecyclerView.ViewHolder {
+			private final ViewDetailDailyForecastListBinding binding;
 
-			public ViewHolder(@NonNull @NotNull View itemView) {
-				super(itemView);
-				binding = ViewDetailDailyForecastListBinding.bind(itemView);
-				binding.getRoot().setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						onClickedForecastItem.onClickedItem(getBindingAdapterPosition());
-					}
-				});
+			public ViewHolder(@NonNull @NotNull ViewDetailDailyForecastListBinding binding) {
+				super(binding.getRoot());
+				this.binding = binding;
+				this.binding.getRoot().setOnClickListener(v ->
+						onClickedForecastItem.onClickedItem(getBindingAdapterPosition()));
 			}
 
 			public void onBind(DailyForecastDto daily) {

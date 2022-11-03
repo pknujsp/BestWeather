@@ -51,6 +51,7 @@ import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.settings.fragments.SettingsMainFragment;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
+import com.lifedawn.bestweather.weathers.interfaces.ILoadWeatherData;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -68,6 +69,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	private List<FavoriteAddressDto> favoriteAddressDtoList = new ArrayList<>();
 	private String currentAddressName;
 	private InitViewModel initViewModel;
+	private boolean init = true;
 
 	private final CloseWindow closeWindow = new CloseWindow(new CloseWindow.OnBackKeyDoubleClickedListener() {
 		@Override
@@ -292,50 +294,44 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		});
 
 
-		weatherViewModel.favoriteAddressListLiveData.observe(requireActivity(), new Observer<List<FavoriteAddressDto>>() {
-			boolean init = true;
+		weatherViewModel.favoriteAddressListLiveData.observe(requireActivity(), result -> {
+			createLocationsList(result);
 
-			@Override
-			public void onChanged(List<FavoriteAddressDto> result) {
-				createLocationsList(result);
+			if (init) {
+				init = false;
 
-				if (init) {
-					init = false;
+				final boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
+				final LocationType lastSelectedLocationType = LocationType.valueOf(
+						sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
+								LocationType.CurrentLocation.name()));
+				setCurrentLocationState(usingCurrentLocation);
 
-					final boolean usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false);
-					final LocationType lastSelectedLocationType = LocationType.valueOf(
-							sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type),
-									LocationType.CurrentLocation.name()));
-					setCurrentLocationState(usingCurrentLocation);
+				if (currentAddressName != null)
+					binding.sideNavMenu.addressName.setText(currentAddressName);
 
-					if (currentAddressName != null) {
-						binding.sideNavMenu.addressName.setText(currentAddressName);
-					}
-
-					if (lastSelectedLocationType == LocationType.CurrentLocation) {
-						if (usingCurrentLocation) {
-							addWeatherFragment(lastSelectedLocationType, null, null);
-						} else {
-							if (favoriteAddressDtoList.size() > 0) {
-								binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
-							} else {
-								binding.sideNavMenu.favorites.callOnClick();
-							}
-						}
-
+				if (lastSelectedLocationType == LocationType.CurrentLocation) {
+					if (usingCurrentLocation) {
+						addWeatherFragment(lastSelectedLocationType, null, null);
 					} else {
-						final int lastSelectedFavoriteId = sharedPreferences.getInt(
-								getString(R.string.pref_key_last_selected_favorite_address_id), -1);
-						if (!clickLocationItemById(lastSelectedFavoriteId)) {
-							if (favoriteAddressDtoList.size() > 0) {
-								binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
-							} else {
-								binding.sideNavMenu.favorites.callOnClick();
-							}
+						if (favoriteAddressDtoList.size() > 0) {
+							binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+						} else {
+							binding.sideNavMenu.favorites.callOnClick();
 						}
 					}
 
+				} else {
+					final int lastSelectedFavoriteId = sharedPreferences.getInt(
+							getString(R.string.pref_key_last_selected_favorite_address_id), -1);
+					if (!clickLocationItemById(lastSelectedFavoriteId)) {
+						if (favoriteAddressDtoList.size() > 0) {
+							binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick();
+						} else {
+							binding.sideNavMenu.favorites.callOnClick();
+						}
+					}
 				}
+
 			}
 		});
 
@@ -345,6 +341,12 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	@Override
 	public void onStart() {
 		super.onStart();
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
 	}
 
 	public void createLocationsList(List<FavoriteAddressDto> result) {
@@ -534,15 +536,25 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 		bundle.putSerializable("LocationType", locationType);
 		bundle.putSerializable("FavoriteAddressDto", favoriteAddressDto);
-		bundle.putBoolean("load", true);
 
-		WeatherFragment newWeatherFragment = new WeatherFragment(this);
+		final WeatherFragment newWeatherFragment = new WeatherFragment(this);
 		newWeatherFragment.setArguments(bundle);
 		newWeatherFragment.setMenuOnClickListener(v -> binding.drawerLayout.openDrawer(binding.sideNavigation));
 
 		newWeatherFragment.setiRefreshFavoriteLocationListOnSideNav((IRefreshFavoriteLocationListOnSideNav) this);
 
-		getChildFragmentManager().beginTransaction().replace(binding.fragmentContainer.getId(), newWeatherFragment,
+		final FragmentManager fragmentManager = getChildFragmentManager();
+		fragmentManager.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+			@Override
+			public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
+				super.onFragmentStarted(fm, f);
+				fm.unregisterFragmentLifecycleCallbacks(this);
+				if (f instanceof WeatherFragment)
+					((ILoadWeatherData) f).load();
+
+			}
+		}, false);
+		fragmentManager.beginTransaction().replace(binding.fragmentContainer.getId(), newWeatherFragment,
 				WeatherFragment.class.getName()).setPrimaryNavigationFragment(newWeatherFragment).commit();
 	}
 
@@ -560,5 +572,6 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			}
 		});
 	}
+
 
 }

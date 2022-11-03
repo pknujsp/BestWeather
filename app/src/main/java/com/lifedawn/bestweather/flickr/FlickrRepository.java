@@ -65,6 +65,11 @@ public final class FlickrRepository {
 
 	}
 
+	public void clear() {
+		IMG_REQUEST_OBJ_SET.clear();
+		BACKGROUND_IMG_MAP.clear();
+	}
+
 	public void loadImg(Context context, FlickrRequestParameter flickrRequestParameter, GlideImgCallback glideImgCallback) {
 		executorService.submit(new Runnable() {
 			@Override

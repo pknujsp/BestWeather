@@ -52,7 +52,7 @@ public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment
 			}
 		}
 
-		DailyForecastListAdapter adapter = new DailyForecastListAdapter(getContext(), this);
+		DailyForecastListAdapter adapter = new DailyForecastListAdapter(this);
 		adapter.setDailyForecastDtoList(dailyForecastDtoList, hasPrecipitationVolume);
 		binding.listview.setAdapter(adapter);
 	}

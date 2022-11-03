@@ -69,4 +69,11 @@ public class IntroTransactionFragment extends Fragment {
 		super.onDestroy();
 		onBackPressedCallback.remove();
 	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
+
 }

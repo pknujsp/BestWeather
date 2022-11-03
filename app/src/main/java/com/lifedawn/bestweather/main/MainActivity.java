@@ -26,12 +26,14 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
+import com.lifedawn.bestweather.flickr.FlickrRepository;
 import com.lifedawn.bestweather.intro.IntroTransactionFragment;
 import com.lifedawn.bestweather.notification.model.OngoingNotificationDto;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
 import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationViewModel;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel;
 import com.lifedawn.bestweather.widget.WidgetHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -77,11 +79,6 @@ public class MainActivity extends AppCompatActivity {
 
 		networkStatus = NetworkStatus.getInstance(getApplicationContext());
 		ongoingNotificationViewModel = new ViewModelProvider(this).get(OngoingNotificationViewModel.class);
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
 
 		if (networkStatus.networkAvailable()) {
 			processNextStep();
@@ -98,8 +95,20 @@ public class MainActivity extends AppCompatActivity {
 	}
 
 	@Override
+	protected void onStart() {
+		super.onStart();
+	}
+
+	@Override
 	protected void onRestart() {
 		super.onRestart();
+	}
+
+	@Override
+	protected void onDestroy() {
+		FlickrRepository.getINSTANCE().clear();
+		WeatherFragmentViewModel.FINAL_RESPONSE_MAP.clear();
+		super.onDestroy();
 	}
 
 	private void processNextStep() {

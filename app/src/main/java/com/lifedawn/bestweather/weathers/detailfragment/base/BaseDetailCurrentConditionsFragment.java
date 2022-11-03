@@ -75,6 +75,12 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	}
 
 	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
+
+	@Override
 	public void setValuesToViews() {
 
 	}

@@ -222,6 +222,13 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		super.onDestroy();
 	}
 
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
+
+
 	private void initNotificationTypeSpinner() {
 		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.DailyPushNotificationType));
 		binding.notificationTypesSpinner.setAdapter(spinnerAdapter);

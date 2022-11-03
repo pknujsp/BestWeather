@@ -1,22 +1,20 @@
 package com.lifedawn.bestweather.weathers.detailfragment.hourlyforecast;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailHourlyForecastFragment;
-import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
 
 public class DetailHourlyForecastFragment extends BaseDetailHourlyForecastFragment {
 
@@ -36,9 +34,25 @@ public class DetailHourlyForecastFragment extends BaseDetailHourlyForecastFragme
 
 	@Override
 	protected void setDataViewsByList() {
-		HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(getContext(),
-				this);
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+		final int selectedItem = sharedPreferences.getInt(getString(R.string.pref_key_detail_hourly_forecast_show_data), 0);
+
+		HourlyForecastListAdapter.ShowDataType showDataType = null;
+		switch (selectedItem) {
+			case 0:
+				showDataType = HourlyForecastListAdapter.ShowDataType.Precipitation;
+				break;
+			case 1:
+				showDataType = HourlyForecastListAdapter.ShowDataType.Wind;
+				break;
+			case 2:
+				showDataType = HourlyForecastListAdapter.ShowDataType.Humidity;
+				break;
+		}
+		HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(
+				this, showDataType);
 		adapter.setHourlyForecastDtoList(hourlyForecastDtoList);
+		binding.listview.setHasFixedSize(true);
 		binding.listview.setAdapter(adapter);
 	}
 

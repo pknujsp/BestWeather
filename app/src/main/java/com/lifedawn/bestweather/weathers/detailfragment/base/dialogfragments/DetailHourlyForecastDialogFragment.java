@@ -17,6 +17,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.databinding.TabForecastItemBinding;
 import com.lifedawn.bestweather.weathers.detailfragment.adapters.DetailHourlyForecastViewPagerAdapter;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
@@ -28,7 +29,6 @@ import java.util.List;
 
 public class DetailHourlyForecastDialogFragment extends BaseDetailDialogFragment {
 	private static List<HourlyForecastDto> hourlyForecastDtoList;
-	private LayoutInflater layoutInflater;
 
 	public static void setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
 		DetailHourlyForecastDialogFragment.hourlyForecastDtoList = hourlyForecastDtoList;
@@ -68,25 +68,22 @@ public class DetailHourlyForecastDialogFragment extends BaseDetailDialogFragment
 	protected void setTabCustomView() {
 		super.setTabCustomView();
 
-		layoutInflater = getLayoutInflater();
-		ImageView weatherIcon = null;
-		TextView temp = null;
-		TextView hour = null;
+		LayoutInflater layoutInflater = getLayoutInflater();
 		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E H");
 
 		int index = 0;
+		TabForecastItemBinding tabItemBinding = null;
+
 		for (HourlyForecastDto item : hourlyForecastDtoList) {
-			LinearLayout itemView = (LinearLayout) layoutInflater.inflate(R.layout.tab_forecast_item, binding.tabLayout, false);
-			itemView.findViewById(R.id.right_weather_icon).setVisibility(View.GONE);
-			weatherIcon = (ImageView) itemView.findViewById(R.id.left_weather_icon);
-			temp = (TextView) itemView.findViewById(R.id.temp);
-			hour = (TextView) itemView.findViewById(R.id.dateTime);
+			tabItemBinding = TabForecastItemBinding.inflate(layoutInflater, binding.tabLayout, false);
+			tabItemBinding.rightWeatherIcon.setVisibility(View.GONE);
 
-			hour.setText(item.getHours().format(hour0Formatter));
-			weatherIcon.setImageResource(item.getWeatherIcon());
-			temp.setText(item.getTemp());
 
-			binding.tabLayout.getTabAt(index++).setCustomView(itemView);
+			tabItemBinding.dateTime.setText(item.getHours().format(hour0Formatter));
+			Glide.with(tabItemBinding.leftWeatherIcon).load(item.getWeatherIcon()).into(tabItemBinding.leftWeatherIcon);
+			tabItemBinding.temp.setText(item.getTemp());
+
+			binding.tabLayout.getTabAt(index++).setCustomView(tabItemBinding.getRoot());
 		}
 		binding.tabLayout.selectTab(binding.tabLayout.getTabAt(firstSelectedPosition));
 

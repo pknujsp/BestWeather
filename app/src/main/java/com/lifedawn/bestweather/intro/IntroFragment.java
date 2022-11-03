@@ -136,6 +136,12 @@ public class IntroFragment extends Fragment {
 	}
 
 	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
+
+	@Override
 	public void onDestroy() {
 		getParentFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		getLifecycle().removeObserver(locationLifeCycleObserver);

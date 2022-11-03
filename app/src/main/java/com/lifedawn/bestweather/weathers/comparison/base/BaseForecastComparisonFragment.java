@@ -115,6 +115,12 @@ public class BaseForecastComparisonFragment extends Fragment {
 
 	}
 
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
+
 
 	protected void createValueUnitsDescription(List<WeatherSourceUnitObj> weatherSourceUnitObjs) {
 		StringBuilder stringBuilder = new StringBuilder();

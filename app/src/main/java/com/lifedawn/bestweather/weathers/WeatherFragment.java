@@ -11,8 +11,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -20,7 +18,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
@@ -30,7 +27,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -43,7 +39,6 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdOptions;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -105,6 +100,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.F
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.detailfragment.currentconditions.DetailCurrentConditionsFragment;
+import com.lifedawn.bestweather.weathers.interfaces.ILoadWeatherData;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
@@ -134,7 +130,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 
-public class WeatherFragment extends Fragment implements IGps {
+public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData {
 	private final ExecutorService executorService = MyApplication.getExecutorService();
 	private FragmentWeatherBinding binding;
 	private WeatherViewModel weatherViewModel;
@@ -147,7 +143,6 @@ public class WeatherFragment extends Fragment implements IGps {
 	private IRefreshFavoriteLocationListOnSideNav iRefreshFavoriteLocationListOnSideNav;
 	private LocationLifeCycleObserver locationLifeCycleObserver;
 	private final IWeatherFragment iWeatherFragment;
-	private boolean load;
 
 	private WeatherFragmentViewModel weatherFragmentViewModel;
 
@@ -226,12 +221,10 @@ public class WeatherFragment extends Fragment implements IGps {
 		flickrViewModel = new ViewModelProvider(this).get(FlickrViewModel.class);
 
 		weatherFragmentViewModel.arguments = getArguments() == null ? savedInstanceState : getArguments();
-
-		if (weatherFragmentViewModel.arguments.getBoolean("load", false)) {
-			load = true;
-			weatherFragmentViewModel.arguments.remove("load");
-			setArguments(weatherFragmentViewModel.arguments);
-		}
+		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
+		weatherFragmentViewModel.locationType = (LocationType) weatherFragmentViewModel.arguments.getSerializable("LocationType");
+		weatherFragmentViewModel.favoriteAddressDto = weatherFragmentViewModel.arguments.containsKey("FavoriteAddressDto") ?
+				(FavoriteAddressDto) weatherFragmentViewModel.arguments.getSerializable("FavoriteAddressDto") : null;
 	}
 
 	/**
@@ -253,6 +246,7 @@ public class WeatherFragment extends Fragment implements IGps {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		binding = FragmentWeatherBinding.inflate(inflater);
+		shimmer(true);
 
 		final int statusBarHeight = MyApplication.getStatusBarHeight();
 
@@ -267,7 +261,6 @@ public class WeatherFragment extends Fragment implements IGps {
 		binding.weatherDataSourceLayout.setLayoutParams(headerLayoutParams);
 
 		onChangedStateBackgroundImg(false);
-		shimmer(true);
 
 		binding.loadingAnimation.setVisibility(View.VISIBLE);
 		binding.flickrImageUrl.setVisibility(View.GONE);
@@ -278,7 +271,6 @@ public class WeatherFragment extends Fragment implements IGps {
 	@Override
 	public void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.clear();
 		outState.putAll(weatherFragmentViewModel.arguments);
 	}
 
@@ -428,10 +420,6 @@ public class WeatherFragment extends Fragment implements IGps {
 			binding.flickrImageUrl.setVisibility(View.VISIBLE);
 		});
 
-		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
-		weatherFragmentViewModel.locationType = (LocationType) weatherFragmentViewModel.arguments.getSerializable("LocationType");
-		weatherFragmentViewModel.favoriteAddressDto = weatherFragmentViewModel.arguments.containsKey("FavoriteAddressDto") ?
-				(FavoriteAddressDto) weatherFragmentViewModel.arguments.getSerializable("FavoriteAddressDto") : null;
 
 		weatherFragmentViewModel.weatherDataLiveData.observe(getViewLifecycleOwner(), responseResultObj -> {
 			if (responseResultObj != null) {
@@ -439,17 +427,14 @@ public class WeatherFragment extends Fragment implements IGps {
 			}
 		});
 
-		if (load) {
-			load = false;
-			load();
-		} else {
-			shimmer(false);
-		}
-
+		shimmer(false);
 	}
 
 
-	private void load() {
+	@Override
+	public void load() {
+		shimmer(true);
+
 		binding.mainToolbar.gps.setVisibility(weatherFragmentViewModel.locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
 		binding.mainToolbar.find.setVisibility(weatherFragmentViewModel.locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
 
@@ -526,6 +511,12 @@ public class WeatherFragment extends Fragment implements IGps {
 			}
 		}
 
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
 	}
 
 	@Override
@@ -779,6 +770,7 @@ public class WeatherFragment extends Fragment implements IGps {
 	}
 
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
+		getChildFragmentManager().beginTransaction().setPrimaryNavigationFragment(null).commitNow();
 		FragmentManager fragmentManager = getParentFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -1051,6 +1043,19 @@ public class WeatherFragment extends Fragment implements IGps {
 				binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(weatherFragmentViewModel.dateTimeFormatter));
 
 				FragmentManager fragmentManager = getChildFragmentManager();
+
+				fragmentManager.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+					@Override
+					public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
+						super.onFragmentResumed(fm, f);
+						if (f instanceof SimpleRainViewerFragment) {
+							fm.unregisterFragmentLifecycleCallbacks(this);
+							shimmer(false);
+							loadImgOfCurrentConditions(flickrRequestParameter);
+						}
+					}
+				}, false);
+
 				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
 				fragmentTransaction
@@ -1066,10 +1071,9 @@ public class WeatherFragment extends Fragment implements IGps {
 								getString(R.string.tag_sun_set_rise_fragment))
 						.replace(binding.radar.getId(), rainViewerFragment,
 								SimpleRainViewerFragment.class.getName())
+						.setPrimaryNavigationFragment(simpleCurrentConditionsFragment)
 						.commit();
 
-				shimmer(false);
-				loadImgOfCurrentConditions(flickrRequestParameter);
 			});
 
 		}

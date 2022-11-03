@@ -79,6 +79,11 @@ public class WeatherFragmentViewModel extends AndroidViewModel {
 		super(application);
 	}
 
+	@Override
+	protected void onCleared() {
+		super.onCleared();
+	}
+
 	public void requestNewData() {
 		MyApplication.getExecutorService().execute(new Runnable() {
 			@Override
