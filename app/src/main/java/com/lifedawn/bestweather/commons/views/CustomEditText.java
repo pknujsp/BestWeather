@@ -82,24 +82,21 @@ public class CustomEditText extends AppCompatEditText implements TextWatcher, Vi
 		}
 	}
 
-	private long end;
+	private final int DELAY = 500;
 
 	@Override
 	public void afterTextChanged(Editable editable) {
-		end = System.currentTimeMillis();
 		timer.cancel();
-
+		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if (System.currentTimeMillis() - end >= 495) {
-					if (onEditTextQueryListener != null) {
-						Log.e("afterTextChanged", getText().toString());
-						onEditTextQueryListener.onTextChange(getText().toString());
-					}
+				if (onEditTextQueryListener != null) {
+					Log.e("afterTextChanged", editable.toString());
+					onEditTextQueryListener.onTextChange(editable.toString());
 				}
 			}
-		}, 500);
+		}, DELAY);
 	}
 
 

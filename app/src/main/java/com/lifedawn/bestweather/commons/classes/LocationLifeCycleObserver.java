@@ -41,7 +41,7 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 	private ActivityResultCallback<ActivityResult> backgroundLocationPermissionResultCallback;
 	private ActivityResultCallback<Map<String, Boolean>> permissionResultCallback;
 
-	public LocationLifeCycleObserver(@NonNull ActivityResultRegistry mRegistry, Activity activity) {
+	public LocationLifeCycleObserver(@NonNull ActivityResultRegistry mRegistry, Context context) {
 		this.mRegistry = mRegistry;
 		this.activity = activity;
 	}
@@ -102,15 +102,41 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 
 		backgroundLocationPermissionLauncher = mRegistry.register("backgroundLocationPermission", new ActivityResultContracts.StartActivityForResult(),
 				new ActivityResultCallback<ActivityResult>() {
-			@Override
-			public void onActivityResult(ActivityResult result) {
-				if (backgroundLocationPermissionResultCallback != null) {
-					backgroundLocationPermissionResultCallback.onActivityResult(result);
-				}
+					@Override
+					public void onActivityResult(ActivityResult result) {
+						if (backgroundLocationPermissionResultCallback != null) {
+							backgroundLocationPermissionResultCallback.onActivityResult(result);
+						}
 
 
-			}
-		});
+					}
+				});
+	}
+
+	@Override
+	public void onStart(@NonNull LifecycleOwner owner) {
+		DefaultLifecycleObserver.super.onStart(owner);
+	}
+
+	@Override
+	public void onResume(@NonNull LifecycleOwner owner) {
+		DefaultLifecycleObserver.super.onResume(owner);
+	}
+
+	@Override
+	public void onPause(@NonNull LifecycleOwner owner) {
+		DefaultLifecycleObserver.super.onPause(owner);
+	}
+
+	@Override
+	public void onStop(@NonNull LifecycleOwner owner) {
+		DefaultLifecycleObserver.super.onStop(owner);
+	}
+
+	@Override
+	public void onDestroy(@NonNull LifecycleOwner owner) {
+		DefaultLifecycleObserver.super.onDestroy(owner);
+		activity = null;
 	}
 
 	public void launchGpsLauncher(Intent intent, @NonNull ActivityResultCallback<ActivityResult> callback) {
