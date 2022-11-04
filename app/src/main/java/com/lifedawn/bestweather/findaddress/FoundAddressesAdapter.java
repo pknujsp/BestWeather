@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Set;
 
 public class FoundAddressesAdapter extends RecyclerView.Adapter<FoundAddressesAdapter.ViewHolder> implements Filterable {
+
+
 	private List<Geocoding.AddressDto> itemList = new ArrayList<>();
 	private List<Geocoding.AddressDto> filteredAddressList = new ArrayList<>();
 	private Set<String> favoriteAddressSet = new HashSet<>();

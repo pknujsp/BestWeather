@@ -154,6 +154,7 @@ public class FindAddressFragment extends Fragment {
 
 		binding.progressResultView.setContentView(binding.addressList);
 		binding.progressResultView.onFailed(getString(R.string.title_empty_locations));
+		binding.addressList.setHasFixedSize(true);
 
 		binding.currentLocationBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -210,7 +211,6 @@ public class FindAddressFragment extends Fragment {
 			}
 		});
 
-		binding.addressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		binding.addressList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 		binding.addressList.setAdapter(addressesAdapter);
 

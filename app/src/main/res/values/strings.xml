@@ -590,6 +590,8 @@
     <string name="com_lifedawn_bestweather_action_RESTART" translatable="false">com_lifedawn_bestweather_action_RESTART</string>
     <string name="failed_load_radar_data">failed to load radar</string>
     <string name="updated">updated: </string>
+    <string name="min">min</string>
+    <string name="max">max</string>
 
 
 </resources>

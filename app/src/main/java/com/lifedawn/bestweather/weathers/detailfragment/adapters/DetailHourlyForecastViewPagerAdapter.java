@@ -100,7 +100,6 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 
 		public void onBind(HourlyForecastDto hourlyForecastDto) {
 			//header 화면 구성
-
 			if (hourlyForecastDto.isHasNext6HoursPrecipitation()) {
 				ZonedDateTime dateTime = hourlyForecastDto.getHours();
 				String date = dateTime.format(dateFormatter);

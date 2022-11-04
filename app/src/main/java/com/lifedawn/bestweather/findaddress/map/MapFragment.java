@@ -346,155 +346,136 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 		});
 
-		binding.headerLayout.setEditTextOnFocusListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if (hasFocus) {
-					if (clickedHeader) {
-						return;
-					}
-					clickedHeader = true;
-					FragmentManager childFragmentManager = getChildFragmentManager();
-
-					if (childFragmentManager.findFragmentByTag(getString(R.string.tag_find_address_fragment)) != null) {
-						return;
-					}
-
-					collapseAllExpandedBottomSheets();
-					int backStackCount = childFragmentManager.getBackStackEntryCount();
-
-					for (int count = 0; count < backStackCount; count++) {
-						childFragmentManager.popBackStack();
-					}
-
-					FindAddressFragment findAddressFragment = new FindAddressFragment();
-					Bundle bundle = new Bundle();
-					bundle.putString(BundleKey.RequestFragment.name(), MapFragment.class.getName());
-					findAddressFragment.setArguments(bundle);
-
-					findAddressFragment.setOnAddressListListener(new FindAddressFragment.OnAddressListListener() {
-						@Override
-						public void onSearchedAddressList(List<Geocoding.AddressDto> addressList) {
-							removeMarkers(MarkerType.SEARCH);
-
-							LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
-							adapterMap.put(MarkerType.SEARCH, adapter);
-							adapter.setFavoriteAddressSet(favoriteAddressSet);
-							adapter.setAddressList(addressList);
-							adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<Geocoding.AddressDto>() {
-								@Override
-								public void onSelected(Geocoding.AddressDto e, boolean remove) {
-									onClickedAddress(e);
-								}
-							});
-
-							adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
-								@Override
-								public void toLeft() {
-									if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
-										binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-												binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
-									}
-								}
-
-								@Override
-								public void toRight() {
-									if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
-										binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-												binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
-									}
-								}
-							});
-
-							int i = 0;
-							for (Geocoding.AddressDto address : addressList) {
-								addMarker(MarkerType.SEARCH, i++, address);
-							}
-
-							showMarkers(MarkerType.SEARCH);
-						}
-					});
-
-					findAddressFragment.setiBottomSheetState(MapFragment.this);
-					findAddressFragment.setOnClickedAddressListener(MapFragment.this);
-					findAddressFragment.setOnListListener(MapFragment.this);
-
-					binding.headerLayout.setOnEditTextQueryListener(findAddressFragment.getOnEditTextQueryListener());
-
-					childFragmentManager.beginTransaction().
-							add(binding.bottomSheetSearchPlace.searchFragmentContainer.getId(), findAddressFragment,
-									getString(R.string.tag_find_address_fragment)).addToBackStack(
-									getString(R.string.tag_find_address_fragment)).commitAllowingStateLoss();
-
-					setStateOfBottomSheet(BottomSheetType.SEARCH_LOCATION, BottomSheetBehavior.STATE_EXPANDED);
+		binding.headerLayout.setEditTextOnFocusListener((v, hasFocus) -> {
+			if (hasFocus) {
+				if (clickedHeader) {
+					return;
 				}
-			}
-		});
-
-
-		binding.favorite.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
+				clickedHeader = true;
 				FragmentManager childFragmentManager = getChildFragmentManager();
 
-				if (childFragmentManager.findFragmentByTag(SimpleFavoritesFragment.class.getName()) != null) {
+				if (childFragmentManager.findFragmentByTag(getString(R.string.tag_find_address_fragment)) != null) {
 					return;
 				}
 
 				collapseAllExpandedBottomSheets();
-
 				int backStackCount = childFragmentManager.getBackStackEntryCount();
 
 				for (int count = 0; count < backStackCount; count++) {
 					childFragmentManager.popBackStack();
 				}
 
-				final SimpleFavoritesFragment simpleFavoritesFragment = new SimpleFavoritesFragment();
+				FindAddressFragment findAddressFragment = new FindAddressFragment();
 				Bundle bundle = new Bundle();
-				bundle.putBoolean("showCheckBtn", showFavoriteAddBtn);
-				simpleFavoritesFragment.setArguments(bundle);
+				bundle.putString(BundleKey.RequestFragment.name(), MapFragment.class.getName());
+				findAddressFragment.setArguments(bundle);
 
-				simpleFavoritesFragment.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
-					@Override
-					public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {
-						removedLocation = true;
-					}
+				findAddressFragment.setOnAddressListListener(addressList -> {
+					removeMarkers(MarkerType.SEARCH);
 
-					@Override
-					public void onClicked(FavoriteAddressDto favoriteAddressDto) {
-						if (showFavoriteAddBtn) {
-							onResultFavoriteListener.onClickedAddress(favoriteAddressDto);
+					LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
+					adapterMap.put(MarkerType.SEARCH, adapter);
+					adapter.setFavoriteAddressSet(favoriteAddressSet);
+					adapter.setAddressList(addressList);
+					adapter.setOnClickedLocationBtnListener((e, remove) -> onClickedAddress(e));
+
+					adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
+						@Override
+						public void toLeft() {
+							if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
+								binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+										binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
+							}
 						}
 
+						@Override
+						public void toRight() {
+							if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
+								binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+										binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
+							}
+						}
+					});
+
+					int i = 0;
+					for (Geocoding.AddressDto address : addressList) {
+						addMarker(MarkerType.SEARCH, i++, address);
 					}
 
-					@Override
-					public void onShowMarker(FavoriteAddressDto favoriteAddressDto, int position) {
-						setStateOfBottomSheet(BottomSheetType.FAVORITES, BottomSheetBehavior.STATE_COLLAPSED);
-						getChildFragmentManager().popBackStack();
-
-						Marker marker = markerMaps.get(MarkerType.FAVORITE).get(position);
-						onMarkerClick(marker);
-					}
+					showMarkers(MarkerType.SEARCH);
 				});
 
+				findAddressFragment.setiBottomSheetState(MapFragment.this);
+				findAddressFragment.setOnClickedAddressListener(MapFragment.this);
+				findAddressFragment.setOnListListener(MapFragment.this);
+
+				binding.headerLayout.setOnEditTextQueryListener(findAddressFragment.getOnEditTextQueryListener());
+
 				childFragmentManager.beginTransaction().
-						add(binding.favoritesBottomSheet.fragmentContainer.getId(), simpleFavoritesFragment,
-								SimpleFavoritesFragment.class.getName()).
-						addToBackStack(
-								SimpleFavoritesFragment.class.getName()).
-						commitAllowingStateLoss();
+						add(binding.bottomSheetSearchPlace.searchFragmentContainer.getId(), findAddressFragment,
+								getString(R.string.tag_find_address_fragment)).addToBackStack(
+								getString(R.string.tag_find_address_fragment)).commitAllowingStateLoss();
 
-				setStateOfBottomSheet(BottomSheetType.FAVORITES, BottomSheetBehavior.STATE_EXPANDED);
+				setStateOfBottomSheet(BottomSheetType.SEARCH_LOCATION, BottomSheetBehavior.STATE_EXPANDED);
 			}
 		});
 
-		binding.headerLayout.setOnBackClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				onBackPressedCallback.handleOnBackPressed();
+
+		binding.favorite.setOnClickListener(view1 -> {
+			FragmentManager childFragmentManager = getChildFragmentManager();
+
+			if (childFragmentManager.findFragmentByTag(SimpleFavoritesFragment.class.getName()) != null) {
+				return;
 			}
+
+			collapseAllExpandedBottomSheets();
+
+			int backStackCount = childFragmentManager.getBackStackEntryCount();
+
+			for (int count = 0; count < backStackCount; count++) {
+				childFragmentManager.popBackStack();
+			}
+
+			final SimpleFavoritesFragment simpleFavoritesFragment = new SimpleFavoritesFragment();
+			Bundle bundle = new Bundle();
+			bundle.putBoolean("showCheckBtn", showFavoriteAddBtn);
+			simpleFavoritesFragment.setArguments(bundle);
+
+			simpleFavoritesFragment.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
+				@Override
+				public void onClickedDelete(FavoriteAddressDto favoriteAddressDto, int position) {
+					removedLocation = true;
+				}
+
+				@Override
+				public void onClicked(FavoriteAddressDto favoriteAddressDto) {
+					if (showFavoriteAddBtn) {
+						onResultFavoriteListener.onClickedAddress(favoriteAddressDto);
+					}
+
+				}
+
+				@Override
+				public void onShowMarker(FavoriteAddressDto favoriteAddressDto, int position) {
+					setStateOfBottomSheet(BottomSheetType.FAVORITES, BottomSheetBehavior.STATE_COLLAPSED);
+					getChildFragmentManager().popBackStack();
+
+					Marker marker = markerMaps.get(MarkerType.FAVORITE).get(position);
+					onMarkerClick(marker);
+				}
+			});
+
+			childFragmentManager.beginTransaction().
+					add(binding.favoritesBottomSheet.fragmentContainer.getId(), simpleFavoritesFragment,
+							SimpleFavoritesFragment.class.getName()).
+					addToBackStack(
+							SimpleFavoritesFragment.class.getName()).
+					commitAllowingStateLoss();
+
+			setStateOfBottomSheet(BottomSheetType.FAVORITES, BottomSheetBehavior.STATE_EXPANDED);
 		});
+
+		binding.headerLayout.setOnBackClickListener(v -> onBackPressedCallback.handleOnBackPressed());
 
 		if (requestFragment.equals(MainTransactionFragment.class.getName())) {
 			binding.favorite.callOnClick();
@@ -510,6 +491,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		super.onDestroy();
 	}
 
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
+	}
 
 	@SuppressLint("MissingPermission")
 	@Override
@@ -524,19 +510,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 		googleMap.setOnMarkerClickListener(this);
 
-		googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-			@Override
-			public void onMapClick(@NonNull LatLng latLng) {
-				setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_COLLAPSED);
-			}
-		});
+		googleMap.setOnMapClickListener(latLng -> setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_COLLAPSED));
 
-		googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-			@Override
-			public void onMapLongClick(@NonNull LatLng latLng) {
-				onLongClicked(latLng);
-			}
-		});
+		googleMap.setOnMapLongClickListener(latLng -> onLongClicked(latLng));
 
 		binding.mapButtons.zoomInBtn.setOnClickListener((view) -> {
 					googleMap.animateCamera(CameraUpdateFactory.zoomIn());
@@ -549,95 +525,68 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		);
 
 
-		binding.mapButtons.currentLocationBtn.setOnClickListener(new View.OnClickListener() {
+		binding.mapButtons.currentLocationBtn.setOnClickListener(v -> fusedLocation.findCurrentLocation(new FusedLocation.MyLocationCallback() {
 			@Override
-			public void onClick(View v) {
-				fusedLocation.findCurrentLocation(new FusedLocation.MyLocationCallback() {
-					@Override
-					public void onSuccessful(LocationResult locationResult) {
-						Location result = getBestLocation(locationResult);
-						googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(result.getLatitude(), result.getLongitude())
-								, 10));
-					}
-
-					@Override
-					public void onFailed(Fail fail) {
-						if (fail == Fail.DISABLED_GPS) {
-							fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
-								@Override
-								public void onActivityResult(ActivityResult result) {
-									if (fusedLocation.isOnGps()) {
-										binding.mapButtons.currentLocationBtn.callOnClick();
-									}
-								}
-							});
-						} else if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
-							fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, new ActivityResultCallback<ActivityResult>() {
-								@Override
-								public void onActivityResult(ActivityResult result) {
-									if (fusedLocation.checkDefaultPermissions()) {
-										binding.mapButtons.currentLocationBtn.callOnClick();
-									}
-								}
-							}, new ActivityResultCallback<Map<String, Boolean>>() {
-								@Override
-								public void onActivityResult(Map<String, Boolean> result) {
-									//gps사용 권한
-									//허가남 : 현재 위치 다시 파악
-									//거부됨 : 작업 취소
-									//계속 거부 체크됨 : 작업 취소
-									if (!result.containsValue(false)) {
-										binding.mapButtons.currentLocationBtn.callOnClick();
-									}
-								}
-							});
-
-						}
-					}
-				}, false);
+			public void onSuccessful(LocationResult locationResult) {
+				Location result = getBestLocation(locationResult);
+				googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(result.getLatitude(), result.getLongitude())
+						, 10));
 			}
-		});
+
+			@Override
+			public void onFailed(Fail fail) {
+				if (fail == Fail.DISABLED_GPS) {
+					fusedLocation.onDisabledGps(requireActivity(), locationLifeCycleObserver, result -> {
+						if (fusedLocation.isOnGps()) {
+							binding.mapButtons.currentLocationBtn.callOnClick();
+						}
+					});
+				} else if (fail == Fail.DENIED_LOCATION_PERMISSIONS) {
+					fusedLocation.onRejectPermissions(requireActivity(), locationLifeCycleObserver, result -> {
+						if (fusedLocation.checkDefaultPermissions()) {
+							binding.mapButtons.currentLocationBtn.callOnClick();
+						}
+					}, new ActivityResultCallback<Map<String, Boolean>>() {
+						@Override
+						public void onActivityResult(Map<String, Boolean> result) {
+							//gps사용 권한
+							//허가남 : 현재 위치 다시 파악
+							//거부됨 : 작업 취소
+							//계속 거부 체크됨 : 작업 취소
+							if (!result.containsValue(false)) {
+								binding.mapButtons.currentLocationBtn.callOnClick();
+							}
+						}
+					});
+
+				}
+			}
+		}, false));
 
 		FavoriteLocationItemViewPagerAdapter adapter = new FavoriteLocationItemViewPagerAdapter();
 		adapterMap.put(MarkerType.FAVORITE, adapter);
-		adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<FavoriteAddressDto>() {
-			@Override
-			public void onSelected(FavoriteAddressDto e, boolean remove) {
-				if (remove) {
-					new MaterialAlertDialogBuilder(getActivity()).
-							setTitle(R.string.remove)
-							.setMessage(e.getDisplayName()).
-							setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									weatherViewModel.delete(e, new DbQueryCallback<Boolean>() {
-										@Override
-										public void onResultSuccessful(Boolean result) {
-											MainThreadWorker.runOnUiThread(new Runnable() {
-												@Override
-												public void run() {
-													setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_COLLAPSED);
-													removedLocation = true;
-													dialog.dismiss();
-												}
-											});
-										}
-
-										@Override
-										public void onResultNoData() {
-
-										}
-									});
-								}
-							}).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
+		adapter.setOnClickedLocationBtnListener((e, remove) -> {
+			if (remove) {
+				new MaterialAlertDialogBuilder(getActivity()).
+						setTitle(R.string.remove)
+						.setMessage(e.getDisplayName()).
+						setPositiveButton(R.string.remove, (dialog, which) -> weatherViewModel.delete(e, new DbQueryCallback<Boolean>() {
+							@Override
+							public void onResultSuccessful(Boolean result) {
+								MainThreadWorker.runOnUiThread(() -> {
+									setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_COLLAPSED);
+									removedLocation = true;
 									dialog.dismiss();
-								}
-							}).create().show();
-				} else {
-					onResultFavoriteListener.onClickedAddress(e);
-				}
+								});
+							}
+
+							@Override
+							public void onResultNoData() {
+
+							}
+						})).setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss()).create().show();
+			} else {
+				onResultFavoriteListener.onClickedAddress(e);
 			}
 		});
 
@@ -659,30 +608,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 		});
 
-		weatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), new Observer<List<FavoriteAddressDto>>() {
-			@Override
-			public void onChanged(List<FavoriteAddressDto> result) {
-				if (!addedNewLocation) {
-					MainThreadWorker.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							FavoriteLocationItemViewPagerAdapter adapter = (FavoriteLocationItemViewPagerAdapter) adapterMap.get(MarkerType.FAVORITE);
-							adapter.setAddressList(result);
-							adapter.setShowAddBtn(showFavoriteAddBtn);
+		weatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), result -> {
+			if (!addedNewLocation) {
+				FavoriteLocationItemViewPagerAdapter adapter1 = (FavoriteLocationItemViewPagerAdapter) adapterMap.get(MarkerType.FAVORITE);
+				adapter1.setAddressList(result);
+				adapter1.setShowAddBtn(showFavoriteAddBtn);
 
-							favoriteAddressSet.clear();
-							for (FavoriteAddressDto favoriteAddressDto : result) {
-								favoriteAddressSet.add(favoriteAddressDto.getLatitude() + favoriteAddressDto.getLongitude());
-							}
-
-							removeMarkers(MarkerType.FAVORITE);
-
-							for (int i = 0; i < result.size(); i++) {
-								addFavoriteMarker(i, result.get(i));
-							}
-						}
-					});
+				favoriteAddressSet.clear();
+				for (FavoriteAddressDto favoriteAddressDto : result) {
+					favoriteAddressSet.add(favoriteAddressDto.getLatitude() + favoriteAddressDto.getLongitude());
 				}
+
+				removeMarkers(MarkerType.FAVORITE);
+
+				for (int i = 0; i < result.size(); i++) {
+					addFavoriteMarker(i, result.get(i));
+				}
+
 			}
 		});
 
@@ -690,59 +632,49 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 	private void onLongClicked(LatLng latLng) {
 		collapseAllExpandedBottomSheets();
-		Geocoding.nominatimReverseGeocoding(getContext(), latLng.latitude, latLng.longitude, new Geocoding.ReverseGeocodingCallback() {
+		Geocoding.nominatimReverseGeocoding(getContext(), latLng.latitude, latLng.longitude, addressDto -> MainThreadWorker.runOnUiThread(new Runnable() {
 			@Override
-			public void onReverseGeocodingResult(Geocoding.AddressDto addressDto) {
-				MainThreadWorker.runOnUiThread(new Runnable() {
+			public void run() {
+				List<Geocoding.AddressDto> addresses = new ArrayList<>();
+				addresses.add(addressDto);
+
+				LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
+				adapterMap.put(MarkerType.LONG_CLICK, adapter);
+
+				adapter.setAddressList(addresses);
+				adapter.setFavoriteAddressSet(favoriteAddressSet);
+
+				adapter.setOnClickedLocationBtnListener((e, remove) -> onClickedAddress(e));
+
+				adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
 					@Override
-					public void run() {
-						List<Geocoding.AddressDto> addresses = new ArrayList<>();
-						addresses.add(addressDto);
+					public void toLeft() {
+						if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
+							binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+									binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
+						}
+					}
 
-						LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
-						adapterMap.put(MarkerType.LONG_CLICK, adapter);
-
-						adapter.setAddressList(addresses);
-						adapter.setFavoriteAddressSet(favoriteAddressSet);
-
-						adapter.setOnClickedLocationBtnListener(new OnClickedLocationBtnListener<Geocoding.AddressDto>() {
-							@Override
-							public void onSelected(Geocoding.AddressDto e, boolean remove) {
-								onClickedAddress(e);
-							}
-						});
-
-						adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
-							@Override
-							public void toLeft() {
-								if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
-									binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-											binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
-								}
-							}
-
-							@Override
-							public void toRight() {
-								if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
-									binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-											binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
-								}
-							}
-						});
-
-						removeMarkers(MarkerType.LONG_CLICK);
-						addMarker(MarkerType.LONG_CLICK, 0, addressDto);
-						showMarkers(MarkerType.LONG_CLICK);
-
-						locationItemBottomSheetViewPager.setTag(MarkerType.LONG_CLICK);
-						locationItemBottomSheetViewPager.setAdapter(adapterMap.get(MarkerType.LONG_CLICK));
-						locationItemBottomSheetViewPager.setCurrentItem(0, false);
-
-						setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_EXPANDED);
+					@Override
+					public void toRight() {
+						if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
+							binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+									binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
+						}
 					}
 				});
+
+				removeMarkers(MarkerType.LONG_CLICK);
+				addMarker(MarkerType.LONG_CLICK, 0, addressDto);
+				showMarkers(MarkerType.LONG_CLICK);
+
+				locationItemBottomSheetViewPager.setTag(MarkerType.LONG_CLICK);
+				locationItemBottomSheetViewPager.setAdapter(adapterMap.get(MarkerType.LONG_CLICK));
+				locationItemBottomSheetViewPager.setCurrentItem(0, false);
+
+				setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_EXPANDED);
 			}
-		});
+		}));
 	}
 
 	private void addMarker(MarkerType markerType, int position, Geocoding.AddressDto address) {
@@ -1022,18 +954,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 								onResultFavoriteListener.onResult(result);
 							}
 						}
-					}).setNegativeButton(R.string.add_favorite, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialogInterface, int i) {
-					dialogInterface.dismiss();
-					binding.headerLayout.callOnClickEditText();
-				}
-			}).setNeutralButton(R.string.close_app, new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialogInterface, int i) {
-					dialogInterface.dismiss();
-					getActivity().finish();
-				}
+					}).setNegativeButton(R.string.add_favorite, (dialogInterface, i) -> {
+				dialogInterface.dismiss();
+				binding.headerLayout.callOnClickEditText();
+			}).setNeutralButton(R.string.close_app, (dialogInterface, i) -> {
+				dialogInterface.dismiss();
+				getActivity().finish();
 			}).create().show();
 		} else if (haveFavorites) {
 			getParentFragmentManager().popBackStack();
@@ -1078,11 +1004,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
-				MainThreadWorker.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						processIfNoLocations(result);
-					}
+				MainThreadWorker.runOnUiThread(() -> {
+					processIfNoLocations(result);
+
 				});
 			}
 

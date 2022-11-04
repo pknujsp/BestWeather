@@ -1055,7 +1055,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 						}
 					}
 				}, false);
-
+				weatherFragmentViewModel.iTextColor = simpleCurrentConditionsFragment;
 				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
 				fragmentTransaction
@@ -1114,7 +1114,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 				if (weatherFragmentViewModel.mainWeatherProviderType == WeatherProviderType.OWM_ONECALL) {
 					checkedItemIdx = 1;
-				} else {
+				} else if (weatherFragmentViewModel.mainWeatherProviderType == WeatherProviderType.MET_NORWAY) {
 					checkedItemIdx = 2;
 				}
 			} else {
@@ -1157,6 +1157,9 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		binding.updatedDatetime.setTextColor(color);
 		binding.countryName.setTextColor(color);
 		binding.addressName.setTextColor(color);
+
+		if (weatherFragmentViewModel.iTextColor != null)
+			weatherFragmentViewModel.iTextColor.changeColor(color);
 	}
 
 	private void shimmer(boolean showShimmer) {
@@ -1205,5 +1208,9 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 	public interface IWeatherFragment {
 		void addWeatherFragment(LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto, Bundle arguments);
+	}
+
+	public interface ITextColor {
+		void changeColor(int color);
 	}
 }

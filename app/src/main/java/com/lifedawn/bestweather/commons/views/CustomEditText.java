@@ -87,6 +87,7 @@ public class CustomEditText extends AppCompatEditText implements TextWatcher, Vi
 	@Override
 	public void afterTextChanged(Editable editable) {
 		end = System.currentTimeMillis();
+		timer.cancel();
 
 		timer.schedule(new TimerTask() {
 			@Override

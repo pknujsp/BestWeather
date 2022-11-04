@@ -1,71 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:paddingLeft="8dp"
     android:paddingTop="8dp"
     android:paddingRight="8dp"
-    android:clipChildren="false"
     android:paddingBottom="8dp"
     >
 
-    <LinearLayout
-        android:id="@+id/weatherIconLayout"
+
+    <ImageView
+        android:id="@+id/weather_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/day_clear"
+        app:layout_constraintBottom_toTopOf="@id/temperature"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
+
+
+    <TextView
+        android:id="@+id/sky"
+        style="@style/text_shadow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginBottom="4dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        >
+        android:layout_marginLeft="8dp"
+        android:shadowColor="@color/black"
+        android:text="비"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/precipitation"
+        app:layout_constraintLeft_toRightOf="@id/weather_icon"
+        app:layout_constraintTop_toTopOf="@id/weather_icon"
+        />
 
-        <ImageView
-            android:id="@+id/weather_icon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
-            android:layout_marginRight="6dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/day_clear"
-            />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:orientation="vertical"
-            >
-
-            <TextView
-                android:id="@+id/sky"
-                style="@style/text_shadow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:includeFontPadding="false"
-                android:shadowColor="@color/black"
-                android:text="weather"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                />
-
-            <TextView
-                android:id="@+id/precipitation"
-                style="@style/text_shadow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:includeFontPadding="false"
-                android:shadowColor="@color/black"
-                android:text="precipitation"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                />
-
-        </LinearLayout>
-
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/precipitation"
+        style="@style/text_shadow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:includeFontPadding="false"
+        android:shadowColor="@color/black"
+        android:text="0.3mm"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@id/weather_icon"
+        app:layout_constraintLeft_toRightOf="@id/weather_icon"
+        app:layout_constraintTop_toBottomOf="@id/sky"
+        />
 
 
     <TextView
@@ -73,13 +60,13 @@
         style="@style/text_shadow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/wind"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="6dp"
+        android:layout_marginBottom="8dp"
         android:shadowColor="@color/black"
         android:text="@string/humidity"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="17sp"
+        app:layout_constraintBottom_toTopOf="@id/wind"
+        app:layout_constraintRight_toRightOf="parent"
         />
 
     <ImageView
@@ -87,14 +74,13 @@
         style="@style/text_shadow"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_alignTop="@id/windDirection"
-        android:layout_alignBottom="@id/windDirection"
         android:layout_marginRight="4dp"
-        android:layout_toLeftOf="@id/windDirection"
         android:scaleType="fitCenter"
         android:shadowColor="@color/black"
         android:src="@drawable/arrow"
-        app:tint="@color/white"
+        app:layout_constraintBottom_toBottomOf="@id/windDirection"
+        app:layout_constraintRight_toLeftOf="@id/windDirection"
+        app:tint="@color/black"
         />
 
     <TextView
@@ -107,8 +93,10 @@
         android:layout_toLeftOf="@id/wind"
         android:shadowColor="@color/black"
         android:text="@string/wind_direction"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="15sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/wind"
+        app:layout_constraintRight_toLeftOf="@id/wind"
         />
 
     <TextView
@@ -116,52 +104,44 @@
         style="@style/text_shadow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-
-        android:layout_above="@id/feelsLikeTemp"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="32dp"
-
+        android:layout_marginBottom="8dp"
         android:shadowColor="@color/black"
         android:text="@string/wind"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="17sp"
+        app:layout_constraintBottom_toTopOf="@id/airQuality"
+        app:layout_constraintRight_toRightOf="parent"
         />
 
-    <LinearLayout
-        android:id="@+id/airQualityLayout"
+
+    <TextView
+        android:id="@+id/airQualityLabel"
+        style="@style/text_shadow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/humidity"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="6dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        >
+        android:layout_marginRight="8dp"
+        android:shadowColor="@color/black"
+        android:text="@string/air_quality"
+        android:textColor="@color/black"
+        android:textSize="17sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/airQuality"
+        app:layout_constraintRight_toLeftOf="@id/airQuality"
+        />
 
-        <TextView
-            style="@style/text_shadow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
-            android:shadowColor="@color/black"
-            android:text="@string/air_quality"
-            android:textColor="@color/white"
-            android:textSize="17sp"
-            />
+    <TextView
+        android:id="@+id/airQuality"
+        style="@style/text_shadow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:shadowColor="@color/black"
+        android:text="@string/good"
 
-        <TextView
-            android:id="@+id/airQuality"
-            style="@style/text_shadow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:shadowColor="@color/black"
-            android:text="@string/good"
-            android:textColor="@color/white"
-            android:textSize="17sp"
-            />
-
-    </LinearLayout>
+        android:textColor="@color/black"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toTopOf="@id/feelsLikeTemp"
+        app:layout_constraintRight_toRightOf="parent"
+        />
 
 
     <TextView
@@ -169,14 +149,14 @@
         style="@style/text_shadow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/weatherIconLayout"
-        android:layout_alignParentLeft="true"
         android:fontFamily="sans-serif-light"
         android:includeFontPadding="false"
         android:shadowColor="@color/black"
         android:text="10"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="105sp"
+        app:layout_constraintBottom_toTopOf="@id/tempDescription"
+        app:layout_constraintLeft_toLeftOf="parent"
         />
 
     <TextView
@@ -184,29 +164,31 @@
         style="@style/text_shadow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/temperature"
-        android:layout_toRightOf="@id/temperature"
         android:fontFamily="sans-serif-light"
         android:includeFontPadding="false"
         android:shadowColor="@color/black"
         android:text="℃"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="45sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/temperature"
+
+        app:layout_constraintLeft_toRightOf="@id/temperature"
         />
 
 
     <TextView
+        android:id="@+id/feelsLikeTemp_label"
         style="@style/text_shadow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/temperature"
         android:layout_marginRight="8dp"
-        android:layout_toLeftOf="@id/feelsLikeTemp"
         android:fontFamily="sans-serif-light"
         android:shadowColor="@color/black"
         android:text="@string/real_feel_temperature_simple"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="19sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/temperature"
+        app:layout_constraintRight_toLeftOf="@id/feelsLikeTemp"
         />
 
     <TextView
@@ -214,14 +196,14 @@
         style="@style/text_shadow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/temperature"
-        android:layout_toLeftOf="@id/feelsLikeTempUnit"
         android:fontFamily="sans-serif-light"
         android:includeFontPadding="false"
         android:shadowColor="@color/black"
-        android:text="-20"
-        android:textColor="@color/white"
+        android:text="9"
+        android:textColor="@color/black"
         android:textSize="35sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/temperature"
+        app:layout_constraintRight_toLeftOf="@id/feelsLikeTempUnit"
         />
 
     <TextView
@@ -229,14 +211,14 @@
         style="@style/text_shadow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/temperature"
-        android:layout_alignParentRight="true"
         android:fontFamily="sans-serif-light"
         android:includeFontPadding="false"
         android:shadowColor="@color/black"
         android:text="℃"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="21sp"
+        app:layout_constraintBaseline_toBaselineOf="@id/temperature"
+        app:layout_constraintRight_toRightOf="parent"
         />
 
     <TextView
@@ -244,12 +226,12 @@
         style="@style/text_shadow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/temperature"
         android:includeFontPadding="false"
         android:shadowColor="@color/black"
         android:text="@string/temp_yesterdayTemperature"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

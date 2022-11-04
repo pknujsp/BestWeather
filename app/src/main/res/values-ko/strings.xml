@@ -516,5 +516,7 @@
     <string name="failed_load_img">사진 불러오기 실패, 다시시도 하기</string>
     <string name="failed_load_radar_data">레이더 로드 오류</string>
     <string name="updated">업데이트 됨: </string>
+    <string name="min">최저</string>
+    <string name="max">최고</string>
 
 </resources>

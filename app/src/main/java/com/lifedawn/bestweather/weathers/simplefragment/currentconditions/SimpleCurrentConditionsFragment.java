@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.bumptech.glide.Glide;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
@@ -72,14 +73,14 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		binding.windDirection.setVisibility(currentConditionsDto.getWindDirection() == null ? View.GONE : View.VISIBLE);
 
 
-		binding.weatherIcon.setImageResource(currentConditionsDto.getWeatherIcon());
+		Glide.with(binding.weatherIcon).load(currentConditionsDto.getWeatherIcon()).into(binding.weatherIcon);
 		binding.sky.setText(currentConditionsDto.getWeatherDescription());
 		binding.wind.setText(currentConditionsDto.getWindStrength() != null ? currentConditionsDto.getWindStrength() :
 				getString(R.string.noWindData));
 
 		binding.windDirection.setText(currentConditionsDto.getWindDirection());
 
-		binding.humidity.setText(new String(getString(R.string.humidity) + " " + currentConditionsDto.getHumidity()));
+		binding.humidity.setText(String.format("%s %s", getString(R.string.humidity), currentConditionsDto.getHumidity()));
 
 		final String tempUnitStr = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
 		final String currentTempText = currentConditionsDto.getTemp().replace(tempUnitStr, "");
@@ -101,7 +102,7 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		String airQuality = null;
 
 		if (airQualityDto.isSuccessful()) {
-			Double distance = LocationDistance.distance(latitude, longitude, airQualityDto.getLatitude(), airQualityDto.getLongitude(),
+			final double distance = LocationDistance.distance(latitude, longitude, airQualityDto.getLatitude(), airQualityDto.getLongitude(),
 					LocationDistance.Unit.KM);
 
 			if (distance > 100.0) {

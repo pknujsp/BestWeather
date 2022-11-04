@@ -11,6 +11,7 @@ import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
 import androidx.fragment.app.DialogFragment;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
@@ -20,6 +21,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.DialogFragmentDetailForecastBinding;
 
 import org.jetbrains.annotations.NotNull;
@@ -54,7 +56,8 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	@NonNull
 	@Override
 	public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-		return new Dialog(getContext(), R.style.DialogTransparent);
+		Dialog dialog = new Dialog(getContext(), R.style.DialogTransparent);
+		return dialog;
 	}
 
 	@Nullable
@@ -62,6 +65,7 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	@Override
 	public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		binding = DialogFragmentDetailForecastBinding.inflate(inflater);
+
 		final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
 
 		binding.detailForecastViewPager.setOffscreenPageLimit(2);
@@ -104,11 +108,14 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	}
 
 	@Override
+	public void onStart() {
+		super.onStart();
+		getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+	}
+
+	@Override
 	public void onResume() {
 		super.onResume();
-
-		Window window = getDialog().getWindow();
-		window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 	}
 
 	@Override

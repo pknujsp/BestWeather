@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
@@ -18,6 +19,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.databinding.TabForecastItemBinding;
+import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.detailfragment.adapters.DetailHourlyForecastViewPagerAdapter;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
@@ -68,24 +70,24 @@ public class DetailHourlyForecastDialogFragment extends BaseDetailDialogFragment
 	protected void setTabCustomView() {
 		super.setTabCustomView();
 
-		LayoutInflater layoutInflater = getLayoutInflater();
-		DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E H");
+			LayoutInflater layoutInflater = getLayoutInflater();
+			DateTimeFormatter hour0Formatter = DateTimeFormatter.ofPattern("E H");
 
-		int index = 0;
-		TabForecastItemBinding tabItemBinding = null;
+			int index = 0;
+			TabForecastItemBinding tabItemBinding = null;
 
-		for (HourlyForecastDto item : hourlyForecastDtoList) {
-			tabItemBinding = TabForecastItemBinding.inflate(layoutInflater, binding.tabLayout, false);
-			tabItemBinding.rightWeatherIcon.setVisibility(View.GONE);
+			for (HourlyForecastDto item : hourlyForecastDtoList) {
+				tabItemBinding = TabForecastItemBinding.inflate(layoutInflater, binding.tabLayout, false);
+				tabItemBinding.rightWeatherIcon.setVisibility(View.GONE);
 
+				tabItemBinding.dateTime.setText(item.getHours().format(hour0Formatter));
+				Glide.with(tabItemBinding.leftWeatherIcon).load(item.getWeatherIcon()).into(tabItemBinding.leftWeatherIcon);
+				tabItemBinding.temp.setText(item.getTemp());
 
-			tabItemBinding.dateTime.setText(item.getHours().format(hour0Formatter));
-			Glide.with(tabItemBinding.leftWeatherIcon).load(item.getWeatherIcon()).into(tabItemBinding.leftWeatherIcon);
-			tabItemBinding.temp.setText(item.getTemp());
+				binding.tabLayout.getTabAt(index++).setCustomView(tabItemBinding.getRoot());
+			}
+			binding.tabLayout.selectTab(binding.tabLayout.getTabAt(firstSelectedPosition));
 
-			binding.tabLayout.getTabAt(index++).setCustomView(tabItemBinding.getRoot());
-		}
-		binding.tabLayout.selectTab(binding.tabLayout.getTabAt(firstSelectedPosition));
 
 	}
 }

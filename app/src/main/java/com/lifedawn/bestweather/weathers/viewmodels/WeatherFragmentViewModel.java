@@ -59,6 +59,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel {
 	public DateTimeFormatter dateTimeFormatter;
 	public FavoriteAddressDto selectedFavoriteAddressDto;
 	public LocationType locationType;
+	public WeatherFragment.ITextColor iTextColor;
 
 	public WeatherProviderType mainWeatherProviderType;
 	public Double latitude;

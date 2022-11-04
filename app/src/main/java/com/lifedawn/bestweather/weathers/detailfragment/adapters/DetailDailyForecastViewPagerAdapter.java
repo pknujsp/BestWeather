@@ -250,10 +250,8 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 			} else {
 				final int valuesSize = dailyForecastDto.getValuesList().size();
 
-				final DailyForecastDto.Values am = dailyForecastDto.getValuesList().get(valuesSize == 2 ? 0
-						: 1);
-				final DailyForecastDto.Values pm = dailyForecastDto.getValuesList().get(valuesSize == 2 ? 1
-						: 2);
+				final DailyForecastDto.Values am = dailyForecastDto.getValuesList().get(valuesSize == 2 ? 0 : 1);
+				final DailyForecastDto.Values pm = dailyForecastDto.getValuesList().get(valuesSize == 2 ? 1 : 2);
 				final String divider = " / ";
 
 				if (am.getPop() != null || pm.getPop() != null) {

@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers.simplefragment.base;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
 import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +26,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues {
+public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues, WeatherFragment.ITextColor {
 	protected BaseLayoutSimpleCurrentConditionsBinding binding;
 	protected ValueUnits tempUnit;
 	protected Double latitude;
@@ -39,7 +41,6 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		bundle = savedInstanceState != null ? savedInstanceState : getArguments();
 
 		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
@@ -83,4 +84,20 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		binding = null;
 	}
 
+	@Override
+	public void changeColor(int color) {
+		binding.sky.setTextColor(color);
+		binding.precipitation.setTextColor(color);
+		binding.humidity.setTextColor(color);
+		binding.windDirection.setTextColor(color);
+		binding.wind.setTextColor(color);
+		binding.airQualityLabel.setTextColor(color);
+		binding.airQuality.setTextColor(color);
+		binding.temperature.setTextColor(color);
+		binding.tempUnit.setTextColor(color);
+		binding.feelsLikeTempLabel.setTextColor(color);
+		binding.feelsLikeTemp.setTextColor(color);
+		binding.feelsLikeTempUnit.setTextColor(color);
+		binding.tempDescription.setTextColor(color);
+	}
 }
