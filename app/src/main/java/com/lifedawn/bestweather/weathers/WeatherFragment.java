@@ -108,6 +108,7 @@ import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.weathers.models.WeatherDataDTO;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.SimpleAirQualityFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.currentconditions.SimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.dailyforecast.SimpleDailyForecastFragment;
@@ -196,7 +197,6 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		flickrViewModel = new ViewModelProvider(this).get(FlickrViewModel.class);
 
 		weatherFragmentViewModel.arguments = getArguments() == null ? savedInstanceState : getArguments();
-		//LocationType locationType, @Nullable FavoriteAddressDto favoriteAddressDto
 		weatherFragmentViewModel.locationType = (LocationType) weatherFragmentViewModel.arguments.getSerializable("LocationType");
 		weatherFragmentViewModel.favoriteAddressDto = weatherFragmentViewModel.arguments.containsKey("FavoriteAddressDto") ?
 				(FavoriteAddressDto) weatherFragmentViewModel.arguments.getSerializable("FavoriteAddressDto") : null;
@@ -210,10 +210,8 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		super.onHiddenChanged(hidden);
 
 		if (hidden) {
-			// 상단바 블랙으로
 			HeaderbarStyle.setStyle(HeaderbarStyle.Style.Black, getActivity());
 		} else {
-			// 상단바 하양으로
 			HeaderbarStyle.setStyle(HeaderbarStyle.Style.White, getActivity());
 		}
 	}
@@ -264,7 +262,6 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 					}
 				});
 
-
 				binding.mainToolbar.find.setOnClickListener(v -> {
 					if (networkStatus.networkAvailable()) {
 						final MapFragment mapFragment = new MapFragment();
@@ -272,7 +269,6 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 						final Bundle arguments = new Bundle();
 						arguments.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
 						mapFragment.setArguments(arguments);
-
 						mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
 							@Override
 							public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
@@ -678,9 +674,9 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		weatherFragmentViewModel.requestNewData();
 	}
 
-	private void requestNewDataWithAnotherWeatherSource(WeatherProviderType newWeatherProviderType, WeatherProviderType lastWeatherProviderType) {
+	private void requestNewDataWithAnotherWeatherSource(WeatherProviderType newWeatherProviderType) {
 		shimmer(true, false);
-		weatherFragmentViewModel.requestNewDataWithAnotherWeatherSource(newWeatherProviderType, lastWeatherProviderType);
+		weatherFragmentViewModel.requestNewDataWithAnotherWeatherSource(newWeatherProviderType);
 	}
 
 	private void processOnResult(ResponseResultObj responseResultObj) {
@@ -788,215 +784,56 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 	private void setWeatherFragments(Set<WeatherProviderType> weatherProviderTypeSet, WeatherRestApiDownloader weatherRestApiDownloader,
 	                                 Double latitude, Double longitude) {
-		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
-		ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> arrayMap;
+		final WeatherDataDTO weatherDataDTO = weatherFragmentViewModel.createWeatherFragments(weatherProviderTypeSet,
+				weatherRestApiDownloader, latitude,
+				longitude);
 
-		CurrentConditionsDto currentConditionsDto = null;
-		List<HourlyForecastDto> hourlyForecastDtoList = null;
-		List<DailyForecastDto> dailyForecastDtoList = null;
-
-		final SimpleCurrentConditionsFragment simpleCurrentConditionsFragment = new SimpleCurrentConditionsFragment();
-		final SimpleHourlyForecastFragment simpleHourlyForecastFragment = new SimpleHourlyForecastFragment();
-		final SimpleDailyForecastFragment simpleDailyForecastFragment = new SimpleDailyForecastFragment();
-		final DetailCurrentConditionsFragment detailCurrentConditionsFragment = new DetailCurrentConditionsFragment();
-		final SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
-		final SunsetriseFragment sunSetRiseFragment = new SunsetriseFragment();
-
-		String currentConditionsWeatherVal = null;
-
-		if (weatherProviderTypeSet.contains(WeatherProviderType.KMA_API)) {
-			arrayMap = responseMap.get(WeatherProviderType.KMA_API);
-
-			FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditionsByXML(
-					(VilageFcstResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST)).getResponseObj());
-			FinalCurrentConditions yesterDayFinalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditionsByXML(
-					(VilageFcstResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_YESTERDAY_ULTRA_SRT_NCST)).getResponseObj());
-
-			List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastListByXML(
-					(VilageFcstResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST)).getResponseObj(),
-					(VilageFcstResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST)).getResponseObj());
-
-			List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastListByXML(
-					(MidLandFcstResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_MID_LAND_FCST)).getResponseObj(),
-					(MidTaResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_MID_TA_FCST)).getResponseObj(),
-					Long.parseLong(weatherRestApiDownloader.get("tmFc")));
-
-			finalDailyForecastList = KmaResponseProcessor.getDailyForecastListByXML(finalDailyForecastList, finalHourlyForecastList);
-
-			currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDtoOfXML(getContext(), finalCurrentConditions,
-					finalHourlyForecastList.get(0), latitude, longitude);
-			currentConditionsDto.setYesterdayTemp(ValueUnits.convertTemperature(yesterDayFinalCurrentConditions.getTemperature(),
-					MyApplication.VALUE_UNIT_OBJ.getTempUnit()) + MyApplication.VALUE_UNIT_OBJ.getTempUnitText());
-
-			hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoListOfXML(getContext(),
-					finalHourlyForecastList, latitude, longitude);
-
-			dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfXML(finalDailyForecastList);
-
-			String sky = finalHourlyForecastList.get(0).getSky();
-			String pty = finalCurrentConditions.getPrecipitationType();
-
-			currentConditionsWeatherVal = pty.equals("0") ? sky + "_sky" : pty + "_pty";
-			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.KMA_API;
-
-		} else if (weatherProviderTypeSet.contains(WeatherProviderType.KMA_WEB)) {
-			arrayMap = responseMap.get(WeatherProviderType.KMA_WEB);
-
-			KmaCurrentConditions kmaCurrentConditions = (KmaCurrentConditions) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS)).getResponseObj();
-			Object[] forecasts = (Object[]) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS)).getResponseObj();
-
-			ArrayList<KmaHourlyForecast> kmaHourlyForecasts = (ArrayList<KmaHourlyForecast>) forecasts[0];
-			ArrayList<KmaDailyForecast> kmaDailyForecasts = (ArrayList<KmaDailyForecast>) forecasts[1];
-
-			currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDtoOfWEB(getContext(),
-					kmaCurrentConditions, kmaHourlyForecasts.get(0), latitude, longitude);
-
-			hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoListOfWEB(getContext(),
-					kmaHourlyForecasts, latitude, longitude);
-
-			dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfWEB(kmaDailyForecasts);
-
-			String pty = kmaCurrentConditions.getPty();
-
-			currentConditionsWeatherVal = pty.isEmpty() ? kmaHourlyForecasts.get(0).getWeatherDescription() : pty;
-			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.KMA_WEB;
-
-		} else if (weatherProviderTypeSet.contains(WeatherProviderType.ACCU_WEATHER)) {
-			arrayMap = responseMap.get(WeatherProviderType.ACCU_WEATHER);
-
-			AccuCurrentConditionsResponse accuCurrentConditionsResponse =
-					(AccuCurrentConditionsResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS)).getResponseObj();
-
-			AccuHourlyForecastsResponse accuHourlyForecastsResponse =
-					(AccuHourlyForecastsResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST)).getResponseObj();
-
-			AccuDailyForecastsResponse accuDailyForecastsResponse =
-					(AccuDailyForecastsResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST)).getResponseObj();
-
-			currentConditionsDto = AccuWeatherResponseProcessor.makeCurrentConditionsDto(getContext(), accuCurrentConditionsResponse.getItems().get(0)
-			);
-
-			hourlyForecastDtoList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(), accuHourlyForecastsResponse.getItems()
-			);
-
-			dailyForecastDtoList = AccuWeatherResponseProcessor.makeDailyForecastDtoList(getContext(),
-					accuDailyForecastsResponse.getDailyForecasts());
-
-			currentConditionsWeatherVal = accuCurrentConditionsResponse.getItems().get(0).getWeatherIcon();
-			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.ACCU_WEATHER;
-
-		} else if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_ONECALL)) {
-			arrayMap = responseMap.get(WeatherProviderType.OWM_ONECALL);
-
-			OwmOneCallResponse owmOneCallResponse =
-					(OwmOneCallResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL)).getResponseObj();
-
-			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(getContext(), owmOneCallResponse, weatherFragmentViewModel.zoneId
-			);
-
-			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(), owmOneCallResponse, weatherFragmentViewModel.zoneId
-			);
-
-			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(getContext(), owmOneCallResponse, weatherFragmentViewModel.zoneId
-			);
-
-			currentConditionsWeatherVal = owmOneCallResponse.getCurrent().getWeather().get(0).getId();
-
-			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.OWM_ONECALL;
-
-		} else if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_INDIVIDUAL)) {
-			arrayMap = responseMap.get(WeatherProviderType.OWM_INDIVIDUAL);
-
-			OwmCurrentConditionsResponse owmCurrentConditionsResponse =
-					(OwmCurrentConditionsResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS)).getResponseObj();
-			OwmHourlyForecastResponse owmHourlyForecastResponse =
-					(OwmHourlyForecastResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST)).getResponseObj();
-			OwmDailyForecastResponse owmDailyForecastResponse =
-					(OwmDailyForecastResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST)).getResponseObj();
-
-			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(getContext(), owmCurrentConditionsResponse, weatherFragmentViewModel.zoneId
-			);
-
-			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(getContext(),
-					owmHourlyForecastResponse, weatherFragmentViewModel.zoneId);
-
-			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(getContext(),
-					owmDailyForecastResponse, weatherFragmentViewModel.zoneId);
-
-			currentConditionsWeatherVal = owmCurrentConditionsResponse.getWeather().get(0).getId();
-
-			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.OWM_INDIVIDUAL;
-		} else if (weatherProviderTypeSet.contains(WeatherProviderType.MET_NORWAY)) {
-			arrayMap = responseMap.get(WeatherProviderType.MET_NORWAY);
-
-			LocationForecastResponse locationForecastResponse =
-					(LocationForecastResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST)).getResponseObj();
-
-			currentConditionsDto = MetNorwayResponseProcessor.makeCurrentConditionsDto(getContext(), locationForecastResponse
-					, weatherFragmentViewModel.zoneId);
-
-			hourlyForecastDtoList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(getContext(), locationForecastResponse, weatherFragmentViewModel.zoneId);
-
-			dailyForecastDtoList = MetNorwayResponseProcessor.makeDailyForecastDtoList(getContext(), locationForecastResponse, weatherFragmentViewModel.zoneId);
-
-			currentConditionsWeatherVal = locationForecastResponse.getProperties().getTimeSeries().get(0)
-					.getData().getNext_1_hours().getSummary().getSymbolCode().replace("day", "").replace("night", "")
-					.replace("_", "");
-
-			weatherFragmentViewModel.mainWeatherProviderType = WeatherProviderType.MET_NORWAY;
-		}
-
-		WeatherRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherProviderType.AQICN).get(
-				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
-		AqiCnGeolocalizedFeedResponse airQualityResponse = null;
-
-		if (aqicnResponse != null && aqicnResponse.isSuccessful()) {
-			airQualityResponse = (AqiCnGeolocalizedFeedResponse) aqicnResponse.getResponseObj();
-		}
-
-		final AirQualityDto airQualityDto = AqicnResponseProcessor.makeAirQualityDto(airQualityResponse,
-				ZonedDateTime.now(weatherFragmentViewModel.zoneId).getOffset());
 
 		final Bundle defaultBundle = new Bundle();
-		defaultBundle.putDouble(BundleKey.Latitude.name(), weatherFragmentViewModel.latitude);
-		defaultBundle.putDouble(BundleKey.Longitude.name(), weatherFragmentViewModel.longitude);
-		defaultBundle.putString(BundleKey.AddressName.name(), weatherFragmentViewModel.addressName);
-		defaultBundle.putString(BundleKey.CountryCode.name(), weatherFragmentViewModel.countryCode);
-		defaultBundle.putSerializable(BundleKey.WeatherProvider.name(), weatherFragmentViewModel.mainWeatherProviderType);
-		defaultBundle.putSerializable(BundleKey.TimeZone.name(), weatherFragmentViewModel.zoneId);
+		defaultBundle.putDouble(BundleKey.Latitude.name(), weatherDataDTO.getLatitude());
+		defaultBundle.putDouble(BundleKey.Longitude.name(), weatherDataDTO.getLongitude());
+		defaultBundle.putString(BundleKey.AddressName.name(), weatherDataDTO.getAddressName());
+		defaultBundle.putString(BundleKey.CountryCode.name(), weatherDataDTO.getCountryCode());
+		defaultBundle.putSerializable(BundleKey.WeatherProvider.name(), weatherDataDTO.getMainWeatherProviderType());
+		defaultBundle.putSerializable(BundleKey.TimeZone.name(), weatherDataDTO.getZoneId());
 
 		// simple current conditions ------------------------------------------------------------------------------------------------------
 		final Bundle simpleCurrentConditionsBundle = new Bundle();
 		simpleCurrentConditionsBundle.putAll(defaultBundle);
 
-		simpleCurrentConditionsFragment.setCurrentConditionsDto(currentConditionsDto)
-				.setAirQualityDto(airQualityDto);
+		final SimpleCurrentConditionsFragment simpleCurrentConditionsFragment = new SimpleCurrentConditionsFragment();
+		simpleCurrentConditionsFragment.setCurrentConditionsDto(weatherDataDTO.getCurrentConditionsDto())
+				.setAirQualityDto(weatherDataDTO.getAirQualityDto());
 
 		// hourly forecasts ----------------------------------------------------------------------------------------------------------------
 		final Bundle hourlyForecastBundle = new Bundle();
 		hourlyForecastBundle.putAll(defaultBundle);
 
-		simpleHourlyForecastFragment.setHourlyForecastDtoList(hourlyForecastDtoList);
+		final SimpleHourlyForecastFragment simpleHourlyForecastFragment = new SimpleHourlyForecastFragment();
+		simpleHourlyForecastFragment.setHourlyForecastDtoList(weatherDataDTO.getHourlyForecastList());
 
 		// daily forecasts ----------------------------------------------------------------------------------------------------------------
 		final Bundle dailyForecastBundle = new Bundle();
 		dailyForecastBundle.putAll(defaultBundle);
 
-		simpleDailyForecastFragment.setDailyForecastDtoList(dailyForecastDtoList);
+		final SimpleDailyForecastFragment simpleDailyForecastFragment = new SimpleDailyForecastFragment();
+		simpleDailyForecastFragment.setDailyForecastDtoList(weatherDataDTO.getDailyForecastList());
 
 		// detail current conditions ----------------------------------------------
 		final Bundle detailCurrentConditionsBundle = new Bundle();
 		detailCurrentConditionsBundle.putAll(defaultBundle);
-		detailCurrentConditionsBundle.putSerializable(WeatherDataType.currentConditions.name(), currentConditionsDto);
+		detailCurrentConditionsBundle.putSerializable(WeatherDataType.currentConditions.name(), weatherDataDTO.getCurrentConditionsDto());
 
-		detailCurrentConditionsFragment.setCurrentConditionsDto(currentConditionsDto);
+		final DetailCurrentConditionsFragment detailCurrentConditionsFragment = new DetailCurrentConditionsFragment();
+		detailCurrentConditionsFragment.setCurrentConditionsDto(weatherDataDTO.getCurrentConditionsDto());
 
 		// air quality  ----------------------------------------------
 		final Bundle airQualityBundle = new Bundle();
 		airQualityBundle.putAll(defaultBundle);
 
-		simpleAirQualityFragment.setAirQualityDto(airQualityDto)
-				.setAqiCnGeolocalizedFeedResponse(airQualityResponse);
+		final SimpleAirQualityFragment simpleAirQualityFragment = new SimpleAirQualityFragment();
+		simpleAirQualityFragment.setAirQualityDto(weatherDataDTO.getAirQualityDto())
+				.setAqiCnGeolocalizedFeedResponse(weatherDataDTO.getAirQualityResponse());
 
 		final SimpleRainViewerFragment rainViewerFragment = new SimpleRainViewerFragment();
 		rainViewerFragment.setArguments(defaultBundle);
@@ -1005,62 +842,53 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		rainViewerFragment.getArguments().putBoolean("simpleMode", true);
 
 		simpleAirQualityFragment.setArguments(airQualityBundle);
+
+		final SunsetriseFragment sunSetRiseFragment = new SunsetriseFragment();
 		sunSetRiseFragment.setArguments(defaultBundle);
 		simpleHourlyForecastFragment.setArguments(hourlyForecastBundle);
 		simpleDailyForecastFragment.setArguments(dailyForecastBundle);
 		simpleCurrentConditionsFragment.setArguments(simpleCurrentConditionsBundle);
 		detailCurrentConditionsFragment.setArguments(detailCurrentConditionsBundle);
 
-		final String finalCurrentConditionsWeatherVal = currentConditionsWeatherVal;
-		final ZoneId finalZoneId = weatherFragmentViewModel.zoneId;
-
-		String precipitationVolume = null;
-		if (currentConditionsDto.isHasPrecipitationVolume()) {
-			precipitationVolume = currentConditionsDto.getPrecipitationVolume();
-		} else if (currentConditionsDto.isHasRainVolume()) {
-			precipitationVolume = currentConditionsDto.getRainVolume();
-		} else if (currentConditionsDto.isHasSnowVolume()) {
-			precipitationVolume = currentConditionsDto.getSnowVolume();
-		}
-		final String finalPrecipitationVolume = precipitationVolume;
-
 
 		FlickrRepository.FlickrRequestParameter flickrRequestParameter = new FlickrRepository.FlickrRequestParameter(
-				weatherFragmentViewModel.mainWeatherProviderType, finalCurrentConditionsWeatherVal, latitude, longitude,
-				finalZoneId, finalPrecipitationVolume,
+				weatherDataDTO.getMainWeatherProviderType(), weatherDataDTO.getCurrentConditionsWeatherVal(), latitude, longitude,
+				weatherDataDTO.getZoneId(), weatherDataDTO.getPrecipitationVolume(),
 				ZonedDateTime.parse(weatherRestApiDownloader.getRequestDateTime().toString())
 		);
 
-		weatherFragmentViewModel.dateTimeFormatter = DateTimeFormatter.ofPattern(
-				MyApplication.VALUE_UNIT_OBJ.getClockUnit() == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
-						getString(R.string.datetime_pattern_clock24), Locale.getDefault());
-		weatherFragmentViewModel.iTextColor = simpleCurrentConditionsFragment;
 		flickrViewModel.setLastParameter(flickrRequestParameter);
-		Objects.requireNonNull(requireActivity()).runOnUiThread(() -> {
-			changeWeatherDataSourcePicker(weatherFragmentViewModel.countryCode);
-			binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(weatherFragmentViewModel.dateTimeFormatter));
+		weatherFragmentViewModel.iTextColor = simpleCurrentConditionsFragment;
 
-			FragmentManager fragmentManager = getChildFragmentManager();
+		try {
+			Objects.requireNonNull(requireActivity()).runOnUiThread(() -> {
+				changeWeatherDataSourcePicker(weatherFragmentViewModel.countryCode);
+				binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(weatherFragmentViewModel.dateTimeFormatter));
 
-			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+				FragmentManager fragmentManager = getChildFragmentManager();
 
-			fragmentTransaction
-					.replace(binding.simpleCurrentConditions.getId(),
-							simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment))
-					.replace(binding.simpleHourlyForecast.getId(), simpleHourlyForecastFragment,
-							getString(R.string.tag_simple_hourly_forecast_fragment))
-					.replace(binding.simpleDailyForecast.getId(), simpleDailyForecastFragment, getString(R.string.tag_simple_daily_forecast_fragment))
-					.replace(binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
-							getString(R.string.tag_detail_current_conditions_fragment))
-					.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment))
-					.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
-							getString(R.string.tag_sun_set_rise_fragment))
-					.replace(binding.radar.getId(), rainViewerFragment,
-							SimpleRainViewerFragment.class.getName())
-					.setPrimaryNavigationFragment(simpleCurrentConditionsFragment)
-					.commit();
+				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-		});
+				fragmentTransaction
+						.replace(binding.simpleCurrentConditions.getId(),
+								simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment))
+						.replace(binding.simpleHourlyForecast.getId(), simpleHourlyForecastFragment,
+								getString(R.string.tag_simple_hourly_forecast_fragment))
+						.replace(binding.simpleDailyForecast.getId(), simpleDailyForecastFragment, getString(R.string.tag_simple_daily_forecast_fragment))
+						.replace(binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
+								getString(R.string.tag_detail_current_conditions_fragment))
+						.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment))
+						.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
+								getString(R.string.tag_sun_set_rise_fragment))
+						.replace(binding.radar.getId(), rainViewerFragment,
+								SimpleRainViewerFragment.class.getName())
+						.setPrimaryNavigationFragment(simpleCurrentConditionsFragment)
+						.commit();
+			});
+
+		} catch (Exception e) {
+
+		}
 
 
 	}
@@ -1115,7 +943,6 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 			new MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.title_pick_weather_data_source).setSingleChoiceItems(items,
 					finalCheckedItemIdx, (dialogInterface, index) -> {
-						WeatherProviderType lastWeatherProviderType = weatherFragmentViewModel.mainWeatherProviderType;
 						WeatherProviderType newWeatherProviderType;
 
 						if (finalCheckedItemIdx != index) {
@@ -1126,7 +953,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 							} else {
 								newWeatherProviderType = WeatherProviderType.OWM_ONECALL;
 							}
-							requestNewDataWithAnotherWeatherSource(newWeatherProviderType, lastWeatherProviderType);
+							requestNewDataWithAnotherWeatherSource(newWeatherProviderType);
 						}
 						dialogInterface.dismiss();
 					}).create().show();
