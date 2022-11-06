@@ -207,7 +207,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		favoriteAddressDto.setLatitude(latitude.toString());
 		favoriteAddressDto.setLongitude(longitude.toString());
 
-		TimeZoneUtils.Companion.getTimeZone(latitude, longitude, zoneId -> {
+		TimeZoneUtils.INSTANCE.getTimeZone(latitude, longitude, zoneId -> {
 			favoriteAddressDto.setZoneId(zoneId.getId());
 			add(favoriteAddressDto);
 		});
@@ -371,6 +371,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				findAddressFragment.setArguments(bundle);
 
 				findAddressFragment.setOnAddressListListener(addressList -> {
+					collapseAllExpandedBottomSheets();
 					removeMarkers(MarkerType.SEARCH);
 
 					LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
@@ -632,49 +633,47 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 	private void onLongClicked(LatLng latLng) {
 		collapseAllExpandedBottomSheets();
-		Geocoding.nominatimReverseGeocoding(getContext(), latLng.latitude, latLng.longitude, addressDto -> MainThreadWorker.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				List<Geocoding.AddressDto> addresses = new ArrayList<>();
-				addresses.add(addressDto);
+		Geocoding.nominatimReverseGeocoding(getContext(), latLng.latitude, latLng.longitude,
+				addressDto -> MainThreadWorker.runOnUiThread(() -> {
+					List<Geocoding.AddressDto> addresses = new ArrayList<>();
+					addresses.add(addressDto);
 
-				LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
-				adapterMap.put(MarkerType.LONG_CLICK, adapter);
+					LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
+					adapterMap.put(MarkerType.LONG_CLICK, adapter);
 
-				adapter.setAddressList(addresses);
-				adapter.setFavoriteAddressSet(favoriteAddressSet);
+					adapter.setAddressList(addresses);
+					adapter.setFavoriteAddressSet(favoriteAddressSet);
 
-				adapter.setOnClickedLocationBtnListener((e, remove) -> onClickedAddress(e));
+					adapter.setOnClickedLocationBtnListener((e, remove) -> onClickedAddress(e));
 
-				adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
-					@Override
-					public void toLeft() {
-						if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
-							binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-									binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
+					adapter.setOnClickedScrollBtnListener(new OnClickedScrollBtnListener() {
+						@Override
+						public void toLeft() {
+							if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() > 0) {
+								binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+										binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() - 1, true);
+							}
 						}
-					}
 
-					@Override
-					public void toRight() {
-						if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
-							binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
-									binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
+						@Override
+						public void toRight() {
+							if (binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() < adapter.getItemCount() - 1) {
+								binding.placeslistBottomSheet.placeItemsViewpager.setCurrentItem(
+										binding.placeslistBottomSheet.placeItemsViewpager.getCurrentItem() + 1, true);
+							}
 						}
-					}
-				});
+					});
 
-				removeMarkers(MarkerType.LONG_CLICK);
-				addMarker(MarkerType.LONG_CLICK, 0, addressDto);
-				showMarkers(MarkerType.LONG_CLICK);
+					removeMarkers(MarkerType.LONG_CLICK);
+					addMarker(MarkerType.LONG_CLICK, 0, addressDto);
+					showMarkers(MarkerType.LONG_CLICK);
 
-				locationItemBottomSheetViewPager.setTag(MarkerType.LONG_CLICK);
-				locationItemBottomSheetViewPager.setAdapter(adapterMap.get(MarkerType.LONG_CLICK));
-				locationItemBottomSheetViewPager.setCurrentItem(0, false);
+					locationItemBottomSheetViewPager.setTag(MarkerType.LONG_CLICK);
+					locationItemBottomSheetViewPager.setAdapter(adapterMap.get(MarkerType.LONG_CLICK));
+					locationItemBottomSheetViewPager.setCurrentItem(0, false);
 
-				setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_EXPANDED);
-			}
-		}));
+					setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_EXPANDED);
+				}));
 	}
 
 	private void addMarker(MarkerType markerType, int position, Geocoding.AddressDto address) {

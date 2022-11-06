@@ -63,25 +63,17 @@ public class FindAddressFragment extends Fragment {
 			if (newText.isEmpty())
 				return;
 
-			MainThreadWorker.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					binding.progressResultView.onStarted();
-				}
-			});
+			MainThreadWorker.runOnUiThread(() -> binding.progressResultView.onStarted());
 
-			Geocoding.nominatimGeocoding(getContext(), newText, new Geocoding.GeocodingCallback() {
-				@Override
-				public void onGeocodingResult(List<Geocoding.AddressDto> addressList) {
-					if (getActivity() != null) {
-						MainThreadWorker.runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								addressesAdapter.setItemList(addressList);
-								addressesAdapter.getFilter().filter(newText);
-							}
-						});
-					}
+			Geocoding.nominatimGeocoding(getContext(), newText, addressList -> {
+				if (getActivity() != null) {
+					MainThreadWorker.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							addressesAdapter.setItemList(addressList);
+							addressesAdapter.getFilter().filter(newText);
+						}
+					});
 				}
 			});
 
@@ -261,7 +253,7 @@ public class FindAddressFragment extends Fragment {
 		@Override
 		public void onSuccessful(LocationResult locationResult) {
 			final Location location = getBestLocation(locationResult);
-			Geocoding.nominatimReverseGeocoding(getContext(), location.getLatitude(), location.getLongitude(),
+			Geocoding.nominatimReverseGeocoding(getContext(),  location.getLatitude(),  location.getLongitude(),
 					new Geocoding.ReverseGeocodingCallback() {
 						@Override
 						public void onReverseGeocodingResult(Geocoding.AddressDto addressDto) {

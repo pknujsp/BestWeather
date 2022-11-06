@@ -401,22 +401,23 @@ public class WidgetListenableWorker extends ListenableWorker {
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 				final Location location = getBestLocation(locationResult);
 
-				Geocoding.nominatimReverseGeocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(), new Geocoding.ReverseGeocodingCallback() {
-					@Override
-					public void onReverseGeocodingResult(Geocoding.AddressDto address) {
-						if (address == null) {
-							onLocationResponse(Fail.FAILED_FIND_LOCATION, null, backgroundWorkCallback);
-						} else {
-							final String addressName = address.displayName;
-							currentLocationRequestObj.address = address;
+				Geocoding.nominatimReverseGeocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(),
+						new Geocoding.ReverseGeocodingCallback() {
+							@Override
+							public void onReverseGeocodingResult(Geocoding.AddressDto address) {
+								if (address == null) {
+									onLocationResponse(Fail.FAILED_FIND_LOCATION, null, backgroundWorkCallback);
+								} else {
+									final String addressName = address.displayName;
+									currentLocationRequestObj.address = address;
 
-							final String zoneIdText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-									.getString("zoneId", "");
-							currentLocationRequestObj.zoneId = ZoneId.of(zoneIdText);
-							onResultCurrentLocation(addressName, address, backgroundWorkCallback);
-						}
-					}
-				});
+									final String zoneIdText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+											.getString("zoneId", "");
+									currentLocationRequestObj.zoneId = ZoneId.of(zoneIdText);
+									onResultCurrentLocation(addressName, address, backgroundWorkCallback);
+								}
+							}
+						});
 			}
 
 			@Override

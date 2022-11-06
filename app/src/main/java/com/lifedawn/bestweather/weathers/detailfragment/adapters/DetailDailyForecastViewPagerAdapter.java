@@ -100,22 +100,22 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 
 				binding.weatherDescription.setText(dailyForecastDto.getValuesList().get(0).getWeatherDescription());
 
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windDirection), dailyForecastDto.getValuesList().get(0).getWindDirection());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windSpeed),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windDirection), dailyForecastDto.getValuesList().get(0).getWindDirection());
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windSpeed),
 						dailyForecastDto.getValuesList().get(0).getWindSpeed());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windStrength),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windStrength),
 						dailyForecastDto.getValuesList().get(0).getWindStrength());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windGust),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windGust),
 						dailyForecastDto.getValuesList().get(0).getWindGust());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pressure),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.pressure),
 						dailyForecastDto.getValuesList().get(0).getPressure());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.humidity),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.humidity),
 						dailyForecastDto.getValuesList().get(0).getHumidity());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.dewPoint),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.dewPoint),
 						dailyForecastDto.getValuesList().get(0).getDewPointTemp());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.cloudiness),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.cloudiness),
 						dailyForecastDto.getValuesList().get(0).getCloudiness());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.uvIndex),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.uvIndex),
 						dailyForecastDto.getValuesList().get(0).getUvIndex());
 			} else if (dailyForecastDto.getValuesList().size() == 2) {
 				binding.timezone.setText(new String(context.getString(R.string.am) + " / " +
@@ -131,23 +131,23 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				binding.leftIcon.setVisibility(View.VISIBLE);
 				binding.rightIcon.setVisibility(View.VISIBLE);
 
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windDirection),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windDirection),
 						dailyForecastDto.getValuesList().get(0).getWindDirection(), dailyForecastDto.getValuesList().get(1).getWindDirection());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windSpeed),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windSpeed),
 						dailyForecastDto.getValuesList().get(0).getWindSpeed(), dailyForecastDto.getValuesList().get(1).getWindSpeed());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windStrength),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windStrength),
 						dailyForecastDto.getValuesList().get(0).getWindStrength(), dailyForecastDto.getValuesList().get(1).getWindStrength());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windGust),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windGust),
 						dailyForecastDto.getValuesList().get(0).getWindGust(), dailyForecastDto.getValuesList().get(1).getWindGust());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pressure),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.pressure),
 						dailyForecastDto.getValuesList().get(0).getPressure(), dailyForecastDto.getValuesList().get(1).getPressure());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.humidity),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.humidity),
 						dailyForecastDto.getValuesList().get(0).getHumidity(), dailyForecastDto.getValuesList().get(1).getHumidity());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.dewPoint),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.dewPoint),
 						dailyForecastDto.getValuesList().get(0).getDewPointTemp(), dailyForecastDto.getValuesList().get(1).getDewPointTemp());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.cloudiness),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.cloudiness),
 						dailyForecastDto.getValuesList().get(0).getCloudiness(), dailyForecastDto.getValuesList().get(1).getCloudiness());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.uvIndex),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.uvIndex),
 						dailyForecastDto.getValuesList().get(0).getUvIndex(), dailyForecastDto.getValuesList().get(1).getUvIndex());
 
 			} else if (dailyForecastDto.getValuesList().size() == 4) {
@@ -166,13 +166,13 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				binding.leftIcon.setVisibility(View.VISIBLE);
 				binding.rightIcon.setVisibility(View.VISIBLE);
 
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windDirection),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windDirection),
 						dailyForecastDto.getValuesList().get(1).getWindDirection(),
 						dailyForecastDto.getValuesList().get(2).getWindDirection());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windSpeed),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windSpeed),
 						dailyForecastDto.getValuesList().get(1).getWindSpeed()
 						, dailyForecastDto.getValuesList().get(2).getWindSpeed());
-				addListItem(labelValueItemList, WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windStrength),
+				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windStrength),
 						dailyForecastDto.getValuesList().get(1).getWindStrength(),
 						dailyForecastDto.getValuesList().get(2).getWindStrength());
 			}
@@ -223,27 +223,27 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				final DailyForecastDto.Values single = dailyForecastDto.getValuesList().get(0);
 
 				if (single.getPop() != null) {
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pop),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.pop),
 							single.getPop(), null));
 				}
 				if (single.getPor() != null) {
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.por),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.por),
 							single.getPor(), null));
 				}
 				if (single.getPos() != null) {
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pos),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.pos),
 							single.getPos(), null));
 				}
 				if (single.isHasPrecipitationVolume() && single.getPrecipitationVolume() != null) {
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.precipitationVolume),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.precipitationVolume),
 							single.getPrecipitationVolume(), null));
 				}
 				if (single.isHasRainVolume()) {
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.rainVolume),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.rainVolume),
 							single.getRainVolume(), null));
 				}
 				if (single.isHasSnowVolume()) {
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.snowVolume),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.snowVolume),
 							single.getSnowVolume(), null));
 				}
 
@@ -255,17 +255,17 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				final String divider = " / ";
 
 				if (am.getPop() != null || pm.getPop() != null) {
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pop),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.pop),
 							am.getPop() + divider + pm.getPop(),
 							null));
 				}
 				if (am.getPor() != null || pm.getPor() != null) {
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.por),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.por),
 							am.getPor() + divider + pm.getPor(),
 							null));
 				}
 				if (am.getPos() != null || pm.getPos() != null) {
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pos),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.pos),
 							am.getPos() + divider + pm.getPos(), null));
 				}
 
@@ -276,16 +276,16 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 					final float pmVolume = Float.parseFloat(dailyForecastDto.getValuesList().get(2).getPrecipitationVolume().replace(mm,
 							"")) + Float.parseFloat(dailyForecastDto.getValuesList().get(3).getPrecipitationVolume().replace(mm, ""));
 
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.precipitationVolume),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.precipitationVolume),
 							String.format(Locale.getDefault(), "%.1fmm", amVolume) + divider + String.format(Locale.getDefault(), "%.1fmm", pmVolume),
 							null));
 				}
 				if (am.isHasRainVolume() || pm.isHasRainVolume()) {
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.rainVolume),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.rainVolume),
 							am.getRainVolume() + divider + pm.getRainVolume(), null));
 				}
 				if (am.isHasSnowVolume() || pm.isHasSnowVolume()) {
-					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.snowVolume),
+					gridItemDtoList.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.snowVolume),
 							am.getSnowVolume() + divider + pm.getSnowVolume(), null));
 				}
 			}

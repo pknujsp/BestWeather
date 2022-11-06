@@ -1,19 +1,21 @@
 package com.lifedawn.bestweather.rainviewer.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.TileOverlay
-import com.google.android.gms.maps.model.TileOverlayOptions
-import com.google.android.gms.maps.model.TileProvider
-import com.google.android.gms.maps.model.UrlTileProvider
-import com.lifedawn.bestweather.rainviewer.model.RainViewerRepository
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.lifedawn.bestweather.rainviewer.model.RainViewerRepositoryImpl
 import com.lifedawn.bestweather.rainviewer.model.RainViewerResponseDto
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.time.format.DateTimeFormatter
 
-class RainViewerViewModel(application: Application) : AndroidViewModel(application), RainViewerRepository.IRainViewer {
-    private val repository: RainViewerRepository = RainViewerRepository.INSTANCE!!
-    val initMapLiveData: MutableLiveData<RainViewerResponseDto?> = repository.initMapLiveData
+class RainViewerViewModel() : ViewModel() {
+    private val _rainViewerData: MutableLiveData<RainViewerResponseDto?> = MutableLiveData<RainViewerResponseDto?>()
+    val rainViewerData: MutableLiveData<RainViewerResponseDto?>
+        get() = _rainViewerData
 
     val frames = ArrayList<RainViewerResponseDto.Data>()
     var lastFramePosition = 0
@@ -33,8 +35,23 @@ class RainViewerViewModel(application: Application) : AndroidViewModel(applicati
 
     var simpleMode = false
 
-    override fun initMap() {
-        repository.initMap()
+    fun initMap() {
+        RainViewerRepositoryImpl.initMap(object : Callback<JsonElement> {
+            override fun onResponse(call: Call<JsonElement>, response: Response<JsonElement>) {
+                if (response.isSuccessful) {
+                    val responseDto: RainViewerResponseDto = Gson().fromJson(response.body(),
+                            RainViewerResponseDto::class.java)
+                    _rainViewerData.postValue(responseDto)
+                } else {
+                    //fail
+                    _rainViewerData.postValue(null)
+                }
+            }
+
+            override fun onFailure(call: Call<JsonElement>, t: Throwable) {
+                _rainViewerData.postValue(null)
+            }
+        })
     }
 
 }

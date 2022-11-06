@@ -390,7 +390,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 			}
 		});
 
-		flickrViewModel.imgLiveData.observe(getViewLifecycleOwner(), flickrImgResponse -> {
+		flickrViewModel.img.observe(getViewLifecycleOwner(), flickrImgResponse -> {
 			onChangedStateBackgroundImg(flickrImgResponse.successful);
 
 			if (flickrImgResponse.successful) {
@@ -546,9 +546,10 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	}
 
 	private void loadImgOfCurrentConditions(FlickrRepository.FlickrRequestParameter flickrRequestParameter) {
+		HeaderbarStyle.setStyle(HeaderbarStyle.Style.Black, requireActivity());
+
 		binding.loadingAnimation.setVisibility(View.VISIBLE);
 		binding.flickrImageUrl.setVisibility(View.GONE);
-		HeaderbarStyle.setStyle(HeaderbarStyle.Style.Black, requireActivity());
 
 		flickrViewModel.loadImg(flickrRequestParameter);
 	}
@@ -623,7 +624,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 				SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(requireContext()).edit();
 
-				TimeZoneUtils.Companion.getTimeZone(latitude, longitude, zoneId -> {
+				TimeZoneUtils.INSTANCE.getTimeZone(latitude, longitude, zoneId -> {
 					editor.putString("zoneId", zoneId.getId()).apply();
 					onResultCurrentLocation(addressStr, address, refresh);
 				});
@@ -1045,10 +1046,14 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 				FragmentManager fragmentManager = getChildFragmentManager();
 
 				fragmentManager.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+					int count = 0;
+
 					@Override
 					public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
 						super.onFragmentResumed(fm, f);
-						if (f instanceof SimpleRainViewerFragment) {
+						++count;
+
+						if (count == 7) {
 							fm.unregisterFragmentLifecycleCallbacks(this);
 							shimmer(false);
 							loadImgOfCurrentConditions(flickrRequestParameter);

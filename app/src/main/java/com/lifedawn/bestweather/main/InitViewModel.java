@@ -4,11 +4,9 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.ViewModel;
 
-public class InitViewModel extends AndroidViewModel {
+public class InitViewModel extends ViewModel {
 	public boolean ready;
 
-	public InitViewModel(@NonNull Application application) {
-		super(application);
-	}
 }

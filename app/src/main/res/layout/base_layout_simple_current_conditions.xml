@@ -76,11 +76,11 @@
         android:layout_height="26dp"
         android:layout_marginRight="4dp"
         android:scaleType="fitCenter"
-        android:shadowColor="@color/light_blue_600"
+        android:shadowColor="@color/black"
         android:src="@drawable/arrow"
         app:layout_constraintBottom_toBottomOf="@id/windDirection"
         app:layout_constraintRight_toLeftOf="@id/windDirection"
-        app:tint="@color/light_blue_600"
+        app:tint="@color/black"
         />
 
     <TextView

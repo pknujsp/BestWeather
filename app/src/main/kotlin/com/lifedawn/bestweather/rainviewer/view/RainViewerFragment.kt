@@ -10,13 +10,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.RelativeLayout
+import androidx.constraintlayout.widget.ConstraintLayout
+
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Transformations.map
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -42,6 +41,7 @@ import java.util.*
 class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
     private var _binding: FragmentRainViewerBinding? = null
     private val binding get() = _binding!!
+
     private val rainViewerViewModel: RainViewerViewModel by viewModels()
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocation: FusedLocation
@@ -71,12 +71,13 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
                               savedInstanceState: Bundle?): View? {
         _binding = FragmentRainViewerBinding.inflate(inflater)
 
-        binding.progressResultView.setContentView(binding.mapButtons.root, binding.controlLayout, binding.mapFragmentContainer)
+        binding.progressResultView.setContentView(binding.mapButtons.root, binding.previousBtn, binding.datetime, binding.nextBtn, binding
+                .mapFragmentContainer)
         binding.progressResultView.setBtnOnClickListener {
             rainViewerViewModel.initMap()
         }
 
-        val layoutParams = binding.toolbar.root.layoutParams as RelativeLayout.LayoutParams
+        val layoutParams = binding.toolbar.root.layoutParams as ConstraintLayout.LayoutParams
         layoutParams.topMargin = MyApplication.getStatusBarHeight()
         binding.toolbar.root.layoutParams = layoutParams
 
@@ -97,14 +98,16 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
-                binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                if (binding.root.height > 0 && binding.datetime.top > 0) {
+                    binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
-                mapContentPadding = (binding.root.height - binding.controlLayout.top + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                        8f, requireContext().resources.displayMetrics)).toInt()
+                    mapContentPadding = (binding.root.height - binding.datetime.top + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                            8f, requireContext().resources.displayMetrics)).toInt()
 
-                val mapFragment = SupportMapFragment()
-                childFragmentManager.beginTransaction().add(binding.mapFragmentContainer.id, mapFragment).commitNow()
-                mapFragment!!.getMapAsync(this@RainViewerFragment)
+                    val mapFragment = SupportMapFragment()
+                    childFragmentManager.beginTransaction().add(binding.mapFragmentContainer.id, mapFragment).commitNow()
+                    mapFragment.getMapAsync(this@RainViewerFragment)
+                }
             }
         })
 
@@ -127,7 +130,6 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
         googleMap.setPadding(0, mapContentPadding, 0, mapContentPadding)
 
         val latLng = LatLng(rainViewerViewModel.latitude, rainViewerViewModel.longitude)
-
 
         val size = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 26f, resources.displayMetrics).toInt()
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.location)!!
@@ -184,7 +186,7 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
         })
 
 
-        rainViewerViewModel.initMapLiveData.observe(viewLifecycleOwner) {
+        rainViewerViewModel.rainViewerData.observe(viewLifecycleOwner) {
             initialize(it)
         }
 
@@ -266,7 +268,7 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
         val tileProvider = object : UrlTileProvider(tileSize, tileSize) {
             override fun getTileUrl(x: Int, y: Int, zoom: Int): URL? {
-                val url: String = rainViewerViewModel.initMapLiveData.value!!.host + frame.path +
+                val url: String = rainViewerViewModel.rainViewerData.value!!.host + frame.path +
                         "/$tileSize/$zoom/$x/$y/$colorScheme/$smooth" + "_$snow.png"
 
                 return try {
@@ -301,7 +303,7 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
     private fun play() {
         if (!rainViewerViewModel.animationTimer)
-            rainViewerViewModel.animationTimer = setTimeOut(800)
+            rainViewerViewModel.animationTimer = setTimeOut(900)
         else
             showFrame(rainViewerViewModel.animationPosition + 1)
     }

@@ -1,20 +1,15 @@
 package com.lifedawn.bestweather.weathers.detailfragment.adapters;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.gridlayout.widget.GridLayout;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
@@ -128,54 +123,54 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			List<GridItemDto> gridItemDtos = new ArrayList<>();
 
 			if (hourlyForecastDto.getPrecipitationType() != null) {
-				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.precipitationType),
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.precipitationType),
 						hourlyForecastDto.getPrecipitationType(),
 						ContextCompat.getDrawable(context, hourlyForecastDto.getPrecipitationTypeIcon())));
 			}
 
-			gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windDirection),
+			gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windDirection),
 					hourlyForecastDto.getWindDirection() == null ?
 							noData : hourlyForecastDto.getWindDirection(),
 					ContextCompat.getDrawable(context, R.drawable.arrow), hourlyForecastDto.getWindDirectionVal() + 180));
 
-			gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windSpeed),
+			gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windSpeed),
 					hourlyForecastDto.getWindSpeed() == null ?
 							noData : hourlyForecastDto.getWindSpeed(), null));
 
-			gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windStrength),
+			gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windStrength),
 					hourlyForecastDto.getWindStrength() == null ?
 							noData : hourlyForecastDto.getWindStrength(), null));
 
 			if (hourlyForecastDto.getWindGust() != null) {
-				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.windGust),
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windGust),
 						hourlyForecastDto.getWindGust(), null));
 			}
 			if (hourlyForecastDto.getPressure() != null) {
-				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pressure),
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.pressure),
 						hourlyForecastDto.getPressure(), null));
 			}
 
 			if (hourlyForecastDto.getHumidity() != null) {
-				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.humidity),
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.humidity),
 						hourlyForecastDto.getHumidity(), null));
 			}
 
 			//나머지 - 돌풍, 기압, 이슬점, 운량, 시정, 자외선, 체감기온
 
 			if (hourlyForecastDto.getDewPointTemp() != null) {
-				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.dewPoint),
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.dewPoint),
 						hourlyForecastDto.getDewPointTemp(), null));
 			}
 			if (hourlyForecastDto.getCloudiness() != null) {
-				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.cloudiness),
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.cloudiness),
 						hourlyForecastDto.getCloudiness(), null));
 			}
 			if (hourlyForecastDto.getVisibility() != null) {
-				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.visibility),
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.visibility),
 						hourlyForecastDto.getVisibility(), null));
 			}
 			if (hourlyForecastDto.getUvIndex() != null) {
-				gridItemDtos.add(new GridItemDto(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.uvIndex),
+				gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.uvIndex),
 						hourlyForecastDto.getUvIndex(), null));
 			}
 
@@ -187,7 +182,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			final int blueColor = ContextCompat.getColor(context, R.color.blue);
 
 			//강수확률
-			((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pop));
+			((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.pop));
 			((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPop() == null ? "-" : hourlyForecastDto.getPop());
 			((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 			gridItem.findViewById(R.id.label_icon).setVisibility(View.GONE);
@@ -197,7 +192,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasPor()) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.por));
+				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.por));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPor());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 
@@ -210,7 +205,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasPos()) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.pos));
+				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.pos));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPos());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 
@@ -223,7 +218,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasPrecipitation() && hourlyForecastDto.getPrecipitationVolume() != null) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.precipitationVolume));
+				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.precipitationVolume));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getPrecipitationVolume());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 
@@ -236,7 +231,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasRain()) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.rainVolume));
+				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.rainVolume));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getRainVolume());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 
@@ -249,7 +244,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.isHasSnow()) {
 				gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
 
-				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.Companion.getWeatherValueLabelsMap().get(WeatherValueType.snowVolume));
+				((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.snowVolume));
 				((TextView) gridItem.findViewById(R.id.value)).setText(hourlyForecastDto.getSnowVolume());
 				((TextView) gridItem.findViewById(R.id.value)).setTextColor(blueColor);
 

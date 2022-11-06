@@ -202,19 +202,20 @@ public class DailyNotificationListenableWorker extends ListenableWorker {
 				final ZoneId zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(context).getString("zoneId", ""));
 				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
 				final Location location = getBestLocation(locationResult);
-				Geocoding.nominatimReverseGeocoding(context, location.getLatitude(), location.getLongitude(), new Geocoding.ReverseGeocodingCallback() {
-					@Override
-					public void onReverseGeocodingResult(Geocoding.AddressDto address) {
-						dailyPushNotificationDto.setAddressName(address.displayName);
-						dailyPushNotificationDto.setCountryCode(address.countryCode);
-						dailyPushNotificationDto.setLatitude(address.latitude);
-						dailyPushNotificationDto.setLongitude(address.longitude);
-						dailyPushNotificationDto.setZoneId(zoneId.getId());
+				Geocoding.nominatimReverseGeocoding(context, location.getLatitude(), location.getLongitude(),
+						new Geocoding.ReverseGeocodingCallback() {
+							@Override
+							public void onReverseGeocodingResult(Geocoding.AddressDto address) {
+								dailyPushNotificationDto.setAddressName(address.displayName);
+								dailyPushNotificationDto.setCountryCode(address.countryCode);
+								dailyPushNotificationDto.setLatitude(address.latitude.doubleValue());
+								dailyPushNotificationDto.setLongitude(address.longitude.doubleValue());
+								dailyPushNotificationDto.setZoneId(zoneId.getId());
 
-						repository.update(dailyPushNotificationDto, null);
-						loadWeatherData(context, executorService, remoteViews, dailyPushNotificationDto, backgroundWorkCallback);
-					}
-				});
+								repository.update(dailyPushNotificationDto, null);
+								loadWeatherData(context, executorService, remoteViews, dailyPushNotificationDto, backgroundWorkCallback);
+							}
+						});
 			}
 
 			@Override

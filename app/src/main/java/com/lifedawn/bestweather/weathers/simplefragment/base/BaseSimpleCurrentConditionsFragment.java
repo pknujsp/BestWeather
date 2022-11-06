@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers.simplefragment.base;
 
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,13 +10,16 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
+import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
+import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
@@ -26,8 +30,9 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues, WeatherFragment.ITextColor {
+public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues, WeatherFragment.ITextColor, AsyncLayoutInflater.OnInflateFinishedListener {
 	protected BaseLayoutSimpleCurrentConditionsBinding binding;
+	protected LoadingViewAsyncBinding asyncBinding;
 	protected ValueUnits tempUnit;
 	protected Double latitude;
 	protected Double longitude;
@@ -64,8 +69,11 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = BaseLayoutSimpleCurrentConditionsBinding.inflate(inflater);
-		return binding.getRoot();
+		asyncBinding = LoadingViewAsyncBinding.inflate(inflater, container, false);
+
+		final AsyncLayoutInflater asyncLayoutInflater = new AsyncLayoutInflater(requireContext());
+		asyncLayoutInflater.inflate(R.layout.base_layout_simple_current_conditions, container, this::onInflateFinished);
+		return asyncBinding.getRoot();
 	}
 
 	@Override
@@ -82,6 +90,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	public void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
+		asyncBinding = null;
 	}
 
 	@Override
@@ -99,5 +108,14 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		binding.feelsLikeTemp.setTextColor(color);
 		binding.feelsLikeTempUnit.setTextColor(color);
 		binding.tempDescription.setTextColor(color);
+		binding.windDirectionArrow.setImageTintList(ColorStateList.valueOf(color));
+	}
+
+	@Override
+	public void onInflateFinished(@NonNull View view, int resid, @Nullable ViewGroup parent) {
+		binding = BaseLayoutSimpleCurrentConditionsBinding.bind(view);
+		asyncBinding.getRoot().addView(binding.getRoot());
+		asyncBinding.progressCircular.setVisibility(View.GONE);
+		asyncBinding.progressCircular.pauseAnimation();
 	}
 }

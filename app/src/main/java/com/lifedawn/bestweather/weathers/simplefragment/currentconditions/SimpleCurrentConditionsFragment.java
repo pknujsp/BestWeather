@@ -52,10 +52,14 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
-		setValuesToViews();
 	}
 
+
+	@Override
+	public void onInflateFinished(@NonNull View view, int resid, @Nullable ViewGroup parent) {
+		super.onInflateFinished(view, resid, parent);
+		setValuesToViews();
+	}
 
 	@Override
 	public void setValuesToViews() {

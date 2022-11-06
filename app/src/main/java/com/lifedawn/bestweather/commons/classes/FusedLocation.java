@@ -133,7 +133,9 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 								final Double latitude = location.getLatitude();
 								final Double longitude = location.getLongitude();
 
-								TimeZoneUtils.Companion.getTimeZone(latitude, longitude, zoneId -> onResultTimeZone(latitude, longitude, zoneId, myLocationCallback, locationResult));
+								TimeZoneUtils.INSTANCE.getTimeZone(latitude, longitude, zoneId -> onResultTimeZone(latitude, longitude,
+										zoneId,
+										myLocationCallback, locationResult));
 
 							} else {
 								myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION);
@@ -196,7 +198,7 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 								final Double latitude = location.getLatitude();
 								final Double longitude = location.getLongitude();
 
-								TimeZoneUtils.Companion.getTimeZone(latitude, longitude, new TimeZoneUtils.TimeZoneCallback() {
+								TimeZoneUtils.INSTANCE.getTimeZone(latitude, longitude, new TimeZoneUtils.TimeZoneCallback() {
 									@Override
 									public void onResult(@NonNull ZoneId zoneId) {
 										onResultTimeZone(latitude, longitude, zoneId, new MyLocationCallback() {

@@ -41,12 +41,7 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 
 	@Override
 	public void getAll(DbQueryCallback<List<FavoriteAddressDto>> callback) {
-		executors.execute(new Runnable() {
-			@Override
-			public void run() {
-				callback.processResult(favoriteAddressDao.getAll());
-			}
-		});
+		executors.execute(() -> callback.processResult(favoriteAddressDao.getAll()));
 	}
 
 	public LiveData<List<FavoriteAddressDto>> getAllData() {
@@ -55,66 +50,37 @@ public class FavoriteAddressRepository implements FavoriteAddressQuery {
 
 	@Override
 	public void get(int id, DbQueryCallback<FavoriteAddressDto> callback) {
-		executors.execute(new Runnable() {
-			@Override
-			public void run() {
-				callback.processResult(favoriteAddressDao.get(id));
-
-			}
-		});
+		executors.execute(() -> callback.processResult(favoriteAddressDao.get(id)));
 	}
 
 	@Override
 	public void size(DbQueryCallback<Integer> callback) {
-		executors.execute(new Runnable() {
-			@Override
-			public void run() {
-				callback.processResult(favoriteAddressDao.size());
-
-			}
-		});
+		executors.execute(() -> callback.processResult(favoriteAddressDao.size()));
 	}
 
 	@Override
 	public void contains(String latitude, String longitude, DbQueryCallback<Boolean> callback) {
-		executors.execute(new Runnable() {
-			@Override
-			public void run() {
-				callback.processResult(favoriteAddressDao.contains(latitude, longitude) == 1);
-			}
-		});
+		executors.execute(() -> callback.processResult(favoriteAddressDao.contains(latitude, longitude) == 1));
 	}
 
 	@Override
 	public void add(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Long> callback) {
-		executors.execute(new Runnable() {
-			@Override
-			public void run() {
-				long id = favoriteAddressDao.add(favoriteAddressDto);
-				callback.processResult(id);
-			}
+		executors.execute(() -> {
+			long id = favoriteAddressDao.add(favoriteAddressDto);
+			callback.processResult(id);
 		});
 	}
 
 	@Override
 	public void delete(FavoriteAddressDto favoriteAddressDto) {
-		executors.execute(new Runnable() {
-			@Override
-			public void run() {
-				favoriteAddressDao.delete(favoriteAddressDto);
-
-			}
-		});
+		executors.execute(() -> favoriteAddressDao.delete(favoriteAddressDto));
 	}
 
 	@Override
 	public void delete(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Boolean> callback) {
-		executors.execute(new Runnable() {
-			@Override
-			public void run() {
-				favoriteAddressDao.delete(favoriteAddressDto);
-				callback.onResultSuccessful(true);
-			}
+		executors.execute(() -> {
+			favoriteAddressDao.delete(favoriteAddressDto);
+			callback.onResultSuccessful(true);
 		});
 	}
 

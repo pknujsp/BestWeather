@@ -33,31 +33,18 @@ public class WidgetRepository {
 	}
 
 	public void add(WidgetDto widgetDto, DbQueryCallback<WidgetDto> callback) {
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				long newDtoId = widgetDao.add(widgetDto);
-				callback.onResultSuccessful(widgetDao.get(newDtoId));
-			}
+		executorService.execute(() -> {
+			long newDtoId = widgetDao.add(widgetDto);
+			callback.onResultSuccessful(widgetDao.get(newDtoId));
 		});
 	}
 
 	public void get(int appWidgetId, DbQueryCallback<WidgetDto> callback) {
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				callback.onResultSuccessful(widgetDao.get(appWidgetId));
-			}
-		});
+		executorService.execute(() -> callback.onResultSuccessful(widgetDao.get(appWidgetId)));
 	}
 
 	public void getAll(DbQueryCallback<List<WidgetDto>> callback) {
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				callback.onResultSuccessful(widgetDao.getAll());
-			}
-		});
+		executorService.execute(() -> callback.onResultSuccessful(widgetDao.getAll()));
 	}
 
 	public void getAll(String widgetProviderClassName, DbQueryCallback<List<WidgetDto>> callback) {

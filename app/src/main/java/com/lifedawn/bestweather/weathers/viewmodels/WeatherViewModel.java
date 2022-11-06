@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class WeatherViewModel extends AndroidViewModel implements FavoriteAddressQuery {
+public class WeatherViewModel extends ViewModel implements FavoriteAddressQuery {
 	private FusedLocation.MyLocationCallback locationCallback;
 	private FavoriteAddressRepository favoriteAddressRepository;
 
@@ -32,8 +33,8 @@ public class WeatherViewModel extends AndroidViewModel implements FavoriteAddres
 
 	public final LiveData<List<FavoriteAddressDto>> favoriteAddressListLiveData;
 
-	public WeatherViewModel(@NonNull @NotNull Application application) {
-		super(application);
+	public WeatherViewModel() {
+		super();
 		favoriteAddressRepository = FavoriteAddressRepository.getINSTANCE();
 		favoriteAddressListLiveData = favoriteAddressRepository.getAllData();
 	}

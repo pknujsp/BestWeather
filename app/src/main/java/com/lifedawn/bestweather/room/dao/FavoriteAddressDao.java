@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Room;
 
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
@@ -31,6 +33,6 @@ public interface FavoriteAddressDao {
 	@Delete
 	void delete(FavoriteAddressDto favoriteAddressDto);
 
-	@Insert(entity = FavoriteAddressDto.class)
+	@Insert(entity = FavoriteAddressDto.class, onConflict = OnConflictStrategy.IGNORE)
 	long add(FavoriteAddressDto favoriteAddressDto);
 }

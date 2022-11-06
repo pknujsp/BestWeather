@@ -12,20 +12,15 @@ import com.lifedawn.bestweather.commons.classes.WeatherValueLabels;
 import com.lifedawn.bestweather.commons.enums.AppThemes;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.flickr.FlickrRepository;
-import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepository;
+import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepositoryImpl;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationRepository;
-import com.lifedawn.bestweather.rainviewer.model.RainViewerRepository;
 import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
 import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
-import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -57,19 +52,17 @@ public class MyApplication extends Application {
 		}
 
 		localeCountryCode = locale.getCountry();
-
 		Context context = getApplicationContext();
 
 		FavoriteAddressRepository.initialize(context);
 		KmaAreaCodesRepository.initialize(context);
-		TimeZoneIdRepository.Companion.initialize(context);
+		TimeZoneIdRepositoryImpl.Companion.initialize(context);
 		OngoingNotificationRepository.initialize(context);
 		WidgetRepository.initialize(context);
 		FlickrRepository.initialize();
 		DailyPushNotificationRepository.initialize(context);
-		RainViewerRepository.Companion.initialize();
 		WindUtil.init(context);
-		WeatherValueLabels.Companion.load(context);
+		WeatherValueLabels.INSTANCE.load(context);
 		initPreferences();
 	}
 

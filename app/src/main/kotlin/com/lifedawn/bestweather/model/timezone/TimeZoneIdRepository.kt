@@ -8,49 +8,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class TimeZoneIdRepository(context: Context) {
-    private val dao: TimeZoneIdDao
+interface TimeZoneIdRepository {
+    fun get(lat: Double, lon: Double, callback: DbQueryCallback<TimeZoneIdDto?>)
 
-    init {
-        dao = AppDb.getInstance(context).timeZoneIdDao()
-    }
+    fun insert(timeZoneDto: TimeZoneIdDto)
 
-    companion object {
-        var INSTANCE: TimeZoneIdRepository? = null
+    fun delete(timeZoneDto: TimeZoneIdDto)
 
-        fun initialize(context: Context) {
-            if (INSTANCE == null) {
-                INSTANCE = TimeZoneIdRepository(context)
-            }
-        }
-
-    }
-
-
-    fun get(lat: Double, lon: Double, callback: DbQueryCallback<TimeZoneIdDto?>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            callback.processResult(dao.get(lat, lon))
-        }
-    }
-
-    fun insert(timeZoneDto: TimeZoneIdDto) {
-        CoroutineScope(Dispatchers.IO).launch {
-            if (dao.count() > 100)
-                dao.reset()
-            dao.insert(timeZoneDto)
-        }
-    }
-
-    fun delete(timeZoneDto: TimeZoneIdDto) {
-        CoroutineScope(Dispatchers.IO).launch {
-            dao.delete(timeZoneDto)
-        }
-    }
-
-    fun reset(callback: DbQueryCallback<Boolean>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            dao.reset()
-            callback.onResultSuccessful(true)
-        }
-    }
+    fun reset(callback: DbQueryCallback<Boolean>)
 }
