@@ -13,17 +13,22 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherValueType;
+import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleForecastBinding;
+import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -33,8 +38,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BaseSimpleForecastFragment extends Fragment implements IWeatherValues {
+public class BaseSimpleForecastFragment extends Fragment implements IWeatherValues, AsyncLayoutInflater.OnInflateFinishedListener {
 	protected BaseLayoutSimpleForecastBinding binding;
+	protected LoadingViewAsyncBinding asyncBinding;
+
 	protected DateView dateRow;
 	protected String countryCode;
 	protected WeatherProviderType mainWeatherProviderType;
@@ -47,6 +54,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	protected Double latitude;
 	protected Double longitude;
 	protected ZoneId zoneId;
+	protected WeatherFragmentViewModel weatherFragmentViewModel;
 
 	protected int headerVisibility = View.VISIBLE;
 
@@ -76,44 +84,29 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
 		networkStatus = NetworkStatus.getInstance(getContext());
+		weatherFragmentViewModel = new ViewModelProvider(requireParentFragment()).get(WeatherFragmentViewModel.class);
+
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = BaseLayoutSimpleForecastBinding.inflate(inflater);
-		return binding.getRoot();
+		asyncBinding = LoadingViewAsyncBinding.inflate(inflater, container, false);
+
+		final AsyncLayoutInflater asyncLayoutInflater = new AsyncLayoutInflater(requireContext());
+		asyncLayoutInflater.inflate(R.layout.base_layout_simple_forecast, container, this);
+		return asyncBinding.getRoot();
 	}
 
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
-		if (!countryCode.equals("KR")) {
-			binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
-		} else {
-			binding.weatherCardViewHeader.compareForecast.setVisibility(View.VISIBLE);
-		}
-
-		if (cardBackgroundColor != null) {
-			binding.card.setBackgroundColor(cardBackgroundColor);
-		}
-		binding.weatherCardViewHeader.getRoot().setVisibility(headerVisibility);
-
-		binding.scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
-			@Override
-			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-				if (dateRow != null) {
-					dateRow.reDraw(scrollX);
-				}
-			}
-		});
-
 	}
 
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
+		asyncBinding = null;
 	}
 
 
@@ -212,5 +205,41 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 
 			binding.extraView.addView(textView);
 		}
+	}
+
+	@Override
+	public void onInflateFinished(@NonNull View view, int resid, @Nullable ViewGroup parent) {
+		binding = BaseLayoutSimpleForecastBinding.bind(view);
+		binding.getRoot().setVisibility(View.GONE);
+		asyncBinding.getRoot().addView(binding.getRoot());
+
+		if (!countryCode.equals("KR")) {
+			binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
+		} else {
+			binding.weatherCardViewHeader.compareForecast.setVisibility(View.VISIBLE);
+		}
+
+		if (cardBackgroundColor != null) {
+			binding.card.setBackgroundColor(cardBackgroundColor);
+		}
+		binding.weatherCardViewHeader.getRoot().setVisibility(headerVisibility);
+
+		binding.scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+			@Override
+			public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+				if (dateRow != null) {
+					dateRow.reDraw(scrollX);
+				}
+			}
+		});
+
+	}
+
+
+	protected final void onFinishedSetData() {
+		binding.getRoot().setVisibility(View.VISIBLE);
+		asyncBinding.progressCircular.setVisibility(View.GONE);
+		asyncBinding.progressCircular.pauseAnimation();
+		weatherFragmentViewModel.onResumeWithAsync(this);
 	}
 }

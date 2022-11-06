@@ -30,6 +30,11 @@ public class DetailCurrentConditionsFragment extends BaseDetailCurrentConditions
 		setValuesToViews();
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		weatherFragmentViewModel.onResumeWithAsync(this);
+	}
 
 	@Override
 	public void setValuesToViews() {

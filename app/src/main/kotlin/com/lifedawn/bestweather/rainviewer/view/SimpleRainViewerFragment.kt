@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.databinding.FragmentSimpleRainViewerBinding
 import com.lifedawn.bestweather.weathers.WeatherFragment
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel
 import java.lang.ref.WeakReference
 
 
@@ -16,6 +18,7 @@ class SimpleRainViewerFragment : Fragment() {
     private var _binding: FragmentSimpleRainViewerBinding? = null
     private val binding get() = _binding!!
     private lateinit var bundle: Bundle
+    private val weatherFragmentViewModel: WeatherFragmentViewModel by viewModels({ requireParentFragment() })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +54,11 @@ class SimpleRainViewerFragment : Fragment() {
                     .add(R.id.fragment_container, detailRainViewerFragment, RainViewerFragment::class.simpleName).addToBackStack(
                             RainViewerFragment::class.simpleName).commit()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        weatherFragmentViewModel.onResumeWithAsync(this@SimpleRainViewerFragment)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

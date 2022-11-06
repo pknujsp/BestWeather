@@ -14,12 +14,14 @@ import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
+import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -59,6 +61,7 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 	public void onInflateFinished(@NonNull View view, int resid, @Nullable ViewGroup parent) {
 		super.onInflateFinished(view, resid, parent);
 		setValuesToViews();
+
 	}
 
 	@Override
@@ -119,6 +122,7 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		}
 
 		binding.airQuality.setText(airQuality);
+
 	}
 
 }

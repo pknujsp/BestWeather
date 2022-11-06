@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -63,6 +65,7 @@ import com.lifedawn.bestweather.commons.interfaces.IGps;
 
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
+import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
 import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.flickr.FlickrRepository;
 import com.lifedawn.bestweather.flickr.FlickrViewModel;
@@ -133,6 +136,7 @@ import java.util.concurrent.ExecutorService;
 public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData {
 	private final ExecutorService executorService = MyApplication.getExecutorService();
 	private FragmentWeatherBinding binding;
+	private LoadingViewAsyncBinding asyncBinding;
 	private WeatherViewModel weatherViewModel;
 	private View.OnClickListener menuOnClickListener;
 	private FusedLocation fusedLocation;
@@ -162,51 +166,22 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	}
 
 
-	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
-		@Override
-		public void onFragmentCreated(@NonNull @NotNull FragmentManager fm, @NonNull @NotNull Fragment f,
-		                              @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-			super.onFragmentCreated(fm, f, savedInstanceState);
-		}
+	private OnAsyncLoadCallback onAsyncLoadCallback;
 
-		@Override
-		public void onFragmentViewCreated(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull View v, @Nullable Bundle savedInstanceState) {
-			super.onFragmentViewCreated(fm, f, v, savedInstanceState);
-
-		}
-
-		@Override
-		public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
-			super.onFragmentStarted(fm, f);
-		}
-
-		@Override
-		public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
-			super.onFragmentResumed(fm, f);
-
-		}
-
-		@Override
-		public void onFragmentStopped(@NonNull FragmentManager fm, @NonNull Fragment f) {
-			super.onFragmentStopped(fm, f);
-		}
-
-		@Override
-		public void onFragmentDestroyed(@NonNull FragmentManager fm, @NonNull Fragment f) {
-			super.onFragmentDestroyed(fm, f);
-		}
-	};
+	public WeatherFragment setOnAsyncLoadCallback(OnAsyncLoadCallback onAsyncLoadCallback) {
+		this.onAsyncLoadCallback = onAsyncLoadCallback;
+		return this;
+	}
 
 	@Override
 	public void onAttach(@NonNull Context context) {
 		super.onAttach(context);
+		HeaderbarStyle.setStyle(HeaderbarStyle.Style.Black, requireActivity());
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
@@ -245,27 +220,198 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = FragmentWeatherBinding.inflate(inflater);
-		shimmer(true);
+		asyncBinding = LoadingViewAsyncBinding.inflate(inflater, container, false);
+		final AsyncLayoutInflater asyncLayoutInflater = new AsyncLayoutInflater(requireContext());
+		asyncLayoutInflater.inflate(R.layout.fragment_weather, container, new AsyncLayoutInflater.OnInflateFinishedListener() {
+			@Override
+			public void onInflateFinished(@NonNull View view, int resid, @Nullable ViewGroup parent) {
+				binding = FragmentWeatherBinding.bind(view);
+				asyncBinding.getRoot().addView(binding.getRoot());
+				asyncBinding.progressCircular.pauseAnimation();
+				asyncBinding.progressCircular.setVisibility(View.GONE);
 
-		final int statusBarHeight = MyApplication.getStatusBarHeight();
+				shimmer(true, false);
 
-		FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.mainToolbar.getRoot().getLayoutParams();
-		layoutParams.topMargin = statusBarHeight;
-		binding.mainToolbar.getRoot().setLayoutParams(layoutParams);
+				final int statusBarHeight = MyApplication.getStatusBarHeight();
 
-		int topMargin = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics())
-				+ getResources().getDimension(R.dimen.toolbarHeight) + statusBarHeight);
-		ConstraintLayout.LayoutParams headerLayoutParams = (ConstraintLayout.LayoutParams) binding.weatherDataSourceLayout.getLayoutParams();
-		headerLayoutParams.topMargin = topMargin;
-		binding.weatherDataSourceLayout.setLayoutParams(headerLayoutParams);
+				FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.mainToolbar.getRoot().getLayoutParams();
+				layoutParams.topMargin = statusBarHeight;
+				binding.mainToolbar.getRoot().setLayoutParams(layoutParams);
 
-		onChangedStateBackgroundImg(false);
+				int topMargin = (int) (TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics())
+						+ getResources().getDimension(R.dimen.toolbarHeight) + statusBarHeight);
+				ConstraintLayout.LayoutParams headerLayoutParams = (ConstraintLayout.LayoutParams) binding.weatherDataSourceLayout.getLayoutParams();
+				headerLayoutParams.topMargin = topMargin;
+				binding.weatherDataSourceLayout.setLayoutParams(headerLayoutParams);
 
-		binding.loadingAnimation.setVisibility(View.VISIBLE);
-		binding.flickrImageUrl.setVisibility(View.GONE);
+				onChangedStateBackgroundImg(false);
 
-		return binding.getRoot();
+				binding.loadingAnimation.setVisibility(View.VISIBLE);
+				binding.flickrImageUrl.setVisibility(View.GONE);
+
+				binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(requireContext(), R.color.black_alpha_30), PorterDuff.Mode.DARKEN);
+
+				weatherViewController = new WeatherViewController(binding.rootLayout);
+				weatherViewController.setWeatherView(PrecipType.CLEAR, null);
+
+				binding.mainToolbar.openNavigationDrawer.setOnClickListener(menuOnClickListener);
+				binding.mainToolbar.gps.setOnClickListener(v -> {
+					if (networkStatus.networkAvailable()) {
+						shimmer(true, false);
+						fusedLocation.findCurrentLocation(MY_LOCATION_CALLBACK, false);
+					} else {
+						Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
+					}
+				});
+
+
+				binding.mainToolbar.find.setOnClickListener(v -> {
+					if (networkStatus.networkAvailable()) {
+						final MapFragment mapFragment = new MapFragment();
+
+						final Bundle arguments = new Bundle();
+						arguments.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
+						mapFragment.setArguments(arguments);
+
+						mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
+							@Override
+							public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
+								getParentFragmentManager().popBackStack();
+								iRefreshFavoriteLocationListOnSideNav.onResultMapFragment(newFavoriteAddressDto);
+							}
+
+							@Override
+							public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
+								iRefreshFavoriteLocationListOnSideNav.onResultMapFragment(null);
+							}
+
+							@Override
+							public void onClickedAddress(@Nullable FavoriteAddressDto favoriteAddressDto) {
+
+							}
+						});
+
+						getParentFragmentManager().beginTransaction().hide(WeatherFragment.this).add(R.id.fragment_container,
+								mapFragment, MapFragment.class.getName()).addToBackStack(
+								MapFragment.class.getName()).setPrimaryNavigationFragment(mapFragment).commitAllowingStateLoss();
+					}
+				});
+
+				binding.mainToolbar.refresh.setOnClickListener(v -> {
+					if (networkStatus.networkAvailable()) {
+						requestNewData();
+					} else {
+						Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
+					}
+				});
+
+				binding.flickrImageUrl.setOnClickListener(v -> {
+					if (binding.flickrImageUrl.getTag() != null) {
+						String url = (String) binding.flickrImageUrl.getTag();
+
+						if (url.equals("failed")) {
+							loadImgOfCurrentConditions(flickrViewModel.getLastParameter());
+						} else {
+							Intent intent = new Intent(Intent.ACTION_VIEW);
+							intent.setData(Uri.parse(url));
+							startActivity(intent);
+						}
+					}
+
+				});
+
+				AdRequest adRequest = new AdRequest.Builder().build();
+				AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_unitId))
+						.forNativeAd(nativeAd -> {
+							NativeTemplateStyle styles = new
+									NativeTemplateStyle.Builder().withMainBackgroundColor(new ColorDrawable(Color.WHITE)).build();
+							TemplateView template = binding.adViewBottom;
+							template.setStyles(styles);
+							template.setNativeAd(nativeAd);
+						}).withNativeAdOptions(new NativeAdOptions.Builder().setRequestCustomMuteThisAd(true).build())
+						.build();
+
+				adLoader.loadAd(adRequest);
+
+				binding.adViewBelowAirQuality.loadAd(adRequest);
+				binding.adViewBelowAirQuality.setAdListener(new AdListener() {
+					@Override
+					public void onAdClosed() {
+						super.onAdClosed();
+						binding.adViewBelowAirQuality.loadAd(new AdRequest.Builder().build());
+					}
+
+					@Override
+					public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+						super.onAdFailedToLoad(loadAdError);
+					}
+				});
+
+				binding.adViewBelowDetailCurrentConditions.loadAd(adRequest);
+				binding.adViewBelowDetailCurrentConditions.setAdListener(new AdListener() {
+					@Override
+					public void onAdClosed() {
+						super.onAdClosed();
+						binding.adViewBelowDetailCurrentConditions.loadAd(new AdRequest.Builder().build());
+					}
+
+					@Override
+					public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+						super.onAdFailedToLoad(loadAdError);
+					}
+				});
+
+
+				weatherFragmentViewModel.resumedFragmentObserver.observe(getViewLifecycleOwner(), aBoolean -> {
+					shimmer(false, true);
+					loadImgOfCurrentConditions(flickrViewModel.getLastParameter());
+				});
+
+				flickrViewModel.img.observe(getViewLifecycleOwner(), flickrImgResponse -> {
+					onChangedStateBackgroundImg(flickrImgResponse.successful);
+
+					if (flickrImgResponse.successful) {
+						Glide.with(requireContext()).load(flickrImgResponse.flickrImgData.getImg()).diskCacheStrategy(DiskCacheStrategy.ALL).transition(
+								DrawableTransitionOptions.withCrossFade(300)).into(binding.currentConditionsImg);
+
+						final String text = flickrImgResponse.flickrImgData.getPhoto().getOwner() + "-" + flickrImgResponse.flickrImgData.getPhoto().getTitle();
+						binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
+								ContextCompat.getColor(requireContext(), R.color.white)));
+						binding.flickrImageUrl.setTag(flickrImgResponse.flickrImgData.getRealFlickrUrl());
+
+						setBackgroundWeatherView(flickrImgResponse.flickrImgData.getWeather(), flickrImgResponse.flickrImgData.getVolume());
+					} else {
+						Glide.with(requireContext()).clear(binding.currentConditionsImg);
+
+						final String text = getString(R.string.failed_load_img);
+						binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
+								ContextCompat.getColor(requireContext(), R.color.black)));
+						binding.flickrImageUrl.setTag("failed");
+
+						if (flickrImgResponse.flickrImgData != null) {
+							setBackgroundWeatherView(flickrImgResponse.flickrImgData.getWeather(), flickrImgResponse.flickrImgData.getVolume());
+						}
+
+					}
+					binding.loadingAnimation.setVisibility(View.GONE);
+					binding.flickrImageUrl.setVisibility(View.VISIBLE);
+				});
+
+
+				weatherFragmentViewModel.weatherDataLiveData.observe(getViewLifecycleOwner(), responseResultObj -> {
+					if (responseResultObj != null) {
+						processOnResult(responseResultObj);
+					}
+				});
+
+				shimmer(false, false);
+				Objects.requireNonNull(onAsyncLoadCallback).onFinished(WeatherFragment.this);
+				onAsyncLoadCallback = null;
+			}
+		});
+
+
+		return asyncBinding.getRoot();
 	}
 
 	@Override
@@ -278,162 +424,12 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(requireContext(), R.color.black_alpha_30), PorterDuff.Mode.DARKEN);
-
-		weatherViewController = new WeatherViewController(binding.rootLayout);
-		weatherViewController.setWeatherView(PrecipType.CLEAR, null);
-
-		binding.mainToolbar.openNavigationDrawer.setOnClickListener(menuOnClickListener);
-		binding.mainToolbar.gps.setOnClickListener(v -> {
-			if (networkStatus.networkAvailable()) {
-				shimmer(true);
-				fusedLocation.findCurrentLocation(MY_LOCATION_CALLBACK, false);
-			} else {
-				Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
-			}
-		});
-
-
-		binding.mainToolbar.find.setOnClickListener(v -> {
-			if (networkStatus.networkAvailable()) {
-				final MapFragment mapFragment = new MapFragment();
-
-				final Bundle arguments = new Bundle();
-				arguments.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
-				mapFragment.setArguments(arguments);
-
-				mapFragment.setOnResultFavoriteListener(new MapFragment.OnResultFavoriteListener() {
-					@Override
-					public void onAddedNewAddress(FavoriteAddressDto newFavoriteAddressDto, List<FavoriteAddressDto> favoriteAddressDtoList, boolean removed) {
-						getParentFragmentManager().popBackStack();
-						iRefreshFavoriteLocationListOnSideNav.onResultMapFragment(newFavoriteAddressDto);
-					}
-
-					@Override
-					public void onResult(List<FavoriteAddressDto> favoriteAddressDtoList) {
-						iRefreshFavoriteLocationListOnSideNav.onResultMapFragment(null);
-					}
-
-					@Override
-					public void onClickedAddress(@Nullable FavoriteAddressDto favoriteAddressDto) {
-
-					}
-				});
-
-				getParentFragmentManager().beginTransaction().hide(WeatherFragment.this).add(R.id.fragment_container,
-						mapFragment, MapFragment.class.getName()).addToBackStack(
-						MapFragment.class.getName()).setPrimaryNavigationFragment(mapFragment).commitAllowingStateLoss();
-			}
-		});
-
-		binding.mainToolbar.refresh.setOnClickListener(v -> {
-			if (networkStatus.networkAvailable()) {
-				requestNewData();
-			} else {
-				Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
-			}
-		});
-
-		binding.flickrImageUrl.setOnClickListener(v -> {
-			if (binding.flickrImageUrl.getTag() != null) {
-				String url = (String) binding.flickrImageUrl.getTag();
-
-				if (url.equals("failed")) {
-					loadImgOfCurrentConditions(flickrViewModel.getLastParameter());
-				} else {
-					Intent intent = new Intent(Intent.ACTION_VIEW);
-					intent.setData(Uri.parse(url));
-					startActivity(intent);
-				}
-			}
-
-		});
-
-		AdRequest adRequest = new AdRequest.Builder().build();
-		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_unitId))
-				.forNativeAd(nativeAd -> {
-					NativeTemplateStyle styles = new
-							NativeTemplateStyle.Builder().withMainBackgroundColor(new ColorDrawable(Color.WHITE)).build();
-					TemplateView template = binding.adViewBottom;
-					template.setStyles(styles);
-					template.setNativeAd(nativeAd);
-				}).withNativeAdOptions(new NativeAdOptions.Builder().setRequestCustomMuteThisAd(true).build())
-				.build();
-
-		adLoader.loadAd(adRequest);
-
-		binding.adViewBelowAirQuality.loadAd(adRequest);
-		binding.adViewBelowAirQuality.setAdListener(new AdListener() {
-			@Override
-			public void onAdClosed() {
-				super.onAdClosed();
-				binding.adViewBelowAirQuality.loadAd(new AdRequest.Builder().build());
-			}
-
-			@Override
-			public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-				super.onAdFailedToLoad(loadAdError);
-			}
-		});
-
-		binding.adViewBelowDetailCurrentConditions.loadAd(adRequest);
-		binding.adViewBelowDetailCurrentConditions.setAdListener(new AdListener() {
-			@Override
-			public void onAdClosed() {
-				super.onAdClosed();
-				binding.adViewBelowDetailCurrentConditions.loadAd(new AdRequest.Builder().build());
-			}
-
-			@Override
-			public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-				super.onAdFailedToLoad(loadAdError);
-			}
-		});
-
-		flickrViewModel.img.observe(getViewLifecycleOwner(), flickrImgResponse -> {
-			onChangedStateBackgroundImg(flickrImgResponse.successful);
-
-			if (flickrImgResponse.successful) {
-				Glide.with(requireContext()).load(flickrImgResponse.flickrImgData.getImg()).diskCacheStrategy(DiskCacheStrategy.ALL).transition(
-						DrawableTransitionOptions.withCrossFade(300)).into(binding.currentConditionsImg);
-
-				final String text = flickrImgResponse.flickrImgData.getPhoto().getOwner() + "-" + flickrImgResponse.flickrImgData.getPhoto().getTitle();
-				binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
-						ContextCompat.getColor(requireContext(), R.color.white)));
-				binding.flickrImageUrl.setTag(flickrImgResponse.flickrImgData.getRealFlickrUrl());
-
-				setBackgroundWeatherView(flickrImgResponse.flickrImgData.getWeather(), flickrImgResponse.flickrImgData.getVolume());
-			} else {
-				Glide.with(requireContext()).clear(binding.currentConditionsImg);
-
-				final String text = getString(R.string.failed_load_img);
-				binding.flickrImageUrl.setText(TextUtil.getUnderLineColorText(text, text,
-						ContextCompat.getColor(requireContext(), R.color.black)));
-				binding.flickrImageUrl.setTag("failed");
-
-				if (flickrImgResponse.flickrImgData != null) {
-					setBackgroundWeatherView(flickrImgResponse.flickrImgData.getWeather(), flickrImgResponse.flickrImgData.getVolume());
-				}
-
-			}
-			binding.loadingAnimation.setVisibility(View.GONE);
-			binding.flickrImageUrl.setVisibility(View.VISIBLE);
-		});
-
-
-		weatherFragmentViewModel.weatherDataLiveData.observe(getViewLifecycleOwner(), responseResultObj -> {
-			if (responseResultObj != null) {
-				processOnResult(responseResultObj);
-			}
-		});
-
-		shimmer(false);
 	}
 
 
 	@Override
 	public void load() {
-		shimmer(true);
+		shimmer(true, false);
 
 		binding.mainToolbar.gps.setVisibility(weatherFragmentViewModel.locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
 		binding.mainToolbar.find.setVisibility(weatherFragmentViewModel.locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
@@ -517,6 +513,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	public void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
+		asyncBinding = null;
 	}
 
 	@Override
@@ -526,7 +523,6 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		}
 
 		getLifecycle().removeObserver(locationLifeCycleObserver);
-		getChildFragmentManager().unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks);
 		super.onDestroy();
 	}
 
@@ -569,7 +565,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 		@Override
 		public void onFailed(Fail fail) {
-			shimmer(false);
+			shimmer(false, false);
 			locationCallbackInMainFragment.onFailed(fail);
 
 			if (fail == Fail.DISABLED_GPS) {
@@ -655,7 +651,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	public void reDraw() {
 		//날씨 프래그먼트 다시 그림
 		if (WeatherFragmentViewModel.FINAL_RESPONSE_MAP.containsKey(weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString())) {
-			shimmer(true);
+			shimmer(true, false);
 
 			executorService.submit(() -> {
 				Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
@@ -678,12 +674,12 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 
 	public void requestNewData() {
-		shimmer(true);
+		shimmer(true, false);
 		weatherFragmentViewModel.requestNewData();
 	}
 
 	private void requestNewDataWithAnotherWeatherSource(WeatherProviderType newWeatherProviderType, WeatherProviderType lastWeatherProviderType) {
-		shimmer(true);
+		shimmer(true, false);
 		weatherFragmentViewModel.requestNewDataWithAnotherWeatherSource(newWeatherProviderType, lastWeatherProviderType);
 	}
 
@@ -703,7 +699,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 				if (!responseResult.isSuccessful()) {
 					if (weatherFragmentViewModel.containWeatherData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
 						MainThreadWorker.runOnUiThread(() -> {
-							shimmer(false);
+							shimmer(false, false);
 							Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
 						});
 
@@ -753,7 +749,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 						}
 
 						MainThreadWorker.runOnUiThread(() -> {
-							shimmer(false);
+							shimmer(false, false);
 							setFailFragment(btnObjList);
 						});
 					}
@@ -1028,60 +1024,45 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		}
 		final String finalPrecipitationVolume = precipitationVolume;
 
-		if (getActivity() != null) {
-			FlickrRepository.FlickrRequestParameter flickrRequestParameter = new FlickrRepository.FlickrRequestParameter(
-					weatherFragmentViewModel.mainWeatherProviderType, finalCurrentConditionsWeatherVal, latitude, longitude,
-					finalZoneId, finalPrecipitationVolume,
-					ZonedDateTime.parse(weatherRestApiDownloader.getRequestDateTime().toString())
-			);
 
-			weatherFragmentViewModel.dateTimeFormatter = DateTimeFormatter.ofPattern(
-					MyApplication.VALUE_UNIT_OBJ.getClockUnit() == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
-							getString(R.string.datetime_pattern_clock24), Locale.getDefault());
+		FlickrRepository.FlickrRequestParameter flickrRequestParameter = new FlickrRepository.FlickrRequestParameter(
+				weatherFragmentViewModel.mainWeatherProviderType, finalCurrentConditionsWeatherVal, latitude, longitude,
+				finalZoneId, finalPrecipitationVolume,
+				ZonedDateTime.parse(weatherRestApiDownloader.getRequestDateTime().toString())
+		);
 
-			MainThreadWorker.runOnUiThread(() -> {
-				changeWeatherDataSourcePicker(weatherFragmentViewModel.countryCode);
-				binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(weatherFragmentViewModel.dateTimeFormatter));
+		weatherFragmentViewModel.dateTimeFormatter = DateTimeFormatter.ofPattern(
+				MyApplication.VALUE_UNIT_OBJ.getClockUnit() == ValueUnits.clock12 ? getString(R.string.datetime_pattern_clock12) :
+						getString(R.string.datetime_pattern_clock24), Locale.getDefault());
+		weatherFragmentViewModel.iTextColor = simpleCurrentConditionsFragment;
+		flickrViewModel.setLastParameter(flickrRequestParameter);
+		Objects.requireNonNull(requireActivity()).runOnUiThread(() -> {
+			changeWeatherDataSourcePicker(weatherFragmentViewModel.countryCode);
+			binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(weatherFragmentViewModel.dateTimeFormatter));
 
-				FragmentManager fragmentManager = getChildFragmentManager();
+			FragmentManager fragmentManager = getChildFragmentManager();
 
-				fragmentManager.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
-					int count = 0;
+			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-					@Override
-					public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
-						super.onFragmentResumed(fm, f);
-						++count;
+			fragmentTransaction
+					.replace(binding.simpleCurrentConditions.getId(),
+							simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment))
+					.replace(binding.simpleHourlyForecast.getId(), simpleHourlyForecastFragment,
+							getString(R.string.tag_simple_hourly_forecast_fragment))
+					.replace(binding.simpleDailyForecast.getId(), simpleDailyForecastFragment, getString(R.string.tag_simple_daily_forecast_fragment))
+					.replace(binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
+							getString(R.string.tag_detail_current_conditions_fragment))
+					.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment))
+					.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
+							getString(R.string.tag_sun_set_rise_fragment))
+					.replace(binding.radar.getId(), rainViewerFragment,
+							SimpleRainViewerFragment.class.getName())
+					.setPrimaryNavigationFragment(simpleCurrentConditionsFragment)
+					.commit();
 
-						if (count == 7) {
-							fm.unregisterFragmentLifecycleCallbacks(this);
-							shimmer(false);
-							loadImgOfCurrentConditions(flickrRequestParameter);
-						}
-					}
-				}, false);
-				weatherFragmentViewModel.iTextColor = simpleCurrentConditionsFragment;
-				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+		});
 
-				fragmentTransaction
-						.replace(binding.simpleCurrentConditions.getId(),
-								simpleCurrentConditionsFragment, getString(R.string.tag_simple_current_conditions_fragment))
-						.replace(binding.simpleHourlyForecast.getId(), simpleHourlyForecastFragment,
-								getString(R.string.tag_simple_hourly_forecast_fragment))
-						.replace(binding.simpleDailyForecast.getId(), simpleDailyForecastFragment, getString(R.string.tag_simple_daily_forecast_fragment))
-						.replace(binding.detailCurrentConditions.getId(), detailCurrentConditionsFragment,
-								getString(R.string.tag_detail_current_conditions_fragment))
-						.replace(binding.simpleAirQuality.getId(), simpleAirQualityFragment, getString(R.string.tag_simple_air_quality_fragment))
-						.replace(binding.sunSetRise.getId(), sunSetRiseFragment,
-								getString(R.string.tag_sun_set_rise_fragment))
-						.replace(binding.radar.getId(), rainViewerFragment,
-								SimpleRainViewerFragment.class.getName())
-						.setPrimaryNavigationFragment(simpleCurrentConditionsFragment)
-						.commit();
 
-			});
-
-		}
 	}
 
 	private void changeWeatherDataSourcePicker(String countryCode) {
@@ -1162,19 +1143,25 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		binding.updatedDatetime.setTextColor(color);
 		binding.countryName.setTextColor(color);
 		binding.addressName.setTextColor(color);
+		binding.weatherDataSourceName.setCompoundDrawableTintList(ColorStateList.valueOf(color));
 
-		if (weatherFragmentViewModel.iTextColor != null)
-			weatherFragmentViewModel.iTextColor.changeColor(color);
+		try {
+			Objects.requireNonNull(weatherFragmentViewModel.iTextColor).changeColor(color);
+		} catch (Exception e) {
+
+		}
 	}
 
-	private void shimmer(boolean showShimmer) {
+	private void shimmer(boolean showShimmer, boolean noChangeHeader) {
 		if (showShimmer) {
-			HeaderbarStyle.setStyle(HeaderbarStyle.Style.Black, requireActivity());
+			if (!noChangeHeader)
+				HeaderbarStyle.setStyle(HeaderbarStyle.Style.Black, requireActivity());
 			binding.rootSubLayout.setVisibility(View.GONE);
 			binding.shimmer.startShimmer();
 			binding.shimmer.setVisibility(View.VISIBLE);
 		} else {
-			HeaderbarStyle.setStyle(HeaderbarStyle.Style.White, requireActivity());
+			if (!noChangeHeader)
+				HeaderbarStyle.setStyle(HeaderbarStyle.Style.White, requireActivity());
 			binding.shimmer.stopShimmer();
 			binding.shimmer.setVisibility(View.GONE);
 			binding.rootSubLayout.setVisibility(View.VISIBLE);
@@ -1217,5 +1204,13 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 	public interface ITextColor {
 		void changeColor(int color);
+	}
+
+	public interface OnAsyncLoadCallback {
+		void onFinished(Fragment fragment);
+	}
+
+	public interface OnResumeFragment {
+		void onResumeWithAsync(Fragment fragment);
 	}
 }

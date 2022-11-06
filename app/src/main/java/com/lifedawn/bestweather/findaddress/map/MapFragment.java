@@ -86,6 +86,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -105,8 +106,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	protected final Map<MarkerType, RecyclerView.Adapter> adapterMap = new HashMap<>();
 
 	private FusedLocation fusedLocation;
-	private int mapPadding;
-
 	private ViewPager2 locationItemBottomSheetViewPager;
 	private boolean removedLocation;
 
@@ -151,19 +150,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 
 	private final FragmentManager.FragmentLifecycleCallbacks fragmentLifecycleCallbacks = new FragmentManager.FragmentLifecycleCallbacks() {
-		@Override
-		public void onFragmentAttached(@NonNull FragmentManager fm, @NonNull Fragment f, @NonNull Context context) {
-			super.onFragmentAttached(fm, f, context);
 
-
-		}
-
-		@Override
-		public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
-			super.onFragmentStarted(fm, f);
-
-
-		}
 
 		@Override
 		public void onFragmentResumed(@NonNull FragmentManager fm, @NonNull Fragment f) {
@@ -241,7 +228,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 														LocationType.SelectedAddress.name()).commit();
 
 										try {
-											Thread.sleep(1000);
+											Thread.sleep(900);
 										} catch (InterruptedException e) {
 											e.printStackTrace();
 										}
@@ -358,7 +345,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 					return;
 				}
 
-				collapseAllExpandedBottomSheets();
+
 				int backStackCount = childFragmentManager.getBackStackEntryCount();
 
 				for (int count = 0; count < backStackCount; count++) {
@@ -371,7 +358,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				findAddressFragment.setArguments(bundle);
 
 				findAddressFragment.setOnAddressListListener(addressList -> {
-					collapseAllExpandedBottomSheets();
+					if (bottomSheetBehaviorMap.get(BottomSheetType.LOCATION_ITEM).getState() != BottomSheetBehavior.STATE_COLLAPSED)
+						setStateOfBottomSheet(BottomSheetType.LOCATION_ITEM, BottomSheetBehavior.STATE_COLLAPSED);
 					removeMarkers(MarkerType.SEARCH);
 
 					LocationItemViewPagerAdapter adapter = new LocationItemViewPagerAdapter();
@@ -503,8 +491,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	public void onMapReady(@NonNull GoogleMap googleMap) {
 		this.googleMap = googleMap;
 
-		mapPadding = MyApplication.getStatusBarHeight() + binding.headerLayout.getBottom() +
-				(int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, getResources().getDisplayMetrics());
 
 		googleMap.getUiSettings().setZoomControlsEnabled(false);
 		googleMap.getUiSettings().setRotateGesturesEnabled(false);
@@ -793,16 +779,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		BottomSheetBehavior locationItemBottomSheetBehavior = BottomSheetBehavior.from(locationItemBottomSheet);
 		locationItemBottomSheetBehavior.setDraggable(false);
 		locationItemBottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-			float differenceY;
 
 			@Override
 			public void onStateChanged(@NonNull View bottomSheet, int newState) {
-				if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-					//binding.naverMapButtonsLayout.getRoot().setY(binding.getRoot().getHeight() - bottomSheet.getHeight());
-				} else if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-					//binding.naverMapButtonsLayout.getRoot().setY(binding.getRoot().getHeight() - binding.naverMapButtonsLayout.getRoot
-					// ().getHeight());
-				}
+
 			}
 
 			@Override
@@ -810,7 +790,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				//expanded일때 offset == 1.0, collapsed일때 offset == 0.0
 				//offset에 따라서 버튼들이 이동하고, 지도의 좌표가 변경되어야 한다.
 				int translationValue = (int) (bottomSheet.getHeight() * slideOffset);
-				binding.mapLayout.setPadding(0, 0, 0, translationValue);
+				Objects.requireNonNull(binding).mapLayout.setPadding(0, 0, 0, translationValue);
 			}
 		});
 

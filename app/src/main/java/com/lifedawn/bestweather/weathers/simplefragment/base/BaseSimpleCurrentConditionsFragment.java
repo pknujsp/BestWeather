@@ -1,8 +1,6 @@
 package com.lifedawn.bestweather.weathers.simplefragment.base;
 
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
 import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.enums.BundleKey;
@@ -23,6 +21,7 @@ import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -43,6 +42,8 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	protected ZoneOffset zoneOffset;
 	protected Bundle bundle;
 
+	private WeatherFragmentViewModel weatherFragmentViewModel;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -59,6 +60,8 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
 		zoneOffset = ZonedDateTime.now(zoneId).getOffset();
+
+		weatherFragmentViewModel = new ViewModelProvider(requireParentFragment()).get(WeatherFragmentViewModel.class);
 	}
 
 	@Override
@@ -95,20 +98,22 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 
 	@Override
 	public void changeColor(int color) {
-		binding.sky.setTextColor(color);
-		binding.precipitation.setTextColor(color);
-		binding.humidity.setTextColor(color);
-		binding.windDirection.setTextColor(color);
-		binding.wind.setTextColor(color);
-		binding.airQualityLabel.setTextColor(color);
-		binding.airQuality.setTextColor(color);
-		binding.temperature.setTextColor(color);
-		binding.tempUnit.setTextColor(color);
-		binding.feelsLikeTempLabel.setTextColor(color);
-		binding.feelsLikeTemp.setTextColor(color);
-		binding.feelsLikeTempUnit.setTextColor(color);
-		binding.tempDescription.setTextColor(color);
-		binding.windDirectionArrow.setImageTintList(ColorStateList.valueOf(color));
+		if (binding != null) {
+			binding.sky.setTextColor(color);
+			binding.precipitation.setTextColor(color);
+			binding.humidity.setTextColor(color);
+			binding.windDirection.setTextColor(color);
+			binding.wind.setTextColor(color);
+			binding.airQualityLabel.setTextColor(color);
+			binding.airQuality.setTextColor(color);
+			binding.temperature.setTextColor(color);
+			binding.tempUnit.setTextColor(color);
+			binding.feelsLikeTempLabel.setTextColor(color);
+			binding.feelsLikeTemp.setTextColor(color);
+			binding.feelsLikeTempUnit.setTextColor(color);
+			binding.tempDescription.setTextColor(color);
+			binding.windDirectionArrow.setImageTintList(ColorStateList.valueOf(color));
+		}
 	}
 
 	@Override
@@ -117,5 +122,7 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		asyncBinding.getRoot().addView(binding.getRoot());
 		asyncBinding.progressCircular.setVisibility(View.GONE);
 		asyncBinding.progressCircular.pauseAnimation();
+		weatherFragmentViewModel.onResumeWithAsync(this);
 	}
+
 }

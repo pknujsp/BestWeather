@@ -6,10 +6,12 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.gridlayout.widget.GridLayout;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
@@ -23,7 +25,9 @@ import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.databinding.AirQualityItemBinding;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
+import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
@@ -33,6 +37,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.aqicn.DetailAirQualityFr
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.FragmentType;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -41,16 +46,19 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 
-public class SimpleAirQualityFragment extends Fragment implements IWeatherValues {
+public class SimpleAirQualityFragment extends Fragment implements IWeatherValues, AsyncLayoutInflater.OnInflateFinishedListener {
 	private FragmentAirQualitySimpleBinding binding;
+	private LoadingViewAsyncBinding asyncBinding;
 	private AirQualityDto airQualityDto;
 	private AqiCnGeolocalizedFeedResponse aqiCnGeolocalizedFeedResponse;
 	private Double latitude;
 	private Double longitude;
 	private ZoneId zoneId;
 	private Bundle bundle;
+	private WeatherFragmentViewModel weatherFragmentViewModel;
 
 	public SimpleAirQualityFragment setAirQualityDto(AirQualityDto airQualityDto) {
 		this.airQualityDto = airQualityDto;
@@ -70,12 +78,17 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		latitude = bundle.getDouble(BundleKey.Latitude.name());
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
+		weatherFragmentViewModel = new ViewModelProvider(requireParentFragment()).get(WeatherFragmentViewModel.class);
+
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = FragmentAirQualitySimpleBinding.inflate(inflater);
-		return binding.getRoot();
+		asyncBinding = LoadingViewAsyncBinding.inflate(inflater, container, false);
+		final AsyncLayoutInflater asyncLayoutInflater = new AsyncLayoutInflater(requireContext());
+		asyncLayoutInflater.inflate(R.layout.fragment_air_quality_simple, container, this);
+
+		return asyncBinding.getRoot();
 	}
 
 	@Override
@@ -88,39 +101,13 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	public void onDestroyView() {
 		super.onDestroyView();
 		binding = null;
+		asyncBinding = null;
 	}
 
 
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
-		binding.progressResultView.setContentView(binding.contentContainer);
-		binding.progressResultView.setTextColor(Color.WHITE);
-
-		binding.weatherCardViewHeader.forecastName.setText(R.string.air_quality);
-		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
-		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				DetailAirQualityFragment detailAirQualityFragment = new DetailAirQualityFragment();
-				DetailAirQualityFragment.setResponse(aqiCnGeolocalizedFeedResponse);
-
-				Bundle bundle = new Bundle();
-				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
-				bundle.putDouble(BundleKey.Latitude.name(), latitude);
-				bundle.putDouble(BundleKey.Longitude.name(), longitude);
-				detailAirQualityFragment.setArguments(bundle);
-
-				String tag = getString(R.string.tag_detail_air_quality_fragment);
-				FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
-
-				fragmentManager.beginTransaction().hide(
-						fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
-						detailAirQualityFragment, tag).addToBackStack(tag).commit();
-			}
-		});
-		setValuesToViews();
 	}
 
 
@@ -135,15 +122,9 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			binding.progressResultView.onSuccessful();
 
 			//측정소와의 거리 계산 후 50km이상의 거리에 있으면 표시보류
-			final Double distance = LocationDistance.distance(latitude, longitude,
-					airQualityDto.getLatitude(), airQualityDto.getLongitude(), LocationDistance.Unit.KM);
 
 			String noData = getString(R.string.noData);
-			String distanceStr = String.format("%.2f", distance) + getString(R.string.km);
-			if (distance > 100) {
-				distanceStr += ", " + getString(R.string.the_measuring_station_is_very_far_away);
-			}
-			binding.distanceToMeasuringStation.setText(distanceStr);
+
 			binding.measuringStationName.setText(airQualityDto.getCityName() != null ? airQualityDto.getCityName() : noData);
 
 			final int overallGrade = airQualityDto.getAqi();
@@ -192,9 +173,9 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 
 			List<AirQualityDto.DailyForecast> forecastList = airQualityDto.getDailyForecastList();
-			final int textColor = AppTheme.getColor(getContext(), R.attr.textColorInWeatherCard);
+			final int textColor = AppTheme.getColor(requireContext(), R.attr.textColorInWeatherCard);
 
-			LayoutInflater layoutInflater = LayoutInflater.from(getContext());
+			LayoutInflater layoutInflater = LayoutInflater.from(requireContext());
 			View labelView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 
 			labelView.findViewById(R.id.date).setVisibility(View.INVISIBLE);
@@ -214,8 +195,8 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 				((TextView) forecastItemView.findViewById(R.id.date)).setText(forecastObj.getDate().format(dateTimeFormatter));
 				((TextView) forecastItemView.findViewById(R.id.date)).setTextColor(textColor);
-				((TextView) forecastItemView.findViewById(R.id.pm25)).setVisibility(View.GONE);
-				((TextView) forecastItemView.findViewById(R.id.o3)).setVisibility(View.GONE);
+				forecastItemView.findViewById(R.id.pm25).setVisibility(View.GONE);
+				forecastItemView.findViewById(R.id.o3).setVisibility(View.GONE);
 
 				int grade = -1;
 				if (forecastObj.isHasPm10()) {
@@ -254,17 +235,18 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	}
 
 	protected final View addGridItem(@Nullable Integer value, int labelDescriptionId, @NonNull Integer labelIconId) {
-		View gridItem = getLayoutInflater().inflate(R.layout.air_quality_item, null);
-		((ImageView) gridItem.findViewById(R.id.label_icon)).setVisibility(View.GONE);
-		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
-		((TextView) gridItem.findViewById(R.id.label)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
-		gridItem.findViewById(R.id.value_int).setVisibility(View.GONE);
+		final AirQualityItemBinding itemBinding = AirQualityItemBinding.inflate(getLayoutInflater());
+		itemBinding.labelIcon.setVisibility(View.GONE);
+		itemBinding.label.setText(labelDescriptionId);
+		itemBinding.label.setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
+		itemBinding.valueInt.setVisibility(View.GONE);
+
 		//((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
 		//((TextView) gridItem.findViewById(R.id.value_int)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
-		((TextView) gridItem.findViewById(R.id.value_str)).setText(
+		itemBinding.valueStr.setText(
 				value == null ? getString(R.string.noData) : AqicnResponseProcessor.getGradeDescription(value));
-		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(
-				value == null ? ContextCompat.getColor(getContext(), R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(
+		itemBinding.valueStr.setTextColor(
+				value == null ? ContextCompat.getColor(requireContext(), R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(
 						value));
 
 		int cellCount = binding.grid.getChildCount();
@@ -275,7 +257,44 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
 		layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
 
-		binding.grid.addView(gridItem, layoutParams);
-		return gridItem;
+		binding.grid.addView(itemBinding.getRoot(), layoutParams);
+		return itemBinding.getRoot();
+	}
+
+	@Override
+	public void onInflateFinished(@NonNull View view, int resid, @Nullable ViewGroup parent) {
+		binding = FragmentAirQualitySimpleBinding.bind(view);
+		asyncBinding.getRoot().addView(binding.getRoot());
+
+		binding.progressResultView.setContentView(binding.group);
+		binding.progressResultView.setTextColor(Color.WHITE);
+
+		binding.weatherCardViewHeader.forecastName.setText(R.string.air_quality);
+		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
+		binding.weatherCardViewHeader.detailForecast.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				DetailAirQualityFragment detailAirQualityFragment = new DetailAirQualityFragment();
+				DetailAirQualityFragment.setResponse(aqiCnGeolocalizedFeedResponse);
+
+				Bundle bundle = new Bundle();
+				bundle.putSerializable(BundleKey.TimeZone.name(), zoneId);
+				bundle.putDouble(BundleKey.Latitude.name(), latitude);
+				bundle.putDouble(BundleKey.Longitude.name(), longitude);
+				detailAirQualityFragment.setArguments(bundle);
+
+				String tag = getString(R.string.tag_detail_air_quality_fragment);
+				FragmentManager fragmentManager = getParentFragment().getParentFragmentManager();
+
+				fragmentManager.beginTransaction().hide(
+						fragmentManager.findFragmentByTag(WeatherFragment.class.getName())).add(R.id.fragment_container,
+						detailAirQualityFragment, tag).addToBackStack(tag).commit();
+			}
+		});
+		setValuesToViews();
+
+		asyncBinding.progressCircular.setVisibility(View.GONE);
+		asyncBinding.progressCircular.pauseAnimation();
+		weatherFragmentViewModel.onResumeWithAsync(this);
 	}
 }

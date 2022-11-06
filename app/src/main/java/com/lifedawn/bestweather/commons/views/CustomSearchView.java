@@ -138,6 +138,7 @@ public class CustomSearchView extends FrameLayout {
 
 	}
 
+
 	public void setOnEditTextQueryListener(CustomEditText.OnEditTextQueryListener onEditTextQueryListener) {
 		this.onEditTextQueryListener = onEditTextQueryListener;
 		binding.edittext.setOnEditTextQueryListener(onEditTextQueryListener);

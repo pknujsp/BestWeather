@@ -7,6 +7,7 @@ import android.util.ArrayMap;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
@@ -52,9 +53,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class WeatherFragmentViewModel extends AndroidViewModel {
+public class WeatherFragmentViewModel extends AndroidViewModel implements WeatherFragment.OnResumeFragment {
 	public static final Map<String, WeatherFragment.WeatherResponseObj> FINAL_RESPONSE_MAP = new ConcurrentHashMap<>();
+
+	public final MutableLiveData<Boolean> resumedFragmentObserver = new MutableLiveData<>();
 
 	public DateTimeFormatter dateTimeFormatter;
 	public FavoriteAddressDto selectedFavoriteAddressDto;
@@ -73,6 +77,9 @@ public class WeatherFragmentViewModel extends AndroidViewModel {
 
 	public WeatherRestApiDownloader weatherRestApiDownloader;
 	public Bundle arguments;
+
+	private final int FRAGMENT_TOTAL_COUNTS = 7;
+	private AtomicInteger resumedFragmentCount = new AtomicInteger(0);
 
 	public final MutableLiveData<WeatherFragment.ResponseResultObj> weatherDataLiveData = new MutableLiveData<>();
 
@@ -354,4 +361,11 @@ public class WeatherFragmentViewModel extends AndroidViewModel {
 	}
 
 
+	@Override
+	public void onResumeWithAsync(Fragment fragment) {
+		if (resumedFragmentCount.incrementAndGet() == FRAGMENT_TOTAL_COUNTS) {
+			resumedFragmentCount.set(0);
+			resumedFragmentObserver.setValue(true);
+		}
+	}
 }

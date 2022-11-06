@@ -5,7 +5,7 @@
     android:background="@drawable/searchview_background_stroke"
     android:backgroundTint="#CCFFFFFF"
     android:clipChildren="false"
-    android:elevation="3dp"
+    android:elevation="4dp"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingHorizontal="@dimen/searchviewPaddingHorizontal"

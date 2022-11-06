@@ -64,6 +64,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:drawableRight="@drawable/ic_baseline_find_replace_24"
                         android:gravity="center_vertical"
                         android:shadowColor="@color/black"
                         android:text="weatherDataSourceName"
@@ -72,21 +73,6 @@
                         android:textStyle="bold"
                         />
 
-                    <TextView
-                        style="@style/text_shadow"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="4dp"
-                        android:background="@drawable/rounded_btn_background"
-                        android:backgroundTint="@color/gray"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="6dp"
-                        android:paddingVertical="4dp"
-                        android:text="@string/change"
-                        android:textColor="@color/white"
-                        android:textSize="13sp"
-                        />
 
                 </LinearLayout>
 

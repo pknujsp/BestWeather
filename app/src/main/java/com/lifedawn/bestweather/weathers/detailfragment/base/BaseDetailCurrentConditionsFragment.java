@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.gridlayout.widget.GridLayout;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
@@ -23,6 +24,7 @@ import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailCurrentConditionsBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
+import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,6 +42,7 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	protected ZoneId zoneId;
 	protected WeatherProviderType mainWeatherProviderType;
 	protected Bundle bundle;
+	protected WeatherFragmentViewModel weatherFragmentViewModel;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,8 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 		windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
 		visibilityUnit = MyApplication.VALUE_UNIT_OBJ.getVisibilityUnit();
 		clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit();
+		weatherFragmentViewModel = new ViewModelProvider(requireParentFragment()).get(WeatherFragmentViewModel.class);
+
 	}
 
 	@Override
@@ -71,7 +76,6 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
 		layoutInflater = getLayoutInflater();
 	}
 

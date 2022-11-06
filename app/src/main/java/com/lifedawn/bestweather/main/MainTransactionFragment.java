@@ -538,22 +538,21 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		bundle.putSerializable("FavoriteAddressDto", favoriteAddressDto);
 
 		final WeatherFragment newWeatherFragment = new WeatherFragment(this);
+
+		newWeatherFragment.setOnAsyncLoadCallback(new WeatherFragment.OnAsyncLoadCallback() {
+			@Override
+			public void onFinished(Fragment fragment) {
+				if (fragment.isAdded())
+					((ILoadWeatherData) fragment).load();
+			}
+		});
+
 		newWeatherFragment.setArguments(bundle);
 		newWeatherFragment.setMenuOnClickListener(v -> binding.drawerLayout.openDrawer(binding.sideNavigation));
 
 		newWeatherFragment.setiRefreshFavoriteLocationListOnSideNav((IRefreshFavoriteLocationListOnSideNav) this);
 
 		final FragmentManager fragmentManager = getChildFragmentManager();
-		fragmentManager.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
-			@Override
-			public void onFragmentStarted(@NonNull FragmentManager fm, @NonNull Fragment f) {
-				super.onFragmentStarted(fm, f);
-				fm.unregisterFragmentLifecycleCallbacks(this);
-				if (f instanceof WeatherFragment)
-					((ILoadWeatherData) f).load();
-
-			}
-		}, false);
 		fragmentManager.beginTransaction().replace(binding.fragmentContainer.getId(), newWeatherFragment,
 				WeatherFragment.class.getName()).setPrimaryNavigationFragment(newWeatherFragment).commit();
 	}
