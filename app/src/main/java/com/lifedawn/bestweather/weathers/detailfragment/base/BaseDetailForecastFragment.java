@@ -275,14 +275,14 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 
 	public static class DailyForecastListAdapter extends RecyclerView.Adapter<DailyForecastListAdapter.ViewHolder> {
 		private List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
-		private OnClickedListViewItemListener<Integer> onClickedForecastItem;
+		private final OnClickedListViewItemListener<Integer> onClickedForecastItem;
 		private final String tempDegree;
 		private final String degree = "°";
 
 		private boolean hasPrecipitationVolume;
 
-		private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
-		private DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
+		private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d");
+		private final DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("E");
 
 		public DailyForecastListAdapter(@Nullable OnClickedListViewItemListener<Integer> onClickedForecastItem) {
 			this.onClickedForecastItem = onClickedForecastItem;

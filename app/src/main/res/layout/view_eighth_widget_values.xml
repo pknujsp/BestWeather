@@ -16,8 +16,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginHorizontal="24dp"
         >
 
         <LinearLayout
@@ -25,14 +24,51 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
             android:gravity="center_vertical"
             android:orientation="vertical"
             >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                >
+
+                <TextClock
+                    android:id="@+id/timeClock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-light"
+                    android:format12Hour="hh:mm"
+                    android:format24Hour="hh:mm"
+                    android:includeFontPadding="false"
+                    android:text="1:40"
+                    android:textColor="@color/widgetTextColor"
+                    android:textSize="@dimen/timeClockTextSizeInEighthWidget"
+                    />
+
+                <TextClock
+                    android:id="@+id/ampm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:fontFamily="sans-serif-light"
+                    android:format12Hour="a"
+                    android:format24Hour="a"
+                    android:includeFontPadding="false"
+                    android:text="오후"
+                    android:textColor="@color/widgetTextColor"
+                    android:textSize="@dimen/ampmTextSizeInEighthWidget"
+                    />
+            </LinearLayout>
+
 
             <TextClock
                 android:id="@+id/dateClock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-light"
                 android:format12Hour="M.d E"
                 android:format24Hour="M.d E"
                 android:includeFontPadding="false"
@@ -40,19 +76,6 @@
                 android:textColor="@color/widgetTextColor"
                 android:textSize="@dimen/dateClockTextSizeInEighthWidget"
                 />
-
-            <TextClock
-                android:id="@+id/timeClock"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:format12Hour="HH:mm"
-                android:format24Hour="HH:mm"
-                android:includeFontPadding="false"
-                android:text="@string/temp_time"
-                android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/timeClockTextSizeInEighthWidget"
-                />
-
         </LinearLayout>
 
 
@@ -62,74 +85,75 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical">
-
+            android:gravity="center_vertical|right"
+            android:orientation="vertical"
+            >
 
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
                 android:layout_marginBottom="4dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                >
 
                 <ImageView
                     android:id="@+id/weatherIcon"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:scaleType="centerInside"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_marginRight="4dp"
-                    android:src="@drawable/day_clear" />
+                    android:scaleType="centerInside"
+                    android:src="@drawable/day_clear"
+                    />
 
                 <TextView
                     android:id="@+id/temperature"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-light"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:maxLines="1"
                     android:text="@string/temp_temperature"
-                    android:fontFamily="sans-serif-light"
                     android:textAlignment="center"
                     android:textColor="@color/widgetTextColor"
-                    android:textSize="@dimen/tempTextSizeInEighthWidget" />
+                    android:textSize="@dimen/tempTextSizeInEighthWidget"
+                    />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/precipitation"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:includeFontPadding="false"
-                android:text="@string/temp_noPrecipitation"
-                android:textAlignment="center"
-                android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/precipitationTextSizeInEighthWidget" />
+                android:orientation="horizontal"
+                >
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:text="@string/air_quality"
-                android:id="@+id/airQualityLabel"
-                android:textAlignment="center"
-                android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/airQualityTextSizeInEighthWidget" />
+                <TextView
+                    android:id="@+id/airQualityLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="6dp"
+                    android:fontFamily="sans-serif-light"
+                    android:text="@string/air_quality"
+                    android:textColor="@color/widgetTextColor"
+                    android:textSize="@dimen/airQualityTextSizeInEighthWidget"
+                    />
 
-            <TextView
-                android:id="@+id/airQuality"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:includeFontPadding="false"
-                android:text="@string/good"
-                android:textAlignment="center"
-                android:textColor="@color/widgetTextColor"
-                android:textSize="@dimen/airQualityTextSizeInEighthWidget" />
+                <TextView
+                    android:id="@+id/airQuality"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-light"
 
+                    android:includeFontPadding="false"
+                    android:text="@string/good"
+                    android:textColor="@color/widgetTextColor"
+                    android:textSize="@dimen/airQualityTextSizeInEighthWidget"
+                    />
+            </LinearLayout>
 
         </LinearLayout>
 

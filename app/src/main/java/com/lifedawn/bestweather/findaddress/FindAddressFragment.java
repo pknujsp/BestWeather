@@ -253,7 +253,7 @@ public class FindAddressFragment extends Fragment {
 		@Override
 		public void onSuccessful(LocationResult locationResult) {
 			final Location location = getBestLocation(locationResult);
-			Geocoding.nominatimReverseGeocoding(getContext(),  location.getLatitude(),  location.getLongitude(),
+			Geocoding.nominatimReverseGeocoding(getContext(), location.getLatitude(), location.getLongitude(),
 					new Geocoding.ReverseGeocodingCallback() {
 						@Override
 						public void onReverseGeocodingResult(Geocoding.AddressDto addressDto) {

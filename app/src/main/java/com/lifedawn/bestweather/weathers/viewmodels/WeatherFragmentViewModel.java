@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.ArrayMap;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -14,10 +13,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.FusedLocation;
-import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
-import com.lifedawn.bestweather.commons.classes.NetworkStatus;
-import com.lifedawn.bestweather.commons.classes.WeatherViewController;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAqicn;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
@@ -25,19 +20,10 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestMet;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.LocationType;
 import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
-import com.lifedawn.bestweather.commons.interfaces.OnResultFragmentListener;
-import com.lifedawn.bestweather.commons.views.ProgressDialog;
-import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
-import com.lifedawn.bestweather.flickr.FlickrRepository;
-import com.lifedawn.bestweather.flickr.FlickrViewModel;
-import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.rainviewer.view.SimpleRainViewerFragment;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
@@ -67,22 +53,14 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapR
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
-import com.lifedawn.bestweather.weathers.detailfragment.currentconditions.DetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.models.WeatherDataDTO;
-import com.lifedawn.bestweather.weathers.simplefragment.aqicn.SimpleAirQualityFragment;
-import com.lifedawn.bestweather.weathers.simplefragment.currentconditions.SimpleCurrentConditionsFragment;
-import com.lifedawn.bestweather.weathers.simplefragment.dailyforecast.SimpleDailyForecastFragment;
-import com.lifedawn.bestweather.weathers.simplefragment.hourlyforecast.SimpleHourlyForecastFragment;
-import com.lifedawn.bestweather.weathers.simplefragment.sunsetrise.SunsetriseFragment;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -94,8 +72,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -126,7 +102,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 	public AtomicBoolean needDrawFragments = new AtomicBoolean(true);
 	private AtomicInteger resumedFragmentCount = new AtomicInteger(0);
 
-	public final MutableLiveData<WeatherFragment.ResponseResultObj> weatherDataLiveData = new MutableLiveData<>();
+	public final MutableLiveData<WeatherFragment.ResponseResultObj> weatherDataResponse = new MutableLiveData<>();
 
 	public WeatherFragmentViewModel(@NonNull Application application) {
 		super(application);
@@ -156,7 +132,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 					public void onResult() {
 						weatherRestApiDownloader = this;
 						responseResultObj.weatherRestApiDownloader = this;
-						weatherDataLiveData.postValue(responseResultObj);
+						weatherDataResponse.postValue(responseResultObj);
 					}
 
 					@Override
@@ -192,7 +168,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 					public void onResult() {
 						weatherRestApiDownloader = this;
 						responseResultObj.weatherRestApiDownloader = this;
-						weatherDataLiveData.postValue(responseResultObj);
+						weatherDataResponse.postValue(responseResultObj);
 					}
 
 					@Override
@@ -571,6 +547,9 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 		dateTimeFormatter = DateTimeFormatter.ofPattern(
 				MyApplication.VALUE_UNIT_OBJ.getClockUnit() == ValueUnits.clock12 ? context.getString(R.string.datetime_pattern_clock12) :
 						context.getString(R.string.datetime_pattern_clock24), Locale.getDefault());
+		resumedFragmentCount.set(0);
+		needDrawFragments.set(true);
+
 		return weatherDataDTO;
 	}
 

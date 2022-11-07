@@ -58,7 +58,6 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeat
 import com.lifedawn.bestweather.commons.enums.BundleKey;
 import com.lifedawn.bestweather.commons.enums.Flickr;
 import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
@@ -74,40 +73,13 @@ import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.rainviewer.view.SimpleRainViewerFragment;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 
-import com.lifedawn.bestweather.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
-import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
-import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
-import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaCurrentConditions;
-import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaDailyForecast;
-import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
-import com.lifedawn.bestweather.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
-import com.lifedawn.bestweather.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
-import com.lifedawn.bestweather.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
-import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.currentweather.OwmCurrentConditionsResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import com.lifedawn.bestweather.timezone.TimeZoneUtils;
 
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
-import com.lifedawn.bestweather.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.weathers.detailfragment.currentconditions.DetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.interfaces.ILoadWeatherData;
-import com.lifedawn.bestweather.weathers.models.AirQualityDto;
-import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
-import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.models.WeatherDataDTO;
 import com.lifedawn.bestweather.weathers.simplefragment.aqicn.SimpleAirQualityFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.currentconditions.SimpleCurrentConditionsFragment;
@@ -123,11 +95,9 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -394,7 +364,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 				});
 
 
-				weatherFragmentViewModel.weatherDataLiveData.observe(getViewLifecycleOwner(), responseResultObj -> {
+				weatherFragmentViewModel.weatherDataResponse.observe(getViewLifecycleOwner(), responseResultObj -> {
 					if (responseResultObj != null) {
 						processOnResult(responseResultObj);
 					}
@@ -763,7 +733,6 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	}
 
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
-		getChildFragmentManager().beginTransaction().setPrimaryNavigationFragment(null).commitNow();
 		FragmentManager fragmentManager = getParentFragmentManager();
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
@@ -787,7 +756,6 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		final WeatherDataDTO weatherDataDTO = weatherFragmentViewModel.createWeatherFragments(weatherProviderTypeSet,
 				weatherRestApiDownloader, latitude,
 				longitude);
-
 
 		final Bundle defaultBundle = new Bundle();
 		defaultBundle.putDouble(BundleKey.Latitude.name(), weatherDataDTO.getLatitude());
@@ -866,7 +834,6 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 				binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(weatherFragmentViewModel.dateTimeFormatter));
 
 				FragmentManager fragmentManager = getChildFragmentManager();
-
 				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
 				fragmentTransaction
@@ -882,7 +849,6 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 								getString(R.string.tag_sun_set_rise_fragment))
 						.replace(binding.radar.getId(), rainViewerFragment,
 								SimpleRainViewerFragment.class.getName())
-						.setPrimaryNavigationFragment(simpleCurrentConditionsFragment)
 						.commit();
 			});
 

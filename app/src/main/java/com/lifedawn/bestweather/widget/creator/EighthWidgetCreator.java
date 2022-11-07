@@ -94,14 +94,6 @@ public class EighthWidgetCreator extends AbstractWidgetCreator {
 		valuesRemoteViews.setTextViewText(R.id.temperature, currentConditionsDto.getTemp().replace(tempDegree, "°"));
 		valuesRemoteViews.setImageViewResource(R.id.weatherIcon, currentConditionsDto.getWeatherIcon());
 
-		String precipitation = "";
-		if (currentConditionsDto.isHasPrecipitationVolume()) {
-			precipitation += context.getString(R.string.precipitation) + ": " + currentConditionsDto.getPrecipitationVolume();
-		} else {
-			precipitation = context.getString(R.string.not_precipitation);
-		}
-		valuesRemoteViews.setTextViewText(R.id.precipitation, precipitation);
-
 		String airQuality = null;
 		if (airQualityDto.isSuccessful()) {
 			airQuality = AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());

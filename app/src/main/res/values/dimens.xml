@@ -155,7 +155,7 @@
     <dimen name="seventhWidgetHeight">180dp</dimen>
 
     <dimen name="eighthWidgetWidth">320dp</dimen>
-    <dimen name="eighthWidgetHeight">110dp</dimen>
+    <dimen name="eighthWidgetHeight">40dp</dimen>
 
     <dimen name="ninthWidgetWidth">320dp</dimen>
     <dimen name="ninthWidgetHeight">110dp</dimen>
@@ -188,11 +188,12 @@
     <dimen name="stationNameTextSizeInSeventhWidget">14sp</dimen>
     <dimen name="airQualityTextSizeInSeventhWidget">16sp</dimen>
 
-    <dimen name="dateClockTextSizeInEighthWidget">24sp</dimen>
-    <dimen name="timeClockTextSizeInEighthWidget">60sp</dimen>
-    <dimen name="tempTextSizeInEighthWidget">30sp</dimen>
+    <dimen name="dateClockTextSizeInEighthWidget">16sp</dimen>
+    <dimen name="timeClockTextSizeInEighthWidget">34sp</dimen>
+    <dimen name="ampmTextSizeInEighthWidget">16sp</dimen>
+    <dimen name="tempTextSizeInEighthWidget">32sp</dimen>
     <dimen name="precipitationTextSizeInEighthWidget">14sp</dimen>
-    <dimen name="airQualityTextSizeInEighthWidget">14sp</dimen>
+    <dimen name="airQualityTextSizeInEighthWidget">15sp</dimen>
 
     <dimen name="labelTextSizeInAirQualityItem">13sp</dimen>
     <dimen name="gradeValueTextSizeInAirQualityItem">20sp</dimen>

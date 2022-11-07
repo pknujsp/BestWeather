@@ -31,7 +31,6 @@ public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.toolbar.fragmentTitle.setText(R.string.detail_daily_forecast);
-		binding.listview.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
 		binding.listview.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 	}
 
@@ -41,7 +40,7 @@ public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment
 		boolean hasPrecipitationVolume = false;
 		for (DailyForecastDto item : dailyForecastDtoList) {
 			for (DailyForecastDto.Values values : item.getValuesList()) {
-				if (values.isHasPrecipitationVolume()) {
+				if (values.isHasPrecipitationVolume() || values.isHasRainVolume() || values.isHasSnowVolume()) {
 					hasPrecipitationVolume = true;
 					break;
 				}

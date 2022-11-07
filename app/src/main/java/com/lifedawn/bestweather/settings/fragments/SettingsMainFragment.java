@@ -57,12 +57,7 @@ public class SettingsMainFragment extends Fragment implements IAppbarTitle {
 		SettingsFragment settingsFragment = new SettingsFragment(this);
 		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), settingsFragment).commitNow();
 
-		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				onBackPressedCallback.handleOnBackPressed();
-			}
-		});
+		binding.toolbar.backBtn.setOnClickListener(view1 -> onBackPressedCallback.handleOnBackPressed());
 
 		binding.toolbar.fragmentTitle.setText(R.string.settings);
 
@@ -73,6 +68,12 @@ public class SettingsMainFragment extends Fragment implements IAppbarTitle {
 	public void onDestroy() {
 		super.onDestroy();
 		onBackPressedCallback.remove();
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		binding = null;
 	}
 
 	@Override

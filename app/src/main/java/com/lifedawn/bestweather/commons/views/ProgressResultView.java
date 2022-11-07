@@ -91,7 +91,7 @@ public class ProgressResultView extends FrameLayout implements OnProgressViewLis
 	public void onStarted() {
 		succeed = false;
 		for (View v : views)
-			v.setVisibility(View.VISIBLE);
+			v.setVisibility(View.GONE);
 
 		binding.btn.setVisibility(View.GONE);
 		binding.status.setVisibility(GONE);

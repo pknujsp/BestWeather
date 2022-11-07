@@ -10,7 +10,6 @@
     <string name="temp_feelsLikeTemperature">feels: 12℃</string>
     <string name="temp_address">address</string>
     <string name="temp_date">3.6 Mon</string>
-    <string name="temp_time" translatable="false">16:30</string>
     <string name="temp_dateTime">3.6 Mon 16:30</string>
     <string name="temp_windDirection">N</string>
     <string name="temp_windSpeed" translatable="false">2.2m/s</string>

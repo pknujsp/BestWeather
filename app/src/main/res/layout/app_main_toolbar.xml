@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="@dimen/toolbarHeight"
     android:background="@color/transparent"
@@ -17,9 +18,9 @@
         android:background="@drawable/img_btn_background"
         android:scaleType="centerInside"
         android:src="@drawable/menu"
-        app:tint="@color/white"
+        android:tint="@color/white"
+        tools:ignore="UseAppTint"
         />
-
 
 
     <ImageButton
@@ -32,7 +33,8 @@
         android:background="@drawable/img_btn_background"
         android:scaleType="centerInside"
         android:src="@drawable/search"
-        app:tint="@color/white"
+        android:tint="@color/white"
+        tools:ignore="UseAppTint"
         />
 
     <ImageButton
@@ -41,12 +43,12 @@
         android:layout_height="@dimen/toolbar_image_size"
         android:layout_centerVertical="true"
         android:layout_marginEnd="@dimen/toolbar_left_right_margin"
-
         android:layout_toLeftOf="@id/refresh"
         android:background="@drawable/img_btn_background"
         android:scaleType="centerInside"
         android:src="@drawable/gps"
-        app:tint="@color/white"
+        android:tint="@color/white"
+        tools:ignore="UseAppTint"
         />
 
 
@@ -59,8 +61,8 @@
         android:background="@drawable/img_btn_background"
         android:scaleType="centerInside"
         android:src="@drawable/refresh"
-
-        app:tint="@color/white"
+        android:tint="@color/white"
+        tools:ignore="UseAppTint"
         />
 
 </RelativeLayout>
