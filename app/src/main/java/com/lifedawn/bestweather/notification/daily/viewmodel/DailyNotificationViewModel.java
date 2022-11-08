@@ -89,7 +89,7 @@ public class DailyNotificationViewModel extends AndroidViewModel {
 			newNotificationDto = new DailyPushNotificationDto();
 			newNotificationDto.setEnabled(true);
 			newNotificationDto.setAlarmClock(LocalTime.of(8, 0).toString());
-			newNotificationDto.addWeatherSourceType(getMainWeatherProviderType());
+			newNotificationDto.setWeatherProviderType(getMainWeatherProviderType());
 			newNotificationDto.setNotificationType(DailyPushNotificationType.First);
 			newNotificationDto.setLocationType(LocationType.CurrentLocation);
 

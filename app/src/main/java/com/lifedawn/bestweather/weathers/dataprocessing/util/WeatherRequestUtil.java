@@ -36,14 +36,11 @@ public class WeatherRequestUtil {
 	public static void loadWeatherData(Context context, ExecutorService executorService, Double latitude, Double longitude,
 	                                   Set<WeatherDataType> weatherDataTypeSet,
 	                                   WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherProviderType> weatherProviderTypeSet, ZoneId zoneId) {
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				weatherRestApiDownloader.setZoneId(zoneId);
-				final ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
-				setRequestWeatherSourceWithSourceType(weatherProviderTypeSet, requestWeatherSources, weatherDataTypeSet);
-				MainProcessing.requestNewWeatherData(context, latitude, longitude, requestWeatherSources, weatherRestApiDownloader);
-			}
+		executorService.submit(() -> {
+			weatherRestApiDownloader.setZoneId(zoneId);
+			final ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
+			setRequestWeatherSourceWithSourceType(weatherProviderTypeSet, requestWeatherSources, weatherDataTypeSet);
+			MainProcessing.requestNewWeatherData(context, latitude, longitude, requestWeatherSources, weatherRestApiDownloader);
 		});
 	}
 

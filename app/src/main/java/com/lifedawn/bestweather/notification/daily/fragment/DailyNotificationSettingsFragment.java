@@ -51,7 +51,6 @@ import org.jetbrains.annotations.NotNull;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Set;
 
 
 public class DailyNotificationSettingsFragment extends Fragment {
@@ -80,12 +79,16 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		viewModel = new ViewModelProvider(this).get(DailyNotificationViewModel.class);
 		viewModel.setMainWeatherProviderType(WeatherRequestUtil.getMainWeatherSourceType(getContext(), null));
 
-		if (getArguments() != null)
-			viewModel.setBundle(getArguments());
-
+		viewModel.setBundle(savedInstanceState == null ? getArguments() : savedInstanceState);
 		viewModel.setNotificationSession(viewModel.getBundle().getBoolean(BundleKey.NewSession.name()));
 	}
 
+
+	@Override
+	public void onSaveInstanceState(@NonNull Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putAll(viewModel.getBundle());
+	}
 
 	@Nullable
 	@org.jetbrains.annotations.Nullable
@@ -182,7 +185,7 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		});
 
 		initLocation();
-		initWeatherDataSource();
+		initWeatherDataProvider();
 		initNotificationTypeSpinner();
 	}
 
@@ -206,11 +209,16 @@ public class DailyNotificationSettingsFragment extends Fragment {
 		LocalTime localTime = LocalTime.parse(viewModel.getEditingNotificationDto().getAlarmClock());
 		binding.hours.setText(localTime.format(hoursFormatter));
 
-		Set<WeatherProviderType> weatherProviderTypeSet = viewModel.getEditingNotificationDto().getWeatherProviderTypeSet();
-		if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_ONECALL)) {
-			binding.commons.owmRadio.setChecked(true);
+		WeatherProviderType weatherProviderType = viewModel.getEditingNotificationDto().getWeatherProviderType();
+
+		if (weatherProviderType != null) {
+			if (weatherProviderType == WeatherProviderType.OWM_ONECALL)
+				binding.commons.owmRadio.setChecked(true);
+			else
+				binding.commons.metNorwayRadio.setChecked(true);
 		} else {
-			binding.commons.metNorwayRadio.setChecked(true);
+			binding.commons.weatherDataSourceRadioGroup.check(viewModel.getMainWeatherProviderType() == WeatherProviderType.OWM_ONECALL ?
+					binding.commons.owmRadio.getId() : binding.commons.metNorwayRadio.getId());
 		}
 
 		binding.commons.kmaTopPrioritySwitch.setChecked(viewModel.getEditingNotificationDto().isTopPriorityKma());
@@ -258,39 +266,39 @@ public class DailyNotificationSettingsFragment extends Fragment {
 				//시간별 예보
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new FirstDailyNotificationViewCreator(context);
-				viewModel.getEditingNotificationDto().removeWeatherSourceType(WeatherProviderType.AQICN);
-				viewModel.getEditingNotificationDto().addWeatherSourceType(binding.commons.metNorwayRadio.isChecked() ? WeatherProviderType.MET_NORWAY :
+				viewModel.getEditingNotificationDto().setShowAirQuality(false);
+				viewModel.getEditingNotificationDto().setWeatherProviderType(binding.commons.metNorwayRadio.isChecked() ? WeatherProviderType.MET_NORWAY :
 						WeatherProviderType.OWM_ONECALL);
 				break;
 			case Second:
 				//현재날씨
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new SecondDailyNotificationViewCreator(context);
-				viewModel.getEditingNotificationDto().addWeatherSourceType(WeatherProviderType.AQICN);
-				viewModel.getEditingNotificationDto().addWeatherSourceType(binding.commons.metNorwayRadio.isChecked() ? WeatherProviderType.MET_NORWAY :
+				viewModel.getEditingNotificationDto().setShowAirQuality(true);
+				viewModel.getEditingNotificationDto().setWeatherProviderType(binding.commons.metNorwayRadio.isChecked() ? WeatherProviderType.MET_NORWAY :
 						WeatherProviderType.OWM_ONECALL);
 				break;
 			case Third:
 				//일별 예보
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.VISIBLE);
 				viewCreator = new ThirdDailyNotificationViewCreator(context);
-				viewModel.getEditingNotificationDto().removeWeatherSourceType(WeatherProviderType.AQICN);
-				viewModel.getEditingNotificationDto().addWeatherSourceType(binding.commons.metNorwayRadio.isChecked() ? WeatherProviderType.MET_NORWAY :
+				viewModel.getEditingNotificationDto().setShowAirQuality(false);
+				viewModel.getEditingNotificationDto().setWeatherProviderType(binding.commons.metNorwayRadio.isChecked() ? WeatherProviderType.MET_NORWAY :
 						WeatherProviderType.OWM_ONECALL);
 				break;
 			case Fourth:
 				//현재 대기질
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.GONE);
 				viewCreator = new FourthDailyNotificationViewCreator(context);
-				viewModel.getEditingNotificationDto().getWeatherProviderTypeSet().clear();
-				viewModel.getEditingNotificationDto().addWeatherSourceType(WeatherProviderType.AQICN);
+				viewModel.getEditingNotificationDto().setShowAirQuality(true);
+				viewModel.getEditingNotificationDto().setWeatherProviderType(null);
 				break;
 			default:
 				//대기질 예보
 				binding.commons.singleWeatherDataSourceLayout.setVisibility(View.GONE);
 				viewCreator = new FifthDailyNotificationViewCreator(context);
-				viewModel.getEditingNotificationDto().getWeatherProviderTypeSet().clear();
-				viewModel.getEditingNotificationDto().addWeatherSourceType(WeatherProviderType.AQICN);
+				viewModel.getEditingNotificationDto().setShowAirQuality(true);
+				viewModel.getEditingNotificationDto().setWeatherProviderType(null);
 				break;
 		}
 
@@ -305,10 +313,10 @@ public class DailyNotificationSettingsFragment extends Fragment {
 	}
 
 
-	private void initWeatherDataSource() {
+	private void initWeatherDataProvider() {
 		binding.commons.weatherDataSourceRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
 			WeatherProviderType checked = checkedId == R.id.met_norway_radio ? WeatherProviderType.MET_NORWAY : WeatherProviderType.OWM_ONECALL;
-			viewModel.getEditingNotificationDto().addWeatherSourceType(checked);
+			viewModel.getEditingNotificationDto().setWeatherProviderType(checked);
 		});
 		binding.commons.kmaTopPrioritySwitch.setOnCheckedChangeListener((buttonView, isChecked) -> viewModel.getEditingNotificationDto().setTopPriorityKma(isChecked));
 

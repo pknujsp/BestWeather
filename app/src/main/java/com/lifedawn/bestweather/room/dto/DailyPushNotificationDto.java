@@ -24,8 +24,8 @@ public class DailyPushNotificationDto implements Serializable {
 	@ColumnInfo(name = "notificationType")
 	private DailyPushNotificationType notificationType;
 
-	@ColumnInfo(name = "weatherSourceTypeSet")
-	private Set<WeatherProviderType> weatherProviderTypeSet;
+	@ColumnInfo(name = "weatherProviderType")
+	private WeatherProviderType weatherProviderType;
 
 	@ColumnInfo(name = "topPriorityKma")
 	private boolean topPriorityKma;
@@ -50,6 +50,9 @@ public class DailyPushNotificationDto implements Serializable {
 
 	@ColumnInfo(name = "enabled")
 	private boolean enabled;
+
+	@ColumnInfo(name = "showAirQuality")
+	private boolean showAirQuality;
 
 	@ColumnInfo(name = "zoneId")
 	private String zoneId;
@@ -78,10 +81,13 @@ public class DailyPushNotificationDto implements Serializable {
 		this.locationType = locationType;
 	}
 
-	public void setWeatherSourceTypeSet(Set<WeatherProviderType> weatherProviderTypeSet) {
-		this.weatherProviderTypeSet = weatherProviderTypeSet;
+	public boolean isShowAirQuality() {
+		return showAirQuality;
 	}
 
+	public void setShowAirQuality(boolean showAirQuality) {
+		this.showAirQuality = showAirQuality;
+	}
 
 	public boolean isTopPriorityKma() {
 		return topPriorityKma;
@@ -139,23 +145,13 @@ public class DailyPushNotificationDto implements Serializable {
 		this.notificationType = notificationType;
 	}
 
-	public void addWeatherSourceType(WeatherProviderType newType) {
-		if (weatherProviderTypeSet == null) {
-			weatherProviderTypeSet = new HashSet<>();
-		}
-		weatherProviderTypeSet.add(newType);
+	public WeatherProviderType getWeatherProviderType() {
+		return weatherProviderType;
 	}
 
-	public void removeWeatherSourceType(WeatherProviderType removeType) {
-		weatherProviderTypeSet.remove(removeType);
-	}
 
-	public Set<WeatherProviderType> getWeatherProviderTypeSet() {
-		return weatherProviderTypeSet;
-	}
-
-	public void setWeatherProviderTypeSet(Set<WeatherProviderType> weatherProviderTypeSet) {
-		this.weatherProviderTypeSet = weatherProviderTypeSet;
+	public void setWeatherProviderType(WeatherProviderType weatherProviderType) {
+		this.weatherProviderType = weatherProviderType;
 	}
 
 	public void setAdmin(String admin) {

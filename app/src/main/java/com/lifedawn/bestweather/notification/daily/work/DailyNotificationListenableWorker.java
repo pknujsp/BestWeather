@@ -43,6 +43,7 @@ import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 
 import java.time.ZoneId;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -245,13 +246,17 @@ public class DailyNotificationListenableWorker extends ListenableWorker {
 	public void loadWeatherData(Context context, ExecutorService executorService, RemoteViews remoteViews,
 	                            DailyPushNotificationDto dailyPushNotificationDto, BackgroundWorkCallback backgroundWorkCallback) {
 		final Set<WeatherDataType> weatherDataTypeSet = viewCreator.getRequestWeatherDataTypeSet();
-		final Set<WeatherProviderType> weatherProviderTypeSet = dailyPushNotificationDto.getWeatherProviderTypeSet();
+		final Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
+
+		if (dailyPushNotificationDto.getWeatherProviderType() != null)
+			weatherProviderTypeSet.add(dailyPushNotificationDto.getWeatherProviderType());
+
+		if (dailyPushNotificationDto.isShowAirQuality())
+			weatherProviderTypeSet.add(WeatherProviderType.AQICN);
 
 		if (dailyPushNotificationDto.isTopPriorityKma() && dailyPushNotificationDto.getCountryCode().equals("KR")) {
-			if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_ONECALL)) {
-				weatherProviderTypeSet.remove(WeatherProviderType.OWM_ONECALL);
-				weatherProviderTypeSet.add(WeatherProviderType.KMA_WEB);
-			}
+			weatherProviderTypeSet.clear();
+			weatherProviderTypeSet.add(WeatherProviderType.KMA_WEB);
 		}
 
 		WeatherRequestUtil.loadWeatherData(context, executorService,
