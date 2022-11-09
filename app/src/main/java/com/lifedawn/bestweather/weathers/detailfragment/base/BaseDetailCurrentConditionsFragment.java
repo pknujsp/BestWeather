@@ -81,13 +81,14 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 
 	@Override
 	public void onDestroy() {
-		binding.conditionsGrid.removeAllViews();
 		super.onDestroy();
 	}
 
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		binding.conditionsGrid.removeAllViews();
+
 		layoutInflater = null;
 		binding = null;
 	}

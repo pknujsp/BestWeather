@@ -104,18 +104,19 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 
 	@Override
 	public void onDestroy() {
-		textColorMap.clear();
-		textColorMap = null;
 
-		textSizeMap.clear();
-		textSizeMap = null;
-		binding.forecastView.removeAllViews();
 		super.onDestroy();
 	}
 
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		textColorMap.clear();
+		textColorMap = null;
+
+		textSizeMap.clear();
+		textSizeMap = null;
+		binding.forecastView.removeAllViews();
 		binding = null;
 		asyncBinding = null;
 	}
