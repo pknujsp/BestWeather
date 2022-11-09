@@ -26,10 +26,10 @@ public abstract class WeatherRestApiDownloader {
 	private boolean responseCompleted;
 	private ZoneId zoneId;
 
-	private Map<String, String> valueMap = new ConcurrentHashMap<>();
-	private Map<RetrofitClient.ServiceType, Call<?>> callMap = new ConcurrentHashMap<>();
+	public Map<String, String> valueMap = new ConcurrentHashMap<>();
+	public Map<RetrofitClient.ServiceType, Call<?>> callMap = new ConcurrentHashMap<>();
 
-	protected Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ConcurrentHashMap<>();
+	public Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ConcurrentHashMap<>();
 
 	public WeatherRestApiDownloader() {
 	}

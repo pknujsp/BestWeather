@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onDestroy() {
 		FlickrRepository.getINSTANCE().clear();
-		WeatherFragmentViewModel.FINAL_RESPONSE_MAP.clear();
+		WeatherFragmentViewModel.clear();
 		super.onDestroy();
 	}
 

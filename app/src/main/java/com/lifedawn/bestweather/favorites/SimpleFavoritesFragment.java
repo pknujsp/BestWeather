@@ -73,8 +73,7 @@ public class SimpleFavoritesFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 		binding.progressResultView.setContentView(binding.favoriteAddressList);
 
-		binding.favoriteAddressList.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
-		binding.favoriteAddressList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+		binding.favoriteAddressList.addItemDecoration(new DividerItemDecoration(requireContext().getApplicationContext(), DividerItemDecoration.VERTICAL));
 
 		adapter.setOnClickedAddressListener(new FavoriteAddressesAdapter.OnClickedAddressListener() {
 			@Override

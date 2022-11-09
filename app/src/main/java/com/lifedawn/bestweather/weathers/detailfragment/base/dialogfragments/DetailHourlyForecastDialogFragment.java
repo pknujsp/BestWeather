@@ -44,7 +44,7 @@ public class DetailHourlyForecastDialogFragment extends BaseDetailDialogFragment
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		DetailHourlyForecastViewPagerAdapter adapter = new DetailHourlyForecastViewPagerAdapter(getContext());
+		DetailHourlyForecastViewPagerAdapter adapter = new DetailHourlyForecastViewPagerAdapter(requireContext().getApplicationContext());
 		adapter.setHourlyForecastDtoList(hourlyForecastDtoList);
 
 		binding.detailForecastViewPager.setAdapter(adapter);

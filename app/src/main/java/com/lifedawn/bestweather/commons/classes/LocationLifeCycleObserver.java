@@ -41,7 +41,7 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 	private ActivityResultCallback<ActivityResult> backgroundLocationPermissionResultCallback;
 	private ActivityResultCallback<Map<String, Boolean>> permissionResultCallback;
 
-	public LocationLifeCycleObserver(@NonNull ActivityResultRegistry mRegistry, Context context) {
+	public LocationLifeCycleObserver(@NonNull ActivityResultRegistry mRegistry, Activity activity) {
 		this.mRegistry = mRegistry;
 		this.activity = activity;
 	}

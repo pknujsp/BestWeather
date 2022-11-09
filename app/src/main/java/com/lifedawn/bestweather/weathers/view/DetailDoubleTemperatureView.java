@@ -49,13 +49,13 @@ public class DetailDoubleTemperatureView extends View {
 		tempPaint = new TextPaint();
 		tempPaint.setTextAlign(Paint.Align.CENTER);
 		tempPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, getResources().getDisplayMetrics()));
-		tempPaint.setColor(AppTheme.getTextColor(context, fragmentType));
+		tempPaint.setColor(AppTheme.getTextColor(fragmentType));
 
 		linePaint = new Paint();
 		linePaint.setAntiAlias(true);
 		linePaint.setStyle(Paint.Style.STROKE);
 		linePaint.setStrokeWidth(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.3f, getResources().getDisplayMetrics()));
-		linePaint.setColor(AppTheme.getTextColor(context, fragmentType));
+		linePaint.setColor(AppTheme.getTextColor(fragmentType));
 
 		maxCirclePaint = new Paint();
 		maxCirclePaint.setAntiAlias(true);

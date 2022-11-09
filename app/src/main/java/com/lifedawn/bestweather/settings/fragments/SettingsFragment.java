@@ -55,7 +55,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 	public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 		setPreferencesFromResource(R.xml.app_settings_main_preference, rootKey);
 
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
 		sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
 			@Override
 			public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -104,7 +104,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 										widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
 											@Override
 											public void onResultSuccessful(List<WidgetDto> result) {
-												WidgetHelper widgetHelper = new WidgetHelper(getContext());
+												WidgetHelper widgetHelper = new WidgetHelper(requireContext().getApplicationContext());
 
 												if (result.isEmpty()) {
 													widgetHelper.cancelAutoRefresh();
@@ -120,7 +120,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 										});
 
 
-										MyApplication.loadValueUnits(getContext(), true);
+										MyApplication.loadValueUnits(requireContext().getApplicationContext(), true);
 										dialog.dismiss();
 									}
 								}).create().show();
@@ -197,7 +197,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 		redrawWidgetsPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
-				WidgetHelper widgetHelper = new WidgetHelper(getActivity());
+				WidgetHelper widgetHelper = new WidgetHelper(requireContext().getApplicationContext());
 				widgetHelper.reDrawWidgets(null);
 				Toast.makeText(getContext(), R.string.pref_title_redraw_widgets, Toast.LENGTH_SHORT).show();
 				return true;

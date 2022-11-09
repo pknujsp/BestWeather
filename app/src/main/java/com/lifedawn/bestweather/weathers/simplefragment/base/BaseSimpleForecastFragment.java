@@ -83,7 +83,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 		longitude = bundle.getDouble(BundleKey.Longitude.name(), 0);
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
 
-		networkStatus = NetworkStatus.getInstance(getContext());
+		networkStatus = NetworkStatus.getInstance(requireContext().getApplicationContext());
 		weatherFragmentViewModel = new ViewModelProvider(requireParentFragment()).get(WeatherFragmentViewModel.class);
 
 	}
@@ -100,6 +100,17 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+	}
+
+	@Override
+	public void onDestroy() {
+		textColorMap.clear();
+		textColorMap = null;
+
+		textSizeMap.clear();
+		textSizeMap = null;
+		binding.forecastView.removeAllViews();
+		super.onDestroy();
 	}
 
 	@Override
@@ -155,7 +166,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 				stringBuilder.append(getString(R.string.snow)).append(" - ").append(snowUnit);
 			}
 
-			TextView textView = new TextView(getContext());
+			TextView textView = new TextView(requireContext().getApplicationContext());
 			FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 					ViewGroup.LayoutParams.WRAP_CONTENT);
 			layoutParams.gravity = Gravity.RIGHT;
@@ -193,7 +204,7 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 						" is the precipitation for the next " + hourAmount + " hours";
 			}
 
-			TextView textView = new TextView(getContext());
+			TextView textView = new TextView(requireContext().getApplicationContext());
 			FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 					ViewGroup.LayoutParams.WRAP_CONTENT);
 			layoutParams.gravity = Gravity.RIGHT;

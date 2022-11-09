@@ -64,13 +64,13 @@ public class AirQualityBarView extends View {
 
 		gradeValueIntPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		gradeValueIntPaint.setTextAlign(Paint.Align.CENTER);
-		gradeValueIntPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
+		gradeValueIntPaint.setColor(Color.BLACK);
 		gradeValueIntPaint.setTextSize(getResources().getDimension(R.dimen.gradeValueTextSizeInAirQualityBarView));
 		gradeValueIntPaint.getTextBounds(gradeValueIntStr, 0, gradeValueIntStr.length(), gradeValueIntRect);
 
 		gradeStrPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		gradeStrPaint.setTextAlign(Paint.Align.CENTER);
-		gradeStrPaint.setColor(AppTheme.getColor(context, R.attr.textColor));
+		gradeStrPaint.setColor(Color.BLACK);
 		gradeStrPaint.setTextSize(getResources().getDimension(R.dimen.gradeTextSizeInAirQualityBarView));
 		gradeStrPaint.getTextBounds(gradeStr, 0, gradeStr.length(), gradeStrRect);
 

@@ -29,7 +29,7 @@ public class WeatherSourcesFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
 	}
 
 	@Override

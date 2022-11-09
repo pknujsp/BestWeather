@@ -168,7 +168,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			if (f instanceof FindAddressFragment) {
 				clickedHeader = false;
 				if (getActivity().getCurrentFocus() != null)
-					DeviceUtils.Companion.hideKeyboard(getContext(), getActivity().getCurrentFocus().getWindowToken());
+					DeviceUtils.Companion.hideKeyboard(requireContext().getApplicationContext(), requireActivity().getCurrentFocus().getWindowToken());
 
 				binding.headerLayout.clearFocusEditText();
 				removeMarkers(MarkerType.SEARCH);
@@ -222,7 +222,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 									if (getActivity() != null) {
 										favoriteAddressDto.setId(id.intValue());
 
-										PreferenceManager.getDefaultSharedPreferences(getContext())
+										PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext())
 												.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
 														favoriteAddressDto.getId()).putString(getString(R.string.pref_key_last_selected_location_type),
 														LocationType.SelectedAddress.name()).commit();
@@ -619,7 +619,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 	private void onLongClicked(LatLng latLng) {
 		collapseAllExpandedBottomSheets();
-		Geocoding.nominatimReverseGeocoding(getContext(), latLng.latitude, latLng.longitude,
+		Geocoding.nominatimReverseGeocoding(requireContext().getApplicationContext(), latLng.latitude, latLng.longitude,
 				addressDto -> MainThreadWorker.runOnUiThread(() -> {
 					List<Geocoding.AddressDto> addresses = new ArrayList<>();
 					addresses.add(addressDto);
@@ -909,7 +909,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 	private void processIfNoLocations(@NonNull List<FavoriteAddressDto> result) {
 		final boolean haveFavorites = result.size() > 0;
-		final boolean useCurrentLocation = PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(
+		final boolean useCurrentLocation = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext()).getBoolean(
 				getString(R.string.pref_key_use_current_location), false);
 
 		if (!haveFavorites && !useCurrentLocation) {
@@ -921,7 +921,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialogInterface, int i) {
-							PreferenceManager.getDefaultSharedPreferences(getContext()).edit().putBoolean(
+							PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext()).edit().putBoolean(
 											getString(R.string.pref_key_use_current_location), true)
 									.putString(getString(R.string.pref_key_last_selected_location_type),
 											LocationType.CurrentLocation.name()).commit();

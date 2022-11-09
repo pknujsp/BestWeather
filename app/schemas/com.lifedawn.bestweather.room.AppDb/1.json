@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5b5a51fdb6981198b8a0e07629f8b042",
+    "identityHash": "ad816d670eedadf950c823d50c4ac58f",
     "entities": [
       {
         "tableName": "weather_area_code_table",
@@ -440,7 +440,7 @@
       },
       {
         "tableName": "daily_push_notifications_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `locationType` TEXT, `notificationType` TEXT, `weatherSourceTypeSet` TEXT, `topPriorityKma` INTEGER NOT NULL, `addressName` TEXT, `admin` TEXT, `latitude` REAL, `longitude` REAL, `countryCode` TEXT, `alarmClock` TEXT, `enabled` INTEGER NOT NULL, `zoneId` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `locationType` TEXT, `notificationType` TEXT, `weatherProviderType` TEXT, `topPriorityKma` INTEGER NOT NULL, `addressName` TEXT, `admin` TEXT, `latitude` REAL, `longitude` REAL, `countryCode` TEXT, `alarmClock` TEXT, `enabled` INTEGER NOT NULL, `showAirQuality` INTEGER NOT NULL, `zoneId` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -461,8 +461,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "weatherProviderTypeSet",
-            "columnName": "weatherSourceTypeSet",
+            "fieldPath": "weatherProviderType",
+            "columnName": "weatherProviderType",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -511,6 +511,12 @@
           {
             "fieldPath": "enabled",
             "columnName": "enabled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "showAirQuality",
+            "columnName": "showAirQuality",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -572,7 +578,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5b5a51fdb6981198b8a0e07629f8b042')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ad816d670eedadf950c823d50c4ac58f')"
     ]
   }
 }

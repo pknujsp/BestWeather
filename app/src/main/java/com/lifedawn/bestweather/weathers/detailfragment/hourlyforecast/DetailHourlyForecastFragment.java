@@ -28,8 +28,7 @@ public class DetailHourlyForecastFragment extends BaseDetailHourlyForecastFragme
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.toolbar.fragmentTitle.setText(R.string.detail_hourly_forecast);
-		binding.listview.setLayoutManager(new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false));
-		binding.listview.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+		binding.listview.addItemDecoration(new DividerItemDecoration(requireContext().getApplicationContext(), DividerItemDecoration.VERTICAL));
 	}
 
 	@Override

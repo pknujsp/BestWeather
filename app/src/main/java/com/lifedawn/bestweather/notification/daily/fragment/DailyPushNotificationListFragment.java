@@ -71,7 +71,7 @@ public class DailyPushNotificationListFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		repository = DailyPushNotificationRepository.getINSTANCE();
-		dailyNotificationHelper = new DailyNotificationHelper(getContext());
+		dailyNotificationHelper = new DailyNotificationHelper(requireContext().getApplicationContext());
 		dailyNotificationViewModel = new ViewModelProvider(this).get(DailyNotificationViewModel.class);
 	}
 
@@ -114,7 +114,7 @@ public class DailyPushNotificationListFragment extends Fragment {
 		});
 
 
-		adapter = new NotificationListAdapter(getContext(), new OnClickedListViewItemListener<DailyPushNotificationDto>() {
+		adapter = new NotificationListAdapter(requireContext().getApplicationContext(), new OnClickedListViewItemListener<DailyPushNotificationDto>() {
 			@Override
 			public void onClickedItem(DailyPushNotificationDto e) {
 				DailyNotificationSettingsFragment settingsFragment = new DailyNotificationSettingsFragment();

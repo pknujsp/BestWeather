@@ -421,8 +421,8 @@ public abstract class AbstractWidgetCreator {
 	}
 
 
-	protected final Bitmap drawBitmap(ViewGroup rootLayout, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, RemoteViews remoteViews,
-	                                  @Nullable Integer parentWidth, @Nullable Integer parentHeight) {
+	protected final void drawBitmap(ViewGroup rootLayout, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, RemoteViews remoteViews,
+	                                @Nullable Integer parentWidth, @Nullable Integer parentHeight) {
 		int widthSize = 0;
 		int heightSize = 0;
 
@@ -448,8 +448,7 @@ public abstract class AbstractWidgetCreator {
 			onDrawBitmapCallback.onCreatedBitmap(viewBmp);
 		}
 
-
-		return viewBmp;
+		viewBmp.recycle();
 	}
 
 	protected final Bitmap drawBitmap(ViewGroup rootLayout, RemoteViews remoteViews) {

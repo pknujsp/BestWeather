@@ -47,8 +47,8 @@ import retrofit2.Response;
 public final class FlickrRepository {
 	private static FlickrRepository INSTANCE;
 	private final ExecutorService executorService = Executors.newFixedThreadPool(4);
-	private final List<ImgRequestData> IMG_REQUEST_OBJ_SET = new CopyOnWriteArrayList<>();
-	private final Map<String, FlickrImgData> BACKGROUND_IMG_MAP = new ConcurrentHashMap<>();
+	private static final List<ImgRequestData> IMG_REQUEST_OBJ_SET = new CopyOnWriteArrayList<>();
+	private static final Map<String, FlickrImgData> BACKGROUND_IMG_MAP = new ConcurrentHashMap<>();
 
 	public static void initialize() {
 		if (INSTANCE == null) {
@@ -65,7 +65,17 @@ public final class FlickrRepository {
 
 	}
 
-	public void clear() {
+	public static void clear() {
+		for (ImgRequestData data : IMG_REQUEST_OBJ_SET) {
+			data.getPhotoInfoCall = null;
+			data.glideTarget = null;
+			data.galleryCall = null;
+		}
+
+		for (FlickrImgData data : BACKGROUND_IMG_MAP.values()) {
+			data.clear();
+		}
+
 		IMG_REQUEST_OBJ_SET.clear();
 		BACKGROUND_IMG_MAP.clear();
 	}

@@ -90,8 +90,16 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	}
 
 	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+	}
+
+	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		binding.windDirectionArrow.setImageDrawable(null);
+		binding.weatherIcon.setImageDrawable(null);
 		binding = null;
 		asyncBinding = null;
 	}

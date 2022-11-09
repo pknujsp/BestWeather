@@ -56,7 +56,7 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	@NonNull
 	@Override
 	public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-		Dialog dialog = new Dialog(getContext(), R.style.DialogTransparent);
+		Dialog dialog = new Dialog(requireContext().getApplicationContext(), R.style.DialogTransparent);
 		return dialog;
 	}
 

@@ -40,7 +40,7 @@ public class DetailDailyForecastDialogFragment extends BaseDetailDialogFragment 
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		DetailDailyForecastViewPagerAdapter adapter = new DetailDailyForecastViewPagerAdapter(getContext());
+		DetailDailyForecastViewPagerAdapter adapter = new DetailDailyForecastViewPagerAdapter(requireContext().getApplicationContext());
 		adapter.setDailyForecastDtoList(dailyForecastDtoList);
 
 		binding.detailForecastViewPager.setAdapter(adapter);

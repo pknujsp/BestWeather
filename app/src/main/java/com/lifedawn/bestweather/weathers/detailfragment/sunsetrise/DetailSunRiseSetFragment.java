@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.weathers.detailfragment.sunsetrise;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -179,10 +180,11 @@ public class DetailSunRiseSetFragment extends Fragment {
 					List<BarEntry> sunRiseSetTimeDataList = new ArrayList<>();
 					List<String> dateListForAxis = new ArrayList<>();
 					DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
+					Context context = requireContext().getApplicationContext();
 
-					final int rightColor = ContextCompat.getColor(getContext(), R.color.sunGradientStart);
-					final int leftColor = ContextCompat.getColor(getContext(), R.color.sunGradientEnd);
-					final int todayColor = ContextCompat.getColor(getContext(), android.R.color.holo_blue_bright);
+					final int rightColor = ContextCompat.getColor(context, R.color.sunGradientStart);
+					final int leftColor = ContextCompat.getColor(context, R.color.sunGradientEnd);
+					final int todayColor = ContextCompat.getColor(context, android.R.color.holo_blue_bright);
 
 					int index = 0;
 					int leftMinutes;

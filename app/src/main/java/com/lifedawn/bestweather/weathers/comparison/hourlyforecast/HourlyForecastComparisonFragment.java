@@ -90,6 +90,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 	private void setValuesToViews(HourlyForecastResponse hourlyForecastResponse) {
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
+		Context context = requireContext().getApplicationContext();
 		final List<WeatherProviderType> weatherProviderTypeList = new ArrayList<>();
 
 		List<ForecastObj<HourlyForecastDto>> kmaFinalHourlyForecasts = null;
@@ -213,8 +214,8 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		final int valueRowWidth = columnWidth * columnsCount;
 
 		//날짜, 시각, 날씨, 기온, 강수량, 강수확률
-		dateRow = new DateView(getContext(), FragmentType.Comparison, valueRowWidth, columnWidth);
-		TextsView clockRow = new TextsView(getContext(), valueRowWidth, columnWidth, hourList);
+		dateRow = new DateView(context, FragmentType.Comparison, valueRowWidth, columnWidth);
+		TextsView clockRow = new TextsView(context, valueRowWidth, columnWidth, hourList);
 		SingleWeatherIconView[] weatherIconRows = new SingleWeatherIconView[columnsCount];
 		TextsView[] tempRows = new TextsView[columnsCount];
 		IconTextView[] rainVolumeRows = new IconTextView[columnsCount];
@@ -263,29 +264,28 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				}
 			}
 
-			weatherIconRows[i] = new SingleWeatherIconView(getContext(), FragmentType.Comparison, specificRowWidth, weatherValueRowHeight,
+			weatherIconRows[i] = new SingleWeatherIconView(context, FragmentType.Comparison, specificRowWidth, weatherValueRowHeight,
 					columnWidth);
 			weatherIconRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 
-			tempRows[i] = new TextsView(getContext(), specificRowWidth, columnWidth, null);
+			tempRows[i] = new TextsView(context, specificRowWidth, columnWidth, null);
 			tempRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 
-			rainVolumeRows[i] = new IconTextView(getContext(), FragmentType.Comparison, specificRowWidth,
+			rainVolumeRows[i] = new IconTextView(context, FragmentType.Comparison, specificRowWidth,
 					columnWidth, R.drawable.raindrop);
 			rainVolumeRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 
-			probabilityOfPrecipitationRows[i] = new IconTextView(getContext(), FragmentType.Comparison,
+			probabilityOfPrecipitationRows[i] = new IconTextView(context, FragmentType.Comparison,
 					specificRowWidth, columnWidth, R.drawable.pop);
 			probabilityOfPrecipitationRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 
-			snowVolumeRows[i] = new IconTextView(getContext(), FragmentType.Comparison, specificRowWidth,
+			snowVolumeRows[i] = new IconTextView(context, FragmentType.Comparison, specificRowWidth,
 					columnWidth, R.drawable.snowparticle);
 			snowVolumeRows[i].setTag(R.id.begin_column_index, beginColumnIndex);
 		}
 
 		//날짜, 시각
 		dateRow.init(dateTimeList);
-		Context context = getContext();
 
 		final String cm = "cm";
 		final String mm = "mm";
@@ -455,7 +455,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 					logoId = R.drawable.metlogo;
 					break;
 			}
-			notScrolledViews[i] = new NotScrolledView(getContext());
+			notScrolledViews[i] = new NotScrolledView(context);
 			notScrolledViews[i].setImg(logoId);
 			notScrolledViews[i].setText(sourceName);
 
@@ -522,7 +522,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		weatherRestApiDownloader.setZoneId(zoneId);
 
 		MyApplication.getExecutorService().submit(() -> {
-			MainProcessing.requestNewWeatherData(getContext(), latitude, longitude, request, weatherRestApiDownloader);
+			MainProcessing.requestNewWeatherData(requireContext().getApplicationContext(), latitude, longitude, request, weatherRestApiDownloader);
 		});
 	}
 
@@ -538,6 +538,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> arrayMap;
 		HourlyForecastResponse hourlyForecastResponse = new HourlyForecastResponse();
+		Context context = requireContext().getApplicationContext();
 
 		//kma api
 		if (responseMap.containsKey(WeatherProviderType.KMA_API)) {
@@ -554,7 +555,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 						(VilageFcstResponse) vilageFcstResponse.getResponseObj();
 
 				hourlyForecastResponse.kmaSuccessful = true;
-				hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.makeHourlyForecastDtoListOfXML(getContext(), KmaResponseProcessor.getFinalHourlyForecastListByXML(ultraSrtFcstRoot,
+				hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.makeHourlyForecastDtoListOfXML(context, KmaResponseProcessor.getFinalHourlyForecastListByXML(ultraSrtFcstRoot,
 						vilageFcstRoot), latitude, longitude);
 			} else {
 				if (!ultraSrtFcstResponse.isSuccessful()) {
@@ -575,7 +576,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				List<KmaHourlyForecast> kmaHourlyForecasts = (List<KmaHourlyForecast>) objects[0];
 
 				hourlyForecastResponse.kmaSuccessful = true;
-				hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.makeHourlyForecastDtoListOfWEB(getContext(),
+				hourlyForecastResponse.kmaHourlyForecastList = KmaResponseProcessor.makeHourlyForecastDtoListOfWEB(context,
 						kmaHourlyForecasts, latitude, longitude);
 			} else {
 				hourlyForecastResponse.kmaThrowable = forecastsResponseResult.getT();
@@ -594,7 +595,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 						(AccuHourlyForecastsResponse) accuHourlyForecastResponse.getResponseObj();
 
 				hourlyForecastResponse.accuSuccessful = true;
-				hourlyForecastResponse.accuHourlyForecastList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(getContext(),
+				hourlyForecastResponse.accuHourlyForecastList = AccuWeatherResponseProcessor.makeHourlyForecastDtoList(context,
 						hourlyForecastsResponse.getItems());
 			} else {
 				hourlyForecastResponse.accuThrowable = accuHourlyForecastResponse.getT();
@@ -607,7 +608,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.owmSuccessful = true;
-				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(getContext(),
+				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(context,
 						(OwmOneCallResponse) responseResult.getResponseObj(), zoneId);
 			} else {
 				hourlyForecastResponse.owmThrowable = responseResult.getT();
@@ -620,7 +621,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.owmSuccessful = true;
-				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(getContext(),
+				hourlyForecastResponse.owmHourlyForecastList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(context,
 						(OwmHourlyForecastResponse) responseResult.getResponseObj(), zoneId);
 			} else {
 				hourlyForecastResponse.owmThrowable = responseResult.getT();
@@ -634,7 +635,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 			if (responseResult.isSuccessful()) {
 				hourlyForecastResponse.metNorwaySuccessful = true;
-				hourlyForecastResponse.metNorwayHourlyForecastList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(getContext(),
+				hourlyForecastResponse.metNorwayHourlyForecastList = MetNorwayResponseProcessor.makeHourlyForecastDtoList(context,
 						(LocationForecastResponse) responseResult.getResponseObj(), zoneId);
 			} else {
 				hourlyForecastResponse.metNorwayThrowable = responseResult.getT();

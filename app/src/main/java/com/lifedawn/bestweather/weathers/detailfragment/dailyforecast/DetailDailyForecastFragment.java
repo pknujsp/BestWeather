@@ -31,7 +31,7 @@ public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		binding.toolbar.fragmentTitle.setText(R.string.detail_daily_forecast);
-		binding.listview.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+		binding.listview.addItemDecoration(new DividerItemDecoration(requireContext().getApplicationContext(), DividerItemDecoration.VERTICAL));
 	}
 
 

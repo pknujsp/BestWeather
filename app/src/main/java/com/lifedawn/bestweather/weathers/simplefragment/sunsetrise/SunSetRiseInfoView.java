@@ -2,6 +2,7 @@ package com.lifedawn.bestweather.weathers.simplefragment.sunsetrise;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -54,11 +55,11 @@ public class SunSetRiseInfoView extends View {
 
 		typeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		typeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 15f, getResources().getDisplayMetrics()));
-		typeTextPaint.setColor(AppTheme.getColor(getContext(), R.attr.textColorInWeatherCard));
+		typeTextPaint.setColor(Color.WHITE);
 
 		timeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		timeTextPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, getResources().getDisplayMetrics()));
-		timeTextPaint.setColor(AppTheme.getColor(getContext(), R.attr.textColorInWeatherCard));
+		timeTextPaint.setColor(Color.WHITE);
 
 		typeTextRect = new Rect();
 		timeTextRect = new Rect();

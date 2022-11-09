@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.weathers.detailfragment.aqicn;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -104,10 +105,11 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		longitude = bundle.getDouble(BundleKey.Longitude.name());
 
 		clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit();
+		Context context = requireContext().getApplicationContext();
 
-		pm10LineColor = ContextCompat.getColor(getContext(), R.color.pm10LineColor);
-		pm25LineColor = ContextCompat.getColor(getContext(), R.color.pm25LineColor);
-		o3LineColor = ContextCompat.getColor(getContext(), R.color.o3LineColor);
+		pm10LineColor = ContextCompat.getColor(context, R.color.pm10LineColor);
+		pm25LineColor = ContextCompat.getColor(context, R.color.pm25LineColor);
+		o3LineColor = ContextCompat.getColor(context, R.color.o3LineColor);
 	}
 
 	@Override
@@ -476,7 +478,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 			public void run() {
 				final int cellWidth = (int) getResources().getDimension(R.dimen.minColumnWidthInAirQualityBarView);
 				final int viewWidth = cellWidth * dateList.size();
-				TextsView dateView = new TextsView(getContext(), viewWidth, cellWidth, dateList);
+				TextsView dateView = new TextsView(requireContext().getApplicationContext(), viewWidth, cellWidth, dateList);
 				dateView.setValueTextSize(14);
 				dateView.setValueTextColor(Color.BLACK);
 
@@ -608,11 +610,11 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		View gridItem = getLayoutInflater().inflate(R.layout.air_quality_item, null);
 		((ImageView) gridItem.findViewById(R.id.label_icon)).setImageResource(labelIconId);
 		((TextView) gridItem.findViewById(R.id.label)).setText(labelDescriptionId);
-		((TextView) gridItem.findViewById(R.id.label)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Detail));
+		((TextView) gridItem.findViewById(R.id.label)).setTextColor(Color.BLACK);
 		((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
-		((TextView) gridItem.findViewById(R.id.value_int)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Detail));
+		((TextView) gridItem.findViewById(R.id.value_int)).setTextColor(Color.BLACK);
 		((TextView) gridItem.findViewById(R.id.value_str)).setText(value == null ? getString(R.string.noData) : AqicnResponseProcessor.getGradeDescription(value));
-		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(value == null ? ContextCompat.getColor(getContext(), R.color.not_data_color)
+		((TextView) gridItem.findViewById(R.id.value_str)).setTextColor(value == null ? ContextCompat.getColor(requireContext().getApplicationContext(), R.color.not_data_color)
 				: AqicnResponseProcessor.getGradeColorId(value));
 
 		int cellCount = binding.grid.getChildCount();
@@ -642,7 +644,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 		for (int i = 0; i < icons.length; i++) {
 			infoItem = layoutInflater.inflate(R.layout.air_pollution_material_info_item_view, null);
-			((ImageView) infoItem.findViewById(R.id.material_icon)).setImageDrawable(ContextCompat.getDrawable(getContext(), icons[i]));
+			((ImageView) infoItem.findViewById(R.id.material_icon)).setImageDrawable(ContextCompat.getDrawable(requireContext().getApplicationContext(), icons[i]));
 			((TextView) infoItem.findViewById(R.id.material_name)).setText(names[i]);
 			((TextView) infoItem.findViewById(R.id.material_description)).setText(descriptions[i]);
 

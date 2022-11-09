@@ -74,7 +74,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
 
 		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 		windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
@@ -181,7 +181,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		@Override
 		public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
 			return new ViewHolder(
-					ViewDetailHourlyForecastListBinding.inflate(LayoutInflater.from(parent.getContext())));
+					ViewDetailHourlyForecastListBinding.inflate(LayoutInflater.from(parent.getContext().getApplicationContext())));
 		}
 
 		@Override
@@ -192,7 +192,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		@Override
 		public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
 			super.onViewDetachedFromWindow(holder);
-			Glide.with(holder.itemView.getContext()).clear(holder.binding.weatherIcon);
+			Glide.with(holder.itemView.getContext().getApplicationContext()).clear(holder.binding.weatherIcon);
 		}
 
 		@Override
@@ -305,7 +305,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		@Override
 		public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
 			return new ViewHolder(ViewDetailDailyForecastListBinding.
-					inflate(LayoutInflater.from(parent.getContext()), parent, false));
+					inflate(LayoutInflater.from(parent.getContext().getApplicationContext()), parent, false));
 		}
 
 		@Override
@@ -317,7 +317,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		@Override
 		public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
 			super.onViewDetachedFromWindow(holder);
-			Context context = holder.binding.getRoot().getContext();
+			Context context = holder.binding.getRoot().getContext().getApplicationContext();
 
 			Glide.with(context).clear(holder.binding.leftWeatherIcon);
 			Glide.with(context).clear(holder.binding.rightWeatherIcon);

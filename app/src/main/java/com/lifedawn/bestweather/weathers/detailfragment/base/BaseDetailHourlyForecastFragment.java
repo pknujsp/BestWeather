@@ -38,7 +38,7 @@ public class BaseDetailHourlyForecastFragment extends BaseDetailForecastFragment
 			@Override
 			public void onClick(View v) {
 				final CharSequence[] items = getResources().getTextArray(R.array.DetailHourlyForecastShowDataType);
-				SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+				SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
 				final int selectedItem = sharedPreferences.getInt(getString(R.string.pref_key_detail_hourly_forecast_show_data), 0);
 
 				new MaterialAlertDialogBuilder(getActivity())

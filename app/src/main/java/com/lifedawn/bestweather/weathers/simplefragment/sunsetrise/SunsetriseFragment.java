@@ -44,12 +44,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues, Asyn
 	private ZoneId zoneId;
 	private Bundle bundle;
 	private boolean registeredReceiver = false;
-	private OnSunRiseSetListener onSunRiseSetListener;
 	private WeatherFragmentViewModel weatherFragmentViewModel;
-
-	public void setOnSunRiseSetListener(OnSunRiseSetListener onSunRiseSetListener) {
-		this.onSunRiseSetListener = onSunRiseSetListener;
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -139,7 +134,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues, Asyn
 					detailSunRiseSetFragment, tag).addToBackStack(tag).commit();
 		});
 
-		sunSetRiseViewGroup = new SunSetRiseViewGroup(getContext(), location, zoneId, (calcSuccessful, night) -> {
+		sunSetRiseViewGroup = new SunSetRiseViewGroup(requireContext().getApplicationContext(), location, zoneId, (calcSuccessful, night) -> {
 			if (calcSuccessful) {
 				if (!registeredReceiver) {
 					registeredReceiver = true;

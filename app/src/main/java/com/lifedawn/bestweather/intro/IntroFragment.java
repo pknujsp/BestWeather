@@ -153,7 +153,7 @@ public class IntroFragment extends Fragment {
 		@Override
 		public void onSuccessful(LocationResult locationResult) {
 			//현재 위치 파악 성공
-			PreferenceManager.getDefaultSharedPreferences(getContext())
+			PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext())
 					.edit().putBoolean(getString(R.string.pref_key_show_intro), false).commit();
 
 			ProgressDialog.clearDialogs();

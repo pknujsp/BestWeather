@@ -173,7 +173,7 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 
 			List<AirQualityDto.DailyForecast> forecastList = airQualityDto.getDailyForecastList();
-			final int textColor = AppTheme.getColor(requireContext(), R.attr.textColorInWeatherCard);
+			final int textColor =Color.WHITE;
 
 			LayoutInflater layoutInflater = LayoutInflater.from(requireContext());
 			View labelView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
@@ -211,24 +211,26 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 
 				((TextView) forecastItemView.findViewById(R.id.pm10)).setText(grade == -1
 						? noData : AqicnResponseProcessor.getGradeDescription(grade));
-				((TextView) forecastItemView.findViewById(R.id.pm10)).setTextColor(grade == -1 ? ContextCompat.getColor(getContext(),
+				((TextView) forecastItemView.findViewById(R.id.pm10)).setTextColor(grade == -1 ? ContextCompat.getColor(requireContext().getApplicationContext(),
 						R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(grade));
 
 				/*
 				((TextView) forecastItemView.findViewById(R.id.pm25)).setText(
 						!forecastObj.isHasPm25() ? noData : AqicnResponseProcessor.getGradeDescription(forecastObj.getPm25().getAvg()));
 				((TextView) forecastItemView.findViewById(R.id.pm25)).setTextColor(!forecastObj.isHasPm25() ?
-						ContextCompat.getColor(getContext(),
+						ContextCompat.getColor(requireContext().getApplicationContext(),
 								R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.getPm25().getAvg()));
 
 				((TextView) forecastItemView.findViewById(R.id.o3)).setText(
 						!forecastObj.isHasO3() ? noData : AqicnResponseProcessor.getGradeDescription(forecastObj.getO3().getAvg()));
 				((TextView) forecastItemView.findViewById(R.id.o3)).setTextColor(!forecastObj.isHasO3() ?
-						ContextCompat.getColor(getContext(),
+						ContextCompat.getColor(requireContext().getApplicationContext(),
 								R.color.not_data_color) : AqicnResponseProcessor.getGradeColorId(forecastObj.getO3().getAvg()));
 				 */
 				binding.forecast.addView(forecastItemView);
 			}
+
+			layoutInflater = null;
 		}
 
 
@@ -238,11 +240,11 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 		final AirQualityItemBinding itemBinding = AirQualityItemBinding.inflate(getLayoutInflater());
 		itemBinding.labelIcon.setVisibility(View.GONE);
 		itemBinding.label.setText(labelDescriptionId);
-		itemBinding.label.setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
+		itemBinding.label.setTextColor(Color.WHITE);
 		itemBinding.valueInt.setVisibility(View.GONE);
 
 		//((TextView) gridItem.findViewById(R.id.value_int)).setText(value == null ? "?" : value.toString());
-		//((TextView) gridItem.findViewById(R.id.value_int)).setTextColor(AppTheme.getTextColor(getContext(), FragmentType.Simple));
+		//((TextView) gridItem.findViewById(R.id.value_int)).setTextColor(AppTheme.getTextColor(requireContext().getApplicationContext(), FragmentType.Simple));
 		itemBinding.valueStr.setText(
 				value == null ? getString(R.string.noData) : AqicnResponseProcessor.getGradeDescription(value));
 		itemBinding.valueStr.setTextColor(

@@ -37,7 +37,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 	@Override
 	public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
 		setPreferencesFromResource(R.xml.unit_preference, rootKey);
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
 		initPreferences();
 	}
 
@@ -50,7 +50,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		//좌측 여백 없애기 :  app:iconSpaceReserved="false"
 		PreferenceScreen preferenceScreen = getPreferenceManager().getPreferenceScreen();
 		//기온
-		tempPreference = new UnitPreference(getContext());
+		tempPreference = new UnitPreference(requireContext().getApplicationContext());
 		tempPreference.setKey(getString(R.string.pref_key_unit_temp));
 		tempPreference.setTitle(R.string.pref_title_unit_temp);
 		tempPreference.setUnit(ValueUnits.valueOf(sharedPreferences.getString(getString(R.string.pref_key_unit_temp), "")));
@@ -79,7 +79,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 												break;
 											//fahrenheit
 										}
-										MyApplication.loadValueUnits(getContext(), true);
+										MyApplication.loadValueUnits(requireContext().getApplicationContext(), true);
 
 										dialog.dismiss();
 									}
@@ -91,7 +91,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		preferenceScreen.addPreference(tempPreference);
 
 		//바람
-		windPreference = new UnitPreference(getContext());
+		windPreference = new UnitPreference(requireContext().getApplicationContext());
 		windPreference.setKey(getString(R.string.pref_key_unit_wind));
 		windPreference.setTitle(R.string.pref_title_unit_wind);
 		windPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
@@ -101,7 +101,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		windPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
 			@Override
 			public boolean onPreferenceClick(Preference preference) {
-				new MaterialAlertDialogBuilder(getActivity()).setTitle(getString(R.string.pref_title_unit_wind))
+				new MaterialAlertDialogBuilder(requireActivity()).setTitle(getString(R.string.pref_title_unit_wind))
 						.setSingleChoiceItems(getList(windPreference), getCheckedItem(ValueType.wind, windPreference.getKey()),
 								new DialogInterface.OnClickListener() {
 									@Override
@@ -120,7 +120,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 												break;
 											//kmPerHour
 										}
-										MyApplication.loadValueUnits(getContext(), true);
+										MyApplication.loadValueUnits(requireContext().getApplicationContext(), true);
 
 										dialog.dismiss();
 									}
@@ -132,7 +132,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		preferenceScreen.addPreference(windPreference);
 
 		//시정거리
-		visibilityPreference = new UnitPreference(getContext());
+		visibilityPreference = new UnitPreference(requireContext().getApplicationContext());
 		visibilityPreference.setKey(getString(R.string.pref_key_unit_visibility));
 		visibilityPreference.setTitle(R.string.pref_title_unit_visibility);
 		visibilityPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
@@ -161,7 +161,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 												break;
 											//mile
 										}
-										MyApplication.loadValueUnits(getContext(), true);
+										MyApplication.loadValueUnits(requireContext().getApplicationContext(), true);
 
 										dialog.dismiss();
 									}
@@ -173,7 +173,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 		preferenceScreen.addPreference(visibilityPreference);
 
 		//시간제
-		clockPreference = new UnitPreference(getContext());
+		clockPreference = new UnitPreference(requireContext().getApplicationContext());
 		clockPreference.setKey(getString(R.string.pref_key_unit_clock));
 		clockPreference.setTitle(R.string.pref_title_unit_clock);
 		clockPreference.setWidgetLayoutResource(R.layout.custom_preference_layout);
@@ -202,7 +202,7 @@ public class UnitsFragment extends PreferenceFragmentCompat {
 												break;
 											//24
 										}
-										MyApplication.loadValueUnits(getContext(), true);
+										MyApplication.loadValueUnits(requireContext().getApplicationContext(), true);
 
 										dialog.dismiss();
 									}

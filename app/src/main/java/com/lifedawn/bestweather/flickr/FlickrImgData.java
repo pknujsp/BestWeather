@@ -54,6 +54,16 @@ public class FlickrImgData implements Serializable {
 		return this;
 	}
 
+	public void clear() {
+		img.recycle();
+		img = null;
+
+		weather = null;
+		time = null;
+		volume = null;
+		photo = null;
+	}
+
 	public String getRealFlickrUrl() {
 		return "https://www.flickr.com/photos/" + photo.getOwner() + "/" + photo.getId();
 	}

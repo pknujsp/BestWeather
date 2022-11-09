@@ -29,6 +29,7 @@
         android:orientation="vertical"
         android:overScrollMode="never"
         android:visibility="visible"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/favorite_address_item"
         />
 

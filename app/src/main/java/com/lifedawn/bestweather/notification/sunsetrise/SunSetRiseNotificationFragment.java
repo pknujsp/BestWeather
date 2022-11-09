@@ -55,7 +55,7 @@ public class SunSetRiseNotificationFragment extends Fragment {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (!init) {
-					SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+					SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
 					sharedPreferences.edit().putBoolean(getString(R.string.pref_key_sun_rise_notification), isChecked).commit();
 				} else {
 					init = false;
@@ -69,7 +69,7 @@ public class SunSetRiseNotificationFragment extends Fragment {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (!init) {
-					SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+					SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
 					sharedPreferences.edit().putBoolean(getString(R.string.pref_key_sun_set_notification), isChecked).commit();
 				} else {
 					init = false;

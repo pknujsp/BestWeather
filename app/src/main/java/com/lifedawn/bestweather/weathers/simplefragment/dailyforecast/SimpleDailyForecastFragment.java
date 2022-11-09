@@ -109,7 +109,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 		// 날짜 ,낮과 밤의 날씨상태, 강수확률, 강우량, 강설량, 최저/최고 기온
 
 		MyApplication.getExecutorService().submit(() -> {
-			Context context = getContext();
+			Context context = requireContext().getApplicationContext();
 
 			final int WEATHER_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 			final int TEMP_ROW_HEIGHT = (int) context.getResources().getDimension(R.dimen.doubleTemperatureRowHeightInSC);
@@ -227,7 +227,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			snowVolumeRow.setValueList(snowVolumeList);
 
 			TextsView dateRow = new TextsView(context, VIEW_WIDTH, COLUMN_WIDTH, dateList);
-			DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(getContext(), FragmentType.Simple, VIEW_WIDTH,
+			DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(requireContext().getApplicationContext(), FragmentType.Simple, VIEW_WIDTH,
 					TEMP_ROW_HEIGHT, COLUMN_WIDTH, minTempList, maxTempList);
 
 			LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,

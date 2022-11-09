@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.TypedValue;
@@ -50,7 +49,7 @@ public class IconTextView extends View {
 		valueTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		valueTextPaint.setTextAlign(Paint.Align.CENTER);
 		valueTextPaint.setTextSize(context.getResources().getDimension(R.dimen.iconValueTextSizeInSCD));
-		valueTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
+		valueTextPaint.setColor(AppTheme.getTextColor(fragmentType));
 		valueTextPaint.setTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
 
 		icon = ContextCompat.getDrawable(context, iconId);

@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.alert;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -91,9 +92,11 @@ public class AlertFragment extends Fragment {
 				ViewGroup.LayoutParams.WRAP_CONTENT);
 		layoutParams.topMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, getResources().getDisplayMetrics());
 
+		Context context = requireContext().getApplicationContext();
+
 		for (BtnObj btnObj : btnObjList) {
-			Button button = new Button(getContext());
-			button.setBackground(ContextCompat.getDrawable(getContext(), R.drawable.rounded_btn_background));
+			Button button = new Button(context);
+			button.setBackground(ContextCompat.getDrawable(context, R.drawable.rounded_btn_background));
 			button.setTextColor(Color.WHITE);
 			button.setLayoutParams(layoutParams);
 			button.setText(btnObj.text);

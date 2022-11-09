@@ -98,19 +98,19 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 		binding.toolbar.backBtn.setOnClickListener(v -> getParentFragmentManager().popBackStackImmediate());
 		binding.toolbar.fragmentTitle.setText(R.string.always_notification);
-		if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_met), true)) {
+		if (PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext()).getBoolean(getString(R.string.pref_key_met), true)) {
 			binding.commons.metNorwayRadio.setChecked(true);
 		} else {
 			binding.commons.owmRadio.setChecked(true);
 		}
 
-		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.AutoRefreshIntervals));
+		SpinnerAdapter spinnerAdapter = new ArrayAdapter<String>(requireContext().getApplicationContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.AutoRefreshIntervals));
 		binding.commons.autoRefreshIntervalSpinner.setAdapter(spinnerAdapter);
 
-		binding.dataTypeOfIconSpinner.setAdapter(new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1,
+		binding.dataTypeOfIconSpinner.setAdapter(new ArrayAdapter<String>(requireContext().getApplicationContext(), android.R.layout.simple_list_item_1,
 				getResources().getStringArray(R.array.DataTypeOfIcons)));
 
-		if (PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_met), true)) {
+		if (PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext()).getBoolean(getString(R.string.pref_key_met), true)) {
 			binding.commons.metNorwayRadio.setChecked(true);
 		} else {
 			binding.commons.owmRadio.setChecked(true);
@@ -373,7 +373,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 		OngoingNotificationDto defaultDto = new OngoingNotiDtoOngoing();
 		defaultDto.setLocationType(LocationType.CurrentLocation);
 		defaultDto.setOn(true);
-		defaultDto.setWeatherSourceType(PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(getString(R.string.pref_key_met), true) ? WeatherProviderType.MET_NORWAY : WeatherProviderType.OWM_ONECALL);
+		defaultDto.setWeatherSourceType(PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext()).getBoolean(getString(R.string.pref_key_met), true) ? WeatherProviderType.MET_NORWAY : WeatherProviderType.OWM_ONECALL);
 		defaultDto.setTopPriorityKma(false);
 		defaultDto.setUpdateIntervalMillis(0);
 		defaultDto.setDataTypeOfIcon(WidgetNotiConstants.DataTypeOfIcon.TEMPERATURE);

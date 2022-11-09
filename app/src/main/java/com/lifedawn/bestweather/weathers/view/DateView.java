@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.weathers.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.TypedValue;
@@ -42,7 +41,7 @@ public class DateView extends View {
 		dateTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 		dateTextPaint.setTextAlign(Paint.Align.CENTER);
 		dateTextPaint.setTextSize(context.getResources().getDimension(R.dimen.dateValueTextSizeInSCD));
-		dateTextPaint.setColor(AppTheme.getTextColor(context, fragmentType));
+		dateTextPaint.setColor(AppTheme.getTextColor(fragmentType));
 
 		setWillNotDraw(false);
 	}

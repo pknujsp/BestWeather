@@ -1,6 +1,8 @@
 package com.lifedawn.bestweather.weathers.simplefragment.hourlyforecast;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -120,7 +122,7 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 	@Override
 	public void setValuesToViews() {
 		MyApplication.getExecutorService().submit(() -> {
-			Context context = getContext();
+			Context context = requireContext().getApplicationContext();
 
 			final int weatherRowHeight = (int) context.getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
 			final int columnCount = hourlyForecastDtoList.size();

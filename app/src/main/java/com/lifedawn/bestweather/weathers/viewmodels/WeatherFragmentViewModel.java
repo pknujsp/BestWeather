@@ -111,6 +111,26 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 	@Override
 	protected void onCleared() {
 		super.onCleared();
+
+	}
+
+	public static void clear() {
+		for (WeatherFragment.WeatherResponseObj v : FINAL_RESPONSE_MAP.values()) {
+			v.dataDownloadedDateTime = null;
+			v.requestMainWeatherProviderType = null;
+			v.weatherRestApiDownloader.responseMap.clear();
+			v.weatherRestApiDownloader.responseMap = null;
+			v.weatherRestApiDownloader.callMap.clear();
+			v.weatherRestApiDownloader.callMap = null;
+			v.weatherRestApiDownloader.valueMap.clear();
+			v.weatherRestApiDownloader.valueMap = null;
+			v.weatherRestApiDownloader = null;
+
+			v.requestWeatherProviderTypeSet.clear();
+			v.requestWeatherProviderTypeSet = null;
+		}
+
+		FINAL_RESPONSE_MAP.clear();
 	}
 
 	public void requestNewData() {

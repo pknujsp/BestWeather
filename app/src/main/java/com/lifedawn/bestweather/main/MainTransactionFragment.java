@@ -220,7 +220,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
 		initViewModel = new ViewModelProvider(requireActivity()).get(InitViewModel.class);
 		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
 		weatherViewModel.setLocationCallback(new FusedLocation.MyLocationCallback() {

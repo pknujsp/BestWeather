@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.theme;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.TypedValue;
 
 import com.lifedawn.bestweather.R;
@@ -13,17 +14,15 @@ public class AppTheme {
 		return value.data;
 	}
 
-	public static int getTextColor(Context context, FragmentType fragmentType) {
-		TypedValue value = new TypedValue();
+	public static int getTextColor(FragmentType fragmentType) {
+
 		switch (fragmentType) {
-			case Simple:
-				context.getTheme().resolveAttribute(R.attr.textColorInWeatherCard, value, true);
-				break;
 			case Detail:
 			case Comparison:
-				context.getTheme().resolveAttribute(R.attr.textColor, value, true);
-				break;
+				return Color.BLACK;
+			default:
+				return Color.WHITE;
 		}
-		return value.data;
+
 	}
 }

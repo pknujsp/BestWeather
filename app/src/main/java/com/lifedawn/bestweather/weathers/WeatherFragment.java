@@ -576,7 +576,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 
 	private void requestAddressOfLocation(Double latitude, Double longitude, boolean refresh) {
-		Geocoding.nominatimReverseGeocoding(getContext(), latitude, longitude, address -> {
+		Geocoding.nominatimReverseGeocoding(requireContext().getApplicationContext(), latitude, longitude, address -> {
 			if (getActivity() != null) {
 				weatherFragmentViewModel.addressName = address.displayName;
 				weatherFragmentViewModel.mainWeatherProviderType = weatherFragmentViewModel.getMainWeatherSourceType(address.countryCode);
@@ -977,9 +977,9 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	}
 
 	public static final class WeatherResponseObj implements Serializable {
-		public final WeatherRestApiDownloader weatherRestApiDownloader;
-		public final Set<WeatherProviderType> requestWeatherProviderTypeSet;
-		public final WeatherProviderType requestMainWeatherProviderType;
+		public WeatherRestApiDownloader weatherRestApiDownloader;
+		public Set<WeatherProviderType> requestWeatherProviderTypeSet;
+		public WeatherProviderType requestMainWeatherProviderType;
 		public LocalDateTime dataDownloadedDateTime;
 
 		public WeatherResponseObj(WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherProviderType> requestWeatherProviderTypeSet, WeatherProviderType requestMainWeatherProviderType) {

@@ -100,7 +100,7 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 
 		if (currentConditionsDto.getYesterdayTemp() != null) {
 			binding.tempDescription.setText(WeatherUtil.makeTempCompareToYesterdayText(currentConditionsDto.getTemp(),
-					currentConditionsDto.getYesterdayTemp(), tempUnit, getContext()));
+					currentConditionsDto.getYesterdayTemp(), tempUnit, requireContext().getApplicationContext()));
 			binding.tempDescription.setVisibility(View.VISIBLE);
 		} else {
 			binding.tempDescription.setVisibility(View.GONE);
