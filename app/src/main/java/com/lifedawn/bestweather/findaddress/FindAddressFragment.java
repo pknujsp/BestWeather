@@ -124,7 +124,7 @@ public class FindAddressFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = FragmentFindAddressBinding.inflate(inflater);
+		binding = FragmentFindAddressBinding.inflate(inflater, container, false);
 		return binding.getRoot();
 	}
 

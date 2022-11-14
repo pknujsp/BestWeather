@@ -76,8 +76,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class WeatherFragmentViewModel extends AndroidViewModel implements WeatherFragment.OnResumeFragment {
-	public static final Map<String, WeatherFragment.WeatherResponseObj> FINAL_RESPONSE_MAP = new ConcurrentHashMap<>();
-
+	public static final ConcurrentHashMap<String, WeatherFragment.WeatherResponseObj> FINAL_RESPONSE_MAP = new ConcurrentHashMap<>();
 	public final MutableLiveData<Boolean> resumedFragmentObserver = new MutableLiveData<>();
 
 	public DateTimeFormatter dateTimeFormatter;
@@ -99,8 +98,8 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 	public Bundle arguments;
 
 	private final int FRAGMENT_TOTAL_COUNTS = 7;
-	public AtomicBoolean needDrawFragments = new AtomicBoolean(true);
-	private AtomicInteger resumedFragmentCount = new AtomicInteger(0);
+	public final AtomicBoolean needDrawFragments = new AtomicBoolean(true);
+	private final AtomicInteger resumedFragmentCount = new AtomicInteger(0);
 
 	public final MutableLiveData<WeatherFragment.ResponseResultObj> weatherDataResponse = new MutableLiveData<>();
 
@@ -111,23 +110,22 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 	@Override
 	protected void onCleared() {
 		super.onCleared();
-
 	}
 
 	public static void clear() {
 		for (WeatherFragment.WeatherResponseObj v : FINAL_RESPONSE_MAP.values()) {
 			v.dataDownloadedDateTime = null;
 			v.requestMainWeatherProviderType = null;
+
 			v.weatherRestApiDownloader.responseMap.clear();
-			v.weatherRestApiDownloader.responseMap = null;
+
 			v.weatherRestApiDownloader.callMap.clear();
-			v.weatherRestApiDownloader.callMap = null;
+
 			v.weatherRestApiDownloader.valueMap.clear();
-			v.weatherRestApiDownloader.valueMap = null;
-			v.weatherRestApiDownloader = null;
 
 			v.requestWeatherProviderTypeSet.clear();
-			v.requestWeatherProviderTypeSet = null;
+			v.weatherRestApiDownloader = null;
+
 		}
 
 		FINAL_RESPONSE_MAP.clear();
@@ -399,17 +397,17 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 			arrayMap = responseMap.get(WeatherProviderType.KMA_API);
 
 			FinalCurrentConditions finalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditionsByXML(
-					(VilageFcstResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST)).getResponseObj());
+					(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST).getResponseObj());
 			FinalCurrentConditions yesterDayFinalCurrentConditions = KmaResponseProcessor.getFinalCurrentConditionsByXML(
-					(VilageFcstResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_YESTERDAY_ULTRA_SRT_NCST)).getResponseObj());
+					(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.KMA_YESTERDAY_ULTRA_SRT_NCST).getResponseObj());
 
 			List<FinalHourlyForecast> finalHourlyForecastList = KmaResponseProcessor.getFinalHourlyForecastListByXML(
-					(VilageFcstResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST)).getResponseObj(),
-					(VilageFcstResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST)).getResponseObj());
+					(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).getResponseObj(),
+					(VilageFcstResponse) arrayMap.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST).getResponseObj());
 
 			List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastListByXML(
-					(MidLandFcstResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_MID_LAND_FCST)).getResponseObj(),
-					(MidTaResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_MID_TA_FCST)).getResponseObj(),
+					(MidLandFcstResponse) arrayMap.get(RetrofitClient.ServiceType.KMA_MID_LAND_FCST).getResponseObj(),
+					(MidTaResponse) arrayMap.get(RetrofitClient.ServiceType.KMA_MID_TA_FCST).getResponseObj(),
 					Long.parseLong(weatherRestApiDownloader.get("tmFc")));
 
 			finalDailyForecastList = KmaResponseProcessor.getDailyForecastListByXML(finalDailyForecastList, finalHourlyForecastList);
@@ -433,8 +431,8 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.KMA_WEB)) {
 			arrayMap = responseMap.get(WeatherProviderType.KMA_WEB);
 
-			KmaCurrentConditions kmaCurrentConditions = (KmaCurrentConditions) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS)).getResponseObj();
-			Object[] forecasts = (Object[]) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS)).getResponseObj();
+			KmaCurrentConditions kmaCurrentConditions = (KmaCurrentConditions) arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS).getResponseObj();
+			Object[] forecasts = (Object[]) arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS).getResponseObj();
 
 			ArrayList<KmaHourlyForecast> kmaHourlyForecasts = (ArrayList<KmaHourlyForecast>) forecasts[0];
 			ArrayList<KmaDailyForecast> kmaDailyForecasts = (ArrayList<KmaDailyForecast>) forecasts[1];
@@ -456,13 +454,13 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 			arrayMap = responseMap.get(WeatherProviderType.ACCU_WEATHER);
 
 			AccuCurrentConditionsResponse accuCurrentConditionsResponse =
-					(AccuCurrentConditionsResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS)).getResponseObj();
+					(AccuCurrentConditionsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponseObj();
 
 			AccuHourlyForecastsResponse accuHourlyForecastsResponse =
-					(AccuHourlyForecastsResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST)).getResponseObj();
+					(AccuHourlyForecastsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST).getResponseObj();
 
 			AccuDailyForecastsResponse accuDailyForecastsResponse =
-					(AccuDailyForecastsResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST)).getResponseObj();
+					(AccuDailyForecastsResponse) arrayMap.get(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST).getResponseObj();
 
 			currentConditionsDto = AccuWeatherResponseProcessor.makeCurrentConditionsDto(context, accuCurrentConditionsResponse.getItems().get(0)
 			);
@@ -480,7 +478,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 			arrayMap = responseMap.get(WeatherProviderType.OWM_ONECALL);
 
 			OwmOneCallResponse owmOneCallResponse =
-					(OwmOneCallResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL)).getResponseObj();
+					(OwmOneCallResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponseObj();
 
 			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(context, owmOneCallResponse, zoneId
 			);
@@ -499,11 +497,11 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 			arrayMap = responseMap.get(WeatherProviderType.OWM_INDIVIDUAL);
 
 			OwmCurrentConditionsResponse owmCurrentConditionsResponse =
-					(OwmCurrentConditionsResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS)).getResponseObj();
+					(OwmCurrentConditionsResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS).getResponseObj();
 			OwmHourlyForecastResponse owmHourlyForecastResponse =
-					(OwmHourlyForecastResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST)).getResponseObj();
+					(OwmHourlyForecastResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST).getResponseObj();
 			OwmDailyForecastResponse owmDailyForecastResponse =
-					(OwmDailyForecastResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST)).getResponseObj();
+					(OwmDailyForecastResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST).getResponseObj();
 
 			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(context, owmCurrentConditionsResponse, zoneId
 			);
@@ -521,7 +519,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 			arrayMap = responseMap.get(WeatherProviderType.MET_NORWAY);
 
 			LocationForecastResponse locationForecastResponse =
-					(LocationForecastResponse) Objects.requireNonNull(arrayMap.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST)).getResponseObj();
+					(LocationForecastResponse) arrayMap.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST).getResponseObj();
 
 			currentConditionsDto = MetNorwayResponseProcessor.makeCurrentConditionsDto(context, locationForecastResponse
 					, zoneId);

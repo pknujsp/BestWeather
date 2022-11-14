@@ -48,7 +48,7 @@ public class AlarmListFragment extends Fragment {
 	private FragmentAlarmListBinding binding;
 	private AlarmRepository alarmRepository;
 	private AlarmListAdapter alarmListAdapter;
-	private DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a hh:mm");
+	private final DateTimeFormatter hoursFormatter = DateTimeFormatter.ofPattern("a hh:mm");
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -141,7 +141,6 @@ public class AlarmListFragment extends Fragment {
 		});
 
 
-
 	}
 
 	@Override
@@ -198,7 +197,7 @@ public class AlarmListFragment extends Fragment {
 		@NotNull
 		@Override
 		public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-			return new ViewHolder(LayoutInflater.from(context).inflate(R.layout.view_alarm_item, null, false));
+			return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.view_alarm_item, null, false));
 		}
 
 		@Override

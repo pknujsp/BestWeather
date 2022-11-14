@@ -448,7 +448,6 @@ public abstract class AbstractWidgetCreator {
 			onDrawBitmapCallback.onCreatedBitmap(viewBmp);
 		}
 
-		viewBmp.recycle();
 	}
 
 	protected final Bitmap drawBitmap(ViewGroup rootLayout, RemoteViews remoteViews) {
@@ -489,7 +488,6 @@ public abstract class AbstractWidgetCreator {
 		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
 			@Override
 			public void onResultSuccessful(WidgetDto result) {
-				//appWidgetManager.updateAppWidget(appWidgetId, createRemoteViews());
 				remoteViewsCallback.onResult(result.getAppWidgetId(), createRemoteViews());
 			}
 

@@ -56,7 +56,7 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	@NonNull
 	@Override
 	public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-		Dialog dialog = new Dialog(requireContext().getApplicationContext(), R.style.DialogTransparent);
+		Dialog dialog = new Dialog(requireContext(), R.style.DialogTransparent);
 		return dialog;
 	}
 
@@ -64,7 +64,7 @@ public abstract class BaseDetailDialogFragment extends DialogFragment {
 	@org.jetbrains.annotations.Nullable
 	@Override
 	public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-		binding = DialogFragmentDetailForecastBinding.inflate(inflater);
+		binding = DialogFragmentDetailForecastBinding.inflate(inflater, container, false);
 
 		final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24f, getResources().getDisplayMetrics());
 

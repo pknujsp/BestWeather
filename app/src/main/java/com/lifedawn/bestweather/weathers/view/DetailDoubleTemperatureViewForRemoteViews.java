@@ -18,7 +18,7 @@ import com.lifedawn.bestweather.weathers.FragmentType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailDoubleTemperatureViewForRemoteViews extends View {
+public class DetailDoubleTemperatureViewForRemoteViews extends View implements ICleaner {
 	private final int maxTemp;
 	private final int minTemp;
 	private final TextPaint tempPaint;
@@ -201,4 +201,9 @@ public class DetailDoubleTemperatureViewForRemoteViews extends View {
 	}
 
 
+	@Override
+	public void clear() {
+		maxTempList.clear();
+		minTempList.clear();
+	}
 }

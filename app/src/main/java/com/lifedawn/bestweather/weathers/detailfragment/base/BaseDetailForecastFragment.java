@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
@@ -42,7 +43,6 @@ import java.util.concurrent.ExecutorService;
 
 public abstract class BaseDetailForecastFragment extends Fragment implements OnClickedListViewItemListener<Integer> {
 	protected BaseLayoutDetailForecastBinding binding;
-	protected SharedPreferences sharedPreferences;
 	protected ValueUnits tempUnit;
 	protected ValueUnits windUnit;
 	protected ValueUnits visibilityUnit;
@@ -51,7 +51,6 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	protected ZoneId zoneId;
 	protected Double latitude;
 	protected Double longitude;
-	protected ForecastViewType forecastViewType = ForecastViewType.List;
 	protected ExecutorService executorService = MyApplication.getExecutorService();
 	protected WeatherProviderType mainWeatherProviderType;
 	protected Bundle bundle;
@@ -74,7 +73,6 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
-		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
 
 		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
 		windUnit = MyApplication.VALUE_UNIT_OBJ.getWindUnit();
@@ -95,13 +93,13 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	@org.jetbrains.annotations.Nullable
 	@Override
 	public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-		binding = BaseLayoutDetailForecastBinding.inflate(inflater);
-		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getParentFragmentManager().popBackStackImmediate();
-			}
-		});
+		binding = BaseLayoutDetailForecastBinding.inflate(inflater, container, false);
+		binding.toolbar.backBtn.setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
+
+		ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
+		layoutParams.topMargin = MyApplication.getStatusBarHeight();
+		binding.toolbar.getRoot().setLayoutParams(layoutParams);
+
 		return binding.getRoot();
 	}
 
@@ -109,10 +107,6 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
-		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
-		layoutParams.topMargin = MyApplication.getStatusBarHeight();
-		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 
 		AdRequest adRequest = new AdRequest.Builder().build();
 		binding.adViewBottom.loadAd(adRequest);
@@ -147,7 +141,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 	}
 
 	public static class HourlyForecastListAdapter extends RecyclerView.Adapter<HourlyForecastListAdapter.ViewHolder> {
-		private List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
+		public List<HourlyForecastDto> hourlyForecastDtoList = new ArrayList<>();
 		private OnClickedListViewItemListener<Integer> onClickedForecastItem;
 		private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
 		private DateTimeFormatter hourFormatter = DateTimeFormatter.ofPattern("H");
@@ -181,7 +175,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		@Override
 		public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
 			return new ViewHolder(
-					ViewDetailHourlyForecastListBinding.inflate(LayoutInflater.from(parent.getContext().getApplicationContext())));
+					ViewDetailHourlyForecastListBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
 		}
 
 		@Override
@@ -192,7 +186,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		@Override
 		public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
 			super.onViewDetachedFromWindow(holder);
-			Glide.with(holder.itemView.getContext().getApplicationContext()).clear(holder.binding.weatherIcon);
+			Glide.with(holder.itemView.getContext()).clear(holder.binding.weatherIcon);
 		}
 
 		@Override
@@ -274,7 +268,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 
 
 	public static class DailyForecastListAdapter extends RecyclerView.Adapter<DailyForecastListAdapter.ViewHolder> {
-		private List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
+		public List<DailyForecastDto> dailyForecastDtoList = new ArrayList<>();
 		private final OnClickedListViewItemListener<Integer> onClickedForecastItem;
 		private final String tempDegree;
 		private final String degree = "°";
@@ -305,7 +299,7 @@ public abstract class BaseDetailForecastFragment extends Fragment implements OnC
 		@Override
 		public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
 			return new ViewHolder(ViewDetailDailyForecastListBinding.
-					inflate(LayoutInflater.from(parent.getContext().getApplicationContext()), parent, false));
+					inflate(LayoutInflater.from(parent.getContext()), parent, false));
 		}
 
 		@Override

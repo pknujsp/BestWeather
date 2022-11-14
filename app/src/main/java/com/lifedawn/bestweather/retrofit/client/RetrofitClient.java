@@ -1,5 +1,9 @@
 package com.lifedawn.bestweather.retrofit.client;
 
+import androidx.annotation.NonNull;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +65,8 @@ public class RetrofitClient {
 		GOOGLE_PLACE_SEARCH, GOOGLE_FIND_PLACE, FREE_TIME, NOMINATIM, RAIN_VIEWER
 	}
 
-
+	@NotNull
+	@NonNull
 	public static synchronized Queries getApiService(ServiceType serviceType) {
 
 		switch (serviceType) {

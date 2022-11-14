@@ -55,7 +55,7 @@ public class AlertFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
-		binding = FragmentAlertBinding.inflate(inflater);
+		binding = FragmentAlertBinding.inflate(inflater, container, false);
 
 		binding.mainToolbar.gps.setVisibility(View.GONE);
 		binding.mainToolbar.find.setVisibility(View.GONE);

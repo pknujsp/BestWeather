@@ -110,7 +110,7 @@ public class SunsetriseFragment extends Fragment implements IWeatherValues, Asyn
 	public void onDestroy() {
 		if (registeredReceiver) {
 			try {
-				Objects.requireNonNull(requireActivity()).unregisterReceiver(broadcastReceiver);
+				requireActivity().unregisterReceiver(broadcastReceiver);
 			} catch (Exception e) {
 
 			}

@@ -34,7 +34,7 @@ public class WeatherSourcesFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = FragmentWeatherSourcesBinding.inflate(inflater);
+		binding = FragmentWeatherSourcesBinding.inflate(inflater, container, false);
 		return binding.getRoot();
 	}
 

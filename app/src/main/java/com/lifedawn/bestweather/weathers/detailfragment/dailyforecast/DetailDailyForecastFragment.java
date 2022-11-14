@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment {
-
+	private DailyForecastListAdapter adapter;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -51,7 +51,7 @@ public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment
 			}
 		}
 
-		DailyForecastListAdapter adapter = new DailyForecastListAdapter(this);
+		adapter = new DailyForecastListAdapter(this);
 		adapter.setDailyForecastDtoList(dailyForecastDtoList, hasPrecipitationVolume);
 		binding.listview.setAdapter(adapter);
 	}
@@ -59,6 +59,13 @@ public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment
 	@Override
 	protected void setDataViewsByTable() {
 
+	}
+
+	@Override
+	public void onDestroy() {
+		adapter.dailyForecastDtoList.clear();
+		adapter = null;
+		super.onDestroy();
 	}
 
 	@Override

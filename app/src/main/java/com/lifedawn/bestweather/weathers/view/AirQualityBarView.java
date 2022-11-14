@@ -19,7 +19,7 @@ import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponsePr
 
 import java.util.List;
 
-public class AirQualityBarView extends View {
+public class AirQualityBarView extends View implements ICleaner {
 	private final FragmentType fragmentType;
 	private final int viewWidth;
 	private final int viewHeight;
@@ -157,6 +157,12 @@ public class AirQualityBarView extends View {
 			canvas.drawText(airQualityObj.grade, gradeStrPoint.x, gradeStrPoint.y, gradeStrPaint);
 			i++;
 		}
+	}
+
+	@Override
+	public void clear() {
+		if (airQualityObjList != null)
+			airQualityObjList.clear();
 	}
 
 	public static class AirQualityObj {

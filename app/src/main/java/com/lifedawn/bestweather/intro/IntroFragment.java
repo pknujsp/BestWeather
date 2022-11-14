@@ -67,7 +67,7 @@ public class IntroFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = FragmentIntroBinding.inflate(inflater);
+		binding = FragmentIntroBinding.inflate(inflater, container, false);
 		binding.getRoot().setPadding(0, MyApplication.getStatusBarHeight(), 0, 0);
 
 		return binding.getRoot();

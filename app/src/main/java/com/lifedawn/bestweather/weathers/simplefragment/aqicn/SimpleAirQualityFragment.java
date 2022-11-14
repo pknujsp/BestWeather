@@ -100,6 +100,8 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		aqiCnGeolocalizedFeedResponse = null;
+		airQualityDto = null;
 		binding = null;
 		asyncBinding = null;
 	}
@@ -173,9 +175,9 @@ public class SimpleAirQualityFragment extends Fragment implements IWeatherValues
 			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("M.d E", Locale.getDefault());
 
 			List<AirQualityDto.DailyForecast> forecastList = airQualityDto.getDailyForecastList();
-			final int textColor =Color.WHITE;
+			final int textColor = Color.WHITE;
 
-			LayoutInflater layoutInflater = LayoutInflater.from(requireContext());
+			LayoutInflater layoutInflater = LayoutInflater.from(getContext());
 			View labelView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
 
 			labelView.findViewById(R.id.date).setVisibility(View.INVISIBLE);

@@ -123,7 +123,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 	@Override
 	public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container,
 	                         @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-		binding = FragmentAirQualityDetailBinding.inflate(inflater);
+		binding = FragmentAirQualityDetailBinding.inflate(inflater, container, false);
 		return binding.getRoot();
 	}
 

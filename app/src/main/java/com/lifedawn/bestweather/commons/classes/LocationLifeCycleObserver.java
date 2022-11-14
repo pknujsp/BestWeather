@@ -29,6 +29,7 @@ import java.util.Map;
 
 public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 	private final ActivityResultRegistry mRegistry;
+	private final Context context;
 
 	private Activity activity;
 	private ActivityResultLauncher<Intent> requestOnGpsLauncher;
@@ -44,6 +45,7 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 	public LocationLifeCycleObserver(@NonNull ActivityResultRegistry mRegistry, Activity activity) {
 		this.mRegistry = mRegistry;
 		this.activity = activity;
+		this.context = activity.getApplicationContext();
 	}
 
 	@Override
@@ -51,6 +53,9 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 		requestOnGpsLauncher = mRegistry.register("gps", owner, new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
 			@Override
 			public void onActivityResult(ActivityResult result) {
+				if (activity == null || activity.isFinishing())
+					return;
+
 				//gps 사용확인 화면에서 나온뒤 현재 위치 다시 파악
 				if (gpsResultCallback != null) {
 					gpsResultCallback.onActivityResult(result);
@@ -62,15 +67,18 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 		moveToAppDetailSettingsLauncher = mRegistry.register("appSettings", new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
 			@Override
 			public void onActivityResult(ActivityResult result) {
+				if (activity == null || activity.isFinishing())
+					return;
+
 				if (appSettingsResultCallback != null) {
 					appSettingsResultCallback.onActivityResult(result);
 				}
 
-				if (ContextCompat.checkSelfPermission(activity,
+				if (ContextCompat.checkSelfPermission(context,
 						Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-						ContextCompat.checkSelfPermission(activity,
+						ContextCompat.checkSelfPermission(context,
 								Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-					PreferenceManager.getDefaultSharedPreferences(activity).edit().putBoolean(
+					PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(
 							activity.getString(R.string.pref_key_never_ask_again_permission_for_access_location), false).apply();
 				}
 
@@ -80,6 +88,9 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 		requestLocationPermissionLauncher = mRegistry.register("locationPermissions", new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
 			@Override
 			public void onActivityResult(Map<String, Boolean> result) {
+				if (activity == null || activity.isFinishing())
+					return;
+
 				if (permissionResultCallback != null) {
 					permissionResultCallback.onActivityResult(result);
 				}
@@ -88,12 +99,12 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 				//거부됨 : 작업 취소
 				//계속 거부 체크됨 : 작업 취소
 				if (!result.containsValue(false)) {
-					PreferenceManager.getDefaultSharedPreferences(activity).edit().putBoolean(
+					PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(
 							activity.getString(R.string.pref_key_never_ask_again_permission_for_access_location), false).apply();
 				} else {
 					if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)
 							|| !ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-						PreferenceManager.getDefaultSharedPreferences(activity).edit().putBoolean(
+						PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(
 								activity.getString(R.string.pref_key_never_ask_again_permission_for_access_location), true).apply();
 					}
 				}
@@ -104,6 +115,8 @@ public class LocationLifeCycleObserver implements DefaultLifecycleObserver {
 				new ActivityResultCallback<ActivityResult>() {
 					@Override
 					public void onActivityResult(ActivityResult result) {
+						if (activity == null || activity.isFinishing())
+							return;
 						if (backgroundLocationPermissionResultCallback != null) {
 							backgroundLocationPermissionResultCallback.onActivityResult(result);
 						}

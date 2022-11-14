@@ -16,7 +16,7 @@ import com.lifedawn.bestweather.weathers.FragmentType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SingleWeatherIconView extends View {
+public class SingleWeatherIconView extends View implements ICleaner {
 	private final FragmentType fragmentType;
 
 	private final int viewWidth;
@@ -85,6 +85,11 @@ public class SingleWeatherIconView extends View {
 
 	public void setWeatherImgs(List<WeatherIconObj> weatherIconObjList) {
 		this.weatherIconObjList = weatherIconObjList;
+	}
+
+	@Override
+	public void clear() {
+		weatherIconObjList.clear();
 	}
 
 

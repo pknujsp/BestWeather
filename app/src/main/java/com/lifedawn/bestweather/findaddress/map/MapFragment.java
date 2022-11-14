@@ -293,7 +293,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
-		binding = FragmentMapBinding.inflate(inflater);
+		binding = FragmentMapBinding.inflate(inflater, container, false);
 		return binding.getRoot();
 	}
 
@@ -790,7 +790,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				//expanded일때 offset == 1.0, collapsed일때 offset == 0.0
 				//offset에 따라서 버튼들이 이동하고, 지도의 좌표가 변경되어야 한다.
 				int translationValue = (int) (bottomSheet.getHeight() * slideOffset);
-				Objects.requireNonNull(binding).mapLayout.setPadding(0, 0, 0, translationValue);
+				try {
+					Objects.requireNonNull(binding).mapLayout.setPadding(0, 0, 0, translationValue);
+				} catch (Exception e) {
+					
+				}
 			}
 		});
 

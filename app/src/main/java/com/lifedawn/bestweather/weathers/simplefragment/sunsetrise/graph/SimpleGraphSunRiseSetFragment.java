@@ -77,7 +77,7 @@ public class SimpleGraphSunRiseSetFragment extends Fragment implements IWeatherV
 	@Override
 	public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container,
 	                         @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-		binding = FragmentSunsetriseBinding.inflate(inflater);
+		binding = FragmentSunsetriseBinding.inflate(inflater, container, false);
 		return binding.getRoot();
 	}
 

@@ -63,12 +63,13 @@ import java.util.Set;
 
 public class DailyForecastComparisonFragment extends BaseForecastComparisonFragment {
 	private WeatherRestApiDownloader weatherRestApiDownloader;
+	private DailyForecastResponse dailyForecastResponse;
 
 	@Override
 	public void onAttach(@NonNull Context context) {
 		super.onAttach(context);
 		ProgressDialog.show(requireActivity(), getString(R.string.msg_refreshing_weather_data), v -> {
-			getParentFragmentManager().popBackStackImmediate();
+			getParentFragmentManager().popBackStack();
 
 			if (weatherRestApiDownloader != null) {
 				weatherRestApiDownloader.cancel();
@@ -99,7 +100,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 	@SuppressLint("DefaultLocale")
 	private void setValues(DailyForecastResponse dailyForecastResponse) {
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
-		
+
 		Context context = requireContext().getApplicationContext();
 
 		List<WeatherProviderType> weatherProviderTypeList = new ArrayList<>();
@@ -464,6 +465,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 		final int tempRowTopMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
 
+
 		for (int i = 0; i < weatherProviderTypeList.size(); i++) {
 			LinearLayout.LayoutParams specificRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 					ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -521,6 +523,13 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			tempRows.get(i).setValueTextColor(Color.BLACK);
 			view.addView(tempRows.get(i), tempRowLayoutParams);
 		}
+
+		customViewList.addAll(weatherIconRows);
+		customViewList.addAll(probabilityOfPrecipitationRows);
+		customViewList.addAll(rainVolumeRows);
+		customViewList.addAll(snowVolumeRows);
+		customViewList.addAll(tempRows);
+		customViewList.add(dateRow);
 
 		createValueUnitsDescription(weatherSourceUnitObjList);
 	}
@@ -580,17 +589,22 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
-
 		if (weatherRestApiDownloader != null) {
 			weatherRestApiDownloader.cancel();
+			weatherRestApiDownloader.clear();
 		}
+		if (dailyForecastResponse != null)
+			dailyForecastResponse.clear();
+		dailyForecastResponse = null;
+		weatherRestApiDownloader = null;
+
+		super.onDestroy();
 	}
 
 	private void setTable(WeatherRestApiDownloader weatherRestApiDownloader) {
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> arrayMap;
-		DailyForecastResponse dailyForecastResponse = new DailyForecastResponse();
+		dailyForecastResponse = new DailyForecastResponse();
 
 		//kma api
 		if (responseMap.containsKey(WeatherProviderType.KMA_API)) {
@@ -728,6 +742,22 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		Throwable accuThrowable;
 		Throwable owmThrowable;
 		Throwable metNorwayThrowable;
+
+		void clear() {
+			if (kmaDailyForecastList != null)
+				kmaDailyForecastList.clear();
+			if (accuDailyForecastList != null)
+				accuDailyForecastList.clear();
+			if (owmDailyForecastList != null)
+				owmDailyForecastList.clear();
+			if (metNorwayDailyForecastList != null)
+				metNorwayDailyForecastList.clear();
+
+			kmaThrowable = null;
+			accuThrowable = null;
+			owmThrowable = null;
+			metNorwayThrowable = null;
+		}
 	}
 
 }

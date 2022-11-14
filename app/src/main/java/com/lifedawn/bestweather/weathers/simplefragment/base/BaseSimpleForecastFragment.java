@@ -28,6 +28,7 @@ import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
+import com.lifedawn.bestweather.weathers.view.ICleaner;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,12 +36,15 @@ import org.jetbrains.annotations.NotNull;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BaseSimpleForecastFragment extends Fragment implements IWeatherValues, AsyncLayoutInflater.OnInflateFinishedListener {
 	protected BaseLayoutSimpleForecastBinding binding;
 	protected LoadingViewAsyncBinding asyncBinding;
+
 
 	protected DateView dateRow;
 	protected String countryCode;
@@ -55,6 +59,8 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	protected Double longitude;
 	protected ZoneId zoneId;
 	protected WeatherFragmentViewModel weatherFragmentViewModel;
+
+	protected List<ICleaner> customViewList = new ArrayList<>();
 
 	protected int headerVisibility = View.VISIBLE;
 
@@ -111,11 +117,18 @@ public class BaseSimpleForecastFragment extends Fragment implements IWeatherValu
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		for (ICleaner iCleaner : customViewList) {
+			if (iCleaner != null)
+				iCleaner.clear();
+		}
+		customViewList.clear();
+
 		textColorMap.clear();
 		textColorMap = null;
 
 		textSizeMap.clear();
 		textSizeMap = null;
+
 		binding.forecastView.removeAllViews();
 		binding = null;
 		asyncBinding = null;

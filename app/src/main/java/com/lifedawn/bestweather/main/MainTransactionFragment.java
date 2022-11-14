@@ -249,7 +249,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = FragmentMainBinding.inflate(inflater);
+		binding = FragmentMainBinding.inflate(inflater, container, false);
 
 		binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 

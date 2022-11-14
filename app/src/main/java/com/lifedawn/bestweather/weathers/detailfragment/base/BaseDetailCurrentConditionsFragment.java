@@ -66,7 +66,7 @@ public class BaseDetailCurrentConditionsFragment extends Fragment implements IWe
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = BaseLayoutDetailCurrentConditionsBinding.inflate(inflater);
+		binding = BaseLayoutDetailCurrentConditionsBinding.inflate(inflater, container, false);
 		binding.weatherCardViewHeader.forecastName.setText(R.string.current_conditions);
 		binding.weatherCardViewHeader.compareForecast.setVisibility(View.GONE);
 		binding.weatherCardViewHeader.detailForecast.setVisibility(View.GONE);

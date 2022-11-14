@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onDestroy() {
-		FlickrRepository.getINSTANCE().clear();
+		FlickrRepository.clear();
 		WeatherFragmentViewModel.clear();
 		super.onDestroy();
 	}

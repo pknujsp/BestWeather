@@ -92,7 +92,7 @@ public class OngoingNotificationSettingsFragment extends Fragment implements Not
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
-		binding = FragmentBaseNotificationSettingsBinding.inflate(inflater);
+		binding = FragmentBaseNotificationSettingsBinding.inflate(inflater, container, false);
 		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
 		layoutParams.topMargin = MyApplication.getStatusBarHeight();
 		binding.toolbar.getRoot().setLayoutParams(layoutParams);

@@ -50,6 +50,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,7 @@ import java.util.Set;
 
 public class HourlyForecastComparisonFragment extends BaseForecastComparisonFragment {
 	private WeatherRestApiDownloader weatherRestApiDownloader;
+	private HourlyForecastResponse hourlyForecastResponse;
 
 	@Override
 	public void onAttach(@NonNull Context context) {
@@ -470,6 +472,14 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 			tempRows[i].setValueTextColor(Color.BLACK);
 			view.addView(tempRows[i], tempRowLayoutParams);
 		}
+
+		customViewList.add(dateRow);
+		customViewList.add(clockRow);
+		customViewList.addAll(Arrays.asList(tempRows));
+		customViewList.addAll(Arrays.asList(rainVolumeRows));
+		customViewList.addAll(Arrays.asList(probabilityOfPrecipitationRows));
+		customViewList.addAll(Arrays.asList(weatherIconRows));
+		customViewList.addAll(Arrays.asList(snowVolumeRows));
 	}
 
 	private void loadForecasts() {
@@ -528,22 +538,28 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
 		if (weatherRestApiDownloader != null) {
 			weatherRestApiDownloader.cancel();
+			weatherRestApiDownloader.clear();
 		}
+		if (hourlyForecastResponse != null)
+			hourlyForecastResponse.clear();
+		hourlyForecastResponse = null;
+		weatherRestApiDownloader = null;
+		super.onDestroy();
+
 	}
 
 	private void setTable(WeatherRestApiDownloader weatherRestApiDownloader, Double latitude, Double longitude) {
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> arrayMap;
-		HourlyForecastResponse hourlyForecastResponse = new HourlyForecastResponse();
+		hourlyForecastResponse = new HourlyForecastResponse();
 		Context context = requireContext().getApplicationContext();
 
 		//kma api
 		if (responseMap.containsKey(WeatherProviderType.KMA_API)) {
 			arrayMap = responseMap.get(WeatherProviderType.KMA_API);
-			WeatherRestApiDownloader.ResponseResult ultraSrtFcstResponse = Objects.requireNonNull(arrayMap).get(
+			WeatherRestApiDownloader.ResponseResult ultraSrtFcstResponse = arrayMap.get(
 					RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
 			WeatherRestApiDownloader.ResponseResult vilageFcstResponse = arrayMap.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
 
@@ -671,6 +687,22 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		Throwable accuThrowable;
 		Throwable owmThrowable;
 		Throwable metNorwayThrowable;
+
+		void clear() {
+			if (kmaHourlyForecastList != null)
+				kmaHourlyForecastList.clear();
+			if (accuHourlyForecastList != null)
+				accuHourlyForecastList.clear();
+			if (owmHourlyForecastList != null)
+				owmHourlyForecastList.clear();
+			if (metNorwayHourlyForecastList != null)
+				metNorwayHourlyForecastList.clear();
+
+			kmaThrowable = null;
+			owmThrowable = null;
+			accuThrowable = null;
+			metNorwayThrowable = null;
+		}
 	}
 
 }

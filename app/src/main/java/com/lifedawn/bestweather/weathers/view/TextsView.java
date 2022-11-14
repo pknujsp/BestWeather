@@ -17,7 +17,7 @@ import com.lifedawn.bestweather.weathers.FragmentType;
 
 import java.util.List;
 
-public class TextsView extends View {
+public class TextsView extends View implements ICleaner {
 	protected final int columnWidth;
 	protected final TextPaint valueTextPaint;
 	protected final Rect valueTextRect = new Rect();
@@ -97,4 +97,9 @@ public class TextsView extends View {
 		canvas.restore();
 	}
 
+	@Override
+	public void clear() {
+		if (valueList != null)
+			valueList.clear();
+	}
 }

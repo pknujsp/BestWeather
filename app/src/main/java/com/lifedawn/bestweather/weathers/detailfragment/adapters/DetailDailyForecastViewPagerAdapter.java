@@ -30,15 +30,11 @@ import java.util.List;
 import java.util.Locale;
 
 public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<DetailDailyForecastViewPagerAdapter.ViewHolder> {
-	private final Context context;
-	private final LayoutInflater layoutInflater;
 	private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
 
 	private List<DailyForecastDto> dailyForecastDtoList;
 
-	public DetailDailyForecastViewPagerAdapter(Context context) {
-		this.context = context;
-		layoutInflater = LayoutInflater.from(context);
+	public DetailDailyForecastViewPagerAdapter() {
 	}
 
 	public void setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
@@ -118,8 +114,8 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				addListItem(labelValueItemList, WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.uvIndex),
 						dailyForecastDto.getValuesList().get(0).getUvIndex());
 			} else if (dailyForecastDto.getValuesList().size() == 2) {
-				binding.timezone.setText(new String(context.getString(R.string.am) + " / " +
-						context.getString(R.string.pm)));
+				binding.timezone.setText(new String(binding.getRoot().getContext().getString(R.string.am) + " / " +
+						binding.getRoot().getContext().getString(R.string.pm)));
 
 				binding.weatherDescription.setText(new String(dailyForecastDto.getValuesList().get(0).getWeatherDescription() + " / " +
 						dailyForecastDto.getValuesList().get(1).getWeatherDescription()));
@@ -153,8 +149,8 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 			} else if (dailyForecastDto.getValuesList().size() == 4) {
 				// 강수량, 날씨 아이콘, 날씨 설명, 풍향, 풍속
 
-				binding.timezone.setText(new String(context.getString(R.string.am) + " / " +
-						context.getString(R.string.pm)));
+				binding.timezone.setText(new String(binding.getRoot().getContext().getString(R.string.am) + " / " +
+						binding.getRoot().getContext().getString(R.string.pm)));
 
 				binding.weatherDescription.setText(new String(dailyForecastDto.getValuesList().get(1).getWeatherDescription() + " / " +
 						dailyForecastDto.getValuesList().get(2).getWeatherDescription()));
@@ -176,6 +172,7 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 						dailyForecastDto.getValuesList().get(1).getWindStrength(),
 						dailyForecastDto.getValuesList().get(2).getWindStrength());
 			}
+			LayoutInflater layoutInflater = LayoutInflater.from(binding.getRoot().getContext());
 
 			for (LabelValueItem labelValueItem : labelValueItemList) {
 				View view = layoutInflater.inflate(R.layout.value_itemview, null, false);
@@ -183,15 +180,15 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 				((TextView) view.findViewById(R.id.value)).setText(labelValueItem.value);
 				binding.amList.addView(view);
 			}
-
+			layoutInflater = null;
 		}
 
 		protected void addGridItems(List<GridItemDto> gridItemDtos) {
 			TextView label = null;
 			TextView value = null;
 			View convertView = null;
-			final int blueColor = ContextCompat.getColor(context, R.color.blue);
-
+			final int blueColor = ContextCompat.getColor(binding.getRoot().getContext(), R.color.blue);
+			LayoutInflater layoutInflater = LayoutInflater.from(binding.getRoot().getContext());
 			for (GridItemDto gridItem : gridItemDtos) {
 				convertView = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null, false);
 
@@ -214,6 +211,7 @@ public class DetailDailyForecastViewPagerAdapter extends RecyclerView.Adapter<De
 
 				binding.precipitationGridLayout.addView(convertView, layoutParams);
 			}
+			layoutInflater = null;
 		}
 
 		private void setPrecipitationGridItems(DailyForecastDto dailyForecastDto) {

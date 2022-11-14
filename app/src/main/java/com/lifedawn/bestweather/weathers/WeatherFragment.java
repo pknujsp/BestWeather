@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.widget.TextViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -191,6 +192,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		asyncBinding = LoadingViewAsyncBinding.inflate(inflater, container, false);
 		final AsyncLayoutInflater asyncLayoutInflater = new AsyncLayoutInflater(requireContext());
 		asyncLayoutInflater.inflate(R.layout.fragment_weather, container, new AsyncLayoutInflater.OnInflateFinishedListener() {
+			@SuppressLint("MissingPermission")
 			@Override
 			public void onInflateFinished(@NonNull View view, int resid, @Nullable ViewGroup parent) {
 				binding = FragmentWeatherBinding.bind(view);
@@ -199,7 +201,6 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 				asyncBinding.progressCircular.setVisibility(View.GONE);
 
 				shimmer(true, false);
-
 				final int statusBarHeight = MyApplication.getStatusBarHeight();
 
 				FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) binding.mainToolbar.getRoot().getLayoutParams();
@@ -220,6 +221,8 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 				binding.currentConditionsImg.setColorFilter(ContextCompat.getColor(requireContext(), R.color.black_alpha_30), PorterDuff.Mode.DARKEN);
 
 				weatherViewController = new WeatherViewController(binding.rootLayout);
+				getLifecycle().addObserver(weatherViewController);
+
 				weatherViewController.setWeatherView(PrecipType.CLEAR, null);
 
 				binding.mainToolbar.openNavigationDrawer.setOnClickListener(menuOnClickListener);
@@ -371,11 +374,11 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 				});
 
 				shimmer(false, false);
-				Objects.requireNonNull(onAsyncLoadCallback).onFinished(WeatherFragment.this);
+				if (onAsyncLoadCallback != null)
+					onAsyncLoadCallback.onFinished(WeatherFragment.this);
 				onAsyncLoadCallback = null;
 			}
 		});
-
 
 		return asyncBinding.getRoot();
 	}
@@ -400,79 +403,100 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		binding.mainToolbar.gps.setVisibility(weatherFragmentViewModel.locationType == LocationType.CurrentLocation ? View.VISIBLE : View.GONE);
 		binding.mainToolbar.find.setVisibility(weatherFragmentViewModel.locationType == LocationType.CurrentLocation ? View.GONE : View.VISIBLE);
 
-		final Bundle bundle = new Bundle();
-		bundle.putSerializable(BundleKey.SelectedAddressDto.name(), weatherFragmentViewModel.favoriteAddressDto);
-		bundle.putSerializable(BundleKey.IGps.name(), (IGps) this);
-		bundle.putString(BundleKey.LocationType.name(), weatherFragmentViewModel.locationType.name());
-		bundle.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
+		executorService.submit(() -> {
+			final Bundle bundle = new Bundle();
+			bundle.putSerializable(BundleKey.SelectedAddressDto.name(), weatherFragmentViewModel.favoriteAddressDto);
+			bundle.putSerializable(BundleKey.IGps.name(), (IGps) this);
+			bundle.putString(BundleKey.LocationType.name(), weatherFragmentViewModel.locationType.name());
+			bundle.putString(BundleKey.RequestFragment.name(), WeatherFragment.class.getName());
 
-		weatherFragmentViewModel.locationType = LocationType.valueOf(bundle.getString(BundleKey.LocationType.name()));
+			weatherFragmentViewModel.locationType = LocationType.valueOf(bundle.getString(BundleKey.LocationType.name()));
 
-		final boolean clickGps = weatherFragmentViewModel.arguments.getBoolean("clickGps", false);
+			final boolean clickGps = weatherFragmentViewModel.arguments.getBoolean("clickGps", false);
 
-		if (weatherFragmentViewModel.locationType == LocationType.CurrentLocation) {
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
-			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
-					getString(R.string.pref_key_last_selected_location_type), weatherFragmentViewModel.locationType.name()).commit();
+			if (weatherFragmentViewModel.locationType == LocationType.CurrentLocation) {
+				SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+				sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
+						getString(R.string.pref_key_last_selected_location_type), weatherFragmentViewModel.locationType.name()).commit();
 
-			LocationResult locationResult = fusedLocation.getLastCurrentLocation();
-			weatherFragmentViewModel.latitude = locationResult.getLocations().get(0).getLatitude();
-			weatherFragmentViewModel.longitude = locationResult.getLocations().get(0).getLongitude();
+				LocationResult locationResult = fusedLocation.getLastCurrentLocation();
+				weatherFragmentViewModel.latitude = locationResult.getLocations().get(0).getLatitude();
+				weatherFragmentViewModel.longitude = locationResult.getLocations().get(0).getLongitude();
 
-			if (weatherFragmentViewModel.latitude == 0.0 && weatherFragmentViewModel.longitude == 0.0) {
-				//최근에 현재위치로 잡힌 위치가 없으므로 현재 위치 요청
-				requestCurrentLocation();
-			} else if (clickGps) {
-				binding.mainToolbar.gps.callOnClick();
-			} else {
-				weatherFragmentViewModel.zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(requireContext())
-						.getString("zoneId", ""));
-				//위/경도에 해당하는 지역명을 불러오고, 날씨 데이터 다운로드
-				//이미 존재하는 날씨 데이터면 다운로드X
-				boolean refresh = !weatherFragmentViewModel.containWeatherData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
+				if (weatherFragmentViewModel.latitude == 0.0 && weatherFragmentViewModel.longitude == 0.0) {
+					//최근에 현재위치로 잡힌 위치가 없으므로 현재 위치 요청
+					requestCurrentLocation();
+				} else if (clickGps) {
+					MainThreadWorker.runOnUiThread(() -> {
+						binding.mainToolbar.gps.callOnClick();
+					});
 
-				if (weatherFragmentViewModel.isOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
-					refresh = true;
-					weatherFragmentViewModel.removeOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
-				}
-
-				requestAddressOfLocation(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude, refresh);
-			}
-		} else {
-			weatherFragmentViewModel.selectedFavoriteAddressDto = (FavoriteAddressDto) bundle.getSerializable(
-					BundleKey.SelectedAddressDto.name());
-
-			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
-			sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
-					weatherFragmentViewModel.selectedFavoriteAddressDto.getId()).putString(getString(R.string.pref_key_last_selected_location_type),
-					weatherFragmentViewModel.locationType.name()).commit();
-
-			weatherFragmentViewModel.mainWeatherProviderType =
-					weatherFragmentViewModel.getMainWeatherSourceType(weatherFragmentViewModel.selectedFavoriteAddressDto.getCountryCode());
-			weatherFragmentViewModel.countryCode = weatherFragmentViewModel.selectedFavoriteAddressDto.getCountryCode();
-			weatherFragmentViewModel.addressName = weatherFragmentViewModel.selectedFavoriteAddressDto.getDisplayName();
-			weatherFragmentViewModel.latitude = Double.parseDouble(weatherFragmentViewModel.selectedFavoriteAddressDto.getLatitude());
-			weatherFragmentViewModel.longitude = Double.parseDouble(weatherFragmentViewModel.selectedFavoriteAddressDto.getLongitude());
-			weatherFragmentViewModel.zoneId = ZoneId.of(weatherFragmentViewModel.selectedFavoriteAddressDto.getZoneId());
-
-			binding.addressName.setText(weatherFragmentViewModel.addressName);
-			binding.countryName.setText(weatherFragmentViewModel.selectedFavoriteAddressDto.getCountryName());
-
-			if (weatherFragmentViewModel.containWeatherData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
-				if (weatherFragmentViewModel.isOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
-					weatherFragmentViewModel.removeOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
-					requestNewData();
 				} else {
-					//기존 데이터 표시
-					weatherFragmentViewModel.mainWeatherProviderType =
-							WeatherFragmentViewModel.FINAL_RESPONSE_MAP.get(weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString()).requestMainWeatherProviderType;
-					reDraw();
+					weatherFragmentViewModel.zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(requireContext())
+							.getString("zoneId", ""));
+					//위/경도에 해당하는 지역명을 불러오고, 날씨 데이터 다운로드
+					//이미 존재하는 날씨 데이터면 다운로드X
+					boolean refresh = !weatherFragmentViewModel.containWeatherData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
+
+					if (weatherFragmentViewModel.isOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
+						refresh = true;
+						weatherFragmentViewModel.removeOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
+					}
+
+					boolean finalRefresh = refresh;
+					MainThreadWorker.runOnUiThread(() -> {
+						requestAddressOfLocation(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude, finalRefresh);
+					});
+
 				}
 			} else {
-				requestNewData();
-			}
-		}
+				weatherFragmentViewModel.selectedFavoriteAddressDto = (FavoriteAddressDto) bundle.getSerializable(
+						BundleKey.SelectedAddressDto.name());
 
+				SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+				sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
+						weatherFragmentViewModel.selectedFavoriteAddressDto.getId()).putString(getString(R.string.pref_key_last_selected_location_type),
+						weatherFragmentViewModel.locationType.name()).commit();
+
+				weatherFragmentViewModel.mainWeatherProviderType =
+						weatherFragmentViewModel.getMainWeatherSourceType(weatherFragmentViewModel.selectedFavoriteAddressDto.getCountryCode());
+				weatherFragmentViewModel.countryCode = weatherFragmentViewModel.selectedFavoriteAddressDto.getCountryCode();
+				weatherFragmentViewModel.addressName = weatherFragmentViewModel.selectedFavoriteAddressDto.getDisplayName();
+				weatherFragmentViewModel.latitude = Double.parseDouble(weatherFragmentViewModel.selectedFavoriteAddressDto.getLatitude());
+				weatherFragmentViewModel.longitude = Double.parseDouble(weatherFragmentViewModel.selectedFavoriteAddressDto.getLongitude());
+				weatherFragmentViewModel.zoneId = ZoneId.of(weatherFragmentViewModel.selectedFavoriteAddressDto.getZoneId());
+
+				if (weatherFragmentViewModel.containWeatherData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
+					if (weatherFragmentViewModel.isOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
+						weatherFragmentViewModel.removeOldDownloadedData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
+						requestNewData();
+					} else {
+						//기존 데이터 표시
+						try {
+							final WeatherResponseObj responseResultObj =
+									WeatherFragmentViewModel.FINAL_RESPONSE_MAP.get(weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString());
+							if (responseResultObj != null) {
+								weatherFragmentViewModel.mainWeatherProviderType = responseResultObj.requestMainWeatherProviderType;
+								MainThreadWorker.runOnUiThread(this::reDraw);
+							}
+						} catch (Exception e) {
+							requestNewData();
+						}
+
+					}
+				} else {
+					MainThreadWorker.runOnUiThread(() -> {
+						requestNewData();
+					});
+
+				}
+
+				MainThreadWorker.runOnUiThread(() -> {
+					binding.addressName.setText(weatherFragmentViewModel.addressName);
+					binding.countryName.setText(weatherFragmentViewModel.selectedFavoriteAddressDto.getCountryName());
+				});
+			}
+		});
 	}
 
 	@Override
@@ -484,17 +508,18 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 	@Override
 	public void onDestroy() {
-		if (weatherFragmentViewModel.weatherRestApiDownloader != null) {
+		if (weatherFragmentViewModel.weatherRestApiDownloader != null)
 			weatherFragmentViewModel.weatherRestApiDownloader.cancel();
-		}
-
-		getLifecycle().removeObserver(locationLifeCycleObserver);
+		if (weatherViewController != null)
+			getLifecycle().removeObserver(weatherViewController);
+		if (locationLifeCycleObserver != null)
+			getLifecycle().removeObserver(locationLifeCycleObserver);
 		super.onDestroy();
 	}
 
 
 	private void setBackgroundWeatherView(String weather, String volume) {
-		if (!PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean(getString(R.string.pref_key_show_background_animation), false)) {
+		if (!PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext()).getBoolean(getString(R.string.pref_key_show_background_animation), false)) {
 			weatherViewController.setWeatherView(PrecipType.CLEAR, null);
 		} else {
 			if (weather.equals(Flickr.Weather.rain.getText())) {
@@ -606,9 +631,15 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 				requestNewData();
 			} else {
 				//이미 데이터가 있으면 다시 그림
-				weatherFragmentViewModel.mainWeatherProviderType = Objects.requireNonNull(WeatherFragmentViewModel.FINAL_RESPONSE_MAP.get(
-						weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString())).requestMainWeatherProviderType;
-				reDraw();
+				final String key =
+						weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString();
+				try {
+					weatherFragmentViewModel.mainWeatherProviderType =
+							WeatherFragmentViewModel.FINAL_RESPONSE_MAP.get(key).requestMainWeatherProviderType;
+					reDraw();
+				} catch (Exception e) {
+					requestNewData();
+				}
 			}
 
 		});
@@ -616,16 +647,28 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 	public void reDraw() {
 		//날씨 프래그먼트 다시 그림
-		if (WeatherFragmentViewModel.FINAL_RESPONSE_MAP.containsKey(weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString())) {
+		final String key = weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString();
+
+		if (WeatherFragmentViewModel.FINAL_RESPONSE_MAP.containsKey(key)) {
 			shimmer(true, false);
 
 			executorService.submit(() -> {
+
 				Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
 				weatherProviderTypeSet.add(weatherFragmentViewModel.mainWeatherProviderType);
 				weatherProviderTypeSet.add(WeatherProviderType.AQICN);
-				setWeatherFragments(weatherProviderTypeSet, Objects.requireNonNull(WeatherFragmentViewModel.FINAL_RESPONSE_MAP.get(weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString()))
-								.weatherRestApiDownloader,
-						weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
+				try {
+					WeatherResponseObj responseObj = WeatherFragmentViewModel.FINAL_RESPONSE_MAP.get(key);
+					if (responseObj != null) {
+						setWeatherFragments(weatherProviderTypeSet, responseObj.weatherRestApiDownloader,
+								weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
+					} else {
+						requestNewData();
+					}
+				} catch (Exception e) {
+					requestNewData();
+				}
+
 			});
 
 		}
@@ -829,7 +872,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		weatherFragmentViewModel.iTextColor = simpleCurrentConditionsFragment;
 
 		try {
-			Objects.requireNonNull(requireActivity()).runOnUiThread(() -> {
+			requireActivity().runOnUiThread(() -> {
 				changeWeatherDataSourcePicker(weatherFragmentViewModel.countryCode);
 				binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(weatherFragmentViewModel.dateTimeFormatter));
 
@@ -936,10 +979,10 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		binding.updatedDatetime.setTextColor(color);
 		binding.countryName.setTextColor(color);
 		binding.addressName.setTextColor(color);
-		binding.weatherDataSourceName.setCompoundDrawableTintList(ColorStateList.valueOf(color));
+		TextViewCompat.setCompoundDrawableTintList(binding.weatherDataSourceName, ColorStateList.valueOf(color));
 
 		try {
-			Objects.requireNonNull(weatherFragmentViewModel.iTextColor).changeColor(color);
+			weatherFragmentViewModel.iTextColor.changeColor(color);
 		} catch (Exception e) {
 
 		}

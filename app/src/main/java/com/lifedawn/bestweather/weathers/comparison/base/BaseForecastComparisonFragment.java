@@ -28,11 +28,13 @@ import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding;
 import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.view.DateView;
+import com.lifedawn.bestweather.weathers.view.ICleaner;
 import com.lifedawn.bestweather.weathers.view.NotScrolledView;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BaseForecastComparisonFragment extends Fragment {
@@ -47,6 +49,8 @@ public class BaseForecastComparisonFragment extends Fragment {
 	protected ZoneId zoneId;
 
 	protected NotScrolledView[] notScrolledViews;
+
+	protected List<ICleaner> customViewList = new ArrayList<>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -63,7 +67,12 @@ public class BaseForecastComparisonFragment extends Fragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		binding = BaseLayoutForecastComparisonBinding.inflate(inflater);
+		binding = BaseLayoutForecastComparisonBinding.inflate(inflater, container, false);
+
+		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
+		layoutParams.topMargin = MyApplication.getStatusBarHeight();
+		binding.toolbar.getRoot().setLayoutParams(layoutParams);
+
 		return binding.getRoot();
 	}
 
@@ -77,10 +86,6 @@ public class BaseForecastComparisonFragment extends Fragment {
 	@Override
 	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
-		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
-		layoutParams.topMargin = MyApplication.getStatusBarHeight();
-		binding.toolbar.getRoot().setLayoutParams(layoutParams);
 
 		binding.adViewBelowScrollView.loadAd(new AdRequest.Builder().build());
 		binding.adViewBelowScrollView.setAdListener(new AdListener() {
@@ -118,6 +123,16 @@ public class BaseForecastComparisonFragment extends Fragment {
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
+		for (ICleaner iCleaner : customViewList) {
+			if (iCleaner != null)
+				iCleaner.clear();
+		}
+		customViewList.clear();
+
+		binding.metNorway.removeAllViews();
+		binding.accu.removeAllViews();
+		binding.kma.removeAllViews();
+		binding.owm.removeAllViews();
 		binding = null;
 	}
 

@@ -27,7 +27,7 @@ class SimpleRainViewerFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        _binding = FragmentSimpleRainViewerBinding.inflate(inflater)
+        _binding = FragmentSimpleRainViewerBinding.inflate(inflater, container, false)
 
         binding.weatherCardViewHeader.forecastName.setText(R.string.radar)
         binding.weatherCardViewHeader.compareForecast.visibility = View.GONE

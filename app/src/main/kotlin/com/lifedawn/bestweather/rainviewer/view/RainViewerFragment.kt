@@ -69,7 +69,7 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        _binding = FragmentRainViewerBinding.inflate(inflater)
+        _binding = FragmentRainViewerBinding.inflate(inflater, container, false)
 
         binding.progressResultView.setContentView(binding.mapButtons.root, binding.previousBtn, binding.datetime, binding.nextBtn, binding
                 .mapFragmentContainer)

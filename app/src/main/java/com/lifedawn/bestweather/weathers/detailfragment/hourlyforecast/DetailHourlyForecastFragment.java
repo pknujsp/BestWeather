@@ -17,7 +17,7 @@ import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailHourlyFor
 import org.jetbrains.annotations.NotNull;
 
 public class DetailHourlyForecastFragment extends BaseDetailHourlyForecastFragment {
-
+	private HourlyForecastListAdapter adapter;
 
 	@Override
 	public void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
@@ -48,8 +48,7 @@ public class DetailHourlyForecastFragment extends BaseDetailHourlyForecastFragme
 				showDataType = HourlyForecastListAdapter.ShowDataType.Humidity;
 				break;
 		}
-		HourlyForecastListAdapter adapter = new HourlyForecastListAdapter(
-				this, showDataType);
+		adapter = new HourlyForecastListAdapter(this, showDataType);
 		adapter.setHourlyForecastDtoList(hourlyForecastDtoList);
 		binding.listview.setHasFixedSize(true);
 		binding.listview.setAdapter(adapter);
@@ -58,6 +57,13 @@ public class DetailHourlyForecastFragment extends BaseDetailHourlyForecastFragme
 	@Override
 	protected void setDataViewsByTable() {
 
+	}
+
+	@Override
+	public void onDestroy() {
+		adapter.hourlyForecastDtoList.clear();
+		adapter = null;
+		super.onDestroy();
 	}
 
 	@Override

@@ -216,7 +216,7 @@ public final class KmaProcessing {
 		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "30");
 
 		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST);
-		Call<String> xmlCall = Objects.requireNonNull(queries).getUltraSrtFcstByXml(parameter.getMap());
+		Call<String> xmlCall = queries.getUltraSrtFcstByXml(parameter.getMap());
 		xmlCall.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -276,7 +276,7 @@ public final class KmaProcessing {
 		parameter.setBaseTime(dateTime.toLocalTime().format(HH) + "00");
 
 		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_VILAGE_FCST);
-		Call<String> call = Objects.requireNonNull(queries).getVilageFcstByXml(parameter.getMap());
+		Call<String> call = queries.getVilageFcstByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -307,7 +307,7 @@ public final class KmaProcessing {
 	 */
 	public static Call<String> getMidLandFcstData(MidLandParameter parameter, JsonDownloader callback) {
 		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_MID_LAND_FCST);
-		Call<String> call = Objects.requireNonNull(queries).getMidLandFcstByXml(parameter.getMap());
+		Call<String> call = queries.getMidLandFcstByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {
@@ -339,7 +339,7 @@ public final class KmaProcessing {
 	 */
 	public static Call<String> getMidTaData(MidTaParameter parameter, JsonDownloader callback) {
 		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.KMA_MID_TA_FCST);
-		Call<String> call = Objects.requireNonNull(queries).getMidTaByXml(parameter.getMap());
+		Call<String> call = queries.getMidTaByXml(parameter.getMap());
 		call.enqueue(new Callback<String>() {
 			@Override
 			public void onResponse(Call<String> call, Response<String> response) {

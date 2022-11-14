@@ -191,7 +191,7 @@ public class ConfigureWidgetActivity extends AppCompatActivity implements Abstra
 					AppWidgetManager.INVALID_APPWIDGET_ID);
 		}
 
-		appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+		appWidgetManager = AppWidgetManager.getInstance(this);
 		final AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId);
 		layoutId = appWidgetProviderInfo.initialLayout;
 		ComponentName componentName = appWidgetProviderInfo.provider;

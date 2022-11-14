@@ -108,7 +108,7 @@ public class WidgetListenableWorker extends ListenableWorker {
 			widgetRepository = WidgetRepository.getINSTANCE();
 		}
 		if (appWidgetManager == null) {
-			appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+			appWidgetManager = AppWidgetManager.getInstance(context);
 		}
 
 		Data parameterData = workerParams.getInputData();
@@ -159,7 +159,6 @@ public class WidgetListenableWorker extends ListenableWorker {
 									@Override
 									protected void onFinished(Map<Integer, RemoteViews> remoteViewsMap) {
 										processing.set(false);
-
 
 										for (int id : remoteViewsMap.keySet()) {
 											appWidgetManager.updateAppWidget(id, remoteViewsMap.get(id));

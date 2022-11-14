@@ -57,7 +57,7 @@ public class NotScrolledView extends FrameLayout {
 			typedArray.recycle();
 		}
 
-		binding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.view_not_scrolled, this, true);
+		binding = ViewNotScrolledBinding.inflate(LayoutInflater.from(getContext()), this, true);
 		binding.img.setVisibility(iconVisibility);
 		binding.img.setImageResource(iconSrc);
 		binding.text.setText(text);

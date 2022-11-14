@@ -302,11 +302,15 @@ public class FusedLocation implements ConnectionCallbacks, OnConnectionFailedLis
 			if (timerTask != null)
 				timerTask.cancel();
 
-			if (Objects.requireNonNull(locationRequestObj).locationCallback != null) {
+			if (locationRequestObj == null) {
+				return;
+			}
+
+			if (locationRequestObj.locationCallback != null) {
 				fusedLocationClient.removeLocationUpdates(locationRequestObj.locationCallback);
 			}
-			if (Objects.requireNonNull(locationRequestObj).currentLocationTask != null) {
-				Objects.requireNonNull(locationRequestObj).cancellationTokenSource.cancel();
+			if (locationRequestObj.currentLocationTask != null) {
+				locationRequestObj.cancellationTokenSource.cancel();
 			}
 			locationRequestObjMap.remove(myLocationCallback);
 		}

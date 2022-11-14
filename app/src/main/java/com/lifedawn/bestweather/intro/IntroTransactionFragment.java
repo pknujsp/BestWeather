@@ -45,7 +45,7 @@ public class IntroTransactionFragment extends Fragment {
 	@Override
 	public View onCreateView(@NonNull @NotNull LayoutInflater inflater, @Nullable @org.jetbrains.annotations.Nullable ViewGroup container,
 	                         @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-		binding = FragmentIntroTransactionBinding.inflate(inflater);
+		binding = FragmentIntroTransactionBinding.inflate(inflater, container, false);
 		return binding.getRoot();
 	}
 

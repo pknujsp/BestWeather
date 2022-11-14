@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DateView extends View {
+public class DateView extends View implements ICleaner {
 	private final FragmentType fragmentType;
 
 	private final TextPaint dateTextPaint;
@@ -137,6 +137,12 @@ public class DateView extends View {
 		canvas.translate(x, y);
 		staticLayout.draw(canvas);
 		canvas.restore();
+	}
+
+	@Override
+	public void clear() {
+		if (dateValueList != null)
+			dateValueList.clear();
 	}
 
 

@@ -64,7 +64,7 @@ public class DialogActivity extends Activity {
 		Bundle bundle = getIntent().getExtras();
 		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
 
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
 		final AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId);
 		ComponentName componentName = appWidgetProviderInfo.provider;
 		final String providerClassName = componentName.getClassName();

@@ -30,7 +30,7 @@ public class SunSetRiseNotificationFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
-		binding = FragmentSunSetRiseNotificationBinding.inflate(inflater);
+		binding = FragmentSunSetRiseNotificationBinding.inflate(inflater, container, false);
 		return binding.getRoot();
 	}
 

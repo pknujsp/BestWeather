@@ -20,7 +20,7 @@ import com.lifedawn.bestweather.weathers.FragmentType;
 
 import java.util.List;
 
-public class IconTextView extends View {
+public class IconTextView extends View implements ICleaner {
 	private final FragmentType fragmentType;
 
 	private final int viewWidth;
@@ -149,5 +149,13 @@ public class IconTextView extends View {
 			idx++;
 		}
 
+	}
+
+	@Override
+	public void clear() {
+		if (valueList != null)
+			valueList.clear();
+		if (visibleList != null)
+			visibleList.clear();
 	}
 }

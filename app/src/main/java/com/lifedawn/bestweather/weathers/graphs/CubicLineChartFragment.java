@@ -58,7 +58,7 @@ public class CubicLineChartFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
-		binding = FragmentCubicLineChartBinding.inflate(inflater);
+		binding = FragmentCubicLineChartBinding.inflate(inflater, container, false);
 		return binding.getRoot();
 	}
 

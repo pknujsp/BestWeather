@@ -14,33 +14,33 @@ import com.lifedawn.bestweather.weathers.FragmentType;
 
 import java.util.List;
 
-public class SingleWindDirectionView extends LinearLayout {
+public class SingleWindDirectionView extends LinearLayout implements ICleaner {
 	private final FragmentType fragmentType;
 	private final int viewWidth;
 	private final int viewHeight;
 	private final int columnWidth;
 	private final int iconSize;
-	
+
 	private List<Integer> windDirectionObjList;
-	
-	
+
+
 	public SingleWindDirectionView(Context context, FragmentType fragmentType, int viewWidth, int viewHeight, int columnWidth) {
 		super(context);
 		this.fragmentType = fragmentType;
 		this.viewWidth = viewWidth;
 		this.viewHeight = viewHeight;
 		this.columnWidth = columnWidth;
-		
+
 		int tempImgSize = viewHeight;
 		iconSize = tempImgSize;
 	}
-	
+
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 	}
-	
-	
+
+
 	public void setWindDirectionObjList(List<Integer> windDirectionObjList) {
 		this.windDirectionObjList = windDirectionObjList;
 		LinearLayout.LayoutParams layoutParams = new LayoutParams(columnWidth, viewHeight);
@@ -48,7 +48,7 @@ public class SingleWindDirectionView extends LinearLayout {
 		Context context = getContext();
 		Drawable drawable = ContextCompat.getDrawable(context, R.drawable.arrow);
 		int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, context.getResources().getDisplayMetrics());
-		
+
 		for (Integer degree : windDirectionObjList) {
 			ImageView directionView = new ImageView(context);
 			directionView.setImageDrawable(drawable);
@@ -57,6 +57,11 @@ public class SingleWindDirectionView extends LinearLayout {
 			addView(directionView, layoutParams);
 		}
 	}
-	
-	
+
+
+	@Override
+	public void clear() {
+		if (windDirectionObjList != null)
+			windDirectionObjList.clear();
+	}
 }

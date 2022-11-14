@@ -30,22 +30,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<DetailHourlyForecastViewPagerAdapter.ViewHolder> {
-	private LayoutInflater layoutInflater;
-	private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
-	private DateTimeFormatter hoursFormatter;
-	private final String feelsLikeTempLabel;
-	private final Context context;
-	private final String noData;
+	private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d E");
+	private final DateTimeFormatter hoursFormatter;
+
 
 	private List<HourlyForecastDto> hourlyForecastDtoList;
 
-	public DetailHourlyForecastViewPagerAdapter(Context context) {
-		this.context = context;
-		layoutInflater = LayoutInflater.from(context);
+	public DetailHourlyForecastViewPagerAdapter() {
 		ValueUnits clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit();
 		hoursFormatter = DateTimeFormatter.ofPattern(clockUnit == ValueUnits.clock12 ? "h a" : "H");
-		feelsLikeTempLabel = context.getString(R.string.feelsLike) + ": ";
-		noData = context.getString(R.string.noData);
+
 	}
 
 	public DetailHourlyForecastViewPagerAdapter setHourlyForecastDtoList(List<HourlyForecastDto> hourlyForecastDtoList) {
@@ -57,6 +51,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 	@NotNull
 	@Override
 	public DetailHourlyForecastViewPagerAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+		LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
 		return new ViewHolder(ItemviewDetailForecastBinding.inflate(layoutInflater, parent, false),
 				HeaderviewDetailHourlyforecastBinding.inflate(layoutInflater, null, false));
 	}
@@ -80,12 +75,17 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 	protected class ViewHolder extends RecyclerView.ViewHolder {
 		private final ItemviewDetailForecastBinding binding;
 		private final HeaderviewDetailHourlyforecastBinding headerBinding;
+		private final String feelsLikeTempLabel;
+		private final String noData;
 
 		public ViewHolder(ItemviewDetailForecastBinding binding, HeaderviewDetailHourlyforecastBinding headerBinding) {
 			super(binding.getRoot());
 			this.binding = binding;
 			this.headerBinding = headerBinding;
 			binding.header.addView(headerBinding.getRoot());
+
+			feelsLikeTempLabel = binding.getRoot().getContext().getString(R.string.feelsLike) + ": ";
+			noData = binding.getRoot().getContext().getString(R.string.noData);
 		}
 
 		public void clear() {
@@ -113,10 +113,12 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 
 			headerBinding.weatherIcon.setImageResource(hourlyForecastDto.getWeatherIcon());
 			headerBinding.temp.setText(hourlyForecastDto.getTemp());
+
+
 			headerBinding.feelsLikeTemp.setText(new String(feelsLikeTempLabel + hourlyForecastDto.getFeelsLikeTemp()));
 			headerBinding.weatherDescription.setText(hourlyForecastDto.getWeatherDescription());
 
-			addPrecipitationGridItem(layoutInflater, hourlyForecastDto);
+			addPrecipitationGridItem(LayoutInflater.from(binding.getRoot().getContext()), hourlyForecastDto);
 
 			//gridviewLayout
 			//공통 - 날씨, 기온, 강수량, 강수확률, 풍향, 풍속, 바람세기, 습도
@@ -125,13 +127,13 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			if (hourlyForecastDto.getPrecipitationType() != null) {
 				gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.precipitationType),
 						hourlyForecastDto.getPrecipitationType(),
-						ContextCompat.getDrawable(context, hourlyForecastDto.getPrecipitationTypeIcon())));
+						ContextCompat.getDrawable(binding.getRoot().getContext(), hourlyForecastDto.getPrecipitationTypeIcon())));
 			}
 
 			gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windDirection),
 					hourlyForecastDto.getWindDirection() == null ?
 							noData : hourlyForecastDto.getWindDirection(),
-					ContextCompat.getDrawable(context, R.drawable.arrow), hourlyForecastDto.getWindDirectionVal() + 180));
+					ContextCompat.getDrawable(binding.getRoot().getContext(), R.drawable.arrow), hourlyForecastDto.getWindDirectionVal() + 180));
 
 			gridItemDtos.add(new GridItemDto(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.windSpeed),
 					hourlyForecastDto.getWindSpeed() == null ?
@@ -179,7 +181,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 
 		private void addPrecipitationGridItem(LayoutInflater layoutInflater, HourlyForecastDto hourlyForecastDto) {
 			View gridItem = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null);
-			final int blueColor = ContextCompat.getColor(context, R.color.blue);
+			final int blueColor = ContextCompat.getColor(binding.getRoot().getContext(), R.color.blue);
 
 			//강수확률
 			((TextView) gridItem.findViewById(R.id.label)).setText(WeatherValueLabels.INSTANCE.getWeatherValueLabelsMap().get(WeatherValueType.pop));
@@ -259,6 +261,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 			TextView value = null;
 			ImageView icon = null;
 			View convertView = null;
+			LayoutInflater layoutInflater = LayoutInflater.from(binding.getRoot().getContext());
 
 			for (GridItemDto gridItem : gridItemDtos) {
 				convertView = layoutInflater.inflate(R.layout.view_detail_weather_data_item, null, false);
@@ -290,6 +293,7 @@ public class DetailHourlyForecastViewPagerAdapter extends RecyclerView.Adapter<D
 
 				binding.detailGridView.addView(convertView, layoutParams);
 			}
+			layoutInflater = null;
 		}
 
 	}

@@ -141,6 +141,12 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 			IconTextView snowVolumeRow = new IconTextView(context, FragmentType.Simple, viewWidth,
 					columnWidth, R.drawable.snowparticle);
 
+			customViewList.add(weatherIconRow);
+			customViewList.add(probabilityOfPrecipitationRow);
+			customViewList.add(rainVolumeRow);
+			customViewList.add(precipitationVolumeRow);
+			customViewList.add(snowVolumeRow);
+
 			List<SingleWeatherIconView.WeatherIconObj> weatherIconObjList = new ArrayList<>();
 			List<String> hourList = new ArrayList<>();
 			List<Integer> tempList = new ArrayList<>();
@@ -211,6 +217,10 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 
 			TextsView hourRow = new TextsView(context, viewWidth, columnWidth, hourList);
 			DetailSingleTemperatureView tempRow = new DetailSingleTemperatureView(context, tempList);
+
+			customViewList.add(hourRow);
+			customViewList.add(tempRow);
+
 			tempRow.setLineColor(Color.WHITE);
 			tempRow.setCircleColor(Color.WHITE);
 
@@ -266,34 +276,39 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 			boolean finalHasNextNHoursPrecipitation = hasNextNHoursPrecipitation;
 			ZonedDateTime finalFirstDateTime_hasNextNHours = firstDateTime_hasNextNHours;
 
-			Objects.requireNonNull(requireActivity()).runOnUiThread(() -> {
-				binding.forecastView.addView(dateRow, rowLayoutParams);
-				binding.forecastView.addView(hourRow, rowLayoutParams);
-				binding.forecastView.addView(weatherIconRow, rowLayoutParams);
-				binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
+			try {
 
-				if (finalHaveRain) {
-					binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
-				}
-				if (finalHaveSnow) {
-					binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
-				}
-				if (finalHavePrecipitation) {
-					binding.forecastView.addView(precipitationVolumeRow, rowLayoutParams);
-				}
+				requireActivity().runOnUiThread(() -> {
+					binding.forecastView.addView(dateRow, rowLayoutParams);
+					binding.forecastView.addView(hourRow, rowLayoutParams);
+					binding.forecastView.addView(weatherIconRow, rowLayoutParams);
+					binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
 
-				LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-						(int) context.getResources().getDimension(R.dimen.singleTemperatureRowHeightInCOMMON));
-				binding.forecastView.addView(tempRow, tempRowLayoutParams);
+					if (finalHaveRain) {
+						binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
+					}
+					if (finalHaveSnow) {
+						binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
+					}
+					if (finalHavePrecipitation) {
+						binding.forecastView.addView(precipitationVolumeRow, rowLayoutParams);
+					}
 
-				if (finalHasNextNHoursPrecipitation) {
-					createValueUnitsDescription(mainWeatherProviderType, true, finalHaveSnow, finalFirstDateTime_hasNextNHours, "6");
-				} else {
-					createValueUnitsDescription(mainWeatherProviderType, finalHaveRain, finalHaveSnow);
-				}
+					LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+							(int) context.getResources().getDimension(R.dimen.singleTemperatureRowHeightInCOMMON));
+					binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
-				onFinishedSetData();
-			});
+					if (finalHasNextNHoursPrecipitation) {
+						createValueUnitsDescription(mainWeatherProviderType, true, finalHaveSnow, finalFirstDateTime_hasNextNHours, "6");
+					} else {
+						createValueUnitsDescription(mainWeatherProviderType, finalHaveRain, finalHaveSnow);
+					}
+
+					onFinishedSetData();
+				});
+			} catch (Exception e) {
+
+			}
 		});
 
 

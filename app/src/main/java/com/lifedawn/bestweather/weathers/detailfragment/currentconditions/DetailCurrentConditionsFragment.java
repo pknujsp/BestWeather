@@ -103,6 +103,12 @@ public class DetailCurrentConditionsFragment extends BaseDetailCurrentConditions
 		}
 	}
 
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		currentConditionsDto = null;
+	}
+
 	public void setCurrentConditionsDto(CurrentConditionsDto currentConditionsDto) {
 		this.currentConditionsDto = currentConditionsDto;
 	}

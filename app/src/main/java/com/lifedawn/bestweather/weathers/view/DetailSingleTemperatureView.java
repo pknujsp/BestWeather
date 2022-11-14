@@ -17,7 +17,7 @@ import com.lifedawn.bestweather.theme.AppTheme;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailSingleTemperatureView extends View {
+public class DetailSingleTemperatureView extends View implements ICleaner {
 	private final TextPaint tempPaint;
 	private final Paint linePaint;
 	private final Paint circlePaint;
@@ -169,4 +169,8 @@ public class DetailSingleTemperatureView extends View {
 	}
 
 
+	@Override
+	public void clear() {
+		tempList.clear();
+	}
 }

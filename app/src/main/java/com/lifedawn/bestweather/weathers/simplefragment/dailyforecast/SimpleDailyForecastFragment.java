@@ -42,7 +42,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	private static List<DailyForecastDto> dailyForecastDtoList;
 
 	public SimpleDailyForecastFragment setDailyForecastDtoList(List<DailyForecastDto> dailyForecastDtoList) {
-		this.dailyForecastDtoList = dailyForecastDtoList;
+		SimpleDailyForecastFragment.dailyForecastDtoList = dailyForecastDtoList;
 		return this;
 	}
 
@@ -50,6 +50,11 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		needCompare = true;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
 	}
 
 	@Override
@@ -82,7 +87,7 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				arguments.putSerializable(BundleKey.TimeZone.name(), bundle.getSerializable(BundleKey.TimeZone.name()));
 				arguments.putSerializable(BundleKey.WeatherProvider.name(), mainWeatherProviderType);
 
-				DetailDailyForecastFragment detailDailyForecastFragment = new DetailDailyForecastFragment();
+				final DetailDailyForecastFragment detailDailyForecastFragment = new DetailDailyForecastFragment();
 				DetailDailyForecastFragment.setDailyForecastDtoList(dailyForecastDtoList);
 				detailDailyForecastFragment.setArguments(arguments);
 
@@ -126,6 +131,11 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 					COLUMN_WIDTH, R.drawable.raindrop);
 			IconTextView snowVolumeRow = new IconTextView(context, FragmentType.Simple, VIEW_WIDTH,
 					COLUMN_WIDTH, R.drawable.snowparticle);
+
+			customViewList.add(weatherIconRow);
+			customViewList.add(probabilityOfPrecipitationRow);
+			customViewList.add(rainVolumeRow);
+			customViewList.add(snowVolumeRow);
 
 			//시각 --------------------------------------------------------------------------
 			List<String> dateList = new ArrayList<>();
@@ -230,6 +240,9 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 			DetailDoubleTemperatureView tempRow = new DetailDoubleTemperatureView(requireContext().getApplicationContext(), FragmentType.Simple, VIEW_WIDTH,
 					TEMP_ROW_HEIGHT, COLUMN_WIDTH, minTempList, maxTempList);
 
+			customViewList.add(dateRow);
+			customViewList.add(tempRow);
+
 			LinearLayout.LayoutParams rowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
 					ViewGroup.LayoutParams.WRAP_CONTENT);
 
@@ -272,26 +285,30 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 
 			boolean finalHaveRain = haveRain;
 			boolean finalHaveSnow = haveSnow;
-			Objects.requireNonNull(requireActivity()).runOnUiThread(() -> {
-				binding.forecastView.addView(dateRow, dateRowLayoutParams);
-				binding.forecastView.addView(weatherIconRow, rowLayoutParams);
-				binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
-				if (finalHaveRain) {
-					binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
-				}
-				if (finalHaveSnow) {
-					binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
-				}
+			try {
+				requireActivity().runOnUiThread(() -> {
+					binding.forecastView.addView(dateRow, dateRowLayoutParams);
+					binding.forecastView.addView(weatherIconRow, rowLayoutParams);
+					binding.forecastView.addView(probabilityOfPrecipitationRow, rowLayoutParams);
+					if (finalHaveRain) {
+						binding.forecastView.addView(rainVolumeRow, rowLayoutParams);
+					}
+					if (finalHaveSnow) {
+						binding.forecastView.addView(snowVolumeRow, rowLayoutParams);
+					}
 
-				LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-						ViewGroup.LayoutParams.WRAP_CONTENT);
-				tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
-				binding.forecastView.addView(tempRow, tempRowLayoutParams);
+					LinearLayout.LayoutParams tempRowLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+							ViewGroup.LayoutParams.WRAP_CONTENT);
+					tempRowLayoutParams.topMargin = (int) getResources().getDimension(R.dimen.tempTopMargin);
+					binding.forecastView.addView(tempRow, tempRowLayoutParams);
 
-				createValueUnitsDescription(mainWeatherProviderType, finalHaveRain, finalHaveSnow);
+					createValueUnitsDescription(mainWeatherProviderType, finalHaveRain, finalHaveSnow);
+					onFinishedSetData();
+				});
+			} catch (Exception e) {
 
-				onFinishedSetData();
-			});
+			}
+
 		});
 
 

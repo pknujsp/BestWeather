@@ -26,10 +26,9 @@ public abstract class WeatherRestApiDownloader {
 	private boolean responseCompleted;
 	private ZoneId zoneId;
 
-	public Map<String, String> valueMap = new ConcurrentHashMap<>();
-	public Map<RetrofitClient.ServiceType, Call<?>> callMap = new ConcurrentHashMap<>();
-
-	public Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<RetrofitClient.ServiceType, Call<?>> callMap = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ConcurrentHashMap<>();
 
 	public WeatherRestApiDownloader() {
 	}
@@ -111,6 +110,12 @@ public abstract class WeatherRestApiDownloader {
 			}
 		}
 
+	}
+
+	public void clear() {
+		valueMap.clear();
+		callMap.clear();
+		responseMap.clear();
 	}
 
 	public void processResult(WeatherProviderType weatherProviderType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
