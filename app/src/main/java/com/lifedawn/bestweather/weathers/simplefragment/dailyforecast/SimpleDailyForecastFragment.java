@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -87,8 +88,11 @@ public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 				arguments.putSerializable(BundleKey.TimeZone.name(), bundle.getSerializable(BundleKey.TimeZone.name()));
 				arguments.putSerializable(BundleKey.WeatherProvider.name(), mainWeatherProviderType);
 
+				List<DailyForecastDto> copiedList = new ArrayList<>(dailyForecastDtoList);
+				Collections.copy(copiedList, dailyForecastDtoList);
+
 				final DetailDailyForecastFragment detailDailyForecastFragment = new DetailDailyForecastFragment();
-				DetailDailyForecastFragment.setDailyForecastDtoList(dailyForecastDtoList);
+				DetailDailyForecastFragment.setDailyForecastDtoList(copiedList);
 				detailDailyForecastFragment.setArguments(arguments);
 
 				String tag = getString(R.string.tag_detail_daily_forecast_fragment);

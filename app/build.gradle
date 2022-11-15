@@ -173,6 +173,9 @@ dependencies {
 
     apply plugin: 'com.google.firebase.crashlytics'
 
+    apply plugin: 'kotlin-android'
+    apply plugin: 'kotlin-parcelize'
+
     dependencies {
 
         implementation platform('com.google.firebase:firebase-bom:30.1.0')
@@ -214,7 +217,6 @@ dependencies {
     }
 
     implementation 'androidx.asynclayoutinflater:asynclayoutinflater:1.0.0'
-
 
 
 }

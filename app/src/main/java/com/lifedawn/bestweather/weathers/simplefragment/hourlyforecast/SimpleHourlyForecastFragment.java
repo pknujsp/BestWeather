@@ -28,6 +28,7 @@ import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecas
 
 import com.lifedawn.bestweather.weathers.detailfragment.hourlyforecast.DetailHourlyForecastFragment;
 
+import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 
@@ -45,6 +46,7 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -92,7 +94,10 @@ public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 				arguments.putDouble(BundleKey.Longitude.name(), bundle.getDouble(BundleKey.Longitude.name()));
 				arguments.putSerializable(BundleKey.WeatherProvider.name(), mainWeatherProviderType);
 
-				DetailHourlyForecastFragment.setHourlyForecastDtoList(hourlyForecastDtoList);
+				List<HourlyForecastDto> copiedList = new ArrayList<>(hourlyForecastDtoList);
+				Collections.copy(copiedList, hourlyForecastDtoList);
+
+				DetailHourlyForecastFragment.setHourlyForecastDtoList(copiedList);
 				detailHourlyForecastFragment.setArguments(arguments);
 
 				String tag = getString(R.string.tag_detail_hourly_forecast_fragment);

@@ -1,13 +1,18 @@
 package com.lifedawn.bestweather.weathers.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DailyForecastDto implements Serializable {
+import kotlinx.parcelize.Parcelize;
+
+public class DailyForecastDto implements Parcelable {
 	private ZonedDateTime date;
-	private final List<Values> valuesList = new ArrayList<>();
+	private final ArrayList<Values> valuesList = new ArrayList<>();
 
 	private String minTemp;
 	private String maxTemp;
@@ -16,7 +21,10 @@ public class DailyForecastDto implements Serializable {
 	private boolean available_toMakeMinMaxTemp = true;
 	private boolean haveOnly1HoursForecast = false;
 
-	public final static class Values implements Serializable {
+	public DailyForecastDto() {
+	}
+
+	public static class Values implements Parcelable {
 		private int weatherIcon;
 		private String weatherDescription;
 		private ZonedDateTime dateTime;
@@ -53,6 +61,55 @@ public class DailyForecastDto implements Serializable {
 		private boolean hasPrecipitationVolume;
 		private boolean hasPop;
 		private boolean hasPrecipitationNextHoursAmount;
+
+
+		public Values() {
+		}
+
+		protected Values(Parcel in) {
+			weatherIcon = in.readInt();
+			weatherDescription = in.readString();
+			pop = in.readString();
+			pos = in.readString();
+			por = in.readString();
+			precipitationVolume = in.readString();
+			rainVolume = in.readString();
+			snowVolume = in.readString();
+			minTemp = in.readString();
+			maxTemp = in.readString();
+			temp = in.readString();
+			windDirection = in.readString();
+			windDirectionVal = in.readInt();
+			windSpeed = in.readString();
+			windStrength = in.readString();
+			windGust = in.readString();
+			pressure = in.readString();
+			humidity = in.readString();
+			dewPointTemp = in.readString();
+			cloudiness = in.readString();
+			visibility = in.readString();
+			uvIndex = in.readString();
+			precipitationType = in.readString();
+			precipitationTypeIcon = in.readInt();
+			PrecipitationNextHoursAmount = in.readInt();
+			hasRainVolume = in.readByte() != 0;
+			hasSnowVolume = in.readByte() != 0;
+			hasPrecipitationVolume = in.readByte() != 0;
+			hasPop = in.readByte() != 0;
+			hasPrecipitationNextHoursAmount = in.readByte() != 0;
+		}
+
+		public static final Creator<Values> CREATOR = new Creator<Values>() {
+			@Override
+			public Values createFromParcel(Parcel in) {
+				return new Values(in);
+			}
+
+			@Override
+			public Values[] newArray(int size) {
+				return new Values[size];
+			}
+		};
 
 		public String getTemp() {
 			return temp;
@@ -333,7 +390,82 @@ public class DailyForecastDto implements Serializable {
 			this.precipitationTypeIcon = precipitationTypeIcon;
 			return this;
 		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			dest.writeInt(weatherIcon);
+			dest.writeString(weatherDescription);
+			dest.writeString(pop);
+			dest.writeString(pos);
+			dest.writeString(por);
+			dest.writeString(precipitationVolume);
+			dest.writeString(rainVolume);
+			dest.writeString(snowVolume);
+			dest.writeString(minTemp);
+			dest.writeString(maxTemp);
+			dest.writeString(temp);
+			dest.writeString(windDirection);
+			dest.writeInt(windDirectionVal);
+			dest.writeString(windSpeed);
+			dest.writeString(windStrength);
+			dest.writeString(windGust);
+			dest.writeString(pressure);
+			dest.writeString(humidity);
+			dest.writeString(dewPointTemp);
+			dest.writeString(cloudiness);
+			dest.writeString(visibility);
+			dest.writeString(uvIndex);
+			dest.writeString(precipitationType);
+			dest.writeInt(precipitationTypeIcon);
+			dest.writeInt(PrecipitationNextHoursAmount);
+			dest.writeByte((byte) (hasRainVolume ? 1 : 0));
+			dest.writeByte((byte) (hasSnowVolume ? 1 : 0));
+			dest.writeByte((byte) (hasPrecipitationVolume ? 1 : 0));
+			dest.writeByte((byte) (hasPop ? 1 : 0));
+			dest.writeByte((byte) (hasPrecipitationNextHoursAmount ? 1 : 0));
+		}
 	}
+
+	protected DailyForecastDto(Parcel in) {
+		minTemp = in.readString();
+		maxTemp = in.readString();
+		minFeelsLikeTemp = in.readString();
+		maxFeelsLikeTemp = in.readString();
+		available_toMakeMinMaxTemp = in.readByte() != 0;
+		haveOnly1HoursForecast = in.readByte() != 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(minTemp);
+		dest.writeString(maxTemp);
+		dest.writeString(minFeelsLikeTemp);
+		dest.writeString(maxFeelsLikeTemp);
+		dest.writeByte((byte) (available_toMakeMinMaxTemp ? 1 : 0));
+		dest.writeByte((byte) (haveOnly1HoursForecast ? 1 : 0));
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	public static final Creator<DailyForecastDto> CREATOR = new Creator<DailyForecastDto>() {
+		@Override
+		public DailyForecastDto createFromParcel(Parcel in) {
+			return new DailyForecastDto(in);
+		}
+
+		@Override
+		public DailyForecastDto[] newArray(int size) {
+			return new DailyForecastDto[size];
+		}
+	};
 
 	public ZonedDateTime getDate() {
 		return date;
