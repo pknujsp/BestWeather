@@ -89,7 +89,6 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 	public Double longitude;
 	public String countryCode;
 	public String addressName;
-	public SharedPreferences sharedPreferences;
 	public ZoneId zoneId;
 
 	public FavoriteAddressDto favoriteAddressDto;
@@ -98,7 +97,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 	public Bundle arguments;
 
 	private final int FRAGMENT_TOTAL_COUNTS = 7;
-	public final AtomicBoolean needDrawFragments = new AtomicBoolean(true);
+	private final AtomicBoolean needDrawFragments = new AtomicBoolean(true);
 	private final AtomicInteger resumedFragmentCount = new AtomicInteger(0);
 
 	public final MutableLiveData<WeatherFragment.ResponseResultObj> weatherDataResponse = new MutableLiveData<>();
@@ -110,6 +109,10 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 	@Override
 	protected void onCleared() {
 		super.onCleared();
+		if(weatherRestApiDownloader != null){
+			weatherRestApiDownloader.clear();
+		}
+
 	}
 
 	public static void clear() {

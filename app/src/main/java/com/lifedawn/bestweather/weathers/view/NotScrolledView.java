@@ -18,7 +18,7 @@ import com.lifedawn.bestweather.databinding.ViewNotScrolledBinding;
 import java.util.Arrays;
 import java.util.Collections;
 
-public class NotScrolledView extends FrameLayout {
+public class NotScrolledView extends FrameLayout implements ICleaner {
 	private ViewNotScrolledBinding binding;
 
 	public NotScrolledView(Context context) {
@@ -82,5 +82,12 @@ public class NotScrolledView extends FrameLayout {
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		super.onLayout(changed, l, t, r, b);
+	}
+
+	@Override
+	public void clear() {
+		binding.img.setImageDrawable(null);
+		removeAllViewsInLayout();
+		binding = null;
 	}
 }

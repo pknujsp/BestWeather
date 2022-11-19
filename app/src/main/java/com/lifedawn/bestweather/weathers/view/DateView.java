@@ -143,6 +143,7 @@ public class DateView extends View implements ICleaner {
 	public void clear() {
 		if (dateValueList != null)
 			dateValueList.clear();
+		dateValueList = null;
 	}
 
 

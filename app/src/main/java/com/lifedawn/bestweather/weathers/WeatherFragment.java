@@ -502,18 +502,19 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		binding = null;
-		asyncBinding = null;
-	}
 
-	@Override
-	public void onDestroy() {
 		if (weatherFragmentViewModel.weatherRestApiDownloader != null)
 			weatherFragmentViewModel.weatherRestApiDownloader.cancel();
 		if (weatherViewController != null)
 			getLifecycle().removeObserver(weatherViewController);
 		if (locationLifeCycleObserver != null)
 			getLifecycle().removeObserver(locationLifeCycleObserver);
+		binding = null;
+		asyncBinding = null;
+	}
+
+	@Override
+	public void onDestroy() {
 		super.onDestroy();
 	}
 

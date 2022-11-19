@@ -39,7 +39,6 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 	protected String countryCode;
 	protected WeatherProviderType mainWeatherProviderType;
 	protected ZoneId zoneId;
-	protected ZoneOffset zoneOffset;
 	protected Bundle bundle;
 
 	private WeatherFragmentViewModel weatherFragmentViewModel;
@@ -58,8 +57,6 @@ public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWe
 		mainWeatherProviderType = (WeatherProviderType) bundle.getSerializable(
 				BundleKey.WeatherProvider.name());
 		zoneId = (ZoneId) bundle.getSerializable(BundleKey.TimeZone.name());
-
-		zoneOffset = ZonedDateTime.now(zoneId).getOffset();
 
 		weatherFragmentViewModel = new ViewModelProvider(requireParentFragment()).get(WeatherFragmentViewModel.class);
 	}

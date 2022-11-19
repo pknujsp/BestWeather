@@ -92,7 +92,7 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 	private void setValuesToViews(HourlyForecastResponse hourlyForecastResponse) {
 		final int weatherValueRowHeight = (int) getResources().getDimension(R.dimen.singleWeatherIconValueRowHeightInSC);
-		Context context = requireContext().getApplicationContext();
+		final Context context = requireContext().getApplicationContext();
 		final List<WeatherProviderType> weatherProviderTypeList = new ArrayList<>();
 
 		List<ForecastObj<HourlyForecastDto>> kmaFinalHourlyForecasts = null;
@@ -475,35 +475,38 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 		customViewList.add(dateRow);
 		customViewList.add(clockRow);
+
 		customViewList.addAll(Arrays.asList(tempRows));
 		customViewList.addAll(Arrays.asList(rainVolumeRows));
 		customViewList.addAll(Arrays.asList(probabilityOfPrecipitationRows));
 		customViewList.addAll(Arrays.asList(weatherIconRows));
 		customViewList.addAll(Arrays.asList(snowVolumeRows));
+		customViewList.addAll(Arrays.asList(notScrolledViews));
 	}
 
 	private void loadForecasts() {
-		ArrayMap<WeatherProviderType, RequestWeatherSource> request = new ArrayMap<>();
+		MyApplication.getExecutorService().submit(() -> {
+			ArrayMap<WeatherProviderType, RequestWeatherSource> request = new ArrayMap<>();
 
-		//RequestAccu requestAccu = new RequestAccu();
-		//requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
+			//RequestAccu requestAccu = new RequestAccu();
+			//requestAccu.addRequestServiceType(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
 
-		RequestOwmOneCall requestOwmOneCall = new RequestOwmOneCall();
-		requestOwmOneCall.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
-		Set<OneCallParameter.OneCallApis> exclude = new HashSet<>();
-		exclude.add(OneCallParameter.OneCallApis.alerts);
-		exclude.add(OneCallParameter.OneCallApis.minutely);
-		exclude.add(OneCallParameter.OneCallApis.current);
-		exclude.add(OneCallParameter.OneCallApis.daily);
-		requestOwmOneCall.setExcludeApis(exclude);
+			RequestOwmOneCall requestOwmOneCall = new RequestOwmOneCall();
+			requestOwmOneCall.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
+			Set<OneCallParameter.OneCallApis> exclude = new HashSet<>();
+			exclude.add(OneCallParameter.OneCallApis.alerts);
+			exclude.add(OneCallParameter.OneCallApis.minutely);
+			exclude.add(OneCallParameter.OneCallApis.current);
+			exclude.add(OneCallParameter.OneCallApis.daily);
+			requestOwmOneCall.setExcludeApis(exclude);
 
-		//request.put(WeatherDataSourceType.ACCU_WEATHER, requestAccu);
-		request.put(WeatherProviderType.OWM_ONECALL, requestOwmOneCall);
+			//request.put(WeatherDataSourceType.ACCU_WEATHER, requestAccu);
+			request.put(WeatherProviderType.OWM_ONECALL, requestOwmOneCall);
 
-		RequestMet requestMet = new RequestMet();
-		requestMet.addRequestServiceType(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
+			RequestMet requestMet = new RequestMet();
+			requestMet.addRequestServiceType(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
 
-		request.put(WeatherProviderType.MET_NORWAY, requestMet);
+			request.put(WeatherProviderType.MET_NORWAY, requestMet);
 
 		/*
 		RequestOwmIndividual requestOwmIndividual = new RequestOwmIndividual();
@@ -512,49 +515,54 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 
 		 */
 
-		if (countryCode.equals("KR")) {
-			RequestKma requestKma = new RequestKma();
-			requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
-			request.put(WeatherProviderType.KMA_WEB, requestKma);
-		}
-
-
-		weatherRestApiDownloader = new WeatherRestApiDownloader() {
-			@Override
-			public void onResult() {
-				setTable(weatherRestApiDownloader, latitude, longitude);
+			if (countryCode.equals("KR")) {
+				RequestKma requestKma = new RequestKma();
+				requestKma.addRequestServiceType(RetrofitClient.ServiceType.KMA_WEB_FORECASTS);
+				request.put(WeatherProviderType.KMA_WEB, requestKma);
 			}
 
-			@Override
-			public void onCanceled() {
-			}
-		};
-		weatherRestApiDownloader.setZoneId(zoneId);
 
-		MyApplication.getExecutorService().submit(() -> {
+			weatherRestApiDownloader = new WeatherRestApiDownloader() {
+				@Override
+				public void onResult() {
+					setTable(weatherRestApiDownloader, latitude, longitude);
+				}
+
+				@Override
+				public void onCanceled() {
+				}
+			};
+			weatherRestApiDownloader.setZoneId(zoneId);
+
 			MainProcessing.requestNewWeatherData(requireContext().getApplicationContext(), latitude, longitude, request, weatherRestApiDownloader);
 		});
 	}
 
 	@Override
-	public void onDestroy() {
+	public void onDestroyView() {
+		super.onDestroyView();
+
 		if (weatherRestApiDownloader != null) {
 			weatherRestApiDownloader.cancel();
 			weatherRestApiDownloader.clear();
 		}
 		if (hourlyForecastResponse != null)
 			hourlyForecastResponse.clear();
+
 		hourlyForecastResponse = null;
 		weatherRestApiDownloader = null;
-		super.onDestroy();
+	}
 
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
 	}
 
 	private void setTable(WeatherRestApiDownloader weatherRestApiDownloader, Double latitude, Double longitude) {
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> arrayMap;
 		hourlyForecastResponse = new HourlyForecastResponse();
-		Context context = requireContext().getApplicationContext();
+		final Context context = requireContext().getApplicationContext();
 
 		//kma api
 		if (responseMap.containsKey(WeatherProviderType.KMA_API)) {
@@ -659,17 +667,22 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 		}
 
 
-		if (getActivity() != null) {
-			MainThreadWorker.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					setValuesToViews(hourlyForecastResponse);
-					binding.rootScrollView.setVisibility(View.VISIBLE);
-					ProgressDialog.clearDialogs();
-				}
-			});
+		try {
+			if (getActivity() != null) {
+				MainThreadWorker.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						setValuesToViews(hourlyForecastResponse);
+						binding.rootScrollView.setVisibility(View.VISIBLE);
+						ProgressDialog.clearDialogs();
+					}
+				});
 
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+
 	}
 
 	private static class HourlyForecastResponse {
@@ -697,6 +710,11 @@ public class HourlyForecastComparisonFragment extends BaseForecastComparisonFrag
 				owmHourlyForecastList.clear();
 			if (metNorwayHourlyForecastList != null)
 				metNorwayHourlyForecastList.clear();
+
+			kmaHourlyForecastList = null;
+			accuHourlyForecastList = null;
+			owmHourlyForecastList = null;
+			metNorwayHourlyForecastList = null;
 
 			kmaThrowable = null;
 			owmThrowable = null;

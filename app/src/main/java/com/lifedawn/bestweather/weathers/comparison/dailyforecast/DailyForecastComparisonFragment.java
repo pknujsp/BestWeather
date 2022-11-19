@@ -55,6 +55,7 @@ import org.jetbrains.annotations.NotNull;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -482,6 +483,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			String sourceName;
 			int logoId;
+
 			switch (weatherProviderTypeList.get(i)) {
 				case KMA_WEB:
 					view = binding.kma;
@@ -523,6 +525,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 			tempRows.get(i).setValueTextColor(Color.BLACK);
 			view.addView(tempRows.get(i), tempRowLayoutParams);
 		}
+		dateTimeList.clear();
 
 		customViewList.addAll(weatherIconRows);
 		customViewList.addAll(probabilityOfPrecipitationRows);
@@ -530,6 +533,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 		customViewList.addAll(snowVolumeRows);
 		customViewList.addAll(tempRows);
 		customViewList.add(dateRow);
+		customViewList.addAll(Arrays.asList(notScrolledViews));
 
 		createValueUnitsDescription(weatherSourceUnitObjList);
 	}

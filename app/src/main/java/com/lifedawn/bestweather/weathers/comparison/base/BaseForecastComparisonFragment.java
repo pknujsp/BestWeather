@@ -49,7 +49,6 @@ public class BaseForecastComparisonFragment extends Fragment {
 	protected ZoneId zoneId;
 
 	protected NotScrolledView[] notScrolledViews;
-
 	protected List<ICleaner> customViewList = new ArrayList<>();
 
 	@Override
@@ -129,10 +128,13 @@ public class BaseForecastComparisonFragment extends Fragment {
 		}
 		customViewList.clear();
 
+		binding.datetime.removeAllViews();
 		binding.metNorway.removeAllViews();
 		binding.accu.removeAllViews();
 		binding.kma.removeAllViews();
 		binding.owm.removeAllViews();
+		binding.extraView.removeAllViews();
+
 		binding = null;
 	}
 
@@ -197,8 +199,9 @@ public class BaseForecastComparisonFragment extends Fragment {
 			binding.extraView.setVisibility(View.VISIBLE);
 		} else {
 			binding.extraView.setVisibility(View.GONE);
-
 		}
+
+		stringBuilder = null;
 	}
 
 	protected static class WeatherSourceUnitObj {
