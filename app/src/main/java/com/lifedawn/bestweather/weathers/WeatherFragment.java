@@ -231,7 +231,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 						shimmer(true, false);
 						fusedLocation.findCurrentLocation(MY_LOCATION_CALLBACK, false);
 					} else {
-						Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
+						Toast.makeText(requireContext().getApplicationContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
 					}
 				});
 
@@ -270,7 +270,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 					if (networkStatus.networkAvailable()) {
 						requestNewData();
 					} else {
-						Toast.makeText(getContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
+						Toast.makeText(requireContext().getApplicationContext(), R.string.disconnected_network, Toast.LENGTH_SHORT).show();
 					}
 				});
 
@@ -290,7 +290,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 				});
 
 				AdRequest adRequest = new AdRequest.Builder().build();
-				AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_unitId))
+				AdLoader adLoader = new AdLoader.Builder(requireContext().getApplicationContext(), getString(R.string.NATIVE_ADVANCE_unitId))
 						.forNativeAd(nativeAd -> {
 							NativeTemplateStyle styles = new
 									NativeTemplateStyle.Builder().withMainBackgroundColor(new ColorDrawable(Color.WHITE)).build();
@@ -415,7 +415,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 			final boolean clickGps = weatherFragmentViewModel.arguments.getBoolean("clickGps", false);
 
 			if (weatherFragmentViewModel.locationType == LocationType.CurrentLocation) {
-				SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+				SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
 				sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1).putString(
 						getString(R.string.pref_key_last_selected_location_type), weatherFragmentViewModel.locationType.name()).commit();
 
@@ -432,7 +432,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 					});
 
 				} else {
-					weatherFragmentViewModel.zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(requireContext())
+					weatherFragmentViewModel.zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext())
 							.getString("zoneId", ""));
 					//위/경도에 해당하는 지역명을 불러오고, 날씨 데이터 다운로드
 					//이미 존재하는 날씨 데이터면 다운로드X
@@ -453,7 +453,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 				weatherFragmentViewModel.selectedFavoriteAddressDto = (FavoriteAddressDto) bundle.getSerializable(
 						BundleKey.SelectedAddressDto.name());
 
-				SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+				SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
 				sharedPreferences.edit().putInt(getString(R.string.pref_key_last_selected_favorite_address_id),
 						weatherFragmentViewModel.selectedFavoriteAddressDto.getId()).putString(getString(R.string.pref_key_last_selected_location_type),
 						weatherFragmentViewModel.locationType.name()).commit();
@@ -509,6 +509,19 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 			getLifecycle().removeObserver(weatherViewController);
 		if (locationLifeCycleObserver != null)
 			getLifecycle().removeObserver(locationLifeCycleObserver);
+
+		if (binding.adViewBelowDetailCurrentConditions.getParent() != null)
+			((ViewGroup) binding.adViewBelowDetailCurrentConditions.getParent()).removeView(binding.adViewBelowDetailCurrentConditions);
+		binding.adViewBelowDetailCurrentConditions.destroy();
+
+		if (binding.adViewBelowAirQuality.getParent() != null)
+			((ViewGroup) binding.adViewBelowAirQuality.getParent()).removeView(binding.adViewBelowAirQuality);
+		binding.adViewBelowAirQuality.destroy();
+
+		if (binding.adViewBottom.getParent() != null)
+			((ViewGroup) binding.adViewBottom.getParent()).removeView(binding.adViewBottom);
+		binding.adViewBottom.destroyNativeAd();
+
 		binding = null;
 		asyncBinding = null;
 	}
@@ -549,7 +562,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 			//현재 위/경도 좌표를 최근 현재위치의 위/경도로 등록
 			//날씨 데이터 요청
 			final Location location = getBestLocation(locationResult);
-			weatherFragmentViewModel.zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(requireContext())
+			weatherFragmentViewModel.zoneId = ZoneId.of(PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext())
 					.getString("zoneId", ""));
 			onChangedCurrentLocation(location);
 			locationCallbackInMainFragment.onSuccessful(locationResult);
@@ -610,7 +623,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 				final String addressStr = getString(R.string.current_location) + " : " + weatherFragmentViewModel.addressName;
 
-				SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(requireContext()).edit();
+				SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext()).edit();
 
 				TimeZoneUtils.INSTANCE.getTimeZone(latitude, longitude, zoneId -> {
 					editor.putString("zoneId", zoneId.getId()).apply();
@@ -710,7 +723,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 					if (weatherFragmentViewModel.containWeatherData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
 						MainThreadWorker.runOnUiThread(() -> {
 							shimmer(false, false);
-							Toast.makeText(getContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
+							Toast.makeText(requireContext().getApplicationContext(), R.string.update_failed, Toast.LENGTH_SHORT).show();
 						});
 
 					} else {

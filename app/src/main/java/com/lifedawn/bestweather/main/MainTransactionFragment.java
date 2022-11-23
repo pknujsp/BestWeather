@@ -175,7 +175,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT;
 		}
 
-		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_unitId))
+		AdLoader adLoader = new AdLoader.Builder(requireContext().getApplicationContext(), getString(R.string.NATIVE_ADVANCE_unitId))
 				.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
 					@Override
 					public void onNativeAdLoaded(NativeAd nativeAd) {
@@ -233,7 +233,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			public void onFailed(Fail fail) {
 				if (fail == Fail.FAILED_FIND_LOCATION) {
 					//기존의 현재 위치 값이 없으면 즐겨찾기로 이동
-					Toast.makeText(getContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
+					Toast.makeText(requireContext().getApplicationContext(), R.string.failedFindingLocation, Toast.LENGTH_SHORT).show();
 					LocationResult locationResult = new FusedLocation(requireContext().getApplicationContext()).getLastCurrentLocation();
 
 					if (locationResult.getLocations().get(0).getLatitude() == 0.0 ||

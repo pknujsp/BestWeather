@@ -109,10 +109,22 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 	@Override
 	protected void onCleared() {
 		super.onCleared();
-		if(weatherRestApiDownloader != null){
+		if (weatherRestApiDownloader != null)
 			weatherRestApiDownloader.clear();
-		}
+		weatherRestApiDownloader = null;
+		dateTimeFormatter = null;
+		selectedFavoriteAddressDto = null;
+		locationType = null;
+		iTextColor = null;
 
+		mainWeatherProviderType = null;
+		latitude = null;
+		longitude = null;
+		countryCode = null;
+		addressName = null;
+		zoneId = null;
+		favoriteAddressDto = null;
+		arguments = null;
 	}
 
 	public static void clear() {

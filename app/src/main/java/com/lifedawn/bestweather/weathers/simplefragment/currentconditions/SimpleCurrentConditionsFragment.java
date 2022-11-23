@@ -78,7 +78,7 @@ public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditions
 		}
 		binding.windDirectionArrow.setVisibility(currentConditionsDto.getWindDirection() == null ? View.GONE : View.VISIBLE);
 		binding.windDirection.setVisibility(currentConditionsDto.getWindDirection() == null ? View.GONE : View.VISIBLE);
-		
+
 		Glide.with(binding.weatherIcon).load(currentConditionsDto.getWeatherIcon()).into(binding.weatherIcon);
 		binding.sky.setText(currentConditionsDto.getWeatherDescription());
 		binding.wind.setText(currentConditionsDto.getWindStrength() != null ? currentConditionsDto.getWindStrength() :

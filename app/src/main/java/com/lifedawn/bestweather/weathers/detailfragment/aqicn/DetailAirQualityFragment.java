@@ -163,7 +163,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 		});
 
 		AdRequest adRequest = new AdRequest.Builder().build();
-		AdLoader adLoader = new AdLoader.Builder(requireActivity(), getString(R.string.NATIVE_ADVANCE_unitId))
+		AdLoader adLoader = new AdLoader.Builder(requireContext().getApplicationContext(), getString(R.string.NATIVE_ADVANCE_unitId))
 				.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
 					@Override
 					public void onNativeAdLoaded(NativeAd nativeAd) {

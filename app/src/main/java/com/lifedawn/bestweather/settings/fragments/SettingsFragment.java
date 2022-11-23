@@ -199,7 +199,7 @@ public class SettingsFragment extends PreferenceFragmentCompat {
 			public boolean onPreferenceClick(Preference preference) {
 				WidgetHelper widgetHelper = new WidgetHelper(requireContext().getApplicationContext());
 				widgetHelper.reDrawWidgets(null);
-				Toast.makeText(getContext(), R.string.pref_title_redraw_widgets, Toast.LENGTH_SHORT).show();
+				Toast.makeText(requireContext().getApplicationContext(), R.string.pref_title_redraw_widgets, Toast.LENGTH_SHORT).show();
 				return true;
 			}
 		});
