@@ -28,10 +28,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.SunRiseSetType;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.SunRiseSetType;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.FragmentSunsetriseBinding;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.sunsetrise.DetailSunRiseSetFragment;

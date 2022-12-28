@@ -21,14 +21,14 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.LocationType;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.LocationType;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.FragmentIntroBinding;
 import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.main.InitViewModel;
 import com.lifedawn.bestweather.main.MainTransactionFragment;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import org.jetbrains.annotations.NotNull;

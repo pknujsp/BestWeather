@@ -56,11 +56,11 @@ import com.lifedawn.bestweather.commons.classes.TextUtil;
 import com.lifedawn.bestweather.commons.classes.WeatherViewController;
 
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.Flickr;
-import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.Flickr;
+import com.lifedawn.bestweather.commons.constants.LocationType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherDataType;
 import com.lifedawn.bestweather.commons.interfaces.IGps;
 
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
@@ -70,8 +70,8 @@ import com.lifedawn.bestweather.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.flickr.FlickrRepository;
 import com.lifedawn.bestweather.flickr.FlickrViewModel;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
-import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.rainviewer.view.SimpleRainViewerFragment;
+import com.lifedawn.bestweather.data.MyApplication;
+import com.lifedawn.bestweather.ui.rainviewer.view.SimpleRainViewerFragment;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
@@ -100,7 +100,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 

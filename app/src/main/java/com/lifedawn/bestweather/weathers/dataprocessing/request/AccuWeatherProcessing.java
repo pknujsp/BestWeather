@@ -7,7 +7,7 @@ import androidx.preference.PreferenceManager;
 
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.accuweather.CurrentConditionsParameter;

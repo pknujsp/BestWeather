@@ -1,24 +1,24 @@
-package com.lifedawn.bestweather.rainviewer.model
+package com.lifedawn.bestweather.data.models.rainviewer.dto
 
 
 import com.google.gson.annotations.SerializedName
 
 data class RainViewerResponseDto(
-        @SerializedName("generated")
+    @SerializedName("generated")
         val generated: Int,
-        @SerializedName("host")
+    @SerializedName("host")
         val host: String,
-        @SerializedName("radar")
+    @SerializedName("radar")
         val radar: Radar,
-        @SerializedName("satellite")
+    @SerializedName("satellite")
         val satellite: Satellite,
-        @SerializedName("version")
+    @SerializedName("version")
         val version: String
 ) {
     data class Radar(
-            @SerializedName("nowcast")
+        @SerializedName("nowcast")
             val nowcast: ArrayList<Data>,
-            @SerializedName("past")
+        @SerializedName("past")
             val past: ArrayList<Data>
     )
 

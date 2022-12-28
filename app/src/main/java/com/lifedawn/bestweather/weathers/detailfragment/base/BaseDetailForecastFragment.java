@@ -2,33 +2,29 @@ package com.lifedawn.bestweather.weathers.detailfragment.base;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.ads.AdRequest;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.ForecastViewType;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailForecastBinding;
 import com.lifedawn.bestweather.databinding.ViewDetailDailyForecastListBinding;
 import com.lifedawn.bestweather.databinding.ViewDetailHourlyForecastListBinding;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 

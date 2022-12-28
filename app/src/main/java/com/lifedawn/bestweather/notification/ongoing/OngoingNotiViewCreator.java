@@ -1,51 +1,23 @@
 package com.lifedawn.bestweather.notification.ongoing;
 
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
-import android.location.Location;
 import android.os.Build;
-import android.text.TextPaint;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.IconCompat;
-import androidx.preference.PreferenceManager;
 
-import com.google.android.gms.location.LocationResult;
-import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
-import com.lifedawn.bestweather.utils.DeviceUtils;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.FusedLocation;
-import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
-import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 
-import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.notification.NotificationHelper;
-import com.lifedawn.bestweather.notification.NotificationType;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.notification.model.OngoingNotificationDto;
-import com.lifedawn.bestweather.notification.model.OngoingNotiDtoOngoing;
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
@@ -55,12 +27,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 public class OngoingNotiViewCreator {
 	private Context context;

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.kma.KmaCurrentConditionsParameters;
@@ -36,7 +36,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import retrofit2.Call;

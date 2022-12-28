@@ -1,12 +1,9 @@
 package com.lifedawn.bestweather.weathers.simplefragment.hourlyforecast;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.ArrayMap;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -17,18 +14,15 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.Flickr;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherValueType;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.WeatherValueType;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.hourlyforecast.HourlyForecastComparisonFragment;
 
 import com.lifedawn.bestweather.weathers.detailfragment.hourlyforecast.DetailHourlyForecastFragment;
 
-import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleForecastFragment;
 
@@ -37,20 +31,13 @@ import com.lifedawn.bestweather.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.weathers.view.IconTextView;
 import com.lifedawn.bestweather.weathers.view.SingleWeatherIconView;
 import com.lifedawn.bestweather.weathers.view.TextsView;
-import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
-import com.luckycatlabs.sunrisesunset.dto.Location;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.TimeZone;
 
 public class SimpleHourlyForecastFragment extends BaseSimpleForecastFragment {
 	private static List<HourlyForecastDto> hourlyForecastDtoList;

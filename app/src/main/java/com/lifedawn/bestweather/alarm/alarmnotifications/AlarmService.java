@@ -20,7 +20,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.AlarmActivity;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.room.dto.AlarmDto;

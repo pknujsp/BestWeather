@@ -7,10 +7,8 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceManager;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.notification.model.OngoingNotificationDto;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 

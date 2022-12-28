@@ -1,20 +1,18 @@
 package com.lifedawn.bestweather.alarm;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.WindowManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.alarmnotifications.AlarmOnFragment;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
 import com.lifedawn.bestweather.databinding.ActivityAlarmBinding;
 
 import java.util.Timer;

@@ -1,8 +1,6 @@
 package com.lifedawn.bestweather.alarm;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
@@ -24,7 +22,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
 import com.lifedawn.bestweather.commons.interfaces.OnCheckedSwitchInListListener;
 import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
 import com.lifedawn.bestweather.databinding.FragmentAlarmListBinding;
@@ -35,7 +33,6 @@ import com.lifedawn.bestweather.room.repository.AlarmRepository;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Type;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;

@@ -21,7 +21,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.IntentUtil;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.databinding.FragmentNotificationBinding;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.notification.model.OngoingNotificationDto;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationSettingsFragment;

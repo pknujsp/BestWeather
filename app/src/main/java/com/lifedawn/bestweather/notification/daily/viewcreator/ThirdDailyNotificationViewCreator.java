@@ -8,8 +8,8 @@ import android.widget.RemoteViews;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherDataType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;

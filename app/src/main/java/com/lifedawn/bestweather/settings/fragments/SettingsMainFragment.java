@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.interfaces.IAppbarTitle;
 import com.lifedawn.bestweather.databinding.FragmentSettingsMainBinding;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 
 import org.jetbrains.annotations.NotNull;
 

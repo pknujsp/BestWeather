@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.rainviewer.view
+package com.lifedawn.bestweather.ui.rainviewer.view
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
@@ -6,15 +6,12 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.util.TypedValue
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import androidx.constraintlayout.widget.ConstraintLayout
 
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -27,21 +24,22 @@ import com.lifedawn.bestweather.commons.classes.FusedLocation
 import com.lifedawn.bestweather.commons.classes.FusedLocation.MyLocationCallback
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker
-import com.lifedawn.bestweather.commons.enums.BundleKey
+import com.lifedawn.bestweather.commons.constants.BundleKey
+import com.lifedawn.bestweather.commons.views.BaseFragment
 import com.lifedawn.bestweather.databinding.FragmentRainViewerBinding
-import com.lifedawn.bestweather.main.MyApplication
-import com.lifedawn.bestweather.rainviewer.model.RainViewerResponseDto
-import com.lifedawn.bestweather.rainviewer.viewmodel.RainViewerViewModel
+import com.lifedawn.bestweather.data.MyApplication
+import com.lifedawn.bestweather.data.models.rainviewer.dto.RainViewerResponseDto
+import com.lifedawn.bestweather.ui.rainviewer.viewmodel.RainViewerViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.net.URL
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
-class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdleListener {
-    private var _binding: FragmentRainViewerBinding? = null
-    private val binding get() = _binding!!
-
+@AndroidEntryPoint
+class RainViewerFragment : BaseFragment<FragmentRainViewerBinding>(R.layout.fragment_rain_viewer), OnMapReadyCallback,
+    GoogleMap.OnCameraIdleListener {
     private val rainViewerViewModel: RainViewerViewModel by viewModels()
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocation: FusedLocation
@@ -67,12 +65,12 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        _binding = FragmentRainViewerBinding.inflate(inflater, container, false)
-
-        binding.progressResultView.setContentView(binding.mapButtons.root, binding.previousBtn, binding.datetime, binding.nextBtn, binding
-                .mapFragmentContainer)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.progressResultView.setContentView(
+            binding.mapButtons.root, binding.previousBtn, binding.datetime, binding.nextBtn, binding
+                .mapFragmentContainer
+        )
         binding.progressResultView.setBtnOnClickListener {
             rainViewerViewModel.initMap()
         }
@@ -90,19 +88,15 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
         }
         binding.datetime.text = null
 
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
         binding.root.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 if (binding.root.height > 0 && binding.datetime.top > 0) {
                     binding.root.viewTreeObserver.removeOnGlobalLayoutListener(this)
 
-                    mapContentPadding = (binding.root.height - binding.datetime.top + TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                            8f, requireContext().resources.displayMetrics)).toInt()
+                    mapContentPadding = (binding.root.height - binding.datetime.top + TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP,
+                        8f, requireContext().resources.displayMetrics
+                    )).toInt()
 
                     val mapFragment = SupportMapFragment()
                     childFragmentManager.beginTransaction().add(binding.mapFragmentContainer.id, mapFragment).commitNow()
@@ -113,10 +107,6 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 
     private fun addMarker() {
         googleMap.addMarker(marker)
@@ -254,8 +244,10 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
         val now = ZonedDateTime.now().toEpochSecond()
         val pastOrForecast = if (nextFrame.time > now) getString(R.string.forecast) else getString(R.string.past)
-        val dateTime: String = "$pastOrForecast : " + ZonedDateTime.ofInstant(Instant.ofEpochSecond(nextFrame.time.toLong()),
-                ZoneId.systemDefault()).format(rainViewerViewModel.dateTimeFormatter)
+        val dateTime: String = "$pastOrForecast : " + ZonedDateTime.ofInstant(
+            Instant.ofEpochSecond(nextFrame.time.toLong()),
+            ZoneId.systemDefault()
+        ).format(rainViewerViewModel.dateTimeFormatter)
 
         binding.datetime.text = dateTime
     }
@@ -285,15 +277,19 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
         rainViewerViewModel.tileOverlays[frame.path]?.clearTileCache()
         rainViewerViewModel.tileOverlays[frame.path]?.remove()
 
-        googleMap.addTileOverlay(TileOverlayOptions().tileProvider(tileProvider)
-                .transparency(0.1f))?.let { rainViewerViewModel.tileOverlays.put(frame.path, it) }
+        googleMap.addTileOverlay(
+            TileOverlayOptions().tileProvider(tileProvider)
+                .transparency(0.1f)
+        )?.let { rainViewerViewModel.tileOverlays.put(frame.path, it) }
 
     }
 
     private fun stop(): Boolean {
         if (rainViewerViewModel.animationTimer) {
-            binding.datetime.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_play_arrow_24), null, null,
-                    null)
+            binding.datetime.setCompoundDrawablesWithIntrinsicBounds(
+                ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_play_arrow_24), null, null,
+                null
+            )
             timerTask?.cancel()
             rainViewerViewModel.animationTimer = false
             return true
@@ -310,7 +306,12 @@ class RainViewerFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnCameraIdl
 
     private fun playStop() {
         if (!stop()) {
-            binding.datetime.setCompoundDrawablesWithIntrinsicBounds(ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_stop_24), null, null, null)
+            binding.datetime.setCompoundDrawablesWithIntrinsicBounds(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_baseline_stop_24
+                ), null, null, null
+            )
             play()
         }
     }

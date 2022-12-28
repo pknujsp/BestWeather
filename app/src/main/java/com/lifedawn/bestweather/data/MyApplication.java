@@ -1,16 +1,15 @@
-package com.lifedawn.bestweather.main;
+package com.lifedawn.bestweather.data;
 
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.WeatherValueLabels;
-import com.lifedawn.bestweather.commons.enums.AppThemes;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
+import com.lifedawn.bestweather.commons.constants.AppThemes;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
 import com.lifedawn.bestweather.flickr.FlickrRepository;
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepositoryImpl;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationRepository;
@@ -31,10 +30,6 @@ public class MyApplication extends Application {
 	private static String localeCountryCode;
 	public static Locale locale;
 
-	@Override
-	public void onTerminate() {
-		super.onTerminate();
-	}
 
 	@Override
 	public void onCreate() {
@@ -45,11 +40,7 @@ public class MyApplication extends Application {
 			statusBarHeight = getResources().getDimensionPixelSize(id);
 		}
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-			locale = getResources().getConfiguration().getLocales().get(0);
-		} else {
-			locale = getResources().getConfiguration().locale;
-		}
+		locale = getResources().getConfiguration().getLocales().get(0);
 
 		localeCountryCode = locale.getCountry();
 		Context context = getApplicationContext();

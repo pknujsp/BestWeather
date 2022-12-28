@@ -14,10 +14,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherValueType;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.WeatherValueType;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
@@ -31,13 +30,11 @@ import com.lifedawn.bestweather.weathers.view.TextsView;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class SimpleDailyForecastFragment extends BaseSimpleForecastFragment {
 	private static List<DailyForecastDto> dailyForecastDtoList;

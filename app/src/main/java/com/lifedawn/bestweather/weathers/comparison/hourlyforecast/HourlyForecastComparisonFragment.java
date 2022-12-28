@@ -20,9 +20,9 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestMet;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
 import com.lifedawn.bestweather.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
@@ -54,7 +54,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public class HourlyForecastComparisonFragment extends BaseForecastComparisonFragment {

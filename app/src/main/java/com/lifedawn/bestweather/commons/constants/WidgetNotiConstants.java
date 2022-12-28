@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.commons.enums;
+package com.lifedawn.bestweather.commons.constants;
 
 public class WidgetNotiConstants {
 	public static class Commons {

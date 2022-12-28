@@ -4,12 +4,10 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.detailfragment.base.dialogfragments.DetailDailyForecastDialogFragment;
 import com.lifedawn.bestweather.weathers.detailfragment.base.dialogfragments.DetailHourlyForecastDialogFragment;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class BaseDetailDailyForecastFragment extends BaseDetailForecastFragment {

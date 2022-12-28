@@ -8,12 +8,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.flickr.FlickrGetInfoParameter;

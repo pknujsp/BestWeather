@@ -13,12 +13,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
 import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel;
@@ -26,8 +26,6 @@ import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 
 public class BaseSimpleCurrentConditionsFragment extends Fragment implements IWeatherValues, WeatherFragment.ITextColor, AsyncLayoutInflater.OnInflateFinishedListener {
 	protected BaseLayoutSimpleCurrentConditionsBinding binding;

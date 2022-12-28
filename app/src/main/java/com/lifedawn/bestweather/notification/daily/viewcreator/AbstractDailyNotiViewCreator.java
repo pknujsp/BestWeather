@@ -12,10 +12,9 @@ import androidx.core.app.NotificationCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.IntentUtil;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherDataType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
-import com.lifedawn.bestweather.commons.interfaces.Callback;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;

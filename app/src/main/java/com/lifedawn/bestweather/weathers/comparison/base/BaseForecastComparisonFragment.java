@@ -1,14 +1,12 @@
 package com.lifedawn.bestweather.weathers.comparison.base;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
 
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -22,11 +20,10 @@ import android.widget.TextView;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.ICleaner;
 import com.lifedawn.bestweather.weathers.view.NotScrolledView;

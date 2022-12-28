@@ -12,7 +12,6 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 
 public class WidgetRefreshIntervalPreference extends Preference {
 	private TextView textView;

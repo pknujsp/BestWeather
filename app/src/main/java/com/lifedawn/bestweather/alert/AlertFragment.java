@@ -20,7 +20,7 @@ import android.widget.RelativeLayout;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.FragmentAlertBinding;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 
 import java.util.List;
 

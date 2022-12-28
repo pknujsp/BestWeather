@@ -9,8 +9,8 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.IntentRequestCodes;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.IntentRequestCodes;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;

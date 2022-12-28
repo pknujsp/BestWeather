@@ -19,13 +19,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
-import com.lifedawn.bestweather.commons.enums.WeatherValueType;
-import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherValueType;
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleForecastBinding;
 import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.view.DateView;
 import com.lifedawn.bestweather.weathers.view.ICleaner;

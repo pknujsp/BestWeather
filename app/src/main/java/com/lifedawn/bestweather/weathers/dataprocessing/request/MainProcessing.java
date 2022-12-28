@@ -9,7 +9,7 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestMet;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
 

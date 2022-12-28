@@ -2,7 +2,7 @@ package com.lifedawn.bestweather.room.repository;
 
 import android.content.Context;
 
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.room.AppDb;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dao.KmaAreaCodesDao;

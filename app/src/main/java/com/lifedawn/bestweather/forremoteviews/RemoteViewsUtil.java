@@ -2,13 +2,12 @@ package com.lifedawn.bestweather.forremoteviews;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.os.Build;
 import android.view.View;
 import android.widget.RemoteViews;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.IntentUtil;
-import com.lifedawn.bestweather.commons.enums.IntentRequestCodes;
+import com.lifedawn.bestweather.commons.constants.IntentRequestCodes;
 
 public class RemoteViewsUtil {
 

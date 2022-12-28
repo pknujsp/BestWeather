@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.weathers.simplefragment.aqicn;
 
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 
@@ -12,41 +11,31 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.gridlayout.widget.GridLayout;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
 import com.lifedawn.bestweather.databinding.AirQualityItemBinding;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
 import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
 import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
-import com.lifedawn.bestweather.theme.AppTheme;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.detailfragment.aqicn.DetailAirQualityFragment;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
-import com.lifedawn.bestweather.weathers.FragmentType;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 
 public class SimpleAirQualityFragment extends Fragment implements IWeatherValues, AsyncLayoutInflater.OnInflateFinishedListener {

@@ -1,13 +1,10 @@
 package com.lifedawn.bestweather.room.repository;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.preference.PreferenceManager;
 
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.room.AppDb;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dao.FavoriteAddressDao;
@@ -16,7 +13,6 @@ import com.lifedawn.bestweather.room.queryinterfaces.FavoriteAddressQuery;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class FavoriteAddressRepository implements FavoriteAddressQuery {
 	private FavoriteAddressDao favoriteAddressDao;

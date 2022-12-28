@@ -6,8 +6,8 @@ import android.content.res.TypedArray;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaCurrentConditions;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaDailyForecast;
 import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;

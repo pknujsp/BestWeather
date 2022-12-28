@@ -14,8 +14,8 @@ import android.view.View;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.settings.custompreferences.UnitPreference;
 
 public class UnitsFragment extends PreferenceFragmentCompat {

@@ -5,9 +5,9 @@ import android.graphics.BitmapFactory;
 
 import androidx.room.TypeConverter;
 
-import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
-import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
+import com.lifedawn.bestweather.commons.constants.LocationType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WidgetNotiConstants;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 

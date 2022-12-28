@@ -6,7 +6,7 @@ import android.location.Geocoder;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.nominatim.GeocodeParameter;
 import com.lifedawn.bestweather.retrofit.parameters.nominatim.ReverseGeocodeParameter;

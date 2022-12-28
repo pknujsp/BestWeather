@@ -7,7 +7,6 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.github.matteobattilana.weather.PrecipType;
 import com.github.matteobattilana.weather.WeatherView;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
 
 public class WeatherViewController implements DefaultLifecycleObserver {
 	private WeatherView weatherView;

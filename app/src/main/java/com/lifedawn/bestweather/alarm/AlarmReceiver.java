@@ -1,37 +1,22 @@
 package com.lifedawn.bestweather.alarm;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.os.PowerManager;
-import android.view.View;
-import android.widget.RemoteViews;
-
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.os.HandlerCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.alarmnotifications.AlarmService;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.AlarmDto;
 import com.lifedawn.bestweather.room.repository.AlarmRepository;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Set;

@@ -12,8 +12,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
 
 public class UnitPreference extends Preference {
 	private TextView unitTextView;

@@ -4,7 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.Nullable;
 
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.room.AppDb;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dao.WidgetDao;
@@ -12,7 +12,6 @@ import com.lifedawn.bestweather.room.dto.WidgetDto;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class WidgetRepository {
 	private final WidgetDao widgetDao;

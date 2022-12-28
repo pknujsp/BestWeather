@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.commons.enums;
+package com.lifedawn.bestweather.commons.constants;
 
 public enum BundleKey {
 	Latitude, Longitude, AddressName, CountryCode, WeatherProvider, TimeZone, SelectedAddressDto, LocationType,

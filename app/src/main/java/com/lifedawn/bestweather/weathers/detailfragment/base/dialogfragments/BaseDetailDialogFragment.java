@@ -7,11 +7,9 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
 import androidx.fragment.app.DialogFragment;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
@@ -20,13 +18,9 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.databinding.DialogFragmentDetailForecastBinding;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.io.Serializable;
 
 public abstract class BaseDetailDialogFragment extends DialogFragment {
 	protected DialogFragmentDetailForecastBinding binding;

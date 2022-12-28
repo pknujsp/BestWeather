@@ -1,10 +1,8 @@
 package com.lifedawn.bestweather.weathers.detailfragment.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -16,11 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.WeatherValueLabels;
-import com.lifedawn.bestweather.commons.enums.WeatherValueType;
+import com.lifedawn.bestweather.commons.constants.WeatherValueType;
 import com.lifedawn.bestweather.databinding.ItemviewDetailDailyForecastBinding;
 import com.lifedawn.bestweather.weathers.detailfragment.dto.GridItemDto;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
-import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 

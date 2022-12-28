@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.commons.enums;
+package com.lifedawn.bestweather.commons.constants;
 
 import java.io.Serializable;
 

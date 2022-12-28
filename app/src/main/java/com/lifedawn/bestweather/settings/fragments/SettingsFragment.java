@@ -17,10 +17,10 @@ import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.AppThemes;
+import com.lifedawn.bestweather.commons.constants.AppThemes;
 import com.lifedawn.bestweather.commons.interfaces.IAppbarTitle;
 import com.lifedawn.bestweather.main.MainActivity;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;

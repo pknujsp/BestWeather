@@ -1,23 +1,17 @@
 package com.lifedawn.bestweather.notification.daily;
 
-import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.OutOfQuotaPolicy;
 import androidx.work.WorkManager;
 
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
 import com.lifedawn.bestweather.notification.daily.work.DailyNotificationListenableWorker;
 
 public class DailyPushNotificationReceiver extends BroadcastReceiver {

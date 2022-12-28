@@ -1,28 +1,16 @@
 package com.lifedawn.bestweather.weathers.viewmodels;
 
-import android.app.Application;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.lifedawn.bestweather.commons.classes.FusedLocation;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.room.queryinterfaces.FavoriteAddressQuery;
 import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
-import com.lifedawn.bestweather.weathers.WeatherFragment;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.io.Serializable;
-import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class WeatherViewModel extends ViewModel implements FavoriteAddressQuery {
 	private FusedLocation.MyLocationCallback locationCallback;

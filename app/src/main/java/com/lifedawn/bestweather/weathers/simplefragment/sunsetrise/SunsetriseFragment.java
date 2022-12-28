@@ -19,8 +19,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.databinding.BaseLayoutSimpleCurrentConditionsBinding;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
 import com.lifedawn.bestweather.databinding.FragmentSunsetriseBinding;
 import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
@@ -32,7 +31,6 @@ import com.luckycatlabs.sunrisesunset.dto.Location;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.ZoneId;
-import java.util.Objects;
 
 public class SunsetriseFragment extends Fragment implements IWeatherValues, AsyncLayoutInflater.OnInflateFinishedListener {
 	private FragmentSunsetriseBinding binding;

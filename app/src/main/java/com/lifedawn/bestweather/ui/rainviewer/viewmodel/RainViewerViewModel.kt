@@ -1,18 +1,19 @@
-package com.lifedawn.bestweather.rainviewer.viewmodel
+package com.lifedawn.bestweather.ui.rainviewer.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.TileOverlay
 import com.google.gson.Gson
 import com.google.gson.JsonElement
-import com.lifedawn.bestweather.rainviewer.model.RainViewerRepositoryImpl
-import com.lifedawn.bestweather.rainviewer.model.RainViewerResponseDto
+import com.lifedawn.bestweather.data.models.rainviewer.dto.RainViewerResponseDto
+import com.lifedawn.bestweather.data.models.rainviewer.repository.RainViewerRepositoryImpl
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
 
-class RainViewerViewModel() : ViewModel() {
+class RainViewerViewModel @Inject constructor() : ViewModel() {
     private val _rainViewerData: MutableLiveData<RainViewerResponseDto?> = MutableLiveData<RainViewerResponseDto?>()
     val rainViewerData: MutableLiveData<RainViewerResponseDto?>
         get() = _rainViewerData
@@ -39,8 +40,10 @@ class RainViewerViewModel() : ViewModel() {
         RainViewerRepositoryImpl.initMap(object : Callback<JsonElement> {
             override fun onResponse(call: Call<JsonElement>, response: Response<JsonElement>) {
                 if (response.isSuccessful) {
-                    val responseDto: RainViewerResponseDto = Gson().fromJson(response.body(),
-                            RainViewerResponseDto::class.java)
+                    val responseDto: RainViewerResponseDto = Gson().fromJson(
+                        response.body(),
+                        RainViewerResponseDto::class.java
+                    )
                     _rainViewerData.postValue(responseDto)
                 } else {
                     //fail

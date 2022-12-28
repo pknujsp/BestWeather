@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.weathers.detailfragment.sunsetrise;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
@@ -9,12 +8,10 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.PermissionChecker;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,16 +25,13 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.listener.ChartTouchListener;
-import com.github.mikephil.charting.listener.OnChartGestureListener;
-import com.github.mikephil.charting.model.GradientColor;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
 import com.lifedawn.bestweather.databinding.FragmentDetailSunRiseSetBinding;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.SunRiseSetUtil;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
@@ -55,7 +49,6 @@ import java.util.List;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 

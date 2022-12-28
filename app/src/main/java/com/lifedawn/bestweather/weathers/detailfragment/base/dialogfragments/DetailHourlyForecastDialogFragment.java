@@ -3,30 +3,19 @@ package com.lifedawn.bestweather.weathers.detailfragment.base.dialogfragments;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.asynclayoutinflater.view.AsyncLayoutInflater;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.databinding.TabForecastItemBinding;
-import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.weathers.detailfragment.adapters.DetailHourlyForecastViewPagerAdapter;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 public class DetailHourlyForecastDialogFragment extends BaseDetailDialogFragment {

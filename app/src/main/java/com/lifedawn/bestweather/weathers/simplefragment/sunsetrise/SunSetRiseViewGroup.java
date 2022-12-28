@@ -20,9 +20,8 @@ import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.SunRiseSetType;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.theme.AppTheme;
+import com.lifedawn.bestweather.commons.constants.SunRiseSetType;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 

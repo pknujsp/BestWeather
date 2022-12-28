@@ -8,8 +8,8 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.LocationType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;

@@ -14,17 +14,11 @@ import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.SunRiseSetType;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.theme.AppTheme;
+import com.lifedawn.bestweather.commons.constants.SunRiseSetType;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
 
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Locale;
 
 public class SunSetRiseInfoView extends View {
 	private Drawable typeIcon;

@@ -4,13 +4,11 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.LocationType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity(tableName = "daily_push_notifications_table")
 public class DailyPushNotificationDto implements Serializable {

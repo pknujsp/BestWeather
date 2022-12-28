@@ -5,8 +5,8 @@ import android.content.res.TypedArray;
 
 import com.google.gson.Gson;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
 import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.timeseries.Data;
 import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.timeseries.Details;
@@ -26,8 +26,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import us.dustinj.timezonemap.TimeZoneMap;
 
 public class MetNorwayResponseProcessor extends WeatherResponseProcessor {
 	private static final Map<String, String> WEATHER_ICON_DESCRIPTION_MAP = new HashMap<>();

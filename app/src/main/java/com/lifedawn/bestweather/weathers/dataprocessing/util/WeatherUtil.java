@@ -3,8 +3,8 @@ package com.lifedawn.bestweather.weathers.dataprocessing.util;
 import android.content.Context;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
+import com.lifedawn.bestweather.data.MyApplication;
 
 public class WeatherUtil {
 	private WeatherUtil() {

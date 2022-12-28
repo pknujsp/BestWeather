@@ -6,18 +6,13 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailDailyForecastFragment;
 import com.lifedawn.bestweather.weathers.models.DailyForecastDto;
 
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
 
 public class DetailDailyForecastFragment extends BaseDetailDailyForecastFragment {
 	private DailyForecastListAdapter adapter;

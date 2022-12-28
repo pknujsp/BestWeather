@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.weathers.detailfragment.base;
 
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -15,14 +14,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.gridlayout.widget.GridLayout;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.ValueUnits;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.databinding.BaseLayoutDetailCurrentConditionsBinding;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.weathers.simplefragment.interfaces.IWeatherValues;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherFragmentViewModel;
 

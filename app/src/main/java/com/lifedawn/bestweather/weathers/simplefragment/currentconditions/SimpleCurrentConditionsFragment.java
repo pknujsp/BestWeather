@@ -10,22 +10,15 @@ import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.ValueUnits;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
-import com.lifedawn.bestweather.main.MyApplication;
-import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
-import com.lifedawn.bestweather.weathers.WeatherFragment;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.weathers.models.AirQualityDto;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
-import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.time.ZonedDateTime;
 
 public class SimpleCurrentConditionsFragment extends BaseSimpleCurrentConditionsFragment {
 	private static CurrentConditionsDto currentConditionsDto;

@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.widget.widgetprovider;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -19,7 +18,6 @@ import androidx.work.WorkManager;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
-import com.lifedawn.bestweather.main.MyApplication;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.WidgetDto;
 import com.lifedawn.bestweather.room.repository.WidgetRepository;
@@ -28,7 +26,6 @@ import com.lifedawn.bestweather.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.widget.work.WidgetListenableWorker;
 
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 

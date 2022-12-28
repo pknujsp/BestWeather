@@ -12,13 +12,11 @@ import androidx.preference.PreferenceManager;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
 import com.lifedawn.bestweather.weathers.detailfragment.base.dialogfragments.DetailHourlyForecastDialogFragment;
 import com.lifedawn.bestweather.weathers.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class BaseDetailHourlyForecastFragment extends BaseDetailForecastFragment {

@@ -3,22 +3,19 @@ package com.lifedawn.bestweather.notification.ongoing.work;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.concurrent.futures.CallbackToFutureAdapter;
 import androidx.core.app.NotificationCompat;
-import androidx.preference.PreferenceManager;
 import androidx.work.ForegroundInfo;
 import androidx.work.ListenableWorker;
 import androidx.work.WorkerParameters;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.LocationType;
+import com.lifedawn.bestweather.commons.constants.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.notification.NotificationHelper;
@@ -31,8 +28,6 @@ import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationReposito
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.utils.DeviceUtils;
 
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;

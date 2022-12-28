@@ -10,7 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.kma.KmaCurrentConditionsParameters;
 import com.lifedawn.bestweather.retrofit.parameters.kma.KmaForecastsParameters;

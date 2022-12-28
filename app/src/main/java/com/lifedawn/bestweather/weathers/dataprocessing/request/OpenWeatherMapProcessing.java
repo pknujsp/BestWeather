@@ -6,7 +6,7 @@ import android.util.Log;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.Queries;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.openweathermap.individual.OwmCurrentWeatherParameter;

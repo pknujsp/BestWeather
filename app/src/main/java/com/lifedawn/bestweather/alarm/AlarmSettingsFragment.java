@@ -27,7 +27,7 @@ import com.google.android.material.slider.Slider;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
 import com.lifedawn.bestweather.databinding.FragmentAlarmSettingsBinding;
 import com.lifedawn.bestweather.databinding.ViewRepeatAlarmSettingsBinding;
 import com.lifedawn.bestweather.findaddress.map.MapFragment;

@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.WeatherDataType;
+import com.lifedawn.bestweather.commons.constants.WeatherDataType;
 import com.lifedawn.bestweather.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.weathers.models.CurrentConditionsDto;
 

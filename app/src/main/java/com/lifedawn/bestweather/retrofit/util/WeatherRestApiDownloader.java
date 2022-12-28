@@ -4,7 +4,7 @@ import android.util.ArrayMap;
 
 import androidx.annotation.NonNull;
 
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.retrofit.parameters.RequestParameter;
 

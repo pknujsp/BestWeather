@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.commons.enums;
+package com.lifedawn.bestweather.commons.constants;
 
 import java.util.Locale;
 
@@ -56,11 +56,11 @@ public enum ValueUnits {
 		return convertedVal;
 	}
 
-	public static Double convertWindSpeed(String val, ValueUnits unit) {
+	public static Double convertWindSpeed(String value, ValueUnits unit) {
 		float convertedVal = 0f;
 
 		try {
-			convertedVal = Float.parseFloat(val);
+			convertedVal = Float.parseFloat(value);
 		} catch (Exception e) {
 		}
 
@@ -71,11 +71,11 @@ public enum ValueUnits {
 		return Math.round(convertedVal * 10) / 10.0;
 	}
 
-	public static Double convertWindSpeedForAccu(String val, ValueUnits unit) {
+	public static Double convertWindSpeedForAccu(String value, ValueUnits unit) {
 		float convertedVal = 0f;
 
 		try {
-			convertedVal = Float.parseFloat(val);
+			convertedVal = Float.parseFloat(value);
 		} catch (Exception e) {
 		}
 
@@ -86,11 +86,11 @@ public enum ValueUnits {
 		return Math.round(convertedVal * 10) / 10.0;
 	}
 
-	public static String convertVisibility(String val, ValueUnits unit) {
+	public static String convertVisibility(String value, ValueUnits unit) {
 		float convertedVal = 0f;
 
 		try {
-			convertedVal = Float.parseFloat(val) / 1000f;
+			convertedVal = Float.parseFloat(value) / 1000f;
 		} catch (Exception e) {
 		}
 
@@ -101,20 +101,6 @@ public enum ValueUnits {
 		return String.format(Locale.getDefault(), "%.1f", convertedVal);
 	}
 
-	public static String convertVisibilityForAccu(String val, ValueUnits unit) {
-		float convertedVal = 0f;
-
-		try {
-			convertedVal = Float.parseFloat(val) / 1000f;
-		} catch (Exception e) {
-		}
-
-		if (unit == mile) {
-			//km -> mile  n / 1.609 = c
-			convertedVal = convertedVal / 1.609f;
-		}
-		return String.format(Locale.getDefault(), "%.1f", convertedVal);
-	}
 
 	public static Double CMToMM(String val) {
 		return (Double.parseDouble(val) * 100) / 10.0;

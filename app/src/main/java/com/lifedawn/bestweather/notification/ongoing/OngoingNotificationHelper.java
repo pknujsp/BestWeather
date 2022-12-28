@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.SystemClock;
 
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.enums.IntentRequestCodes;
+import com.lifedawn.bestweather.commons.constants.IntentRequestCodes;
 
 public class OngoingNotificationHelper {
 	private Context context;

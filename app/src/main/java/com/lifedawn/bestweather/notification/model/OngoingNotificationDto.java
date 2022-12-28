@@ -2,9 +2,9 @@ package com.lifedawn.bestweather.notification.model;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.lifedawn.bestweather.commons.enums.LocationType;
-import com.lifedawn.bestweather.commons.enums.WeatherProviderType;
-import com.lifedawn.bestweather.commons.enums.WidgetNotiConstants;
+import com.lifedawn.bestweather.commons.constants.LocationType;
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
+import com.lifedawn.bestweather.commons.constants.WidgetNotiConstants;
 
 public class OngoingNotificationDto {
 	@Expose

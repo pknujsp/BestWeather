@@ -2,7 +2,7 @@ package com.lifedawn.bestweather.commons.classes
 
 import android.content.Context
 import com.lifedawn.bestweather.R
-import com.lifedawn.bestweather.commons.enums.WeatherValueType
+import com.lifedawn.bestweather.commons.constants.WeatherValueType
 
 object WeatherValueLabels {
     private val _weatherValueLabelsMap = HashMap<WeatherValueType, String>()

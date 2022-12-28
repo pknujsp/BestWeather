@@ -1,7 +1,6 @@
 package com.lifedawn.bestweather.notification.daily.fragment;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -27,25 +26,23 @@ import android.widget.Toast;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.RecyclerViewItemDecoration;
-import com.lifedawn.bestweather.commons.enums.BundleKey;
-import com.lifedawn.bestweather.commons.enums.LocationType;
+import com.lifedawn.bestweather.commons.constants.BundleKey;
+import com.lifedawn.bestweather.commons.constants.LocationType;
 import com.lifedawn.bestweather.commons.interfaces.OnCheckedSwitchInListListener;
 import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener;
 import com.lifedawn.bestweather.commons.interfaces.OnClickedPopupMenuItemListener;
 import com.lifedawn.bestweather.databinding.FragmentDailyPushNotificationListBinding;
 import com.lifedawn.bestweather.databinding.ViewDailyPushNotificationItemBinding;
-import com.lifedawn.bestweather.main.MyApplication;
+import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.notification.daily.DailyNotificationHelper;
 import com.lifedawn.bestweather.notification.daily.DailyPushNotificationType;
 import com.lifedawn.bestweather.notification.daily.viewmodel.DailyNotificationViewModel;
-import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalTime;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
