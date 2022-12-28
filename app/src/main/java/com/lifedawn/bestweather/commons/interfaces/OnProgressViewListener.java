@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.commons.views;
+package com.lifedawn.bestweather.commons.interfaces;
 
 public interface OnProgressViewListener {
 	void onSuccessful();

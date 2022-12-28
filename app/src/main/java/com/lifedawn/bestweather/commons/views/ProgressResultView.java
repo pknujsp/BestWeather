@@ -9,6 +9,8 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.lifedawn.bestweather.commons.interfaces.CheckSuccess;
+import com.lifedawn.bestweather.commons.interfaces.OnProgressViewListener;
 import com.lifedawn.bestweather.databinding.ViewProgressResultBinding;
 
 import org.jetbrains.annotations.NotNull;
