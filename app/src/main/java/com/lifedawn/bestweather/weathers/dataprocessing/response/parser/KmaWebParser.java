@@ -1,8 +1,8 @@
 package com.lifedawn.bestweather.weathers.dataprocessing.response.parser;
 
-import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaCurrentConditions;
-import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaDailyForecast;
-import com.lifedawn.bestweather.retrofit.responses.kma.html.KmaHourlyForecast;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.kma.html.KmaCurrentConditions;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.kma.html.KmaDailyForecast;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.kma.html.KmaHourlyForecast;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
 
 import org.jsoup.nodes.Document;

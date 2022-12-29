@@ -6,12 +6,12 @@ import android.util.Log;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestMet;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
-import com.lifedawn.bestweather.retrofit.client.Queries;
-import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.parameters.metnorway.LocationForecastParameter;
-import com.lifedawn.bestweather.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
-import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
-import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.metnorway.LocationForecastParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.JsonDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.MetNorwayResponseProcessor;
 
 import retrofit2.Call;
@@ -24,9 +24,9 @@ public class MetNorwayProcessing {
 	 */
 	public static Call<JsonElement> getLocationForecast(LocationForecastParameter locationForecastParameter,
 	                                                    JsonDownloader callback) {
-		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
+		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
 
-		Call<JsonElement> call = queries.getMetNorwayLocationForecast(locationForecastParameter.getMap());
+		Call<JsonElement> call = restfulApiQuery.getMetNorwayLocationForecast(locationForecastParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {

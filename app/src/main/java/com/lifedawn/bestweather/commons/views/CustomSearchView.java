@@ -11,11 +11,10 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.databinding.DataBindingUtil;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.ViewSearchBinding;
-import com.lifedawn.bestweather.utils.DeviceUtils;
+import com.lifedawn.bestweather.commons.utils.DeviceUtils;
 
 public class CustomSearchView extends FrameLayout {
 	private ViewSearchBinding binding;

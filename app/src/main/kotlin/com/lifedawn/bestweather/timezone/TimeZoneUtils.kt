@@ -2,8 +2,8 @@ package com.lifedawn.bestweather.timezone
 
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdDto
 import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepositoryImpl
-import com.lifedawn.bestweather.retrofit.responses.freetime.FreeTimeResponse
-import com.lifedawn.bestweather.retrofit.util.JsonDownloader
+import com.lifedawn.bestweather.data.remote.retrofit.responses.freetime.FreeTimeResponse
+import com.lifedawn.bestweather.data.remote.retrofit.callback.JsonDownloader
 import com.lifedawn.bestweather.room.callback.DbQueryCallback
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor
 import retrofit2.Response

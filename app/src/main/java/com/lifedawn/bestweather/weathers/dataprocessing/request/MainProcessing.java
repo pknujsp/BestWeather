@@ -10,8 +10,8 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmI
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeatherSource;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
-import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
 
 public class MainProcessing {
 

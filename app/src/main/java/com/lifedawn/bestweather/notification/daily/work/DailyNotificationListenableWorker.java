@@ -36,7 +36,7 @@ import com.lifedawn.bestweather.notification.daily.viewcreator.FirstDailyNotific
 import com.lifedawn.bestweather.notification.daily.viewcreator.FourthDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.SecondDailyNotificationViewCreator;
 import com.lifedawn.bestweather.notification.daily.viewcreator.ThirdDailyNotificationViewCreator;
-import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;

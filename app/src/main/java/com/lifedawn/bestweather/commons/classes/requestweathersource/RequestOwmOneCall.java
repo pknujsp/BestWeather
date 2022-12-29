@@ -1,6 +1,6 @@
 package com.lifedawn.bestweather.commons.classes.requestweathersource;
 
-import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.onecall.OneCallParameter;
 
 import java.util.Set;
 

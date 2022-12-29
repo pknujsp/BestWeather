@@ -26,7 +26,7 @@ import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationHelper;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationProcessor;
 import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationRepository;
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.utils.DeviceUtils;
+import com.lifedawn.bestweather.commons.utils.DeviceUtils;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;

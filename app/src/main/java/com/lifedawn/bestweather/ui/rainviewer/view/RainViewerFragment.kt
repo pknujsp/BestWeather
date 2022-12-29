@@ -9,7 +9,6 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.constraintlayout.widget.ConstraintLayout
-
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.viewModels
@@ -26,9 +25,9 @@ import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker
 import com.lifedawn.bestweather.commons.constants.BundleKey
 import com.lifedawn.bestweather.commons.views.BaseFragment
-import com.lifedawn.bestweather.databinding.FragmentRainViewerBinding
 import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.data.models.rainviewer.dto.RainViewerResponseDto
+import com.lifedawn.bestweather.databinding.FragmentRainViewerBinding
 import com.lifedawn.bestweather.ui.rainviewer.viewmodel.RainViewerViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.net.URL
@@ -36,15 +35,16 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RainViewerFragment : BaseFragment<FragmentRainViewerBinding>(R.layout.fragment_rain_viewer), OnMapReadyCallback,
     GoogleMap.OnCameraIdleListener {
+
     private val rainViewerViewModel: RainViewerViewModel by viewModels()
     private lateinit var googleMap: GoogleMap
     private lateinit var fusedLocation: FusedLocation
     private var locationLifeCycleObserver: LocationLifeCycleObserver? = null
-
     private val timer: Timer = Timer()
     private var timerTask: TimerTask? = null
     private var mapContentPadding: Int = 0

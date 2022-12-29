@@ -2,15 +2,13 @@ package com.lifedawn.bestweather.timezone
 
 import com.google.gson.Gson
 import com.google.gson.JsonElement
-import com.lifedawn.bestweather.retrofit.client.Queries
-import com.lifedawn.bestweather.retrofit.client.RetrofitClient
-import com.lifedawn.bestweather.retrofit.parameters.freetime.FreeTimeParameter
-import com.lifedawn.bestweather.retrofit.responses.freetime.FreeTimeResponse
-import com.lifedawn.bestweather.retrofit.util.JsonDownloader
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.freetime.FreeTimeParameter
+import com.lifedawn.bestweather.data.remote.retrofit.responses.freetime.FreeTimeResponse
+import com.lifedawn.bestweather.data.remote.retrofit.callback.JsonDownloader
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 
 class FreeTimeZoneApi {
     companion object {

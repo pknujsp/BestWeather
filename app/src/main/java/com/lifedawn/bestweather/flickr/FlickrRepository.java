@@ -13,12 +13,12 @@ import com.bumptech.glide.request.transition.Transition;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
-import com.lifedawn.bestweather.retrofit.client.Queries;
-import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.parameters.flickr.FlickrGetInfoParameter;
-import com.lifedawn.bestweather.retrofit.parameters.flickr.FlickrGetPhotosFromGalleryParameter;
-import com.lifedawn.bestweather.retrofit.responses.flickr.GetInfoPhotoResponse;
-import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.flickr.FlickrGetInfoParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.flickr.FlickrGetPhotosFromGalleryParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.flickr.GetInfoPhotoResponse;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.flickr.PhotosFromGalleryResponse;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.FlickrUtil;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.KmaResponseProcessor;
@@ -164,8 +164,8 @@ public final class FlickrRepository {
 					FlickrGetPhotosFromGalleryParameter photosFromGalleryParameter = new FlickrGetPhotosFromGalleryParameter();
 					photosFromGalleryParameter.setGalleryId(FlickrUtil.getWeatherGalleryId(galleryName));
 
-					Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
-					Call<JsonElement> call = queries.getPhotosFromGallery(photosFromGalleryParameter.getMap());
+					RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
+					Call<JsonElement> call = restfulApiQuery.getPhotosFromGallery(photosFromGalleryParameter.getMap());
 
 					final ImgRequestData imgRequestData = new ImgRequestData();
 					IMG_REQUEST_OBJ_SET.add(imgRequestData);
@@ -195,8 +195,8 @@ public final class FlickrRepository {
 										getInfoParameter.setSecret(photo.getSecret());
 										getInfoParameter.setPhotoId(photo.getId());
 
-										Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
-										Call<JsonElement> getPhotoInfoCall = queries.getGetInfo(getInfoParameter.getMap());
+										RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.FLICKR);
+										Call<JsonElement> getPhotoInfoCall = restfulApiQuery.getGetInfo(getInfoParameter.getMap());
 										imgRequestData.getPhotoInfoCall = getPhotoInfoCall;
 
 										getPhotoInfoCall.enqueue(new Callback<JsonElement>() {

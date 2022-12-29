@@ -71,7 +71,7 @@ import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationSettings
 import com.lifedawn.bestweather.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.timezone.TimeZoneUtils;
-import com.lifedawn.bestweather.utils.DeviceUtils;
+import com.lifedawn.bestweather.commons.utils.DeviceUtils;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.viewmodels.WeatherViewModel;
 import com.lifedawn.bestweather.widget.ConfigureWidgetActivity;

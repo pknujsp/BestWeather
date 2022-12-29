@@ -6,14 +6,16 @@ import com.google.android.gms.maps.model.TileOverlay
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.lifedawn.bestweather.data.models.rainviewer.dto.RainViewerResponseDto
-import com.lifedawn.bestweather.data.models.rainviewer.repository.RainViewerRepositoryImpl
+import com.lifedawn.bestweather.data.models.rainviewer.repository.RainViewerRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
-class RainViewerViewModel @Inject constructor() : ViewModel() {
+@HiltViewModel
+class RainViewerViewModel @Inject constructor(private val rainViewerRepository: RainViewerRepository) : ViewModel() {
     private val _rainViewerData: MutableLiveData<RainViewerResponseDto?> = MutableLiveData<RainViewerResponseDto?>()
     val rainViewerData: MutableLiveData<RainViewerResponseDto?>
         get() = _rainViewerData
@@ -37,7 +39,7 @@ class RainViewerViewModel @Inject constructor() : ViewModel() {
     var simpleMode = false
 
     fun initMap() {
-        RainViewerRepositoryImpl.initMap(object : Callback<JsonElement> {
+        rainViewerRepository.initMap(object : Callback<JsonElement> {
             override fun onResponse(call: Call<JsonElement>, response: Response<JsonElement>) {
                 if (response.isSuccessful) {
                     val responseDto: RainViewerResponseDto = Gson().fromJson(

@@ -1,0 +1,74 @@
+package com.lifedawn.bestweather.data.remote.retrofit.parameters.kma;
+
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.RequestParameter;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class MidLandParameter extends RequestParameter {
+	private String serviceKey = RetrofitClient.MID_FCST_INFO_SERVICE_SERVICE_KEY;
+	private final String numOfRows = "300";
+	private final String pageNo = "1";
+	private String dataType = RetrofitClient.XML;
+	private String regId;
+	private String tmFc;
+	private double latitude;
+	private double longitude;
+	private Map<String, String> map = new HashMap<>();
+
+
+	public MidLandParameter() {
+	}
+
+
+	public Map<String, String> getMap() {
+		map.clear();
+
+		map.put("serviceKey", serviceKey);
+		map.put("numOfRows", numOfRows);
+		map.put("pageNo", pageNo);
+		map.put("dataType", dataType);
+		map.put("regId", regId);
+		map.put("tmFc", tmFc);
+
+		return map;
+	}
+
+
+	public String getRegId() {
+		return regId;
+	}
+
+	public MidLandParameter setRegId(String regId) {
+		this.regId = regId;
+		return this;
+	}
+
+	public String getTmFc() {
+		return tmFc;
+	}
+
+	public MidLandParameter setTmFc(String tmFc) {
+		this.tmFc = tmFc;
+		return this;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public MidLandParameter setLatitude(double latitude) {
+		this.latitude = latitude;
+		return this;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public MidLandParameter setLongitude(double longitude) {
+		this.longitude = longitude;
+		return this;
+	}
+}

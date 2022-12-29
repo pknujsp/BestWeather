@@ -32,8 +32,8 @@ import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.notification.NotificationHelper;
 import com.lifedawn.bestweather.notification.NotificationType;
 import com.lifedawn.bestweather.notification.model.OngoingNotificationDto;
-import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
-import com.lifedawn.bestweather.utils.DeviceUtils;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.commons.utils.DeviceUtils;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherRequestUtil;
 
 import java.time.ZoneId;

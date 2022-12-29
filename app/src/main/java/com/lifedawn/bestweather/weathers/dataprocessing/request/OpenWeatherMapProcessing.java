@@ -7,18 +7,18 @@ import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmIndividual;
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestOwmOneCall;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
-import com.lifedawn.bestweather.retrofit.client.Queries;
-import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.parameters.openweathermap.individual.OwmCurrentWeatherParameter;
-import com.lifedawn.bestweather.retrofit.parameters.openweathermap.individual.OwmDailyForecastParameter;
-import com.lifedawn.bestweather.retrofit.parameters.openweathermap.individual.OwmHourlyForecastParameter;
-import com.lifedawn.bestweather.retrofit.parameters.openweathermap.onecall.OneCallParameter;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.currentweather.OwmCurrentConditionsResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
-import com.lifedawn.bestweather.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
-import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
-import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.individual.OwmCurrentWeatherParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.individual.OwmDailyForecastParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.individual.OwmHourlyForecastParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.onecall.OneCallParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.currentweather.OwmCurrentConditionsResponse;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.JsonDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 
 import java.util.Set;
@@ -34,9 +34,9 @@ public class OpenWeatherMapProcessing {
 	 */
 	public static Call<JsonElement> getOneCall(OneCallParameter oneCallParameter,
 	                                           JsonDownloader callback) {
-		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_ONE_CALL);
+		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_ONE_CALL);
 
-		Call<JsonElement> call = queries.getOneCall(oneCallParameter.getMap());
+		Call<JsonElement> call = restfulApiQuery.getOneCall(oneCallParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
@@ -61,9 +61,9 @@ public class OpenWeatherMapProcessing {
 	 */
 	public static Call<JsonElement> getCurrentConditions(OwmCurrentWeatherParameter owmCurrentWeatherParameter,
 	                                                     JsonDownloader callback) {
-		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS);
+		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS);
 
-		Call<JsonElement> call = queries.getOwmCurrentConditions(owmCurrentWeatherParameter.getMap());
+		Call<JsonElement> call = restfulApiQuery.getOwmCurrentConditions(owmCurrentWeatherParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
@@ -88,9 +88,9 @@ public class OpenWeatherMapProcessing {
 	 */
 	public static Call<JsonElement> getHourlyForecast(OwmHourlyForecastParameter owmHourlyForecastParameter,
 	                                                  JsonDownloader callback) {
-		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
+		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST);
 
-		Call<JsonElement> call = queries.getOwmHourlyForecast(owmHourlyForecastParameter.getMap());
+		Call<JsonElement> call = restfulApiQuery.getOwmHourlyForecast(owmHourlyForecastParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
@@ -115,9 +115,9 @@ public class OpenWeatherMapProcessing {
 	 */
 	public static Call<JsonElement> getDailyForecast(OwmDailyForecastParameter owmDailyForecastParameter,
 	                                                 JsonDownloader callback) {
-		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
+		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.OWM_DAILY_FORECAST);
 
-		Call<JsonElement> call = queries.getOwmDailyForecast(owmDailyForecastParameter.getMap());
+		Call<JsonElement> call = restfulApiQuery.getOwmDailyForecast(owmDailyForecastParameter.getMap());
 		call.enqueue(new Callback<JsonElement>() {
 			@Override
 			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {

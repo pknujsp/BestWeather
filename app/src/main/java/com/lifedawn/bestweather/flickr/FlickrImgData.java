@@ -2,7 +2,7 @@ package com.lifedawn.bestweather.flickr;
 
 import android.graphics.Bitmap;
 
-import com.lifedawn.bestweather.retrofit.responses.flickr.PhotosFromGalleryResponse;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.flickr.PhotosFromGalleryResponse;
 
 import java.io.Serializable;
 

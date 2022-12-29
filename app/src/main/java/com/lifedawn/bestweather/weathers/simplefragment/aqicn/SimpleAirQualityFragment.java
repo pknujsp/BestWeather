@@ -22,7 +22,7 @@ import com.lifedawn.bestweather.commons.constants.BundleKey;
 import com.lifedawn.bestweather.databinding.AirQualityItemBinding;
 import com.lifedawn.bestweather.databinding.FragmentAirQualitySimpleBinding;
 import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
-import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.weathers.WeatherFragment;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.detailfragment.aqicn.DetailAirQualityFragment;

@@ -72,9 +72,9 @@ import com.lifedawn.bestweather.flickr.FlickrViewModel;
 import com.lifedawn.bestweather.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.ui.rainviewer.view.SimpleRainViewerFragment;
-import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
 
-import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.room.dto.FavoriteAddressDto;
 
 import com.lifedawn.bestweather.timezone.TimeZoneUtils;

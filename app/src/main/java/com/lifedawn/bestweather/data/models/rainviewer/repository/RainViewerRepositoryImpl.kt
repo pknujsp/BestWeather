@@ -1,13 +1,13 @@
 package com.lifedawn.bestweather.data.models.rainviewer.repository
 
 import com.google.gson.JsonElement
-import com.lifedawn.bestweather.retrofit.client.RetrofitClient
+import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery
 import retrofit2.Callback
+import javax.inject.Inject
 
-object RainViewerRepositoryImpl : RainViewerRepository {
+class RainViewerRepositoryImpl @Inject constructor(private val rainViewerApi: RestfulApiQuery) : RainViewerRepository {
     override fun initMap(callback: Callback<JsonElement>) {
-        RetrofitClient.getApiService(RetrofitClient.ServiceType.RAIN_VIEWER)
-                .rainViewer.enqueue(callback)
+        rainViewerApi.getRainViewer().enqueue(callback)
     }
 
 }

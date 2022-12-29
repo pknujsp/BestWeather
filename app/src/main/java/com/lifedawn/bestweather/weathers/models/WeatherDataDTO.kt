@@ -1,7 +1,7 @@
 package com.lifedawn.bestweather.weathers.models
 
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType
-import com.lifedawn.bestweather.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse
+import com.lifedawn.bestweather.data.remote.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse
 import java.time.ZoneId
 
 data class WeatherDataDTO(

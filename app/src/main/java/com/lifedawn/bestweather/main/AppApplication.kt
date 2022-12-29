@@ -16,9 +16,8 @@ class AppApplication : Application() {
         super.onCreate()
 
         val id = resources.getIdentifier("status_bar_height", "dimen", "android")
-        if (id > 0) {
+        if (id > 0)
             statusBarHeight = resources.getDimensionPixelSize(id)
-        }
 
         locale = resources.configuration.locales[0]
         localeCountryCode = locale.country
@@ -26,7 +25,7 @@ class AppApplication : Application() {
         val context = applicationContext
     }
 
-    fun loadValueUnitTypes(){
+    fun loadValueUnitTypes() {
         //datastore쓰기
     }
 }

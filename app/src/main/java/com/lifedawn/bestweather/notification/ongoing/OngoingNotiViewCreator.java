@@ -15,7 +15,7 @@ import com.lifedawn.bestweather.forremoteviews.RemoteViewsUtil;
 
 import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.notification.model.OngoingNotificationDto;
-import com.lifedawn.bestweather.retrofit.util.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.weathers.dataprocessing.util.WeatherUtil;

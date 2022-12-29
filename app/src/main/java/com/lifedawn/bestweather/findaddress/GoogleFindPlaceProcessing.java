@@ -2,12 +2,11 @@ package com.lifedawn.bestweather.findaddress;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.lifedawn.bestweather.retrofit.client.Queries;
-import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.retrofit.parameters.google.GoogleFindPlaceParameter;
-import com.lifedawn.bestweather.retrofit.parameters.google.GooglePlaceSearchParameter;
-import com.lifedawn.bestweather.retrofit.responses.google.placesearch.GooglePlaceSearchResponse;
-import com.lifedawn.bestweather.retrofit.util.JsonDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.google.GoogleFindPlaceParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.responses.google.placesearch.GooglePlaceSearchResponse;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.JsonDownloader;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -19,9 +18,9 @@ public class GoogleFindPlaceProcessing {
 	}
 
 	public static void findPlace(String input, JsonDownloader callback) {
-		Queries queries = RetrofitClient.getApiService(RetrofitClient.ServiceType.GOOGLE_PLACE_SEARCH);
+		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.GOOGLE_PLACE_SEARCH);
 		GoogleFindPlaceParameter parameter = new GoogleFindPlaceParameter(input);
-		Call<JsonElement> call = queries.getFindPlaceSearch(parameter.getMap());
+		Call<JsonElement> call = restfulApiQuery.getFindPlaceSearch(parameter.getMap());
 
 		call.enqueue(new Callback<JsonElement>() {
 			@Override

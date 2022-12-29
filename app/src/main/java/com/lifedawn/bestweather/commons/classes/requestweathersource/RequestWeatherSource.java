@@ -1,6 +1,6 @@
 package com.lifedawn.bestweather.commons.classes.requestweathersource;
 
-import com.lifedawn.bestweather.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
 
 import java.util.HashSet;
 import java.util.Set;
