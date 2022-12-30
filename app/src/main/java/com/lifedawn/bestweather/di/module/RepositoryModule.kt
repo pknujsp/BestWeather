@@ -12,12 +12,9 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object RepositoryModule {
 
-    @Provides
-    @Singleton
-    fun provideRainViewerApi() =
-        RetrofitClient.getApiService(RetrofitClient.ServiceType.RAIN_VIEWER)
+
 
 
     @Provides
