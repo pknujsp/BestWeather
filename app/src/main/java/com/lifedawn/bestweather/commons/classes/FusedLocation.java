@@ -38,9 +38,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.notification.NotificationHelper;
-import com.lifedawn.bestweather.notification.NotificationType;
-import com.lifedawn.bestweather.timezone.TimeZoneUtils;
+import com.lifedawn.bestweather.ui.notification.NotificationHelper;
+import com.lifedawn.bestweather.ui.notification.NotificationType;
+import com.lifedawn.bestweather.commons.utils.TimeZoneUtils;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +48,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;

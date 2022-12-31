@@ -2,7 +2,7 @@ package com.lifedawn.bestweather.di.module
 
 import android.content.Context
 import androidx.room.Room
-import com.lifedawn.bestweather.room.AppDb
+import com.lifedawn.bestweather.data.local.room.AppDb
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -24,7 +24,7 @@ object RetrofitClient {
     const val FLICKR_SERVICE_URL = "https://www.flickr.com/services/"
 
     //freeTimeApi
-    const val FREE_TIME_SERVICE_URL = "https://timeapi.io/api/TimeZone/
+    const val FREE_TIME_SERVICE_URL = "https://timeapi.io/api/TimeZone/"
 
     const val NOMINATIM_GEOCODE_URL = "https://nominatim.openstreetmap.org/"
     const val RAIN_VIEWER_URL = "https://api.rainviewer.com/public/"

@@ -10,14 +10,14 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.WeatherValueLabels;
 import com.lifedawn.bestweather.commons.constants.AppThemes;
 import com.lifedawn.bestweather.commons.constants.ValueUnits;
-import com.lifedawn.bestweather.flickr.FlickrRepository;
-import com.lifedawn.bestweather.model.timezone.TimeZoneIdRepositoryImpl;
-import com.lifedawn.bestweather.notification.ongoing.OngoingNotificationRepository;
-import com.lifedawn.bestweather.room.repository.DailyPushNotificationRepository;
-import com.lifedawn.bestweather.room.repository.FavoriteAddressRepository;
-import com.lifedawn.bestweather.room.repository.KmaAreaCodesRepository;
-import com.lifedawn.bestweather.room.repository.WidgetRepository;
-import com.lifedawn.bestweather.weathers.dataprocessing.util.WindUtil;
+import com.lifedawn.bestweather.data.remote.flickr.FlickrRepository;
+import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepositoryImpl;
+import com.lifedawn.bestweather.ui.notification.ongoing.OngoingNotificationRepository;
+import com.lifedawn.bestweather.data.local.room.repository.DailyPushNotificationRepository;
+import com.lifedawn.bestweather.data.local.room.repository.FavoriteAddressRepository;
+import com.lifedawn.bestweather.data.local.room.repository.KmaAreaCodesRepository;
+import com.lifedawn.bestweather.data.local.room.repository.WidgetRepository;
+import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WindUtil;
 
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
@@ -47,7 +47,7 @@ public class MyApplication extends Application {
 
 		FavoriteAddressRepository.initialize(context);
 		KmaAreaCodesRepository.initialize(context);
-		TimeZoneIdRepositoryImpl.Companion.initialize(context);
+		LocalTimeZoneRepositoryImpl.Companion.initialize(context);
 		OngoingNotificationRepository.initialize(context);
 		WidgetRepository.initialize(context);
 		FlickrRepository.initialize();

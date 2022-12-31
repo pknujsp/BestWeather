@@ -3,21 +3,15 @@ package com.lifedawn.bestweather.commons.views;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.ColorStateListDrawable;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.databinding.ProgressViewBinding;
-import com.lifedawn.bestweather.widget.DialogActivity;
 
 import java.util.Stack;
 

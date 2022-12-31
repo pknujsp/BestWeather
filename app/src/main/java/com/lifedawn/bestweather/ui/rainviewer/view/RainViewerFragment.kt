@@ -51,6 +51,10 @@ class RainViewerFragment : BaseFragment<FragmentRainViewerBinding>(R.layout.frag
 
     private lateinit var marker: MarkerOptions
 
+    companion object {
+        const val TAG = "RainViewerFragment"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
