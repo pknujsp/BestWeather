@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.ui.rainviewer.viewmodel
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.TileOverlay
 import com.google.gson.Gson
@@ -8,6 +7,7 @@ import com.google.gson.JsonElement
 import com.lifedawn.bestweather.data.models.rainviewer.dto.RainViewerResponseDto
 import com.lifedawn.bestweather.data.models.rainviewer.repository.RainViewerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,9 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RainViewerViewModel @Inject constructor(private val rainViewerRepository: RainViewerRepository) : ViewModel() {
-    private val _rainViewerData: MutableLiveData<RainViewerResponseDto?> = MutableLiveData<RainViewerResponseDto?>()
-    val rainViewerData: MutableLiveData<RainViewerResponseDto?>
-        get() = _rainViewerData
+    val rainViewerDataFlow = MutableStateFlow<RainViewerResponseDto?>(null)
 
     val frames = ArrayList<RainViewerResponseDto.Data>()
     var lastFramePosition = 0
@@ -43,18 +41,17 @@ class RainViewerViewModel @Inject constructor(private val rainViewerRepository: 
             override fun onResponse(call: Call<JsonElement>, response: Response<JsonElement>) {
                 if (response.isSuccessful) {
                     val responseDto: RainViewerResponseDto = Gson().fromJson(
-                        response.body(),
-                        RainViewerResponseDto::class.java
+                        response.body(), RainViewerResponseDto::class.java
                     )
-                    _rainViewerData.postValue(responseDto)
+                    rainViewerDataFlow.value = responseDto
                 } else {
                     //fail
-                    _rainViewerData.postValue(null)
+                    rainViewerDataFlow.value = null
                 }
             }
 
             override fun onFailure(call: Call<JsonElement>, t: Throwable) {
-                _rainViewerData.postValue(null)
+                rainViewerDataFlow.value = null
             }
         })
     }

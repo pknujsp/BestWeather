@@ -12,6 +12,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -35,7 +36,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class RainViewerFragment : BaseFragment<FragmentRainViewerBinding>(R.layout.fragment_rain_viewer), OnMapReadyCallback,
@@ -180,8 +180,12 @@ class RainViewerFragment : BaseFragment<FragmentRainViewerBinding>(R.layout.frag
         })
 
 
-        rainViewerViewModel.rainViewerData.observe(viewLifecycleOwner) {
-            initialize(it)
+        lifecycleScope.launchWhenCreated {
+            rainViewerViewModel.rainViewerDataFlow.collect {
+                it?.apply {
+                    initialize(this)
+                }
+            }
         }
 
         rainViewerViewModel.initMap()
@@ -264,7 +268,7 @@ class RainViewerFragment : BaseFragment<FragmentRainViewerBinding>(R.layout.frag
 
         val tileProvider = object : UrlTileProvider(tileSize, tileSize) {
             override fun getTileUrl(x: Int, y: Int, zoom: Int): URL? {
-                val url: String = rainViewerViewModel.rainViewerData.value!!.host + frame.path +
+                val url: String = rainViewerViewModel.rainViewerDataFlow.value!!.host + frame.path +
                         "/$tileSize/$zoom/$x/$y/$colorScheme/$smooth" + "_$snow.png"
 
                 return try {
