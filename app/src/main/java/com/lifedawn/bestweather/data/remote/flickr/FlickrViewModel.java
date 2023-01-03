@@ -26,7 +26,7 @@ public class FlickrViewModel extends AndroidViewModel {
 
 	public void loadImg(FlickrRepository.FlickrRequestParameter flickrRequestParameter) {
 		lastParameter = flickrRequestParameter;
-		flickrRepository.loadImg(getApplication().getApplicationContext(), flickrRequestParameter,
-				img::postValue);
+		flickrRepository.loadImg(flickrRequestParameter
+		);
 	}
 }

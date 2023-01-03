@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment;
 
 import com.lifedawn.bestweather.ui.weathers.detailfragment.base.dialogfragments.DetailDailyForecastDialogFragment;
 import com.lifedawn.bestweather.ui.weathers.detailfragment.base.dialogfragments.DetailHourlyForecastDialogFragment;
-import com.lifedawn.bestweather.ui.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
 
 import java.util.List;
 

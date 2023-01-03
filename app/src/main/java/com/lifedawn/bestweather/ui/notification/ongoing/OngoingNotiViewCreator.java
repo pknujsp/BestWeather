@@ -19,9 +19,9 @@ import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDown
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherUtil;
-import com.lifedawn.bestweather.ui.weathers.models.AirQualityDto;
-import com.lifedawn.bestweather.ui.weathers.models.CurrentConditionsDto;
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;
+import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;

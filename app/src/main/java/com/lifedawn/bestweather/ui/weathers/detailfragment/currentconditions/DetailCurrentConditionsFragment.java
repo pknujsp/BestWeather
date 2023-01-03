@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.constants.WeatherDataType;
 import com.lifedawn.bestweather.ui.weathers.detailfragment.base.BaseDetailCurrentConditionsFragment;
-import com.lifedawn.bestweather.ui.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
 
 import org.jetbrains.annotations.NotNull;
 

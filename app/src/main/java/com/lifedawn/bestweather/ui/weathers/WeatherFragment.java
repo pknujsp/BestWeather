@@ -81,7 +81,7 @@ import com.lifedawn.bestweather.commons.utils.TimeZoneUtils;
 
 import com.lifedawn.bestweather.ui.weathers.detailfragment.currentconditions.DetailCurrentConditionsFragment;
 import com.lifedawn.bestweather.ui.weathers.interfaces.ILoadWeatherData;
-import com.lifedawn.bestweather.ui.weathers.models.WeatherDataDTO;
+import com.lifedawn.bestweather.data.local.weather.models.WeatherDataDto;
 import com.lifedawn.bestweather.ui.weathers.simplefragment.aqicn.SimpleAirQualityFragment;
 import com.lifedawn.bestweather.ui.weathers.simplefragment.currentconditions.SimpleCurrentConditionsFragment;
 import com.lifedawn.bestweather.ui.weathers.simplefragment.dailyforecast.SimpleDailyForecastFragment;
@@ -809,7 +809,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 	private void setWeatherFragments(Set<WeatherProviderType> weatherProviderTypeSet, WeatherRestApiDownloader weatherRestApiDownloader,
 	                                 Double latitude, Double longitude) {
-		final WeatherDataDTO weatherDataDTO = weatherFragmentViewModel.createWeatherFragments(weatherProviderTypeSet,
+		final WeatherDataDto weatherDataDTO = weatherFragmentViewModel.createWeatherFragments(weatherProviderTypeSet,
 				weatherRestApiDownloader, latitude,
 				longitude);
 

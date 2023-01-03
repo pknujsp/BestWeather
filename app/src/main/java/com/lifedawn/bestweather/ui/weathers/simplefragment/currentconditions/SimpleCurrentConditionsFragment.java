@@ -14,8 +14,8 @@ import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherUtil;
-import com.lifedawn.bestweather.ui.weathers.models.AirQualityDto;
-import com.lifedawn.bestweather.ui.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;
+import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.ui.weathers.simplefragment.base.BaseSimpleCurrentConditionsFragment;
 
 import org.jetbrains.annotations.NotNull;

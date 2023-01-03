@@ -13,7 +13,7 @@ import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;

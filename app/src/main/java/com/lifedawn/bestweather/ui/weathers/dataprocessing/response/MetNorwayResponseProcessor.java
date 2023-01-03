@@ -13,9 +13,9 @@ import com.lifedawn.bestweather.data.remote.retrofit.responses.metnorway.locatio
 import com.lifedawn.bestweather.data.remote.retrofit.responses.metnorway.locationforecast.timeseries.LocationForecastTimeSeriesItem;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WindUtil;
-import com.lifedawn.bestweather.ui.weathers.models.CurrentConditionsDto;
-import com.lifedawn.bestweather.ui.weathers.models.DailyForecastDto;
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

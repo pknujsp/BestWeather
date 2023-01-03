@@ -1,10 +1,10 @@
-package com.lifedawn.bestweather.ui.weathers.models
+package com.lifedawn.bestweather.data.local.weather.models
 
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType
 import com.lifedawn.bestweather.data.remote.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse
 import java.time.ZoneId
 
-data class WeatherDataDTO(
+data class WeatherDataDto(
     val currentConditionsDto: CurrentConditionsDto, val hourlyForecastList: ArrayList<HourlyForecastDto>,
     val dailyForecastList: ArrayList<DailyForecastDto>, val airQualityDto: AirQualityDto, val currentConditionsWeatherVal: String,
     val latitude: Double,

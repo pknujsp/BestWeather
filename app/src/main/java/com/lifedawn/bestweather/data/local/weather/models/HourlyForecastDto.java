@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.models;
+package com.lifedawn.bestweather.data.local.weather.models;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;

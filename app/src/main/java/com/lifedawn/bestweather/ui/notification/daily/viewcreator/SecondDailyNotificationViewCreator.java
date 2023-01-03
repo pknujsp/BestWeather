@@ -17,8 +17,8 @@ import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherUtil;
-import com.lifedawn.bestweather.ui.weathers.models.AirQualityDto;
-import com.lifedawn.bestweather.ui.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;
+import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;

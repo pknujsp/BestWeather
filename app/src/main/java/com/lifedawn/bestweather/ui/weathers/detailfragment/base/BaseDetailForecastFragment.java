@@ -25,8 +25,8 @@ import com.lifedawn.bestweather.databinding.BaseLayoutDetailForecastBinding;
 import com.lifedawn.bestweather.databinding.ViewDetailDailyForecastListBinding;
 import com.lifedawn.bestweather.databinding.ViewDetailHourlyForecastListBinding;
 import com.lifedawn.bestweather.data.MyApplication;
-import com.lifedawn.bestweather.ui.weathers.models.DailyForecastDto;
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 

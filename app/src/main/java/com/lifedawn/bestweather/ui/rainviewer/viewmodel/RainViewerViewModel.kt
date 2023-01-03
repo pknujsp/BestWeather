@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.TileOverlay
 import com.google.gson.Gson
 import com.google.gson.JsonElement
-import com.lifedawn.bestweather.data.models.rainviewer.dto.RainViewerResponseDto
-import com.lifedawn.bestweather.data.models.rainviewer.repository.RainViewerRepository
+import com.lifedawn.bestweather.data.remote.rainviewer.dto.RainViewerResponseDto
+import com.lifedawn.bestweather.data.remote.rainviewer.repository.RainViewerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import retrofit2.Call
@@ -17,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RainViewerViewModel @Inject constructor(private val rainViewerRepository: RainViewerRepository) : ViewModel() {
     val rainViewerDataFlow = MutableStateFlow<RainViewerResponseDto?>(null)
+
 
     val frames = ArrayList<RainViewerResponseDto.Data>()
     var lastFramePosition = 0
@@ -45,7 +46,6 @@ class RainViewerViewModel @Inject constructor(private val rainViewerRepository: 
                     )
                     rainViewerDataFlow.value = responseDto
                 } else {
-                    //fail
                     rainViewerDataFlow.value = null
                 }
             }

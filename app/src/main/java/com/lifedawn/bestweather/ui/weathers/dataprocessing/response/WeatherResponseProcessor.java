@@ -37,10 +37,10 @@ import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.finaldata.km
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.parser.KmaWebParser;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WindUtil;
-import com.lifedawn.bestweather.ui.weathers.models.AirQualityDto;
-import com.lifedawn.bestweather.ui.weathers.models.CurrentConditionsDto;
-import com.lifedawn.bestweather.ui.weathers.models.DailyForecastDto;
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;
+import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 import com.tickaroo.tikxml.TikXml;
 
 import org.jsoup.Jsoup;

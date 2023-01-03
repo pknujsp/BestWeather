@@ -21,7 +21,7 @@ import com.lifedawn.bestweather.ui.weathers.FragmentType;
 import com.lifedawn.bestweather.ui.weathers.WeatherFragment;
 import com.lifedawn.bestweather.ui.weathers.comparison.dailyforecast.DailyForecastComparisonFragment;
 import com.lifedawn.bestweather.ui.weathers.detailfragment.dailyforecast.DetailDailyForecastFragment;
-import com.lifedawn.bestweather.ui.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
 import com.lifedawn.bestweather.ui.weathers.simplefragment.base.BaseSimpleForecastFragment;
 import com.lifedawn.bestweather.ui.weathers.view.DetailDoubleTemperatureView;
 import com.lifedawn.bestweather.ui.weathers.view.DoubleWeatherIconView;

@@ -27,7 +27,7 @@ import com.lifedawn.bestweather.commons.classes.MainThreadWorker
 import com.lifedawn.bestweather.commons.constants.BundleKey
 import com.lifedawn.bestweather.commons.views.BaseFragment
 import com.lifedawn.bestweather.data.MyApplication
-import com.lifedawn.bestweather.data.models.rainviewer.dto.RainViewerResponseDto
+import com.lifedawn.bestweather.data.remote.rainviewer.dto.RainViewerResponseDto
 import com.lifedawn.bestweather.databinding.FragmentRainViewerBinding
 import com.lifedawn.bestweather.ui.rainviewer.viewmodel.RainViewerViewModel
 import dagger.hilt.android.AndroidEntryPoint

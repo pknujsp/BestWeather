@@ -23,7 +23,7 @@ import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherRequestUtil;
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 import com.lifedawn.bestweather.ui.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.ui.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.ui.widget.widgetprovider.NinthWidgetProvider;

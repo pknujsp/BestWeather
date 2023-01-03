@@ -17,7 +17,7 @@ import com.lifedawn.bestweather.commons.classes.WeatherValueLabels;
 import com.lifedawn.bestweather.commons.constants.WeatherValueType;
 import com.lifedawn.bestweather.databinding.ItemviewDetailDailyForecastBinding;
 import com.lifedawn.bestweather.ui.weathers.detailfragment.dto.GridItemDto;
-import com.lifedawn.bestweather.ui.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 

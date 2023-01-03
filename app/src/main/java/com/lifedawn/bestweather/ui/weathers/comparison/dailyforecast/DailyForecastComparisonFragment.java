@@ -43,7 +43,7 @@ import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.MetNorwayRes
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
-import com.lifedawn.bestweather.ui.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
 import com.lifedawn.bestweather.ui.weathers.view.DoubleWeatherIconView;
 import com.lifedawn.bestweather.ui.weathers.FragmentType;
 import com.lifedawn.bestweather.ui.weathers.view.IconTextView;

@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.data.models.rainviewer.repository
+package com.lifedawn.bestweather.data.remote.rainviewer.repository
 
 import com.google.gson.JsonElement
 import retrofit2.Callback

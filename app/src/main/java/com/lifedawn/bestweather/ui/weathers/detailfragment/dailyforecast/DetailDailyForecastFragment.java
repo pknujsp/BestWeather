@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.ui.weathers.detailfragment.base.BaseDetailDailyForecastFragment;
-import com.lifedawn.bestweather.ui.weathers.models.DailyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
 
 
 import org.jetbrains.annotations.NotNull;

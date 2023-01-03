@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.models;
+package com.lifedawn.bestweather.data.local.weather.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

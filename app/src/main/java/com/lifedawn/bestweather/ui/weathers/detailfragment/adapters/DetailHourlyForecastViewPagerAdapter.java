@@ -19,7 +19,7 @@ import com.lifedawn.bestweather.databinding.HeaderviewDetailHourlyforecastBindin
 import com.lifedawn.bestweather.databinding.ItemviewDetailForecastBinding;
 import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.ui.weathers.detailfragment.dto.GridItemDto;
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 

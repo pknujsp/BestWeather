@@ -24,9 +24,9 @@ import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDown
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherRequestUtil;
-import com.lifedawn.bestweather.ui.weathers.models.AirQualityDto;
-import com.lifedawn.bestweather.ui.weathers.models.CurrentConditionsDto;
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;
+import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 import com.lifedawn.bestweather.ui.weathers.view.DetailSingleTemperatureView;
 import com.lifedawn.bestweather.ui.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.ui.widget.widgetprovider.SecondWidgetProvider;

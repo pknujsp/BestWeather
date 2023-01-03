@@ -1,11 +1,13 @@
 package com.lifedawn.bestweather.di.module
 
 import android.content.Context
-import com.lifedawn.bestweather.data.models.rainviewer.repository.RainViewerRepository
-import com.lifedawn.bestweather.data.models.rainviewer.repository.RainViewerRepositoryImpl
+import com.lifedawn.bestweather.data.remote.rainviewer.repository.RainViewerRepository
+import com.lifedawn.bestweather.data.remote.rainviewer.repository.RainViewerRepositoryImpl
 import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery
 import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepository
 import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepositoryImpl
+import com.lifedawn.bestweather.data.remote.flickr.FlickrRepository
+import com.lifedawn.bestweather.data.remote.flickr.FlickrRepositoryImpl
 import com.lifedawn.bestweather.data.remote.timezone.FreeTimeZoneApi
 import com.lifedawn.bestweather.data.remote.timezone.RemoteTimeZoneRepository
 import com.lifedawn.bestweather.data.remote.timezone.RemoteTimeZoneRepositoryImpl
@@ -39,4 +41,9 @@ object RepositoryModule {
     @Singleton
     fun provideRemoteTimeZoneRepository(freeTimeZoneApi: FreeTimeZoneApi): RemoteTimeZoneRepository =
         RemoteTimeZoneRepositoryImpl(freeTimeZoneApi)
+
+    @Provides
+    @Singleton
+    fun provideFlickrRepository(@ApplicationContext context: Context): FlickrRepository =
+        FlickrRepositoryImpl(context)
 }

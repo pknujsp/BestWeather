@@ -13,7 +13,7 @@ import androidx.preference.PreferenceManager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.ui.weathers.detailfragment.base.dialogfragments.DetailHourlyForecastDialogFragment;
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -53,11 +53,11 @@ import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.OpenWeatherM
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
-import com.lifedawn.bestweather.ui.weathers.models.AirQualityDto;
-import com.lifedawn.bestweather.ui.weathers.models.CurrentConditionsDto;
-import com.lifedawn.bestweather.ui.weathers.models.DailyForecastDto;
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
-import com.lifedawn.bestweather.ui.weathers.models.WeatherDataDTO;
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;
+import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.WeatherDataDto;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -395,7 +395,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 	}
 
 
-	public WeatherDataDTO createWeatherFragments(Set<WeatherProviderType> weatherProviderTypeSet, WeatherRestApiDownloader weatherRestApiDownloader,
+	public WeatherDataDto createWeatherFragments(Set<WeatherProviderType> weatherProviderTypeSet, WeatherRestApiDownloader weatherRestApiDownloader,
 	                                             Double latitude, Double longitude) {
 		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
 		ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> arrayMap;
@@ -569,7 +569,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 			precipitationVolume = currentConditionsDto.getSnowVolume();
 		}
 
-		final WeatherDataDTO weatherDataDTO = new WeatherDataDTO(currentConditionsDto,
+		final WeatherDataDto weatherDataDTO = new WeatherDataDto(currentConditionsDto,
 				(ArrayList<HourlyForecastDto>) hourlyForecastDtoList, (ArrayList<DailyForecastDto>) dailyForecastDtoList,
 				airQualityDto,
 				currentConditionsWeatherVal, latitude, longitude, addressName, countryCode, mainWeatherProviderType, zoneId,

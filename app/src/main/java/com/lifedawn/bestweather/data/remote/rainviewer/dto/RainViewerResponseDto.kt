@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.data.models.rainviewer.dto
+package com.lifedawn.bestweather.data.remote.rainviewer.dto
 
 
 import com.google.gson.annotations.SerializedName

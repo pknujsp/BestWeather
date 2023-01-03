@@ -11,7 +11,7 @@ import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
-import com.lifedawn.bestweather.ui.weathers.models.AirQualityDto;
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;
 import com.lifedawn.bestweather.ui.weathers.simplefragment.aqicn.AirQualityForecastObj;
 
 import java.time.LocalDate;

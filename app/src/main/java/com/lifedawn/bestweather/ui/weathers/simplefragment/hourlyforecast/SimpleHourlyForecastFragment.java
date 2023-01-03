@@ -23,7 +23,7 @@ import com.lifedawn.bestweather.ui.weathers.comparison.hourlyforecast.HourlyFore
 
 import com.lifedawn.bestweather.ui.weathers.detailfragment.hourlyforecast.DetailHourlyForecastFragment;
 
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 import com.lifedawn.bestweather.ui.weathers.simplefragment.base.BaseSimpleForecastFragment;
 
 import com.lifedawn.bestweather.ui.weathers.view.DateView;

@@ -11,7 +11,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.bumptech.glide.Glide;
 import com.lifedawn.bestweather.databinding.TabForecastItemBinding;
 import com.lifedawn.bestweather.ui.weathers.detailfragment.adapters.DetailHourlyForecastViewPagerAdapter;
-import com.lifedawn.bestweather.ui.weathers.models.HourlyForecastDto;
+import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 
 import org.jetbrains.annotations.NotNull;
 

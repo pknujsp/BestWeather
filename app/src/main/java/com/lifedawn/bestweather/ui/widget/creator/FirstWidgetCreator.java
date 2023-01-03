@@ -23,8 +23,8 @@ import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnRespons
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherUtil;
-import com.lifedawn.bestweather.ui.weathers.models.AirQualityDto;
-import com.lifedawn.bestweather.ui.weathers.models.CurrentConditionsDto;
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;
+import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.ui.widget.OnDrawBitmapCallback;
 import com.lifedawn.bestweather.ui.widget.widgetprovider.FirstWidgetProvider;
 
