@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepository;
+
 public class FlickrViewModel extends AndroidViewModel {
 	private final FlickrRepository flickrRepository = FlickrRepository.getINSTANCE();
 	public final MutableLiveData<FlickrRepository.FlickrImgResponse> img = new MutableLiveData<>();

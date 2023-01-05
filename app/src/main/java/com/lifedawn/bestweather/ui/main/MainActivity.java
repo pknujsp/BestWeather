@@ -25,7 +25,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.NetworkStatus;
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.ActivityMainBinding;
-import com.lifedawn.bestweather.data.remote.flickr.FlickrRepository;
+import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepository;
 import com.lifedawn.bestweather.ui.intro.IntroTransactionFragment;
 import com.lifedawn.bestweather.ui.notification.model.OngoingNotificationDto;
 import com.lifedawn.bestweather.ui.notification.ongoing.OngoingNotificationHelper;

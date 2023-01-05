@@ -67,7 +67,7 @@ import com.lifedawn.bestweather.commons.views.HeaderbarStyle;
 import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
 import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
 import com.lifedawn.bestweather.ui.findaddress.map.MapFragment;
-import com.lifedawn.bestweather.data.remote.flickr.FlickrRepository;
+import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepository;
 import com.lifedawn.bestweather.data.remote.flickr.FlickrViewModel;
 import com.lifedawn.bestweather.ui.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.data.MyApplication;

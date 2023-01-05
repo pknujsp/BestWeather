@@ -4,5 +4,5 @@ import com.google.gson.JsonElement
 import retrofit2.Response
 
 interface RemoteTimeZoneRepository {
-    suspend fun getTimeZone(latitude: Double, longitude: Double) : Response<JsonElement>
+    suspend fun getTimeZone(latitude: Double, longitude: Double): Result<JsonElement>
 }

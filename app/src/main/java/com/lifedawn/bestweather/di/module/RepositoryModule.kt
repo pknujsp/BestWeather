@@ -6,9 +6,8 @@ import com.lifedawn.bestweather.data.remote.rainviewer.repository.RainViewerRepo
 import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery
 import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepository
 import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepositoryImpl
-import com.lifedawn.bestweather.data.remote.flickr.FlickrRepository
-import com.lifedawn.bestweather.data.remote.flickr.FlickrRepositoryImpl
-import com.lifedawn.bestweather.data.remote.timezone.FreeTimeZoneApi
+import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepository
+import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepositoryImpl
 import com.lifedawn.bestweather.data.remote.timezone.RemoteTimeZoneRepository
 import com.lifedawn.bestweather.data.remote.timezone.RemoteTimeZoneRepositoryImpl
 import dagger.Module
@@ -33,14 +32,11 @@ object RepositoryModule {
     fun provideTimeZoneIdRepository(@ApplicationContext context: Context): LocalTimeZoneRepository =
         LocalTimeZoneRepositoryImpl(context)
 
-    @Provides
-    @Singleton
-    fun provideFreeTimeZoneApi(freeTimeRestApi: RestfulApiQuery) = FreeTimeZoneApi(freeTimeRestApi)
 
     @Provides
     @Singleton
-    fun provideRemoteTimeZoneRepository(freeTimeZoneApi: FreeTimeZoneApi): RemoteTimeZoneRepository =
-        RemoteTimeZoneRepositoryImpl(freeTimeZoneApi)
+    fun provideRemoteTimeZoneRepository(freeTimeRestApi: RestfulApiQuery): RemoteTimeZoneRepository =
+        RemoteTimeZoneRepositoryImpl(freeTimeRestApi)
 
     @Provides
     @Singleton

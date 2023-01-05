@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.data.remote.flickr;
+package com.lifedawn.bestweather.data.remote.flickr.model;
 
 import android.graphics.Bitmap;
 

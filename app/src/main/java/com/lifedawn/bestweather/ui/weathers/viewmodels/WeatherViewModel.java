@@ -76,9 +76,7 @@ public class WeatherViewModel extends ViewModel implements FavoriteAddressQuery 
 		return currentLocationLiveData;
 	}
 
-
 	public void setCurrentLocationAddressName(String addressName) {
 		currentLocationLiveData.setValue(addressName);
 	}
-
 }

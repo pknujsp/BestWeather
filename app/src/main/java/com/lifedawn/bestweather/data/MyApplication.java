@@ -10,7 +10,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.classes.WeatherValueLabels;
 import com.lifedawn.bestweather.commons.constants.AppThemes;
 import com.lifedawn.bestweather.commons.constants.ValueUnits;
-import com.lifedawn.bestweather.data.remote.flickr.FlickrRepository;
+import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepository;
 import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepositoryImpl;
 import com.lifedawn.bestweather.ui.notification.ongoing.OngoingNotificationRepository;
 import com.lifedawn.bestweather.data.local.room.repository.DailyPushNotificationRepository;

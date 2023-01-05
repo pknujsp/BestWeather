@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.commons.utils
 import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepository
 import com.lifedawn.bestweather.data.local.timezone.model.TimeZoneIdDto
 import com.lifedawn.bestweather.data.remote.retrofit.responses.freetime.FreeTimeResponse
-import com.lifedawn.bestweather.data.remote.timezone.FreeTimeZoneApi
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor
 import retrofit2.Response
