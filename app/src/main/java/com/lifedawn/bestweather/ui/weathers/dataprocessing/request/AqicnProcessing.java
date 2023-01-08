@@ -9,7 +9,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.aqicn.AqicnParameter;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
 
 import retrofit2.Call;
@@ -49,7 +49,7 @@ public class AqicnProcessing {
 		return call;
 	}
 
-	public static void getAirQuality(Double latitude, Double longitude, WeatherRestApiDownloader weatherRestApiDownloader, Context context) {
+	public static void getAirQuality(Double latitude, Double longitude, MultipleWeatherRestApiCallback multipleWeatherRestApiCallback, Context context) {
 		AqicnResponseProcessor.init(context);
 
 		AqicnParameter aqicnParameter = new AqicnParameter();
@@ -58,18 +58,18 @@ public class AqicnProcessing {
 		Call<JsonElement> localizedFeedCall = getLocalizedFeed(aqicnParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-				weatherRestApiDownloader.processResult(WeatherProviderType.AQICN, aqicnParameter,
+				multipleWeatherRestApiCallback.processResult(WeatherProviderType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, response, responseObj, responseText);
 			}
 
 			@Override
 			public void onResponseResult(Throwable t) {
-				weatherRestApiDownloader.processResult(WeatherProviderType.AQICN, aqicnParameter,
+				multipleWeatherRestApiCallback.processResult(WeatherProviderType.AQICN, aqicnParameter,
 						RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, t);
 			}
 		});
 
-		weatherRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, localizedFeedCall);
+		multipleWeatherRestApiCallback.getCallMap().put(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED, localizedFeedCall);
 	}
 
 }

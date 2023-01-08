@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.constants.WeatherDataType;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -119,11 +119,11 @@ public class FifthDailyNotificationViewCreator extends AbstractDailyNotiViewCrea
 
 
 	@Override
-	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherProviderType> weatherProviderTypeSet, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
-		final String refreshDateTime = weatherRestApiDownloader.getRequestDateTime().toString();
-		zoneId = weatherRestApiDownloader.getZoneId();
+	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherProviderType> weatherProviderTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleWeatherRestApiCallback multipleWeatherRestApiCallback, Set<WeatherDataType> weatherDataTypeSet) {
+		final String refreshDateTime = multipleWeatherRestApiCallback.getRequestDateTime().toString();
+		zoneId = multipleWeatherRestApiCallback.getZoneId();
 
-		final AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(weatherRestApiDownloader, null);
+		final AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(multipleWeatherRestApiCallback, null);
 		final boolean successful = airQualityDto.isSuccessful();
 
 		if (successful) {

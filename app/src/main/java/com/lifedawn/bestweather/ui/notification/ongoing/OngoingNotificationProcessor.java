@@ -32,7 +32,7 @@ import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.ui.notification.NotificationHelper;
 import com.lifedawn.bestweather.ui.notification.NotificationType;
 import com.lifedawn.bestweather.ui.notification.model.OngoingNotificationDto;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.commons.utils.DeviceUtils;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherRequestUtil;
 
@@ -137,7 +137,7 @@ public class OngoingNotificationProcessor {
 
 		WeatherRequestUtil.loadWeatherData(context, MyApplication.getExecutorService(),
 				ongoingNotificationDto.getLatitude(), ongoingNotificationDto.getLongitude(), weatherDataTypeSet,
-				new WeatherRestApiDownloader() {
+				new MultipleWeatherRestApiCallback() {
 					@Override
 					public void onResult() {
 						ongoingNotiViewCreator.setResultViews(collapsedRemoteViews, expandedRemoteViews, finalWeatherProviderType, this,

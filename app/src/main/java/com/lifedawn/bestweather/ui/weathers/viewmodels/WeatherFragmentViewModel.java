@@ -30,9 +30,9 @@ import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.curre
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
-import com.lifedawn.bestweather.data.remote.retrofit.responses.kma.html.KmaCurrentConditions;
-import com.lifedawn.bestweather.data.remote.retrofit.responses.kma.html.KmaDailyForecast;
-import com.lifedawn.bestweather.data.remote.retrofit.responses.kma.html.KmaHourlyForecast;
+import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaCurrentConditions;
+import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaDailyForecast;
+import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaHourlyForecast;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.kma.json.midtaresponse.MidTaResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.kma.json.vilagefcstcommons.VilageFcstResponse;
@@ -41,7 +41,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.in
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.ui.weathers.WeatherFragment;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.request.MainProcessing;
@@ -92,7 +92,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 
 	public FavoriteAddressDto favoriteAddressDto;
 
-	public WeatherRestApiDownloader weatherRestApiDownloader;
+	public MultipleWeatherRestApiCallback multipleWeatherRestApiCallback;
 	public Bundle arguments;
 
 	private final int FRAGMENT_TOTAL_COUNTS = 7;
@@ -108,9 +108,9 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 	@Override
 	protected void onCleared() {
 		super.onCleared();
-		if (weatherRestApiDownloader != null)
-			weatherRestApiDownloader.clear();
-		weatherRestApiDownloader = null;
+		if (multipleWeatherRestApiCallback != null)
+			multipleWeatherRestApiCallback.clear();
+		multipleWeatherRestApiCallback = null;
 		dateTimeFormatter = null;
 		selectedFavoriteAddressDto = null;
 		locationType = null;
@@ -131,14 +131,14 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 			v.dataDownloadedDateTime = null;
 			v.requestMainWeatherProviderType = null;
 
-			v.weatherRestApiDownloader.responseMap.clear();
+			v.multipleWeatherRestApiCallback.responseMap.clear();
 
-			v.weatherRestApiDownloader.callMap.clear();
+			v.multipleWeatherRestApiCallback.callMap.clear();
 
-			v.weatherRestApiDownloader.valueMap.clear();
+			v.multipleWeatherRestApiCallback.valueMap.clear();
 
 			v.requestWeatherProviderTypeSet.clear();
-			v.weatherRestApiDownloader = null;
+			v.multipleWeatherRestApiCallback = null;
 
 		}
 
@@ -159,11 +159,11 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 				setRequestWeatherSourceWithSourceTypes(weatherProviderTypeSet, requestWeatherSources);
 
 				final WeatherFragment.ResponseResultObj responseResultObj = new WeatherFragment.ResponseResultObj(weatherProviderTypeSet, requestWeatherSources, mainWeatherProviderType);
-				weatherRestApiDownloader = new WeatherRestApiDownloader() {
+				multipleWeatherRestApiCallback = new MultipleWeatherRestApiCallback() {
 					@Override
 					public void onResult() {
-						weatherRestApiDownloader = this;
-						responseResultObj.weatherRestApiDownloader = this;
+						multipleWeatherRestApiCallback = this;
+						responseResultObj.multipleWeatherRestApiCallback = this;
 						weatherDataResponse.postValue(responseResultObj);
 					}
 
@@ -173,10 +173,10 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 					}
 				};
 
-				weatherRestApiDownloader.setZoneId(zoneId);
+				multipleWeatherRestApiCallback.setZoneId(zoneId);
 				MainProcessing.requestNewWeatherData(getApplication().getApplicationContext(), latitude,
 						longitude,
-						requestWeatherSources, weatherRestApiDownloader);
+						requestWeatherSources, multipleWeatherRestApiCallback);
 			}
 		});
 	}
@@ -195,11 +195,11 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 				setRequestWeatherSourceWithSourceTypes(newWeatherProviderTypeSet, requestWeatherSources);
 
 				final WeatherFragment.ResponseResultObj responseResultObj = new WeatherFragment.ResponseResultObj(newWeatherProviderTypeSet, requestWeatherSources, newWeatherProviderType);
-				weatherRestApiDownloader = new WeatherRestApiDownloader() {
+				multipleWeatherRestApiCallback = new MultipleWeatherRestApiCallback() {
 					@Override
 					public void onResult() {
-						weatherRestApiDownloader = this;
-						responseResultObj.weatherRestApiDownloader = this;
+						multipleWeatherRestApiCallback = this;
+						responseResultObj.multipleWeatherRestApiCallback = this;
 						weatherDataResponse.postValue(responseResultObj);
 					}
 
@@ -209,9 +209,9 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 					}
 				};
 
-				weatherRestApiDownloader.setZoneId(zoneId);
+				multipleWeatherRestApiCallback.setZoneId(zoneId);
 				MainProcessing.requestNewWeatherData(getApplication().getApplicationContext(), latitude,
-						longitude, requestWeatherSources, weatherRestApiDownloader);
+						longitude, requestWeatherSources, multipleWeatherRestApiCallback);
 			}
 		});
 	}
@@ -395,10 +395,10 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 	}
 
 
-	public WeatherDataDto createWeatherFragments(Set<WeatherProviderType> weatherProviderTypeSet, WeatherRestApiDownloader weatherRestApiDownloader,
+	public WeatherDataDto createWeatherFragments(Set<WeatherProviderType> weatherProviderTypeSet, MultipleWeatherRestApiCallback multipleWeatherRestApiCallback,
 	                                             Double latitude, Double longitude) {
-		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> responseMap = weatherRestApiDownloader.getResponseMap();
-		ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> arrayMap;
+		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleWeatherRestApiCallback.ResponseResult>> responseMap = multipleWeatherRestApiCallback.getResponseMap();
+		ArrayMap<RetrofitClient.ServiceType, MultipleWeatherRestApiCallback.ResponseResult> arrayMap;
 
 		CurrentConditionsDto currentConditionsDto = null;
 		List<HourlyForecastDto> hourlyForecastDtoList = null;
@@ -422,7 +422,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 			List<FinalDailyForecast> finalDailyForecastList = KmaResponseProcessor.getFinalDailyForecastListByXML(
 					(MidLandFcstResponse) arrayMap.get(RetrofitClient.ServiceType.KMA_MID_LAND_FCST).getResponseObj(),
 					(MidTaResponse) arrayMap.get(RetrofitClient.ServiceType.KMA_MID_TA_FCST).getResponseObj(),
-					Long.parseLong(weatherRestApiDownloader.get("tmFc")));
+					Long.parseLong(multipleWeatherRestApiCallback.getValue("tmFc")));
 
 			finalDailyForecastList = KmaResponseProcessor.getDailyForecastListByXML(finalDailyForecastList, finalHourlyForecastList);
 
@@ -445,23 +445,23 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.KMA_WEB)) {
 			arrayMap = responseMap.get(WeatherProviderType.KMA_WEB);
 
-			KmaCurrentConditions kmaCurrentConditions = (KmaCurrentConditions) arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS).getResponseObj();
+			ParsedKmaCurrentConditions parsedKmaCurrentConditions = (ParsedKmaCurrentConditions) arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS).getResponseObj();
 			Object[] forecasts = (Object[]) arrayMap.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS).getResponseObj();
 
-			ArrayList<KmaHourlyForecast> kmaHourlyForecasts = (ArrayList<KmaHourlyForecast>) forecasts[0];
-			ArrayList<KmaDailyForecast> kmaDailyForecasts = (ArrayList<KmaDailyForecast>) forecasts[1];
+			ArrayList<ParsedKmaHourlyForecast> parsedKmaHourlyForecasts = (ArrayList<ParsedKmaHourlyForecast>) forecasts[0];
+			ArrayList<ParsedKmaDailyForecast> parsedKmaDailyForecasts = (ArrayList<ParsedKmaDailyForecast>) forecasts[1];
 
 			currentConditionsDto = KmaResponseProcessor.makeCurrentConditionsDtoOfWEB(context,
-					kmaCurrentConditions, kmaHourlyForecasts.get(0), latitude, longitude);
+					parsedKmaCurrentConditions, parsedKmaHourlyForecasts.get(0), latitude, longitude);
 
 			hourlyForecastDtoList = KmaResponseProcessor.makeHourlyForecastDtoListOfWEB(context,
-					kmaHourlyForecasts, latitude, longitude);
+					parsedKmaHourlyForecasts, latitude, longitude);
 
-			dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfWEB(kmaDailyForecasts);
+			dailyForecastDtoList = KmaResponseProcessor.makeDailyForecastDtoListOfWEB(parsedKmaDailyForecasts);
 
-			String pty = kmaCurrentConditions.getPty();
+			String pty = parsedKmaCurrentConditions.getPty();
 
-			currentConditionsWeatherVal = pty.isEmpty() ? kmaHourlyForecasts.get(0).getWeatherDescription() : pty;
+			currentConditionsWeatherVal = pty.isEmpty() ? parsedKmaHourlyForecasts.get(0).getWeatherDescription() : pty;
 			mainWeatherProviderType = WeatherProviderType.KMA_WEB;
 
 		} else if (weatherProviderTypeSet.contains(WeatherProviderType.ACCU_WEATHER)) {
@@ -549,7 +549,7 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 			mainWeatherProviderType = WeatherProviderType.MET_NORWAY;
 		}
 
-		WeatherRestApiDownloader.ResponseResult aqicnResponse = responseMap.get(WeatherProviderType.AQICN).get(
+		MultipleWeatherRestApiCallback.ResponseResult aqicnResponse = responseMap.get(WeatherProviderType.AQICN).get(
 				RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 		AqiCnGeolocalizedFeedResponse airQualityResponse = null;
 

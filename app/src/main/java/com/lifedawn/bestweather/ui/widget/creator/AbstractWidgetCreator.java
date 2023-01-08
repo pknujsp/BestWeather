@@ -30,7 +30,7 @@ import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.data.local.room.dto.WidgetDto;
 import com.lifedawn.bestweather.data.local.room.repository.WidgetRepository;
@@ -269,7 +269,7 @@ public abstract class AbstractWidgetCreator {
 		return new int[]{(int) widgetWidthPx, (int) widgetHeightPx};
 	}
 
-	public void makeResponseTextToJson(WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet,
+	public void makeResponseTextToJson(MultipleWeatherRestApiCallback multipleWeatherRestApiCallback, Set<WeatherDataType> weatherDataTypeSet,
 	                                   Set<WeatherProviderType> weatherProviderTypeSet, WidgetDto widgetDto, ZoneOffset zoneOffset) {
 		//json형태로 저장
 		/*
@@ -285,15 +285,15 @@ public abstract class AbstractWidgetCreator {
 			"zoneOffset": "09:00"
 		}
 		 */
-		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> arrayMap =
-				weatherRestApiDownloader.getResponseMap();
+		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleWeatherRestApiCallback.ResponseResult>> arrayMap =
+				multipleWeatherRestApiCallback.getResponseMap();
 
 		final JsonObject rootJsonObject = new JsonObject();
 		String text = null;
 
 		//owm이면 onecall이므로 한번만 수행
 		for (WeatherProviderType weatherProviderType : weatherProviderTypeSet) {
-			ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult> requestWeatherSourceArr =
+			ArrayMap<RetrofitClient.ServiceType, MultipleWeatherRestApiCallback.ResponseResult> requestWeatherSourceArr =
 					arrayMap.get(weatherProviderType);
 
 			if (weatherProviderType == WeatherProviderType.OWM_ONECALL) {
@@ -360,7 +360,7 @@ public abstract class AbstractWidgetCreator {
 						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST).getResponseText();
 						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name(), text);
 					}
-					long tmFc = Long.parseLong(weatherRestApiDownloader.get("tmFc"));
+					long tmFc = Long.parseLong(multipleWeatherRestApiCallback.getValue("tmFc"));
 					kmaJsonObject.addProperty("tmFc", tmFc);
 				}
 				rootJsonObject.add(weatherProviderType.name(), kmaJsonObject);
@@ -416,7 +416,7 @@ public abstract class AbstractWidgetCreator {
 			rootJsonObject.addProperty("zoneOffset", zoneOffset.getId());
 		}
 
-		rootJsonObject.addProperty("lastUpdatedDateTime", weatherRestApiDownloader.getRequestDateTime().toString());
+		rootJsonObject.addProperty("lastUpdatedDateTime", multipleWeatherRestApiCallback.getRequestDateTime().toString());
 		widgetDto.setResponseText(rootJsonObject.toString());
 	}
 
@@ -473,7 +473,7 @@ public abstract class AbstractWidgetCreator {
 	}
 
 	public void setResultViews(int appWidgetId,
-	                           @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader,
+	                           @Nullable @org.jetbrains.annotations.Nullable MultipleWeatherRestApiCallback multipleWeatherRestApiCallback,
 	                           @Nullable ZoneId zoneId) {
 		if (!widgetDto.isInitialized())
 			widgetDto.setInitialized(true);

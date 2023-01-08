@@ -12,7 +12,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.constants.WeatherDataType;
 import com.lifedawn.bestweather.commons.constants.ValueUnits;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor;
@@ -109,21 +109,21 @@ public class SecondDailyNotificationViewCreator extends AbstractDailyNotiViewCre
 	}
 
 	@Override
-	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherProviderType> weatherProviderTypeSet, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherDataType> weatherDataTypeSet) {
-		final String refreshDateTime = weatherRestApiDownloader.getRequestDateTime().toString();
+	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherProviderType> weatherProviderTypeSet, @Nullable @org.jetbrains.annotations.Nullable MultipleWeatherRestApiCallback multipleWeatherRestApiCallback, Set<WeatherDataType> weatherDataTypeSet) {
+		final String refreshDateTime = multipleWeatherRestApiCallback.getRequestDateTime().toString();
 
-		zoneId = weatherRestApiDownloader.getZoneId();
+		zoneId = multipleWeatherRestApiCallback.getZoneId();
 
 
 		WeatherProviderType weatherProviderType = WeatherResponseProcessor.getMainWeatherSourceType(weatherProviderTypeSet);
-		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, weatherRestApiDownloader,
+		CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleWeatherRestApiCallback,
 				weatherProviderType, zoneId);
 
 		boolean successful = currentConditionsDto != null;
 		if (successful) {
 			ZoneOffset zoneOffset = currentConditionsDto.getCurrentTime().getOffset();
 
-			AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(weatherRestApiDownloader,
+			AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(multipleWeatherRestApiCallback,
 					zoneOffset);
 
 			setDataViews(remoteViews, dailyPushNotificationDto.getAddressName(), refreshDateTime, airQualityDto, currentConditionsDto);

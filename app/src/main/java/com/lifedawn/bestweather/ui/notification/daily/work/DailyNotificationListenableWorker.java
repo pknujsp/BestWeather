@@ -36,7 +36,7 @@ import com.lifedawn.bestweather.ui.notification.daily.viewcreator.FirstDailyNoti
 import com.lifedawn.bestweather.ui.notification.daily.viewcreator.FourthDailyNotificationViewCreator;
 import com.lifedawn.bestweather.ui.notification.daily.viewcreator.SecondDailyNotificationViewCreator;
 import com.lifedawn.bestweather.ui.notification.daily.viewcreator.ThirdDailyNotificationViewCreator;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.data.local.room.repository.DailyPushNotificationRepository;
@@ -260,7 +260,7 @@ public class DailyNotificationListenableWorker extends ListenableWorker {
 		}
 
 		WeatherRequestUtil.loadWeatherData(context, executorService,
-				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), weatherDataTypeSet, new WeatherRestApiDownloader() {
+				dailyPushNotificationDto.getLatitude(), dailyPushNotificationDto.getLongitude(), weatherDataTypeSet, new MultipleWeatherRestApiCallback() {
 					@Override
 					public void onResult() {
 						viewCreator.setResultViews(remoteViews, dailyPushNotificationDto, weatherProviderTypeSet, this, weatherDataTypeSet);

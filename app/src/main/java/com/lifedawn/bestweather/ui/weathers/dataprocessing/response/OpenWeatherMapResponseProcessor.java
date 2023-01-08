@@ -12,7 +12,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.in
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
@@ -79,7 +79,7 @@ public class OpenWeatherMapResponseProcessor extends WeatherResponseProcessor {
 		return WEATHER_ICON_DESCRIPTION_MAP.get(code);
 	}
 
-	public static boolean successfulResponse(WeatherRestApiDownloader.ResponseResult result) {
+	public static boolean successfulResponse(MultipleWeatherRestApiCallback.ResponseResult result) {
 		if (result.getResponse() != null) {
 			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();
 

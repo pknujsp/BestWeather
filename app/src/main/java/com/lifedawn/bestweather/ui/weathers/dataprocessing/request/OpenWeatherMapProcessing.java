@@ -17,7 +17,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.in
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
 
 import java.util.Set;
@@ -137,7 +137,7 @@ public class OpenWeatherMapProcessing {
 	}
 
 	public static void requestWeatherDataOneCall(Context context, Double latitude, Double longitude,
-	                                             RequestOwmOneCall requestOwmOneCall, WeatherRestApiDownloader weatherRestApiDownloader) {
+	                                             RequestOwmOneCall requestOwmOneCall, MultipleWeatherRestApiCallback multipleWeatherRestApiCallback) {
 		OpenWeatherMapResponseProcessor.init(context);
 
 		OneCallParameter oneCallParameter = new OneCallParameter();
@@ -147,23 +147,23 @@ public class OpenWeatherMapProcessing {
 		Call<JsonElement> oneCallCall = getOneCall(oneCallParameter, new JsonDownloader() {
 			@Override
 			public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-				weatherRestApiDownloader.processResult(WeatherProviderType.OWM_ONECALL, oneCallParameter,
+				multipleWeatherRestApiCallback.processResult(WeatherProviderType.OWM_ONECALL, oneCallParameter,
 						RetrofitClient.ServiceType.OWM_ONE_CALL, response, responseObj, responseText);
 			}
 
 			@Override
 			public void onResponseResult(Throwable t) {
-				weatherRestApiDownloader.processResult(WeatherProviderType.OWM_ONECALL, oneCallParameter,
+				multipleWeatherRestApiCallback.processResult(WeatherProviderType.OWM_ONECALL, oneCallParameter,
 						RetrofitClient.ServiceType.OWM_ONE_CALL, t);
 			}
 
 		});
-		weatherRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.OWM_ONE_CALL, oneCallCall);
+		multipleWeatherRestApiCallback.getCallMap().put(RetrofitClient.ServiceType.OWM_ONE_CALL, oneCallCall);
 
 	}
 
 	public static void requestWeatherDataIndividual(Context context, Double latitude, Double longitude,
-	                                                RequestOwmIndividual requestOwmIndividual, WeatherRestApiDownloader weatherRestApiDownloader) {
+	                                                RequestOwmIndividual requestOwmIndividual, MultipleWeatherRestApiCallback multipleWeatherRestApiCallback) {
 		Set<RetrofitClient.ServiceType> serviceTypeSet = requestOwmIndividual.getRequestServiceTypes();
 
 		if (serviceTypeSet.contains(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS)) {
@@ -174,18 +174,18 @@ public class OpenWeatherMapProcessing {
 			Call<JsonElement> currentConditionsCall = getCurrentConditions(owmCurrentWeatherParameter, new JsonDownloader() {
 				@Override
 				public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-					weatherRestApiDownloader.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmCurrentWeatherParameter,
+					multipleWeatherRestApiCallback.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmCurrentWeatherParameter,
 							RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS, response, responseObj, responseText);
 				}
 
 				@Override
 				public void onResponseResult(Throwable t) {
-					weatherRestApiDownloader.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmCurrentWeatherParameter,
+					multipleWeatherRestApiCallback.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmCurrentWeatherParameter,
 							RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS, t);
 				}
 
 			});
-			weatherRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS, currentConditionsCall);
+			multipleWeatherRestApiCallback.getCallMap().put(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS, currentConditionsCall);
 		}
 		if (serviceTypeSet.contains(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST)) {
 			OwmHourlyForecastParameter owmHourlyForecastParameter = new OwmHourlyForecastParameter();
@@ -195,18 +195,18 @@ public class OpenWeatherMapProcessing {
 			Call<JsonElement> hourlyForecastCall = getHourlyForecast(owmHourlyForecastParameter, new JsonDownloader() {
 				@Override
 				public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-					weatherRestApiDownloader.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmHourlyForecastParameter,
+					multipleWeatherRestApiCallback.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmHourlyForecastParameter,
 							RetrofitClient.ServiceType.OWM_HOURLY_FORECAST, response, responseObj, responseText);
 				}
 
 				@Override
 				public void onResponseResult(Throwable t) {
-					weatherRestApiDownloader.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmHourlyForecastParameter,
+					multipleWeatherRestApiCallback.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmHourlyForecastParameter,
 							RetrofitClient.ServiceType.OWM_HOURLY_FORECAST, t);
 				}
 
 			});
-			weatherRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST, hourlyForecastCall);
+			multipleWeatherRestApiCallback.getCallMap().put(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST, hourlyForecastCall);
 		}
 		if (serviceTypeSet.contains(RetrofitClient.ServiceType.OWM_DAILY_FORECAST)) {
 			OwmDailyForecastParameter owmDailyForecastParameter = new OwmDailyForecastParameter();
@@ -216,18 +216,18 @@ public class OpenWeatherMapProcessing {
 			Call<JsonElement> dailyForecastCall = getDailyForecast(owmDailyForecastParameter, new JsonDownloader() {
 				@Override
 				public void onResponseResult(Response<?> response, Object responseObj, String responseText) {
-					weatherRestApiDownloader.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmDailyForecastParameter,
+					multipleWeatherRestApiCallback.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmDailyForecastParameter,
 							RetrofitClient.ServiceType.OWM_DAILY_FORECAST, response, responseObj, responseText);
 				}
 
 				@Override
 				public void onResponseResult(Throwable t) {
-					weatherRestApiDownloader.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmDailyForecastParameter,
+					multipleWeatherRestApiCallback.processResult(WeatherProviderType.OWM_INDIVIDUAL, owmDailyForecastParameter,
 							RetrofitClient.ServiceType.OWM_DAILY_FORECAST, t);
 				}
 
 			});
-			weatherRestApiDownloader.getCallMap().put(RetrofitClient.ServiceType.OWM_DAILY_FORECAST, dailyForecastCall);
+			multipleWeatherRestApiCallback.getCallMap().put(RetrofitClient.ServiceType.OWM_DAILY_FORECAST, dailyForecastCall);
 		}
 	}
 }

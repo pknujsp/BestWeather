@@ -10,6 +10,11 @@ import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepository
 import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepositoryImpl
 import com.lifedawn.bestweather.data.remote.timezone.RemoteTimeZoneRepository
 import com.lifedawn.bestweather.data.remote.timezone.RemoteTimeZoneRepositoryImpl
+import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnDataSourceImpl
+import com.lifedawn.bestweather.data.remote.weather.commons.WeatherRepositoryImpl
+import com.lifedawn.bestweather.data.remote.weather.kma.datasource.KmaDataSourceImpl
+import com.lifedawn.bestweather.data.remote.weather.metnorway.datasource.MetNorwayDataSourceImpl
+import com.lifedawn.bestweather.data.remote.weather.owm.datasource.OwmDataSourceImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,4 +47,12 @@ object RepositoryModule {
     @Singleton
     fun provideFlickrRepository(@ApplicationContext context: Context): FlickrRepository =
         FlickrRepositoryImpl(context)
+
+    @Provides
+    @Singleton
+    fun provideWeatherRepository(
+        kmaDataSource: KmaDataSourceImpl,
+        owmDataSource: OwmDataSourceImpl, metNorwayDataSource: MetNorwayDataSourceImpl,
+        aqicnDataSource: AqicnDataSourceImpl
+    ) = WeatherRepositoryImpl(kmaDataSource, owmDataSource, metNorwayDataSource, aqicnDataSource)
 }

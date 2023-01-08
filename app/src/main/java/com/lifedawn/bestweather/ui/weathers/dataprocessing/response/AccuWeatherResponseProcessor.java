@@ -12,7 +12,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.curre
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.geopositionsearch.AccuGeoPositionResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
@@ -114,7 +114,7 @@ public class AccuWeatherResponseProcessor extends WeatherResponseProcessor {
 	}
 
 
-	public static boolean successfulResponse(WeatherRestApiDownloader.ResponseResult result) {
+	public static boolean successfulResponse(MultipleWeatherRestApiCallback.ResponseResult result) {
 		if (result.getResponse() != null) {
 			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();
 

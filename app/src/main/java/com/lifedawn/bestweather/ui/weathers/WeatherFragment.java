@@ -68,13 +68,12 @@ import com.lifedawn.bestweather.databinding.FragmentWeatherBinding;
 import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding;
 import com.lifedawn.bestweather.ui.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepository;
-import com.lifedawn.bestweather.data.remote.flickr.FlickrViewModel;
 import com.lifedawn.bestweather.ui.main.IRefreshFavoriteLocationListOnSideNav;
 import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.ui.rainviewer.view.SimpleRainViewerFragment;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
 
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto;
 
 import com.lifedawn.bestweather.commons.utils.TimeZoneUtils;
@@ -502,8 +501,8 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	public void onDestroyView() {
 		super.onDestroyView();
 
-		if (weatherFragmentViewModel.weatherRestApiDownloader != null)
-			weatherFragmentViewModel.weatherRestApiDownloader.cancel();
+		if (weatherFragmentViewModel.multipleWeatherRestApiCallback != null)
+			weatherFragmentViewModel.multipleWeatherRestApiCallback.cancel();
 		if (weatherViewController != null)
 			getLifecycle().removeObserver(weatherViewController);
 		if (locationLifeCycleObserver != null)
@@ -673,7 +672,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 				try {
 					WeatherResponseObj responseObj = WeatherFragmentViewModel.FINAL_RESPONSE_MAP.get(key);
 					if (responseObj != null) {
-						setWeatherFragments(weatherProviderTypeSet, responseObj.weatherRestApiDownloader,
+						setWeatherFragments(weatherProviderTypeSet, responseObj.multipleWeatherRestApiCallback,
 								weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
 					} else {
 						requestNewData();
@@ -706,18 +705,18 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	}
 
 	private void processOnResult(ResponseResultObj responseResultObj) {
-		Set<Map.Entry<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>>> entrySet =
-				responseResultObj.weatherRestApiDownloader.getResponseMap().entrySet();
+		Set<Map.Entry<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleWeatherRestApiCallback.ResponseResult>>> entrySet =
+				responseResultObj.multipleWeatherRestApiCallback.getResponseMap().entrySet();
 		//메인 날씨 제공사의 데이터가 정상이면 메인 날씨 제공사의 프래그먼트들을 설정하고 값을 표시한다.
 		//메인 날씨 제공사의 응답이 불량이면 재 시도, 취소 중 택1 다이얼로그 표시
-		for (Map.Entry<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, WeatherRestApiDownloader.ResponseResult>> entry : entrySet) {
+		for (Map.Entry<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleWeatherRestApiCallback.ResponseResult>> entry : entrySet) {
 			final WeatherProviderType weatherProviderType = entry.getKey();
 
 			if (weatherProviderType == WeatherProviderType.AQICN) {
 				continue;
 			}
 
-			for (WeatherRestApiDownloader.ResponseResult responseResult : entry.getValue().values()) {
+			for (MultipleWeatherRestApiCallback.ResponseResult responseResult : entry.getValue().values()) {
 				if (!responseResult.isSuccessful()) {
 					if (weatherFragmentViewModel.containWeatherData(weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude)) {
 						MainThreadWorker.runOnUiThread(() -> {
@@ -782,10 +781,10 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		}
 
 		//응답 성공 하면
-		final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.weatherRestApiDownloader,
+		final WeatherResponseObj weatherResponseObj = new WeatherResponseObj(responseResultObj.multipleWeatherRestApiCallback,
 				responseResultObj.weatherProviderTypeSet, responseResultObj.mainWeatherProviderType);
 		WeatherFragmentViewModel.FINAL_RESPONSE_MAP.put(weatherFragmentViewModel.latitude.toString() + weatherFragmentViewModel.longitude.toString(), weatherResponseObj);
-		setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.weatherRestApiDownloader, weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
+		setWeatherFragments(responseResultObj.weatherProviderTypeSet, responseResultObj.multipleWeatherRestApiCallback, weatherFragmentViewModel.latitude, weatherFragmentViewModel.longitude);
 	}
 
 	private void setFailFragment(List<AlertFragment.BtnObj> btnObjList) {
@@ -807,10 +806,10 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	}
 
 
-	private void setWeatherFragments(Set<WeatherProviderType> weatherProviderTypeSet, WeatherRestApiDownloader weatherRestApiDownloader,
+	private void setWeatherFragments(Set<WeatherProviderType> weatherProviderTypeSet, MultipleWeatherRestApiCallback multipleWeatherRestApiCallback,
 	                                 Double latitude, Double longitude) {
 		final WeatherDataDto weatherDataDTO = weatherFragmentViewModel.createWeatherFragments(weatherProviderTypeSet,
-				weatherRestApiDownloader, latitude,
+				multipleWeatherRestApiCallback, latitude,
 				longitude);
 
 		final Bundle defaultBundle = new Bundle();
@@ -878,7 +877,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		FlickrRepository.FlickrRequestParameter flickrRequestParameter = new FlickrRepository.FlickrRequestParameter(
 				weatherDataDTO.getMainWeatherProviderType(), weatherDataDTO.getCurrentConditionsWeatherVal(), latitude, longitude,
 				weatherDataDTO.getZoneId(), weatherDataDTO.getPrecipitationVolume(),
-				ZonedDateTime.parse(weatherRestApiDownloader.getRequestDateTime().toString())
+				ZonedDateTime.parse(multipleWeatherRestApiCallback.getRequestDateTime().toString())
 		);
 
 		flickrViewModel.setLastParameter(flickrRequestParameter);
@@ -887,7 +886,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		try {
 			requireActivity().runOnUiThread(() -> {
 				changeWeatherDataSourcePicker(weatherFragmentViewModel.countryCode);
-				binding.updatedDatetime.setText(weatherRestApiDownloader.getRequestDateTime().format(weatherFragmentViewModel.dateTimeFormatter));
+				binding.updatedDatetime.setText(multipleWeatherRestApiCallback.getRequestDateTime().format(weatherFragmentViewModel.dateTimeFormatter));
 
 				FragmentManager fragmentManager = getChildFragmentManager();
 				FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -1019,7 +1018,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 
 
 	public static final class ResponseResultObj implements Serializable {
-		public WeatherRestApiDownloader weatherRestApiDownloader;
+		public MultipleWeatherRestApiCallback multipleWeatherRestApiCallback;
 		public Set<WeatherProviderType> weatherProviderTypeSet;
 		public WeatherProviderType mainWeatherProviderType;
 		public ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources;
@@ -1033,13 +1032,13 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	}
 
 	public static final class WeatherResponseObj implements Serializable {
-		public WeatherRestApiDownloader weatherRestApiDownloader;
+		public MultipleWeatherRestApiCallback multipleWeatherRestApiCallback;
 		public Set<WeatherProviderType> requestWeatherProviderTypeSet;
 		public WeatherProviderType requestMainWeatherProviderType;
 		public LocalDateTime dataDownloadedDateTime;
 
-		public WeatherResponseObj(WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherProviderType> requestWeatherProviderTypeSet, WeatherProviderType requestMainWeatherProviderType) {
-			this.weatherRestApiDownloader = weatherRestApiDownloader;
+		public WeatherResponseObj(MultipleWeatherRestApiCallback multipleWeatherRestApiCallback, Set<WeatherProviderType> requestWeatherProviderTypeSet, WeatherProviderType requestMainWeatherProviderType) {
+			this.multipleWeatherRestApiCallback = multipleWeatherRestApiCallback;
 			this.requestWeatherProviderTypeSet = requestWeatherProviderTypeSet;
 			this.requestMainWeatherProviderType = requestMainWeatherProviderType;
 

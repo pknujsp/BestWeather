@@ -19,7 +19,7 @@ import com.lifedawn.bestweather.commons.constants.WeatherDataType;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.onecall.OneCallParameter;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
@@ -35,12 +35,12 @@ import java.util.concurrent.ExecutorService;
 public class WeatherRequestUtil {
 	public static void loadWeatherData(Context context, ExecutorService executorService, Double latitude, Double longitude,
 	                                   Set<WeatherDataType> weatherDataTypeSet,
-	                                   WeatherRestApiDownloader weatherRestApiDownloader, Set<WeatherProviderType> weatherProviderTypeSet, ZoneId zoneId) {
+	                                   MultipleWeatherRestApiCallback multipleWeatherRestApiCallback, Set<WeatherProviderType> weatherProviderTypeSet, ZoneId zoneId) {
 		executorService.submit(() -> {
-			weatherRestApiDownloader.setZoneId(zoneId);
+			multipleWeatherRestApiCallback.setZoneId(zoneId);
 			final ArrayMap<WeatherProviderType, RequestWeatherSource> requestWeatherSources = new ArrayMap<>();
 			setRequestWeatherSourceWithSourceType(weatherProviderTypeSet, requestWeatherSources, weatherDataTypeSet);
-			MainProcessing.requestNewWeatherData(context, latitude, longitude, requestWeatherSources, weatherRestApiDownloader);
+			MainProcessing.requestNewWeatherData(context, latitude, longitude, requestWeatherSources, multipleWeatherRestApiCallback);
 		});
 	}
 

@@ -17,7 +17,7 @@ import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
 import com.lifedawn.bestweather.ui.notification.NotificationHelper;
 import com.lifedawn.bestweather.ui.notification.NotificationType;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto;
 
 import java.time.ZoneId;
@@ -89,7 +89,7 @@ public abstract class AbstractDailyNotiViewCreator {
 	public abstract Set<WeatherDataType> getRequestWeatherDataTypeSet();
 
 	public void setResultViews(RemoteViews remoteViews, DailyPushNotificationDto dailyPushNotificationDto, Set<WeatherProviderType> weatherProviderTypeSet,
-	                           @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader,
+	                           @Nullable @org.jetbrains.annotations.Nullable MultipleWeatherRestApiCallback multipleWeatherRestApiCallback,
 	                           Set<WeatherDataType> weatherDataTypeSet) {
 	}
 

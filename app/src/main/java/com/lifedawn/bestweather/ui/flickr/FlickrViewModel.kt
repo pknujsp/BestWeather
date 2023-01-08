@@ -17,6 +17,12 @@ class FlickrViewModel @Inject constructor(private val flickrRepository: FlickrRe
     private val _img = MutableStateFlow<DownloadedImg>(DownloadedImg.Failure(Exception("")))
     val img = _img.asStateFlow()
 
+    private lateinit var lastParameter: FlickrRequestParameter
+
+    fun setLastParameter(flickrRequestParameter: FlickrRequestParameter) {
+        this.lastParameter = flickrRequestParameter
+    }
+
     suspend fun loadImg(parameter: FlickrRequestParameter) {
         CoroutineScope(Dispatchers.IO).launch {
             val response = flickrRepository.loadImg(parameter)

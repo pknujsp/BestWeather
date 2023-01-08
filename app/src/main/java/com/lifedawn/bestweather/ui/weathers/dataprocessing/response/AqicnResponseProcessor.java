@@ -10,7 +10,7 @@ import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;
 import com.lifedawn.bestweather.ui.weathers.simplefragment.aqicn.AirQualityForecastObj;
 
@@ -209,7 +209,7 @@ public class AqicnResponseProcessor {
 		return LocalDate.parse(day, dateTimeFormatter);
 	}
 
-	public static boolean successfulResponse(WeatherRestApiDownloader.ResponseResult result) {
+	public static boolean successfulResponse(MultipleWeatherRestApiCallback.ResponseResult result) {
 		if (result.getResponse() != null) {
 			Response<JsonElement> response = (Response<JsonElement>) result.getResponse();
 

@@ -15,7 +15,7 @@ import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil;
 
 import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.ui.notification.model.OngoingNotificationDto;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherUtil;
@@ -68,21 +68,21 @@ public class OngoingNotiViewCreator {
 
 
 	protected void setResultViews(RemoteViews collapsedRemoteViews, RemoteViews expandedRemoteViews,
-	                              WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable WeatherRestApiDownloader weatherRestApiDownloader,
+	                              WeatherProviderType requestWeatherProviderType, @Nullable @org.jetbrains.annotations.Nullable MultipleWeatherRestApiCallback multipleWeatherRestApiCallback,
 	                              OnRemoteViewsCallback onRemoteViewsCallback) {
 		ZoneOffset zoneOffset = null;
-		setHeaderViews(collapsedRemoteViews, ongoingNotificationDto.getDisplayName(), weatherRestApiDownloader.getRequestDateTime().toString());
-		setHeaderViews(expandedRemoteViews, ongoingNotificationDto.getDisplayName(), weatherRestApiDownloader.getRequestDateTime().toString());
+		setHeaderViews(collapsedRemoteViews, ongoingNotificationDto.getDisplayName(), multipleWeatherRestApiCallback.getRequestDateTime().toString());
+		setHeaderViews(expandedRemoteViews, ongoingNotificationDto.getDisplayName(), multipleWeatherRestApiCallback.getRequestDateTime().toString());
 
 		final ZoneId zoneId = ZoneId.of(ongoingNotificationDto.getZoneId());
 
 		int icon = R.mipmap.ic_launcher_round;
 		String temperature = null;
 
-		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, weatherRestApiDownloader,
+		final CurrentConditionsDto currentConditionsDto = WeatherResponseProcessor.getCurrentConditionsDto(context, multipleWeatherRestApiCallback,
 				requestWeatherProviderType, zoneId);
 
-		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, weatherRestApiDownloader,
+		final List<HourlyForecastDto> hourlyForecastDtoList = WeatherResponseProcessor.getHourlyForecastDtoList(context, multipleWeatherRestApiCallback,
 				requestWeatherProviderType, zoneId);
 
 
@@ -96,7 +96,7 @@ public class OngoingNotiViewCreator {
 			icon = currentConditionsDto.getWeatherIcon();
 			temperature = currentConditionsDto.getTemp().replace(MyApplication.VALUE_UNIT_OBJ.getTempUnitText(), "°");
 
-			AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(weatherRestApiDownloader, zoneOffset);
+			AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(multipleWeatherRestApiCallback, zoneOffset);
 			if (airQualityDto.isSuccessful()) {
 				setAirQualityViews(expandedRemoteViews, AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi()));
 			} else {

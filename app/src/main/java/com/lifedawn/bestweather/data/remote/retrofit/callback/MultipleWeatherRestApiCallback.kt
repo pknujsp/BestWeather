@@ -1,210 +1,77 @@
-package com.lifedawn.bestweather.data.remote.retrofit.callback;
+package com.lifedawn.bestweather.data.remote.retrofit.callback
 
-import android.util.ArrayMap;
+import androidx.collection.ArrayMap
+import androidx.collection.arrayMapOf
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient.ServiceType
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.RequestParameter
+import retrofit2.Call
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
-import androidx.annotation.NonNull;
+abstract class MultipleWeatherRestApiCallback(private val requestCount: Int = 0) {
+    val requestDateTimeISO8601: String = ZonedDateTime.now().toString()
+    private val responseCount = AtomicInteger(0)
 
-import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
-import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.RequestParameter;
+    var isResponseCompleted = false
+        private set
+    var zoneId: ZoneId? = null
+        private set
 
-import org.jetbrains.annotations.NotNull;
+    val valueMap = ConcurrentHashMap<String, String>()
+    val callMap = ConcurrentHashMap<ServiceType, Call<Any>>()
+    val responseMap = ConcurrentHashMap<WeatherProviderType, ArrayMap<ServiceType, Result<Any>>>()
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import retrofit2.Call;
-import retrofit2.Response;
-
-public abstract class WeatherRestApiDownloader {
-	private final ZonedDateTime requestDateTime = ZonedDateTime.now();
-	private int requestCount;
-	private AtomicInteger responseCount = new AtomicInteger(0);
-	private boolean responseCompleted;
-	private ZoneId zoneId;
-
-	public ConcurrentHashMap<String, String> valueMap = new ConcurrentHashMap<>();
-	public ConcurrentHashMap<RetrofitClient.ServiceType, Call<?>> callMap = new ConcurrentHashMap<>();
-	public ConcurrentHashMap<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> responseMap = new ConcurrentHashMap<>();
-
-	public WeatherRestApiDownloader() {
-	}
-
-	public WeatherRestApiDownloader setResponseCompleted(boolean responseCompleted) {
-		this.responseCompleted = responseCompleted;
-		return this;
-	}
-
-	public WeatherRestApiDownloader setZoneId(ZoneId zoneId) {
-		this.zoneId = zoneId;
-		return this;
-	}
-
-	private synchronized int getResponseCount() {
-		return responseCount.get();
-	}
-
-	public ZoneId getZoneId() {
-		return zoneId;
-	}
-
-	public Map<RetrofitClient.ServiceType, Call<?>> getCallMap() {
-		return callMap;
-	}
-
-	public Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, ResponseResult>> getResponseMap() {
-		return responseMap;
-	}
-
-	public WeatherRestApiDownloader(int requestCount) {
-		this.requestCount = requestCount;
-	}
-
-	public ZonedDateTime getRequestDateTime() {
-		return requestDateTime;
-	}
-
-	public void setRequestCount(int requestCount) {
-		this.requestCount = requestCount;
-	}
-
-	public int getRequestCount() {
-		return requestCount;
-	}
-
-	public void setResponseCount(int responseCount) {
-		this.responseCount.set(responseCount);
-	}
+    fun setResponseCompleted(responseCompleted: Boolean): MultipleWeatherRestApiCallback {
+        isResponseCompleted = responseCompleted
+        return this
+    }
 
 
-	public String get(@NonNull @NotNull String key) {
-		return valueMap.get(key);
-	}
+    fun setResponseCount(responseCount: Int) {
+        this.responseCount.set(responseCount)
+    }
 
+    fun getValue(key: String): String? {
+        return valueMap[key]
+    }
 
-	public void put(@NonNull @NotNull String key, @NonNull @NotNull String value) {
-		valueMap.put(key, value);
-	}
+    fun putValue(key: String, value: String) {
+        valueMap[key] = value
+    }
 
-	public boolean isResponseCompleted() {
-		return responseCompleted;
-	}
+    abstract fun onResult()
+    abstract fun onCanceled()
 
-	public Map<String, String> getValueMap() {
-		return valueMap;
-	}
+    fun cancel() {
+        responseCount.set(10000)
 
-	public abstract void onResult();
+        if (!callMap.isEmpty())
+            for (call in callMap.values)
+                call.cancel()
+    }
 
-	public abstract void onCanceled();
+    fun clear() {
+        valueMap.clear()
+        callMap.clear()
+        responseMap.clear()
+    }
 
-	public void cancel() {
-		responseCount.set(10000);
+    fun processResult(
+        weatherProviderType: WeatherProviderType, serviceType: ServiceType, result: Result<Any>
+    ) {
+        responseCount.incrementAndGet()
+        if (!responseMap.containsKey(weatherProviderType)) {
+            responseMap[weatherProviderType] = arrayMapOf<ServiceType, Result<Any>>()
+        }
+        responseMap[weatherProviderType]?.set(serviceType, result)
 
-		if (!callMap.isEmpty()) {
-			for (Call<?> call : callMap.values()) {
-				call.cancel();
-			}
-		}
+        if (requestCount == responseCount.get()) {
+            isResponseCompleted = true
+            onResult()
+        }
+    }
 
-	}
-
-	public void clear() {
-		valueMap.clear();
-		callMap.clear();
-		responseMap.clear();
-	}
-
-	public void processResult(WeatherProviderType weatherProviderType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType,
-	                          Response<?> response, Object responseObj, String responseText) {
-		responseCount.incrementAndGet();
-
-		if (!responseMap.containsKey(weatherProviderType)) {
-			responseMap.put(weatherProviderType, new ArrayMap<>());
-		}
-		responseMap.get(weatherProviderType).put(serviceType, new ResponseResult(requestParameter, response, responseObj, responseText));
-
-		if (requestCount == responseCount.get()) {
-			responseCompleted = true;
-			onResult();
-		}
-	}
-
-	public void processResult(WeatherProviderType weatherProviderType, RequestParameter requestParameter, RetrofitClient.ServiceType serviceType, Throwable t) {
-		responseCount.incrementAndGet();
-
-		if (!responseMap.containsKey(weatherProviderType)) {
-			responseMap.put(weatherProviderType, new ArrayMap<>());
-		}
-
-		responseMap.get(weatherProviderType).put(serviceType, new ResponseResult(requestParameter, t));
-
-		if (requestCount == responseCount.get()) {
-			responseCompleted = true;
-			onResult();
-		}
-	}
-
-	public RequestParameter getRequestParameter(WeatherProviderType weatherProviderType, RetrofitClient.ServiceType serviceType) {
-		return responseMap.get(weatherProviderType).get(serviceType).getRequestParameter();
-	}
-
-	public static class ResponseResult {
-		private final RequestParameter requestParameter;
-		private boolean successful;
-
-		private Response<?> response;
-		private Throwable t;
-		private String responseText;
-		private Object responseObj;
-
-		public ResponseResult(RequestParameter requestParameter, Throwable t) {
-			this.t = t;
-			successful = false;
-			this.requestParameter = requestParameter;
-		}
-
-		public ResponseResult(RequestParameter requestParameter, Response<?> response, Object responseObj, String responseText) {
-			this.response = response;
-			successful = true;
-			this.responseObj = responseObj;
-			this.requestParameter = requestParameter;
-			this.responseText = responseText;
-		}
-
-		public Response<?> getResponse() {
-			return response;
-		}
-
-		public void setResponse(Response<?> response) {
-			this.response = response;
-		}
-
-		public Throwable getT() {
-			return t;
-		}
-
-		public void setT(Throwable t) {
-			this.t = t;
-		}
-
-		public RequestParameter getRequestParameter() {
-			return requestParameter;
-		}
-
-		public boolean isSuccessful() {
-			return successful;
-		}
-
-		public String getResponseText() {
-			return responseText;
-		}
-
-		public Object getResponseObj() {
-			return responseObj;
-		}
-	}
 }

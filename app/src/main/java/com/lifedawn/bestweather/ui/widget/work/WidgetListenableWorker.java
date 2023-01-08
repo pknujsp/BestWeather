@@ -30,7 +30,7 @@ import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil;
 import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.ui.notification.NotificationHelper;
 import com.lifedawn.bestweather.ui.notification.NotificationType;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.WeatherRestApiDownloader;
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.data.local.room.dto.WidgetDto;
 import com.lifedawn.bestweather.data.local.room.repository.WidgetRepository;
@@ -79,11 +79,11 @@ public class WidgetListenableWorker extends ListenableWorker {
 	private final Map<Integer, WidgetDto> currentLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
 	private final Map<Integer, WidgetDto> selectedLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
 	private final Map<Integer, WidgetDto> allWidgetDtoArrayMap = new ConcurrentHashMap<>();
-	private final Map<Integer, WeatherRestApiDownloader> multipleRestApiDownloaderMap = new ConcurrentHashMap<>();
+	private final Map<Integer, MultipleWeatherRestApiCallback> multipleRestApiDownloaderMap = new ConcurrentHashMap<>();
 	private final Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new ConcurrentHashMap<>();
 
-	private WeatherRestApiDownloader currentLocationResponseWeatherRestApiDownloader;
-	private final Map<String, WeatherRestApiDownloader> selectedLocationResponseMap = new ConcurrentHashMap<>();
+	private MultipleWeatherRestApiCallback currentLocationResponseMultipleWeatherRestApiCallback;
+	private final Map<String, MultipleWeatherRestApiCallback> selectedLocationResponseMap = new ConcurrentHashMap<>();
 
 	private RequestObj currentLocationRequestObj;
 	private final Map<String, RequestObj> selectedLocationRequestMap = new ConcurrentHashMap<>();
@@ -477,7 +477,7 @@ public class WidgetListenableWorker extends ListenableWorker {
 
 	private void loadWeatherData(LocationType locationType, List<String> addressList, BackgroundWorkCallback backgroundWorkCallback) {
 		for (String addressName : addressList) {
-			WeatherRestApiDownloader weatherRestApiDownloader = new WeatherRestApiDownloader() {
+			MultipleWeatherRestApiCallback multipleWeatherRestApiCallback = new MultipleWeatherRestApiCallback() {
 				@Override
 				public void onResult() {
 					onResponseResult(locationType, addressName, backgroundWorkCallback);
@@ -493,10 +493,10 @@ public class WidgetListenableWorker extends ListenableWorker {
 
 			if (locationType == LocationType.SelectedAddress) {
 				requestObj = selectedLocationRequestMap.get(addressName);
-				selectedLocationResponseMap.put(addressName, weatherRestApiDownloader);
+				selectedLocationResponseMap.put(addressName, multipleWeatherRestApiCallback);
 			} else {
 				requestObj = currentLocationRequestObj;
-				currentLocationResponseWeatherRestApiDownloader = weatherRestApiDownloader;
+				currentLocationResponseMultipleWeatherRestApiCallback = multipleWeatherRestApiCallback;
 
 				boolean onlyKma = true;
 
@@ -515,23 +515,23 @@ public class WidgetListenableWorker extends ListenableWorker {
 					requestObj.weatherProviderTypeSet.remove(WeatherProviderType.OWM_ONECALL);
 				}
 			}
-			weatherRestApiDownloader.setZoneId(requestObj.zoneId);
+			multipleWeatherRestApiCallback.setZoneId(requestObj.zoneId);
 
 			WeatherRequestUtil.loadWeatherData(getApplicationContext(), executorService, requestObj.address.latitude,
-					requestObj.address.longitude, requestObj.weatherDataTypeSet, weatherRestApiDownloader,
-					requestObj.weatherProviderTypeSet, weatherRestApiDownloader.getZoneId());
+					requestObj.address.longitude, requestObj.weatherDataTypeSet, multipleWeatherRestApiCallback,
+					requestObj.weatherProviderTypeSet, multipleWeatherRestApiCallback.getZoneId());
 		}
 	}
 
 	private void onResponseResult(LocationType locationType, String addressName, BackgroundWorkCallback backgroundWorkCallback) {
-		WeatherRestApiDownloader restApiDownloader = null;
+		MultipleWeatherRestApiCallback restApiDownloader = null;
 		Set<Integer> appWidgetIdSet = null;
 
 		if (locationType == LocationType.SelectedAddress) {
 			restApiDownloader = selectedLocationResponseMap.get(addressName);
 			appWidgetIdSet = selectedLocationRequestMap.get(addressName).appWidgetSet;
 		} else {
-			restApiDownloader = currentLocationResponseWeatherRestApiDownloader;
+			restApiDownloader = currentLocationResponseMultipleWeatherRestApiCallback;
 			appWidgetIdSet = currentLocationRequestObj.appWidgetSet;
 		}
 
