@@ -1,82 +1,62 @@
-package com.lifedawn.bestweather.ui.weathers.viewmodels;
+package com.lifedawn.bestweather.ui.weathers.viewmodels
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.lifedawn.bestweather.data.local.room.queryinterfaces.FavoriteAddressQuery
+import com.lifedawn.bestweather.commons.classes.FusedLocation.MyLocationCallback
+import com.lifedawn.bestweather.data.local.room.repository.FavoriteAddressRepository
+import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
+import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
+import com.lifedawn.bestweather.data.remote.weather.commons.GetWeatherUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-import com.lifedawn.bestweather.commons.classes.FusedLocation;
-import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.data.local.room.queryinterfaces.FavoriteAddressQuery;
-import com.lifedawn.bestweather.data.local.room.repository.FavoriteAddressRepository;
+@HiltViewModel
+class GetWeatherViewModel @Inject constructor(private val getWeatherUseCase: GetWeatherUseCase) : ViewModel() {
+    var locationCallback: MyLocationCallback? = null
+    private val favoriteAddressRepository: FavoriteAddressRepository
+    private val currentLocationLiveData = MutableLiveData<String>()
+    @JvmField val favoriteAddressListLiveData: LiveData<List<FavoriteAddressDto>>
 
-import java.util.List;
+    override fun getAll(callback: DbQueryCallback<List<FavoriteAddressDto>>) {
+        favoriteAddressRepository.getAll(callback)
+    }
 
-public class WeatherViewModel extends ViewModel implements FavoriteAddressQuery {
-	private FusedLocation.MyLocationCallback locationCallback;
-	private FavoriteAddressRepository favoriteAddressRepository;
+    override fun get(id: Int, callback: DbQueryCallback<FavoriteAddressDto>) {
+        favoriteAddressRepository[id, callback]
+    }
 
-	private MutableLiveData<String> currentLocationLiveData = new MutableLiveData<>();
+    override fun size(callback: DbQueryCallback<Int>) {
+        favoriteAddressRepository.size(callback)
+    }
 
+    override fun contains(latitude: String, longitude: String, callback: DbQueryCallback<Boolean>) {
+        favoriteAddressRepository.contains(latitude, longitude, callback)
+    }
 
-	public final LiveData<List<FavoriteAddressDto>> favoriteAddressListLiveData;
+    override fun add(favoriteAddressDto: FavoriteAddressDto, callback: DbQueryCallback<Long>) {
+        favoriteAddressRepository.add(favoriteAddressDto, callback)
+    }
 
-	public WeatherViewModel() {
-		super();
-		favoriteAddressRepository = FavoriteAddressRepository.getINSTANCE();
-		favoriteAddressListLiveData = favoriteAddressRepository.getAllData();
-	}
+    override fun delete(favoriteAddressDto: FavoriteAddressDto) {
+        favoriteAddressRepository.delete(favoriteAddressDto)
+    }
 
-	public void setLocationCallback(FusedLocation.MyLocationCallback locationCallback) {
-		this.locationCallback = locationCallback;
-	}
+    override fun delete(favoriteAddressDto: FavoriteAddressDto, callback: DbQueryCallback<Boolean>) {
+        favoriteAddressRepository.delete(favoriteAddressDto, callback)
+    }
 
-	public FusedLocation.MyLocationCallback getLocationCallback() {
-		return locationCallback;
-	}
+    fun getCurrentLocationLiveData(): LiveData<String> {
+        return currentLocationLiveData
+    }
 
+    fun setCurrentLocationAddressName(addressName: String) {
+        currentLocationLiveData.value = addressName
+    }
 
-	@Override
-	public void getAll(DbQueryCallback<List<FavoriteAddressDto>> callback) {
-		favoriteAddressRepository.getAll(callback);
-	}
-
-
-	@Override
-	public void get(int id, DbQueryCallback<FavoriteAddressDto> callback) {
-		favoriteAddressRepository.get(id, callback);
-	}
-
-	@Override
-	public void size(DbQueryCallback<Integer> callback) {
-		favoriteAddressRepository.size(callback);
-	}
-
-	@Override
-	public void contains(String latitude, String longitude, DbQueryCallback<Boolean> callback) {
-		favoriteAddressRepository.contains(latitude, longitude, callback);
-	}
-
-	@Override
-	public void add(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Long> callback) {
-		favoriteAddressRepository.add(favoriteAddressDto, callback);
-	}
-
-	@Override
-	public void delete(FavoriteAddressDto favoriteAddressDto) {
-		favoriteAddressRepository.delete(favoriteAddressDto);
-	}
-
-	@Override
-	public void delete(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Boolean> callback) {
-		favoriteAddressRepository.delete(favoriteAddressDto, callback);
-	}
-
-	public LiveData<String> getCurrentLocationLiveData() {
-		return currentLocationLiveData;
-	}
-
-	public void setCurrentLocationAddressName(String addressName) {
-		currentLocationLiveData.setValue(addressName);
-	}
+    init {
+        favoriteAddressRepository = FavoriteAddressRepository.getINSTANCE()
+        favoriteAddressListLiveData = favoriteAddressRepository.allData
+    }
 }

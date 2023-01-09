@@ -51,7 +51,7 @@ import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.ui.settings.fragments.SettingsMainFragment;
 import com.lifedawn.bestweather.ui.weathers.WeatherFragment;
 import com.lifedawn.bestweather.ui.weathers.interfaces.ILoadWeatherData;
-import com.lifedawn.bestweather.ui.weathers.viewmodels.WeatherViewModel;
+import com.lifedawn.bestweather.ui.weathers.viewmodels.GetWeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -63,7 +63,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 	private final int favDtoTagInFavLocItemView = R.id.favoriteLocationDtoTagInFavLocItemViewInSideNav;
 
 	private FragmentMainBinding binding;
-	private WeatherViewModel weatherViewModel;
+	private GetWeatherViewModel getWeatherViewModel;
 	private SharedPreferences sharedPreferences;
 	private List<FavoriteAddressDto> favoriteAddressDtoList = new ArrayList<>();
 	private String currentAddressName;
@@ -221,8 +221,8 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false);
 		sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
 		initViewModel = new ViewModelProvider(requireActivity()).get(InitViewModel.class);
-		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
-		weatherViewModel.setLocationCallback(new FusedLocation.MyLocationCallback() {
+		getWeatherViewModel = new ViewModelProvider(requireActivity()).get(GetWeatherViewModel.class);
+		getWeatherViewModel.setLocationCallback(new FusedLocation.MyLocationCallback() {
 			@Override
 			public void onSuccessful(LocationResult locationResult) {
 
@@ -284,7 +284,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 			}
 		});
 
-		weatherViewModel.getCurrentLocationLiveData().observe(getViewLifecycleOwner(), addressName -> {
+		getWeatherViewModel.getCurrentLocationLiveData().observe(getViewLifecycleOwner(), addressName -> {
 			currentAddressName = addressName;
 
 			if (currentAddressName != null) {
@@ -293,7 +293,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 		});
 
 
-		weatherViewModel.favoriteAddressListLiveData.observe(requireActivity(), result -> {
+		getWeatherViewModel.favoriteAddressListLiveData.observe(requireActivity(), result -> {
 			createLocationsList(result);
 
 			if (init) {
@@ -558,7 +558,7 @@ public class MainTransactionFragment extends Fragment implements IRefreshFavorit
 
 	@Override
 	public void refreshFavorites(DbQueryCallback<List<FavoriteAddressDto>> callback) {
-		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
+		getWeatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
 				MainThreadWorker.runOnUiThread(() -> callback.onResultSuccessful(result));

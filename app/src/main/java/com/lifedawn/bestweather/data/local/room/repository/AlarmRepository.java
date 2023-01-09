@@ -7,7 +7,6 @@ import androidx.annotation.Nullable;
 import com.lifedawn.bestweather.data.local.room.AppDb;
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.data.local.room.dao.AlarmDao;
-import com.lifedawn.bestweather.data.local.room.dto.AlarmDto;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

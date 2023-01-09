@@ -33,7 +33,7 @@ import com.lifedawn.bestweather.ui.findaddress.map.IBottomSheetState;
 import com.lifedawn.bestweather.ui.findaddress.map.MapFragment;
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.ui.weathers.viewmodels.WeatherViewModel;
+import com.lifedawn.bestweather.ui.weathers.viewmodels.GetWeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +54,7 @@ public class FindAddressFragment extends Fragment {
 	private OnListListener onListListener;
 	private FoundAddressesAdapter.OnClickedAddressListener onClickedAddressListener;
 	private IBottomSheetState iBottomSheetState;
-	private WeatherViewModel weatherViewModel;
+	private GetWeatherViewModel getWeatherViewModel;
 
 	private final CustomEditText.OnEditTextQueryListener onEditTextQueryListener = new CustomEditText.OnEditTextQueryListener() {
 		@Override
@@ -118,7 +118,7 @@ public class FindAddressFragment extends Fragment {
 		networkStatus = NetworkStatus.getInstance(getContext());
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
-		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
+		getWeatherViewModel = new ViewModelProvider(requireActivity()).get(GetWeatherViewModel.class);
 	}
 
 	@Override
@@ -205,7 +205,7 @@ public class FindAddressFragment extends Fragment {
 		binding.addressList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 		binding.addressList.setAdapter(addressesAdapter);
 
-		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
+		getWeatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
 				Set<String> favoriteAddressSet = new HashSet<>();

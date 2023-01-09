@@ -73,7 +73,7 @@ import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.commons.utils.TimeZoneUtils;
 import com.lifedawn.bestweather.commons.utils.DeviceUtils;
 import com.lifedawn.bestweather.ui.weathers.WeatherFragment;
-import com.lifedawn.bestweather.ui.weathers.viewmodels.WeatherViewModel;
+import com.lifedawn.bestweather.ui.weathers.viewmodels.GetWeatherViewModel;
 import com.lifedawn.bestweather.ui.widget.ConfigureWidgetActivity;
 
 import java.util.ArrayList;
@@ -92,7 +92,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	private GoogleMap googleMap;
 	private Map<MarkerType, List<Marker>> markerMaps = new HashMap<>();
 	private LocationLifeCycleObserver locationLifeCycleObserver;
-	private WeatherViewModel weatherViewModel;
+	private GetWeatherViewModel getWeatherViewModel;
 	private OnResultFavoriteListener onResultFavoriteListener;
 	private Set<String> favoriteAddressSet = new HashSet<>();
 
@@ -197,7 +197,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 
 	private void add(FavoriteAddressDto favoriteAddressDto) {
-		weatherViewModel.contains(favoriteAddressDto.getLatitude(), favoriteAddressDto.getLongitude(),
+		getWeatherViewModel.contains(favoriteAddressDto.getLatitude(), favoriteAddressDto.getLongitude(),
 				new DbQueryCallback<Boolean>() {
 					@Override
 					public void onResultSuccessful(Boolean contains) {
@@ -209,9 +209,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 								});
 							}
 						} else {
-							MainThreadWorker.runOnUiThread(() -> weatherViewModel.favoriteAddressListLiveData.removeObservers(getViewLifecycleOwner()));
+							MainThreadWorker.runOnUiThread(() -> getWeatherViewModel.favoriteAddressListLiveData.removeObservers(getViewLifecycleOwner()));
 
-							weatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
+							getWeatherViewModel.add(favoriteAddressDto, new DbQueryCallback<Long>() {
 								@Override
 								public void onResultSuccessful(Long id) {
 									if (getActivity() != null) {
@@ -269,7 +269,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		locationLifeCycleObserver = new LocationLifeCycleObserver(requireActivity().getActivityResultRegistry(), requireActivity());
 		getLifecycle().addObserver(locationLifeCycleObserver);
 
-		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
+		getWeatherViewModel = new ViewModelProvider(requireActivity()).get(GetWeatherViewModel.class);
 		getChildFragmentManager().registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, true);
 
 		fusedLocation = new FusedLocation(requireContext().getApplicationContext());
@@ -552,7 +552,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 				new MaterialAlertDialogBuilder(getActivity()).
 						setTitle(R.string.remove)
 						.setMessage(e.getDisplayName()).
-						setPositiveButton(R.string.remove, (dialog, which) -> weatherViewModel.delete(e, new DbQueryCallback<Boolean>() {
+						setPositiveButton(R.string.remove, (dialog, which) -> getWeatherViewModel.delete(e, new DbQueryCallback<Boolean>() {
 							@Override
 							public void onResultSuccessful(Boolean result) {
 								MainThreadWorker.runOnUiThread(() -> {
@@ -590,7 +590,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 			}
 		});
 
-		weatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), result -> {
+		getWeatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), result -> {
 			if (!addedNewLocation) {
 				FavoriteLocationItemViewPagerAdapter adapter1 = (FavoriteLocationItemViewPagerAdapter) adapterMap.get(MarkerType.FAVORITE);
 				adapter1.setAddressList(result);
@@ -979,7 +979,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 	}
 
 	private void checkHaveLocations() {
-		weatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
+		getWeatherViewModel.getAll(new DbQueryCallback<List<FavoriteAddressDto>>() {
 			@Override
 			public void onResultSuccessful(List<FavoriteAddressDto> result) {
 				MainThreadWorker.runOnUiThread(() -> {

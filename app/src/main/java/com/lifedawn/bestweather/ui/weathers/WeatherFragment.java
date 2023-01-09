@@ -87,7 +87,7 @@ import com.lifedawn.bestweather.ui.weathers.simplefragment.dailyforecast.SimpleD
 import com.lifedawn.bestweather.ui.weathers.simplefragment.hourlyforecast.SimpleHourlyForecastFragment;
 import com.lifedawn.bestweather.ui.weathers.simplefragment.sunsetrise.SunsetriseFragment;
 import com.lifedawn.bestweather.ui.weathers.viewmodels.WeatherFragmentViewModel;
-import com.lifedawn.bestweather.ui.weathers.viewmodels.WeatherViewModel;
+import com.lifedawn.bestweather.ui.weathers.viewmodels.GetWeatherViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -107,7 +107,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 	private final ExecutorService executorService = MyApplication.getExecutorService();
 	private FragmentWeatherBinding binding;
 	private LoadingViewAsyncBinding asyncBinding;
-	private WeatherViewModel weatherViewModel;
+	private GetWeatherViewModel getWeatherViewModel;
 	private View.OnClickListener menuOnClickListener;
 	private FusedLocation fusedLocation;
 	private NetworkStatus networkStatus;
@@ -160,8 +160,8 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		fusedLocation = new FusedLocation(requireContext().getApplicationContext());
 		weatherFragmentViewModel = new ViewModelProvider(this).get(WeatherFragmentViewModel.class);
 
-		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
-		locationCallbackInMainFragment = weatherViewModel.getLocationCallback();
+		getWeatherViewModel = new ViewModelProvider(requireActivity()).get(GetWeatherViewModel.class);
+		locationCallbackInMainFragment = getWeatherViewModel.getLocationCallback();
 
 		flickrViewModel = new ViewModelProvider(this).get(FlickrViewModel.class);
 
@@ -637,7 +637,7 @@ public class WeatherFragment extends Fragment implements IGps, ILoadWeatherData 
 		requireActivity().runOnUiThread(() -> {
 			binding.addressName.setText(addressStr);
 			binding.countryName.setText(addressDto.country);
-			weatherViewModel.setCurrentLocationAddressName(addressDto.displayName);
+			getWeatherViewModel.setCurrentLocationAddressName(addressDto.displayName);
 
 			if (refresh) {
 				requestNewData();

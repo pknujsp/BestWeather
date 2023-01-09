@@ -21,7 +21,7 @@ import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.databinding.FragmentSimpleFavoritesBinding;
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.ui.weathers.viewmodels.WeatherViewModel;
+import com.lifedawn.bestweather.ui.weathers.viewmodels.GetWeatherViewModel;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ import java.util.List;
 public class SimpleFavoritesFragment extends Fragment {
 	private FragmentSimpleFavoritesBinding binding;
 	private FavoriteAddressesAdapter adapter;
-	private WeatherViewModel weatherViewModel;
+	private GetWeatherViewModel getWeatherViewModel;
 	private FavoriteAddressesAdapter.OnClickedAddressListener onClickedAddressListener;
 	private Bundle bundle;
 
@@ -41,7 +41,7 @@ public class SimpleFavoritesFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		weatherViewModel = new ViewModelProvider(requireActivity()).get(WeatherViewModel.class);
+		getWeatherViewModel = new ViewModelProvider(requireActivity()).get(GetWeatherViewModel.class);
 
 		bundle = getArguments() != null ? getArguments() : savedInstanceState;
 		boolean showCheckBtn = bundle.getBoolean("showCheckBtn", false);
@@ -83,7 +83,7 @@ public class SimpleFavoritesFragment extends Fragment {
 						setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								weatherViewModel.delete(favoriteAddressDto, new DbQueryCallback<Boolean>() {
+								getWeatherViewModel.delete(favoriteAddressDto, new DbQueryCallback<Boolean>() {
 									@Override
 									public void onResultSuccessful(Boolean result) {
 										MainThreadWorker.runOnUiThread(new Runnable() {
@@ -135,7 +135,7 @@ public class SimpleFavoritesFragment extends Fragment {
 
 		binding.favoriteAddressList.setAdapter(adapter);
 
-		weatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), new Observer<List<FavoriteAddressDto>>() {
+		getWeatherViewModel.favoriteAddressListLiveData.observe(getViewLifecycleOwner(), new Observer<List<FavoriteAddressDto>>() {
 			@Override
 			public void onChanged(List<FavoriteAddressDto> favoriteAddressDtoList) {
 				adapter.setFavoriteAddressDtoList(favoriteAddressDtoList);

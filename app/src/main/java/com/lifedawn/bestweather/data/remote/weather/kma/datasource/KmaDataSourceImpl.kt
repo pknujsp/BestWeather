@@ -3,8 +3,6 @@ package com.lifedawn.bestweather.data.remote.weather.kma.datasource
 import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.kma.KmaCurrentConditionsParameters
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.kma.KmaForecastsParameters
-import retrofit2.Response
-import java.lang.Exception
 import javax.inject.Inject
 
 class KmaDataSourceImpl @Inject constructor(
