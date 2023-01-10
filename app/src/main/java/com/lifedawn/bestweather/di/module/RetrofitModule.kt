@@ -38,7 +38,6 @@ object RetrofitModule {
     fun provideAqicnRestApi() =
         RetrofitClient.getApiService(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED)
 
-
     @Provides
     @Singleton
     fun provideOwmOneCallRestApi() =

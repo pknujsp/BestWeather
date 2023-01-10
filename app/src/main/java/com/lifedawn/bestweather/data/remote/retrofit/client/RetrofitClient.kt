@@ -38,7 +38,7 @@ object RetrofitClient {
     const val LOG_TAG = "Retrofit Response"
 
     private val client = OkHttpClient.Builder().readTimeout(4, TimeUnit.SECONDS)
-        .connectTimeout(3, TimeUnit.SECONDS).build()
+        .connectTimeout(4, TimeUnit.SECONDS).build()
 
     enum class ServiceType {
         MET_NORWAY_LOCATION_FORECAST, AQICN_GEOLOCALIZED_FEED,

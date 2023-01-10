@@ -1,6 +1,9 @@
 package com.lifedawn.bestweather.data.remote.weather.commons
 
+import com.lifedawn.bestweather.commons.classes.FlowResponse
+import com.lifedawn.bestweather.data.remote.retrofit.callback.ApiResponse
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto
 import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto
 import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto
 import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto
@@ -8,6 +11,8 @@ import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnDataSource
 import com.lifedawn.bestweather.data.remote.weather.kma.datasource.KmaDataSource
 import com.lifedawn.bestweather.data.remote.weather.metnorway.datasource.MetNorwayDataSource
 import com.lifedawn.bestweather.data.remote.weather.owm.datasource.OwmDataSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class WeatherRepositoryImpl @Inject constructor(
@@ -21,15 +26,15 @@ class WeatherRepositoryImpl @Inject constructor(
         weatherProviderTypes: Set<WeatherProviderType>,
         latitude: Double,
         longitude: Double
-    ): CurrentConditionsDto {
-        TODO("Not yet implemented")
+    ): Flow<ApiResponse<CurrentConditionsDto>> = flow {
+        emit(object : FlowResponse)
     }
 
     override suspend fun getHourlyForecasts(
         weatherProviderTypes: Set<WeatherProviderType>,
         latitude: Double,
         longitude: Double
-    ): List<HourlyForecastDto> {
+    ): Flow<ApiResponse<List<HourlyForecastDto>>> {
         TODO("Not yet implemented")
     }
 
@@ -37,11 +42,11 @@ class WeatherRepositoryImpl @Inject constructor(
         weatherProviderTypes: Set<WeatherProviderType>,
         latitude: Double,
         longitude: Double
-    ): List<DailyForecastDto> {
+    ): Flow<ApiResponse<List<DailyForecastDto>>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getAirQuality() {
+    override suspend fun getAirQuality(latitude: Double, longitude: Double): Flow<ApiResponse<AirQualityDto>> {
         TODO("Not yet implemented")
     }
 }
