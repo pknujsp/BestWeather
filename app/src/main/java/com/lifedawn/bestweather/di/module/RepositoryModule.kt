@@ -53,6 +53,7 @@ object RepositoryModule {
     fun provideWeatherRepository(
         kmaDataSource: KmaDataSourceImpl,
         owmDataSource: OwmDataSourceImpl, metNorwayDataSource: MetNorwayDataSourceImpl,
-        aqicnDataSource: AqicnDataSourceImpl
-    ) = WeatherRepositoryImpl(kmaDataSource, owmDataSource, metNorwayDataSource, aqicnDataSource)
+        aqicnDataSource: AqicnDataSourceImpl,
+        @ApplicationContext context: Context
+    ) = WeatherRepositoryImpl(kmaDataSource, owmDataSource, metNorwayDataSource, aqicnDataSource, context)
 }

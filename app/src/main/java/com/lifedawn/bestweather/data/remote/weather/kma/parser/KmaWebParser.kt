@@ -3,13 +3,12 @@ package com.lifedawn.bestweather.data.remote.weather.kma.parser
 import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaCurrentConditions
 import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaDailyForecast
 import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaHourlyForecast
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.KmaResponseProcessor
+import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor
 import org.jsoup.nodes.Document
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 

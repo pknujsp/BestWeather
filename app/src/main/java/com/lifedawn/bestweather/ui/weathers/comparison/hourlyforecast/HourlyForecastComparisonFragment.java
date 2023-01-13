@@ -33,11 +33,11 @@ import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.in
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.onecall.OwmOneCallResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.ui.weathers.comparison.base.BaseForecastComparisonFragment;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.request.MainProcessing;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.KmaResponseProcessor;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.MetNorwayResponseProcessor;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.request.MainProcessing;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AccuWeatherResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.MetNorwayResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.OpenWeatherMapResponseProcessor;
 import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;
 import com.lifedawn.bestweather.ui.weathers.view.DateView;
 import com.lifedawn.bestweather.ui.weathers.FragmentType;

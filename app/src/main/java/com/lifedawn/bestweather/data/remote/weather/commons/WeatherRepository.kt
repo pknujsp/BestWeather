@@ -10,19 +10,19 @@ import kotlinx.coroutines.flow.Flow
 
 interface WeatherRepository {
     suspend fun getCurrentConditions(
-        weatherProviderTypes: Set<WeatherProviderType>,
+        weatherProviderType: WeatherProviderType,
         latitude: Double,
         longitude: Double
     ): Flow<ApiResponse<CurrentConditionsDto>>
 
     suspend fun getHourlyForecasts(
-        weatherProviderTypes: Set<WeatherProviderType>,
+        weatherProviderTypes: WeatherProviderType,
         latitude: Double,
         longitude: Double
     ): Flow<ApiResponse<List<HourlyForecastDto>>>
 
     suspend fun getDailyForecasts(
-        weatherProviderTypes: Set<WeatherProviderType>,
+        weatherProviderTypes: WeatherProviderType,
         latitude: Double,
         longitude: Double
     ): Flow<ApiResponse<List<DailyForecastDto>>>

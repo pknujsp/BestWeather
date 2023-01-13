@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.dataprocessing.util;
+package com.lifedawn.bestweather.data.remote.weather.dataprocessing.util;
 
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;

@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.dataprocessing.util;
+package com.lifedawn.bestweather.data.remote.weather.dataprocessing.util;
 
 public final class LocationDistance {
 	public enum Unit {

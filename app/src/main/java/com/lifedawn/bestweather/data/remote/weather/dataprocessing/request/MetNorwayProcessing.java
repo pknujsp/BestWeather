@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.dataprocessing.request;
+package com.lifedawn.bestweather.data.remote.weather.dataprocessing.request;
 
 import android.content.Context;
 import android.util.Log;
@@ -11,7 +11,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.metnorway.LocationForecastParameter;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.MetNorwayResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.MetNorwayResponseProcessor;
 
 import retrofit2.Call;
 import retrofit2.Callback;

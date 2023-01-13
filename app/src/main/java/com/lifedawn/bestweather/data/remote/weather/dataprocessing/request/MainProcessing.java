@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.dataprocessing.request;
+package com.lifedawn.bestweather.data.remote.weather.dataprocessing.request;
 
 import android.content.Context;
 import android.util.ArrayMap;

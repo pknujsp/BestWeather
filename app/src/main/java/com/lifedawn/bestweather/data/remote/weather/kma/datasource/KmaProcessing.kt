@@ -13,8 +13,8 @@ import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient.Servi
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient.getApiService
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.kma.*
 import com.lifedawn.bestweather.data.remote.weather.kma.parser.KmaWebParser
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.KmaResponseProcessor
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.LocationDistance
+import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.LocationDistance
 import org.jsoup.Jsoup
 import retrofit2.Call
 import retrofit2.Callback
@@ -355,7 +355,7 @@ object KmaProcessing {
                             nearbyKmaAreaCodeDto = weatherAreaCodeDTO
                         }
                     }
-                    val koreaLocalDateTime = ZonedDateTime.now(KmaResponseProcessor.getZoneId())
+                    val koreaLocalDateTime = ZonedDateTime.now(KmaResponseProcessor.zoneId)
                     multipleWeatherRestApiCallback.putValue("koreaLocalDateTime", koreaLocalDateTime.toString())
                     val tmFc = getTmFc(koreaLocalDateTime)
                     multipleWeatherRestApiCallback.putValue("tmFc", tmFc)
@@ -561,7 +561,7 @@ object KmaProcessing {
                             nearbyKmaAreaCodeDto = weatherAreaCodeDTO
                         }
                     }
-                    val koreaLocalDateTime = ZonedDateTime.now(KmaResponseProcessor.getZoneId())
+                    val koreaLocalDateTime = ZonedDateTime.now(KmaResponseProcessor.zoneId)
                     multipleWeatherRestApiCallback.putValue("koreaLocalDateTime", koreaLocalDateTime.toString())
                     val tmFc = getTmFc(koreaLocalDateTime)
                     multipleWeatherRestApiCallback.putValue("tmFc", tmFc)

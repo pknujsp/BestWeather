@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.dataprocessing.util;
+package com.lifedawn.bestweather.data.remote.weather.dataprocessing.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -20,12 +20,12 @@ import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.onecall.OneCallParameter;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.request.MainProcessing;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.KmaResponseProcessor;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.MetNorwayResponseProcessor;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.request.MainProcessing;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AccuWeatherResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.MetNorwayResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.OpenWeatherMapResponseProcessor;
 
 import java.time.ZoneId;
 import java.util.HashSet;

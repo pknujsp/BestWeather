@@ -4,7 +4,7 @@ import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepository
 import com.lifedawn.bestweather.data.local.timezone.model.TimeZoneIdDto
 import com.lifedawn.bestweather.data.remote.retrofit.responses.freetime.FreeTimeResponse
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.WeatherResponseProcessor
 import retrofit2.Response
 import java.time.ZoneId
 

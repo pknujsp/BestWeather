@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.dataprocessing.response;
+package com.lifedawn.bestweather.data.remote.weather.dataprocessing.response;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -13,7 +13,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.daily
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.geopositionsearch.AccuGeoPositionResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WindUtil;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
 import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;

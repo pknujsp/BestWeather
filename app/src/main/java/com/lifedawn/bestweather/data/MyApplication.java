@@ -17,7 +17,7 @@ import com.lifedawn.bestweather.data.local.room.repository.DailyPushNotification
 import com.lifedawn.bestweather.data.local.room.repository.FavoriteAddressRepository;
 import com.lifedawn.bestweather.data.local.room.repository.KmaAreaCodesRepository;
 import com.lifedawn.bestweather.data.local.room.repository.WidgetRepository;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WindUtil;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WindUtil;
 
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;

@@ -32,7 +32,7 @@ import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.constants.BundleKey;
 import com.lifedawn.bestweather.databinding.FragmentDetailSunRiseSetBinding;
 import com.lifedawn.bestweather.data.MyApplication;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.SunRiseSetUtil;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.SunRiseSetUtil;
 import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 import com.luckycatlabs.sunrisesunset.dto.Location;
 

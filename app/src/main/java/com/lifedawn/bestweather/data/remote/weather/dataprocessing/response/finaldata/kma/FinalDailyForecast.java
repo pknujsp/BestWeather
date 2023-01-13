@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.dataprocessing.response.finaldata.kma;
+package com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.finaldata.kma;
 
 import java.time.ZonedDateTime;
 

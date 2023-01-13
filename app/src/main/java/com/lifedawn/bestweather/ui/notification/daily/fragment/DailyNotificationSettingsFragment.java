@@ -44,7 +44,7 @@ import com.lifedawn.bestweather.ui.notification.daily.viewmodel.DailyNotificatio
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherRequestUtil;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WeatherRequestUtil;
 
 import org.jetbrains.annotations.NotNull;
 

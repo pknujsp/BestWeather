@@ -40,7 +40,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRes
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto;
 import com.lifedawn.bestweather.data.local.room.repository.DailyPushNotificationRepository;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherRequestUtil;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WeatherRequestUtil;
 
 import java.time.ZoneId;
 import java.util.HashSet;

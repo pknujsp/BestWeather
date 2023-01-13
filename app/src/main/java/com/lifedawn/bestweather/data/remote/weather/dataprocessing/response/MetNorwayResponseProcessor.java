@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.dataprocessing.response;
+package com.lifedawn.bestweather.data.remote.weather.dataprocessing.response;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -11,8 +11,8 @@ import com.lifedawn.bestweather.data.remote.retrofit.responses.metnorway.locatio
 import com.lifedawn.bestweather.data.remote.retrofit.responses.metnorway.locationforecast.timeseries.Data;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.metnorway.locationforecast.timeseries.Details;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.metnorway.locationforecast.timeseries.LocationForecastTimeSeriesItem;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherUtil;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WindUtil;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WeatherUtil;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WindUtil;
 import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto;
 import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
 import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto;

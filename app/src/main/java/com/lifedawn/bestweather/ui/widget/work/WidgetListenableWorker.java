@@ -34,7 +34,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRes
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
 import com.lifedawn.bestweather.data.local.room.dto.WidgetDto;
 import com.lifedawn.bestweather.data.local.room.repository.WidgetRepository;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.util.WeatherRequestUtil;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WeatherRequestUtil;
 import com.lifedawn.bestweather.ui.widget.WidgetHelper;
 import com.lifedawn.bestweather.ui.widget.creator.AbstractWidgetCreator;
 import com.lifedawn.bestweather.ui.widget.creator.EighthWidgetCreator;

@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.dataprocessing.response;
+package com.lifedawn.bestweather.data.remote.weather.dataprocessing.response;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

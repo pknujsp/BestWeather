@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.dataprocessing.request;
+package com.lifedawn.bestweather.data.remote.weather.dataprocessing.request;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,7 +10,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.aqicn.AqicnParameter;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AqicnResponseProcessor;
 
 import retrofit2.Call;
 import retrofit2.Callback;

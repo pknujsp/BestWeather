@@ -11,8 +11,8 @@ import com.lifedawn.bestweather.commons.constants.WeatherDataType;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.AqicnResponseProcessor;
-import com.lifedawn.bestweather.ui.weathers.dataprocessing.response.WeatherResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.WeatherResponseProcessor;
 import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;
 
 import java.time.ZonedDateTime;

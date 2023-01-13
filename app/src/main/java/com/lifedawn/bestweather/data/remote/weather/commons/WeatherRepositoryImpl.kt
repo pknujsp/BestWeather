@@ -1,6 +1,6 @@
 package com.lifedawn.bestweather.data.remote.weather.commons
 
-import com.lifedawn.bestweather.commons.classes.FlowResponse
+import android.content.Context
 import com.lifedawn.bestweather.data.remote.retrofit.callback.ApiResponse
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType
 import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto
@@ -19,19 +19,33 @@ class WeatherRepositoryImpl @Inject constructor(
     private val kmaDataSource: KmaDataSource,
     private val owmDataSource: OwmDataSource,
     private val metNorwayDataSource: MetNorwayDataSource,
-    private val aqicnDataSource: AqicnDataSource
+    private val aqicnDataSource: AqicnDataSource,
+    private val context: Context
 ) : WeatherRepository {
 
     override suspend fun getCurrentConditions(
-        weatherProviderTypes: Set<WeatherProviderType>,
+        weatherProviderType: WeatherProviderType,
         latitude: Double,
         longitude: Double
     ): Flow<ApiResponse<CurrentConditionsDto>> = flow {
-        emit(object : FlowResponse)
+        when (weatherProviderType) {
+            WeatherProviderType.KMA_WEB -> {
+
+            }
+
+            WeatherProviderType.MET_NORWAY -> {
+
+            }
+
+            else -> {
+                //owm
+
+            }
+        }
     }
 
     override suspend fun getHourlyForecasts(
-        weatherProviderTypes: Set<WeatherProviderType>,
+        weatherProviderTypes: WeatherProviderType,
         latitude: Double,
         longitude: Double
     ): Flow<ApiResponse<List<HourlyForecastDto>>> {
@@ -39,7 +53,7 @@ class WeatherRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getDailyForecasts(
-        weatherProviderTypes: Set<WeatherProviderType>,
+        weatherProviderTypes: WeatherProviderType,
         latitude: Double,
         longitude: Double
     ): Flow<ApiResponse<List<DailyForecastDto>>> {

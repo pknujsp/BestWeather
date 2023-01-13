@@ -1,13 +1,13 @@
 package com.lifedawn.bestweather.data.remote.retrofit.callback
 
-import retrofit2.Response
-
 sealed class ApiResponse<out T> {
-    class Success<T>(response: Response<T>) : ApiResponse<T>() {
-        val data = response.body()
+    class Success<out T>(response: T) : ApiResponse<T>() {
+        val data = response
     }
 
-    class Failure<T>(throwable: Throwable) : ApiResponse<T>() {
+    class Failure(throwable: Throwable) : ApiResponse<Nothing>() {
         val message: String? = throwable.localizedMessage
     }
+
+    object Loading: ApiResponse<Nothing>()
 }
