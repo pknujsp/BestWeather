@@ -1,6 +1,5 @@
 package com.lifedawn.bestweather.data.local.weather.models
 
-import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaDailyForecast
 import java.time.ZonedDateTime
 
 data class DailyForecastDto(

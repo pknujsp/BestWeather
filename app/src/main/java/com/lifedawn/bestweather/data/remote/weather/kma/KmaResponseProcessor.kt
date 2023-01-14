@@ -421,9 +421,9 @@ object KmaResponseProcessor : WeatherResponseProcessor() {
         }
 
         val precipitationVolume =
-            if (!parsedKmaCurrentConditions.precipitationVolume.contains("-") && !parsedKmaCurrentConditions.precipitationVolume.contains("0.0")) {
+            if (!parsedKmaCurrentConditions.precipitationVolume.contains("-") && !parsedKmaCurrentConditions.precipitationVolume.contains("0.0"))
                 parsedKmaCurrentConditions.precipitationVolume
-            } else ""
+            else ""
 
         val currentConditionsDto = CurrentConditionsDto(
             currentTime = currentTime,
