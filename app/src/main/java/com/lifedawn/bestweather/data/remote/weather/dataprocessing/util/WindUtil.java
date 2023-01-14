@@ -101,8 +101,11 @@ public class WindUtil {
 			case 15:
 				return context.getString(R.string.wind_direction_NNW);
 
-			default:
+			case 16:
 				return context.getString(R.string.wind_direction_N);
+
+			default:
+				return "";
 		}
 	}
 
@@ -206,7 +209,7 @@ public class WindUtil {
 				return 337;
 
 			default:
-				return 0;
+				return -1;
 		}
 	}
 }

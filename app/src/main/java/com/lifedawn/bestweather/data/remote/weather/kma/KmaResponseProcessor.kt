@@ -21,13 +21,14 @@ import java.time.ZonedDateTime
 import java.util.*
 
 object KmaResponseProcessor : WeatherResponseProcessor() {
-    private val WEATHER_MID_ICON_DESCRIPTION_MAP = HashMap<String, String>()
-    private val WEATHER_WEB_ICON_DESCRIPTION_MAP = HashMap<String, String>()
-    private val WEATHER_MID_ICON_ID_MAP = HashMap<String, String>()
-    private val WEATHER_WEB_ICON_ID_MAP = HashMap<String, String>()
-    private val PTY_FLICKR_MAP = HashMap<String, String>()
-    private val SKY_FLICKR_MAP = HashMap<String, String>()
-    private val HOURLY_TO_DAILY_DESCRIPTION_MAP = HashMap<String, String>()
+    private val WEATHER_MID_ICON_DESCRIPTION_MAP = mutableMapOf<String, String>()
+    private val WEATHER_WEB_ICON_DESCRIPTION_MAP = mutableMapOf<String, String>()
+    private val WEATHER_MID_ICON_ID_MAP = mutableMapOf<String, Int>()
+    private val WEATHER_WEB_ICON_ID_MAP = mutableMapOf<String, Int>()
+    private val PTY_FLICKR_MAP = mutableMapOf<String, String>()
+    private val SKY_FLICKR_MAP = mutableMapOf<String, String>()
+    private val HOURLY_TO_DAILY_DESCRIPTION_MAP = mutableMapOf<String, String>()
+    private val zoneId = ZoneId.of("Asia/Seoul")
 
     private const val POP = "POP"
     private const val PTY = "PTY"
@@ -45,10 +46,7 @@ object KmaResponseProcessor : WeatherResponseProcessor() {
     private const val LGT = "LGT"
 
     fun init(context: Context) {
-        if ((WEATHER_MID_ICON_DESCRIPTION_MAP.isEmpty()
-                    || WEATHER_MID_ICON_ID_MAP.isEmpty() || PTY_FLICKR_MAP.isEmpty() ||
-                    SKY_FLICKR_MAP.isEmpty() || HOURLY_TO_DAILY_DESCRIPTION_MAP.isEmpty())
-        ) {
+        if ((WEATHER_MID_ICON_DESCRIPTION_MAP.isEmpty() || WEATHER_MID_ICON_ID_MAP.isEmpty() || PTY_FLICKR_MAP.isEmpty() || SKY_FLICKR_MAP.isEmpty() || HOURLY_TO_DAILY_DESCRIPTION_MAP.isEmpty())) {
             val midCodes = context.resources.getStringArray(R.array.KmaMidIconCodes)
             val webIconCodes = context.resources.getStringArray(R.array.KmaWeatherDescriptionCodes)
             val midDescriptions = context.resources.getStringArray(R.array.KmaMidIconDescriptionsForCode)
@@ -56,26 +54,30 @@ object KmaResponseProcessor : WeatherResponseProcessor() {
             val midIconIds = context.resources.obtainTypedArray(R.array.KmaMidWeatherIconForCode)
             val webIconIds = context.resources.obtainTypedArray(R.array.KmaWeatherIconForDescriptionCode)
             WEATHER_MID_ICON_DESCRIPTION_MAP.clear()
+
             for (i in midCodes.indices) {
-                WEATHER_MID_ICON_DESCRIPTION_MAP[midCodes.get(i)] = midDescriptions.get(i)
-                WEATHER_MID_ICON_ID_MAP[midCodes.get(i)] = midIconIds.getResourceId(i, R.drawable.temp_icon)
+                WEATHER_MID_ICON_DESCRIPTION_MAP[midCodes[i]] = midDescriptions[i]
+                WEATHER_MID_ICON_ID_MAP[midCodes[i]] = midIconIds.getResourceId(i, R.drawable.temp_icon)
             }
+
             WEATHER_WEB_ICON_DESCRIPTION_MAP.clear()
             for (i in webIconCodes.indices) {
-                WEATHER_WEB_ICON_DESCRIPTION_MAP[webIconCodes.get(i)] = webIconDescriptions.get(i)
-                WEATHER_WEB_ICON_ID_MAP[webIconCodes.get(i)] = webIconIds.getResourceId(i, R.drawable.temp_icon)
+                WEATHER_WEB_ICON_DESCRIPTION_MAP[webIconCodes[i]] = webIconDescriptions[i]
+                WEATHER_WEB_ICON_ID_MAP[webIconCodes[i]] = webIconIds.getResourceId(i, R.drawable.temp_icon)
             }
+
             val ptyFlickrGalleryNames = context.resources.getStringArray(R.array.KmaPtyFlickrGalleryNames)
             val skyFlickrGalleryNames = context.resources.getStringArray(R.array.KmaSkyFlickrGalleryNames)
             val skyCodes = context.resources.getStringArray(R.array.KmaSkyIconCodes)
             val ptyCodes = context.resources.getStringArray(R.array.KmaPtyIconCodes)
+
             PTY_FLICKR_MAP.clear()
             for (i in ptyCodes.indices) {
-                PTY_FLICKR_MAP[ptyCodes.get(i)] = ptyFlickrGalleryNames.get(i)
+                PTY_FLICKR_MAP[ptyCodes[i]] = ptyFlickrGalleryNames.get(i)
             }
             SKY_FLICKR_MAP.clear()
             for (i in skyCodes.indices) {
-                SKY_FLICKR_MAP[skyCodes.get(i)] = skyFlickrGalleryNames.get(i)
+                SKY_FLICKR_MAP[skyCodes[i]] = skyFlickrGalleryNames.get(i)
             }
             HOURLY_TO_DAILY_DESCRIPTION_MAP["비"] = "흐리고 비"
             HOURLY_TO_DAILY_DESCRIPTION_MAP["비/눈"] = "흐리고 비/눈"
@@ -110,8 +112,7 @@ object KmaResponseProcessor : WeatherResponseProcessor() {
     }
 
 
-    fun convertPtyTextToCode(text: String?): String? = when (text) {
-        "없음" -> "0"
+    private fun convertPtyTextToCode(text: String): String = when (text) {
         "비" -> "1"
         "비/눈" -> "2"
         "눈" -> "3"
@@ -119,89 +120,65 @@ object KmaResponseProcessor : WeatherResponseProcessor() {
         "빗방울" -> "5"
         "빗방울/눈날림" -> "6"
         "눈날림" -> "7"
-        else -> null
+        else -> "0"
     }
 
 
-    fun getWeatherSkyIconDescription(code: String?): String? {
-        //return WEATHER_SKY_ICON_DESCRIPTION_MAP.get(code);
-        return null
-    }
+    private fun getWeatherDescriptionWeb(weatherDescriptionKr: String): String =
+        WEATHER_WEB_ICON_DESCRIPTION_MAP[weatherDescriptionKr] ?: ""
 
-    fun getWeatherDescription(pty: String, sky: String?): String? {
-        return if ((pty == "0")) {
-            getWeatherSkyIconDescription(sky)
+
+    private fun getWeatherIconImgWeb(weatherDescriptionKr: String, night: Boolean): Int = if (night) {
+        if ((weatherDescriptionKr == "맑음")) {
+            R.drawable.night_clear
+        } else if ((weatherDescriptionKr == "구름 많음")) {
+            R.drawable.night_mostly_cloudy
         } else {
-            getWeatherPtyIconDescription(pty)
+            WEATHER_WEB_ICON_ID_MAP[weatherDescriptionKr] ?: -1
+        }
+    } else {
+        WEATHER_WEB_ICON_ID_MAP[weatherDescriptionKr] ?: -1
+    }
+
+
+    private fun getWeatherIconImgWeb(weatherDescriptionKr: String, night: Boolean, thunder: Boolean): Int = if (thunder) {
+        R.drawable.thunderstorm
+    } else {
+        getWeatherIconImgWeb(weatherDescriptionKr, night)
+    }
+
+
+    private fun getWeatherMidIconDescription(code: String): String = WEATHER_MID_ICON_DESCRIPTION_MAP[code] ?: ""
+
+
+    private fun getWeatherMidIconImg(code: String, night: Boolean): Int = if (night) {
+        when (code) {
+            "맑음" -> R.drawable.night_clear
+            "구름많음" -> R.drawable.night_mostly_cloudy
+            else -> WEATHER_MID_ICON_ID_MAP[code] ?: -1
+        }
+    } else {
+        WEATHER_MID_ICON_ID_MAP[code] ?: -1
+    }
+
+
+    fun convertSkyPtyToMid(sky: String?, pty: String): String = if (pty == "0") {
+        when (sky) {
+            "1" -> "맑음"
+            "3" -> "구름많음"
+            else -> "흐림"
+        }
+    } else {
+        when (pty) {
+            "1", "5" -> "흐리고 비"
+            "2", "6" -> "흐리고 비/눈"
+            "3", "7" -> "흐리고 눈"
+            else -> "흐리고 소나기"
         }
     }
 
-    fun getWeatherDescriptionWeb(weatherDescriptionKr: String): String? {
-        return WEATHER_WEB_ICON_DESCRIPTION_MAP[weatherDescriptionKr]
-    }
 
-    fun getWeatherIconImgWeb(weatherDescriptionKr: String, night: Boolean): Int {
-        if (night) {
-            if ((weatherDescriptionKr == "맑음")) {
-                return R.drawable.night_clear
-            } else return if ((weatherDescriptionKr == "구름 많음")) {
-                R.drawable.night_mostly_cloudy
-            } else {
-                (WEATHER_WEB_ICON_ID_MAP.get(weatherDescriptionKr))!!
-            }
-        } else {
-            return (WEATHER_WEB_ICON_ID_MAP[weatherDescriptionKr])!!
-        }
-    }
-
-    fun getWeatherIconImgWeb(weatherDescriptionKr: String, night: Boolean, thunder: Boolean): Int {
-        return if (thunder) {
-            R.drawable.thunderstorm
-        } else {
-            getWeatherIconImgWeb(weatherDescriptionKr, night)
-        }
-    }
-
-    fun getWeatherMidIconDescription(code: String): String? {
-        return WEATHER_MID_ICON_DESCRIPTION_MAP[code]
-    }
-
-    fun getWeatherMidIconImg(code: String, night: Boolean): Int {
-        if (night) {
-            if ((code == "맑음")) {
-                return R.drawable.night_clear
-            } else return if ((code == "구름많음")) {
-                R.drawable.night_mostly_cloudy
-            } else {
-                (WEATHER_MID_ICON_ID_MAP.get(code))!!
-            }
-        }
-        return (WEATHER_MID_ICON_ID_MAP[code])!!
-    }
-
-    fun getWeatherPtyIconDescription(code: String?): String? {
-        //return WEATHER_PTY_ICON_DESCRIPTION_MAP.get(code);
-        return null
-    }
-
-    fun convertSkyPtyToMid(sky: String?, pty: String): String {
-        return if ((pty == "0")) {
-            when (sky) {
-                "1" -> "맑음"
-                "3" -> "구름많음"
-                else -> "흐림"
-            }
-        } else {
-            when (pty) {
-                "1", "5" -> "흐리고 비"
-                "2", "6" -> "흐리고 비/눈"
-                "3", "7" -> "흐리고 눈"
-                else -> "흐리고 소나기"
-            }
-        }
-    }
-
-    fun convertHourlyWeatherDescriptionToMid(description: String): String? {
+    fun convertHourlyWeatherDescriptionToMid(description: String): String {
         /*
 		hourly -
 		<item>맑음</item>
@@ -231,24 +208,20 @@ object KmaResponseProcessor : WeatherResponseProcessor() {
         <item>소나기</item>
 		 */
         return if (HOURLY_TO_DAILY_DESCRIPTION_MAP.containsKey(description)) {
-            HOURLY_TO_DAILY_DESCRIPTION_MAP.get(description)
+            HOURLY_TO_DAILY_DESCRIPTION_MAP[description] ?: ""
         } else {
             description
         }
     }
 
-    fun getPtyFlickrGalleryName(code: String): String? {
-        return PTY_FLICKR_MAP[code]
-    }
+    fun getPtyFlickrGalleryName(code: String): String? = PTY_FLICKR_MAP[code] ?: ""
 
-    fun getSkyFlickrGalleryName(code: String): String? {
-        return SKY_FLICKR_MAP[code]
-    }
 
-    @JvmStatic
+    fun getSkyFlickrGalleryName(code: String): String? = SKY_FLICKR_MAP[code] ?: ""
+
+
     fun makeHourlyForecastDtoListOfWEB(
-        context: Context?,
-        hourlyForecastList: List<ParsedKmaHourlyForecast>, latitude: Double, longitude: Double
+        context: Context, parsedKmaHourlyForecasts: List<ParsedKmaHourlyForecast>, latitude: Double, longitude: Double
     ): List<HourlyForecastDto> {
         val windUnit = MyApplication.VALUE_UNIT_OBJ.windUnit
         val tempUnit = MyApplication.VALUE_UNIT_OBJ.tempUnit
@@ -259,189 +232,219 @@ object KmaResponseProcessor : WeatherResponseProcessor() {
         val percent = "%"
         val zoneId = ZoneId.of("Asia/Seoul")
         val sunSetRiseDataMap = SunRiseSetUtil.getDailySunRiseSetMap(
-            ZonedDateTime.of(hourlyForecastList[0].getHour().toLocalDateTime(), zoneId),
-            ZonedDateTime.of(
-                hourlyForecastList[hourlyForecastList.size - 1].getHour().toLocalDateTime(),
-                zoneId
+            ZonedDateTime.parse(parsedKmaHourlyForecasts[0].hourISO8601), ZonedDateTime.parse(
+                parsedKmaHourlyForecasts[parsedKmaHourlyForecasts.size - 1].hourISO8601
             ), latitude, longitude
         )
+        val poong = "풍"
+
         var isNight = false
         val itemCalendar = Calendar.getInstance(TimeZone.getTimeZone(zoneId.id))
         var sunRise: Calendar? = null
         var sunSet: Calendar? = null
-        val hourlyForecastDtoList: MutableList<HourlyForecastDto> = ArrayList()
-        var snowVolume: String
-        var rainVolume: String
-        var hasRain: Boolean
-        var hasSnow: Boolean
-        var hasThunder: Boolean
-        var windSpeed: String? = null
-        var humidity = 0
-        var feelsLikeTemp = 0.0
-        var windDirectionStr: String? = null
-        var windDirectionInt = 0
-        val poong = "풍"
-        for (finalHourlyForecast: ParsedKmaHourlyForecast in hourlyForecastList) {
-            val hourlyForecastDto = HourlyForecastDto()
-            hasRain = finalHourlyForecast.isHasRain
-            if (!hasRain) {
-                rainVolume = zeroRainVolume
+        val hourlyForecastDtoList = mutableListOf<HourlyForecastDto>()
+        var hours = ZonedDateTime.now()
+
+        for (parsedKmaHourlyForecast in parsedKmaHourlyForecasts) {
+            hours = ZonedDateTime.parse(parsedKmaHourlyForecast.hourISO8601)
+
+            val hasRain = parsedKmaHourlyForecast.isHasRain
+            val hasSnow = parsedKmaHourlyForecast.isHasSnow
+            val hasThunder = parsedKmaHourlyForecast.isHasThunder
+            var snowVolume = if (!hasSnow) {
+                zeroSnowVolume
             } else {
-                rainVolume = finalHourlyForecast.rainVolume
+                parsedKmaHourlyForecast.snowVolume
             }
-            hasSnow = finalHourlyForecast.isHasSnow
-            if (!hasSnow) {
-                snowVolume = zeroSnowVolume
+            var rainVolume = if (!hasRain) {
+                zeroRainVolume
             } else {
-                snowVolume = finalHourlyForecast.snowVolume
+                parsedKmaHourlyForecast.rainVolume
             }
-            hasThunder = finalHourlyForecast.isHasThunder
-            itemCalendar.timeInMillis = finalHourlyForecast.getHour().toInstant().toEpochMilli()
-            sunRise = sunSetRiseDataMap[finalHourlyForecast.getHour().getDayOfYear()]!!.sunrise
-            sunSet = sunSetRiseDataMap[finalHourlyForecast.getHour().getDayOfYear()]!!.sunset
+
+            var feelsLikeTemp = ""
+            var windDirectionInt = -1
+            val temp = ValueUnits.convertTemperature(parsedKmaHourlyForecast.temp, tempUnit).toString() + tempDegree
+            val weatherIcon = getWeatherIconImgWeb(
+                parsedKmaHourlyForecast.weatherDescription, isNight, hasThunder
+            )
+            val weatherDescription = getWeatherDescriptionWeb(parsedKmaHourlyForecast.weatherDescription)
+            val pop = if (!parsedKmaHourlyForecast.pop.contains("%")) "" else parsedKmaHourlyForecast.pop
+            var windDirection = ""
+            var windStrength = ""
+            var windSpeed = ""
+            val humidity = parsedKmaHourlyForecast.humidity
+            val humidityVal = parsedKmaHourlyForecast.humidity.replace(percent, "").toInt()
+
+            itemCalendar.timeInMillis = hours.toInstant().toEpochMilli()
+            sunRise = sunSetRiseDataMap[hours.dayOfYear]?.sunrise
+            sunSet = sunSetRiseDataMap[hours.dayOfYear]?.sunset
             isNight = SunRiseSetUtil.isNight(itemCalendar, sunRise, sunSet)
-            humidity = finalHourlyForecast.humidity.replace(percent, "").toInt()
-            hourlyForecastDto.setHours(finalHourlyForecast.getHour())
-                .setTemp(ValueUnits.convertTemperature(finalHourlyForecast.temp, tempUnit).toString() + tempDegree)
-                .setRainVolume(rainVolume)
-                .setHasRain(hasRain)
-                .setHasSnow(hasSnow)
-                .setSnowVolume(snowVolume)
-                .setHasThunder(hasThunder)
-                .setWeatherIcon(
-                    getWeatherIconImgWeb(
-                        finalHourlyForecast.weatherDescription,
-                        isNight, hasThunder
-                    )
-                )
-                .setWeatherDescription(getWeatherDescriptionWeb(finalHourlyForecast.weatherDescription))
-                .setHumidity(finalHourlyForecast.humidity).pop =
-                if (!finalHourlyForecast.pop.contains("%")) "-" else finalHourlyForecast.pop
-            if (finalHourlyForecast.windDirection != null) {
-                windSpeed = finalHourlyForecast.windSpeed.replace(mPerSec, "")
-                windDirectionStr = finalHourlyForecast.windDirection.replace(poong, "")
+
+            if (parsedKmaHourlyForecast.windDirection.isNotEmpty()) {
+                val windSpeedVal = parsedKmaHourlyForecast.windSpeed.replace(mPerSec, "")
+                val windDirectionStr = parsedKmaHourlyForecast.windDirection.replace(poong, "")
+
                 windDirectionInt = WindUtil.parseWindDirectionStrAsInt(windDirectionStr)
-                hourlyForecastDto.setWindDirectionVal(windDirectionInt)
-                    .setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, windDirectionInt.toString()))
-                    .setWindStrength(WindUtil.getSimpleWindSpeedDescription(windSpeed)).windSpeed =
-                    ValueUnits.convertWindSpeed(windSpeed, windUnit)
-                        .toString() + MyApplication.VALUE_UNIT_OBJ.windUnitText
-                feelsLikeTemp = WeatherUtil.calcFeelsLikeTemperature(
-                    finalHourlyForecast.temp.toDouble(),
-                    ValueUnits.convertWindSpeed(windSpeed, ValueUnits.kmPerHour), humidity.toDouble()
-                )
-                hourlyForecastDto.feelsLikeTemp = ValueUnits.convertTemperature(
-                    feelsLikeTemp.toString(),
-                    tempUnit
+                windDirection = WindUtil.parseWindDirectionDegreeAsStr(context, windDirectionInt.toString())
+                windStrength = WindUtil.getSimpleWindSpeedDescription(windSpeedVal)
+                windSpeed = ValueUnits.convertWindSpeed(windSpeedVal, windUnit).toString() + MyApplication.VALUE_UNIT_OBJ.windUnitText
+
+                feelsLikeTemp = ValueUnits.convertTemperature(
+                    WeatherUtil.calcFeelsLikeTemperature(
+                        parsedKmaHourlyForecast.temp.toDouble(),
+                        ValueUnits.convertWindSpeed(windSpeed, ValueUnits.kmPerHour),
+                        humidityVal.toDouble()
+                    ).toString(), tempUnit
                 ).toString() + tempDegree
             }
-            hourlyForecastDtoList.add(hourlyForecastDto)
+
+            hourlyForecastDtoList.add(
+                HourlyForecastDto(
+                    hours = hours,
+                    temp = temp,
+                    rainVolume = rainVolume,
+                    isHasRain = hasRain,
+                    isHasSnow = hasSnow,
+                    isHasThunder = hasThunder,
+                    weatherIcon = weatherIcon,
+                    weatherDescription = weatherDescription,
+                    humidity = humidity,
+                    pop = pop,
+                    windDirectionVal = windDirectionInt,
+                    windDirection = windDirection,
+                    windStrength = windStrength,
+                    windSpeed = windSpeed,
+                    feelsLikeTemp = feelsLikeTemp
+                )
+            )
         }
-        return hourlyForecastDtoList
+
+        return hourlyForecastDtoList.toList()
     }
 
-    @JvmStatic
-    fun makeDailyForecastDtoListOfWEB(dailyForecastList: List<ParsedKmaDailyForecast>): List<DailyForecastDto> {
+    fun makeDailyForecastDtoListOfWEB(parsedKmaDailyForecasts: List<ParsedKmaDailyForecast>): List<DailyForecastDto> {
         val tempUnit = MyApplication.VALUE_UNIT_OBJ.tempUnit
         val tempDegree = MyApplication.VALUE_UNIT_OBJ.tempUnitText
-        val dailyForecastDtoList: MutableList<DailyForecastDto> = ArrayList()
-        for (finalDailyForecast: ParsedKmaDailyForecast in dailyForecastList) {
-            val dailyForecastDto = DailyForecastDto()
-            dailyForecastDtoList.add(dailyForecastDto)
-            dailyForecastDto.setDate(finalDailyForecast.getDate())
-                .setMinTemp(ValueUnits.convertTemperature(finalDailyForecast.minTemp, tempUnit).toString() + tempDegree).maxTemp =
-                ValueUnits.convertTemperature(finalDailyForecast.maxTemp, tempUnit).toString() + tempDegree
-            if (finalDailyForecast.isSingle) {
-                val single = DailyForecastDto.Values()
-                single.setPop(finalDailyForecast.singleValues!!.pop)
-                    .setWeatherIcon(getWeatherMidIconImg(finalDailyForecast.singleValues.weatherDescription, false)).weatherDescription =
-                    getWeatherMidIconDescription(
-                        finalDailyForecast.singleValues.weatherDescription
+        val dailyForecastDtoList = mutableListOf<DailyForecastDto>()
+
+        for (parsedKmaDailyForecast in parsedKmaDailyForecasts) {
+            val valueList = mutableListOf<DailyForecastDto.Values>()
+
+            if (parsedKmaDailyForecast.isSingle) {
+                parsedKmaDailyForecast.singleValues?.also { singleValues ->
+                    valueList.add(
+                        DailyForecastDto.Values(
+                            pop = singleValues.pop, weatherIcon = getWeatherMidIconImg(
+                                singleValues.weatherDescription, false
+                            ), weatherDescription = getWeatherMidIconDescription(
+                                singleValues.weatherDescription
+                            )
+                        )
                     )
-                dailyForecastDto.valuesList.add(single)
+                }
+
             } else {
-                val am = DailyForecastDto.Values()
-                val pm = DailyForecastDto.Values()
-                dailyForecastDto.valuesList.add(am)
-                dailyForecastDto.valuesList.add(pm)
-                am.setPop(finalDailyForecast.amValues!!.pop)
-                    .setWeatherIcon(getWeatherMidIconImg(finalDailyForecast.amValues.weatherDescription, false)).weatherDescription =
-                    getWeatherMidIconDescription(
-                        finalDailyForecast.amValues.weatherDescription
+                parsedKmaDailyForecast.amValues?.also { amValues ->
+                    valueList.add(
+                        DailyForecastDto.Values(
+                            pop = amValues.pop,
+                            weatherIcon = getWeatherMidIconImg(amValues.weatherDescription, false),
+                            weatherDescription = getWeatherMidIconDescription(
+                                amValues.weatherDescription
+                            )
+                        )
                     )
-                pm.setPop(finalDailyForecast.pmValues!!.pop)
-                    .setWeatherIcon(getWeatherMidIconImg(finalDailyForecast.pmValues.weatherDescription, false)).weatherDescription =
-                    getWeatherMidIconDescription(
-                        finalDailyForecast.pmValues.weatherDescription
+                }
+
+                parsedKmaDailyForecast.pmValues?.also { pmValues ->
+                    valueList.add(
+                        DailyForecastDto.Values(
+                            pop = pmValues.pop,
+                            weatherIcon = getWeatherMidIconImg(pmValues.weatherDescription, false),
+                            weatherDescription = getWeatherMidIconDescription(
+                                pmValues.weatherDescription
+                            )
+                        )
                     )
+                }
             }
+
+            dailyForecastDtoList.add(
+                DailyForecastDto(
+                    date = ZonedDateTime.parse(parsedKmaDailyForecast.dateISO8601),
+                    minTemp = ValueUnits.convertTemperature(parsedKmaDailyForecast.minTemp, tempUnit).toString() + tempDegree,
+                    maxTemp = ValueUnits.convertTemperature(parsedKmaDailyForecast.maxTemp, tempUnit).toString() + tempDegree,
+                    valuesList = valueList.toList()
+                )
+            )
         }
-        return dailyForecastDtoList
+        return dailyForecastDtoList.toList()
     }
 
-    @JvmStatic
     fun makeCurrentConditionsDtoOfWEB(
-        context: Context?,
+        context: Context,
         parsedKmaCurrentConditions: ParsedKmaCurrentConditions,
         parsedKmaHourlyForecast: ParsedKmaHourlyForecast,
-        latitude: Double?,
-        longitude: Double?
+        latitude: Double,
+        longitude: Double
     ): CurrentConditionsDto {
         val windUnit = MyApplication.VALUE_UNIT_OBJ.windUnit
         val tempUnit = MyApplication.VALUE_UNIT_OBJ.tempUnit
         val tempUnitStr = MyApplication.VALUE_UNIT_OBJ.tempUnitText
-        val currentConditionsDto = CurrentConditionsDto()
         val currentTime = ZonedDateTime.parse(parsedKmaCurrentConditions.baseDateTimeISO8601)
-        var currentPtyCode = parsedKmaCurrentConditions.pty
+        val currentPtyCode = convertPtyTextToCode(parsedKmaCurrentConditions.pty)
         val hourlyForecastDescription = parsedKmaHourlyForecast.weatherDescription
         val koreaTimeZone = TimeZone.getTimeZone("Asia/Seoul")
         val sunriseSunsetCalculator = SunriseSunsetCalculator(
-            Location((latitude)!!, (longitude)!!),
-            koreaTimeZone
+            Location(latitude, longitude), koreaTimeZone
         )
+
         val calendar = Calendar.getInstance(koreaTimeZone)
         calendar[currentTime.year, currentTime.monthValue - 1, currentTime.dayOfMonth, currentTime.hour] = currentTime.minute
         val sunRise = sunriseSunsetCalculator.getOfficialSunriseCalendarForDate(calendar)
         val sunSet = sunriseSunsetCalculator.getOfficialSunsetCalendarForDate(calendar)
-        currentConditionsDto.setCurrentTime(currentTime)
-        currentConditionsDto.setWeatherDescription(getWeatherDescriptionWeb((if (currentPtyCode!!.isEmpty()) hourlyForecastDescription else currentPtyCode)))
-        currentConditionsDto.setWeatherIcon(
-            getWeatherIconImgWeb(
-                (if (currentPtyCode!!.isEmpty()) hourlyForecastDescription else currentPtyCode),
-                SunRiseSetUtil.isNight(calendar, sunRise, sunSet)
-            )
+
+        val windDirectionDegree = WindUtil.parseWindDirectionStrAsInt(parsedKmaCurrentConditions.windDirection)
+        val windDirection = WindUtil.parseWindDirectionDegreeAsStr(context, windDirectionDegree.toString())
+        var windSpeed = ""
+        var simpleWindStrength = ""
+        var windStrength = ""
+
+        if (parsedKmaCurrentConditions.windSpeed.isNotEmpty()) {
+            val windSpeedVal = parsedKmaCurrentConditions.windSpeed.toDouble()
+            windSpeed =
+                ValueUnits.convertWindSpeed(windSpeedVal.toString(), windUnit).toString() + MyApplication.VALUE_UNIT_OBJ.windUnitText
+
+            simpleWindStrength = WindUtil.getSimpleWindSpeedDescription(windSpeedVal.toString())
+            windStrength = WindUtil.getWindSpeedDescription(windSpeedVal.toString())
+        }
+
+        val precipitationVolume =
+            if (!parsedKmaCurrentConditions.precipitationVolume.contains("-") && !parsedKmaCurrentConditions.precipitationVolume.contains("0.0")) {
+                parsedKmaCurrentConditions.precipitationVolume
+            } else ""
+
+        val currentConditionsDto = CurrentConditionsDto(
+            currentTime = currentTime,
+            weatherDescription = getWeatherDescriptionWeb(currentPtyCode.ifEmpty { hourlyForecastDescription }),
+            weatherIconId = getWeatherIconImgWeb(
+                (currentPtyCode.ifEmpty { hourlyForecastDescription }), SunRiseSetUtil.isNight(calendar, sunRise, sunSet)
+            ),
+            temp = ValueUnits.convertTemperature(parsedKmaCurrentConditions.temp, tempUnit).toString() + tempUnitStr,
+            feelsLikeTemp = ValueUnits.convertTemperature(parsedKmaCurrentConditions.feelsLikeTemp, tempUnit).toString() + tempUnitStr,
+            humidity = parsedKmaCurrentConditions.humidity,
+            tempYesterday = parsedKmaCurrentConditions.yesterdayTemp,
+            windDirection = windDirection,
+            windDirectionDegree = windDirectionDegree,
+            windSpeed = windSpeed,
+            windStrength = windStrength,
+            simpleWindStrength = simpleWindStrength,
+            precipitationType = currentPtyCode
         )
-        currentConditionsDto.setTemp(ValueUnits.convertTemperature(parsedKmaCurrentConditions.temp, tempUnit).toString() + tempUnitStr)
-        currentConditionsDto.setFeelsLikeTemp(
-            ValueUnits.convertTemperature(parsedKmaCurrentConditions.feelsLikeTemp, tempUnit).toString() + tempUnitStr
-        )
-        currentConditionsDto.setHumidity(parsedKmaCurrentConditions.humidity)
-        currentConditionsDto.setYesterdayTemp(parsedKmaCurrentConditions.yesterdayTemp)
-        if (parsedKmaCurrentConditions.windDirection != null) {
-            val windDirectionDegree = WindUtil.parseWindDirectionStrAsInt(parsedKmaCurrentConditions.windDirection)
-            currentConditionsDto.setWindDirectionDegree(windDirectionDegree)
-            currentConditionsDto.setWindDirection(WindUtil.parseWindDirectionDegreeAsStr(context, windDirectionDegree.toString()))
-        }
-        if (parsedKmaCurrentConditions.windSpeed != null) {
-            val windSpeed = parsedKmaCurrentConditions.windSpeed.toDouble()
-            currentConditionsDto.setWindSpeed(
-                ValueUnits.convertWindSpeed(windSpeed.toString(), windUnit).toString() + MyApplication.VALUE_UNIT_OBJ.windUnitText
-            )
-            currentConditionsDto.setSimpleWindStrength(WindUtil.getSimpleWindSpeedDescription(windSpeed.toString()))
-            currentConditionsDto.setWindStrength(WindUtil.getWindSpeedDescription(windSpeed.toString()))
-        }
-        if (currentPtyCode!!.isEmpty()) {
-            currentPtyCode = "0"
-        } else {
-            currentPtyCode = convertPtyTextToCode(currentPtyCode)
-        }
-        currentConditionsDto.setPrecipitationType(getWeatherPtyIconDescription(currentPtyCode))
-        if (!parsedKmaCurrentConditions.precipitationVolume!!.contains("-") && !parsedKmaCurrentConditions.precipitationVolume.contains("0.0")) {
-            currentConditionsDto.precipitationVolume = (parsedKmaCurrentConditions.precipitationVolume)
-        }
+
+        currentConditionsDto.precipitationVolume = precipitationVolume
         return currentConditionsDto
     }
 
-    val zoneId: ZoneId
-        get() = ZoneId.of("Asia/Seoul")
 }
