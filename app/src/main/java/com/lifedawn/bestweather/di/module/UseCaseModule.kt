@@ -1,8 +1,7 @@
 package com.lifedawn.bestweather.di.module
 
 import com.lifedawn.bestweather.data.local.room.queryinterfaces.KmaAreaCodesRepository
-import com.lifedawn.bestweather.data.remote.weather.commons.GetWeatherUseCase
-import com.lifedawn.bestweather.data.remote.weather.commons.WeatherRepository
+import com.lifedawn.bestweather.data.remote.weather.kma.usecase.GetKmaWeatherUseCase
 import com.lifedawn.bestweather.data.remote.weather.kma.usecase.GetAreaCodeUseCase
 import dagger.Module
 import dagger.Provides
@@ -17,7 +16,7 @@ object UseCaseModule {
 
     @Provides
     @Singleton
-    fun provideGetWeatherUseCase(weatherRepository: WeatherRepository): GetWeatherUseCase = GetWeatherUseCase(weatherRepository)
+    fun provideGetWeatherUseCase(weatherRepository: WeatherRepository): GetKmaWeatherUseCase = GetKmaWeatherUseCase(weatherRepository)
 
     @Provides
     @Singleton

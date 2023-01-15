@@ -18,7 +18,10 @@ import com.lifedawn.bestweather.data.remote.weather.kma.datasource.KmaDataSource
 import com.lifedawn.bestweather.data.remote.weather.kma.datasource.KmaDataSourceImpl
 import com.lifedawn.bestweather.data.remote.weather.kma.repository.KmaWeatherRepository
 import com.lifedawn.bestweather.data.remote.weather.kma.repository.KmaWeatherRepositoryImpl
+import com.lifedawn.bestweather.data.remote.weather.metnorway.datasource.MetNorwayDataSource
 import com.lifedawn.bestweather.data.remote.weather.metnorway.datasource.MetNorwayDataSourceImpl
+import com.lifedawn.bestweather.data.remote.weather.metnorway.repository.MetNorwayRepository
+import com.lifedawn.bestweather.data.remote.weather.metnorway.repository.MetNorwayRepositoryImpl
 import com.lifedawn.bestweather.data.remote.weather.owm.datasource.OwmDataSource
 import com.lifedawn.bestweather.data.remote.weather.owm.datasource.OwmDataSourceImpl
 import com.lifedawn.bestweather.data.remote.weather.owm.repository.OwmWeatherRepository
@@ -74,4 +77,12 @@ object RepositoryModule {
         owmDataSource: OwmDataSource,
         @ApplicationContext context: Context
     ): OwmWeatherRepository = OwmWeatherRepositoryImpl(owmDataSource, context)
+
+    @Provides
+    @Singleton
+    fun provideMetNorwayRepository(
+        metNorwayDataSource: MetNorwayDataSource,
+        @ApplicationContext context: Context
+    ): MetNorwayRepository = MetNorwayRepositoryImpl(metNorwayDataSource, context)
+
 }

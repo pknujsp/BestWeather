@@ -8,7 +8,7 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestMet;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.metnorway.LocationForecastParameterRest;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.metnorway.LocationForecastParameters;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.remote.weather.metnorway.MetNorwayResponseProcessor;
@@ -21,7 +21,7 @@ public class MetNorwayProcessing {
 	/**
 	 * Location Forecast
 	 */
-	public static Call<JsonElement> getLocationForecast(LocationForecastParameterRest locationForecastParameter,
+	public static Call<JsonElement> getLocationForecast(LocationForecastParameters locationForecastParameter,
 	                                                    JsonDownloader callback) {
 		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST);
 
@@ -48,7 +48,7 @@ public class MetNorwayProcessing {
 	                                         MultipleWeatherRestApiCallback multipleWeatherRestApiCallback, Context context) {
 		MetNorwayResponseProcessor.init(context);
 
-		LocationForecastParameterRest locationForecastParameter = new LocationForecastParameterRest();
+		LocationForecastParameters locationForecastParameter = new LocationForecastParameters();
 		locationForecastParameter.setLatitude(latitude).setLongitude(longitude);
 		Call<JsonElement> locationForecastCall = getLocationForecast(locationForecastParameter, new JsonDownloader() {
 			@Override

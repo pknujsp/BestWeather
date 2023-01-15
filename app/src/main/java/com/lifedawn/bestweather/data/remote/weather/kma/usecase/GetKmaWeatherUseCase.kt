@@ -1,13 +1,14 @@
-package com.lifedawn.bestweather.data.remote.weather.commons
+package com.lifedawn.bestweather.data.remote.weather.kma.usecase
 
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType
 import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto
 import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto
 import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto
 import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto
+import com.lifedawn.bestweather.data.remote.weather.kma.repository.KmaWeatherRepository
 import javax.inject.Inject
 
-class GetWeatherUseCase @Inject constructor(private val weatherRepository: WeatherRepository) {
+class GetKmaWeatherUseCase @Inject constructor(private val kmaWeatherRepository: KmaWeatherRepository) {
     suspend fun getCurrentConditions(
         weatherProviderTypes: Set<WeatherProviderType>,
         latitude: Double,
@@ -32,10 +33,4 @@ class GetWeatherUseCase @Inject constructor(private val weatherRepository: Weath
         return weatherRepository.getDailyForecasts(latitude, longitude)
     }
 
-    suspend fun getAirQuality(
-        latitude: Double,
-        longitude: Double
-    ): AirQualityDto {
-        return weatherRepository.getAirQuality(latitude, longitude)
-    }
 }

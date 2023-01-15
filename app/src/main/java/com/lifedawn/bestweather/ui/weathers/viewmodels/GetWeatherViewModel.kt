@@ -3,17 +3,16 @@ package com.lifedawn.bestweather.ui.weathers.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.lifedawn.bestweather.data.local.room.queryinterfaces.FavoriteAddressQuery
 import com.lifedawn.bestweather.commons.classes.FusedLocation.MyLocationCallback
 import com.lifedawn.bestweather.data.local.room.repository.FavoriteAddressRepository
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
-import com.lifedawn.bestweather.data.remote.weather.commons.GetWeatherUseCase
+import com.lifedawn.bestweather.data.remote.weather.kma.usecase.GetKmaWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class GetWeatherViewModel @Inject constructor(private val getWeatherUseCase: GetWeatherUseCase) : ViewModel() {
+class GetWeatherViewModel @Inject constructor(private val getKmaWeatherUseCase: GetKmaWeatherUseCase) : ViewModel() {
     var locationCallback: MyLocationCallback? = null
     private val favoriteAddressRepository: FavoriteAddressRepository
     private val currentLocationLiveData = MutableLiveData<String>()

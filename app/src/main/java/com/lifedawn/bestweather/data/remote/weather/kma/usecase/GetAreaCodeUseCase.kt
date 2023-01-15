@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class GetAreaCodeUseCase @Inject constructor(private val kmaAreaCodesRepository: KmaAreaCodesRepository) {
+
     fun getAreaCode(latitude: Double, longitude: Double) = flow {
         kmaAreaCodesRepository.getAreaCode(latitude, longitude).collect() {
             emit(it.administrativeAreaCode)

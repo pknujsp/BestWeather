@@ -31,14 +31,15 @@ object MetNorwayResponseProcessor : WeatherResponseProcessor() {
             val descriptions = context.resources.getStringArray(R.array.MetNorwayWeatherIconDescriptionsForSymbol)
             val iconIds = context.resources.obtainTypedArray(R.array.MetNorwayWeatherIconForSymbol)
             WEATHER_ICON_DESCRIPTION_MAP.clear()
+
             for (i in codes.indices) {
                 WEATHER_ICON_DESCRIPTION_MAP[codes[i]] = descriptions[i]
                 WEATHER_ICON_ID_MAP[codes[i]] = iconIds.getResourceId(i, R.drawable.temp_icon)
             }
+
             val flickrGalleryNames = context.resources.getStringArray(R.array.MetNorwayFlickrGalleryNames)
             for (i in codes.indices)
                 FLICKR_MAP[codes[i]] = flickrGalleryNames[i]
-
         }
     }
 
