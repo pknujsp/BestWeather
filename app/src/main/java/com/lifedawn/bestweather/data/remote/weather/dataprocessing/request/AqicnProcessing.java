@@ -7,7 +7,7 @@ import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.aqicn.AqicnParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.aqicn.AqicnParameterRest;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AqicnResponseProcessor;
@@ -17,7 +17,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AqicnProcessing {
-	public static Call<JsonElement> getLocalizedFeed(AqicnParameter aqicnParameter, JsonDownloader callback) {
+	public static Call<JsonElement> getLocalizedFeed(AqicnParameterRest aqicnParameter, JsonDownloader callback) {
 		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED);
 
 		Call<JsonElement> call = restfulApiQuery.getAqiCnGeolocalizedFeed(aqicnParameter.getLatitude(), aqicnParameter.getLongitude(),
@@ -52,7 +52,7 @@ public class AqicnProcessing {
 	public static void getAirQuality(Double latitude, Double longitude, MultipleWeatherRestApiCallback multipleWeatherRestApiCallback, Context context) {
 		AqicnResponseProcessor.init(context);
 
-		AqicnParameter aqicnParameter = new AqicnParameter();
+		AqicnParameterRest aqicnParameter = new AqicnParameterRest();
 		aqicnParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString());
 
 		Call<JsonElement> localizedFeedCall = getLocalizedFeed(aqicnParameter, new JsonDownloader() {

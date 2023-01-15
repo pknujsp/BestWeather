@@ -17,8 +17,6 @@ import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRes
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient.ServiceType
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.kma.KmaCurrentConditionsParameters
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.kma.KmaForecastsParameters
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.kma.UltraSrtNcstParameter
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.kma.VilageFcstParameter
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse
@@ -46,6 +44,7 @@ import com.lifedawn.bestweather.data.remote.weather.kma.parser.KmaWebParser
 import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaCurrentConditions
 import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaDailyForecast
 import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaHourlyForecast
+import com.lifedawn.bestweather.data.remote.weather.owm.OwmResponseProcessor
 import com.tickaroo.tikxml.TikXml
 import okio.Buffer
 import org.jsoup.Jsoup
@@ -166,8 +165,8 @@ open class WeatherResponseProcessor {
                 )
             } else if (weatherProviderType === WeatherProviderType.OWM_ONECALL) {
                 val owmOneCallResponse =
-                    OpenWeatherMapResponseProcessor.getOneCallObjFromJson(weatherSourceElement[ServiceType.OWM_ONE_CALL.name].asString)
-                currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(
+                    OwmResponseProcessor.getOneCallObjFromJson(weatherSourceElement[ServiceType.OWM_ONE_CALL.name].asString)
+                currentConditionsDto = OwmResponseProcessor.makeCurrentConditionsDtoOneCall(
                     context, owmOneCallResponse, zoneId
                 )
             } else if (weatherProviderType === WeatherProviderType.MET_NORWAY) {
@@ -178,10 +177,10 @@ open class WeatherResponseProcessor {
                     zoneId
                 )
             } else if (weatherProviderType === WeatherProviderType.OWM_INDIVIDUAL) {
-                val owmCurrentConditionsResponse = OpenWeatherMapResponseProcessor.getOwmCurrentConditionsResponseFromJson(
+                val owmCurrentConditionsResponse = OwmResponseProcessor.getOwmCurrentConditionsResponseFromJson(
                     weatherSourceElement[ServiceType.OWM_CURRENT_CONDITIONS.name()].asString
                 )
-                currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(
+                currentConditionsDto = OwmResponseProcessor.makeCurrentConditionsDtoIndividual(
                     context,
                     owmCurrentConditionsResponse, zoneId
                 )
@@ -250,7 +249,7 @@ open class WeatherResponseProcessor {
                         .get(ServiceType.OWM_ONE_CALL)
                 if (owmResponseResult != null && owmResponseResult.isSuccessful()) {
                     val owmOneCallResponse = owmResponseResult.getResponseObj() as OwmOneCallResponse
-                    currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(
+                    currentConditionsDto = OwmResponseProcessor.makeCurrentConditionsDtoOneCall(
                         context, owmOneCallResponse, zoneId
                     )
                 }
@@ -260,7 +259,7 @@ open class WeatherResponseProcessor {
                         .get(ServiceType.OWM_CURRENT_CONDITIONS)
                 if (owmCurrentConditionsResponseResult != null && owmCurrentConditionsResponseResult.isSuccessful()) {
                     val owmCurrentConditionsResponse = owmCurrentConditionsResponseResult.getResponseObj() as OwmCurrentConditionsResponse
-                    currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(
+                    currentConditionsDto = OwmResponseProcessor.makeCurrentConditionsDtoIndividual(
                         context,
                         owmCurrentConditionsResponse, zoneId
                     )
@@ -328,15 +327,15 @@ open class WeatherResponseProcessor {
             } else if (weatherProviderType === WeatherProviderType.OWM_ONECALL) {
                 if (weatherSourceElement[ServiceType.OWM_ONE_CALL.name] != null) {
                     val owmOneCallResponse =
-                        OpenWeatherMapResponseProcessor.getOneCallObjFromJson(weatherSourceElement[ServiceType.OWM_ONE_CALL.name].asString)
-                    hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(
+                        OwmResponseProcessor.getOneCallObjFromJson(weatherSourceElement[ServiceType.OWM_ONE_CALL.name].asString)
+                    hourlyForecastDtoList = OwmResponseProcessor.makeHourlyForecastDtoListOneCall(
                         context, owmOneCallResponse, zoneId
                     )
                 }
             } else if (weatherProviderType === WeatherProviderType.OWM_INDIVIDUAL) {
                 val owmHourlyForecastResponse =
-                    OpenWeatherMapResponseProcessor.getOwmHourlyForecastResponseFromJson(weatherSourceElement[ServiceType.OWM_HOURLY_FORECAST.name()].asString)
-                hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(
+                    OwmResponseProcessor.getOwmHourlyForecastResponseFromJson(weatherSourceElement[ServiceType.OWM_HOURLY_FORECAST.name()].asString)
+                hourlyForecastDtoList = OwmResponseProcessor.makeHourlyForecastDtoListIndividual(
                     context, owmHourlyForecastResponse, zoneId
                 )
             } else if (weatherProviderType === WeatherProviderType.MET_NORWAY) {
@@ -406,7 +405,7 @@ open class WeatherResponseProcessor {
                     responseMap[weatherProviderType]!![ServiceType.OWM_ONE_CALL]
                 if (responseResult != null && responseResult.isSuccessful()) {
                     val owmOneCallResponse = responseResult.getResponseObj() as OwmOneCallResponse
-                    hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(
+                    hourlyForecastDtoList = OwmResponseProcessor.makeHourlyForecastDtoListOneCall(
                         context, owmOneCallResponse,
                         zoneId
                     )
@@ -417,7 +416,7 @@ open class WeatherResponseProcessor {
                         .get(ServiceType.OWM_HOURLY_FORECAST)
                 if (owmHourlyForecastResponseResult != null && owmHourlyForecastResponseResult.isSuccessful()) {
                     val owmHourlyForecastResponse = owmHourlyForecastResponseResult.getResponseObj() as OwmHourlyForecastResponse
-                    hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(
+                    hourlyForecastDtoList = OwmResponseProcessor.makeHourlyForecastDtoListIndividual(
                         context,
                         owmHourlyForecastResponse, zoneId
                     )
@@ -492,18 +491,18 @@ open class WeatherResponseProcessor {
             } else if (weatherProviderType === WeatherProviderType.OWM_ONECALL) {
                 if (weatherSourceElement[ServiceType.OWM_ONE_CALL.name] != null) {
                     val owmOneCallResponse =
-                        OpenWeatherMapResponseProcessor.getOneCallObjFromJson(weatherSourceElement[ServiceType.OWM_ONE_CALL.name].asString)
-                    dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(
+                        OwmResponseProcessor.getOneCallObjFromJson(weatherSourceElement[ServiceType.OWM_ONE_CALL.name].asString)
+                    dailyForecastDtoList = OwmResponseProcessor.makeDailyForecastDtoListOneCall(
                         context, owmOneCallResponse,
                         zoneId
                     )
                 }
             } else if (weatherProviderType === WeatherProviderType.OWM_INDIVIDUAL) {
                 if (weatherSourceElement[ServiceType.OWM_DAILY_FORECAST.name()] != null) {
-                    val owmDailyForecastResponse = OpenWeatherMapResponseProcessor.getOwmDailyForecastResponseFromJson(
+                    val owmDailyForecastResponse = OwmResponseProcessor.getOwmDailyForecastResponseFromJson(
                         weatherSourceElement[ServiceType.OWM_DAILY_FORECAST.name()].asString
                     )
-                    dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(
+                    dailyForecastDtoList = OwmResponseProcessor.makeDailyForecastDtoListIndividual(
                         context, owmDailyForecastResponse,
                         zoneId
                     )
@@ -578,7 +577,7 @@ open class WeatherResponseProcessor {
                     responseMap[WeatherProviderType.OWM_ONECALL]!![ServiceType.OWM_ONE_CALL]
                 if (responseResult.isSuccessful()) {
                     val owmOneCallResponse = responseResult.getResponseObj() as OwmOneCallResponse
-                    dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(
+                    dailyForecastDtoList = OwmResponseProcessor.makeDailyForecastDtoListOneCall(
                         context, owmOneCallResponse, zoneId
                     )
                 }
@@ -587,7 +586,7 @@ open class WeatherResponseProcessor {
                     responseMap[weatherProviderType]!![ServiceType.OWM_DAILY_FORECAST]
                 if (responseResult.isSuccessful()) {
                     val owmDailyForecastResponse = responseResult.getResponseObj() as OwmDailyForecastResponse
-                    dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(
+                    dailyForecastDtoList = OwmResponseProcessor.makeDailyForecastDtoListIndividual(
                         context,
                         owmDailyForecastResponse, zoneId
                     )

@@ -1,0 +1,41 @@
+package com.lifedawn.bestweather.data.remote.retrofit.parameters.flickr;
+
+import android.util.ArrayMap;
+
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.RestRequestParameter;
+
+import java.util.Map;
+
+public class FlickrGetInfoParameterRest extends RestRequestParameter {
+	private String photoId;
+	private String secret;
+
+	public Map<String, String> getMap() {
+		Map<String, String> map = new ArrayMap<>();
+
+		map.put("method", "flickr.photos.getInfo");
+		map.put("api_key", RetrofitClient.FLICKR_KEY);
+		map.put("photo_id", photoId);
+		map.put("secret", secret);
+		map.put("format", "json");
+		map.put("nojsoncallback", "1");
+		return map;
+	}
+
+	public String getPhotoId() {
+		return photoId;
+	}
+
+	public void setPhotoId(String photoId) {
+		this.photoId = photoId;
+	}
+
+	public String getSecret() {
+		return secret;
+	}
+
+	public void setSecret(String secret) {
+		this.secret = secret;
+	}
+}

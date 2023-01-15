@@ -12,12 +12,13 @@ class KmaDataSourceImpl @Inject constructor(
     private val kmaWebCurrentConditionsRestApi: RestfulApiQuery,
     private val KmaWebForecastsRestApi: RestfulApiQuery
 ) : KmaDataSource {
-    override suspend fun getCurrentConditions(kmaCurrentConditionsParameters: KmaCurrentConditionsParameters):
+
+    override fun getCurrentConditions(kmaCurrentConditionsParameters: KmaCurrentConditionsParameters):
             Flow<ApiResponse<String>> = requestApiFlow {
         kmaWebCurrentConditionsRestApi.getKmaCurrentConditions(kmaCurrentConditionsParameters.parametersMap)
     }
 
-    override suspend fun getForecasts(kmaForecastsParameters: KmaForecastsParameters): Flow<ApiResponse<String>> =
+    override fun getForecasts(kmaForecastsParameters: KmaForecastsParameters): Flow<ApiResponse<String>> =
         requestApiFlow {
             KmaWebForecastsRestApi.getKmaHourlyAndDailyForecast(kmaForecastsParameters.parametersMap)
         }

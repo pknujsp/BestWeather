@@ -6,6 +6,6 @@ import com.lifedawn.bestweather.data.remote.retrofit.parameters.kma.KmaForecasts
 import kotlinx.coroutines.flow.Flow
 
 interface KmaDataSource {
-    suspend fun getCurrentConditions(kmaCurrentConditionsParameters: KmaCurrentConditionsParameters): Flow<ApiResponse<String>>
-    suspend fun getForecasts(kmaForecastsParameters: KmaForecastsParameters): Flow<ApiResponse<String>>
+     fun getCurrentConditions(kmaCurrentConditionsParameters: KmaCurrentConditionsParameters): Flow<ApiResponse<String>>
+     fun getForecasts(kmaForecastsParameters: KmaForecastsParameters): Flow<ApiResponse<String>>
 }

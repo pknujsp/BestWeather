@@ -25,7 +25,7 @@ import com.lifedawn.bestweather.commons.constants.ValueUnits;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.onecall.OneCallParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.onecall.OwmOneCallParameter;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.hourlyforecasts.AccuHourlyForecastsResponse;
@@ -49,7 +49,7 @@ import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.Accu
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.MetNorwayResponseProcessor;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.owm.OwmResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.finaldata.kma.FinalCurrentConditions;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
@@ -236,9 +236,9 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 		if (weatherProviderTypeSet.contains(WeatherProviderType.OWM_ONECALL)) {
 			RequestOwmOneCall requestOwmOneCall = new RequestOwmOneCall();
 			requestOwmOneCall.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
-			Set<OneCallParameter.OneCallApis> excludes = new HashSet<>();
-			excludes.add(OneCallParameter.OneCallApis.minutely);
-			excludes.add(OneCallParameter.OneCallApis.alerts);
+			Set<OwmOneCallParameter.OneCallApis> excludes = new HashSet<>();
+			excludes.add(OwmOneCallParameter.OneCallApis.minutely);
+			excludes.add(OwmOneCallParameter.OneCallApis.alerts);
 			requestOwmOneCall.setExcludeApis(excludes);
 
 			newRequestWeatherSources.put(WeatherProviderType.OWM_ONECALL, requestOwmOneCall);
@@ -494,13 +494,13 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 			OwmOneCallResponse owmOneCallResponse =
 					(OwmOneCallResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponseObj();
 
-			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoOneCall(context, owmOneCallResponse, zoneId
+			currentConditionsDto = OwmResponseProcessor.makeCurrentConditionsDtoOneCall(context, owmOneCallResponse, zoneId
 			);
 
-			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListOneCall(context, owmOneCallResponse, zoneId
+			hourlyForecastDtoList = OwmResponseProcessor.makeHourlyForecastDtoListOneCall(context, owmOneCallResponse, zoneId
 			);
 
-			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(context, owmOneCallResponse, zoneId
+			dailyForecastDtoList = OwmResponseProcessor.makeDailyForecastDtoListOneCall(context, owmOneCallResponse, zoneId
 			);
 
 			currentConditionsWeatherVal = owmOneCallResponse.getCurrent().getWeather().get(0).getId();
@@ -517,13 +517,13 @@ public class WeatherFragmentViewModel extends AndroidViewModel implements Weathe
 			OwmDailyForecastResponse owmDailyForecastResponse =
 					(OwmDailyForecastResponse) arrayMap.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST).getResponseObj();
 
-			currentConditionsDto = OpenWeatherMapResponseProcessor.makeCurrentConditionsDtoIndividual(context, owmCurrentConditionsResponse, zoneId
+			currentConditionsDto = OwmResponseProcessor.makeCurrentConditionsDtoIndividual(context, owmCurrentConditionsResponse, zoneId
 			);
 
-			hourlyForecastDtoList = OpenWeatherMapResponseProcessor.makeHourlyForecastDtoListIndividual(context,
+			hourlyForecastDtoList = OwmResponseProcessor.makeHourlyForecastDtoListIndividual(context,
 					owmHourlyForecastResponse, zoneId);
 
-			dailyForecastDtoList = OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(context,
+			dailyForecastDtoList = OwmResponseProcessor.makeDailyForecastDtoListIndividual(context,
 					owmDailyForecastResponse, zoneId);
 
 			currentConditionsWeatherVal = owmCurrentConditionsResponse.getWeather().get(0).getId();

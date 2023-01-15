@@ -15,7 +15,7 @@ import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepositoryImpl;
 import com.lifedawn.bestweather.ui.notification.ongoing.OngoingNotificationRepository;
 import com.lifedawn.bestweather.data.local.room.repository.DailyPushNotificationRepository;
 import com.lifedawn.bestweather.data.local.room.repository.FavoriteAddressRepository;
-import com.lifedawn.bestweather.data.local.room.repository.KmaAreaCodesRepository;
+import com.lifedawn.bestweather.data.local.room.repository.KmaAreaCodesRepositoryImpl;
 import com.lifedawn.bestweather.data.local.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WindUtil;
 
@@ -46,7 +46,7 @@ public class MyApplication extends Application {
 		Context context = getApplicationContext();
 
 		FavoriteAddressRepository.initialize(context);
-		KmaAreaCodesRepository.initialize(context);
+		KmaAreaCodesRepositoryImpl.initialize(context);
 		LocalTimeZoneRepositoryImpl.Companion.initialize(context);
 		OngoingNotificationRepository.initialize(context);
 		WidgetRepository.initialize(context);

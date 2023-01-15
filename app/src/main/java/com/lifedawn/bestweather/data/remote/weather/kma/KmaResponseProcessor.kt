@@ -18,6 +18,7 @@ import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator
 import com.luckycatlabs.sunrisesunset.dto.Location
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 object KmaResponseProcessor : WeatherResponseProcessor() {
@@ -382,19 +383,20 @@ object KmaResponseProcessor : WeatherResponseProcessor() {
         return dailyForecastDtoList.toList()
     }
 
-    fun makeCurrentConditionsDtoOfWEB(
+    fun makeFirstCurrentConditions(
         context: Context,
-        parsedKmaCurrentConditions: ParsedKmaCurrentConditions,
-        parsedKmaHourlyForecast: ParsedKmaHourlyForecast,
+        parsedKmaCurrentConditions: ParsedKmaCurrentConditions?,
         latitude: Double,
         longitude: Double
-    ): CurrentConditionsDto {
+    ): CurrentConditionsDto? {
+        if (parsedKmaCurrentConditions == null)
+            return null
+
         val windUnit = MyApplication.VALUE_UNIT_OBJ.windUnit
         val tempUnit = MyApplication.VALUE_UNIT_OBJ.tempUnit
         val tempUnitStr = MyApplication.VALUE_UNIT_OBJ.tempUnitText
         val currentTime = ZonedDateTime.parse(parsedKmaCurrentConditions.baseDateTimeISO8601)
         val currentPtyCode = convertPtyTextToCode(parsedKmaCurrentConditions.pty)
-        val hourlyForecastDescription = parsedKmaHourlyForecast.weatherDescription
         val koreaTimeZone = TimeZone.getTimeZone("Asia/Seoul")
         val sunriseSunsetCalculator = SunriseSunsetCalculator(
             Location(latitude, longitude), koreaTimeZone
@@ -427,10 +429,6 @@ object KmaResponseProcessor : WeatherResponseProcessor() {
 
         val currentConditionsDto = CurrentConditionsDto(
             currentTime = currentTime,
-            weatherDescription = getWeatherDescriptionWeb(currentPtyCode.ifEmpty { hourlyForecastDescription }),
-            weatherIconId = getWeatherIconImgWeb(
-                (currentPtyCode.ifEmpty { hourlyForecastDescription }), SunRiseSetUtil.isNight(calendar, sunRise, sunSet)
-            ),
             temp = ValueUnits.convertTemperature(parsedKmaCurrentConditions.temp, tempUnit).toString() + tempUnitStr,
             feelsLikeTemp = ValueUnits.convertTemperature(parsedKmaCurrentConditions.feelsLikeTemp, tempUnit).toString() + tempUnitStr,
             humidity = parsedKmaCurrentConditions.humidity,
@@ -445,6 +443,41 @@ object KmaResponseProcessor : WeatherResponseProcessor() {
 
         currentConditionsDto.precipitationVolume = precipitationVolume
         return currentConditionsDto
+    }
+
+    fun makeFinalCurrentConditions(
+        currentConditionsDto: CurrentConditionsDto,
+        hourlyForecastDto: HourlyForecastDto,
+        latitude: Double,
+        longitude: Double
+    ): CurrentConditionsDto {
+        /*
+        val weatherDescription = hourlyForecastDto.weatherDescription
+        val weatherDescription = getWeatherDescriptionWeb(currentPtyCode.ifEmpty { hourlyForecastDescription }),
+        weatherIconId = getWeatherIconImgWeb(
+            (currentPtyCode.ifEmpty { hourlyForecastDescription }), SunRiseSetUtil.isNight(calendar, sunRise, sunSet)
+        ),
+
+         */
+        return currentConditionsDto
+    }
+
+    fun getTmFc(dateTime: ZonedDateTime): String {
+        var zonedDateTime = dateTime
+        val hour = zonedDateTime.hour
+        val minute = zonedDateTime.minute
+        val yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd")
+
+        return if (hour >= 18 && minute >= 1) {
+            zonedDateTime = zonedDateTime.withHour(18)
+            zonedDateTime.format(yyyyMMdd) + "1800"
+        } else if (hour >= 6 && minute >= 1) {
+            zonedDateTime = zonedDateTime.withHour(6)
+            zonedDateTime.format(yyyyMMdd) + "0600"
+        } else {
+            zonedDateTime = zonedDateTime.minusDays(1).withHour(18)
+            zonedDateTime.format(yyyyMMdd) + "1800"
+        }
     }
 
 }

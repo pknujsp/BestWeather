@@ -1,14 +1,14 @@
 package com.lifedawn.bestweather.data.local.timezone
 
 import com.lifedawn.bestweather.data.local.timezone.model.TimeZoneIdDto
-import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
+import kotlinx.coroutines.flow.Flow
 
 interface LocalTimeZoneRepository {
-    fun get(lat: Double, lon: Double, callback: DbQueryCallback<TimeZoneIdDto?>)
+    fun get(lat: Double, lon: Double): Flow<TimeZoneIdDto>
 
-    fun insert(timeZoneDto: TimeZoneIdDto)
+    suspend fun insert(timeZoneDto: TimeZoneIdDto)
 
-    fun delete(timeZoneDto: TimeZoneIdDto)
+    suspend fun delete(timeZoneDto: TimeZoneIdDto)
 
-    fun reset(callback: DbQueryCallback<Boolean>)
+    fun reset(): Flow<Boolean>
 }

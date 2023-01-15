@@ -16,7 +16,10 @@ class KmaWebParser {
 
     companion object {
 
-        suspend fun parseCurrentConditions(document: Document, baseDateTime: String): ParsedKmaCurrentConditions {
+        fun parseCurrentConditions(document: Document?, baseDateTime: String): ParsedKmaCurrentConditions? {
+            if (document == null)
+                return null
+
             //기온(5.8) tmp, 체감(체감 5.8℃) chill, 어제와 기온이 같아요 w-txt, 습도(40) lbl ic-hm val
             //바람(북서 1.1) lbl ic-wind val, 1시간 강수량(-) lbl rn-hr1 ic-rn val
             //발효중인 특보 cmp-impact-fct
@@ -54,8 +57,8 @@ class KmaWebParser {
             // 43 % 동 1.1 m/s - mm
             val spans2 = wrap2.select("span.val")
             val humidity = spans2[0].text().replace(" ", "")
-            var windDirection: String? = null
-            var windSpeed: String? = null
+            var windDirection = ""
+            var windSpeed = ""
             val wind = spans2[1].text()
             if (wind != "-") {
                 val spWind = wind.split(" ").toTypedArray()
@@ -74,7 +77,10 @@ class KmaWebParser {
             )
         }
 
-        suspend fun parseHourlyForecasts(document: Document): List<ParsedKmaHourlyForecast> {
+        fun parseHourlyForecasts(document: Document?): List<ParsedKmaHourlyForecast> {
+            if (document == null)
+                return emptyList()
+
             val elements = document.getElementsByClass("slide-wrap")
             //오늘, 내일, 모레, 글피, 그글피
             val slides = elements.select("div.slide")
@@ -260,7 +266,10 @@ class KmaWebParser {
             return parsedKmaHourlyForecasts
         }
 
-        suspend fun parseDailyForecasts(document: Document): List<ParsedKmaDailyForecast> {
+        fun parseDailyForecasts(document: Document?): List<ParsedKmaDailyForecast> {
+            if (document == null)
+                return emptyList()
+
             val elements = document.getElementsByClass("slide-wrap")
             //이후 10일
             val slides = elements.select("div.slide.day-ten div.daily")

@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.data.local.weather.models
 
+import com.lifedawn.bestweather.commons.constants.PrecipitationType
 import java.time.ZonedDateTime
 
 data class CurrentConditionsDto(
@@ -26,7 +27,8 @@ data class CurrentConditionsDto(
     val precipitationType: String = "",
     var hasRainVolume: Boolean = false,
     var hasSnowVolume: Boolean = false,
-    var hasPrecipitationVolume: Boolean = false
+    var hasPrecipitationVolume: Boolean = false,
+    val precipitationTypeVal: PrecipitationType = PrecipitationType.EMPTY
 ) {
     var rainVolume: String = ""
         get() = this.toString()

@@ -4,7 +4,6 @@ import androidx.collection.ArrayMap
 import androidx.collection.arrayMapOf
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient.ServiceType
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.RequestParameter
 import retrofit2.Call
 import java.time.ZoneId
 import java.time.ZonedDateTime

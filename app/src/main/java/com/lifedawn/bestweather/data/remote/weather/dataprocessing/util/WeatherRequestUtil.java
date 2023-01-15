@@ -18,14 +18,14 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestWeat
 import com.lifedawn.bestweather.commons.constants.WeatherDataType;
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.onecall.OneCallParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.onecall.OwmOneCallParameter;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.request.MainProcessing;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.MetNorwayResponseProcessor;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.owm.OwmResponseProcessor;
 
 import java.time.ZoneId;
 import java.util.HashSet;
@@ -53,7 +53,7 @@ public class WeatherRequestUtil {
 				AccuWeatherResponseProcessor.init(context);
 				break;
 			case OWM_ONECALL:
-				OpenWeatherMapResponseProcessor.init(context);
+				OwmResponseProcessor.init(context);
 				break;
 			case MET_NORWAY:
 				MetNorwayResponseProcessor.init(context);
@@ -112,20 +112,20 @@ public class WeatherRequestUtil {
 			RequestOwmOneCall requestOwmOneCall = new RequestOwmOneCall();
 			requestWeatherSources.put(WeatherProviderType.OWM_ONECALL, requestOwmOneCall);
 
-			Set<OneCallParameter.OneCallApis> excludeSet = new HashSet<>();
-			excludeSet.add(OneCallParameter.OneCallApis.daily);
-			excludeSet.add(OneCallParameter.OneCallApis.hourly);
-			excludeSet.add(OneCallParameter.OneCallApis.minutely);
-			excludeSet.add(OneCallParameter.OneCallApis.alerts);
-			excludeSet.add(OneCallParameter.OneCallApis.current);
+			Set<OwmOneCallParameter.OneCallApis> excludeSet = new HashSet<>();
+			excludeSet.add(OwmOneCallParameter.OneCallApis.daily);
+			excludeSet.add(OwmOneCallParameter.OneCallApis.hourly);
+			excludeSet.add(OwmOneCallParameter.OneCallApis.minutely);
+			excludeSet.add(OwmOneCallParameter.OneCallApis.alerts);
+			excludeSet.add(OwmOneCallParameter.OneCallApis.current);
 			if (weatherDataTypeSet.contains(WeatherDataType.currentConditions)) {
-				excludeSet.remove(OneCallParameter.OneCallApis.current);
+				excludeSet.remove(OwmOneCallParameter.OneCallApis.current);
 			}
 			if (weatherDataTypeSet.contains(WeatherDataType.hourlyForecast)) {
-				excludeSet.remove(OneCallParameter.OneCallApis.hourly);
+				excludeSet.remove(OwmOneCallParameter.OneCallApis.hourly);
 			}
 			if (weatherDataTypeSet.contains(WeatherDataType.dailyForecast)) {
-				excludeSet.remove(OneCallParameter.OneCallApis.daily);
+				excludeSet.remove(OwmOneCallParameter.OneCallApis.daily);
 			}
 			requestOwmOneCall.setExcludeApis(excludeSet);
 			requestOwmOneCall.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);

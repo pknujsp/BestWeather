@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.google.GooglePlaceSearchParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.google.GooglePlaceSearchParameterRest;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.google.placesearch.GooglePlaceSearchResponse;
 
 import retrofit2.Call;
@@ -18,7 +18,7 @@ public class GooglePlaceSearchProcessing {
 
 	public static void textSearch(String query, JsonDownloader callback) {
 		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.GOOGLE_PLACE_SEARCH);
-		GooglePlaceSearchParameter parameter = new GooglePlaceSearchParameter(query);
+		GooglePlaceSearchParameterRest parameter = new GooglePlaceSearchParameterRest(query);
 		Call<JsonElement> call = restfulApiQuery.getGooglePlaceSearch(parameter.getMap());
 
 		call.enqueue(new Callback<JsonElement>() {

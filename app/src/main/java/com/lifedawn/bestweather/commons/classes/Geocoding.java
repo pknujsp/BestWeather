@@ -8,8 +8,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.nominatim.GeocodeParameter;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.nominatim.ReverseGeocodeParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.nominatim.GeocodeParameterRest;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.nominatim.ReverseGeocodeParameterRest;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.nominatim.GeocodeResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.nominatim.ReverseGeocodeResponse;
 
@@ -65,7 +65,7 @@ public class Geocoding {
 	}
 
 	public static void nominatimGeocoding(Context context, String query, GeocodingCallback callback) {
-		GeocodeParameter parameter = new GeocodeParameter(query);
+		GeocodeParameterRest parameter = new GeocodeParameterRest(query);
 		Call<JsonElement> call =
 				RetrofitClient.getApiService(RetrofitClient.ServiceType.NOMINATIM).nominatimGeocode(parameter.getMap(),
 						MyApplication.locale.toLanguageTag());
@@ -123,7 +123,7 @@ public class Geocoding {
 	}
 
 	public static void nominatimReverseGeocoding(Context context, Double latitude, Double longitude, ReverseGeocodingCallback callback) {
-		ReverseGeocodeParameter parameter = new ReverseGeocodeParameter(latitude, longitude);
+		ReverseGeocodeParameterRest parameter = new ReverseGeocodeParameterRest(latitude, longitude);
 		Call<JsonElement> call =
 				RetrofitClient.getApiService(RetrofitClient.ServiceType.NOMINATIM).nominatimReverseGeocode(parameter.getMap(),
 						MyApplication.locale.toLanguageTag());

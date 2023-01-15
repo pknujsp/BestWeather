@@ -10,10 +10,10 @@ import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestAccu
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.accuweather.CurrentConditionsParameter;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.accuweather.FiveDaysOfDailyForecastsParameter;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.accuweather.GeoPositionSearchParameter;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.accuweather.TwelveHoursOfHourlyForecastsParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.accuweather.CurrentConditionsParameterRest;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.accuweather.FiveDaysOfDailyForecastsParameterRest;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.accuweather.GeoPositionSearchParameterRest;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.accuweather.TwelveHoursOfHourlyForecastsParameterRest;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.currentconditions.AccuCurrentConditionsResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.geopositionsearch.AccuGeoPositionResponse;
@@ -41,7 +41,7 @@ public class AccuWeatherProcessing {
 	/**
 	 * Current Conditions
 	 */
-	public static Call<JsonElement> getCurrentConditions(CurrentConditionsParameter currentConditionsParameter, JsonDownloader callback) {
+	public static Call<JsonElement> getCurrentConditions(CurrentConditionsParameterRest currentConditionsParameter, JsonDownloader callback) {
 		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS);
 
 		Call<JsonElement> call = restfulApiQuery.getAccuCurrentConditions(currentConditionsParameter.getLocationKey(),
@@ -74,7 +74,7 @@ public class AccuWeatherProcessing {
 	/**
 	 * 5 Days Of Daily Forecast
 	 */
-	public static Call<JsonElement> get5DaysOfDailyForecasts(FiveDaysOfDailyForecastsParameter fiveDaysOfDailyForecastsParameter,
+	public static Call<JsonElement> get5DaysOfDailyForecasts(FiveDaysOfDailyForecastsParameterRest fiveDaysOfDailyForecastsParameter,
 	                                                         JsonDownloader callback) {
 		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST);
 
@@ -109,7 +109,7 @@ public class AccuWeatherProcessing {
 	/**
 	 * 12 Hours of Hourly Forecasts
 	 */
-	public static Call<JsonElement> get12HoursOfHourlyForecasts(TwelveHoursOfHourlyForecastsParameter twelveHoursOfHourlyForecastsParameter,
+	public static Call<JsonElement> get12HoursOfHourlyForecasts(TwelveHoursOfHourlyForecastsParameterRest twelveHoursOfHourlyForecastsParameter,
 	                                                            JsonDownloader callback) {
 		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST);
 
@@ -147,7 +147,7 @@ public class AccuWeatherProcessing {
 	/**
 	 * GeoPosition Search
 	 */
-	public static Call<JsonElement> getGeoPositionSearch(Context context, GeoPositionSearchParameter geoPositionSearchParameter,
+	public static Call<JsonElement> getGeoPositionSearch(Context context, GeoPositionSearchParameterRest geoPositionSearchParameter,
 	                                                     JsonDownloader callback) {
 		RestfulApiQuery restfulApiQuery = RetrofitClient.getApiService(RetrofitClient.ServiceType.ACCU_GEOPOSITION_SEARCH);
 
@@ -187,7 +187,7 @@ public class AccuWeatherProcessing {
 
 		if (locationKey.isEmpty()) {
 			//locationKey 요청 후 처리
-			GeoPositionSearchParameter geoPositionSearchParameter = new GeoPositionSearchParameter();
+			GeoPositionSearchParameterRest geoPositionSearchParameter = new GeoPositionSearchParameterRest();
 			geoPositionSearchParameter.setLatitude(latitude.toString()).setLongitude(longitude.toString());
 
 			Call<JsonElement> geoPositionCall = getGeoPositionSearch(context, geoPositionSearchParameter, new JsonDownloader() {
@@ -233,7 +233,7 @@ public class AccuWeatherProcessing {
 		Set<RetrofitClient.ServiceType> requestTypeSet = requestAccu.getRequestServiceTypes();
 
 		if (requestTypeSet.contains(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS)) {
-			CurrentConditionsParameter currentConditionsParameter = new CurrentConditionsParameter();
+			CurrentConditionsParameterRest currentConditionsParameter = new CurrentConditionsParameterRest();
 			currentConditionsParameter.setLocationKey(locationKey);
 
 			Call<JsonElement> currentConditionsCall = getCurrentConditions(currentConditionsParameter, new JsonDownloader() {
@@ -254,7 +254,7 @@ public class AccuWeatherProcessing {
 			multipleWeatherRestApiCallback.getCallMap().put(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS, currentConditionsCall);
 		}
 		if (requestTypeSet.contains(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST)) {
-			TwelveHoursOfHourlyForecastsParameter twelveHoursOfHourlyForecastsParameter = new TwelveHoursOfHourlyForecastsParameter();
+			TwelveHoursOfHourlyForecastsParameterRest twelveHoursOfHourlyForecastsParameter = new TwelveHoursOfHourlyForecastsParameterRest();
 			twelveHoursOfHourlyForecastsParameter.setLocationKey(locationKey);
 
 			Call<JsonElement> hourlyForecastCall = get12HoursOfHourlyForecasts(twelveHoursOfHourlyForecastsParameter,
@@ -278,7 +278,7 @@ public class AccuWeatherProcessing {
 
 		}
 		if (requestTypeSet.contains(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST)) {
-			FiveDaysOfDailyForecastsParameter fiveDaysOfDailyForecastsParameter = new FiveDaysOfDailyForecastsParameter();
+			FiveDaysOfDailyForecastsParameterRest fiveDaysOfDailyForecastsParameter = new FiveDaysOfDailyForecastsParameterRest();
 			fiveDaysOfDailyForecastsParameter.setLocationKey(locationKey);
 
 			Call<JsonElement> dailyForecastCall = get5DaysOfDailyForecasts(fiveDaysOfDailyForecastsParameter, new JsonDownloader() {

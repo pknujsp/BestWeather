@@ -25,7 +25,7 @@ import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
 import com.lifedawn.bestweather.commons.views.ProgressDialog;
 import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.onecall.OneCallParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.openweathermap.onecall.OwmOneCallParameter;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather.dailyforecasts.AccuDailyForecastsResponse;
 import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaDailyForecast;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.kma.json.midlandfcstresponse.MidLandFcstResponse;
@@ -40,7 +40,7 @@ import com.lifedawn.bestweather.data.remote.weather.dataprocessing.request.MainP
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.MetNorwayResponseProcessor;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.OpenWeatherMapResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.owm.OwmResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.finaldata.kma.FinalDailyForecast;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.finaldata.kma.FinalHourlyForecast;
 import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
@@ -557,11 +557,11 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 		RequestOwmOneCall requestOwmOneCall = new RequestOwmOneCall();
 		requestOwmOneCall.addRequestServiceType(RetrofitClient.ServiceType.OWM_ONE_CALL);
-		Set<OneCallParameter.OneCallApis> exclude = new HashSet<>();
-		exclude.add(OneCallParameter.OneCallApis.alerts);
-		exclude.add(OneCallParameter.OneCallApis.minutely);
-		exclude.add(OneCallParameter.OneCallApis.current);
-		exclude.add(OneCallParameter.OneCallApis.hourly);
+		Set<OwmOneCallParameter.OneCallApis> exclude = new HashSet<>();
+		exclude.add(OwmOneCallParameter.OneCallApis.alerts);
+		exclude.add(OwmOneCallParameter.OneCallApis.minutely);
+		exclude.add(OwmOneCallParameter.OneCallApis.current);
+		exclude.add(OwmOneCallParameter.OneCallApis.hourly);
 		requestOwmOneCall.setExcludeApis(exclude);
 
 		//request.put(WeatherDataSourceType.ACCU_WEATHER, requestAccu);
@@ -688,7 +688,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			if (responseResult.isSuccessful()) {
 				dailyForecastResponse.owmDailyForecastList =
-						OpenWeatherMapResponseProcessor.makeDailyForecastDtoListOneCall(requireContext().getApplicationContext(),
+						OwmResponseProcessor.makeDailyForecastDtoListOneCall(requireContext().getApplicationContext(),
 								(OwmOneCallResponse) responseResult.getResponseObj(), zoneId);
 			} else {
 				dailyForecastResponse.owmThrowable = responseResult.getT();
@@ -702,7 +702,7 @@ public class DailyForecastComparisonFragment extends BaseForecastComparisonFragm
 
 			if (responseResult.isSuccessful()) {
 				dailyForecastResponse.owmDailyForecastList =
-						OpenWeatherMapResponseProcessor.makeDailyForecastDtoListIndividual(requireContext().getApplicationContext(),
+						OwmResponseProcessor.makeDailyForecastDtoListIndividual(requireContext().getApplicationContext(),
 								(OwmDailyForecastResponse) responseResult.getResponseObj(), zoneId);
 			} else {
 				dailyForecastResponse.owmThrowable = responseResult.getT();

@@ -13,7 +13,7 @@ class GetWeatherUseCase @Inject constructor(private val weatherRepository: Weath
         latitude: Double,
         longitude: Double
     ): CurrentConditionsDto {
-        return weatherRepository.getCurrentConditions(weatherProviderTypes, latitude, longitude)
+        return weatherRepository.getCurrentConditions(latitude, longitude)
     }
 
     suspend fun getHourlyForecasts(
@@ -21,7 +21,7 @@ class GetWeatherUseCase @Inject constructor(private val weatherRepository: Weath
         latitude: Double,
         longitude: Double
     ): List<HourlyForecastDto> {
-        return weatherRepository.getHourlyForecasts(weatherProviderTypes, latitude, longitude)
+        return weatherRepository.getHourlyForecasts(latitude, longitude)
     }
 
     suspend fun getDailyForecasts(
@@ -29,7 +29,7 @@ class GetWeatherUseCase @Inject constructor(private val weatherRepository: Weath
         latitude: Double,
         longitude: Double
     ): List<DailyForecastDto> {
-        return weatherRepository.getDailyForecasts(weatherProviderTypes, latitude, longitude)
+        return weatherRepository.getDailyForecasts(latitude, longitude)
     }
 
     suspend fun getAirQuality(
