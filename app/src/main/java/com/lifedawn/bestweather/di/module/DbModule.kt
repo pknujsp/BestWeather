@@ -20,4 +20,7 @@ object DbModule {
         Room.databaseBuilder(context, AppDb::class.java, "appdb")
             .createFromAsset("db/appdb.db").build()
 
+    @Provides
+    @Singleton
+    fun provideFavoriteAddressDao(appDb: AppDb) = appDb.favoriteAddressDao()
 }

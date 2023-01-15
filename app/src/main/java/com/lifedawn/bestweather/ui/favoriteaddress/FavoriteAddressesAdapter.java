@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.favorites;
+package com.lifedawn.bestweather.ui.favoriteaddress;
 
 import android.view.LayoutInflater;
 import android.view.View;

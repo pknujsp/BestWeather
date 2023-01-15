@@ -14,7 +14,7 @@ import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepository;
 import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepositoryImpl;
 import com.lifedawn.bestweather.ui.notification.ongoing.OngoingNotificationRepository;
 import com.lifedawn.bestweather.data.local.room.repository.DailyPushNotificationRepository;
-import com.lifedawn.bestweather.data.local.room.repository.FavoriteAddressRepository;
+import com.lifedawn.bestweather.data.local.favoriteaddress.repository.FavoriteAddressRepositoryImpl;
 import com.lifedawn.bestweather.data.local.room.repository.KmaAreaCodesRepositoryImpl;
 import com.lifedawn.bestweather.data.local.room.repository.WidgetRepository;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WindUtil;
@@ -45,7 +45,7 @@ public class MyApplication extends Application {
 		localeCountryCode = locale.getCountry();
 		Context context = getApplicationContext();
 
-		FavoriteAddressRepository.initialize(context);
+		FavoriteAddressRepositoryImpl.initialize(context);
 		KmaAreaCodesRepositoryImpl.initialize(context);
 		LocalTimeZoneRepositoryImpl.Companion.initialize(context);
 		OngoingNotificationRepository.initialize(context);

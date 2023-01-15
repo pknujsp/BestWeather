@@ -7,7 +7,7 @@ import com.lifedawn.bestweather.commons.classes.FusedLocation.MyLocationCallback
 import com.lifedawn.bestweather.commons.constants.WeatherDataType
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
-import com.lifedawn.bestweather.data.local.room.repository.FavoriteAddressRepository
+import com.lifedawn.bestweather.data.local.favoriteaddress.repository.FavoriteAddressRepositoryImpl
 import com.lifedawn.bestweather.data.remote.retrofit.callback.ApiResponse
 import com.lifedawn.bestweather.data.remote.weather.commons.model.WeatherDataDto
 import com.lifedawn.bestweather.data.remote.weather.kma.usecase.GetAreaCodeUseCase
@@ -39,11 +39,6 @@ class GetWeatherViewModel @Inject constructor(
 
     private val _metNorwayFlow = MutableStateFlow<ApiResponse<WeatherDataDto>>(ApiResponse.Empty)
     val metNorwayFlow = _metNorwayFlow.asStateFlow()
-
-    var locationCallback: MyLocationCallback? = null
-    private val favoriteAddressRepository: FavoriteAddressRepository
-    private val currentLocationLiveData = MutableLiveData<String>()
-    @JvmField val favoriteAddressListLiveData: LiveData<List<FavoriteAddressDto>>
 
 
     fun getKmaWeatherData(
@@ -89,49 +84,9 @@ class GetWeatherViewModel @Inject constructor(
 
         CoroutineScope(Dispatchers.IO).launch {
             owmUseCase.getWeatherData(weatherDataTypes, latitude, longitude, zoneId).collect { result ->
-                _owmFlow.value = ApiResponse.Success(result)
+                _owmFlow.emit(ApiResponse.Success(result))
             }
         }
     }
 
-    override fun getAll(callback: DbQueryCallback<List<FavoriteAddressDto>>) {
-        favoriteAddressRepository.getAll(callback)
-    }
-
-    override fun get(id: Int, callback: DbQueryCallback<FavoriteAddressDto>) {
-        favoriteAddressRepository[id, callback]
-    }
-
-    override fun size(callback: DbQueryCallback<Int>) {
-        favoriteAddressRepository.size(callback)
-    }
-
-    override fun contains(latitude: String, longitude: String, callback: DbQueryCallback<Boolean>) {
-        favoriteAddressRepository.contains(latitude, longitude, callback)
-    }
-
-    override fun add(favoriteAddressDto: FavoriteAddressDto, callback: DbQueryCallback<Long>) {
-        favoriteAddressRepository.add(favoriteAddressDto, callback)
-    }
-
-    override fun delete(favoriteAddressDto: FavoriteAddressDto) {
-        favoriteAddressRepository.delete(favoriteAddressDto)
-    }
-
-    override fun delete(favoriteAddressDto: FavoriteAddressDto, callback: DbQueryCallback<Boolean>) {
-        favoriteAddressRepository.delete(favoriteAddressDto, callback)
-    }
-
-    fun getCurrentLocationLiveData(): LiveData<String> {
-        return currentLocationLiveData
-    }
-
-    fun setCurrentLocationAddressName(addressName: String) {
-        currentLocationLiveData.value = addressName
-    }
-
-    init {
-        favoriteAddressRepository = FavoriteAddressRepository.getINSTANCE()
-        favoriteAddressListLiveData = favoriteAddressRepository.allData
-    }
 }

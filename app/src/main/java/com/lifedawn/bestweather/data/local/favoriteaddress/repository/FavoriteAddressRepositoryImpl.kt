@@ -1,83 +1,46 @@
-package com.lifedawn.bestweather.data.local.room.repository;
+package com.lifedawn.bestweather.data.local.favoriteaddress.repository
 
-import android.content.Context;
+import android.content.Context
+import androidx.lifecycle.LiveData
+import com.lifedawn.bestweather.data.MyApplication
+import com.lifedawn.bestweather.data.local.room.AppDb
+import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
+import com.lifedawn.bestweather.data.local.room.dao.FavoriteAddressDao
+import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
+import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
-import androidx.lifecycle.LiveData;
-
-import com.lifedawn.bestweather.data.MyApplication;
-import com.lifedawn.bestweather.data.local.room.AppDb;
-import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.data.local.room.dao.FavoriteAddressDao;
-import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto;
-import com.lifedawn.bestweather.data.local.room.queryinterfaces.FavoriteAddressQuery;
-
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-
-public class FavoriteAddressRepository implements FavoriteAddressQuery {
-	private FavoriteAddressDao favoriteAddressDao;
-	private ExecutorService executors = MyApplication.getExecutorService();
-
-	private static FavoriteAddressRepository INSTANCE;
-
-	public static void initialize(Context context) {
-		if (INSTANCE == null) {
-			INSTANCE = new FavoriteAddressRepository(context);
-		}
-	}
-
-	public static FavoriteAddressRepository getINSTANCE() {
-		return INSTANCE;
-	}
-
-	private FavoriteAddressRepository(Context context) {
-		favoriteAddressDao = AppDb.getInstance(context).favoriteAddressDao();
-	}
+class FavoriteAddressRepositoryImpl @Inject constructor(
+    private val favoriteAddressDao: FavoriteAddressDao
+) :
+    FavoriteAddressRepository {
 
 
-	@Override
-	public void getAll(DbQueryCallback<List<FavoriteAddressDto>> callback) {
-		executors.execute(() -> callback.processResult(favoriteAddressDao.getAll()));
-	}
+    override suspend fun getAll(): List<FavoriteAddressDto> = suspendCoroutine { continuation ->
+        continuation.resume(favoriteAddressDao.all)
+    }
 
-	public LiveData<List<FavoriteAddressDto>> getAllData() {
-		return favoriteAddressDao.getAllData();
-	}
+    override suspend fun get(id: Int): FavoriteAddressDto = suspendCoroutine { continuation ->
+        continuation.resume(favoriteAddressDao[id])
+    }
 
-	@Override
-	public void get(int id, DbQueryCallback<FavoriteAddressDto> callback) {
-		executors.execute(() -> callback.processResult(favoriteAddressDao.get(id)));
-	}
+    override suspend fun size(): Int = suspendCoroutine { continuation ->
+        continuation.resume(favoriteAddressDao.size())
+    }
 
-	@Override
-	public void size(DbQueryCallback<Integer> callback) {
-		executors.execute(() -> callback.processResult(favoriteAddressDao.size()));
-	}
+    override suspend fun contains(latitude: String, longitude: String): Boolean = suspendCoroutine { continuation ->
+        continuation.resume(favoriteAddressDao.contains(latitude, longitude) == 1)
+    }
 
-	@Override
-	public void contains(String latitude, String longitude, DbQueryCallback<Boolean> callback) {
-		executors.execute(() -> callback.processResult(favoriteAddressDao.contains(latitude, longitude) == 1));
-	}
+    override suspend fun add(favoriteAddressDto: FavoriteAddressDto): Long = suspendCoroutine { continuation ->
+        continuation.resume(favoriteAddressDao.add(favoriteAddressDto))
+    }
 
-	@Override
-	public void add(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Long> callback) {
-		executors.execute(() -> {
-			long id = favoriteAddressDao.add(favoriteAddressDto);
-			callback.processResult(id);
-		});
-	}
 
-	@Override
-	public void delete(FavoriteAddressDto favoriteAddressDto) {
-		executors.execute(() -> favoriteAddressDao.delete(favoriteAddressDto));
-	}
-
-	@Override
-	public void delete(FavoriteAddressDto favoriteAddressDto, DbQueryCallback<Boolean> callback) {
-		executors.execute(() -> {
-			favoriteAddressDao.delete(favoriteAddressDto);
-			callback.onResultSuccessful(true);
-		});
-	}
+    override suspend fun delete(favoriteAddressDto: FavoriteAddressDto): Boolean = suspendCoroutine { continuation ->
+        favoriteAddressDao.delete(favoriteAddressDto)
+        continuation.resume(true)
+    }
 
 }

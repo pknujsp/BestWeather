@@ -1,7 +1,10 @@
 package com.lifedawn.bestweather.di.module
 
 import android.content.Context
+import com.lifedawn.bestweather.data.local.favoriteaddress.repository.FavoriteAddressRepository
+import com.lifedawn.bestweather.data.local.favoriteaddress.repository.FavoriteAddressRepositoryImpl
 import com.lifedawn.bestweather.data.local.room.AppDb
+import com.lifedawn.bestweather.data.local.room.dao.FavoriteAddressDao
 import com.lifedawn.bestweather.data.local.room.queryinterfaces.KmaAreaCodesRepository
 import com.lifedawn.bestweather.data.local.room.repository.KmaAreaCodesRepositoryImpl
 import com.lifedawn.bestweather.data.remote.rainviewer.repository.RainViewerRepository
@@ -85,4 +88,9 @@ object RepositoryModule {
         @ApplicationContext context: Context
     ): MetNorwayRepository = MetNorwayRepositoryImpl(metNorwayDataSource, context)
 
+    @Provides
+    @Singleton
+    fun provideFavoriteAddressRepository(
+        favoriteAddressDao: FavoriteAddressDao
+    ): FavoriteAddressRepository = FavoriteAddressRepositoryImpl(favoriteAddressDao)
 }
