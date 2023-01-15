@@ -11,7 +11,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.metnorway.LocationForecastParameterRest;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.metnorway.locationforecast.LocationForecastResponse;
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.MetNorwayResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.metnorway.MetNorwayResponseProcessor;
 
 import retrofit2.Call;
 import retrofit2.Callback;

@@ -44,6 +44,7 @@ import com.lifedawn.bestweather.data.remote.weather.kma.parser.KmaWebParser
 import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaCurrentConditions
 import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaDailyForecast
 import com.lifedawn.bestweather.data.remote.weather.kma.parser.model.ParsedKmaHourlyForecast
+import com.lifedawn.bestweather.data.remote.weather.metnorway.MetNorwayResponseProcessor
 import com.lifedawn.bestweather.data.remote.weather.owm.OwmResponseProcessor
 import com.tickaroo.tikxml.TikXml
 import okio.Buffer

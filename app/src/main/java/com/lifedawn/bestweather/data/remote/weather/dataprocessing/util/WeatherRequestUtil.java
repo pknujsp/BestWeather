@@ -24,7 +24,7 @@ import com.lifedawn.bestweather.data.remote.weather.dataprocessing.request.MainP
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AqicnResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.MetNorwayResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.metnorway.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.owm.OwmResponseProcessor;
 
 import java.time.ZoneId;
