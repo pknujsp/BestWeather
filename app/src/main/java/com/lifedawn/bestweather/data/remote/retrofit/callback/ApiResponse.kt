@@ -10,4 +10,5 @@ sealed class ApiResponse<out T> {
     }
 
     object Loading: ApiResponse<Nothing>()
+    object Empty: ApiResponse<Nothing>()
 }
