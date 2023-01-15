@@ -1,37 +1,14 @@
-package com.lifedawn.bestweather.data.remote.retrofit.parameters.aqicn;
+package com.lifedawn.bestweather.data.remote.retrofit.parameters.aqicn
 
-import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.RestRequestParameter;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.RestRequestParameter
 
-import java.util.HashMap;
-import java.util.Map;
+data class AqicnParameters(
+    var latitude: String = "",
+    var longitude: String = ""
+) : RestRequestParameter() {
 
-public class AqicnParameterRest extends RestRequestParameter {
-	private String latitude;
-	private String longitude;
+    val map: Map<String, String>
+        get() = mapOf("token" to RetrofitClient.AQICN_TOKEN)
 
-	public Map<String, String> getMap() {
-		Map<String, String> map = new HashMap<>();
-		map.put("token", RetrofitClient.AQICN_TOKEN);
-
-		return map;
-	}
-
-	public String getLatitude() {
-		return latitude;
-	}
-
-	public AqicnParameterRest setLatitude(String latitude) {
-		this.latitude = latitude;
-		return this;
-	}
-
-	public String getLongitude() {
-		return longitude;
-	}
-
-	public AqicnParameterRest setLongitude(String longitude) {
-		this.longitude = longitude;
-		return this;
-	}
 }

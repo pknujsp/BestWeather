@@ -3,6 +3,7 @@ package com.lifedawn.bestweather.ui.weathers.viewmodels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.lifedawn.bestweather.commons.classes.FusedLocation.MyLocationCallback
 import com.lifedawn.bestweather.commons.constants.WeatherDataType
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
@@ -40,16 +41,15 @@ class GetWeatherViewModel @Inject constructor(
     private val _metNorwayFlow = MutableStateFlow<ApiResponse<WeatherDataDto>>(ApiResponse.Empty)
     val metNorwayFlow = _metNorwayFlow.asStateFlow()
 
-
     fun getKmaWeatherData(
         weatherDataTypes: Set<WeatherDataType>,
         latitude: Double,
         longitude: Double,
         zoneId: ZoneId
     ) {
-        _kmaFlow.value = ApiResponse.Loading
+        viewModelScope.launch {
+            _kmaFlow.value = ApiResponse.Loading
 
-        CoroutineScope(Dispatchers.IO).launch {
             kmaAreaCodeUseCase.getAreaCode(latitude, longitude).collect { areaCode ->
                 kmaUseCase.getWeatherData(weatherDataTypes, areaCode, latitude, longitude, zoneId).collect { result ->
                     _kmaFlow.value = ApiResponse.Success(result)
@@ -65,9 +65,9 @@ class GetWeatherViewModel @Inject constructor(
         longitude: Double,
         zoneId: ZoneId
     ) {
-        _metNorwayFlow.value = ApiResponse.Loading
+        viewModelScope.launch {
+            _metNorwayFlow.value = ApiResponse.Loading
 
-        CoroutineScope(Dispatchers.IO).launch {
             metNorwayUseCase.getWeatherData(latitude, longitude, zoneId).collect { result ->
                 _metNorwayFlow.value = ApiResponse.Success(result)
             }
@@ -80,9 +80,9 @@ class GetWeatherViewModel @Inject constructor(
         longitude: Double,
         zoneId: ZoneId
     ) {
-        _owmFlow.value = ApiResponse.Loading
+        viewModelScope.launch {
+            _owmFlow.value = ApiResponse.Loading
 
-        CoroutineScope(Dispatchers.IO).launch {
             owmUseCase.getWeatherData(weatherDataTypes, latitude, longitude, zoneId).collect { result ->
                 _owmFlow.emit(ApiResponse.Success(result))
             }

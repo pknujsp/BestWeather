@@ -1,6 +1,7 @@
 package com.lifedawn.bestweather.ui.favoriteaddress.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.lifedawn.bestweather.data.local.favoriteaddress.repository.FavoriteAddressRepository
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
 import com.lifedawn.bestweather.data.remote.retrofit.callback.ApiResponse
@@ -34,39 +35,33 @@ class FavoriteAddressViewModel @Inject constructor(
     private val _deleteFlow = MutableStateFlow<ApiResponse<Boolean>>(ApiResponse.Empty)
     val deleteFlow = _deleteFlow.asStateFlow()
 
-    fun getAll() {
-        CoroutineScope(Dispatchers.IO).launch {
-            _allFavoriteAddressListFlow.value = ApiResponse.Success(favoriteAddressRepository.getAll())
-        }
+    fun getAll() = viewModelScope.launch {
+        _allFavoriteAddressListFlow.value = ApiResponse.Success(favoriteAddressRepository.getAll())
     }
 
-    fun get(id: Int) {
-        CoroutineScope(Dispatchers.IO).launch {
-            _favoriteAddressFlow.value = ApiResponse.Success(favoriteAddressRepository.get(id))
-        }
+
+    fun get(id: Int) = viewModelScope.launch {
+        _favoriteAddressFlow.value = ApiResponse.Success(favoriteAddressRepository.get(id))
     }
 
-    fun size() {
-        CoroutineScope(Dispatchers.IO).launch {
-            _sizeFlow.value = ApiResponse.Success(favoriteAddressRepository.size())
-        }
+
+    fun size() = viewModelScope.launch {
+        _sizeFlow.value = ApiResponse.Success(favoriteAddressRepository.size())
     }
 
-    fun contains(latitude: String, longitude: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            _containsFlow.value = ApiResponse.Success(favoriteAddressRepository.contains(latitude, longitude))
-        }
+
+    fun contains(latitude: String, longitude: String) = viewModelScope.launch {
+        _containsFlow.value = ApiResponse.Success(favoriteAddressRepository.contains(latitude, longitude))
     }
 
-    fun add(favoriteAddressDto: FavoriteAddressDto) {
-        CoroutineScope(Dispatchers.IO).launch {
-            _addFlow.value = ApiResponse.Success(favoriteAddressRepository.add(favoriteAddressDto))
-        }
+
+    fun add(favoriteAddressDto: FavoriteAddressDto) = viewModelScope.launch {
+        _addFlow.value = ApiResponse.Success(favoriteAddressRepository.add(favoriteAddressDto))
     }
 
-    fun delete(favoriteAddressDto: FavoriteAddressDto) {
-        CoroutineScope(Dispatchers.IO).launch {
-            _deleteFlow.value = ApiResponse.Success(favoriteAddressRepository.delete(favoriteAddressDto))
-        }
+
+    fun delete(favoriteAddressDto: FavoriteAddressDto) = viewModelScope.launch {
+        _deleteFlow.value = ApiResponse.Success(favoriteAddressRepository.delete(favoriteAddressDto))
     }
+
 }

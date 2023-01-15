@@ -58,7 +58,7 @@ import com.lifedawn.bestweather.commons.constants.ValueUnits;
 import com.lifedawn.bestweather.databinding.FragmentAirQualityDetailBinding;
 import com.lifedawn.bestweather.data.MyApplication;
 import com.lifedawn.bestweather.data.remote.retrofit.responses.aqicn.AqiCnGeolocalizedFeedResponse;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.ui.weathers.simplefragment.aqicn.AirQualityForecastObj;
 import com.lifedawn.bestweather.ui.weathers.simplefragment.interfaces.IWeatherValues;

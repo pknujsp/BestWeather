@@ -14,7 +14,7 @@ import androidx.core.content.ContextCompat;
 
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.ui.weathers.FragmentType;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnResponseProcessor;
 
 import java.util.List;
 

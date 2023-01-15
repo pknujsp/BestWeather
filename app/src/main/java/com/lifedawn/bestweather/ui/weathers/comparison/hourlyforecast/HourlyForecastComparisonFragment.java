@@ -34,7 +34,6 @@ import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.on
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
 import com.lifedawn.bestweather.ui.weathers.comparison.base.BaseForecastComparisonFragment;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.request.MainProcessing;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AccuWeatherResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.metnorway.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.owm.OwmResponseProcessor;

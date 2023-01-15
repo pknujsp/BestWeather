@@ -45,8 +45,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRes
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto;
 import com.lifedawn.bestweather.ui.weathers.WeatherFragment;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.request.MainProcessing;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AccuWeatherResponseProcessor;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.metnorway.MetNorwayResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.owm.OwmResponseProcessor;

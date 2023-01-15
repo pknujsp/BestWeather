@@ -29,6 +29,7 @@ import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.in
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.onecall.OwmOneCallResponse
+import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnResponseProcessor
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WindUtil
 import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor.getDailyForecastListByXML
 import com.lifedawn.bestweather.data.remote.weather.kma.KmaResponseProcessor.getFinalCurrentConditionsByXML

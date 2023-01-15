@@ -11,7 +11,7 @@ import androidx.annotation.Nullable;
 import com.bumptech.glide.Glide;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.data.MyApplication;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.AqicnResponseProcessor;
+import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnResponseProcessor;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.LocationDistance;
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WeatherUtil;
 import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;

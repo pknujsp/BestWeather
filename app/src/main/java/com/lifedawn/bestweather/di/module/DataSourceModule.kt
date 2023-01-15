@@ -1,8 +1,8 @@
 package com.lifedawn.bestweather.di.module
 
 import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery
-import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnDataSource
-import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnDataSourceImpl
+import com.lifedawn.bestweather.data.remote.weather.aqicn.datasource.AqicnDataSource
+import com.lifedawn.bestweather.data.remote.weather.aqicn.datasource.AqicnDataSourceImpl
 import com.lifedawn.bestweather.data.remote.weather.kma.datasource.KmaDataSource
 import com.lifedawn.bestweather.data.remote.weather.kma.datasource.KmaDataSourceImpl
 import com.lifedawn.bestweather.data.remote.weather.metnorway.datasource.MetNorwayDataSource
