@@ -1,215 +1,113 @@
-package com.lifedawn.bestweather.data.remote.weather.dataprocessing.util;
+package com.lifedawn.bestweather.data.remote.weather.dataprocessing.util
 
-import android.content.Context;
+import android.content.Context
+import com.lifedawn.bestweather.R
 
-import com.lifedawn.bestweather.R;
+object WindUtil {
+    private val windStrengthDescriptionMap: MutableMap<String, String> = HashMap()
+    private val windStrengthDescriptionSimpleMap: MutableMap<String, String> = HashMap()
+    @JvmStatic
+    fun init(context: Context) {
+        if (windStrengthDescriptionMap.isEmpty() || windStrengthDescriptionSimpleMap.isEmpty()) {
+            windStrengthDescriptionMap["1"] = context.getString(R.string.wind_strength_1)
+            windStrengthDescriptionMap["2"] = context.getString(R.string.wind_strength_2)
+            windStrengthDescriptionMap["3"] = context.getString(R.string.wind_strength_3)
+            windStrengthDescriptionMap["4"] = context.getString(R.string.wind_strength_4)
+            windStrengthDescriptionSimpleMap["1"] = context.getString(R.string.wind_strength_1_simple)
+            windStrengthDescriptionSimpleMap["2"] = context.getString(R.string.wind_strength_2_simple)
+            windStrengthDescriptionSimpleMap["3"] = context.getString(R.string.wind_strength_3_simple)
+            windStrengthDescriptionSimpleMap["4"] = context.getString(R.string.wind_strength_4_simple)
+        }
+    }
 
-import java.util.HashMap;
-import java.util.Map;
+    fun getWindSpeedDescription(windSpeed: String): String? {
+        val speed = windSpeed.toDouble()
+        return if (speed >= 14) {
+            windStrengthDescriptionMap["4"]
+        } else if (speed >= 9) {
+            windStrengthDescriptionMap["3"]
+        } else if (speed >= 4) {
+            windStrengthDescriptionMap["2"]
+        } else {
+            windStrengthDescriptionMap["1"]
+        }
+    }
 
-public class WindUtil {
-	private static Map<String, String> windStrengthDescriptionMap = new HashMap<>();
-	private static Map<String, String> windStrengthDescriptionSimpleMap = new HashMap<>();
+    fun getSimpleWindSpeedDescription(windSpeed: String): String? {
+        val speed = windSpeed.toDouble()
+        return if (speed >= 14) {
+            windStrengthDescriptionSimpleMap["4"]
+        } else if (speed >= 9) {
+            windStrengthDescriptionSimpleMap["3"]
+        } else if (speed >= 4) {
+            windStrengthDescriptionSimpleMap["2"]
+        } else {
+            windStrengthDescriptionSimpleMap["1"]
+        }
+    }
 
-	public static void init(Context context) {
-		if (windStrengthDescriptionMap.isEmpty() || windStrengthDescriptionSimpleMap.isEmpty()) {
-			windStrengthDescriptionMap.put("1", context.getString(R.string.wind_strength_1));
-			windStrengthDescriptionMap.put("2", context.getString(R.string.wind_strength_2));
-			windStrengthDescriptionMap.put("3", context.getString(R.string.wind_strength_3));
-			windStrengthDescriptionMap.put("4", context.getString(R.string.wind_strength_4));
+    fun parseWindDirectionDegreeAsStr(context: Context, degree: String): String {
+        val convertedToSixteen = ((degree.toDouble() + 22.5 * 0.5) / 22.5).toInt()
+        return when (convertedToSixteen) {
+            1 -> context.getString(R.string.wind_direction_NNE)
+            2 -> context.getString(R.string.wind_direction_NE)
+            3 -> context.getString(R.string.wind_direction_ENE)
+            4 -> context.getString(R.string.wind_direction_E)
+            5 -> context.getString(R.string.wind_direction_ESE)
+            6 -> context.getString(R.string.wind_direction_SE)
+            7 -> context.getString(R.string.wind_direction_SSE)
+            8 -> context.getString(R.string.wind_direction_S)
+            9 -> context.getString(R.string.wind_direction_SSW)
+            10 -> context.getString(R.string.wind_direction_SW)
+            11 -> context.getString(R.string.wind_direction_WSW)
+            12 -> context.getString(R.string.wind_direction_W)
+            13 -> context.getString(R.string.wind_direction_WNW)
+            14 -> context.getString(R.string.wind_direction_NW)
+            15 -> context.getString(R.string.wind_direction_NNW)
+            16 -> context.getString(R.string.wind_direction_N)
+            else -> ""
+        }
+    }
 
-			windStrengthDescriptionSimpleMap.put("1", context.getString(R.string.wind_strength_1_simple));
-			windStrengthDescriptionSimpleMap.put("2", context.getString(R.string.wind_strength_2_simple));
-			windStrengthDescriptionSimpleMap.put("3", context.getString(R.string.wind_strength_3_simple));
-			windStrengthDescriptionSimpleMap.put("4", context.getString(R.string.wind_strength_4_simple));
-		}
-	}
+    fun parseWindDirectionStrAsStr(context: Context, degree: String?): String {
+        return when (degree) {
+            "북북동" -> context.getString(R.string.wind_direction_NNE)
+            "북동" -> context.getString(R.string.wind_direction_NE)
+            "동북동" -> context.getString(R.string.wind_direction_ENE)
+            "동" -> context.getString(R.string.wind_direction_E)
+            "동남동" -> context.getString(R.string.wind_direction_ESE)
+            "남동" -> context.getString(R.string.wind_direction_SE)
+            "남남동" -> context.getString(R.string.wind_direction_SSE)
+            "남" -> context.getString(R.string.wind_direction_S)
+            "남남서" -> context.getString(R.string.wind_direction_SSW)
+            "남서" -> context.getString(R.string.wind_direction_SW)
+            "서남서" -> context.getString(R.string.wind_direction_WSW)
+            "서" -> context.getString(R.string.wind_direction_W)
+            "서북서" -> context.getString(R.string.wind_direction_WNW)
+            "북서" -> context.getString(R.string.wind_direction_NW)
+            "북북서" -> context.getString(R.string.wind_direction_NNW)
+            else -> context.getString(R.string.wind_direction_N)
+        }
+    }
 
-	public static String getWindSpeedDescription(String windSpeed) {
-		double speed = Double.parseDouble(windSpeed);
-
-		if (speed >= 14) {
-			return windStrengthDescriptionMap.get("4");
-		} else if (speed >= 9) {
-			return windStrengthDescriptionMap.get("3");
-		} else if (speed >= 4) {
-			return windStrengthDescriptionMap.get("2");
-		} else {
-			return windStrengthDescriptionMap.get("1");
-		}
-	}
-
-	public static String getSimpleWindSpeedDescription(String windSpeed) {
-		double speed = Double.parseDouble(windSpeed);
-
-		if (speed >= 14) {
-			return windStrengthDescriptionSimpleMap.get("4");
-		} else if (speed >= 9) {
-			return windStrengthDescriptionSimpleMap.get("3");
-		} else if (speed >= 4) {
-			return windStrengthDescriptionSimpleMap.get("2");
-		} else {
-			return windStrengthDescriptionSimpleMap.get("1");
-		}
-	}
-
-	public static String parseWindDirectionDegreeAsStr(Context context, String degree) {
-		final int convertedToSixteen = (int) ((Double.parseDouble(degree) + 22.5 * 0.5) / 22.5);
-		switch (convertedToSixteen) {
-			case 1:
-				return context.getString(R.string.wind_direction_NNE);
-
-			case 2:
-				return context.getString(R.string.wind_direction_NE);
-
-			case 3:
-				return context.getString(R.string.wind_direction_ENE);
-
-			case 4:
-				return context.getString(R.string.wind_direction_E);
-
-			case 5:
-				return context.getString(R.string.wind_direction_ESE);
-
-			case 6:
-				return context.getString(R.string.wind_direction_SE);
-
-			case 7:
-				return context.getString(R.string.wind_direction_SSE);
-
-			case 8:
-				return context.getString(R.string.wind_direction_S);
-
-			case 9:
-				return context.getString(R.string.wind_direction_SSW);
-
-			case 10:
-				return context.getString(R.string.wind_direction_SW);
-
-			case 11:
-				return context.getString(R.string.wind_direction_WSW);
-
-			case 12:
-				return context.getString(R.string.wind_direction_W);
-
-			case 13:
-				return context.getString(R.string.wind_direction_WNW);
-
-			case 14:
-				return context.getString(R.string.wind_direction_NW);
-
-			case 15:
-				return context.getString(R.string.wind_direction_NNW);
-
-			case 16:
-				return context.getString(R.string.wind_direction_N);
-
-			default:
-				return "";
-		}
-	}
-
-	public static String parseWindDirectionStrAsStr(Context context, String degree) {
-		switch (degree) {
-			case "북북동":
-				return context.getString(R.string.wind_direction_NNE);
-
-			case "북동":
-				return context.getString(R.string.wind_direction_NE);
-
-			case "동북동":
-				return context.getString(R.string.wind_direction_ENE);
-
-			case "동":
-				return context.getString(R.string.wind_direction_E);
-
-			case "동남동":
-				return context.getString(R.string.wind_direction_ESE);
-
-			case "남동":
-				return context.getString(R.string.wind_direction_SE);
-
-			case "남남동":
-				return context.getString(R.string.wind_direction_SSE);
-
-			case "남":
-				return context.getString(R.string.wind_direction_S);
-
-			case "남남서":
-				return context.getString(R.string.wind_direction_SSW);
-
-			case "남서":
-				return context.getString(R.string.wind_direction_SW);
-
-			case "서남서":
-				return context.getString(R.string.wind_direction_WSW);
-
-			case "서":
-				return context.getString(R.string.wind_direction_W);
-
-			case "서북서":
-				return context.getString(R.string.wind_direction_WNW);
-
-			case "북서":
-				return context.getString(R.string.wind_direction_NW);
-
-			case "북북서":
-				return context.getString(R.string.wind_direction_NNW);
-
-			default:
-				return context.getString(R.string.wind_direction_N);
-		}
-	}
-
-	public static int parseWindDirectionStrAsInt(String degree) {
-		switch (degree) {
-			case "북북동":
-				return 25;
-
-			case "북동":
-				return 45;
-
-			case "동북동":
-				return 67;
-
-			case "동":
-				return 90;
-
-			case "동남동":
-				return 112;
-
-			case "남동":
-				return 135;
-
-			case "남남동":
-				return 157;
-
-			case "남":
-				return 180;
-
-			case "남남서":
-				return 202;
-
-			case "남서":
-				return 225;
-
-			case "서남서":
-				return 247;
-
-			case "서":
-				return 270;
-
-			case "서북서":
-				return 292;
-
-			case "북서":
-				return 315;
-
-			case "북북서":
-				return 337;
-
-			default:
-				return -1;
-		}
-	}
+    fun parseWindDirectionStrAsInt(degree: String?): Int {
+        return when (degree) {
+            "북북동" -> 25
+            "북동" -> 45
+            "동북동" -> 67
+            "동" -> 90
+            "동남동" -> 112
+            "남동" -> 135
+            "남남동" -> 157
+            "남" -> 180
+            "남남서" -> 202
+            "남서" -> 225
+            "서남서" -> 247
+            "서" -> 270
+            "서북서" -> 292
+            "북서" -> 315
+            "북북서" -> 337
+            else -> -1
+        }
+    }
 }

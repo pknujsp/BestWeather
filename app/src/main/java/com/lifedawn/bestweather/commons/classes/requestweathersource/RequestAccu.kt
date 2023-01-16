@@ -1,4 +1,3 @@
-package com.lifedawn.bestweather.commons.classes.requestweathersource;
+package com.lifedawn.bestweather.commons.classes.requestweathersource
 
-public class RequestAccu extends RequestWeatherSource {
-}
+class RequestAccu : RequestWeatherSource()

@@ -1,90 +1,65 @@
-package com.lifedawn.bestweather.data.local.room.repository;
+package com.lifedawn.bestweather.data.local.room.repository
 
-import android.content.Context;
+import android.content.Context
+import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
+import java.util.concurrent.ExecutorService
 
-import androidx.annotation.Nullable;
+class WidgetRepository private constructor(context: Context) {
+    private val widgetDao: WidgetDao
+    private val executorService: ExecutorService = MyApplication.getExecutorService()
 
-import com.lifedawn.bestweather.data.MyApplication;
-import com.lifedawn.bestweather.data.local.room.AppDb;
-import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.data.local.room.dao.WidgetDao;
-import com.lifedawn.bestweather.data.local.room.dto.WidgetDto;
+    init {
+        widgetDao = AppDb.getInstance(context).widgetDao()
+    }
 
-import java.util.List;
-import java.util.concurrent.ExecutorService;
+    fun add(widgetDto: WidgetDto?, callback: DbQueryCallback<WidgetDto?>) {
+        executorService.execute {
+            val newDtoId: Long = widgetDao.add(widgetDto)
+            callback.onResultSuccessful(widgetDao.get(newDtoId))
+        }
+    }
 
-public class WidgetRepository {
-	private final WidgetDao widgetDao;
-	private final ExecutorService executorService = MyApplication.getExecutorService();
-	private static WidgetRepository INSTANCE;
+    operator fun get(appWidgetId: Int, callback: DbQueryCallback<WidgetDto?>) {
+        executorService.execute { callback.onResultSuccessful(widgetDao.get(appWidgetId)) }
+    }
 
-	public static WidgetRepository getINSTANCE() {
-		return INSTANCE;
-	}
+    fun getAll(callback: DbQueryCallback<List<WidgetDto?>?>) {
+        executorService.execute { callback.onResultSuccessful(widgetDao.all) }
+    }
 
-	public static void initialize(Context context) {
-		if (INSTANCE == null)
-			INSTANCE = new WidgetRepository(context);
-	}
+    fun getAll(widgetProviderClassName: String?, callback: DbQueryCallback<List<WidgetDto?>?>) {
+        executorService.execute { callback.onResultSuccessful(widgetDao.getAll(widgetProviderClassName)) }
+    }
 
-	private WidgetRepository(Context context) {
-		widgetDao = AppDb.getInstance(context).widgetDao();
-	}
+    operator fun get(widgetDtoId: Long, callback: DbQueryCallback<WidgetDto?>) {
+        executorService.execute { callback.onResultSuccessful(widgetDao.get(widgetDtoId)) }
+    }
 
-	public void add(WidgetDto widgetDto, DbQueryCallback<WidgetDto> callback) {
-		executorService.execute(() -> {
-			long newDtoId = widgetDao.add(widgetDto);
-			callback.onResultSuccessful(widgetDao.get(newDtoId));
-		});
-	}
+    fun update(widgetDto: WidgetDto, callback: DbQueryCallback<WidgetDto?>?) {
+        executorService.execute {
+            widgetDao.update(widgetDto)
+            if (callback != null) {
+                callback.onResultSuccessful(widgetDao.get(widgetDto.id))
+            }
+        }
+    }
 
-	public void get(int appWidgetId, DbQueryCallback<WidgetDto> callback) {
-		executorService.execute(() -> callback.onResultSuccessful(widgetDao.get(appWidgetId)));
-	}
+    fun delete(appWidgetId: Int, callback: DbQueryCallback<Boolean?>?) {
+        executorService.execute {
+            widgetDao.delete(appWidgetId)
+            if (callback != null) {
+                callback.onResultSuccessful(true)
+            }
+        }
+    }
 
-	public void getAll(DbQueryCallback<List<WidgetDto>> callback) {
-		executorService.execute(() -> callback.onResultSuccessful(widgetDao.getAll()));
-	}
+    companion object {
+        var iNSTANCE: WidgetRepository? = null
+            private set
 
-	public void getAll(String widgetProviderClassName, DbQueryCallback<List<WidgetDto>> callback) {
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				callback.onResultSuccessful(widgetDao.getAll(widgetProviderClassName));
-			}
-		});
-	}
-
-	public void get(long widgetDtoId, DbQueryCallback<WidgetDto> callback) {
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				callback.onResultSuccessful(widgetDao.get(widgetDtoId));
-			}
-		});
-	}
-
-	public void update(WidgetDto widgetDto, @Nullable DbQueryCallback<WidgetDto> callback) {
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				widgetDao.update(widgetDto);
-				if (callback != null) {
-					callback.onResultSuccessful(widgetDao.get(widgetDto.getId()));
-				}
-			}
-		});
-	}
-
-	public void delete(int appWidgetId, @Nullable DbQueryCallback<Boolean> callback) {
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				widgetDao.delete(appWidgetId);
-				if (callback != null) {
-					callback.onResultSuccessful(true);
-				}
-			}
-		});
-	}
+        @JvmStatic
+        fun initialize(context: Context) {
+            if (iNSTANCE == null) iNSTANCE = WidgetRepository(context)
+        }
+    }
 }

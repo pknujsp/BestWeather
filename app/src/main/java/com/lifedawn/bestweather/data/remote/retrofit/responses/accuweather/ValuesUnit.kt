@@ -1,32 +1,21 @@
-package com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather;
+package com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-public class ValuesUnit {
-	@Expose
-	@SerializedName("Metric")
-	private ValueUnit metric;
-	
-	@Expose
-	@SerializedName("Imperial")
-	private ValueUnit imperial;
-	
-	public ValueUnit getMetric() {
-		return metric;
-	}
-	
-	public ValuesUnit setMetric(ValueUnit metric) {
-		this.metric = metric;
-		return this;
-	}
-	
-	public ValueUnit getImperial() {
-		return imperial;
-	}
-	
-	public ValuesUnit setImperial(ValueUnit imperial) {
-		this.imperial = imperial;
-		return this;
-	}
+class ValuesUnit {
+    @Expose @SerializedName("Metric") var metric: ValueUnit? = null
+        private set
+    @Expose @SerializedName("Imperial") var imperial: ValueUnit? = null
+        private set
+
+    fun setMetric(metric: ValueUnit?): ValuesUnit {
+        this.metric = metric
+        return this
+    }
+
+    fun setImperial(imperial: ValueUnit?): ValuesUnit {
+        this.imperial = imperial
+        return this
+    }
 }

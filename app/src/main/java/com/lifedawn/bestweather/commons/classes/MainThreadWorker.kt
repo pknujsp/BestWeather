@@ -1,18 +1,12 @@
-package com.lifedawn.bestweather.commons.classes;
+package com.lifedawn.bestweather.commons.classes
 
-import android.os.Handler;
-import android.os.Looper;
+import android.os.Handler
+import android.os.Looper
 
-import androidx.core.os.HandlerCompat;
-
-public class MainThreadWorker {
-	private final static Handler handler = new Handler(Looper.getMainLooper());
-
-	public static void runOnUiThread(Runnable action) {
-		if (Thread.currentThread() == Looper.getMainLooper().getThread())
-			action.run();
-		else
-			handler.post(action);
-	}
-
+object MainThreadWorker {
+    private val handler = Handler(Looper.getMainLooper())
+    @JvmStatic
+    fun runOnUiThread(action: Runnable) {
+        if (Thread.currentThread() === Looper.getMainLooper().thread) action.run() else handler.post(action)
+    }
 }

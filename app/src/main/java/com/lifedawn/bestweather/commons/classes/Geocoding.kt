@@ -1,202 +1,171 @@
-package com.lifedawn.bestweather.commons.classes;
+package com.lifedawn.bestweather.commons.classes
 
-import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
+import android.content.Context
+import android.location.Geocoder
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.lifedawn.bestweather.data.MyApplication
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient.getApiService
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.nominatim.GeocodeParameterRest
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.nominatim.ReverseGeocodeParameterRest
+import com.lifedawn.bestweather.data.remote.retrofit.responses.nominatim.GeocodeResponse
+import com.lifedawn.bestweather.data.remote.retrofit.responses.nominatim.ReverseGeocodeResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import java.util.*
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.lifedawn.bestweather.data.MyApplication;
-import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.nominatim.GeocodeParameterRest;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.nominatim.ReverseGeocodeParameterRest;
-import com.lifedawn.bestweather.data.remote.retrofit.responses.nominatim.GeocodeResponse;
-import com.lifedawn.bestweather.data.remote.retrofit.responses.nominatim.ReverseGeocodeResponse;
+object Geocoding {
+    fun androidGeocoding(context: Context?, query: String, callback: GeocodingCallback) {
+        MyApplication.getExecutorService().submit(Runnable {
+            if (query.isEmpty()) {
+                callback.onGeocodingResult(ArrayList())
+                return@Runnable
+            }
+            val containKr = query.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*")
+            val geocoder = Geocoder(context!!, if (containKr) Locale.KOREA else Locale.US)
+            try {
+                val addressList = geocoder.getFromLocationName(query, 5)
+                val errors: MutableList<Int> = ArrayList()
+                for (i in addressList!!.indices.reversed()) {
+                    if (addressList[i].countryName == null || addressList[i].countryCode == null) {
+                        errors.add(i)
+                    }
+                }
+                for (errorIdx in errors) {
+                    addressList.removeAt(errorIdx)
+                }
+                val addressDtoList: MutableList<AddressDto?> = ArrayList()
+                for (address in addressList) {
+                    addressDtoList.add(
+                        AddressDto(
+                            address.latitude, address.longitude,
+                            address.getAddressLine(0),
+                            address.countryName, address.countryCode
+                        )
+                    )
+                }
+                callback.onGeocodingResult(addressDtoList)
+            } catch (e: Exception) {
+            }
+        })
+    }
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+    @JvmStatic
+    fun nominatimGeocoding(context: Context?, query: String, callback: GeocodingCallback) {
+        val parameter = GeocodeParameterRest(query)
+        val call: Call<JsonElement> = getApiService(RetrofitClient.ServiceType.NOMINATIM).nominatimGeocode(
+            parameter.map,
+            MyApplication.locale.toLanguageTag()
+        )
+        call.enqueue(object : Callback<JsonElement?> {
+            override fun onResponse(call: Call<JsonElement?>, response: Response<JsonElement?>) {
+                if (response.isSuccessful) {
+                    val geocodeResponse = Gson().fromJson(
+                        response.body(),
+                        GeocodeResponse::class.java
+                    )
+                    val addressDtoList: MutableList<AddressDto?> = ArrayList()
+                    for (features in geocodeResponse.features) {
+                        val properties = features.properties
+                        val editedDisplayName = convertDisplayName(properties.displayName)
+                        addressDtoList.add(
+                            AddressDto(
+                                features.geometry.coordinates[1],
+                                features.geometry.coordinates[0],
+                                editedDisplayName, properties.address.country,
+                                properties.address.countryCode.uppercase(Locale.getDefault())
+                            )
+                        )
+                    }
+                    callback.onGeocodingResult(addressDtoList)
+                } else {
+                    androidGeocoding(context, query, callback)
+                }
+            }
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+            override fun onFailure(call: Call<JsonElement?>, t: Throwable) {
+                androidGeocoding(context, query, callback)
+            }
+        })
+    }
 
-public class Geocoding {
+    fun androidReverseGeocoding(context: Context?, latitude: Double?, longitude: Double?, callback: ReverseGeocodingCallback) {
+        val geocoder = Geocoder(context!!)
+        try {
+            val addressList = geocoder.getFromLocation(latitude!!, longitude!!, 20)
+            if (addressList!!.size > 0) {
+                val addressDto = AddressDto(
+                    latitude, longitude,
+                    addressList[0].getAddressLine(0),
+                    addressList[0].countryName, addressList[0].countryCode
+                )
+                callback.onReverseGeocodingResult(addressDto)
+            } else {
+                callback.onReverseGeocodingResult(null)
+            }
+        } catch (e: Exception) {
+        }
+    }
 
-	public static void androidGeocoding(Context context, String query, GeocodingCallback callback) {
-		MyApplication.getExecutorService().submit(new Runnable() {
-			@Override
-			public void run() {
-				if (query.isEmpty()) {
-					callback.onGeocodingResult(new ArrayList<>());
-					return;
-				}
+    @JvmStatic
+    fun nominatimReverseGeocoding(context: Context?, latitude: Double?, longitude: Double?, callback: ReverseGeocodingCallback) {
+        val parameter = ReverseGeocodeParameterRest(latitude, longitude)
+        val call: Call<JsonElement> = getApiService(RetrofitClient.ServiceType.NOMINATIM).nominatimReverseGeocode(
+            parameter.map,
+            MyApplication.locale.toLanguageTag()
+        )
+        call.enqueue(object : Callback<JsonElement> {
+            override fun onResponse(call: Call<JsonElement>, response: Response<JsonElement>) {
+                if (response.isSuccessful) {
+                    val reverseGeocodeResponse = Gson().fromJson(
+                        response.body().toString(),
+                        ReverseGeocodeResponse::class.java
+                    )
+                    val properties = reverseGeocodeResponse.features[0].properties
+                    val editedDisplayName = convertDisplayName(properties.displayName)
+                    val addressDto = AddressDto(
+                        latitude, longitude,
+                        editedDisplayName, properties.address.country,
+                        properties.address.countryCode.uppercase(Locale.getDefault())
+                    )
+                    callback.onReverseGeocodingResult(addressDto)
+                } else {
+                    androidReverseGeocoding(context, latitude, longitude, callback)
+                }
+            }
 
-				boolean containKr = query.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*");
-				Geocoder geocoder = new Geocoder(context, containKr ? Locale.KOREA : Locale.US);
+            override fun onFailure(call: Call<JsonElement>, t: Throwable) {
+                androidReverseGeocoding(context, latitude, longitude, callback)
+            }
+        })
+    }
 
-				try {
-					List<Address> addressList = geocoder.getFromLocationName(query, 5);
-					List<Integer> errors = new ArrayList<>();
+    private fun convertDisplayName(originalDisplayName: String): String {
+        val separatedDisplayNames = originalDisplayName.split(", ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        return if (separatedDisplayNames.size > 2) {
+            val stringBuilder = StringBuilder()
+            val lastIdx = separatedDisplayNames.size - 2
+            for (i in 0..lastIdx) {
+                stringBuilder.append(separatedDisplayNames[i])
+                if (i < lastIdx) {
+                    stringBuilder.append(", ")
+                }
+            }
+            stringBuilder.toString()
+        } else {
+            originalDisplayName
+        }
+    }
 
-					for (int i = addressList.size() - 1; i >= 0; i--) {
-						if (addressList.get(i).getCountryName() == null || addressList.get(i).getCountryCode() == null) {
-							errors.add(i);
-						}
-					}
+    interface ReverseGeocodingCallback {
+        fun onReverseGeocodingResult(addressDto: AddressDto?)
+    }
 
-					for (int errorIdx : errors) {
-						addressList.remove(errorIdx);
-					}
+    interface GeocodingCallback {
+        fun onGeocodingResult(addressList: List<AddressDto?>?)
+    }
 
-					List<AddressDto> addressDtoList = new ArrayList<>();
-					for (Address address : addressList) {
-						addressDtoList.add(new AddressDto(address.getLatitude(), address.getLongitude(),
-								address.getAddressLine(0),
-								address.getCountryName(), address.getCountryCode()));
-					}
-
-					callback.onGeocodingResult(addressDtoList);
-				} catch (Exception e) {
-
-				}
-			}
-		});
-	}
-
-	public static void nominatimGeocoding(Context context, String query, GeocodingCallback callback) {
-		GeocodeParameterRest parameter = new GeocodeParameterRest(query);
-		Call<JsonElement> call =
-				RetrofitClient.getApiService(RetrofitClient.ServiceType.NOMINATIM).nominatimGeocode(parameter.getMap(),
-						MyApplication.locale.toLanguageTag());
-
-		call.enqueue(new Callback<JsonElement>() {
-			@Override
-			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				if (response.isSuccessful()) {
-					GeocodeResponse geocodeResponse = new Gson().fromJson(response.body(),
-							GeocodeResponse.class);
-
-					List<AddressDto> addressDtoList = new ArrayList<>();
-
-					for (GeocodeResponse.Features features : geocodeResponse.getFeatures()) {
-						GeocodeResponse.Properties properties = features.getProperties();
-						String editedDisplayName = convertDisplayName(properties.getDisplayName());
-
-						addressDtoList.add(new AddressDto(features.getGeometry().getCoordinates().get(1),
-								features.getGeometry().getCoordinates().get(0),
-								editedDisplayName, properties.getAddress().getCountry(),
-								properties.getAddress().getCountryCode().toUpperCase()
-						));
-					}
-					callback.onGeocodingResult(addressDtoList);
-				} else {
-					androidGeocoding(context, query, callback);
-				}
-			}
-
-			@Override
-			public void onFailure(Call<JsonElement> call, Throwable t) {
-				androidGeocoding(context, query, callback);
-			}
-		});
-	}
-
-	public static void androidReverseGeocoding(Context context, Double latitude, Double longitude, ReverseGeocodingCallback callback) {
-		Geocoder geocoder = new Geocoder(context);
-		try {
-			List<Address> addressList = geocoder.getFromLocation(latitude, longitude, 20);
-
-			if (addressList.size() > 0) {
-				AddressDto addressDto = new AddressDto(latitude, longitude,
-						addressList.get(0).getAddressLine(0),
-						addressList.get(0).getCountryName(), addressList.get(0).getCountryCode()
-				);
-
-				callback.onReverseGeocodingResult(addressDto);
-			} else {
-				callback.onReverseGeocodingResult(null);
-			}
-		} catch (Exception e) {
-
-		}
-	}
-
-	public static void nominatimReverseGeocoding(Context context, Double latitude, Double longitude, ReverseGeocodingCallback callback) {
-		ReverseGeocodeParameterRest parameter = new ReverseGeocodeParameterRest(latitude, longitude);
-		Call<JsonElement> call =
-				RetrofitClient.getApiService(RetrofitClient.ServiceType.NOMINATIM).nominatimReverseGeocode(parameter.getMap(),
-						MyApplication.locale.toLanguageTag());
-
-		call.enqueue(new Callback<JsonElement>() {
-			@Override
-			public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-				if (response.isSuccessful()) {
-					ReverseGeocodeResponse reverseGeocodeResponse = new Gson().fromJson(response.body().toString(),
-							ReverseGeocodeResponse.class);
-
-					ReverseGeocodeResponse.Properties properties = reverseGeocodeResponse.getFeatures().get(0).getProperties();
-
-					String editedDisplayName = convertDisplayName(properties.getDisplayName());
-
-					AddressDto addressDto = new AddressDto(latitude, longitude,
-							editedDisplayName, properties.getAddress().getCountry(),
-							properties.getAddress().getCountryCode().toUpperCase()
-					);
-
-					callback.onReverseGeocodingResult(addressDto);
-				} else {
-					androidReverseGeocoding(context, latitude, longitude, callback);
-				}
-			}
-
-			@Override
-			public void onFailure(Call<JsonElement> call, Throwable t) {
-				androidReverseGeocoding(context, latitude, longitude, callback);
-			}
-		});
-	}
-
-	private static String convertDisplayName(String originalDisplayName) {
-		String[] separatedDisplayNames = originalDisplayName.split(", ");
-		if (separatedDisplayNames.length > 2) {
-			StringBuilder stringBuilder = new StringBuilder();
-			final int lastIdx = separatedDisplayNames.length - 2;
-			for (int i = 0; i <= lastIdx; i++) {
-				stringBuilder.append(separatedDisplayNames[i]);
-				if (i < lastIdx) {
-					stringBuilder.append(", ");
-				}
-			}
-			return stringBuilder.toString();
-		} else {
-			return originalDisplayName;
-		}
-	}
-
-
-	public interface ReverseGeocodingCallback {
-		void onReverseGeocodingResult(AddressDto addressDto);
-	}
-
-	public interface GeocodingCallback {
-		void onGeocodingResult(List<AddressDto> addressList);
-	}
-
-	public static class AddressDto {
-		public final Double latitude;
-		public final Double longitude;
-		public final String displayName;
-		public final String country;
-		public final String countryCode;
-
-		public AddressDto(Double latitude, Double longitude, String displayName, String country, String countryCode) {
-			this.latitude = latitude;
-			this.longitude = longitude;
-			this.displayName = displayName;
-			this.country = country;
-			this.countryCode = countryCode;
-		}
-
-	}
+    class AddressDto(val latitude: Double?, val longitude: Double?, val displayName: String, val country: String, val countryCode: String)
 }

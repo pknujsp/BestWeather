@@ -1,35 +1,14 @@
+package com.lifedawn.bestweather.data.remote.retrofit.responses.flickr
 
-package com.lifedawn.bestweather.data.remote.retrofit.responses.flickr;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-import java.io.Serializable;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+class GetInfoPhotoResponse : Serializable {
+    @SerializedName("photo") @Expose var photo: Photo? = null
+    @SerializedName("stat") @Expose var stat: String? = null
 
-public class GetInfoPhotoResponse implements Serializable
-{
-
-    @SerializedName("photo")
-    @Expose
-    private Photo photo;
-    @SerializedName("stat")
-    @Expose
-    private String stat;
-    private final static long serialVersionUID = 536358442328479556L;
-
-    public Photo getPhoto() {
-        return photo;
+    companion object {
+        private const val serialVersionUID = 536358442328479556L
     }
-
-    public void setPhoto(Photo photo) {
-        this.photo = photo;
-    }
-
-    public String getStat() {
-        return stat;
-    }
-
-    public void setStat(String stat) {
-        this.stat = stat;
-    }
-
 }

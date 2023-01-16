@@ -1,9 +1,8 @@
-package com.lifedawn.bestweather.commons.interfaces;
+package com.lifedawn.bestweather.commons.interfaces
 
-import android.os.Bundle;
+import android.os.Bundle
+import java.io.Serializable
 
-import java.io.Serializable;
-
-public interface OnResultFragmentListener extends Serializable {
-	void onResultFragment(Bundle result);
+interface OnResultFragmentListener : Serializable {
+    fun onResultFragment(result: Bundle?)
 }

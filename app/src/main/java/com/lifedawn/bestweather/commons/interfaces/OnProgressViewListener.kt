@@ -1,9 +1,7 @@
-package com.lifedawn.bestweather.commons.interfaces;
+package com.lifedawn.bestweather.commons.interfaces
 
-public interface OnProgressViewListener {
-	void onSuccessful();
-
-	void onFailed(String text);
-
-	void onStarted();
+interface OnProgressViewListener {
+    fun onSuccessful()
+    fun onFailed(text: String?)
+    fun onStarted()
 }

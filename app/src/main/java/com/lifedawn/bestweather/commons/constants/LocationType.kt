@@ -1,7 +1,7 @@
-package com.lifedawn.bestweather.commons.constants;
+package com.lifedawn.bestweather.commons.constants
 
-import java.io.Serializable;
+import java.io.Serializable
 
-public enum LocationType implements Serializable {
-	CurrentLocation, SelectedAddress;
+enum class LocationType : Serializable {
+    CurrentLocation, SelectedAddress
 }

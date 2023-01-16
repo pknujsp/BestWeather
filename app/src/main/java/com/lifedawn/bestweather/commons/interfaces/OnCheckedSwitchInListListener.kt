@@ -1,5 +1,5 @@
-package com.lifedawn.bestweather.commons.interfaces;
+package com.lifedawn.bestweather.commons.interfaces
 
-public interface OnCheckedSwitchInListListener<T> {
-	void onCheckedSwitch(T t, boolean isChecked);
+interface OnCheckedSwitchInListListener<T> {
+    fun onCheckedSwitch(t: T, isChecked: Boolean)
 }

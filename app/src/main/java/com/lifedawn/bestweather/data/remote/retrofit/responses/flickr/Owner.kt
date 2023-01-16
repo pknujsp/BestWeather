@@ -1,94 +1,19 @@
+package com.lifedawn.bestweather.data.remote.retrofit.responses.flickr
 
-package com.lifedawn.bestweather.data.remote.retrofit.responses.flickr;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-import java.io.Serializable;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+class Owner : Serializable {
+    @SerializedName("nsid") @Expose var nsid: String? = null
+    @SerializedName("username") @Expose var username: String? = null
+    @SerializedName("realname") @Expose var realname: String? = null
+    @SerializedName("location") @Expose var location: String? = null
+    @SerializedName("iconserver") @Expose var iconserver: String? = null
+    @SerializedName("iconfarm") @Expose var iconfarm: String? = null
+    @SerializedName("path_alias") @Expose var pathAlias: String? = null
 
-public class Owner implements Serializable
-{
-
-    @SerializedName("nsid")
-    @Expose
-    private String nsid;
-    @SerializedName("username")
-    @Expose
-    private String username;
-    @SerializedName("realname")
-    @Expose
-    private String realname;
-    @SerializedName("location")
-    @Expose
-    private String location;
-    @SerializedName("iconserver")
-    @Expose
-    private String iconserver;
-    @SerializedName("iconfarm")
-    @Expose
-    private String iconfarm;
-    @SerializedName("path_alias")
-    @Expose
-    private String pathAlias;
-    private final static long serialVersionUID = -6339607373779670021L;
-
-    public String getNsid() {
-        return nsid;
+    companion object {
+        const val serialVersionUID = -6339607373779670021L
     }
-
-    public void setNsid(String nsid) {
-        this.nsid = nsid;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getRealname() {
-        return realname;
-    }
-
-    public void setRealname(String realname) {
-        this.realname = realname;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getIconserver() {
-        return iconserver;
-    }
-
-    public void setIconserver(String iconserver) {
-        this.iconserver = iconserver;
-    }
-
-    public String getIconfarm() {
-        return iconfarm;
-    }
-
-    public void setIconfarm(String iconfarm) {
-        this.iconfarm = iconfarm;
-    }
-
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
-
-    public String getPathAlias() {
-        return pathAlias;
-    }
-
-    public void setPathAlias(String pathAlias) {
-        this.pathAlias = pathAlias;
-    }
-
 }

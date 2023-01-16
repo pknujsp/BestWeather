@@ -1,276 +1,36 @@
-package com.lifedawn.bestweather.data.remote.retrofit.responses.kma.json.midtaresponse;
+package com.lifedawn.bestweather.data.remote.retrofit.responses.kma.json.midtaresponse
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-import com.tickaroo.tikxml.annotation.PropertyElement;
-import com.tickaroo.tikxml.annotation.Xml;
-
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import com.tickaroo.tikxml.annotation.PropertyElement
+import com.tickaroo.tikxml.annotation.Xml
 
 @Xml(name = "item", inheritance = true)
-public class MidTaItem {
-	@Expose
-	@SerializedName("regId")
-	@PropertyElement(name = "regId")
-	private String regId;
-
-
-	@Expose
-	@SerializedName("taMax3")
-	@PropertyElement(name = "taMax3")
-
-	private String taMax3;
-
-
-	@Expose
-	@SerializedName("taMax4")
-	@PropertyElement(name = "taMax4")
-
-	private String taMax4;
-
-
-	@Expose
-	@SerializedName("taMax5")
-	@PropertyElement(name = "taMax5")
-
-	private String taMax5;
-
-
-	@Expose
-	@SerializedName("taMax6")
-	@PropertyElement(name = "taMax6")
-
-	private String taMax6;
-
-
-	@Expose
-	@SerializedName("taMax7")
-	@PropertyElement(name = "taMax7")
-
-	private String taMax7;
-
-
-	@Expose
-	@SerializedName("taMax8")
-	@PropertyElement(name = "taMax8")
-
-	private String taMax8;
-
-
-	@Expose
-	@SerializedName("taMax9")
-	@PropertyElement(name = "taMax9")
-
-	private String taMax9;
-
-	@Expose
-	@SerializedName("taMax10")
-	@PropertyElement(name = "taMax10")
-
-	private String taMax10;
-
-
-	@Expose
-	@SerializedName("taMin3")
-	@PropertyElement(name = "taMin3")
-
-	private String taMin3;
-
-
-	@Expose
-	@SerializedName("taMin4")
-	@PropertyElement(name = "taMin4")
-
-	private String taMin4;
-
-
-	@Expose
-	@SerializedName("taMin5")
-	@PropertyElement(name = "taMin5")
-
-	private String taMin5;
-
-
-	@Expose
-	@SerializedName("taMin6")
-	@PropertyElement(name = "taMin6")
-
-	private String taMin6;
-
-
-	@Expose
-	@SerializedName("taMin7")
-	@PropertyElement(name = "taMin7")
-
-	private String taMin7;
-
-
-	@Expose
-	@SerializedName("taMin8")
-	@PropertyElement(name = "taMin8")
-
-	private String taMin8;
-
-
-	@Expose
-	@SerializedName("taMin9")
-	@PropertyElement(name = "taMin9")
-
-	private String taMin9;
-
-	@Expose
-	@SerializedName("taMin10")
-	@PropertyElement(name = "taMin10")
-
-	private String taMin10;
-
-
-	public String getRegId() {
-		return regId;
-	}
-
-	public void setRegId(String regId) {
-		this.regId = regId;
-	}
-
-	public String getTaMax3() {
-		return taMax3;
-	}
-
-	public void setTaMax3(String taMax3) {
-		this.taMax3 = taMax3;
-	}
-
-	public String getTaMax4() {
-		return taMax4;
-	}
-
-	public void setTaMax4(String taMax4) {
-		this.taMax4 = taMax4;
-	}
-
-	public String getTaMax5() {
-		return taMax5;
-	}
-
-	public void setTaMax5(String taMax5) {
-		this.taMax5 = taMax5;
-	}
-
-	public String getTaMax6() {
-		return taMax6;
-	}
-
-	public void setTaMax6(String taMax6) {
-		this.taMax6 = taMax6;
-	}
-
-	public String getTaMax7() {
-		return taMax7;
-	}
-
-	public void setTaMax7(String taMax7) {
-		this.taMax7 = taMax7;
-	}
-
-	public String getTaMax8() {
-		return taMax8;
-	}
-
-	public void setTaMax8(String taMax8) {
-		this.taMax8 = taMax8;
-	}
-
-	public String getTaMax9() {
-		return taMax9;
-	}
-
-	public void setTaMax9(String taMax9) {
-		this.taMax9 = taMax9;
-	}
-
-	public String getTaMax10() {
-		return taMax10;
-	}
-
-	public void setTaMax10(String taMax10) {
-		this.taMax10 = taMax10;
-	}
-
-	public String getTaMin3() {
-		return taMin3;
-	}
-
-	public void setTaMin3(String taMin3) {
-		this.taMin3 = taMin3;
-	}
-
-	public String getTaMin4() {
-		return taMin4;
-	}
-
-	public void setTaMin4(String taMin4) {
-		this.taMin4 = taMin4;
-	}
-
-	public String getTaMin5() {
-		return taMin5;
-	}
-
-	public void setTaMin5(String taMin5) {
-		this.taMin5 = taMin5;
-	}
-
-	public String getTaMin6() {
-		return taMin6;
-	}
-
-	public void setTaMin6(String taMin6) {
-		this.taMin6 = taMin6;
-	}
-
-	public String getTaMin7() {
-		return taMin7;
-	}
-
-	public void setTaMin7(String taMin7) {
-		this.taMin7 = taMin7;
-	}
-
-	public String getTaMin8() {
-		return taMin8;
-	}
-
-	public void setTaMin8(String taMin8) {
-		this.taMin8 = taMin8;
-	}
-
-	public String getTaMin9() {
-		return taMin9;
-	}
-
-	public void setTaMin9(String taMin9) {
-		this.taMin9 = taMin9;
-	}
-
-	public String getTaMin10() {
-		return taMin10;
-	}
-
-	public void setTaMin10(String taMin10) {
-		this.taMin10 = taMin10;
-	}
-
-	public String[] getMinArr() {
-		return new String[]{taMin3, taMin4, taMin5, taMin6, taMin7, taMin8, taMin9, taMin10};
-	}
-
-	public String[] getMaxArr() {
-		return new String[]{taMax3, taMax4, taMax5, taMax6, taMax7, taMax8, taMax9, taMax10};
-	}
-
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
-	}
-
+class MidTaItem : Cloneable {
+    @Expose @SerializedName("regId") @PropertyElement(name = "regId") var regId: String? = null
+    @Expose @SerializedName("taMax3") @PropertyElement(name = "taMax3") var taMax3: String? = null
+    @Expose @SerializedName("taMax4") @PropertyElement(name = "taMax4") var taMax4: String? = null
+    @Expose @SerializedName("taMax5") @PropertyElement(name = "taMax5") var taMax5: String? = null
+    @Expose @SerializedName("taMax6") @PropertyElement(name = "taMax6") var taMax6: String? = null
+    @Expose @SerializedName("taMax7") @PropertyElement(name = "taMax7") var taMax7: String? = null
+    @Expose @SerializedName("taMax8") @PropertyElement(name = "taMax8") var taMax8: String? = null
+    @Expose @SerializedName("taMax9") @PropertyElement(name = "taMax9") var taMax9: String? = null
+    @Expose @SerializedName("taMax10") @PropertyElement(name = "taMax10") var taMax10: String? = null
+    @Expose @SerializedName("taMin3") @PropertyElement(name = "taMin3") var taMin3: String? = null
+    @Expose @SerializedName("taMin4") @PropertyElement(name = "taMin4") var taMin4: String? = null
+    @Expose @SerializedName("taMin5") @PropertyElement(name = "taMin5") var taMin5: String? = null
+    @Expose @SerializedName("taMin6") @PropertyElement(name = "taMin6") var taMin6: String? = null
+    @Expose @SerializedName("taMin7") @PropertyElement(name = "taMin7") var taMin7: String? = null
+    @Expose @SerializedName("taMin8") @PropertyElement(name = "taMin8") var taMin8: String? = null
+    @Expose @SerializedName("taMin9") @PropertyElement(name = "taMin9") var taMin9: String? = null
+    @Expose @SerializedName("taMin10") @PropertyElement(name = "taMin10") var taMin10: String? = null
+    val minArr: Array<String?>
+        get() = arrayOf(taMin3, taMin4, taMin5, taMin6, taMin7, taMin8, taMin9, taMin10)
+    val maxArr: Array<String?>
+        get() = arrayOf(taMax3, taMax4, taMax5, taMax6, taMax7, taMax8, taMax9, taMax10)
+
+    @Throws(CloneNotSupportedException::class)
+    public override fun clone(): Any {
+        return super.clone()
+    }
 }

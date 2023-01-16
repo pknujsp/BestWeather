@@ -1,42 +1,10 @@
-package com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather;
+package com.lifedawn.bestweather.data.remote.retrofit.responses.accuweather
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-public class ValueUnit {
-	@Expose
-	@SerializedName("Value")
-	private String value;
-
-	@Expose
-	@SerializedName("Unit")
-	private String unit;
-
-	@Expose
-	@SerializedName("UnitType")
-	private String unitType;
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public String getUnit() {
-		return unit;
-	}
-
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
-	public String getUnitType() {
-		return unitType;
-	}
-
-	public void setUnitType(String unitType) {
-		this.unitType = unitType;
-	}
+class ValueUnit {
+    @Expose @SerializedName("Value") var value: String? = null
+    @Expose @SerializedName("Unit") var unit: String? = null
+    @Expose @SerializedName("UnitType") var unitType: String? = null
 }

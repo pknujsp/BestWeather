@@ -1,114 +1,88 @@
-package com.lifedawn.bestweather.commons.views;
+package com.lifedawn.bestweather.commons.views
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.FrameLayout;
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.FrameLayout
+import com.lifedawn.bestweather.commons.interfaces.CheckSuccess
+import com.lifedawn.bestweather.commons.interfaces.OnProgressViewListener
+import com.lifedawn.bestweather.databinding.ViewProgressResultBinding
+import java.util.*
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+class ProgressResultView : FrameLayout, OnProgressViewListener, CheckSuccess {
+    private var binding: ViewProgressResultBinding? = null
+    private val views: MutableList<View> = ArrayList()
+    override var isSuccess = false
+        private set
+    private var btnEnabled = false
 
-import com.lifedawn.bestweather.commons.interfaces.CheckSuccess;
-import com.lifedawn.bestweather.commons.interfaces.OnProgressViewListener;
-import com.lifedawn.bestweather.databinding.ViewProgressResultBinding;
+    constructor(context: Context?, attrs: AttributeSet?) : super(context!!, attrs) {
+        init()
+    }
 
-import org.jetbrains.annotations.NotNull;
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        init()
+    }
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(
+        context,
+        attrs,
+        defStyleAttr,
+        defStyleRes
+    ) {
+        init()
+    }
 
-public class ProgressResultView extends FrameLayout implements OnProgressViewListener, CheckSuccess {
-	private ViewProgressResultBinding binding;
-	private List<View> views = new ArrayList<>();
-	private boolean succeed;
-	private boolean btnEnabled;
+    constructor(context: Context) : super(context) {
+        init()
+    }
 
-	public ProgressResultView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		init();
-	}
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+    }
 
-	public ProgressResultView(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs, int defStyleAttr) {
-		super(context, attrs, defStyleAttr);
-		init();
+    private fun init() {
+        binding = ViewProgressResultBinding.inflate(LayoutInflater.from(context), this, true)
+    }
 
-	}
+    fun setContentView(vararg contentView: View?) {
+        views.addAll(Arrays.asList(*contentView))
+        onSuccessful()
+    }
 
-	public ProgressResultView(@NonNull @NotNull Context context, @Nullable @org.jetbrains.annotations.Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-		super(context, attrs, defStyleAttr, defStyleRes);
-		init();
+    fun setBtnOnClickListener(onClickListener: OnClickListener?) {
+        binding!!.btn.setOnClickListener(onClickListener)
+        binding!!.btn.visibility = VISIBLE
+        btnEnabled = true
+    }
 
-	}
+    override fun onSuccessful() {
+        isSuccess = true
+        for (v in views) v.visibility = VISIBLE
+        visibility = GONE
+    }
 
-	public ProgressResultView(@NonNull @NotNull Context context) {
-		super(context);
-		init();
-	}
+    override fun onFailed(text: String) {
+        isSuccess = false
+        for (v in views) v.visibility = VISIBLE
+        binding!!.status.text = text
+        binding!!.status.visibility = VISIBLE
+        binding!!.progressbar.visibility = GONE
+        binding!!.btn.visibility = if (btnEnabled) VISIBLE else GONE
+        visibility = VISIBLE
+    }
 
-	@Override
-	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-		super.onLayout(changed, left, top, right, bottom);
-	}
+    override fun onStarted() {
+        isSuccess = false
+        for (v in views) v.visibility = GONE
+        binding!!.btn.visibility = GONE
+        binding!!.status.visibility = GONE
+        binding!!.progressbar.visibility = VISIBLE
+        visibility = VISIBLE
+    }
 
-
-	private void init() {
-		binding = ViewProgressResultBinding.inflate(LayoutInflater.from(getContext()), this, true);
-	}
-
-	public void setContentView(View... contentView) {
-		this.views.addAll(Arrays.asList(contentView));
-		onSuccessful();
-	}
-
-	public void setBtnOnClickListener(View.OnClickListener onClickListener) {
-		binding.btn.setOnClickListener(onClickListener);
-		binding.btn.setVisibility(VISIBLE);
-		btnEnabled = true;
-	}
-
-	@Override
-	public void onSuccessful() {
-		succeed = true;
-		for (View v : views)
-			v.setVisibility(View.VISIBLE);
-		setVisibility(View.GONE);
-	}
-
-	@Override
-	public void onFailed(@NonNull String text) {
-		succeed = false;
-		for (View v : views)
-			v.setVisibility(View.VISIBLE);
-		binding.status.setText(text);
-		binding.status.setVisibility(VISIBLE);
-		binding.progressbar.setVisibility(GONE);
-
-		binding.btn.setVisibility(btnEnabled ? View.VISIBLE : View.GONE);
-		setVisibility(View.VISIBLE);
-	}
-
-	@Override
-	public void onStarted() {
-		succeed = false;
-		for (View v : views)
-			v.setVisibility(View.GONE);
-
-		binding.btn.setVisibility(View.GONE);
-		binding.status.setVisibility(GONE);
-		binding.progressbar.setVisibility(VISIBLE);
-
-		setVisibility(View.VISIBLE);
-	}
-
-
-	@Override
-	public boolean isSuccess() {
-		return succeed;
-	}
-
-	public void setTextColor(int color) {
-		binding.status.setTextColor(color);
-	}
+    fun setTextColor(color: Int) {
+        binding!!.status.setTextColor(color)
+    }
 }

@@ -1,160 +1,138 @@
-package com.lifedawn.bestweather.commons.views;
+package com.lifedawn.bestweather.commons.views
 
-import android.content.Context;
-import android.content.res.ColorStateList;
-import android.content.res.TypedArray;
-import android.util.AttributeSet;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.FrameLayout;
+import android.content.Context
+import android.content.res.ColorStateList
+import android.util.AttributeSet
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View.OnKeyListener
+import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
+import com.lifedawn.bestweather.R
+import com.lifedawn.bestweather.commons.utils.DeviceUtils.Companion.showKeyboard
+import com.lifedawn.bestweather.commons.views.CustomEditText.OnEditTextQueryListener
+import com.lifedawn.bestweather.databinding.ViewSearchBinding
 
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
+class CustomSearchView : FrameLayout {
+    private var binding: ViewSearchBinding? = null
+    private var onEditTextQueryListener: OnEditTextQueryListener? = null
+    var backBtnVisibility = 0
+    var searchBtnVisibility = 0
+    var enabled = false
+    var showStroke = true
+    var hint: String? = null
 
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.databinding.ViewSearchBinding;
-import com.lifedawn.bestweather.commons.utils.DeviceUtils;
+    constructor(context: Context) : super(context) {
+        init(context, null)
+    }
 
-public class CustomSearchView extends FrameLayout {
-	private ViewSearchBinding binding;
-	private CustomEditText.OnEditTextQueryListener onEditTextQueryListener;
-	int backBtnVisibility = 0;
-	int searchBtnVisibility = 0;
-	boolean enabled = false;
-	boolean showStroke = true;
-	String hint = null;
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context, attrs)
+    }
 
-	public CustomSearchView(Context context) {
-		super(context);
-		init(context, null);
-	}
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        init(context, attrs)
+    }
 
-	public CustomSearchView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		init(context, attrs);
-	}
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(
+        context,
+        attrs,
+        defStyleAttr,
+        defStyleRes
+    ) {
+        init(context, attrs)
+    }
 
-	public CustomSearchView(Context context, AttributeSet attrs, int defStyleAttr) {
-		super(context, attrs, defStyleAttr);
-		init(context, attrs);
-	}
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        super.onLayout(changed, l, t, r, b)
+    }
 
-	public CustomSearchView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-		super(context, attrs, defStyleAttr, defStyleRes);
-		init(context, attrs);
-	}
+    private fun init(context: Context, attrs: AttributeSet?) {
+        val a = getContext().theme.obtainStyledAttributes(attrs, R.styleable.CustomSearchView, 0, 0)
+        try {
+            backBtnVisibility = a.getInt(R.styleable.CustomSearchView_backBtnVisibility, VISIBLE)
+            searchBtnVisibility = a.getInt(R.styleable.CustomSearchView_searchBtnVisibility, VISIBLE)
+            hint = a.getString(R.styleable.CustomSearchView_hint)
+            enabled = a.getBoolean(R.styleable.CustomSearchView_enabled, true)
+            showStroke = a.getBoolean(R.styleable.CustomSearchView_showStroke, true)
+        } finally {
+            a.recycle()
+        }
+        binding = ViewSearchBinding.inflate(LayoutInflater.from(context), this, true)
+        if (!showStroke) {
+            binding!!.root.background = ContextCompat.getDrawable(context, R.drawable.searchview_background_no_stroke)
+        }
+        binding!!.back.visibility = backBtnVisibility
+        binding!!.search.visibility = searchBtnVisibility
+        binding!!.edittext.hint = hint
+        binding!!.edittext.isEnabled = enabled
+        if (!enabled) {
+            binding!!.search.visibility = GONE
+        }
+        binding!!.search.setOnClickListener {
+            if (onEditTextQueryListener != null) {
+                onEditTextQueryListener!!.onTextSubmit(if (binding!!.edittext.text!!.length > 0) binding!!.edittext.text.toString() else "")
+            }
+        }
+        binding!!.edittext.setOnKeyListener(OnKeyListener { v, keyCode, event ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
+                binding!!.search.callOnClick()
+                return@OnKeyListener true
+            }
+            false
+        })
+    }
 
-	@Override
-	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		super.onLayout(changed, l, t, r, b);
-	}
+    fun requestFocusEditText() {
+        binding!!.edittext.requestFocus()
+        showKeyboard(context, binding!!.edittext)
+    }
 
-	private void init(Context context, AttributeSet attrs) {
-		TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.CustomSearchView, 0, 0);
-		try {
-			backBtnVisibility = a.getInt(R.styleable.CustomSearchView_backBtnVisibility, View.VISIBLE);
-			searchBtnVisibility = a.getInt(R.styleable.CustomSearchView_searchBtnVisibility, View.VISIBLE);
-			hint = a.getString(R.styleable.CustomSearchView_hint);
-			enabled = a.getBoolean(R.styleable.CustomSearchView_enabled, true);
-			showStroke = a.getBoolean(R.styleable.CustomSearchView_showStroke, true);
-		} finally {
-			a.recycle();
-		}
+    fun clearFocusEditText() {
+        binding!!.edittext.text = null
+        binding!!.edittext.clearFocus()
+    }
 
-		binding = ViewSearchBinding.inflate(LayoutInflater.from(context), this, true);
+    fun setBackgroundTint(color: Int) {
+        binding!!.root.backgroundTintList = ColorStateList.valueOf(color)
+    }
 
-		if (!showStroke) {
-			binding.getRoot().setBackground(ContextCompat.getDrawable(context, R.drawable.searchview_background_no_stroke));
-		}
+    override fun setOnClickListener(l: OnClickListener?) {
+        binding!!.root.setOnClickListener(l)
+    }
 
-		binding.back.setVisibility(backBtnVisibility);
-		binding.search.setVisibility(searchBtnVisibility);
-		binding.edittext.setHint(hint);
-		binding.edittext.setEnabled(enabled);
+    fun setEditTextOnClickListener(l: OnClickListener?) {
+        binding!!.edittext.setOnClickListener(l)
+    }
 
-		if (!enabled) {
-			binding.search.setVisibility(GONE);
-		}
+    fun setEditTextOnFocusListener(onFocusListener: OnFocusChangeListener?) {
+        binding!!.edittext.onFocusChangeListener = onFocusListener
+    }
 
-		binding.search.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (onEditTextQueryListener != null) {
-					onEditTextQueryListener.onTextSubmit(binding.edittext.getText().length() > 0 ?
-							binding.edittext.getText().toString() : "");
-				}
-			}
-		});
+    fun callOnClickEditText() {
+        binding!!.edittext.requestFocusFromTouch()
+    }
 
-		binding.edittext.setOnKeyListener(new OnKeyListener() {
-			@Override
-			public boolean onKey(View v, int keyCode, KeyEvent event) {
-				if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-					binding.search.callOnClick();
-					return true;
-				}
-				return false;
-			}
-		});
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+    }
 
-	}
+    fun setOnEditTextQueryListener(onEditTextQueryListener: OnEditTextQueryListener?) {
+        this.onEditTextQueryListener = onEditTextQueryListener
+        binding!!.edittext.setOnEditTextQueryListener(onEditTextQueryListener)
+    }
 
-	public void requestFocusEditText() {
-		binding.edittext.requestFocus();
-		DeviceUtils.Companion.showKeyboard(getContext(), binding.edittext);
-	}
+    fun setOnBackClickListener(onBackClickListener: OnClickListener?) {
+        binding!!.back.setOnClickListener(onBackClickListener)
+    }
 
-	public void clearFocusEditText() {
-		binding.edittext.setText(null);
-		binding.edittext.clearFocus();
-	}
+    fun setQuery(query: String?, submit: Boolean) {
+        binding!!.edittext.setText(query)
+        if (submit) {
+            binding!!.search.callOnClick()
+        }
+    }
 
-
-	public void setBackgroundTint(int color) {
-		binding.getRoot().setBackgroundTintList(ColorStateList.valueOf(color));
-	}
-
-	public void setOnClickListener(@Nullable OnClickListener l) {
-		binding.getRoot().setOnClickListener(l);
-	}
-
-	public void setEditTextOnClickListener(OnClickListener l) {
-		binding.edittext.setOnClickListener(l);
-	}
-
-	public void setEditTextOnFocusListener(OnFocusChangeListener onFocusListener) {
-		binding.edittext.setOnFocusChangeListener(onFocusListener);
-	}
-
-	public void callOnClickEditText() {
-		binding.edittext.requestFocusFromTouch();
-	}
-
-	@Override
-	protected void onFinishInflate() {
-		super.onFinishInflate();
-
-	}
-
-
-	public void setOnEditTextQueryListener(CustomEditText.OnEditTextQueryListener onEditTextQueryListener) {
-		this.onEditTextQueryListener = onEditTextQueryListener;
-		binding.edittext.setOnEditTextQueryListener(onEditTextQueryListener);
-	}
-
-	public void setOnBackClickListener(View.OnClickListener onBackClickListener) {
-		binding.back.setOnClickListener(onBackClickListener);
-	}
-
-	public void setQuery(String query, boolean submit) {
-		binding.edittext.setText(query);
-		if (submit) {
-			binding.search.callOnClick();
-		}
-	}
-
-	public String getQuery() {
-		return binding.edittext.getText().length() > 0 ? binding.edittext.getText().toString() : "";
-	}
+    val query: String
+        get() = if (binding!!.edittext.text!!.length > 0) binding!!.edittext.text.toString() else ""
 }

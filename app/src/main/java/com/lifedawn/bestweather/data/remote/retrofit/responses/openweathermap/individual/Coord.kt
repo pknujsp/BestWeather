@@ -1,30 +1,9 @@
-package com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual;
+package com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-public class Coord {
-	@Expose
-	@SerializedName("lon")
-	private String lon;
-
-	@Expose
-	@SerializedName("lat")
-	private String lat;
-
-	public String getLon() {
-		return lon;
-	}
-
-	public void setLon(String lon) {
-		this.lon = lon;
-	}
-
-	public String getLat() {
-		return lat;
-	}
-
-	public void setLat(String lat) {
-		this.lat = lat;
-	}
+class Coord {
+    @Expose @SerializedName("lon") var lon: String? = null
+    @Expose @SerializedName("lat") var lat: String? = null
 }

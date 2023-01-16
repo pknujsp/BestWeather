@@ -1,18 +1,8 @@
-package com.lifedawn.bestweather.data.remote.retrofit.responses.freetime;
+package com.lifedawn.bestweather.data.remote.retrofit.responses.freetime
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 
-public class FreeTimeResponse {
-	@Expose
-	@SerializedName("timeZone")
-	private String timezone;
-
-	public void setTimezone(String timezone) {
-		this.timezone = timezone;
-	}
-
-	public String getTimezone() {
-		return timezone;
-	}
+class FreeTimeResponse {
+    @Expose @SerializedName("timeZone") var timezone: String? = null
 }

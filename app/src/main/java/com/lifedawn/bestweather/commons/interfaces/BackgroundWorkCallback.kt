@@ -1,5 +1,5 @@
-package com.lifedawn.bestweather.commons.interfaces;
+package com.lifedawn.bestweather.commons.interfaces
 
-public interface BackgroundWorkCallback {
-	void onFinished();
+interface BackgroundWorkCallback {
+    fun onFinished()
 }

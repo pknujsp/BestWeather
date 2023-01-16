@@ -1,5 +1,5 @@
-package com.lifedawn.bestweather.commons.interfaces;
+package com.lifedawn.bestweather.commons.interfaces
 
-public interface IAppbarTitle {
-	public void setAppbarTitle(String title);
+interface IAppbarTitle {
+    fun setAppbarTitle(title: String?)
 }

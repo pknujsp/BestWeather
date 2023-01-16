@@ -1,25 +1,13 @@
+package com.lifedawn.bestweather.data.remote.retrofit.responses.flickr
 
-package com.lifedawn.bestweather.data.remote.retrofit.responses.flickr;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-import java.io.Serializable;
-import java.util.List;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+class Urls : Serializable {
+    @SerializedName("url") @Expose var url: List<Url>? = null
 
-public class Urls implements Serializable
-{
-
-    @SerializedName("url")
-    @Expose
-    private List<Url> url = null;
-    private final static long serialVersionUID = -7370851300232911951L;
-
-    public List<Url> getUrl() {
-        return url;
+    companion object {
+        private const val serialVersionUID = -7370851300232911951L
     }
-
-    public void setUrl(List<Url> url) {
-        this.url = url;
-    }
-
 }

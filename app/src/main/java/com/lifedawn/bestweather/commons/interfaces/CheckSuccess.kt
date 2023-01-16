@@ -1,5 +1,5 @@
-package com.lifedawn.bestweather.commons.interfaces;
+package com.lifedawn.bestweather.commons.interfaces
 
-public interface CheckSuccess {
-	boolean isSuccess();
+interface CheckSuccess {
+    val isSuccess: Boolean
 }

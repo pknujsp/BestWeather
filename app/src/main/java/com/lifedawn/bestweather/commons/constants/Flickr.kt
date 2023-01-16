@@ -1,31 +1,13 @@
-package com.lifedawn.bestweather.commons.constants;
+package com.lifedawn.bestweather.commons.constants
 
-public class Flickr {
-	public enum Time {
-		sunrise("sunrise"), sunset("sunrise"), day("day"), night("night");
+class Flickr {
+    enum class Time(val text: String) {
+        sunrise("sunrise"), sunset("sunrise"), day("day"), night("night");
 
-		private final String text;
+    }
 
-		Time(String text) {
-			this.text = text;
-		}
+    enum class Weather(val text: String) {
+        clear("clear"), partlyCloudy("partly_cloudy"), mostlyCloudy("mostly_cloudy"), overcast("overcast"), rain("rain"), snow("snow");
 
-		public String getText() {
-			return text;
-		}
-	}
-
-	public enum Weather {
-		clear("clear"), partlyCloudy("partly_cloudy"), mostlyCloudy("mostly_cloudy"), overcast("overcast"), rain("rain"), snow("snow");
-
-		private final String text;
-
-		Weather(String text) {
-			this.text = text;
-		}
-
-		public String getText() {
-			return text;
-		}
-	}
+    }
 }

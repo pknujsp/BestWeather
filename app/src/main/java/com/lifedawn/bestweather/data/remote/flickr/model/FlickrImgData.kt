@@ -1,70 +1,31 @@
-package com.lifedawn.bestweather.data.remote.flickr.model;
+package com.lifedawn.bestweather.data.remote.flickr.model
 
-import android.graphics.Bitmap;
+import android.graphics.Bitmap
+import com.lifedawn.bestweather.data.remote.retrofit.responses.flickr.PhotosFromGalleryResponse
+import java.io.Serializable
 
-import com.lifedawn.bestweather.data.remote.retrofit.responses.flickr.PhotosFromGalleryResponse;
+class FlickrImgData : Serializable {
+    var img: Bitmap? = null
+    var weather: String? = null
+    var time: String? = null
+    var volume: String? = null
+    var photo: PhotosFromGalleryResponse.Photos.Photo? = null
+        private set
 
-import java.io.Serializable;
+    fun setPhoto(photo: PhotosFromGalleryResponse.Photos.Photo?): FlickrImgData {
+        this.photo = photo
+        return this
+    }
 
-public class FlickrImgData implements Serializable {
-	private Bitmap img;
-	private String weather;
-	private String time;
-	private String volume;
-	private PhotosFromGalleryResponse.Photos.Photo photo;
+    fun clear() {
+        img!!.recycle()
+        img = null
+        weather = null
+        time = null
+        volume = null
+        photo = null
+    }
 
-	public String getVolume() {
-		return volume;
-	}
-
-	public void setVolume(String volume) {
-		this.volume = volume;
-	}
-
-	public String getWeather() {
-		return weather;
-	}
-
-	public void setWeather(String weather) {
-		this.weather = weather;
-	}
-
-	public String getTime() {
-		return time;
-	}
-
-	public void setTime(String time) {
-		this.time = time;
-	}
-
-	public Bitmap getImg() {
-		return img;
-	}
-
-	public void setImg(Bitmap img) {
-		this.img = img;
-	}
-
-	public PhotosFromGalleryResponse.Photos.Photo getPhoto() {
-		return photo;
-	}
-
-	public FlickrImgData setPhoto(PhotosFromGalleryResponse.Photos.Photo photo) {
-		this.photo = photo;
-		return this;
-	}
-
-	public void clear() {
-		img.recycle();
-		img = null;
-
-		weather = null;
-		time = null;
-		volume = null;
-		photo = null;
-	}
-
-	public String getRealFlickrUrl() {
-		return "https://www.flickr.com/photos/" + photo.getOwner() + "/" + photo.getId();
-	}
+    val realFlickrUrl: String
+        get() = "https://www.flickr.com/photos/" + photo!!.owner + "/" + photo!!.id
 }

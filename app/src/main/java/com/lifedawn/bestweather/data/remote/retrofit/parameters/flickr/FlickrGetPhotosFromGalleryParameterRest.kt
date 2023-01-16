@@ -1,31 +1,19 @@
-package com.lifedawn.bestweather.data.remote.retrofit.parameters.flickr;
+package com.lifedawn.bestweather.data.remote.retrofit.parameters.flickr
 
-import android.util.ArrayMap;
+import android.util.ArrayMap
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.RestRequestParameter
 
-import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.RestRequestParameter;
-
-import java.util.Map;
-
-public class FlickrGetPhotosFromGalleryParameterRest extends RestRequestParameter {
-	private String galleryId;
-
-	public Map<String, String> getMap() {
-		Map<String, String> map = new ArrayMap<>();
-
-		map.put("method", "flickr.galleries.getPhotos");
-		map.put("api_key", RetrofitClient.FLICKR_KEY);
-		map.put("gallery_id", galleryId);
-		map.put("format", "json");
-		map.put("nojsoncallback", "1");
-		return map;
-	}
-
-	public String getGalleryId() {
-		return galleryId;
-	}
-
-	public void setGalleryId(String galleryId) {
-		this.galleryId = galleryId;
-	}
+class FlickrGetPhotosFromGalleryParameterRest : RestRequestParameter() {
+    var galleryId: String? = null
+    val map: Map<String, String?>
+        get() {
+            val map: MutableMap<String, String?> = ArrayMap()
+            map["method"] = "flickr.galleries.getPhotos"
+            map["api_key"] = RetrofitClient.FLICKR_KEY
+            map["gallery_id"] = galleryId
+            map["format"] = "json"
+            map["nojsoncallback"] = "1"
+            return map
+        }
 }

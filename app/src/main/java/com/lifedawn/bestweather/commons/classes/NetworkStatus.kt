@@ -1,58 +1,44 @@
-package com.lifedawn.bestweather.commons.classes;
+package com.lifedawn.bestweather.commons.classes
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkInfo;
-import android.net.NetworkRequest;
-import android.widget.Toast;
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
+class NetworkStatus private constructor(context: Context) {
+    private val connectivityManager: ConnectivityManager
+    private val networkRequest: NetworkRequest
 
-import com.lifedawn.bestweather.R;
+    init {
+        val builder = NetworkRequest.Builder()
+        builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+        builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+        networkRequest = builder.build()
+        connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+            }
 
-import org.jetbrains.annotations.NotNull;
+            override fun onLost(network: Network) {
+                super.onLost(network)
+            }
+        })
+    }
 
-public class NetworkStatus {
-	private static NetworkStatus instance;
-	private final ConnectivityManager connectivityManager;
-	private final NetworkRequest networkRequest;
+    fun networkAvailable(): Boolean {
+        return connectivityManager.activeNetworkInfo != null
+    }
 
-	public static NetworkStatus getInstance(Context context) {
-		if (instance == null) {
-			instance = new NetworkStatus(context);
-		}
-		return instance;
-	}
-
-	private NetworkStatus(Context context) {
-		NetworkRequest.Builder builder = new NetworkRequest.Builder();
-		builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI);
-		builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR);
-
-		networkRequest = builder.build();
-		connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		connectivityManager.registerNetworkCallback(networkRequest, new ConnectivityManager.NetworkCallback() {
-			@Override
-			public void onAvailable(@NonNull Network network) {
-				super.onAvailable(network);
-			}
-
-			@Override
-			public void onLost(@NonNull Network network) {
-				super.onLost(network);
-			}
-		});
-
-	}
-
-
-	public boolean networkAvailable() {
-		return connectivityManager.getActiveNetworkInfo() != null;
-	}
-
+    companion object {
+        private var instance: NetworkStatus? = null
+        @JvmStatic
+        fun getInstance(context: Context): NetworkStatus? {
+            if (instance == null) {
+                instance = NetworkStatus(context)
+            }
+            return instance
+        }
+    }
 }

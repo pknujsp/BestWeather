@@ -1,46 +1,35 @@
-package com.lifedawn.bestweather.commons.classes;
+package com.lifedawn.bestweather.commons.classes
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.time.ZonedDateTime
+import java.util.*
 
-public class ClockUtil {
+object ClockUtil {
+    fun areSameDate(dt1: Long, dt2: Long): Boolean {
+        val dt1Calendar = GregorianCalendar()
+        dt1Calendar.timeInMillis = dt1
+        val dt2Calendar = GregorianCalendar()
+        dt2Calendar.timeInMillis = dt2
+        return if (dt1Calendar[Calendar.YEAR] == dt2Calendar[Calendar.YEAR] &&
+            dt1Calendar[Calendar.DAY_OF_YEAR] == dt2Calendar[Calendar.DAY_OF_YEAR]
+        ) {
+            true
+        } else {
+            false
+        }
+    }
 
-	private ClockUtil() {
-	}
+    fun areSameDate(calendar1: Calendar, calendar2: Calendar): Boolean {
+        return if (calendar1[Calendar.YEAR] == calendar2[Calendar.YEAR] &&
+            calendar1[Calendar.DAY_OF_YEAR] == calendar2[Calendar.DAY_OF_YEAR]
+        ) {
+            true
+        } else {
+            false
+        }
+    }
 
-	public static boolean areSameDate(long dt1, long dt2) {
-		GregorianCalendar dt1Calendar = new GregorianCalendar();
-		dt1Calendar.setTimeInMillis(dt1);
-		GregorianCalendar dt2Calendar = new GregorianCalendar();
-		dt2Calendar.setTimeInMillis(dt2);
-
-		if (dt1Calendar.get(Calendar.YEAR) == dt2Calendar.get(Calendar.YEAR) &&
-				dt1Calendar.get(Calendar.DAY_OF_YEAR) == dt2Calendar.get(Calendar.DAY_OF_YEAR)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public static boolean areSameDate(Calendar calendar1, Calendar calendar2) {
-		if (calendar1.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR) &&
-				calendar1.get(Calendar.DAY_OF_YEAR) == calendar2.get(Calendar.DAY_OF_YEAR)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public static ZonedDateTime convertISO8061Format(String dateTime) {
-		//2021-10-22T13:31:00+09:00
-		return ZonedDateTime.parse(dateTime);
-	}
-
+    fun convertISO8061Format(dateTime: String?): ZonedDateTime {
+        //2021-10-22T13:31:00+09:00
+        return ZonedDateTime.parse(dateTime)
+    }
 }

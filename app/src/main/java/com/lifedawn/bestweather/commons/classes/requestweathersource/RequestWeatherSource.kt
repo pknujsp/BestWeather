@@ -1,19 +1,15 @@
-package com.lifedawn.bestweather.commons.classes.requestweathersource;
+package com.lifedawn.bestweather.commons.classes.requestweathersource
 
-import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
+import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient.ServiceType
 
-import java.util.HashSet;
-import java.util.Set;
+open class RequestWeatherSource {
+    private val requestServiceTypes: MutableSet<ServiceType> = HashSet()
+    fun getRequestServiceTypes(): Set<ServiceType> {
+        return requestServiceTypes
+    }
 
-public class RequestWeatherSource {
-	private Set<RetrofitClient.ServiceType> requestServiceTypes = new HashSet<>();
-
-	public Set<RetrofitClient.ServiceType> getRequestServiceTypes() {
-		return requestServiceTypes;
-	}
-
-	public RequestWeatherSource addRequestServiceType(RetrofitClient.ServiceType serviceType) {
-		requestServiceTypes.add(serviceType);
-		return this;
-	}
+    fun addRequestServiceType(serviceType: ServiceType): RequestWeatherSource {
+        requestServiceTypes.add(serviceType)
+        return this
+    }
 }

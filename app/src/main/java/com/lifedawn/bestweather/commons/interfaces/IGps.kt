@@ -1,7 +1,7 @@
-package com.lifedawn.bestweather.commons.interfaces;
+package com.lifedawn.bestweather.commons.interfaces
 
-import java.io.Serializable;
+import java.io.Serializable
 
-public interface IGps extends Serializable {
-	void requestCurrentLocation();
+interface IGps : Serializable {
+    fun requestCurrentLocation()
 }

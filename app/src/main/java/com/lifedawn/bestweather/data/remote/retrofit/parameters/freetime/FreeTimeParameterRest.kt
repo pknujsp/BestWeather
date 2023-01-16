@@ -1,27 +1,14 @@
-package com.lifedawn.bestweather.data.remote.retrofit.parameters.freetime;
+package com.lifedawn.bestweather.data.remote.retrofit.parameters.freetime
 
-import android.util.ArrayMap;
+import android.util.ArrayMap
+import com.lifedawn.bestweather.data.remote.retrofit.parameters.RestRequestParameter
 
-import com.lifedawn.bestweather.data.remote.retrofit.parameters.RestRequestParameter;
-
-import java.util.Map;
-
-public class FreeTimeParameterRest extends RestRequestParameter {
-	private final Double latitude;
-	private final Double longitude;
-
-	public Map<String, String> getMap() {
-		Map<String, String> map = new ArrayMap<>();
-
-		map.put("latitude", latitude.toString());
-		map.put("longitude", longitude.toString());
-
-		return map;
-	}
-
-	public FreeTimeParameterRest(Double latitude, Double longitude) {
-		this.latitude = latitude;
-		this.longitude = longitude;
-	}
-
+class FreeTimeParameterRest(private val latitude: Double, private val longitude: Double) : RestRequestParameter() {
+    val map: Map<String, String>
+        get() {
+            val map: MutableMap<String, String> = ArrayMap()
+            map["latitude"] = latitude.toString()
+            map["longitude"] = longitude.toString()
+            return map
+        }
 }

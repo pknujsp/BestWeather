@@ -1,5 +1,5 @@
-package com.lifedawn.bestweather.commons.interfaces;
+package com.lifedawn.bestweather.commons.interfaces
 
-public interface OnClickedListViewItemListener<T> {
-	void onClickedItem(T e);
+interface OnClickedListViewItemListener<T> {
+    fun onClickedItem(e: T)
 }

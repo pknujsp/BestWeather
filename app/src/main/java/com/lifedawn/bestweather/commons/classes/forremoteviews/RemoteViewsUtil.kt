@@ -41,7 +41,7 @@ class RemoteViewsUtil {
                     remoteViews.setOnClickPendingIntent(
                         R.id.btn2, PendingIntent.getActivity(
                             context, IntentRequestCodes.GPS.requestCode,
-                            IntentUtil.getLocationSettingsIntent(), PendingIntent.FLAG_IMMUTABLE
+                            IntentUtil.locationSettingsIntent, PendingIntent.FLAG_IMMUTABLE
                         )
                     )
                     btn2Text = context.getString(R.string.enable_gps)

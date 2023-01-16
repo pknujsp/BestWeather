@@ -1,24 +1,13 @@
+package com.lifedawn.bestweather.data.remote.retrofit.responses.flickr
 
-package com.lifedawn.bestweather.data.remote.retrofit.responses.flickr;
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-import java.io.Serializable;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+class Comments : Serializable {
+    @SerializedName("_content") @Expose var content: Int? = null
 
-public class Comments implements Serializable
-{
-
-    @SerializedName("_content")
-    @Expose
-    private Integer content;
-    private final static long serialVersionUID = -751650815179992814L;
-
-    public Integer getContent() {
-        return content;
+    companion object {
+        private const val serialVersionUID = -751650815179992814L
     }
-
-    public void setContent(Integer content) {
-        this.content = content;
-    }
-
 }

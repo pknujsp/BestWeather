@@ -1,96 +1,73 @@
-package com.lifedawn.bestweather.commons.classes;
+package com.lifedawn.bestweather.commons.classes
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.DefaultLifecycleObserver;
-import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import com.github.matteobattilana.weather.PrecipType
+import com.github.matteobattilana.weather.WeatherView
 
-import com.github.matteobattilana.weather.PrecipType;
-import com.github.matteobattilana.weather.WeatherView;
-
-public class WeatherViewController implements DefaultLifecycleObserver {
-	private WeatherView weatherView;
-
-	public WeatherViewController(WeatherView weatherView) {
-		this.weatherView = weatherView;
-	}
-
-	public void setWeatherView(PrecipType precipType, @Nullable String volume) {
-		weatherView.setWeatherData(precipType);
-		if (precipType == PrecipType.CLEAR) {
-		} else {
-			// mm단위
-			int volumeValue = 0;
-
-			if (volume == null) {
-
-			} else {
-				if (volume.contains("mm") || volume.contains("cm")) {
-					String intStr = volume.replaceAll("[^0-9]", "");
-					volumeValue = Integer.parseInt(intStr);
-
-					if (volume.contains("cm")) {
-						volumeValue = (volumeValue * 100) / 10;
-					}
-				}
-			}
-
-
-			final float originalEr = weatherView.getEmissionRate();
-			float amount = 0;
-
-			if (precipType == PrecipType.RAIN) {
-				/*
+class WeatherViewController(private var weatherView: WeatherView?) : DefaultLifecycleObserver {
+    fun setWeatherView(precipType: PrecipType, volume: String?) {
+        weatherView!!.setWeatherData(precipType)
+        if (precipType === PrecipType.CLEAR) {
+        } else {
+            // mm단위
+            var volumeValue = 0
+            if (volume == null) {
+            } else {
+                if (volume.contains("mm") || volume.contains("cm")) {
+                    val intStr = volume.replace("[^0-9]".toRegex(), "")
+                    volumeValue = intStr.toInt()
+                    if (volume.contains("cm")) {
+                        volumeValue = volumeValue * 100 / 10
+                    }
+                }
+            }
+            val originalEr = weatherView!!.emissionRate
+            var amount = 0f
+            if (precipType === PrecipType.RAIN) {
+                /*
 			‘약한 비’는 1시간에 3㎜ 미만
 			‘(보통) 비’는 1시간에 3∼15㎜
 			‘강한 비’는 1시간에 15㎜ 이상
 			‘매우 강한 비’는 1시간에 30㎜ 이상
 				 */
-				if (volumeValue >= 30) {
-					amount = 1.3f;
-				} else if (volumeValue >= 15) {
-					amount = 1.2f;
-				} else if (volumeValue >= 3) {
-					amount = 0.9f;
-				} else {
-					amount = 0.7f;
-				}
+                amount = if (volumeValue >= 30) {
+                    1.3f
+                } else if (volumeValue >= 15) {
+                    1.2f
+                } else if (volumeValue >= 3) {
+                    0.9f
+                } else {
+                    0.7f
+                }
+                weatherView!!.emissionRate = originalEr * amount
+            } else if (precipType === PrecipType.SNOW) {
+            }
+        }
+    }
 
-				weatherView.setEmissionRate(originalEr * amount);
-			} else if (precipType == PrecipType.SNOW) {
+    override fun onCreate(owner: LifecycleOwner) {
+        super@DefaultLifecycleObserver.onCreate(owner)
+    }
 
-			}
-		}
-	}
+    override fun onStart(owner: LifecycleOwner) {
+        super@DefaultLifecycleObserver.onStart(owner)
+    }
 
-	@Override
-	public void onCreate(@NonNull LifecycleOwner owner) {
-		DefaultLifecycleObserver.super.onCreate(owner);
-	}
+    override fun onResume(owner: LifecycleOwner) {
+        super@DefaultLifecycleObserver.onResume(owner)
+    }
 
-	@Override
-	public void onStart(@NonNull LifecycleOwner owner) {
-		DefaultLifecycleObserver.super.onStart(owner);
-	}
+    override fun onPause(owner: LifecycleOwner) {
+        super@DefaultLifecycleObserver.onPause(owner)
+    }
 
-	@Override
-	public void onResume(@NonNull LifecycleOwner owner) {
-		DefaultLifecycleObserver.super.onResume(owner);
-	}
+    override fun onStop(owner: LifecycleOwner) {
+        super@DefaultLifecycleObserver.onStop(owner)
+    }
 
-	@Override
-	public void onPause(@NonNull LifecycleOwner owner) {
-		DefaultLifecycleObserver.super.onPause(owner);
-	}
-
-	@Override
-	public void onStop(@NonNull LifecycleOwner owner) {
-		DefaultLifecycleObserver.super.onStop(owner);
-	}
-
-	@Override
-	public void onDestroy(@NonNull LifecycleOwner owner) {
-		DefaultLifecycleObserver.super.onDestroy(owner);
-		weatherView = null;
-	}
+    override fun onDestroy(owner: LifecycleOwner) {
+        super@DefaultLifecycleObserver.onDestroy(owner)
+        weatherView = null
+    }
 }
