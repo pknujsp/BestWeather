@@ -1,37 +1,28 @@
-package com.lifedawn.bestweather.data.local.room.dao;
+package com.lifedawn.bestweather.data.local.room.dao
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto;
-
-import java.util.List;
+import androidx.room.*
+import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto
+import kotlinx.coroutines.flow.Flow
 
 @Dao
-public interface DailyPushNotificationDao {
-	@Query("SELECT * FROM daily_push_notifications_table")
-	List<DailyPushNotificationDto> getAll();
+interface DailyPushNotificationDao {
+    @get:Query("SELECT * FROM daily_push_notifications_table") val all: Flow<List<DailyPushNotificationDto>>
 
-	@Query("SELECT * FROM daily_push_notifications_table")
-	LiveData<List<DailyPushNotificationDto>> list();
+    @Query("SELECT * FROM daily_push_notifications_table")
+    fun list(): Flow<List<DailyPushNotificationDto>>
 
-	@Query("SELECT count(*) FROM daily_push_notifications_table")
-	int size();
+    @Query("SELECT count(*) FROM daily_push_notifications_table")
+    fun size(): Flow<Int>
 
-	@Query("SELECT * FROM daily_push_notifications_table WHERE id = :id")
-	DailyPushNotificationDto get(int id);
+    @Query("SELECT * FROM daily_push_notifications_table WHERE id = :id")
+    operator fun get(id: Int): Flow<DailyPushNotificationDto>
 
-	@Delete
-	void delete(DailyPushNotificationDto dailyPushNotificationDto);
+    @Delete
+    fun delete(dailyPushNotificationDto: DailyPushNotificationDto)
 
-	@Insert(entity = DailyPushNotificationDto.class)
-	long add(DailyPushNotificationDto dailyPushNotificationDto);
+    @Insert(entity = DailyPushNotificationDto::class)
+    fun add(dailyPushNotificationDto: DailyPushNotificationDto): Flow<Long>
 
-	@Update(onConflict = OnConflictStrategy.IGNORE)
-	int update(DailyPushNotificationDto dailyPushNotificationDto);
+    @Update(onConflict = OnConflictStrategy.IGNORE)
+    fun update(dailyPushNotificationDto: DailyPushNotificationDto): Flow<Int>
 }

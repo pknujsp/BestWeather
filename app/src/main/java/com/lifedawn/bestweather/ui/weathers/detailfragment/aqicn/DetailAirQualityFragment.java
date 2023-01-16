@@ -207,7 +207,7 @@ public class DetailAirQualityFragment extends Fragment implements IWeatherValues
 
 				List<AirQualityForecastObj> airQualityForecastObjList = new ArrayList<>();
 				airQualityForecastObjList.add(current);
-				airQualityForecastObjList.addAll(AqicnResponseProcessor.getAirQualityForecastObjList(response, zoneId));
+				airQualityForecastObjList.addAll(AqicnResponseProcessor.getAirQualityDailyForecastList(response, zoneId));
 
 				setDataForBarChart(airQualityForecastObjList);
 			}

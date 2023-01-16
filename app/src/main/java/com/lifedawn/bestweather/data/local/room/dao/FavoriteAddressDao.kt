@@ -1,36 +1,28 @@
-package com.lifedawn.bestweather.data.local.room.dao;
+package com.lifedawn.bestweather.data.local.room.dao
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-
-import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto;
-
-import java.util.List;
+import androidx.lifecycle.LiveData
+import androidx.room.*
+import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
+import kotlinx.coroutines.flow.Flow
 
 @Dao
-public interface FavoriteAddressDao {
-	@Query("SELECT * FROM favorite_address_table")
-	List<FavoriteAddressDto> getAll();
+interface FavoriteAddressDao {
+    @get:Query("SELECT * FROM favorite_address_table") val all: Flow<List<FavoriteAddressDto>>
 
-	@Query("SELECT * FROM favorite_address_table")
-	LiveData<List<FavoriteAddressDto>> getAllData();
+    @get:Query("SELECT * FROM favorite_address_table") val allData: Flow<List<FavoriteAddressDto>>
 
-	@Query("SELECT count(*) FROM favorite_address_table")
-	int size();
+    @Query("SELECT count(*) FROM favorite_address_table")
+    fun size(): Flow<Int>
 
-	@Query("SELECT * FROM favorite_address_table WHERE id = :id")
-	FavoriteAddressDto get(int id);
+    @Query("SELECT * FROM favorite_address_table WHERE id = :id")
+    operator fun get(id: Int): Flow<FavoriteAddressDto?>
 
-	@Query("SELECT EXISTS (SELECT * FROM favorite_address_table WHERE latitude =:latitude AND longitude =:longitude) AS SUCCESS")
-	int contains(String latitude, String longitude);
+    @Query("SELECT EXISTS (SELECT * FROM favorite_address_table WHERE latitude =:latitude AND longitude =:longitude) AS SUCCESS")
+    fun contains(latitude: String, longitude: String): Flow<Int>
 
-	@Delete
-	void delete(FavoriteAddressDto favoriteAddressDto);
+    @Delete
+    fun delete(favoriteAddressDto: FavoriteAddressDto)
 
-	@Insert(entity = FavoriteAddressDto.class, onConflict = OnConflictStrategy.IGNORE)
-	long add(FavoriteAddressDto favoriteAddressDto);
+    @Insert(entity = FavoriteAddressDto::class, onConflict = OnConflictStrategy.IGNORE)
+    fun add(favoriteAddressDto: FavoriteAddressDto): Flow<Long>
 }

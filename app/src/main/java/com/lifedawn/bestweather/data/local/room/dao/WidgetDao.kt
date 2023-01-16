@@ -1,35 +1,28 @@
-package com.lifedawn.bestweather.data.local.room.dao;
+package com.lifedawn.bestweather.data.local.room.dao
 
-import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.OnConflictStrategy;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import com.lifedawn.bestweather.data.local.room.dto.WidgetDto;
-
-import java.util.List;
+import androidx.room.*
+import com.lifedawn.bestweather.data.local.room.dto.WidgetDto
+import kotlinx.coroutines.flow.Flow
 
 @Dao
-public interface WidgetDao {
-	@Insert
-	long add(WidgetDto widgetDto);
+interface WidgetDao {
+    @Insert
+    fun add(widgetDto: WidgetDto): Flow<Long>
 
-	@Query("SELECT * FROM widget_table WHERE appWidgetId = :appWidgetId")
-	WidgetDto get(int appWidgetId);
+    @Query("SELECT * FROM widget_table WHERE appWidgetId = :appWidgetId")
+    operator fun get(appWidgetId: Int): Flow<WidgetDto?>
 
-	@Query("SELECT * FROM widget_table WHERE id = :widgetDtoId")
-	WidgetDto get(long widgetDtoId);
+    @Query("SELECT * FROM widget_table WHERE id = :widgetDtoId")
+    operator fun get(widgetDtoId: Long): Flow<WidgetDto?>
 
-	@Query("SELECT * FROM widget_table")
-	List<WidgetDto> getAll();
+    @get:Query("SELECT * FROM widget_table") val all: Flow<List<WidgetDto>>
 
-	@Query("SELECT * FROM widget_table WHERE widgetProviderClassName = :widgetProviderClassName")
-	List<WidgetDto> getAll(String widgetProviderClassName);
+    @Query("SELECT * FROM widget_table WHERE widgetProviderClassName = :widgetProviderClassName")
+    fun getAll(widgetProviderClassName: String): Flow<List<WidgetDto>>
 
-	@Query("DELETE FROM widget_table WHERE appWidgetId = :appWidgetId")
-	void delete(int appWidgetId);
+    @Query("DELETE FROM widget_table WHERE appWidgetId = :appWidgetId")
+    fun delete(appWidgetId: Int)
 
-	@Update(onConflict = OnConflictStrategy.IGNORE, entity = WidgetDto.class)
-	int update(WidgetDto widgetDto);
+    @Update(onConflict = OnConflictStrategy.IGNORE, entity = WidgetDto::class)
+    fun update(widgetDto: WidgetDto): Flow<Int>
 }

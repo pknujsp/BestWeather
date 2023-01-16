@@ -1,9 +1,13 @@
 package com.lifedawn.bestweather.di.module
 
 import com.lifedawn.bestweather.data.local.room.queryinterfaces.KmaAreaCodesRepository
+import com.lifedawn.bestweather.data.remote.weather.aqicn.repository.AqicnRepository
+import com.lifedawn.bestweather.data.remote.weather.aqicn.repository.AqicnRepositoryImpl
+import com.lifedawn.bestweather.data.remote.weather.aqicn.usecase.GetAqicnUseCase
+import com.lifedawn.bestweather.data.remote.weather.aqicn.usecase.GetAqicnUseCaseImpl
 import com.lifedawn.bestweather.data.remote.weather.kma.usecase.GetKmaWeatherUseCase
 import com.lifedawn.bestweather.data.remote.weather.kma.repository.KmaWeatherRepository
-import com.lifedawn.bestweather.data.remote.weather.kma.usecase.GetKmaKmaWeatherUseCaseImpl
+import com.lifedawn.bestweather.data.remote.weather.kma.usecase.GetKmaWeatherUseCaseImpl
 import com.lifedawn.bestweather.data.remote.weather.kma.usecase.GetAreaCodeUseCase
 import com.lifedawn.bestweather.data.remote.weather.kma.usecase.GetAreaCodeUseCaseImpl
 import com.lifedawn.bestweather.data.remote.weather.metnorway.repository.MetNorwayRepository
@@ -16,7 +20,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -26,7 +29,7 @@ object UseCaseModule {
     @Provides
     @Singleton
     fun provideGetKmaWeatherUseCase(weatherRepository: KmaWeatherRepository): GetKmaWeatherUseCase =
-        GetKmaKmaWeatherUseCaseImpl(weatherRepository)
+        GetKmaWeatherUseCaseImpl(weatherRepository)
 
     @Provides
     @Singleton
@@ -37,6 +40,11 @@ object UseCaseModule {
     @Singleton
     fun provideGetMetNorwayWeatherUseCase(weatherRepository: MetNorwayRepository): GetMetNorwayWeatherUseCase =
         GetMetNorwayWeatherUseCaseImpl(weatherRepository)
+
+    @Provides
+    @Singleton
+    fun provideGetAqicnUseCase(aqicnRepository: AqicnRepository): GetAqicnUseCase =
+        GetAqicnUseCaseImpl(aqicnRepository)
 
     @Provides
     @Singleton

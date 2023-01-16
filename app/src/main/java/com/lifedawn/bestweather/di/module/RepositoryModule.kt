@@ -16,6 +16,9 @@ import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepository
 import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepositoryImpl
 import com.lifedawn.bestweather.data.remote.timezone.RemoteTimeZoneRepository
 import com.lifedawn.bestweather.data.remote.timezone.RemoteTimeZoneRepositoryImpl
+import com.lifedawn.bestweather.data.remote.weather.aqicn.datasource.AqicnDataSource
+import com.lifedawn.bestweather.data.remote.weather.aqicn.repository.AqicnRepository
+import com.lifedawn.bestweather.data.remote.weather.aqicn.repository.AqicnRepositoryImpl
 import com.lifedawn.bestweather.data.remote.weather.kma.datasource.KmaDataSource
 import com.lifedawn.bestweather.data.remote.weather.kma.repository.KmaWeatherRepository
 import com.lifedawn.bestweather.data.remote.weather.kma.repository.KmaWeatherRepositoryImpl
@@ -83,6 +86,12 @@ object RepositoryModule {
         metNorwayDataSource: MetNorwayDataSource,
         @ApplicationContext context: Context
     ): MetNorwayRepository = MetNorwayRepositoryImpl(metNorwayDataSource, context)
+
+    @Provides
+    @Singleton
+    fun provideAqicnRepository(
+        aqicnDataSource: AqicnDataSource
+    ): AqicnRepository = AqicnRepositoryImpl(aqicnDataSource)
 
     @Provides
     @Singleton

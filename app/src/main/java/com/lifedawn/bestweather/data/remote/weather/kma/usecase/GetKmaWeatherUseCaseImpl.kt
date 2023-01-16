@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.flow
 import java.time.ZoneId
 import javax.inject.Inject
 
-class GetKmaKmaWeatherUseCaseImpl @Inject constructor(private val kmaWeatherRepository: KmaWeatherRepository) : GetKmaWeatherUseCase {
+class GetKmaWeatherUseCaseImpl @Inject constructor(private val kmaWeatherRepository: KmaWeatherRepository) : GetKmaWeatherUseCase {
 
     override suspend fun getWeatherData(
         weatherDataTypes: Set<WeatherDataType>,

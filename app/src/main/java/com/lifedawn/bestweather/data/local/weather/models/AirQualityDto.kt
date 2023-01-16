@@ -1,5 +1,6 @@
 package com.lifedawn.bestweather.data.local.weather.models
 
+import java.time.LocalDate
 import java.time.ZonedDateTime
 
 data class AirQualityDto(
@@ -13,7 +14,6 @@ data class AirQualityDto(
     val current: Current? = null,
     val timeInfo: Time? = null,
     val dailyForecastList: List<DailyForecast> = emptyList(),
-    val isSuccessful: Boolean = false
 ) {
 
     data class Current(
@@ -34,16 +34,12 @@ data class AirQualityDto(
     )
 
     data class DailyForecast(
-        val date: ZonedDateTime = ZonedDateTime.now(),
-        val isHasO3: Boolean = false,
-        val isHasPm10: Boolean = false,
-        val isHasPm25: Boolean = false,
-        val isHasUvi: Boolean = false,
-        val o3: Val? = null,
-        val pm10: Val? = null,
-        val pm25: Val? = null,
-        val uvi: Val? = null
+        val date: LocalDate = LocalDate.now()
     ) {
+        var o3: Val? = null
+        var pm10: Val? = null
+        var pm25: Val? = null
+
         data class Val(
             val max: Int = -1,
             val min: Int = -1,
