@@ -1,7 +1,6 @@
 package com.lifedawn.bestweather.commons.classes
 
 import android.content.Context
-import android.location.Geocoder
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.lifedawn.bestweather.data.MyApplication
@@ -17,43 +16,8 @@ import retrofit2.Response
 import java.util.*
 
 object Geocoding {
-    fun androidGeocoding(context: Context?, query: String, callback: GeocodingCallback) {
-        MyApplication.getExecutorService().submit(Runnable {
-            if (query.isEmpty()) {
-                callback.onGeocodingResult(ArrayList())
-                return@Runnable
-            }
-            val containKr = query.matches(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*")
-            val geocoder = Geocoder(context!!, if (containKr) Locale.KOREA else Locale.US)
-            try {
-                val addressList = geocoder.getFromLocationName(query, 5)
-                val errors: MutableList<Int> = ArrayList()
-                for (i in addressList!!.indices.reversed()) {
-                    if (addressList[i].countryName == null || addressList[i].countryCode == null) {
-                        errors.add(i)
-                    }
-                }
-                for (errorIdx in errors) {
-                    addressList.removeAt(errorIdx)
-                }
-                val addressDtoList: MutableList<AddressDto?> = ArrayList()
-                for (address in addressList) {
-                    addressDtoList.add(
-                        AddressDto(
-                            address.latitude, address.longitude,
-                            address.getAddressLine(0),
-                            address.countryName, address.countryCode
-                        )
-                    )
-                }
-                callback.onGeocodingResult(addressDtoList)
-            } catch (e: Exception) {
-            }
-        })
-    }
 
-    @JvmStatic
-    fun nominatimGeocoding(context: Context?, query: String, callback: GeocodingCallback) {
+    fun nominatimGeocoding(context: Context, query: String) {
         val parameter = GeocodeParameterRest(query)
         val call: Call<JsonElement> = getApiService(RetrofitClient.ServiceType.NOMINATIM).nominatimGeocode(
             parameter.map,
@@ -91,25 +55,6 @@ object Geocoding {
         })
     }
 
-    fun androidReverseGeocoding(context: Context?, latitude: Double?, longitude: Double?, callback: ReverseGeocodingCallback) {
-        val geocoder = Geocoder(context!!)
-        try {
-            val addressList = geocoder.getFromLocation(latitude!!, longitude!!, 20)
-            if (addressList!!.size > 0) {
-                val addressDto = AddressDto(
-                    latitude, longitude,
-                    addressList[0].getAddressLine(0),
-                    addressList[0].countryName, addressList[0].countryCode
-                )
-                callback.onReverseGeocodingResult(addressDto)
-            } else {
-                callback.onReverseGeocodingResult(null)
-            }
-        } catch (e: Exception) {
-        }
-    }
-
-    @JvmStatic
     fun nominatimReverseGeocoding(context: Context?, latitude: Double?, longitude: Double?, callback: ReverseGeocodingCallback) {
         val parameter = ReverseGeocodeParameterRest(latitude, longitude)
         val call: Call<JsonElement> = getApiService(RetrofitClient.ServiceType.NOMINATIM).nominatimReverseGeocode(
@@ -159,13 +104,16 @@ object Geocoding {
         }
     }
 
-    interface ReverseGeocodingCallback {
+    fun interface ReverseGeocodingCallback {
         fun onReverseGeocodingResult(addressDto: AddressDto?)
     }
 
-    interface GeocodingCallback {
-        fun onGeocodingResult(addressList: List<AddressDto?>?)
+    fun interface GeocodingCallback {
+        fun onGeocodingResult(addressList: List<AddressDto>)
     }
 
-    class AddressDto(val latitude: Double?, val longitude: Double?, val displayName: String, val country: String, val countryCode: String)
+    data class AddressDto(
+        val latitude: Double, val longitude: Double,
+        val displayName: String, val country: String, val countryCode: String
+    )
 }
