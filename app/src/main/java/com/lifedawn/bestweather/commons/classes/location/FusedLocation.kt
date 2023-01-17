@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.commons.classes
+package com.lifedawn.bestweather.commons.classes.location
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -26,23 +26,27 @@ import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.lifedawn.bestweather.R
+import com.lifedawn.bestweather.commons.classes.IntentUtil
+import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver
+import com.lifedawn.bestweather.commons.classes.MainThreadWorker
+import com.lifedawn.bestweather.commons.classes.NetworkStatus
 import com.lifedawn.bestweather.commons.utils.TimeZoneUtils
 import com.lifedawn.bestweather.commons.utils.TimeZoneUtils.TimeZoneCallback
 import com.lifedawn.bestweather.ui.notification.NotificationHelper
 import com.lifedawn.bestweather.ui.notification.NotificationType
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.time.ZoneId
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class FusedLocation @Inject constructor(
-    private val context: Context,
-    private val networkStatus: NetworkStatus
+    private val context: Context, private val networkStatus: NetworkStatus
 ) : ConnectionCallbacks, OnConnectionFailedListener {
 
     private val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
     private val locationManager: LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    private val locationRequestObjMap: MutableMap<MyLocationCallback, LocationRequestObj> = ConcurrentHashMap()
     private var timerTask: TimerTask? = null
     private val timer = Timer()
 
@@ -57,27 +61,28 @@ class FusedLocation @Inject constructor(
                 context
             )
             val latitude =
-                sharedPreferences.getString(context.getString(R.string.pref_key_last_current_location_latitude), "0.0")!!.toDouble()
+                sharedPreferences.getString(context.getString(R.string.pref_key_last_current_location_latitude), "0.0")?.toDouble()
             val longitude =
-                sharedPreferences.getString(context.getString(R.string.pref_key_last_current_location_longitude), "0.0")!!.toDouble()
+                sharedPreferences.getString(context.getString(R.string.pref_key_last_current_location_longitude), "0.0")?.toDouble()
             val location = Location("")
+
             location.latitude = latitude
             location.longitude = longitude
             locations.add(location)
             return LocationResult.create(locations)
         }
 
-    fun findCurrentLocation(myLocationCallback: MyLocationCallback, isBackground: Boolean) {
+    fun findCurrentLocation(isBackground: Boolean): Flow<LocationResponse> = flow {
         if (!isOnGps) {
-            myLocationCallback.onFailed(MyLocationCallback.Fail.DISABLED_GPS)
+            emit(LocationResponse.Failure(Fail.DISABLED_GPS))
         } else if (!isOnNetwork) {
-            myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION)
+            emit(LocationResponse.Failure(Fail.FAILED_FIND_LOCATION))
         } else {
             if (checkDefaultPermissions()) {
                 if (isBackground && !checkBackgroundLocationPermission()) {
-                    myLocationCallback.onFailed(MyLocationCallback.Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION)
-                    return
+                    emit(LocationResponse.Failure(Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION))
                 }
+
                 notifyNotification()
                 val cancellationTokenSource = CancellationTokenSource()
                 val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY.toLong()).build()
@@ -85,98 +90,73 @@ class FusedLocation @Inject constructor(
                     override fun onLocationResult(locationResult: LocationResult) {
                         if (timerTask != null) timerTask!!.cancel()
                         cancelNotification()
-                        locationRequestObjMap.remove(myLocationCallback)
                         fusedLocationClient.removeLocationUpdates(this)
-                        if (locationResult != null) {
-                            if (locationResult.locations.size > 0) {
-                                val location = myLocationCallback.getBestLocation(locationResult)
-                                val latitude = location.latitude
-                                val longitude = location.longitude
-                                TimeZoneUtils.INSTANCE.getTimeZone(latitude, longitude) { zoneId ->
-                                    onResultTimeZone(
-                                        latitude, longitude,
-                                        zoneId,
-                                        myLocationCallback, locationResult
-                                    )
-                                }
-                            } else {
-                                myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION)
-                            }
-                        } else {
-                            myLocationCallback.onFailed(MyLocationCallback.Fail.FAILED_FIND_LOCATION)
-                        }
+
+                        if (locationResult.locations.size > 0)
+                            emit(LocationResponse.Success(locationResult))
+                        else
+                            emit(LocationResponse.Failure(Fail.FAILED_FIND_LOCATION))
                     }
 
                     override fun onLocationAvailability(locationAvailability: LocationAvailability) {
                         super.onLocationAvailability(locationAvailability)
                     }
                 }
+
                 timerTask = object : TimerTask() {
                     override fun run() {
                         cancelNotification()
-                        locationRequestObjMap.remove(myLocationCallback)
                         cancellationTokenSource.cancel()
                         fusedLocationClient.removeLocationUpdates(locationCallback)
-                        MainThreadWorker.runOnUiThread({ myLocationCallback.onFailed(MyLocationCallback.Fail.TIME_OUT) })
+                        emit(LocationResponse.Failure(Fail.TIME_OUT))
                     }
                 }
+
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
                 val locationRequestObj = LocationRequestObj()
-                locationRequestObjMap[myLocationCallback] = locationRequestObj
                 timer.schedule(timerTask, 6000L)
+
                 @SuppressLint("MissingPermission") val currentLocationTask = fusedLocationClient.getCurrentLocation(
-                    Priority.PRIORITY_HIGH_ACCURACY,
-                    cancellationTokenSource.token
+                    Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token
                 )
                 locationRequestObj.currentLocationTask = currentLocationTask
                 locationRequestObj.cancellationTokenSource = cancellationTokenSource
-                currentLocationTask.addOnSuccessListener(OnSuccessListener { location ->
+
+                currentLocationTask.addOnSuccessListener { location ->
                     if (!currentLocationTask.isCanceled) {
                         if (location == null) {
                             locationRequestObj.locationCallback = locationCallback
+
                             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
                             fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
                         } else {
-                            val locations: MutableList<Location> = ArrayList()
-                            locations.add(location)
+                            val locations = mutableListOf(location)
+
                             val latitude = location.latitude
                             val longitude = location.longitude
-                            TimeZoneUtils.INSTANCE.getTimeZone(latitude, longitude, object : TimeZoneCallback {
-                                override fun onResult(zoneId: ZoneId) {
-                                    onResultTimeZone(latitude, longitude, zoneId, object : MyLocationCallback {
-                                        override fun onSuccessful(locationResult: LocationResult?) {
-                                            locationCallback.onLocationResult((locationResult)!!)
-                                        }
 
-                                        override fun onFailed(fail: MyLocationCallback.Fail?) {}
-                                    }, LocationResult.create(locations))
-                                }
-                            })
+
                         }
                     }
-                })
+                }
             } else {
-                myLocationCallback.onFailed(MyLocationCallback.Fail.DENIED_LOCATION_PERMISSIONS)
+                emit(LocationResponse.Failure(Fail.DENIED_LOCATION_PERMISSIONS))
+
             }
         }
     }
 
     private fun onResultTimeZone(
-        latitude: Double, longitude: Double, zoneId: ZoneId, myLocationCallback: MyLocationCallback,
-        locationResult: LocationResult
+        latitude: Double, longitude: Double, zoneId: ZoneId, myLocationCallback: MyLocationCallback, locationResult: LocationResult
     ) {
         val editor = PreferenceManager.getDefaultSharedPreferences(context).edit()
         editor.putString(
-            context.getString(R.string.pref_key_last_current_location_latitude),
-            latitude.toString()
-        )
-            .putString(
-                context.getString(R.string.pref_key_last_current_location_longitude),
-                longitude.toString()
-            )
-            .putString("zoneId", zoneId.id).commit()
+            context.getString(R.string.pref_key_last_current_location_latitude), latitude.toString()
+        ).putString(
+            context.getString(R.string.pref_key_last_current_location_longitude), longitude.toString()
+        ).putString("zoneId", zoneId.id).commit()
         MainThreadWorker.runOnUiThread(object : Runnable {
             override fun run() {
                 myLocationCallback.onSuccessful(locationResult)
@@ -186,10 +166,11 @@ class FusedLocation @Inject constructor(
 
     fun checkDefaultPermissions(): Boolean {
         return ContextCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
             context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     fun checkBackgroundLocationPermission(): Boolean {
@@ -197,8 +178,7 @@ class FusedLocation @Inject constructor(
             true
         } else {
             ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                context, Manifest.permission.ACCESS_BACKGROUND_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         }
     }
@@ -209,21 +189,23 @@ class FusedLocation @Inject constructor(
         get() = networkStatus.networkAvailable()
 
     fun onDisabledGps(
-        activity: Activity, locationLifeCycleObserver: LocationLifeCycleObserver,
+        activity: Activity,
+        locationLifeCycleObserver: LocationLifeCycleObserver,
         gpsResultCallback: ActivityResultCallback<ActivityResult?>?
     ) {
-        MaterialAlertDialogBuilder(activity).setMessage(activity.getString(R.string.request_to_make_gps_on)).setPositiveButton(
-            activity.getString(R.string.check), object : DialogInterface.OnClickListener {
+        MaterialAlertDialogBuilder(activity).setMessage(activity.getString(R.string.request_to_make_gps_on))
+            .setPositiveButton(activity.getString(R.string.check), object : DialogInterface.OnClickListener {
                 override fun onClick(paramDialogInterface: DialogInterface, paramInt: Int) {
                     locationLifeCycleObserver.launchGpsLauncher(IntentUtil.locationSettingsIntent, (gpsResultCallback)!!)
                 }
             }).setNegativeButton(activity.getString(R.string.no), object : DialogInterface.OnClickListener {
-            override fun onClick(dialogInterface: DialogInterface, i: Int) {}
-        }).setCancelable(false).create().show()
+                override fun onClick(dialogInterface: DialogInterface, i: Int) {}
+            }).setCancelable(false).create().show()
     }
 
     fun onRejectPermissions(
-        activity: Activity?, locationLifeCycleObserver: LocationLifeCycleObserver,
+        activity: Activity?,
+        locationLifeCycleObserver: LocationLifeCycleObserver,
         appSettingsResultCallback: ActivityResultCallback<ActivityResult?>?,
         permissionsResultCallback: ActivityResultCallback<Map<String?, Boolean?>?>?
     ) {
@@ -236,8 +218,7 @@ class FusedLocation @Inject constructor(
         } else {
             locationLifeCycleObserver.launchPermissionsLauncher(
                 arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION
                 ), (permissionsResultCallback)!!
             )
         }
@@ -266,8 +247,7 @@ class FusedLocation @Inject constructor(
         val notificationObj = notificationHelper.createNotification(NotificationType.Location)
         val builder = notificationObj.notificationBuilder
         builder.setSmallIcon(R.drawable.location).setContentText(context.getString(R.string.msg_finding_current_location))
-            .setContentTitle(context.getString(R.string.current_location))
-            .setOngoing(false)
+            .setContentTitle(context.getString(R.string.current_location)).setOngoing(false)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             builder.setPriority(NotificationCompat.PRIORITY_LOW).setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         }
@@ -281,30 +261,13 @@ class FusedLocation @Inject constructor(
         notificationManager.cancel(NotificationType.Location.notificationId)
     }
 
-    interface MyLocationCallback {
-        enum class Fail {
-            DISABLED_GPS, DENIED_LOCATION_PERMISSIONS, FAILED_FIND_LOCATION, DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION, TIME_OUT
-        }
-
-        fun onSuccessful(locationResult: LocationResult?)
-        fun onFailed(fail: Fail?)
-        fun getBestLocation(locationResult: LocationResult): Location {
-            var bestIndex = 0
-            var accuracy = Float.MIN_VALUE
-            val locations = locationResult.locations
-            for (i in locations.indices) {
-                if (locations[i].accuracy > accuracy) {
-                    accuracy = locations[i].accuracy
-                    bestIndex = i
-                }
-            }
-            return locations[bestIndex]
-        }
-    }
-
-    private class LocationRequestObj() {
+    private class LocationRequestObj {
         var locationCallback: LocationCallback? = null
         var currentLocationTask: Task<Location>? = null
         var cancellationTokenSource: CancellationTokenSource? = null
+    }
+
+    enum class Fail {
+        DISABLED_GPS, DENIED_LOCATION_PERMISSIONS, FAILED_FIND_LOCATION, DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION, TIME_OUT
     }
 }

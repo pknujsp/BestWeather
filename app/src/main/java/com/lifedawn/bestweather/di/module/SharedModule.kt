@@ -1,7 +1,7 @@
 package com.lifedawn.bestweather.di.module
 
 import android.content.Context
-import com.lifedawn.bestweather.commons.classes.FusedLocation
+import com.lifedawn.bestweather.commons.classes.location.FusedLocation
 import com.lifedawn.bestweather.commons.classes.NetworkStatus
 import dagger.Module
 import dagger.Provides

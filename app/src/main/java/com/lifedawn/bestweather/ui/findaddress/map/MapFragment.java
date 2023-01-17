@@ -49,7 +49,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.lifedawn.bestweather.R;
 import com.lifedawn.bestweather.alarm.AlarmSettingsFragment;
-import com.lifedawn.bestweather.commons.classes.FusedLocation;
+import com.lifedawn.bestweather.commons.classes.location.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.classes.IntentUtil;
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;

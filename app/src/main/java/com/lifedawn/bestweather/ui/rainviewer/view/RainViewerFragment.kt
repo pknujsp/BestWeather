@@ -20,8 +20,8 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.lifedawn.bestweather.R
-import com.lifedawn.bestweather.commons.classes.FusedLocation
-import com.lifedawn.bestweather.commons.classes.FusedLocation.MyLocationCallback
+import com.lifedawn.bestweather.commons.classes.location.FusedLocation
+import com.lifedawn.bestweather.commons.classes.location.FusedLocation.MyLocationCallback
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker
 import com.lifedawn.bestweather.commons.constants.BundleKey

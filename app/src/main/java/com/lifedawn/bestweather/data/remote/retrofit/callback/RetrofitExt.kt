@@ -2,7 +2,6 @@ package com.lifedawn.bestweather.data.remote.retrofit.callback
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import retrofit2.Call
 import retrofit2.Response
 
 fun <T : Any> requestApiFlow(request: suspend () -> Response<T>): Flow<ApiResponse<T>> = flow {

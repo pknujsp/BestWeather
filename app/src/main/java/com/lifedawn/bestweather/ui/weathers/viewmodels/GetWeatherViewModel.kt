@@ -1,14 +1,8 @@
 package com.lifedawn.bestweather.ui.weathers.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lifedawn.bestweather.commons.classes.FusedLocation.MyLocationCallback
 import com.lifedawn.bestweather.commons.constants.WeatherDataType
-import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
-import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
-import com.lifedawn.bestweather.data.local.favoriteaddress.repository.FavoriteAddressRepositoryImpl
 import com.lifedawn.bestweather.data.remote.retrofit.callback.ApiResponse
 import com.lifedawn.bestweather.data.remote.weather.commons.model.WeatherDataDto
 import com.lifedawn.bestweather.data.remote.weather.kma.usecase.GetAreaCodeUseCase
@@ -16,8 +10,6 @@ import com.lifedawn.bestweather.data.remote.weather.kma.usecase.GetKmaWeatherUse
 import com.lifedawn.bestweather.data.remote.weather.metnorway.usecase.GetMetNorwayWeatherUseCase
 import com.lifedawn.bestweather.data.remote.weather.owm.usecase.GetOwmWeatherUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

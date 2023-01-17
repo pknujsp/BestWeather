@@ -20,7 +20,7 @@ import androidx.work.WorkerParameters;
 import com.google.android.gms.location.LocationResult;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.FusedLocation;
+import com.lifedawn.bestweather.commons.classes.location.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.Geocoding;
 import com.lifedawn.bestweather.commons.constants.LocationType;
 import com.lifedawn.bestweather.commons.constants.WeatherDataType;

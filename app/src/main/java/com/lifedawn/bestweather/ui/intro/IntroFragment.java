@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.LocationResult;
 import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.FusedLocation;
+import com.lifedawn.bestweather.commons.classes.location.FusedLocation;
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver;
 import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
 import com.lifedawn.bestweather.commons.constants.BundleKey;
