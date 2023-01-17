@@ -8,13 +8,11 @@ import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.classes.IntentUtil
 import com.lifedawn.bestweather.commons.constants.IntentRequestCodes
 
-class RemoteViewsUtil {
-
+object RemoteViewsUtil {
     enum class ErrorType {
         UNAVAILABLE_NETWORK, FAILED_LOAD_WEATHER_DATA, GPS_OFF, DENIED_GPS_PERMISSIONS, DENIED_BACKGROUND_LOCATION_PERMISSION
     }
 
-    companion object {
         fun onBeginProcess(remoteViews: RemoteViews) {
             remoteViews.setViewVisibility(R.id.progressbar, View.VISIBLE)
             remoteViews.setViewVisibility(R.id.valuesLayout, View.GONE)
@@ -83,6 +81,6 @@ class RemoteViewsUtil {
                 remoteViews.setViewVisibility(R.id.btn2, View.GONE)
             }
         }
-    }
+
 
 }

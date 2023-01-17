@@ -33,24 +33,23 @@ import com.lifedawn.bestweather.ui.notification.NotificationType
 import java.time.ZoneId
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import javax.inject.Inject
 
-class FusedLocation(private val context: Context) : ConnectionCallbacks, OnConnectionFailedListener {
-    private val fusedLocationClient: FusedLocationProviderClient
-    private val locationManager: LocationManager
+class FusedLocation @Inject constructor(
+    private val context: Context,
     private val networkStatus: NetworkStatus
+) : ConnectionCallbacks, OnConnectionFailedListener {
+
+    private val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+    private val locationManager: LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     private val locationRequestObjMap: MutableMap<MyLocationCallback, LocationRequestObj> = ConcurrentHashMap()
     private var timerTask: TimerTask? = null
     private val timer = Timer()
 
-    init {
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-        locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        networkStatus = NetworkStatus.getInstance(context)
-    }
-
     override fun onConnected(bundle: Bundle?) {}
     override fun onConnectionSuspended(i: Int) {}
     override fun onConnectionFailed(connectionResult: ConnectionResult) {}
+
     val lastCurrentLocation: LocationResult
         get() {
             val locations: MutableList<Location> = ArrayList()

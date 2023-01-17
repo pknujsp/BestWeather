@@ -5,8 +5,9 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import javax.inject.Inject
 
-class NetworkStatus private constructor(context: Context) {
+class NetworkStatus @Inject constructor(context: Context) {
     private val connectivityManager: ConnectivityManager
     private val networkRequest: NetworkRequest
 
@@ -14,6 +15,7 @@ class NetworkStatus private constructor(context: Context) {
         val builder = NetworkRequest.Builder()
         builder.addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
         builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+
         networkRequest = builder.build()
         connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         connectivityManager.registerNetworkCallback(networkRequest, object : ConnectivityManager.NetworkCallback() {
@@ -27,18 +29,7 @@ class NetworkStatus private constructor(context: Context) {
         })
     }
 
-    fun networkAvailable(): Boolean {
-        return connectivityManager.activeNetworkInfo != null
-    }
+    fun networkAvailable() =
+        connectivityManager.activeNetwork != null
 
-    companion object {
-        private var instance: NetworkStatus? = null
-        @JvmStatic
-        fun getInstance(context: Context): NetworkStatus? {
-            if (instance == null) {
-                instance = NetworkStatus(context)
-            }
-            return instance
-        }
-    }
 }
