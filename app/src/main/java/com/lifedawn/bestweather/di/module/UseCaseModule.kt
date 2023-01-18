@@ -1,6 +1,9 @@
 package com.lifedawn.bestweather.di.module
 
 import com.lifedawn.bestweather.data.local.room.queryinterfaces.KmaAreaCodesRepository
+import com.lifedawn.bestweather.data.remote.nominatim.repository.NominatimRepository
+import com.lifedawn.bestweather.data.remote.nominatim.usecase.GeocodingUseCase
+import com.lifedawn.bestweather.data.remote.nominatim.usecase.GeocodingUseCaseImpl
 import com.lifedawn.bestweather.data.remote.weather.aqicn.repository.AqicnRepository
 import com.lifedawn.bestweather.data.remote.weather.aqicn.repository.AqicnRepositoryImpl
 import com.lifedawn.bestweather.data.remote.weather.aqicn.usecase.GetAqicnUseCase
@@ -50,4 +53,8 @@ object UseCaseModule {
     @Singleton
     fun provideGetAreaCodeUseCase(kmaAreaCodesRepository: KmaAreaCodesRepository): GetAreaCodeUseCase =
         GetAreaCodeUseCaseImpl(kmaAreaCodesRepository)
+
+    @Provides
+    @Singleton
+    fun provideGeocodingUseCase(nominatimRepository: NominatimRepository): GeocodingUseCase = GeocodingUseCaseImpl(nominatimRepository)
 }
