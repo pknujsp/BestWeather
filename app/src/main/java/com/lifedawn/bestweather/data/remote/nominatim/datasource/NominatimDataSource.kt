@@ -6,6 +6,6 @@ import com.lifedawn.bestweather.data.remote.retrofit.callback.ApiResponse
 import kotlinx.coroutines.flow.Flow
 
 interface NominatimDataSource {
-    fun geocoding(context: Context, query: String) : Flow<ApiResponse<JsonElement>>
-    fun reverseGeocoding(context: Context, latitude: Double, longitude: Double) : Flow<ApiResponse<JsonElement>>
+    fun geocoding(query: String) : Flow<ApiResponse<JsonElement>>
+    fun reverseGeocoding(latitude: Double, longitude: Double) : Flow<ApiResponse<JsonElement>>
 }

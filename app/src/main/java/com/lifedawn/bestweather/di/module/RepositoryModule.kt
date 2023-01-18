@@ -14,6 +14,9 @@ import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepository
 import com.lifedawn.bestweather.data.local.timezone.LocalTimeZoneRepositoryImpl
 import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepository
 import com.lifedawn.bestweather.data.remote.flickr.repository.FlickrRepositoryImpl
+import com.lifedawn.bestweather.data.remote.nominatim.datasource.NominatimDataSource
+import com.lifedawn.bestweather.data.remote.nominatim.repository.NominatimRepository
+import com.lifedawn.bestweather.data.remote.nominatim.repository.NominatimRepositoryImpl
 import com.lifedawn.bestweather.data.remote.timezone.RemoteTimeZoneRepository
 import com.lifedawn.bestweather.data.remote.timezone.RemoteTimeZoneRepositoryImpl
 import com.lifedawn.bestweather.data.remote.weather.aqicn.datasource.AqicnDataSource
@@ -98,4 +101,10 @@ object RepositoryModule {
     fun provideFavoriteAddressRepository(
         favoriteAddressDao: FavoriteAddressDao
     ): FavoriteAddressRepository = FavoriteAddressRepositoryImpl(favoriteAddressDao)
+
+    @Provides
+    @Singleton
+    fun provideNominatimRepository(
+        nominatimDataSource: NominatimDataSource
+    ): NominatimRepository = NominatimRepositoryImpl(nominatimDataSource)
 }

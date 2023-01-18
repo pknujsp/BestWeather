@@ -1,5 +1,7 @@
 package com.lifedawn.bestweather.di.module
 
+import com.lifedawn.bestweather.data.remote.nominatim.datasource.NominatimDataSource
+import com.lifedawn.bestweather.data.remote.nominatim.datasource.NominatimDataSourceImpl
 import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery
 import com.lifedawn.bestweather.data.remote.weather.aqicn.datasource.AqicnDataSource
 import com.lifedawn.bestweather.data.remote.weather.aqicn.datasource.AqicnDataSourceImpl
@@ -37,4 +39,9 @@ object DataSourceModule {
     @Provides
     @Singleton
     fun provideAqicnDataSource(aqicnRestApi: RestfulApiQuery): AqicnDataSource = AqicnDataSourceImpl(aqicnRestApi)
+
+    @Provides
+    @Singleton
+    fun provideNominatimDataSource(nominatimRestApi:RestfulApiQuery) : NominatimDataSource =
+        NominatimDataSourceImpl(nominatimRestApi)
 }
