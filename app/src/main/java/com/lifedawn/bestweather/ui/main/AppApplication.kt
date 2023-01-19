@@ -2,14 +2,21 @@ package com.lifedawn.bestweather.ui.main
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import java.util.*
 
 @HiltAndroidApp
 class AppApplication : Application() {
     companion object {
-        var statusBarHeight = 0
-        lateinit var locale: Locale
-        lateinit var localeCountryCode: String
+        private var _statusBarHeight = 0
+        val statusBarHeight get() = _statusBarHeight
+
+        private lateinit var _locale: Locale
+        val locale get() = _locale
+        private lateinit var _localeCountryCode: String
+        val localeCountryCode get() = _localeCountryCode
     }
 
     override fun onCreate() {
@@ -17,15 +24,14 @@ class AppApplication : Application() {
 
         val id = resources.getIdentifier("status_bar_height", "dimen", "android")
         if (id > 0)
-            statusBarHeight = resources.getDimensionPixelSize(id)
+            _statusBarHeight = resources.getDimensionPixelSize(id)
 
-        locale = resources.configuration.locales[0]
-        localeCountryCode = locale.country
+        _locale = resources.configuration.locales[0]
+        _localeCountryCode = _locale.country
 
-        val context = applicationContext
     }
 
-    fun loadValueUnitTypes() {
-        //datastore쓰기
+    override fun onLowMemory() {
+        super.onLowMemory()
     }
 }

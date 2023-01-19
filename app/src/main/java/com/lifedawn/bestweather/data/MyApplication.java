@@ -43,17 +43,7 @@ public class MyApplication extends Application {
 		locale = getResources().getConfiguration().getLocales().get(0);
 
 		localeCountryCode = locale.getCountry();
-		Context context = getApplicationContext();
 
-		FavoriteAddressRepositoryImpl.initialize(context);
-		KmaAreaCodesRepositoryImpl.initialize(context);
-		LocalTimeZoneRepositoryImpl.Companion.initialize(context);
-		OngoingNotificationRepository.initialize(context);
-		WidgetRepository.initialize(context);
-		FlickrRepository.initialize();
-		DailyPushNotificationRepository.initialize(context);
-		WindUtil.init(context);
-		WeatherValueLabels.INSTANCE.load(context);
 		initPreferences();
 	}
 

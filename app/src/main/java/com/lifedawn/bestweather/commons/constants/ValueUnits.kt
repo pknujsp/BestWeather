@@ -2,8 +2,10 @@ package com.lifedawn.bestweather.commons.constants
 
 import java.util.*
 
-enum class ValueUnits {
-    celsius, fahrenheit, mPerSec, kmPerHour, km, mile, clock12, clock24;
+enum class ValueUnits(
+    val text: String
+) {
+    celsius("℃"), fahrenheit("℉"), mPerSec("m/s"), kmPerHour("km/h"), km("km"), mile("mile"), clock12("3:00 PM"), clock24("15:00");
 
     companion object {
         /*
@@ -16,20 +18,7 @@ enum class ValueUnits {
 	기상청
 	바람 : m/s, 비 : mm, 눈 : mm, 기온 : C
 	 */
-        @JvmStatic
-        fun toString(valueUnit: ValueUnits?): String? {
-            return when (valueUnit) {
-                celsius -> "℃"
-                fahrenheit -> "℉"
-                mPerSec -> "m/s"
-                kmPerHour -> "km/h"
-                km -> "km"
-                mile -> "mile"
-                clock12 -> "3:00 PM"
-                clock24 -> "15:00"
-                else -> null
-            }
-        }
+
 
         @JvmStatic
         fun convertTemperature(`val`: String, unit: ValueUnits): Int {
