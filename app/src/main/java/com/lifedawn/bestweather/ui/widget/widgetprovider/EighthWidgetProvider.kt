@@ -1,41 +1,32 @@
-package com.lifedawn.bestweather.ui.widget.widgetprovider;
+package com.lifedawn.bestweather.ui.widget.widgetprovider
 
-import android.appwidget.AppWidgetManager;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 
-public class EighthWidgetProvider extends BaseAppWidgetProvider {
+class EighthWidgetProvider : BaseAppWidgetProvider() {
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+    }
 
-	@Override
-	public void onEnabled(Context context) {
-		super.onEnabled(context);
-	}
+    override fun onDisabled(context: Context) {
+        super.onDisabled(context)
+    }
 
-	@Override
-	public void onDisabled(Context context) {
-		super.onDisabled(context);
-	}
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        super.onDeleted(context, appWidgetIds)
+    }
 
-	@Override
-	public void onDeleted(Context context, int[] appWidgetIds) {
-		super.onDeleted(context, appWidgetIds);
-	}
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+    }
 
-	@Override
-	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-		super.onUpdate(context, appWidgetManager, appWidgetIds);
-	}
+    override fun onAppWidgetOptionsChanged(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int, newOptions: Bundle) {
+        super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
+    }
 
-	@Override
-	public void onAppWidgetOptionsChanged(Context context, AppWidgetManager appWidgetManager, int appWidgetId, Bundle newOptions) {
-		super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions);
-	}
-
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		super.onReceive(context, intent);
-	}
-
-
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+    }
 }

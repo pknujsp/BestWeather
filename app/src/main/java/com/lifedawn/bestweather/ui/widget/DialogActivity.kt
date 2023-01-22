@@ -1,192 +1,127 @@
-package com.lifedawn.bestweather.ui.widget;
+package com.lifedawn.bestweather.ui.widget
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.preference.PreferenceManager;
+import android.app.Activity
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
+import android.view.ContextThemeWrapper
+import android.view.View
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.preference.PreferenceManager
+import com.lifedawn.bestweather.R
+import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
+import com.lifedawn.bestweather.databinding.ActivityDialogBinding
 
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProviderInfo;
-import android.content.ComponentName;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Bundle;
-import android.view.ContextThemeWrapper;
-import android.view.View;
-import android.widget.TextView;
+class DialogActivity : Activity() {
+    private var binding: ActivityDialogBinding? = null
+    private var appWidgetId = 0
+    private var widgetCreator: AbstractWidgetCreator? = null
+    private var alertDialog: AlertDialog? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        window.setBackgroundDrawable(ColorDrawable(0))
+        binding = ActivityDialogBinding.inflate(layoutInflater)
+        setContentView(binding!!.root)
+        val bundle = intent.extras
+        appWidgetId = bundle!!.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)
+        val appWidgetManager = AppWidgetManager.getInstance(this)
+        val appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
+        val componentName = appWidgetProviderInfo.provider
+        val providerClassName = componentName.className
+        if (providerClassName == FirstWidgetProvider::class.java.getName()) {
+            widgetCreator = FirstWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (providerClassName == SecondWidgetProvider::class.java.getName()) {
+            widgetCreator = SecondWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (providerClassName == ThirdWidgetProvider::class.java.getName()) {
+            widgetCreator = ThirdWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (providerClassName == FourthWidgetProvider::class.java.getName()) {
+            widgetCreator = FourthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (providerClassName == FifthWidgetProvider::class.java.getName()) {
+            widgetCreator = FifthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (providerClassName == SixthWidgetProvider::class.java.getName()) {
+            widgetCreator = SixthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (providerClassName == SeventhWidgetProvider::class.java.getName()) {
+            widgetCreator = SeventhWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (providerClassName == EighthWidgetProvider::class.java.getName()) {
+            widgetCreator = EighthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (providerClassName == NinthWidgetProvider::class.java.getName()) {
+            widgetCreator = NinthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (providerClassName == TenthWidgetProvider::class.java.getName()) {
+            widgetCreator = TenthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (providerClassName == EleventhWidgetProvider::class.java.getName()) {
+            widgetCreator = EleventhWidgetCreator(applicationContext, null, appWidgetId)
+        }
+        val widgetProviderClass: Class<*> = widgetCreator.widgetProviderClass()
+        val dialogView = layoutInflater.inflate(R.layout.view_widget_dialog, null)
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val refreshInterval = sharedPreferences.getLong(getString(R.string.pref_key_widget_refresh_interval), 0L)
+        var refreshIntervalText: String? = null
+        if (refreshInterval > 0) {
+            val autoRefreshIntervalsValue = resources.getStringArray(R.array.AutoRefreshIntervalsLong)
+            val autoRefreshIntervalsText = resources.getStringArray(R.array.AutoRefreshIntervals)
+            for (i in autoRefreshIntervalsValue.indices) {
+                if (refreshInterval.toString() == autoRefreshIntervalsValue[i]) {
+                    refreshIntervalText = autoRefreshIntervalsText[i]
+                    break
+                }
+            }
+        } else {
+            refreshIntervalText = getString(R.string.disable_auto_refresh)
+        }
+        (dialogView.findViewById<View>(R.id.auto_refresh_interval) as TextView).text = refreshIntervalText
+        (dialogView.findViewById<View>(R.id.widgetTypeName) as TextView).text = appWidgetProviderInfo.loadLabel(
+            packageManager
+        )
+        (dialogView.findViewById<View>(R.id.openAppBtn) as TextView).setOnClickListener {
+            val intent = Intent(applicationContext, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            alertDialog!!.dismiss()
+            startActivity(intent)
+            finish()
+        }
+        (dialogView.findViewById<View>(R.id.updateBtn) as TextView).setOnClickListener {
+            val pendingIntent: PendingIntent = widgetCreator.getRefreshPendingIntent()
+            try {
+                pendingIntent.send()
+            } catch (e: PendingIntent.CanceledException) {
+                e.printStackTrace()
+            }
+            alertDialog!!.dismiss()
+            finish()
+        }
+        (dialogView.findViewById<View>(R.id.cancelBtn) as TextView).setOnClickListener {
+            alertDialog!!.dismiss()
+            finish()
+        }
+        widgetCreator.loadSavedSettings(object : DbQueryCallback<WidgetDto?>() {
+            fun onResultSuccessful(result: WidgetDto?) {
+                MainThreadWorker.runOnUiThread(Runnable {
+                    if (this@DialogActivity.isFinishing || this@DialogActivity.isDestroyed) {
+                        return@Runnable
+                    }
+                    alertDialog = AlertDialog.Builder(
+                        ContextThemeWrapper(
+                            this@DialogActivity,
+                            R.style.Theme_AppCompat_Light_Dialog
+                        )
+                    )
+                        .setCancelable(true)
+                        .setOnCancelListener { dialog ->
+                            dialog.dismiss()
+                            finish()
+                        }
+                        .setView(dialogView)
+                        .create()
+                    alertDialog!!.show()
+                    alertDialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                })
+            }
 
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.MainThreadWorker;
-import com.lifedawn.bestweather.databinding.ActivityDialogBinding;
-import com.lifedawn.bestweather.ui.main.MainActivity;
-import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.data.local.room.dto.WidgetDto;
-import com.lifedawn.bestweather.ui.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.EighthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.EleventhWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.FirstWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.NinthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.SecondWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.SeventhWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.SixthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.TenthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.ThirdWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.FourthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.FifthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.EighthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.EleventhWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.FirstWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.NinthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.SecondWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.SeventhWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.SixthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.TenthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.ThirdWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.FourthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.FifthWidgetProvider;
-
-public class DialogActivity extends Activity {
-	private ActivityDialogBinding binding;
-	private int appWidgetId;
-	private AbstractWidgetCreator widgetCreator;
-	private AlertDialog alertDialog;
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		getWindow().setBackgroundDrawable(new ColorDrawable(0));
-		binding = ActivityDialogBinding.inflate(getLayoutInflater());
-		setContentView(binding.getRoot());
-
-		Bundle bundle = getIntent().getExtras();
-		appWidgetId = bundle.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID);
-
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-		final AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId);
-		ComponentName componentName = appWidgetProviderInfo.provider;
-		final String providerClassName = componentName.getClassName();
-
-		if (providerClassName.equals(FirstWidgetProvider.class.getName())) {
-			widgetCreator = new FirstWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (providerClassName.equals(SecondWidgetProvider.class.getName())) {
-			widgetCreator = new SecondWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (providerClassName.equals(ThirdWidgetProvider.class.getName())) {
-			widgetCreator = new ThirdWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (providerClassName.equals(FourthWidgetProvider.class.getName())) {
-			widgetCreator = new FourthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (providerClassName.equals(FifthWidgetProvider.class.getName())) {
-			widgetCreator = new FifthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (providerClassName.equals(SixthWidgetProvider.class.getName())) {
-			widgetCreator = new SixthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (providerClassName.equals(SeventhWidgetProvider.class.getName())) {
-			widgetCreator = new SeventhWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (providerClassName.equals(EighthWidgetProvider.class.getName())) {
-			widgetCreator = new EighthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (providerClassName.equals(NinthWidgetProvider.class.getName())) {
-			widgetCreator = new NinthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (providerClassName.equals(TenthWidgetProvider.class.getName())) {
-			widgetCreator = new TenthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (providerClassName.equals(EleventhWidgetProvider.class.getName())) {
-			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), null, appWidgetId);
-		}
-
-		final Class<?> widgetProviderClass = widgetCreator.widgetProviderClass();
-		final View dialogView = getLayoutInflater().inflate(R.layout.view_widget_dialog, null);
-
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		final Long refreshInterval = sharedPreferences.getLong(getString(R.string.pref_key_widget_refresh_interval), 0L);
-		String refreshIntervalText = null;
-
-		if (refreshInterval > 0) {
-			String[] autoRefreshIntervalsValue = getResources().getStringArray(R.array.AutoRefreshIntervalsLong);
-			String[] autoRefreshIntervalsText = getResources().getStringArray(R.array.AutoRefreshIntervals);
-
-			for (int i = 0; i < autoRefreshIntervalsValue.length; i++) {
-				if (refreshInterval.toString().equals(autoRefreshIntervalsValue[i])) {
-					refreshIntervalText = autoRefreshIntervalsText[i];
-					break;
-				}
-			}
-		} else {
-			refreshIntervalText = getString(R.string.disable_auto_refresh);
-		}
-
-		((TextView) dialogView.findViewById(R.id.auto_refresh_interval)).setText(refreshIntervalText);
-		((TextView) dialogView.findViewById(R.id.widgetTypeName)).setText(appWidgetProviderInfo.loadLabel(getPackageManager()));
-
-		((TextView) dialogView.findViewById(R.id.openAppBtn)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				alertDialog.dismiss();
-
-				startActivity(intent);
-				finish();
-			}
-		});
-
-		((TextView) dialogView.findViewById(R.id.updateBtn)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				PendingIntent pendingIntent = widgetCreator.getRefreshPendingIntent();
-				try {
-					pendingIntent.send();
-				} catch (PendingIntent.CanceledException e) {
-					e.printStackTrace();
-				}
-
-				alertDialog.dismiss();
-				finish();
-			}
-		});
-
-		((TextView) dialogView.findViewById(R.id.cancelBtn)).setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				alertDialog.dismiss();
-				finish();
-			}
-		});
-
-
-		widgetCreator.loadSavedSettings(new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto result) {
-				MainThreadWorker.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						if (DialogActivity.this.isFinishing() || DialogActivity.this.isDestroyed()) {
-							return;
-						}
-
-						alertDialog = new AlertDialog.Builder(new ContextThemeWrapper(DialogActivity.this,
-								R.style.Theme_AppCompat_Light_Dialog))
-								.setCancelable(true)
-								.setOnCancelListener(new DialogInterface.OnCancelListener() {
-									@Override
-									public void onCancel(DialogInterface dialog) {
-										dialog.dismiss();
-										finish();
-									}
-								})
-								.setView(dialogView)
-								.create();
-
-						alertDialog.show();
-						alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-					}
-				});
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
-
-	}
+            fun onResultNoData() {}
+        })
+    }
 }

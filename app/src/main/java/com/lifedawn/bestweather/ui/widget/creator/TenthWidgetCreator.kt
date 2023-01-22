@@ -1,208 +1,183 @@
-package com.lifedawn.bestweather.ui.widget.creator;
+package com.lifedawn.bestweather.ui.widget.creator
 
-import android.appwidget.AppWidgetManager;
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.RemoteViews;
-import android.widget.TextView;
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.*
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import com.lifedawn.bestweather.R
+import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil.onSuccessfulProcess
+import com.lifedawn.bestweather.commons.constants.WeatherDataType
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType
+import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.WeatherResponseProcessor
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WeatherRequestUtil.initWeatherSourceUniqueValues
+import com.lifedawn.bestweather.ui.weathers.view.DetailDoubleTemperatureViewForRemoteViews
+import com.lifedawn.bestweather.ui.widget.OnDrawBitmapCallback
+import com.lifedawn.bestweather.ui.widget.widgetprovider.TenthWidgetProvider
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
-import androidx.annotation.Nullable;
+class TenthWidgetCreator(context: Context, widgetUpdateCallback: WidgetUpdateCallback?, appWidgetId: Int) :
+    AbstractWidgetCreator(context, widgetUpdateCallback, appWidgetId) {
+    private val DAY_LENGTH = 8
+    override val requestWeatherDataTypeSet: Set<Any?>
+        get() {
+            val set: MutableSet<WeatherDataType?> = HashSet()
+            set.add(WeatherDataType.dailyForecast)
+            return set
+        }
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
-import com.lifedawn.bestweather.commons.constants.WeatherDataType;
-import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WeatherRequestUtil;
-import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto;
-import com.lifedawn.bestweather.ui.weathers.view.DetailDoubleTemperatureViewForRemoteViews;
-import com.lifedawn.bestweather.ui.widget.OnDrawBitmapCallback;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.TenthWidgetProvider;
+    override fun createTempViews(parentWidth: Int?, parentHeight: Int?): RemoteViews? {
+        val remoteViews = createBaseRemoteViews()
+        onSuccessfulProcess(remoteViews!!)
+        drawViews(
+            remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
+            WeatherResponseProcessor.getTempDailyForecastDtoList(context, DAY_LENGTH), null, parentWidth, parentHeight
+        )
+        return remoteViews
+    }
 
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+    override fun widgetProviderClass(): Class<*> {
+        return TenthWidgetProvider::class.java
+    }
 
-public class TenthWidgetCreator extends AbstractWidgetCreator {
-	private final int DAY_LENGTH = 8;
+    fun setDataViews(
+        remoteViews: RemoteViews?, addressName: String, lastRefreshDateTime: String,
+        dailyForecastDtoList: List<DailyForecastDto?>, onDrawBitmapCallback: OnDrawBitmapCallback?
+    ) {
+        drawViews(remoteViews, addressName, lastRefreshDateTime, dailyForecastDtoList, onDrawBitmapCallback, null, null)
+    }
 
+    private fun drawViews(
+        remoteViews: RemoteViews?, addressName: String, lastRefreshDateTime: String,
+        dailyForecastDtoList: List<DailyForecastDto?>, onDrawBitmapCallback: OnDrawBitmapCallback?, parentWidth: Int?,
+        parentHeight: Int?
+    ) {
+        val layoutInflater = LayoutInflater.from(context)
+        val headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime)
+        headerView!!.id = R.id.header
+        val hourAndIconLinearLayout = LinearLayout(context)
+        hourAndIconLinearLayout.id = R.id.hourAndIconView
+        hourAndIconLinearLayout.orientation = LinearLayout.HORIZONTAL
+        val hourAndIconCellLayoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT)
+        hourAndIconCellLayoutParams.weight = 1f
+        val minTempList: MutableList<Int> = ArrayList()
+        val maxTempList: MutableList<Int> = ArrayList()
+        val dateFormatter = DateTimeFormatter.ofPattern("M.d\nE")
+        for (cell in 0 until DAY_LENGTH) {
+            if (!dailyForecastDtoList[cell]!!.isAvailable_toMakeMinMaxTemp) break
+            val view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false)
+            (view.findViewById<View>(R.id.dateTime) as TextView).text =
+                dailyForecastDtoList[cell]!!.date.format(dateFormatter)
+            if (dailyForecastDtoList[cell]!!.valuesList.size == 1) {
+                (view.findViewById<View>(R.id.leftIcon) as ImageView).setImageResource(
+                    dailyForecastDtoList[cell]!!.valuesList[0].weatherIcon
+                )
+                view.findViewById<View>(R.id.rightIcon).visibility = View.GONE
+            } else if (dailyForecastDtoList[cell]!!.valuesList.size == 2) {
+                (view.findViewById<View>(R.id.leftIcon) as ImageView).setImageResource(
+                    dailyForecastDtoList[cell]!!.valuesList[0].weatherIcon
+                )
+                (view.findViewById<View>(R.id.rightIcon) as ImageView).setImageResource(
+                    dailyForecastDtoList[cell]!!.valuesList[1].weatherIcon
+                )
+            } else if (dailyForecastDtoList[cell]!!.valuesList.size == 4) {
+                (view.findViewById<View>(R.id.leftIcon) as ImageView).setImageResource(
+                    dailyForecastDtoList[cell]!!.valuesList[1].weatherIcon
+                )
+                (view.findViewById<View>(R.id.rightIcon) as ImageView).setImageResource(
+                    dailyForecastDtoList[cell]!!.valuesList[2].weatherIcon
+                )
+            }
+            view.findViewById<View>(R.id.temperature).visibility = View.GONE
+            view.findViewById<View>(R.id.popLayout).visibility = View.GONE
+            view.findViewById<View>(R.id.rainVolumeLayout).visibility = View.GONE
+            view.findViewById<View>(R.id.snowVolumeLayout).visibility = View.GONE
+            minTempList.add(dailyForecastDtoList[cell]!!.minTemp.replace(tempDegree, "").toInt())
+            maxTempList.add(dailyForecastDtoList[cell]!!.maxTemp.replace(tempDegree, "").toInt())
+            hourAndIconLinearLayout.addView(view, hourAndIconCellLayoutParams)
+        }
+        val headerViewLayoutParams = headerViewLayoutParams
+        val hourAndIconRowLayoutParams = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        val tempRowLayoutParams = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        headerViewLayoutParams!!.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+        hourAndIconRowLayoutParams.addRule(RelativeLayout.BELOW, R.id.header)
+        hourAndIconRowLayoutParams.addRule(RelativeLayout.RIGHT_OF, R.id.currentConditions)
+        tempRowLayoutParams.addRule(RelativeLayout.BELOW, R.id.hourAndIconView)
+        tempRowLayoutParams.addRule(RelativeLayout.RIGHT_OF, R.id.currentConditions)
+        tempRowLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        val detailSingleTemperatureView = DetailDoubleTemperatureViewForRemoteViews(
+            context,
+            minTempList, maxTempList
+        )
+        val rootLayout = RelativeLayout(context)
+        rootLayout.addView(headerView, headerViewLayoutParams)
+        rootLayout.addView(hourAndIconLinearLayout, hourAndIconRowLayoutParams)
+        rootLayout.addView(detailSingleTemperatureView, tempRowLayoutParams)
+        drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews!!, parentWidth, parentHeight)
+    }
 
-	public TenthWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
-		super(context, widgetUpdateCallback, appWidgetId);
-	}
+    override fun setDisplayClock(displayClock: Boolean) {
+        widgetDto.isDisplayClock = displayClock
+    }
 
+    override fun setDataViewsOfSavedData() {
+        var weatherProviderType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet())
+        if (widgetDto.isTopPriorityKma && widgetDto.countryCode == "KR") {
+            weatherProviderType = WeatherProviderType.KMA_WEB
+        }
+        initWeatherSourceUniqueValues(weatherProviderType, true, context)
+        val remoteViews = createRemoteViews()
+        zoneId = ZoneId.of(widgetDto.timeZoneId)
+        val jsonObject = JsonParser.parseString(widgetDto.responseText) as JsonObject
+        val dailyForecastDtoList = WeatherResponseProcessor.parseTextToDailyForecastDtoList(
+            context, jsonObject,
+            weatherProviderType, zoneId
+        )
+        setDataViews(
+            remoteViews, widgetDto.addressName, widgetDto.lastRefreshDateTime,
+            dailyForecastDtoList, null
+        )
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        onSuccessfulProcess(remoteViews!!)
+        appWidgetManager.updateAppWidget(
+            appWidgetId,
+            remoteViews
+        )
+    }
 
-	@Override
-	public Set<WeatherDataType> getRequestWeatherDataTypeSet() {
-		Set<WeatherDataType> set = new HashSet<>();
-		set.add(WeatherDataType.dailyForecast);
-
-		return set;
-	}
-
-	@Override
-	public RemoteViews createTempViews(Integer parentWidth, Integer parentHeight) {
-		RemoteViews remoteViews = createBaseRemoteViews();
-
-		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
-
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(),
-				WeatherResponseProcessor.getTempDailyForecastDtoList(context, DAY_LENGTH), null, parentWidth, parentHeight);
-		return remoteViews;
-	}
-
-
-
-	@Override
-	public Class<?> widgetProviderClass() {
-		return TenthWidgetProvider.class;
-	}
-
-
-
-
-	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
-	                         List<DailyForecastDto> dailyForecastDtoList, OnDrawBitmapCallback onDrawBitmapCallback) {
-		drawViews(remoteViews, addressName, lastRefreshDateTime, dailyForecastDtoList, onDrawBitmapCallback, null, null);
-	}
-
-
-	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
-	                       List<DailyForecastDto> dailyForecastDtoList, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, @Nullable Integer parentWidth,
-	                       @Nullable Integer parentHeight) {
-		LayoutInflater layoutInflater = LayoutInflater.from(context);
-
-		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
-		headerView.setId(R.id.header);
-
-		LinearLayout hourAndIconLinearLayout = new LinearLayout(context);
-		hourAndIconLinearLayout.setId(R.id.hourAndIconView);
-		hourAndIconLinearLayout.setOrientation(LinearLayout.HORIZONTAL);
-		LinearLayout.LayoutParams hourAndIconCellLayoutParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT);
-		hourAndIconCellLayoutParams.weight = 1;
-
-		List<Integer> minTempList = new ArrayList<>();
-		List<Integer> maxTempList = new ArrayList<>();
-		DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M.d\nE");
-
-		for (int cell = 0; cell < DAY_LENGTH; cell++) {
-			if (!dailyForecastDtoList.get(cell).isAvailable_toMakeMinMaxTemp())
-				break;
-			View view = layoutInflater.inflate(R.layout.view_forecast_item_in_linear, null, false);
-			((TextView) view.findViewById(R.id.dateTime)).setText(dailyForecastDtoList.get(cell).getDate().format(dateFormatter));
-
-
-			if (dailyForecastDtoList.get(cell).getValuesList().size() == 1) {
-				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(0).getWeatherIcon());
-				view.findViewById(R.id.rightIcon).setVisibility(View.GONE);
-			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 2) {
-				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(0).getWeatherIcon());
-				((ImageView) view.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(1).getWeatherIcon());
-			} else if (dailyForecastDtoList.get(cell).getValuesList().size() == 4) {
-				((ImageView) view.findViewById(R.id.leftIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(1).getWeatherIcon());
-				((ImageView) view.findViewById(R.id.rightIcon)).setImageResource(dailyForecastDtoList.get(cell).getValuesList().get(2).getWeatherIcon());
-			}
-
-			view.findViewById(R.id.temperature).setVisibility(View.GONE);
-			view.findViewById(R.id.popLayout).setVisibility(View.GONE);
-			view.findViewById(R.id.rainVolumeLayout).setVisibility(View.GONE);
-			view.findViewById(R.id.snowVolumeLayout).setVisibility(View.GONE);
-
-			minTempList.add(Integer.parseInt(dailyForecastDtoList.get(cell).getMinTemp().replace(tempDegree, "")));
-			maxTempList.add(Integer.parseInt(dailyForecastDtoList.get(cell).getMaxTemp().replace(tempDegree, "")));
-			hourAndIconLinearLayout.addView(view, hourAndIconCellLayoutParams);
-		}
-
-		RelativeLayout.LayoutParams headerViewLayoutParams = getHeaderViewLayoutParams();
-		RelativeLayout.LayoutParams hourAndIconRowLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		RelativeLayout.LayoutParams tempRowLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.MATCH_PARENT);
-
-		headerViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-		hourAndIconRowLayoutParams.addRule(RelativeLayout.BELOW, R.id.header);
-		hourAndIconRowLayoutParams.addRule(RelativeLayout.RIGHT_OF, R.id.currentConditions);
-		tempRowLayoutParams.addRule(RelativeLayout.BELOW, R.id.hourAndIconView);
-		tempRowLayoutParams.addRule(RelativeLayout.RIGHT_OF, R.id.currentConditions);
-		tempRowLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-
-		DetailDoubleTemperatureViewForRemoteViews detailSingleTemperatureView = new DetailDoubleTemperatureViewForRemoteViews(context,
-				minTempList, maxTempList);
-
-
-		RelativeLayout rootLayout = new RelativeLayout(context);
-
-		rootLayout.addView(headerView, headerViewLayoutParams);
-		rootLayout.addView(hourAndIconLinearLayout, hourAndIconRowLayoutParams);
-		rootLayout.addView(detailSingleTemperatureView, tempRowLayoutParams);
-
-		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews, parentWidth, parentHeight);
-	}
-
-
-	@Override
-	public void setDisplayClock(boolean displayClock) {
-		widgetDto.setDisplayClock(displayClock);
-	}
-
-	@Override
-	public void setDataViewsOfSavedData() {
-		WeatherProviderType weatherProviderType = WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet());
-
-		if (widgetDto.isTopPriorityKma() && widgetDto.getCountryCode().equals("KR")) {
-			weatherProviderType = WeatherProviderType.KMA_WEB;
-		}
-		WeatherRequestUtil.initWeatherSourceUniqueValues(weatherProviderType, true, context);
-
-		RemoteViews remoteViews = createRemoteViews();
-
-		zoneId = ZoneId.of(widgetDto.getTimeZoneId());
-
-		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
-
-		List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.parseTextToDailyForecastDtoList(context, jsonObject,
-				weatherProviderType, zoneId);
-
-		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
-				dailyForecastDtoList, null);
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
-
-		appWidgetManager.updateAppWidget(appWidgetId,
-				remoteViews);
-	}
-
-	@Override
-	public void setResultViews(int appWidgetId, @Nullable @org.jetbrains.annotations.Nullable MultipleWeatherRestApiCallback multipleWeatherRestApiCallback, ZoneId zoneId) {
-
-		this.zoneId = zoneId;
-		final List<DailyForecastDto> dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(context, multipleWeatherRestApiCallback,
-				WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet()), zoneId);
-		final boolean successful = !dailyForecastDtoList.isEmpty();
-
-		if (successful) {
-			ZoneOffset zoneOffset = dailyForecastDtoList.get(0).getDate().getOffset();
-			widgetDto.setTimeZoneId(zoneId.getId());
-			widgetDto.setLastRefreshDateTime(multipleWeatherRestApiCallback.getRequestDateTime().toString());
-
-			makeResponseTextToJson(multipleWeatherRestApiCallback, getRequestWeatherDataTypeSet(), widgetDto.getWeatherProviderTypeSet(), widgetDto, zoneOffset);
-		}
-
-		widgetDto.setLoadSuccessful(successful);
-
-		super.setResultViews(appWidgetId, multipleWeatherRestApiCallback, zoneId);
-	}
+    override fun setResultViews(appWidgetId: Int, multipleWeatherRestApiCallback: MultipleWeatherRestApiCallback?, zoneId: ZoneId?) {
+        this.zoneId = zoneId
+        val dailyForecastDtoList = WeatherResponseProcessor.getDailyForecastDtoList(
+            context, multipleWeatherRestApiCallback,
+            WeatherResponseProcessor.getMainWeatherSourceType(widgetDto.getWeatherProviderTypeSet()), zoneId
+        )
+        val successful = !dailyForecastDtoList.isEmpty()
+        if (successful) {
+            val zoneOffset = dailyForecastDtoList[0]!!.date.offset
+            widgetDto.timeZoneId = zoneId!!.id
+            widgetDto.lastRefreshDateTime = multipleWeatherRestApiCallback.getRequestDateTime().toString()
+            makeResponseTextToJson(
+                multipleWeatherRestApiCallback,
+                requestWeatherDataTypeSet,
+                widgetDto.getWeatherProviderTypeSet(),
+                widgetDto,
+                zoneOffset
+            )
+        }
+        widgetDto.isLoadSuccessful = successful
+        super.setResultViews(appWidgetId, multipleWeatherRestApiCallback, zoneId)
+    }
 }

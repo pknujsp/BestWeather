@@ -1,277 +1,243 @@
-package com.lifedawn.bestweather.ui.widget.creator;
-
-import android.appwidget.AppWidgetManager;
-import android.content.Context;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.RemoteViews;
-import android.widget.TextView;
-
-import androidx.annotation.Nullable;
-import androidx.gridlayout.widget.GridLayout;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
-import com.lifedawn.bestweather.commons.constants.WeatherDataType;
-import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
-import com.lifedawn.bestweather.data.local.room.dto.WidgetDto;
-import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnResponseProcessor;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.WeatherResponseProcessor;
-import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto;
-import com.lifedawn.bestweather.ui.widget.OnDrawBitmapCallback;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.SeventhWidgetProvider;
-
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-public class SeventhWidgetCreator extends AbstractWidgetCreator {
-	private final DateTimeFormatter forecastDateFormatter = DateTimeFormatter.ofPattern("E");
-
-	public SeventhWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
-		super(context, widgetUpdateCallback, appWidgetId);
-	}
-
-	@Override
-	public WidgetDto loadDefaultSettings() {
-		widgetDto = super.loadDefaultSettings();
-		widgetDto.getWeatherProviderTypeSet().clear();
-		widgetDto.getWeatherProviderTypeSet().add(WeatherProviderType.AQICN);
-		return widgetDto;
-	}
-
-	@Override
-	public Set<WeatherDataType> getRequestWeatherDataTypeSet() {
-		Set<WeatherDataType> set = new HashSet<>();
-		set.add(WeatherDataType.airQuality);
-
-		return set;
-	}
-
-	@Override
-	public RemoteViews createTempViews(Integer parentWidth, Integer parentHeight) {
-		RemoteViews remoteViews = createBaseRemoteViews();
-
-		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
-
-		drawViews(remoteViews, context.getString(R.string.address_name), ZonedDateTime.now().toString(), WeatherResponseProcessor.getTempAirQualityDto(),
-				null, parentWidth, parentHeight);
-		return remoteViews;
-	}
-
-
-	@Override
-	public Class<?> widgetProviderClass() {
-		return SeventhWidgetProvider.class;
-	}
-
-
-	public void setDataViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
-	                         AirQualityDto airQualityDto, OnDrawBitmapCallback onDrawBitmapCallback) {
-		drawViews(remoteViews, addressName, lastRefreshDateTime, airQualityDto, onDrawBitmapCallback, null, null);
-	}
-
-
-	private void drawViews(RemoteViews remoteViews, String addressName, String lastRefreshDateTime,
-	                       AirQualityDto airQualityDto, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, @Nullable Integer parentWidth,
-	                       @Nullable Integer parentHeight) {
-		if (!airQualityDto.isSuccessful()) {
-			RemoteViewsUtil.onErrorProcess(remoteViews, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-			setRefreshPendingIntent(remoteViews);
-			return;
-		}
-
-		RelativeLayout rootLayout = new RelativeLayout(context);
-		LayoutInflater layoutInflater = LayoutInflater.from(context);
-
-		View headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime);
-		headerView.setId(R.id.header);
-
-		ViewGroup seventhView = (ViewGroup) layoutInflater.inflate(R.layout.view_seventh_widget, null, false);
-
-		String stationName = context.getString(R.string.measuring_station_name) + ": " + airQualityDto.getCityName();
-		((TextView) seventhView.findViewById(R.id.measuring_station_name)).setText(stationName);
-
-
-		String airQuality = context.getString(R.string.air_quality) + ": " + AqicnResponseProcessor.getGradeDescription(airQualityDto.getAqi());
-
-		((TextView) seventhView.findViewById(R.id.airQuality)).setText(airQuality);
-
-
-		GridLayout gridLayout = seventhView.findViewById(R.id.airQualityGrid);
-
-		//co, so2, no2 순서로
-		final String[] particleNames = {context.getString(R.string.co_str), context.getString(R.string.so2_str),
-				context.getString(R.string.no2_str)};
-
-		List<String> gradeValueList = new ArrayList<>();
-		List<String> gradeDescriptionList = new ArrayList<>();
-
-		gradeValueList.add(airQualityDto.getCurrent().getCo().toString());
-		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getCo()));
-
-		gradeValueList.add(airQualityDto.getCurrent().getSo2().toString());
-		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getSo2()));
-
-		gradeValueList.add(airQualityDto.getCurrent().getNo2().toString());
-		gradeDescriptionList.add(AqicnResponseProcessor.getGradeDescription(airQualityDto.getCurrent().getNo2()));
-
-		for (int i = 0; i < 3; i++) {
-			addAirQualityGridItem(layoutInflater, gridLayout, particleNames[i], gradeValueList.get(i), gradeDescriptionList.get(i));
-		}
-
-		LinearLayout forecastLayout = seventhView.findViewById(R.id.airQualityForecast);
-		final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, context.getResources().getDisplayMetrics());
-		final String noData = context.getString(R.string.noData);
-
-		LinearLayout.LayoutParams forecastItemLayoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		forecastItemLayoutParams.bottomMargin = margin;
-
-		View forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
-		forecastItemView.setPadding(0, 0, 0, 0);
-
-		TextView dateTextView = forecastItemView.findViewById(R.id.date);
-		TextView pm10TextView = forecastItemView.findViewById(R.id.pm10);
-		TextView pm25TextView = forecastItemView.findViewById(R.id.pm25);
-		TextView o3TextView = forecastItemView.findViewById(R.id.o3);
-
-		dateTextView.setText(null);
-		pm10TextView.setText(context.getString(R.string.pm10_str));
-		pm25TextView.setText(context.getString(R.string.pm25_str));
-		o3TextView.setText(context.getString(R.string.o3_str));
-
-		forecastLayout.addView(forecastItemView, forecastItemLayoutParams);
-
-		AirQualityDto.DailyForecast current = new AirQualityDto.DailyForecast();
-		current.setDate(null).setPm10(new AirQualityDto.DailyForecast.Val().setAvg(airQualityDto.getCurrent().getPm10()))
-				.setPm25(new AirQualityDto.DailyForecast.Val().setAvg(airQualityDto.getCurrent().getPm25()))
-				.setO3(new AirQualityDto.DailyForecast.Val().setAvg(airQualityDto.getCurrent().getO3()));
-
-		List<AirQualityDto.DailyForecast> dailyForecastList = new ArrayList<>();
-		dailyForecastList.add(current);
-		dailyForecastList.addAll(airQualityDto.getDailyForecastList());
-
-		for (AirQualityDto.DailyForecast item : dailyForecastList) {
-			forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null);
-			forecastItemView.setPadding(0, 0, 0, 0);
-
-			dateTextView = forecastItemView.findViewById(R.id.date);
-			pm10TextView = forecastItemView.findViewById(R.id.pm10);
-			pm25TextView = forecastItemView.findViewById(R.id.pm25);
-			o3TextView = forecastItemView.findViewById(R.id.o3);
-
-
-			dateTextView.setText(item.getDate() == null ? context.getString(R.string.current) : item.getDate().format(forecastDateFormatter));
-			if (item.isHasPm10()) {
-				pm10TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getPm10().getAvg()));
-			} else {
-				pm10TextView.setText(noData);
-			}
-			if (item.isHasPm25()) {
-				pm25TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getPm25().getAvg()));
-			} else {
-				pm25TextView.setText(noData);
-			}
-			if (item.isHasO3()) {
-				o3TextView.setText(AqicnResponseProcessor.getGradeDescription(item.getO3().getAvg()));
-			} else {
-				o3TextView.setText(noData);
-			}
-
-			forecastLayout.addView(forecastItemView, forecastItemLayoutParams);
-		}
-
-		RelativeLayout.LayoutParams headerViewLayoutParams = getHeaderViewLayoutParams();
-		RelativeLayout.LayoutParams seventhWidgetViewLayoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.MATCH_PARENT);
-
-		headerViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
-		seventhWidgetViewLayoutParams.addRule(RelativeLayout.BELOW, R.id.header);
-		seventhWidgetViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-
-		rootLayout.addView(headerView, headerViewLayoutParams);
-		rootLayout.addView(seventhView, seventhWidgetViewLayoutParams);
-
-		drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews, parentWidth, parentHeight);
-	}
-
-	private void addAirQualityGridItem(LayoutInflater layoutInflater, GridLayout gridLayout, String label, String gradeValue,
-	                                   String gradeDescription) {
-		View view = layoutInflater.inflate(R.layout.view_simple_air_quality_item, null, false);
-
-		TextView labelTextView = view.findViewById(R.id.label);
-		TextView gradeValueTextView = view.findViewById(R.id.gradeValue);
-		TextView gradeDescriptionTextView = view.findViewById(R.id.gradeDescription);
-
-		labelTextView.setText(label);
-		gradeValueTextView.setText(gradeValue);
-		gradeDescriptionTextView.setText(gradeDescription);
-
-
-		int cellCount = gridLayout.getChildCount();
-		int row = cellCount / gridLayout.getColumnCount();
-		int column = cellCount % gridLayout.getColumnCount();
-
-		GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
-
-		layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1);
-		layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1);
-
-		gridLayout.addView(view, layoutParams);
-	}
-
-	@Override
-	public void setDisplayClock(boolean displayClock) {
-		widgetDto.setDisplayClock(displayClock);
-	}
-
-	@Override
-	public void setDataViewsOfSavedData() {
-		RemoteViews remoteViews = createRemoteViews();
-
-		JsonObject jsonObject = (JsonObject) JsonParser.parseString(widgetDto.getResponseText());
-
-		AirQualityDto airQualityDto = AqicnResponseProcessor.parseTextToAirQualityDto(jsonObject);
-		AqicnResponseProcessor.init(context);
-
-		zoneId = ZoneId.of(widgetDto.getTimeZoneId());
-
-		setDataViews(remoteViews, widgetDto.getAddressName(), widgetDto.getLastRefreshDateTime(),
-				airQualityDto, null);
-		AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-		RemoteViewsUtil.onSuccessfulProcess(remoteViews);
-
-		appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
-	}
-
-	@Override
-	public void setResultViews(int appWidgetId, @Nullable @org.jetbrains.annotations.Nullable MultipleWeatherRestApiCallback multipleWeatherRestApiCallback, ZoneId zoneId) {
-		this.zoneId = zoneId;
-		final AirQualityDto airQualityDto = WeatherResponseProcessor.getAirQualityDto(multipleWeatherRestApiCallback, null);
-		final boolean successful = airQualityDto != null && airQualityDto.isSuccessful();
-
-		if (successful) {
-			ZoneOffset zoneOffset = ZoneOffset.of(airQualityDto.getTimeInfo().getTz());
-			widgetDto.setTimeZoneId(zoneId.getId());
-			widgetDto.setLastRefreshDateTime(multipleWeatherRestApiCallback.getRequestDateTime().toString());
-
-			makeResponseTextToJson(multipleWeatherRestApiCallback, getRequestWeatherDataTypeSet(), widgetDto.getWeatherProviderTypeSet(), widgetDto, zoneOffset);
-		}
-
-		widgetDto.setLoadSuccessful(successful);
-		super.setResultViews(appWidgetId, multipleWeatherRestApiCallback, zoneId);
-	}
+package com.lifedawn.bestweather.ui.widget.creator
+
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import android.widget.RemoteViews
+import android.widget.TextView
+import androidx.gridlayout.widget.GridLayout
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import com.lifedawn.bestweather.R
+import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil
+import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil.onErrorProcess
+import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil.onSuccessfulProcess
+import com.lifedawn.bestweather.commons.constants.WeatherDataType
+import com.lifedawn.bestweather.commons.constants.WeatherProviderType
+import com.lifedawn.bestweather.data.local.room.dto.WidgetDto
+import com.lifedawn.bestweather.data.local.room.repository.WidgetRepository.add
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto.DailyForecast
+import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto.DailyForecast.Val
+import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback
+import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnResponseProcessor.getGradeDescription
+import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnResponseProcessor.init
+import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnResponseProcessor.parseTextToAirQualityDto
+import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.WeatherResponseProcessor
+import com.lifedawn.bestweather.ui.widget.OnDrawBitmapCallback
+import com.lifedawn.bestweather.ui.widget.widgetprovider.SeventhWidgetProvider
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
+class SeventhWidgetCreator(context: Context, widgetUpdateCallback: WidgetUpdateCallback?, appWidgetId: Int) :
+    AbstractWidgetCreator(context, widgetUpdateCallback, appWidgetId) {
+    private val forecastDateFormatter = DateTimeFormatter.ofPattern("E")
+    override fun loadDefaultSettings(): WidgetDto? {
+        widgetDto = super.loadDefaultSettings()
+        widgetDto.getWeatherProviderTypeSet().clear()
+        widgetDto.getWeatherProviderTypeSet().add(WeatherProviderType.AQICN)
+        return widgetDto
+    }
+
+    override val requestWeatherDataTypeSet: Set<Any?>
+        get() {
+            val set: MutableSet<WeatherDataType?> = HashSet()
+            set.add(WeatherDataType.airQuality)
+            return set
+        }
+
+    override fun createTempViews(parentWidth: Int?, parentHeight: Int?): RemoteViews? {
+        val remoteViews = createBaseRemoteViews()
+        onSuccessfulProcess(remoteViews!!)
+        drawViews(
+            remoteViews,
+            context.getString(R.string.address_name),
+            ZonedDateTime.now().toString(),
+            WeatherResponseProcessor.getTempAirQualityDto(),
+            null,
+            parentWidth,
+            parentHeight
+        )
+        return remoteViews
+    }
+
+    override fun widgetProviderClass(): Class<*> {
+        return SeventhWidgetProvider::class.java
+    }
+
+    fun setDataViews(
+        remoteViews: RemoteViews?, addressName: String, lastRefreshDateTime: String,
+        airQualityDto: AirQualityDto?, onDrawBitmapCallback: OnDrawBitmapCallback?
+    ) {
+        drawViews(remoteViews, addressName, lastRefreshDateTime, airQualityDto, onDrawBitmapCallback, null, null)
+    }
+
+    private fun drawViews(
+        remoteViews: RemoteViews?, addressName: String, lastRefreshDateTime: String,
+        airQualityDto: AirQualityDto?, onDrawBitmapCallback: OnDrawBitmapCallback?, parentWidth: Int?,
+        parentHeight: Int?
+    ) {
+        if (!airQualityDto.isSuccessful()) {
+            onErrorProcess(remoteViews!!, context, RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA)
+            setRefreshPendingIntent(remoteViews)
+            return
+        }
+        val rootLayout = RelativeLayout(context)
+        val layoutInflater = LayoutInflater.from(context)
+        val headerView = makeHeaderViews(layoutInflater, addressName, lastRefreshDateTime)
+        headerView!!.id = R.id.header
+        val seventhView = layoutInflater.inflate(R.layout.view_seventh_widget, null, false) as ViewGroup
+        val stationName = context.getString(R.string.measuring_station_name) + ": " + airQualityDto!!.cityName
+        (seventhView.findViewById<View>(R.id.measuring_station_name) as TextView).text = stationName
+        val airQuality = context.getString(R.string.air_quality) + ": " + getGradeDescription(
+            airQualityDto.aqi
+        )
+        (seventhView.findViewById<View>(R.id.airQuality) as TextView).text = airQuality
+        val gridLayout = seventhView.findViewById<GridLayout>(R.id.airQualityGrid)
+
+        //co, so2, no2 순서로
+        val particleNames = arrayOf(
+            context.getString(R.string.co_str), context.getString(R.string.so2_str),
+            context.getString(R.string.no2_str)
+        )
+        val gradeValueList: MutableList<String> = ArrayList()
+        val gradeDescriptionList: MutableList<String> = ArrayList()
+        gradeValueList.add(airQualityDto.current!!.co.toString())
+        gradeDescriptionList.add(getGradeDescription(airQualityDto.current!!.co))
+        gradeValueList.add(airQualityDto.current!!.so2.toString())
+        gradeDescriptionList.add(getGradeDescription(airQualityDto.current!!.so2))
+        gradeValueList.add(airQualityDto.current!!.no2.toString())
+        gradeDescriptionList.add(getGradeDescription(airQualityDto.current!!.no2))
+        for (i in 0..2) {
+            addAirQualityGridItem(layoutInflater, gridLayout, particleNames[i], gradeValueList[i], gradeDescriptionList[i])
+        }
+        val forecastLayout = seventhView.findViewById<LinearLayout>(R.id.airQualityForecast)
+        val margin = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2f, context.resources.displayMetrics).toInt()
+        val noData = context.getString(R.string.noData)
+        val forecastItemLayoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        forecastItemLayoutParams.bottomMargin = margin
+        var forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null)
+        forecastItemView.setPadding(0, 0, 0, 0)
+        var dateTextView = forecastItemView.findViewById<TextView>(R.id.date)
+        var pm10TextView = forecastItemView.findViewById<TextView>(R.id.pm10)
+        var pm25TextView = forecastItemView.findViewById<TextView>(R.id.pm25)
+        var o3TextView = forecastItemView.findViewById<TextView>(R.id.o3)
+        dateTextView.text = null
+        pm10TextView.text = context.getString(R.string.pm10_str)
+        pm25TextView.text = context.getString(R.string.pm25_str)
+        o3TextView.text = context.getString(R.string.o3_str)
+        forecastLayout.addView(forecastItemView, forecastItemLayoutParams)
+        val current = DailyForecast()
+        current.setDate(null).setPm10(Val().setAvg(airQualityDto.current!!.pm10))
+            .setPm25(Val().setAvg(airQualityDto.current!!.pm25))
+            .setO3(Val().setAvg(airQualityDto.current!!.o3))
+        val dailyForecastList: MutableList<DailyForecast> = ArrayList()
+        dailyForecastList.add(current)
+        dailyForecastList.addAll(airQualityDto.dailyForecastList)
+        for (item in dailyForecastList) {
+            forecastItemView = layoutInflater.inflate(R.layout.air_quality_simple_forecast_item, null)
+            forecastItemView.setPadding(0, 0, 0, 0)
+            dateTextView = forecastItemView.findViewById(R.id.date)
+            pm10TextView = forecastItemView.findViewById(R.id.pm10)
+            pm25TextView = forecastItemView.findViewById(R.id.pm25)
+            o3TextView = forecastItemView.findViewById(R.id.o3)
+            dateTextView.text = if (item.date == null) context.getString(R.string.current) else item.date.format(forecastDateFormatter)
+            if (item.isHasPm10()) {
+                pm10TextView.text = getGradeDescription(item.pm10!!.avg)
+            } else {
+                pm10TextView.text = noData
+            }
+            if (item.isHasPm25()) {
+                pm25TextView.text = getGradeDescription(item.pm25!!.avg)
+            } else {
+                pm25TextView.text = noData
+            }
+            if (item.isHasO3()) {
+                o3TextView.text = getGradeDescription(item.o3!!.avg)
+            } else {
+                o3TextView.text = noData
+            }
+            forecastLayout.addView(forecastItemView, forecastItemLayoutParams)
+        }
+        val headerViewLayoutParams = headerViewLayoutParams
+        val seventhWidgetViewLayoutParams = RelativeLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
+        headerViewLayoutParams!!.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+        seventhWidgetViewLayoutParams.addRule(RelativeLayout.BELOW, R.id.header)
+        seventhWidgetViewLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+        rootLayout.addView(headerView, headerViewLayoutParams)
+        rootLayout.addView(seventhView, seventhWidgetViewLayoutParams)
+        drawBitmap(rootLayout, onDrawBitmapCallback, remoteViews!!, parentWidth, parentHeight)
+    }
+
+    private fun addAirQualityGridItem(
+        layoutInflater: LayoutInflater, gridLayout: GridLayout, label: String, gradeValue: String,
+        gradeDescription: String
+    ) {
+        val view = layoutInflater.inflate(R.layout.view_simple_air_quality_item, null, false)
+        val labelTextView = view.findViewById<TextView>(R.id.label)
+        val gradeValueTextView = view.findViewById<TextView>(R.id.gradeValue)
+        val gradeDescriptionTextView = view.findViewById<TextView>(R.id.gradeDescription)
+        labelTextView.text = label
+        gradeValueTextView.text = gradeValue
+        gradeDescriptionTextView.text = gradeDescription
+        val cellCount = gridLayout.childCount
+        val row = cellCount / gridLayout.columnCount
+        val column = cellCount % gridLayout.columnCount
+        val layoutParams = GridLayout.LayoutParams()
+        layoutParams.columnSpec = GridLayout.spec(column, GridLayout.FILL, 1f)
+        layoutParams.rowSpec = GridLayout.spec(row, GridLayout.FILL, 1f)
+        gridLayout.addView(view, layoutParams)
+    }
+
+    override fun setDisplayClock(displayClock: Boolean) {
+        widgetDto.isDisplayClock = displayClock
+    }
+
+    override fun setDataViewsOfSavedData() {
+        val remoteViews = createRemoteViews()
+        val jsonObject = JsonParser.parseString(widgetDto.responseText) as JsonObject
+        val airQualityDto = parseTextToAirQualityDto(jsonObject)
+        init(context)
+        zoneId = ZoneId.of(widgetDto.timeZoneId)
+        setDataViews(
+            remoteViews, widgetDto.addressName, widgetDto.lastRefreshDateTime,
+            airQualityDto, null
+        )
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        onSuccessfulProcess(remoteViews!!)
+        appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
+    }
+
+    override fun setResultViews(appWidgetId: Int, multipleWeatherRestApiCallback: MultipleWeatherRestApiCallback?, zoneId: ZoneId?) {
+        this.zoneId = zoneId
+        val airQualityDto = WeatherResponseProcessor.getAirQualityDto(multipleWeatherRestApiCallback, null)
+        val successful = airQualityDto != null && airQualityDto.isSuccessful()
+        if (successful) {
+            val zoneOffset = ZoneOffset.of(airQualityDto!!.timeInfo!!.tz)
+            widgetDto.timeZoneId = zoneId!!.id
+            widgetDto.lastRefreshDateTime = multipleWeatherRestApiCallback.getRequestDateTime().toString()
+            makeResponseTextToJson(
+                multipleWeatherRestApiCallback,
+                requestWeatherDataTypeSet,
+                widgetDto.getWeatherProviderTypeSet(),
+                widgetDto,
+                zoneOffset
+            )
+        }
+        widgetDto.isLoadSuccessful = successful
+        super.setResultViews(appWidgetId, multipleWeatherRestApiCallback, zoneId)
+    }
 }

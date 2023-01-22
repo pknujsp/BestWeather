@@ -1,575 +1,443 @@
-package com.lifedawn.bestweather.ui.widget.work;
-
-import android.app.Notification;
-import android.appwidget.AppWidgetManager;
-import android.content.Context;
-import android.location.Location;
-import android.os.Build;
-import android.widget.RemoteViews;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.concurrent.futures.CallbackToFutureAdapter;
-import androidx.core.app.NotificationCompat;
-import androidx.preference.PreferenceManager;
-import androidx.work.Data;
-import androidx.work.ForegroundInfo;
-import androidx.work.ListenableWorker;
-import androidx.work.WorkerParameters;
-
-import com.google.android.gms.location.LocationResult;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.classes.location.FusedLocation;
-import com.lifedawn.bestweather.commons.classes.Geocoding;
-import com.lifedawn.bestweather.commons.constants.LocationType;
-import com.lifedawn.bestweather.commons.constants.WeatherDataType;
-import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
-import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback;
-import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil;
-import com.lifedawn.bestweather.data.MyApplication;
-import com.lifedawn.bestweather.ui.notification.NotificationHelper;
-import com.lifedawn.bestweather.ui.notification.NotificationType;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
-import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.data.local.room.dto.WidgetDto;
-import com.lifedawn.bestweather.data.local.room.repository.WidgetRepository;
-import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WeatherRequestUtil;
-import com.lifedawn.bestweather.ui.widget.WidgetHelper;
-import com.lifedawn.bestweather.ui.widget.creator.AbstractWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.EighthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.EleventhWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.FifthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.FirstWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.FourthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.NinthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.SecondWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.SeventhWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.SixthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.TenthWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.creator.ThirdWidgetCreator;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.EighthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.EleventhWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.FifthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.FirstWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.FourthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.NinthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.SecondWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.SeventhWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.SixthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.TenthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.ThirdWidgetProvider;
-
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-public class WidgetListenableWorker extends ListenableWorker {
-	private final Map<Integer, WidgetDto> currentLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
-	private final Map<Integer, WidgetDto> selectedLocationWidgetDtoArrayMap = new ConcurrentHashMap<>();
-	private final Map<Integer, WidgetDto> allWidgetDtoArrayMap = new ConcurrentHashMap<>();
-	private final Map<Integer, MultipleWeatherRestApiCallback> multipleRestApiDownloaderMap = new ConcurrentHashMap<>();
-	private final Map<Integer, AbstractWidgetCreator> widgetCreatorMap = new ConcurrentHashMap<>();
-
-	private MultipleWeatherRestApiCallback currentLocationResponseMultipleWeatherRestApiCallback;
-	private final Map<String, MultipleWeatherRestApiCallback> selectedLocationResponseMap = new ConcurrentHashMap<>();
-
-	private RequestObj currentLocationRequestObj;
-	private final Map<String, RequestObj> selectedLocationRequestMap = new ConcurrentHashMap<>();
-
-	private WidgetRepository widgetRepository;
-	private AppWidgetManager appWidgetManager;
-	private final ExecutorService executorService = MyApplication.getExecutorService();
-	private FusedLocation fusedLocation;
-	private int requestCount;
-	private final AtomicInteger responseCount = new AtomicInteger(0);
-	private final String ACTION;
-	private final int APP_WIDGET_ID;
-
-	public static AtomicBoolean processing = new AtomicBoolean(false);
-
-
-	public WidgetListenableWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
-		super(context, workerParams);
-		processing.set(true);
-
-		if (widgetRepository == null) {
-			widgetRepository = WidgetRepository.getINSTANCE();
-		}
-		if (appWidgetManager == null) {
-			appWidgetManager = AppWidgetManager.getInstance(context);
-		}
-
-		Data parameterData = workerParams.getInputData();
-		ACTION = parameterData.getString("action");
-		APP_WIDGET_ID = parameterData.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 0);
-
-		currentLocationRequestObj = null;
-		currentLocationWidgetDtoArrayMap.clear();
-
-		selectedLocationRequestMap.clear();
-		selectedLocationResponseMap.clear();
-		selectedLocationWidgetDtoArrayMap.clear();
-		allWidgetDtoArrayMap.clear();
-
-		multipleRestApiDownloaderMap.clear();
-		widgetCreatorMap.clear();
-	}
-
-	@NonNull
-	@Override
-	public ListenableFuture<Result> startWork() {
-		processing.set(true);
-
-
-		return CallbackToFutureAdapter.getFuture(completer -> {
-			final BackgroundWorkCallback backgroundWorkCallback = () -> {
-				completer.set(Result.success());
-			};
-
-
-			if (ACTION.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_INIT))) {
-				widgetRepository.get(APP_WIDGET_ID, new DbQueryCallback<WidgetDto>() {
-					@Override
-					public void onResultSuccessful(WidgetDto widgetDto) {
-						AbstractWidgetCreator widgetCreator = createWidgetViewCreator(APP_WIDGET_ID, widgetDto.getWidgetProviderClassName());
-						WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
-						long widgetRefreshInterval = widgetHelper.getRefreshInterval();
-
-						if (widgetRefreshInterval > 0 && !widgetHelper.isRepeating()) {
-							widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval);
-						}
-
-						requestCount = 1;
-
-						final AbstractWidgetCreator.RemoteViewsCallback remoteViewsCallback =
-								new AbstractWidgetCreator.RemoteViewsCallback(requestCount) {
-
-									@Override
-									protected void onFinished(Map<Integer, RemoteViews> remoteViewsMap) {
-										processing.set(false);
-
-										for (int id : remoteViewsMap.keySet()) {
-											appWidgetManager.updateAppWidget(id, remoteViewsMap.get(id));
-										}
-										backgroundWorkCallback.onFinished();
-									}
-								};
-
-						widgetCreator.setRemoteViewsCallback(remoteViewsCallback);
-						if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
-							currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
-							allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
-
-							showProgressBar();
-							loadCurrentLocation(backgroundWorkCallback);
-						} else {
-							selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
-							Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(), widgetDto.getLongitude(),
-									widgetDto.getAddressName(), null, widgetDto.getCountryCode());
-
-							final RequestObj requestObj = new RequestObj(address, ZoneId.of(widgetDto.getTimeZoneId()));
-							requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
-							requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet());
-							requestObj.appWidgetSet.add(widgetDto.getAppWidgetId());
-
-							selectedLocationRequestMap.put(widgetDto.getAddressName(), requestObj);
-							List<String> addressList = new ArrayList<>();
-							addressList.add(widgetDto.getAddressName());
-							allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
-
-							showProgressBar();
-							loadWeatherData(LocationType.SelectedAddress, addressList, backgroundWorkCallback);
-						}
-					}
-
-					@Override
-					public void onResultNoData() {
-						backgroundWorkCallback.onFinished();
-					}
-				});
-
-			} else if (ACTION.equals(getApplicationContext().getString(R.string.com_lifedawn_bestweather_action_REFRESH))) {
-				widgetRepository.getAll(new DbQueryCallback<List<WidgetDto>>() {
-					@Override
-					public void onResultSuccessful(List<WidgetDto> list) {
-						List<String> addressList = new ArrayList<>();
-
-						final AbstractWidgetCreator.RemoteViewsCallback remoteViewsCallback =
-								new AbstractWidgetCreator.RemoteViewsCallback(list.size()) {
-
-									@Override
-									protected void onFinished(Map<Integer, RemoteViews> remoteViewsMap) {
-										processing.set(false);
-
-										for (int id : remoteViewsMap.keySet()) {
-											appWidgetManager.updateAppWidget(id, remoteViewsMap.get(id));
-										}
-										backgroundWorkCallback.onFinished();
-									}
-								};
-
-
-						for (WidgetDto widgetDto : list) {
-							AbstractWidgetCreator widgetCreator = createWidgetViewCreator(widgetDto.getAppWidgetId(),
-									widgetDto.getWidgetProviderClassName());
-							widgetCreator.setRemoteViewsCallback(remoteViewsCallback);
-
-							if (widgetDto.getLocationType() == LocationType.CurrentLocation) {
-								currentLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
-							} else {
-								selectedLocationWidgetDtoArrayMap.put(widgetDto.getAppWidgetId(), widgetDto);
-
-								RequestObj requestObj = selectedLocationRequestMap.get(widgetDto.getAddressName());
-								if (requestObj == null) {
-									Geocoding.AddressDto address = new Geocoding.AddressDto(widgetDto.getLatitude(), widgetDto.getLongitude(),
-											widgetDto.getAddressName(), null, widgetDto.getCountryCode());
-
-									requestObj = new RequestObj(address, ZoneId.of(widgetDto.getTimeZoneId()));
-
-									selectedLocationRequestMap.put(widgetDto.getAddressName(), requestObj);
-									addressList.add(widgetDto.getAddressName());
-								}
-
-								requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet());
-								requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet());
-								requestObj.appWidgetSet.add(widgetDto.getAppWidgetId());
-							}
-						}
-
-						allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap);
-						allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap);
-
-						showProgressBar();
-
-						requestCount = 0;
-
-						if (!currentLocationWidgetDtoArrayMap.isEmpty()) {
-							requestCount++;
-							loadCurrentLocation(backgroundWorkCallback);
-						}
-						if (!selectedLocationWidgetDtoArrayMap.isEmpty()) {
-							requestCount = addressList.size();
-							loadWeatherData(LocationType.SelectedAddress, addressList, backgroundWorkCallback);
-						}
-
-					}
-
-					@Override
-					public void onResultNoData() {
-						backgroundWorkCallback.onFinished();
-					}
-				});
-			}
-			return backgroundWorkCallback;
-		});
-
-
-	}
-
-	@NonNull
-	@Override
-	public ListenableFuture<ForegroundInfo> getForegroundInfoAsync() {
-		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-		NotificationHelper.NotificationObj notificationObj = notificationHelper.createNotification(NotificationType.ForegroundService);
-
-		NotificationCompat.Builder builder = notificationObj.getNotificationBuilder();
-		builder.setSmallIcon(R.mipmap.ic_launcher_round).setContentText(getApplicationContext().getString(R.string.updatingWidgets)).setContentTitle(
-						getApplicationContext().getString(R.string.updatingWidgets))
-				.setOnlyAlertOnce(true).setWhen(0).setOngoing(true);
-
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-			builder.setPriority(NotificationCompat.PRIORITY_LOW).setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-		}
-
-		Notification notification = notificationObj.getNotificationBuilder().build();
-		final int notificationId = (int) System.currentTimeMillis();
-
-		ForegroundInfo foregroundInfo = new ForegroundInfo(notificationId, notification);
-
-		return new ListenableFuture<ForegroundInfo>() {
-			@Override
-			public void addListener(Runnable listener, Executor executor) {
-
-			}
-
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				return false;
-			}
-
-			@Override
-			public boolean isCancelled() {
-				return false;
-			}
-
-			@Override
-			public boolean isDone() {
-				return true;
-			}
-
-			@Override
-			public ForegroundInfo get() throws ExecutionException, InterruptedException {
-				return foregroundInfo;
-			}
-
-			@Override
-			public ForegroundInfo get(long timeout, TimeUnit unit) throws ExecutionException, InterruptedException, TimeoutException {
-				return foregroundInfo;
-			}
-		};
-	}
-
-
-	@Override
-	public void onStopped() {
-		processing.set(false);
-
-		// WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
-		// widgetHelper.reDrawWidgets(null);
-	}
-
-	private void showProgressBar() {
-		AbstractWidgetCreator tempWidgetCreator = new EighthWidgetCreator(getApplicationContext(), null, 0);
-		RemoteViews tempRemoteViews = tempWidgetCreator.createRemoteViews();
-
-		for (Integer appWidgetId : allWidgetDtoArrayMap.keySet())
-			appWidgetManager.updateAppWidget(appWidgetId, tempRemoteViews);
-	}
-
-
-	private AbstractWidgetCreator createWidgetViewCreator(int appWidgetId, String widgetProviderClassName) {
-		AbstractWidgetCreator widgetCreator = null;
-
-		if (widgetProviderClassName.equals(FirstWidgetProvider.class.getName())) {
-			widgetCreator = new FirstWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (widgetProviderClassName.equals(SecondWidgetProvider.class.getName())) {
-			widgetCreator = new SecondWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (widgetProviderClassName.equals(ThirdWidgetProvider.class.getName())) {
-			widgetCreator = new ThirdWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (widgetProviderClassName.equals(FourthWidgetProvider.class.getName())) {
-			widgetCreator = new FourthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (widgetProviderClassName.equals(FifthWidgetProvider.class.getName())) {
-			widgetCreator = new FifthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (widgetProviderClassName.equals(SixthWidgetProvider.class.getName())) {
-			widgetCreator = new SixthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (widgetProviderClassName.equals(SeventhWidgetProvider.class.getName())) {
-			widgetCreator = new SeventhWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (widgetProviderClassName.equals(EighthWidgetProvider.class.getName())) {
-			widgetCreator = new EighthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (widgetProviderClassName.equals(NinthWidgetProvider.class.getName())) {
-			widgetCreator = new NinthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (widgetProviderClassName.equals(TenthWidgetProvider.class.getName())) {
-			widgetCreator = new TenthWidgetCreator(getApplicationContext(), null, appWidgetId);
-		} else if (widgetProviderClassName.equals(EleventhWidgetProvider.class.getName())) {
-			widgetCreator = new EleventhWidgetCreator(getApplicationContext(), null, appWidgetId);
-		}
-
-		widgetCreatorMap.put(appWidgetId, widgetCreator);
-
-		return widgetCreator;
-	}
-
-
-	public void loadCurrentLocation(BackgroundWorkCallback backgroundWorkCallback) {
-		final Set<Integer> appWidgetIdSet = currentLocationWidgetDtoArrayMap.keySet();
-		currentLocationRequestObj = new RequestObj(null, null);
-
-		for (Integer appWidgetId : appWidgetIdSet) {
-			currentLocationRequestObj.weatherDataTypeSet.addAll(widgetCreatorMap.get(appWidgetId).getRequestWeatherDataTypeSet());
-			currentLocationRequestObj.weatherProviderTypeSet.addAll(currentLocationWidgetDtoArrayMap.get(appWidgetId).getWeatherProviderTypeSet());
-			currentLocationRequestObj.appWidgetSet.add(appWidgetId);
-		}
-
-		NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext());
-
-		final FusedLocation.MyLocationCallback locationCallback = new FusedLocation.MyLocationCallback() {
-			@Override
-			public void onSuccessful(LocationResult locationResult) {
-				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
-				final Location location = getBestLocation(locationResult);
-
-				Geocoding.nominatimReverseGeocoding(getApplicationContext(), location.getLatitude(), location.getLongitude(),
-						new Geocoding.ReverseGeocodingCallback() {
-							@Override
-							public void onReverseGeocodingResult(Geocoding.AddressDto address) {
-								if (address == null) {
-									onLocationResponse(Fail.FAILED_FIND_LOCATION, null, backgroundWorkCallback);
-								} else {
-									final String addressName = address.displayName;
-									currentLocationRequestObj.address = address;
-
-									final String zoneIdText = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-											.getString("zoneId", "");
-									currentLocationRequestObj.zoneId = ZoneId.of(zoneIdText);
-									onResultCurrentLocation(addressName, address, backgroundWorkCallback);
-								}
-							}
-						});
-			}
-
-			@Override
-			public void onFailed(Fail fail) {
-				notificationHelper.cancelNotification(NotificationType.Location.getNotificationId());
-				onLocationResponse(fail, null, backgroundWorkCallback);
-			}
-		};
-
-		fusedLocation = new FusedLocation(getApplicationContext());
-		fusedLocation.findCurrentLocation(locationCallback, true);
-	}
-
-	private void onResultCurrentLocation(String addressName, Geocoding.AddressDto newAddress, BackgroundWorkCallback backgroundWorkCallback) {
-		for (Integer appWidgetId : currentLocationWidgetDtoArrayMap.keySet()) {
-			WidgetDto widgetDto = currentLocationWidgetDtoArrayMap.get(appWidgetId);
-
-			widgetDto.setAddressName(addressName);
-			widgetDto.setCountryCode(newAddress.countryCode);
-			widgetDto.setLatitude(newAddress.latitude);
-			widgetDto.setLongitude(newAddress.longitude);
-			widgetDto.setTimeZoneId(currentLocationRequestObj.zoneId.getId());
-
-			widgetRepository.update(widgetDto, null);
-		}
-
-		onLocationResponse(null, addressName, backgroundWorkCallback);
-	}
-
-	private void onLocationResponse(@Nullable FusedLocation.MyLocationCallback.Fail fail, @Nullable String addressName,
-	                                BackgroundWorkCallback backgroundWorkCallback) {
-		if (fail == null) {
-			List<String> addressesList = new ArrayList<>();
-			addressesList.add(addressName);
-			loadWeatherData(LocationType.CurrentLocation, addressesList, backgroundWorkCallback);
-		} else {
-			RemoteViewsUtil.ErrorType errorType = null;
-
-			if (fail == FusedLocation.MyLocationCallback.Fail.DENIED_LOCATION_PERMISSIONS) {
-				errorType = RemoteViewsUtil.ErrorType.DENIED_GPS_PERMISSIONS;
-			} else if (fail == FusedLocation.MyLocationCallback.Fail.DISABLED_GPS) {
-				errorType = RemoteViewsUtil.ErrorType.GPS_OFF;
-			} else if (fail == FusedLocation.MyLocationCallback.Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION) {
-				errorType = RemoteViewsUtil.ErrorType.DENIED_BACKGROUND_LOCATION_PERMISSION;
-			} else {
-				errorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA;
-			}
-
-			for (Integer appWidgetId : currentLocationWidgetDtoArrayMap.keySet()) {
-				allWidgetDtoArrayMap.get(appWidgetId).setLastErrorType(errorType);
-				allWidgetDtoArrayMap.get(appWidgetId).setLoadSuccessful(false);
-			}
-			onResponseResult(LocationType.CurrentLocation, null, backgroundWorkCallback);
-		}
-
-	}
-
-
-	private void loadWeatherData(LocationType locationType, List<String> addressList, BackgroundWorkCallback backgroundWorkCallback) {
-		for (String addressName : addressList) {
-			MultipleWeatherRestApiCallback multipleWeatherRestApiCallback = new MultipleWeatherRestApiCallback() {
-				@Override
-				public void onResult() {
-					onResponseResult(locationType, addressName, backgroundWorkCallback);
-				}
-
-				@Override
-				public void onCanceled() {
-					onResponseResult(locationType, addressName, backgroundWorkCallback);
-				}
-			};
-
-			RequestObj requestObj = null;
-
-			if (locationType == LocationType.SelectedAddress) {
-				requestObj = selectedLocationRequestMap.get(addressName);
-				selectedLocationResponseMap.put(addressName, multipleWeatherRestApiCallback);
-			} else {
-				requestObj = currentLocationRequestObj;
-				currentLocationResponseMultipleWeatherRestApiCallback = multipleWeatherRestApiCallback;
-
-				boolean onlyKma = true;
-
-				for (Integer appWidgetId : currentLocationWidgetDtoArrayMap.keySet()) {
-					if (currentLocationWidgetDtoArrayMap.get(appWidgetId).isTopPriorityKma() &&
-							currentLocationWidgetDtoArrayMap.get(appWidgetId).getCountryCode().equals("KR")) {
-						requestObj.weatherProviderTypeSet.add(WeatherProviderType.KMA_WEB);
-					} else if (!currentLocationWidgetDtoArrayMap.get(appWidgetId).isTopPriorityKma()) {
-						onlyKma = false;
-					}
-				}
-
-				if (onlyKma) {
-					requestObj.weatherProviderTypeSet.remove(WeatherProviderType.ACCU_WEATHER);
-					requestObj.weatherProviderTypeSet.remove(WeatherProviderType.MET_NORWAY);
-					requestObj.weatherProviderTypeSet.remove(WeatherProviderType.OWM_ONECALL);
-				}
-			}
-			multipleWeatherRestApiCallback.setZoneId(requestObj.zoneId);
-
-			WeatherRequestUtil.loadWeatherData(getApplicationContext(), executorService, requestObj.address.latitude,
-					requestObj.address.longitude, requestObj.weatherDataTypeSet, multipleWeatherRestApiCallback,
-					requestObj.weatherProviderTypeSet, multipleWeatherRestApiCallback.getZoneId());
-		}
-	}
-
-	private void onResponseResult(LocationType locationType, String addressName, BackgroundWorkCallback backgroundWorkCallback) {
-		MultipleWeatherRestApiCallback restApiDownloader = null;
-		Set<Integer> appWidgetIdSet = null;
-
-		if (locationType == LocationType.SelectedAddress) {
-			restApiDownloader = selectedLocationResponseMap.get(addressName);
-			appWidgetIdSet = selectedLocationRequestMap.get(addressName).appWidgetSet;
-		} else {
-			restApiDownloader = currentLocationResponseMultipleWeatherRestApiCallback;
-			appWidgetIdSet = currentLocationRequestObj.appWidgetSet;
-		}
-
-		for (int appWidgetId : appWidgetIdSet) {
-			multipleRestApiDownloaderMap.put(appWidgetId, restApiDownloader);
-
-			AbstractWidgetCreator widgetCreator = widgetCreatorMap.get(appWidgetId);
-			widgetCreator.setWidgetDto(allWidgetDtoArrayMap.get(appWidgetId));
-			widgetCreator.setResultViews(appWidgetId,
-					multipleRestApiDownloaderMap.get(appWidgetId), restApiDownloader.getZoneId());
-		}
-
-		//응답 처리가 끝난 요청객체를 제거
-		if (addressName != null && locationType == LocationType.SelectedAddress) {
-			selectedLocationRequestMap.remove(addressName);
-		} else if (locationType == LocationType.CurrentLocation) {
-			currentLocationRequestObj = null;
-		}
-
-		/*
+package com.lifedawn.bestweather.ui.widget.work
+
+import android.app.Notification
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.location.Location
+import android.os.Build
+import android.widget.RemoteViews
+import androidx.core.app.NotificationCompat
+import androidx.preference.PreferenceManager
+import androidx.work.ForegroundInfo
+import androidx.work.ListenableWorker
+import androidx.work.WorkerParameters
+import com.google.common.util.concurrent.ListenableFuture
+import com.lifedawn.bestweather.R
+import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil
+import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
+import com.lifedawn.bestweather.ui.notification.NotificationType
+import java.time.ZoneId
+import java.util.concurrent.*
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
+
+class WidgetListenableWorker(context: Context, workerParams: WorkerParameters) : ListenableWorker(context, workerParams) {
+    private val currentLocationWidgetDtoArrayMap: MutableMap<Int, WidgetDto> = ConcurrentHashMap<Int, WidgetDto>()
+    private val selectedLocationWidgetDtoArrayMap: MutableMap<Int, WidgetDto> = ConcurrentHashMap<Int, WidgetDto>()
+    private val allWidgetDtoArrayMap: MutableMap<Int, WidgetDto> = ConcurrentHashMap<Int, WidgetDto>()
+    private val multipleRestApiDownloaderMap: MutableMap<Int, MultipleWeatherRestApiCallback?> =
+        ConcurrentHashMap<Int, MultipleWeatherRestApiCallback?>()
+    private val widgetCreatorMap: MutableMap<Int, AbstractWidgetCreator?> = ConcurrentHashMap<Int, AbstractWidgetCreator?>()
+    private var currentLocationResponseMultipleWeatherRestApiCallback: MultipleWeatherRestApiCallback? = null
+    private val selectedLocationResponseMap: MutableMap<String?, MultipleWeatherRestApiCallback> =
+        ConcurrentHashMap<String?, MultipleWeatherRestApiCallback>()
+    private var currentLocationRequestObj: RequestObj?
+    private val selectedLocationRequestMap: MutableMap<String?, RequestObj> = ConcurrentHashMap()
+    private var widgetRepository: WidgetRepository? = null
+    private var appWidgetManager: AppWidgetManager? = null
+    private val executorService: ExecutorService = MyApplication.getExecutorService()
+    private var fusedLocation: FusedLocation? = null
+    private var requestCount = 0
+    private val responseCount = AtomicInteger(0)
+    private val ACTION: String?
+    private val APP_WIDGET_ID: Int
+
+    init {
+        processing.set(true)
+        if (widgetRepository == null) {
+            widgetRepository = WidgetRepository.getINSTANCE()
+        }
+        if (appWidgetManager == null) {
+            appWidgetManager = AppWidgetManager.getInstance(context)
+        }
+        val parameterData = workerParams.inputData
+        ACTION = parameterData.getString("action")
+        APP_WIDGET_ID = parameterData.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
+        currentLocationRequestObj = null
+        currentLocationWidgetDtoArrayMap.clear()
+        selectedLocationRequestMap.clear()
+        selectedLocationResponseMap.clear()
+        selectedLocationWidgetDtoArrayMap.clear()
+        allWidgetDtoArrayMap.clear()
+        multipleRestApiDownloaderMap.clear()
+        widgetCreatorMap.clear()
+    }
+
+    override fun startWork(): ListenableFuture<Result> {
+        processing.set(true)
+        return CallbackToFutureAdapter.getFuture<Result>(CallbackToFutureAdapter.Resolver<Result> { completer: CallbackToFutureAdapter.Completer<Result?> ->
+            val backgroundWorkCallback = BackgroundWorkCallback {
+                completer.set(
+                    Result.success()
+                )
+            }
+            if (ACTION == applicationContext.getString(R.string.com_lifedawn_bestweather_action_INIT)) {
+                widgetRepository.get(APP_WIDGET_ID, object : DbQueryCallback<WidgetDto?>() {
+                    fun onResultSuccessful(widgetDto: WidgetDto) {
+                        val widgetCreator: AbstractWidgetCreator? =
+                            createWidgetViewCreator(APP_WIDGET_ID, widgetDto.widgetProviderClassName)
+                        val widgetHelper = WidgetHelper(applicationContext)
+                        val widgetRefreshInterval: Long = widgetHelper.getRefreshInterval()
+                        if (widgetRefreshInterval > 0 && !widgetHelper.isRepeating()) {
+                            widgetHelper.onSelectedAutoRefreshInterval(widgetRefreshInterval)
+                        }
+                        requestCount = 1
+                        val remoteViewsCallback: RemoteViewsCallback = object : RemoteViewsCallback(requestCount) {
+                            protected override fun onFinished(remoteViewsMap: Map<Int, RemoteViews?>) {
+                                processing.set(false)
+                                for (id in remoteViewsMap.keys) {
+                                    appWidgetManager!!.updateAppWidget(id, remoteViewsMap[id])
+                                }
+                                backgroundWorkCallback.onFinished()
+                            }
+                        }
+                        widgetCreator.setRemoteViewsCallback(remoteViewsCallback)
+                        if (widgetDto.locationType === LocationType.CurrentLocation) {
+                            currentLocationWidgetDtoArrayMap[widgetDto.appWidgetId] = widgetDto
+                            allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap)
+                            showProgressBar()
+                            loadCurrentLocation(backgroundWorkCallback)
+                        } else {
+                            selectedLocationWidgetDtoArrayMap[widgetDto.appWidgetId] = widgetDto
+                            val address: Geocoding.AddressDto = AddressDto(
+                                widgetDto.latitude, widgetDto.longitude,
+                                widgetDto.addressName, null, widgetDto.countryCode
+                            )
+                            val requestObj = RequestObj(address, ZoneId.of(widgetDto.timeZoneId))
+                            requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet())
+                            requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet())
+                            requestObj.appWidgetSet.add(widgetDto.appWidgetId)
+                            selectedLocationRequestMap[widgetDto.addressName] = requestObj
+                            val addressList: MutableList<String?> = ArrayList()
+                            addressList.add(widgetDto.addressName)
+                            allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap)
+                            showProgressBar()
+                            loadWeatherData(LocationType.SelectedAddress, addressList, backgroundWorkCallback)
+                        }
+                    }
+
+                    fun onResultNoData() {
+                        backgroundWorkCallback.onFinished()
+                    }
+                })
+            } else if (ACTION == applicationContext.getString(R.string.com_lifedawn_bestweather_action_REFRESH)) {
+                widgetRepository.getAll(object : DbQueryCallback<List<WidgetDto?>?>() {
+                    fun onResultSuccessful(list: List<WidgetDto?>) {
+                        val addressList: MutableList<String?> = ArrayList()
+                        val remoteViewsCallback: RemoteViewsCallback = object : RemoteViewsCallback(list.size) {
+                            protected override fun onFinished(remoteViewsMap: Map<Int, RemoteViews?>) {
+                                processing.set(false)
+                                for (id in remoteViewsMap.keys) {
+                                    appWidgetManager!!.updateAppWidget(id, remoteViewsMap[id])
+                                }
+                                backgroundWorkCallback.onFinished()
+                            }
+                        }
+                        for (widgetDto in list) {
+                            val widgetCreator: AbstractWidgetCreator? = createWidgetViewCreator(
+                                widgetDto.appWidgetId,
+                                widgetDto.widgetProviderClassName
+                            )
+                            widgetCreator.setRemoteViewsCallback(remoteViewsCallback)
+                            if (widgetDto.locationType === LocationType.CurrentLocation) {
+                                currentLocationWidgetDtoArrayMap[widgetDto.appWidgetId] = widgetDto
+                            } else {
+                                selectedLocationWidgetDtoArrayMap[widgetDto.appWidgetId] = widgetDto
+                                var requestObj = selectedLocationRequestMap[widgetDto.addressName]
+                                if (requestObj == null) {
+                                    val address: Geocoding.AddressDto = AddressDto(
+                                        widgetDto.latitude, widgetDto.longitude,
+                                        widgetDto.addressName, null, widgetDto.countryCode
+                                    )
+                                    requestObj = RequestObj(address, ZoneId.of(widgetDto.timeZoneId))
+                                    selectedLocationRequestMap[widgetDto.addressName] = requestObj
+                                    addressList.add(widgetDto.addressName)
+                                }
+                                requestObj.weatherDataTypeSet.addAll(widgetCreator.getRequestWeatherDataTypeSet())
+                                requestObj.weatherProviderTypeSet.addAll(widgetDto.getWeatherProviderTypeSet())
+                                requestObj.appWidgetSet.add(widgetDto.appWidgetId)
+                            }
+                        }
+                        allWidgetDtoArrayMap.putAll(currentLocationWidgetDtoArrayMap)
+                        allWidgetDtoArrayMap.putAll(selectedLocationWidgetDtoArrayMap)
+                        showProgressBar()
+                        requestCount = 0
+                        if (!currentLocationWidgetDtoArrayMap.isEmpty()) {
+                            requestCount++
+                            loadCurrentLocation(backgroundWorkCallback)
+                        }
+                        if (!selectedLocationWidgetDtoArrayMap.isEmpty()) {
+                            requestCount = addressList.size
+                            loadWeatherData(LocationType.SelectedAddress, addressList, backgroundWorkCallback)
+                        }
+                    }
+
+                    fun onResultNoData() {
+                        backgroundWorkCallback.onFinished()
+                    }
+                })
+            }
+            backgroundWorkCallback
+        })
+    }
+
+    override fun getForegroundInfoAsync(): ListenableFuture<ForegroundInfo> {
+        val notificationHelper = NotificationHelper(applicationContext)
+        val notificationObj: NotificationObj = notificationHelper.createNotification(NotificationType.ForegroundService)
+        val builder: NotificationCompat.Builder = notificationObj.getNotificationBuilder()
+        builder.setSmallIcon(R.mipmap.ic_launcher_round).setContentText(applicationContext.getString(R.string.updatingWidgets))
+            .setContentTitle(
+                applicationContext.getString(R.string.updatingWidgets)
+            )
+            .setOnlyAlertOnce(true).setWhen(0).setOngoing(true)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            builder.setPriority(NotificationCompat.PRIORITY_LOW).setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        }
+        val notification: Notification = notificationObj.getNotificationBuilder().build()
+        val notificationId = System.currentTimeMillis().toInt()
+        val foregroundInfo = ForegroundInfo(notificationId, notification)
+        return object : ListenableFuture<ForegroundInfo?> {
+            override fun addListener(listener: Runnable, executor: Executor) {}
+            override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
+                return false
+            }
+
+            override fun isCancelled(): Boolean {
+                return false
+            }
+
+            override fun isDone(): Boolean {
+                return true
+            }
+
+            @Throws(ExecutionException::class, InterruptedException::class)
+            override fun get(): ForegroundInfo {
+                return foregroundInfo
+            }
+
+            @Throws(ExecutionException::class, InterruptedException::class, TimeoutException::class)
+            override fun get(timeout: Long, unit: TimeUnit): ForegroundInfo {
+                return foregroundInfo
+            }
+        }
+    }
+
+    override fun onStopped() {
+        processing.set(false)
+
+        // WidgetHelper widgetHelper = new WidgetHelper(getApplicationContext());
+        // widgetHelper.reDrawWidgets(null);
+    }
+
+    private fun showProgressBar() {
+        val tempWidgetCreator: AbstractWidgetCreator = EighthWidgetCreator(applicationContext, null, 0)
+        val tempRemoteViews: RemoteViews = tempWidgetCreator.createRemoteViews()
+        for (appWidgetId in allWidgetDtoArrayMap.keys) appWidgetManager!!.updateAppWidget(appWidgetId, tempRemoteViews)
+    }
+
+    private fun createWidgetViewCreator(appWidgetId: Int, widgetProviderClassName: String): AbstractWidgetCreator? {
+        var widgetCreator: AbstractWidgetCreator? = null
+        if (widgetProviderClassName == FirstWidgetProvider::class.java.getName()) {
+            widgetCreator = FirstWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (widgetProviderClassName == SecondWidgetProvider::class.java.getName()) {
+            widgetCreator = SecondWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (widgetProviderClassName == ThirdWidgetProvider::class.java.getName()) {
+            widgetCreator = ThirdWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (widgetProviderClassName == FourthWidgetProvider::class.java.getName()) {
+            widgetCreator = FourthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (widgetProviderClassName == FifthWidgetProvider::class.java.getName()) {
+            widgetCreator = FifthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (widgetProviderClassName == SixthWidgetProvider::class.java.getName()) {
+            widgetCreator = SixthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (widgetProviderClassName == SeventhWidgetProvider::class.java.getName()) {
+            widgetCreator = SeventhWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (widgetProviderClassName == EighthWidgetProvider::class.java.getName()) {
+            widgetCreator = EighthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (widgetProviderClassName == NinthWidgetProvider::class.java.getName()) {
+            widgetCreator = NinthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (widgetProviderClassName == TenthWidgetProvider::class.java.getName()) {
+            widgetCreator = TenthWidgetCreator(applicationContext, null, appWidgetId)
+        } else if (widgetProviderClassName == EleventhWidgetProvider::class.java.getName()) {
+            widgetCreator = EleventhWidgetCreator(applicationContext, null, appWidgetId)
+        }
+        widgetCreatorMap[appWidgetId] = widgetCreator
+        return widgetCreator
+    }
+
+    fun loadCurrentLocation(backgroundWorkCallback: BackgroundWorkCallback) {
+        val appWidgetIdSet: Set<Int> = currentLocationWidgetDtoArrayMap.keys
+        currentLocationRequestObj = RequestObj(null, null)
+        for (appWidgetId in appWidgetIdSet) {
+            currentLocationRequestObj!!.weatherDataTypeSet.addAll(widgetCreatorMap[appWidgetId].getRequestWeatherDataTypeSet())
+            currentLocationRequestObj!!.weatherProviderTypeSet.addAll(currentLocationWidgetDtoArrayMap[appWidgetId].getWeatherProviderTypeSet())
+            currentLocationRequestObj!!.appWidgetSet.add(appWidgetId)
+        }
+        val notificationHelper = NotificationHelper(applicationContext)
+        val locationCallback: FusedLocation.MyLocationCallback = object : MyLocationCallback() {
+            fun onSuccessful(locationResult: LocationResult?) {
+                notificationHelper.cancelNotification(NotificationType.Location.notificationId)
+                val location: Location = getBestLocation(locationResult)
+                Geocoding.nominatimReverseGeocoding(
+                    applicationContext, location.latitude, location.longitude,
+                    object : ReverseGeocodingCallback() {
+                        fun onReverseGeocodingResult(address: Geocoding.AddressDto?) {
+                            if (address == null) {
+                                onLocationResponse(Fail.FAILED_FIND_LOCATION, null, backgroundWorkCallback)
+                            } else {
+                                val addressName: String = address.displayName
+                                currentLocationRequestObj!!.address = address
+                                val zoneIdText = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+                                    .getString("zoneId", "")
+                                currentLocationRequestObj!!.zoneId = ZoneId.of(zoneIdText)
+                                onResultCurrentLocation(addressName, address, backgroundWorkCallback)
+                            }
+                        }
+                    })
+            }
+
+            fun onFailed(fail: Fail?) {
+                notificationHelper.cancelNotification(NotificationType.Location.notificationId)
+                onLocationResponse(fail, null, backgroundWorkCallback)
+            }
+        }
+        fusedLocation = FusedLocation(applicationContext)
+        fusedLocation.findCurrentLocation(locationCallback, true)
+    }
+
+    private fun onResultCurrentLocation(
+        addressName: String,
+        newAddress: Geocoding.AddressDto?,
+        backgroundWorkCallback: BackgroundWorkCallback
+    ) {
+        for (appWidgetId in currentLocationWidgetDtoArrayMap.keys) {
+            val widgetDto: WidgetDto? = currentLocationWidgetDtoArrayMap[appWidgetId]
+            widgetDto.addressName = addressName
+            widgetDto.countryCode = newAddress.countryCode
+            widgetDto.latitude = newAddress.latitude
+            widgetDto.longitude = newAddress.longitude
+            widgetDto.timeZoneId = currentLocationRequestObj!!.zoneId!!.id
+            widgetRepository.update(widgetDto, null)
+        }
+        onLocationResponse(null, addressName, backgroundWorkCallback)
+    }
+
+    private fun onLocationResponse(
+        fail: FusedLocation.MyLocationCallback.Fail?, addressName: String?,
+        backgroundWorkCallback: BackgroundWorkCallback
+    ) {
+        if (fail == null) {
+            val addressesList: MutableList<String?> = ArrayList()
+            addressesList.add(addressName)
+            loadWeatherData(LocationType.CurrentLocation, addressesList, backgroundWorkCallback)
+        } else {
+            var errorType: RemoteViewsUtil.ErrorType? = null
+            errorType = if (fail === FusedLocation.MyLocationCallback.Fail.DENIED_LOCATION_PERMISSIONS) {
+                RemoteViewsUtil.ErrorType.DENIED_GPS_PERMISSIONS
+            } else if (fail === FusedLocation.MyLocationCallback.Fail.DISABLED_GPS) {
+                RemoteViewsUtil.ErrorType.GPS_OFF
+            } else if (fail === FusedLocation.MyLocationCallback.Fail.DENIED_ACCESS_BACKGROUND_LOCATION_PERMISSION) {
+                RemoteViewsUtil.ErrorType.DENIED_BACKGROUND_LOCATION_PERMISSION
+            } else {
+                RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA
+            }
+            for (appWidgetId in currentLocationWidgetDtoArrayMap.keys) {
+                allWidgetDtoArrayMap[appWidgetId].lastErrorType = errorType
+                allWidgetDtoArrayMap[appWidgetId].isLoadSuccessful = false
+            }
+            onResponseResult(LocationType.CurrentLocation, null, backgroundWorkCallback)
+        }
+    }
+
+    private fun loadWeatherData(locationType: LocationType, addressList: List<String?>, backgroundWorkCallback: BackgroundWorkCallback) {
+        for (addressName in addressList) {
+            val multipleWeatherRestApiCallback: MultipleWeatherRestApiCallback = object : MultipleWeatherRestApiCallback() {
+                override fun onResult() {
+                    onResponseResult(locationType, addressName, backgroundWorkCallback)
+                }
+
+                override fun onCanceled() {
+                    onResponseResult(locationType, addressName, backgroundWorkCallback)
+                }
+            }
+            var requestObj: RequestObj? = null
+            if (locationType === LocationType.SelectedAddress) {
+                requestObj = selectedLocationRequestMap[addressName]
+                selectedLocationResponseMap[addressName] = multipleWeatherRestApiCallback
+            } else {
+                requestObj = currentLocationRequestObj
+                currentLocationResponseMultipleWeatherRestApiCallback = multipleWeatherRestApiCallback
+                var onlyKma = true
+                for (appWidgetId in currentLocationWidgetDtoArrayMap.keys) {
+                    if (currentLocationWidgetDtoArrayMap[appWidgetId].isTopPriorityKma && currentLocationWidgetDtoArrayMap[appWidgetId].countryCode == "KR") {
+                        requestObj!!.weatherProviderTypeSet.add(WeatherProviderType.KMA_WEB)
+                    } else if (!currentLocationWidgetDtoArrayMap[appWidgetId].isTopPriorityKma) {
+                        onlyKma = false
+                    }
+                }
+                if (onlyKma) {
+                    requestObj!!.weatherProviderTypeSet.remove(WeatherProviderType.ACCU_WEATHER)
+                    requestObj.weatherProviderTypeSet.remove(WeatherProviderType.MET_NORWAY)
+                    requestObj.weatherProviderTypeSet.remove(WeatherProviderType.OWM_ONECALL)
+                }
+            }
+            multipleWeatherRestApiCallback.setZoneId(requestObj!!.zoneId)
+            WeatherRequestUtil.loadWeatherData(
+                applicationContext, executorService, requestObj.address.latitude,
+                requestObj.address.longitude, requestObj.weatherDataTypeSet, multipleWeatherRestApiCallback,
+                requestObj.weatherProviderTypeSet, multipleWeatherRestApiCallback.zoneId
+            )
+        }
+    }
+
+    private fun onResponseResult(locationType: LocationType, addressName: String?, backgroundWorkCallback: BackgroundWorkCallback) {
+        var restApiDownloader: MultipleWeatherRestApiCallback? = null
+        var appWidgetIdSet: Set<Int>? = null
+        if (locationType === LocationType.SelectedAddress) {
+            restApiDownloader = selectedLocationResponseMap[addressName]
+            appWidgetIdSet = selectedLocationRequestMap[addressName]!!.appWidgetSet
+        } else {
+            restApiDownloader = currentLocationResponseMultipleWeatherRestApiCallback
+            appWidgetIdSet = currentLocationRequestObj!!.appWidgetSet
+        }
+        for (appWidgetId in appWidgetIdSet) {
+            multipleRestApiDownloaderMap[appWidgetId] = restApiDownloader
+            val widgetCreator: AbstractWidgetCreator? = widgetCreatorMap[appWidgetId]
+            widgetCreator.setWidgetDto(allWidgetDtoArrayMap[appWidgetId])
+            widgetCreator.setResultViews(
+                appWidgetId,
+                multipleRestApiDownloaderMap[appWidgetId], restApiDownloader.zoneId
+            )
+        }
+
+        //응답 처리가 끝난 요청객체를 제거
+        if (addressName != null && locationType === LocationType.SelectedAddress) {
+            selectedLocationRequestMap.remove(addressName)
+        } else if (locationType === LocationType.CurrentLocation) {
+            currentLocationRequestObj = null
+        }
+
+        /*
 		if (responseCount.incrementAndGet() == requestCount) {
 			backgroundWorkCallback.onFinished();
 		}
 
 		 */
-	}
+    }
 
+    private class RequestObj(address: Geocoding.AddressDto?, zoneId: ZoneId?) {
+        var address: Geocoding.AddressDto?
+        var zoneId: ZoneId?
+        var appWidgetSet: MutableSet<Int> = HashSet()
+        var weatherDataTypeSet: MutableSet<WeatherDataType> = HashSet<WeatherDataType>()
+        var weatherProviderTypeSet: MutableSet<WeatherProviderType> = HashSet<WeatherProviderType>()
 
-	private static class RequestObj {
-		Geocoding.AddressDto address;
-		ZoneId zoneId;
-		Set<Integer> appWidgetSet = new HashSet<>();
-		Set<WeatherDataType> weatherDataTypeSet = new HashSet<>();
-		Set<WeatherProviderType> weatherProviderTypeSet = new HashSet<>();
+        init {
+            this.address = address
+            this.zoneId = zoneId
+        }
+    }
 
-		public RequestObj(Geocoding.AddressDto address, ZoneId zoneId) {
-			this.address = address;
-			this.zoneId = zoneId;
-		}
-	}
+    companion object {
+        var processing = AtomicBoolean(false)
+    }
 }

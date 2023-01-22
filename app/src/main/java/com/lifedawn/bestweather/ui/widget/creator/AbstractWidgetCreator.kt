@@ -1,278 +1,188 @@
-package com.lifedawn.bestweather.ui.widget.creator;
+package com.lifedawn.bestweather.ui.widget.creator
 
-import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProviderInfo;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.os.Bundle;
-import android.util.ArrayMap;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.widget.RemoteViews;
-import android.widget.TextView;
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.os.Bundle
+import android.util.ArrayMap
+import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.RelativeLayout
+import android.widget.RemoteViews
+import android.widget.TextView
+import androidx.preference.PreferenceManager
+import com.lifedawn.bestweather.R
+import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
-import androidx.annotation.Nullable;
-import androidx.preference.PreferenceManager;
+abstract class AbstractWidgetCreator(
+    var context: Context,
+    protected var widgetUpdateCallback: WidgetUpdateCallback?,
+    val appWidgetId: Int
+) {
+    protected val refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm")
+    protected val tempUnit: ValueUnits
+    protected val clockUnit: ValueUnits
+    protected val tempDegree: String
+    protected var zoneId: ZoneId? = null
+    protected var widgetDto: WidgetDto? = null
+    protected var widgetRepository: WidgetRepository
+    protected var appWidgetManager: AppWidgetManager
+    protected var remoteViewsCallback: RemoteViewsCallback? = null
+    fun setRemoteViewsCallback(remoteViewsCallback: RemoteViewsCallback?): AbstractWidgetCreator {
+        this.remoteViewsCallback = remoteViewsCallback
+        return this
+    }
 
-import com.google.gson.JsonObject;
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.constants.IntentRequestCodes;
-import com.lifedawn.bestweather.commons.constants.LocationType;
-import com.lifedawn.bestweather.commons.constants.WeatherDataType;
-import com.lifedawn.bestweather.commons.constants.ValueUnits;
-import com.lifedawn.bestweather.commons.constants.WeatherProviderType;
-import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil;
-import com.lifedawn.bestweather.data.MyApplication;
-import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient;
-import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback;
-import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
-import com.lifedawn.bestweather.data.local.room.dto.WidgetDto;
-import com.lifedawn.bestweather.data.local.room.repository.WidgetRepository;
-import com.lifedawn.bestweather.ui.theme.AppTheme;
-import com.lifedawn.bestweather.ui.widget.DialogActivity;
-import com.lifedawn.bestweather.ui.widget.OnDrawBitmapCallback;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.EighthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.EleventhWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.FifthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.FirstWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.FourthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.NinthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.SecondWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.SeventhWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.SixthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.TenthWidgetProvider;
-import com.lifedawn.bestweather.ui.widget.widgetprovider.ThirdWidgetProvider;
+    fun setWidgetDto(widgetDto: WidgetDto?): AbstractWidgetCreator {
+        this.widgetDto = widgetDto
+        return this
+    }
 
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+    abstract fun createTempViews(parentWidth: Int?, parentHeight: Int?): RemoteViews?
 
-import static android.view.View.MeasureSpec.EXACTLY;
+    init {
+        tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit()
+        clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit()
+        tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText()
+        widgetRepository = WidgetRepository.getINSTANCE()
+        appWidgetManager = AppWidgetManager.getInstance(context)
+    }
 
-public abstract class AbstractWidgetCreator {
-	protected final DateTimeFormatter refreshDateTimeFormatter = DateTimeFormatter.ofPattern("M.d E a h:mm");
+    fun setRefreshPendingIntent(remoteViews: RemoteViews) {
+        remoteViews.setOnClickPendingIntent(R.id.refreshBtn, refreshPendingIntent)
+    }
 
-	protected final int appWidgetId;
-	protected final ValueUnits tempUnit;
-	protected final ValueUnits clockUnit;
-	protected final String tempDegree;
-	protected ZoneId zoneId;
+    val refreshPendingIntent: PendingIntent
+        get() {
+            val refreshIntent = Intent(context, FirstWidgetProvider::class.java)
+            refreshIntent.action = context.getString(R.string.com_lifedawn_bestweather_action_REFRESH)
+            return PendingIntent.getBroadcast(
+                context, IntentRequestCodes.WIDGET_MANUALLY_REFRESH.requestCode, refreshIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
 
-	protected Context context;
+    open fun loadDefaultSettings(): WidgetDto? {
+        widgetDto = WidgetDto()
+        widgetDto.appWidgetId = appWidgetId
+        widgetDto.isMultipleWeatherDataSource = false
+        widgetDto.widgetProviderClassName = widgetProviderClass().name
+        widgetDto.backgroundAlpha = 100
+        widgetDto.isDisplayClock = true
+        widgetDto.isDisplayLocalClock = false
+        widgetDto.locationType = LocationType.CurrentLocation
+        widgetDto.addWeatherProviderType(
+            if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
+                    context.getString(R.string.pref_key_met), true
+                )
+            ) WeatherProviderType.MET_NORWAY else WeatherProviderType.OWM_ONECALL
+        )
+        widgetDto.textSizeAmount = 0
+        widgetDto.isTopPriorityKma = true
+        if (requestWeatherDataTypeSet.contains(WeatherDataType.airQuality)) {
+            widgetDto.getWeatherProviderTypeSet().add(WeatherProviderType.AQICN)
+        }
+        return widgetDto
+    }
 
-	protected WidgetUpdateCallback widgetUpdateCallback;
-	protected WidgetDto widgetDto;
-	protected WidgetRepository widgetRepository;
-	protected AppWidgetManager appWidgetManager;
+    fun loadSavedSettings(callback: DbQueryCallback<WidgetDto?>?) {
+        widgetRepository.get(appWidgetId, object : DbQueryCallback<WidgetDto?>() {
+            fun onResultSuccessful(result: WidgetDto?) {
+                widgetDto = result
+                if (callback != null) {
+                    callback.onResultSuccessful(widgetDto)
+                }
+            }
 
-	protected RemoteViewsCallback remoteViewsCallback;
+            fun onResultNoData() {}
+        })
+    }
 
-	public AbstractWidgetCreator setRemoteViewsCallback(RemoteViewsCallback remoteViewsCallback) {
-		this.remoteViewsCallback = remoteViewsCallback;
-		return this;
-	}
+    fun saveSettings(widgetDto: WidgetDto?, callback: DbQueryCallback<WidgetDto?>?) {
+        widgetRepository.add(widgetDto, object : DbQueryCallback<WidgetDto?>() {
+            fun onResultSuccessful(result: WidgetDto?) {
+                if (callback != null) {
+                    callback.onResultSuccessful(result)
+                }
+            }
 
-	public AbstractWidgetCreator setWidgetDto(WidgetDto widgetDto) {
-		this.widgetDto = widgetDto;
-		return this;
-	}
+            fun onResultNoData() {}
+        })
+    }
 
-	public static AbstractWidgetCreator getInstance(AppWidgetManager appWidgetManager, Context context, int appWidgetId) {
-		AppWidgetProviderInfo appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId);
-		final String providerClassName = appWidgetProviderInfo.provider.getClassName();
+    fun updateSettings(widgetDto: WidgetDto?, callback: DbQueryCallback<WidgetDto?>?) {
+        widgetRepository.update(widgetDto, object : DbQueryCallback<WidgetDto?>() {
+            fun onResultSuccessful(result: WidgetDto?) {
+                if (callback != null) {
+                    callback.onResultSuccessful(result)
+                }
+            }
 
-		if (providerClassName.equals(FirstWidgetProvider.class.getName())) {
-			return new FirstWidgetCreator(context, null, appWidgetId);
-		} else if (providerClassName.equals(SecondWidgetProvider.class.getName())) {
-			return new SecondWidgetCreator(context, null, appWidgetId);
-		} else if (providerClassName.equals(ThirdWidgetProvider.class.getName())) {
-			return new ThirdWidgetCreator(context, null, appWidgetId);
-		} else if (providerClassName.equals(FourthWidgetProvider.class.getName())) {
-			return new FourthWidgetCreator(context, null, appWidgetId);
-		} else if (providerClassName.equals(FifthWidgetProvider.class.getName())) {
-			return new FifthWidgetCreator(context, null, appWidgetId);
-		} else if (providerClassName.equals(SixthWidgetProvider.class.getName())) {
-			return new SixthWidgetCreator(context, null, appWidgetId);
-		} else if (providerClassName.equals(SeventhWidgetProvider.class.getName())) {
-			return new SeventhWidgetCreator(context, null, appWidgetId);
-		} else if (providerClassName.equals(EighthWidgetProvider.class.getName())) {
-			return new EighthWidgetCreator(context, null, appWidgetId);
-		} else if (providerClassName.equals(NinthWidgetProvider.class.getName())) {
-			return new NinthWidgetCreator(context, null, appWidgetId);
-		} else if (providerClassName.equals(TenthWidgetProvider.class.getName())) {
-			return new TenthWidgetCreator(context, null, appWidgetId);
-		} else if (providerClassName.equals(EleventhWidgetProvider.class.getName())) {
-			return new EleventhWidgetCreator(context, null, appWidgetId);
-		} else {
-			return null;
-		}
-	}
+            fun onResultNoData() {}
+        })
+    }
 
-	public abstract RemoteViews createTempViews(Integer parentWidth, Integer parentHeight);
+    protected fun setBackgroundAlpha(remoteViews: RemoteViews, backgroundAlpha: Int) {
+        val opacity: Float = widgetDto.backgroundAlpha / 100f
+        val newBackgroundColor = (opacity * 0xFF).toInt() shl 24 or AppTheme.getColor(context, R.color.widgetBackgroundColor)
+        remoteViews.setInt(R.id.root_layout, "setBackgroundColor", newBackgroundColor)
+    }
 
-	public Context getContext() {
-		return context;
-	}
+    val onClickedPendingIntent: PendingIntent
+        get() {
+            val intent = Intent(context, DialogActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            val bundle = Bundle()
+            bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            intent.putExtras(bundle)
+            return PendingIntent.getActivity(
+                context, IntentRequestCodes.CLICK_WIDGET.requestCode, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        }
 
-	public AbstractWidgetCreator(Context context, WidgetUpdateCallback widgetUpdateCallback, int appWidgetId) {
-		this.context = context;
-		this.widgetUpdateCallback = widgetUpdateCallback;
-		this.appWidgetId = appWidgetId;
+    protected fun getWidgetSizeInDp(appWidgetManager: AppWidgetManager, key: String?): Int {
+        return appWidgetManager.getAppWidgetOptions(appWidgetId).getInt(key, 0)
+    }
 
-		tempUnit = MyApplication.VALUE_UNIT_OBJ.getTempUnit();
-		clockUnit = MyApplication.VALUE_UNIT_OBJ.getClockUnit();
-		tempDegree = MyApplication.VALUE_UNIT_OBJ.getTempUnitText();
+    /**
+     * @param
+     * @return {widgetWidthPx, widgetHeightPx} 반환
+     */
+    fun getWidgetExactSizeInPx(appWidgetManager: AppWidgetManager): IntArray {
+        var widgetWidth = 0
+        var widgetHeight = 0
+        val portrait = context.resources.configuration.orientation
+        if (portrait == Configuration.ORIENTATION_PORTRAIT) {
+            widgetWidth = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
+            widgetHeight = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT)
+        } else {
+            widgetWidth = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH)
+            widgetHeight = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT)
+        }
+        val density = context.resources.displayMetrics.density
+        val widgetWidthPx = widgetWidth * density
+        val widgetHeightPx = widgetHeight * density
+        return intArrayOf(widgetWidthPx.toInt(), widgetHeightPx.toInt())
+    }
 
-		widgetRepository = WidgetRepository.getINSTANCE();
-		appWidgetManager = AppWidgetManager.getInstance(context);
-	}
-
-
-	public void setRefreshPendingIntent(RemoteViews remoteViews) {
-		remoteViews.setOnClickPendingIntent(R.id.refreshBtn, getRefreshPendingIntent());
-	}
-
-	public PendingIntent getRefreshPendingIntent() {
-		Intent refreshIntent = new Intent(context, FirstWidgetProvider.class);
-		refreshIntent.setAction(context.getString(R.string.com_lifedawn_bestweather_action_REFRESH));
-
-		return PendingIntent.getBroadcast(context, IntentRequestCodes.WIDGET_MANUALLY_REFRESH.requestCode, refreshIntent,
-				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-	}
-
-	public WidgetDto loadDefaultSettings() {
-		widgetDto = new WidgetDto();
-		widgetDto.setAppWidgetId(appWidgetId);
-		widgetDto.setMultipleWeatherDataSource(false);
-		widgetDto.setWidgetProviderClassName(widgetProviderClass().getName());
-		widgetDto.setBackgroundAlpha(100);
-		widgetDto.setDisplayClock(true);
-		widgetDto.setDisplayLocalClock(false);
-		widgetDto.setLocationType(LocationType.CurrentLocation);
-		widgetDto.addWeatherProviderType(PreferenceManager.getDefaultSharedPreferences(getContext()).getBoolean(context.getString(R.string.pref_key_met), true) ?
-				WeatherProviderType.MET_NORWAY : WeatherProviderType.OWM_ONECALL);
-		widgetDto.setTextSizeAmount(0);
-		widgetDto.setTopPriorityKma(true);
-
-		if (getRequestWeatherDataTypeSet().contains(WeatherDataType.airQuality)) {
-			widgetDto.getWeatherProviderTypeSet().add(WeatherProviderType.AQICN);
-		}
-
-		return widgetDto;
-	}
-
-	public void loadSavedSettings(@Nullable DbQueryCallback<WidgetDto> callback) {
-		widgetRepository.get(appWidgetId, new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto result) {
-				widgetDto = result;
-
-				if (callback != null) {
-					callback.onResultSuccessful(widgetDto);
-				}
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
-	}
-
-	public void saveSettings(WidgetDto widgetDto, @Nullable DbQueryCallback<WidgetDto> callback) {
-		widgetRepository.add(widgetDto, new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto result) {
-				if (callback != null) {
-					callback.onResultSuccessful(result);
-				}
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
-	}
-
-	public void updateSettings(WidgetDto widgetDto, @Nullable DbQueryCallback<WidgetDto> callback) {
-		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto result) {
-				if (callback != null) {
-					callback.onResultSuccessful(result);
-				}
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
-	}
-
-	protected void setBackgroundAlpha(RemoteViews remoteViews, int backgroundAlpha) {
-		float opacity = widgetDto.getBackgroundAlpha() / 100f;
-		int newBackgroundColor = (int) (opacity * 0xFF) << 24 | AppTheme.getColor(context, R.color.widgetBackgroundColor);
-		remoteViews.setInt(R.id.root_layout, "setBackgroundColor", newBackgroundColor);
-	}
-
-
-	public PendingIntent getOnClickedPendingIntent() {
-		Intent intent = new Intent(context, DialogActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-		Bundle bundle = new Bundle();
-		bundle.putInt(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-		intent.putExtras(bundle);
-
-		return PendingIntent.getActivity(context, IntentRequestCodes.CLICK_WIDGET.requestCode, intent,
-				PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-	}
-
-	protected int getWidgetSizeInDp(AppWidgetManager appWidgetManager, String key) {
-		return appWidgetManager.getAppWidgetOptions(appWidgetId).getInt(key, 0);
-	}
-
-	/**
-	 * @param
-	 * @return {widgetWidthPx, widgetHeightPx} 반환
-	 */
-	public int[] getWidgetExactSizeInPx(AppWidgetManager appWidgetManager) {
-		int widgetWidth = 0;
-		int widgetHeight = 0;
-
-		int portrait = context.getResources().getConfiguration().orientation;
-		if (portrait == Configuration.ORIENTATION_PORTRAIT) {
-			widgetWidth = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
-			widgetHeight = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT);
-		} else {
-			widgetWidth = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH);
-			widgetHeight = getWidgetSizeInDp(appWidgetManager, AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT);
-		}
-
-		float density = context.getResources().getDisplayMetrics().density;
-		float widgetWidthPx = widgetWidth * density;
-		float widgetHeightPx = widgetHeight * density;
-
-		return new int[]{(int) widgetWidthPx, (int) widgetHeightPx};
-	}
-
-	public void makeResponseTextToJson(MultipleWeatherRestApiCallback multipleWeatherRestApiCallback, Set<WeatherDataType> weatherDataTypeSet,
-	                                   Set<WeatherProviderType> weatherProviderTypeSet, WidgetDto widgetDto, ZoneOffset zoneOffset) {
-		//json형태로 저장
-		/*
+    fun makeResponseTextToJson(
+        multipleWeatherRestApiCallback: MultipleWeatherRestApiCallback, weatherDataTypeSet: Set<WeatherDataType?>,
+        weatherProviderTypeSet: Set<WeatherProviderType?>, widgetDto: WidgetDto, zoneOffset: ZoneOffset?
+    ) {
+        //json형태로 저장
+        /*
 		examples :
 		{
 			"KMA":{
@@ -285,278 +195,260 @@ public abstract class AbstractWidgetCreator {
 			"zoneOffset": "09:00"
 		}
 		 */
-		Map<WeatherProviderType, ArrayMap<RetrofitClient.ServiceType, MultipleWeatherRestApiCallback.ResponseResult>> arrayMap =
-				multipleWeatherRestApiCallback.getResponseMap();
+        val arrayMap: Map<WeatherProviderType, ArrayMap<ServiceType, MultipleWeatherRestApiCallback.ResponseResult>> =
+            multipleWeatherRestApiCallback.responseMap
+        val rootJsonObject = JsonObject()
+        var text: String? = null
 
-		final JsonObject rootJsonObject = new JsonObject();
-		String text = null;
+        //owm이면 onecall이므로 한번만 수행
+        for (weatherProviderType in weatherProviderTypeSet) {
+            val requestWeatherSourceArr: ArrayMap<ServiceType, MultipleWeatherRestApiCallback.ResponseResult> =
+                arrayMap[weatherProviderType]!!
+            if (weatherProviderType === WeatherProviderType.OWM_ONECALL) {
+                val owmJsonObject = JsonObject()
+                text = requestWeatherSourceArr[RetrofitClient.ServiceType.OWM_ONE_CALL].getResponseText()
+                owmJsonObject.addProperty(RetrofitClient.ServiceType.OWM_ONE_CALL.name, text)
+                rootJsonObject.add(weatherProviderType.name, owmJsonObject)
+            } else if (weatherProviderType === WeatherProviderType.MET_NORWAY) {
+                val metNorwayJsonObject = JsonObject()
+                text = requestWeatherSourceArr[RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST].getResponseText()
+                metNorwayJsonObject.addProperty(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name, text)
+                rootJsonObject.add(weatherProviderType.name, metNorwayJsonObject)
+            } else if (weatherProviderType === WeatherProviderType.OWM_INDIVIDUAL) {
+                val owmIndividualJsonObject = JsonObject()
+                if (weatherDataTypeSet.contains(WeatherDataType.currentConditions)) {
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS].getResponseText()
+                    owmIndividualJsonObject.addProperty(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS.name(), text)
+                }
+                if (weatherDataTypeSet.contains(WeatherDataType.hourlyForecast)) {
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.OWM_HOURLY_FORECAST].getResponseText()
+                    owmIndividualJsonObject.addProperty(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST.name(), text)
+                }
+                if (weatherDataTypeSet.contains(WeatherDataType.dailyForecast)) {
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.OWM_DAILY_FORECAST].getResponseText()
+                    owmIndividualJsonObject.addProperty(RetrofitClient.ServiceType.OWM_DAILY_FORECAST.name(), text)
+                }
+                rootJsonObject.add(weatherProviderType.name, owmIndividualJsonObject)
+            } else if (weatherProviderType === WeatherProviderType.KMA_API) {
+                val kmaJsonObject = JsonObject()
+                if (weatherDataTypeSet.contains(WeatherDataType.currentConditions)) {
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST].getResponseText()
+                    kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST.name(), text)
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST].getResponseText()
+                    kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name(), text)
+                }
+                if (weatherDataTypeSet.contains(WeatherDataType.hourlyForecast)) {
+                    if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name())) {
+                        text = requestWeatherSourceArr[RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST].getResponseText()
+                        kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name(), text)
+                    }
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.KMA_VILAGE_FCST].getResponseText()
+                    kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name(), text)
+                }
+                if (weatherDataTypeSet.contains(WeatherDataType.dailyForecast)) {
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.KMA_MID_TA_FCST].getResponseText()
+                    kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_MID_TA_FCST.name(), text)
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.KMA_MID_LAND_FCST].getResponseText()
+                    kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_MID_LAND_FCST.name(), text)
+                    if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name())) {
+                        text = requestWeatherSourceArr[RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST].getResponseText()
+                        kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name(), text)
+                    }
+                    if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name())) {
+                        text = requestWeatherSourceArr[RetrofitClient.ServiceType.KMA_VILAGE_FCST].getResponseText()
+                        kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name(), text)
+                    }
+                    val tmFc: Long = multipleWeatherRestApiCallback.getValue("tmFc").toLong()
+                    kmaJsonObject.addProperty("tmFc", tmFc)
+                }
+                rootJsonObject.add(weatherProviderType.name, kmaJsonObject)
+            } else if (weatherProviderType === WeatherProviderType.KMA_WEB) {
+                val kmaJsonObject = JsonObject()
+                if (weatherDataTypeSet.contains(WeatherDataType.currentConditions)) {
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS].getResponseText()
+                    kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS.name, text)
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.KMA_WEB_FORECASTS].getResponseText()
+                    kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_WEB_FORECASTS.name, text)
+                }
+                if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_WEB_FORECASTS.name)) {
+                    if (weatherDataTypeSet.contains(WeatherDataType.hourlyForecast) || weatherDataTypeSet.contains(WeatherDataType.dailyForecast)) {
+                        text = requestWeatherSourceArr[RetrofitClient.ServiceType.KMA_WEB_FORECASTS].getResponseText()
+                        kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_WEB_FORECASTS.name, text)
+                    }
+                }
+                rootJsonObject.add(weatherProviderType.name, kmaJsonObject)
+            } else if (weatherProviderType === WeatherProviderType.ACCU_WEATHER) {
+                val accuJsonObject = JsonObject()
+                if (weatherDataTypeSet.contains(WeatherDataType.currentConditions)) {
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS].getResponseText()
+                    accuJsonObject.addProperty(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS.name(), text)
+                }
+                if (weatherDataTypeSet.contains(WeatherDataType.hourlyForecast)) {
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST].getResponseText()
+                    accuJsonObject.addProperty(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST.name(), text)
+                }
+                if (weatherDataTypeSet.contains(WeatherDataType.dailyForecast)) {
+                    text = requestWeatherSourceArr[RetrofitClient.ServiceType.ACCU_DAILY_FORECAST].getResponseText()
+                    accuJsonObject.addProperty(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST.name(), text)
+                }
+                rootJsonObject.add(weatherProviderType.name, accuJsonObject)
+            } else if (weatherProviderType === WeatherProviderType.AQICN) {
+                val aqiCnJsonObject = JsonObject()
+                if (weatherDataTypeSet.contains(WeatherDataType.airQuality)) {
+                    text = arrayMap[WeatherProviderType.AQICN]!![RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED].getResponseText()
+                    if (text != null && text != "{}") {
+                        aqiCnJsonObject.addProperty(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name, text)
+                    }
+                }
+                rootJsonObject.add(weatherProviderType.name, aqiCnJsonObject)
+            }
+        }
+        if (zoneOffset != null) {
+            rootJsonObject.addProperty("zoneOffset", zoneOffset.id)
+        }
+        rootJsonObject.addProperty("lastUpdatedDateTime", multipleWeatherRestApiCallback.getRequestDateTime().toString())
+        widgetDto.responseText = rootJsonObject.toString()
+    }
 
-		//owm이면 onecall이므로 한번만 수행
-		for (WeatherProviderType weatherProviderType : weatherProviderTypeSet) {
-			ArrayMap<RetrofitClient.ServiceType, MultipleWeatherRestApiCallback.ResponseResult> requestWeatherSourceArr =
-					arrayMap.get(weatherProviderType);
+    protected fun drawBitmap(
+        rootLayout: ViewGroup, onDrawBitmapCallback: OnDrawBitmapCallback?, remoteViews: RemoteViews,
+        parentWidth: Int?, parentHeight: Int?
+    ) {
+        var widthSize = 0
+        var heightSize = 0
+        if (parentWidth == null || parentHeight == null) {
+            val widgetSize = getWidgetExactSizeInPx(AppWidgetManager.getInstance(context))
+            widthSize = widgetSize[0]
+            heightSize = widgetSize[1]
+        } else {
+            widthSize = parentWidth
+            heightSize = parentHeight
+        }
+        val widgetPadding = context.resources.getDimension(R.dimen.widget_padding)
+        val widthSpec = View.MeasureSpec.makeMeasureSpec((widthSize - widgetPadding * 2).toInt(), View.MeasureSpec.EXACTLY)
+        val heightSpec = View.MeasureSpec.makeMeasureSpec((heightSize - widgetPadding * 2).toInt(), View.MeasureSpec.EXACTLY)
+        rootLayout.measure(widthSpec, heightSpec)
+        val viewBmp = drawBitmap(rootLayout, remoteViews)
+        if (onDrawBitmapCallback != null) {
+            onDrawBitmapCallback.onCreatedBitmap(viewBmp)
+        }
+    }
 
-			if (weatherProviderType == WeatherProviderType.OWM_ONECALL) {
-				JsonObject owmJsonObject = new JsonObject();
+    protected fun drawBitmap(rootLayout: ViewGroup, remoteViews: RemoteViews): Bitmap {
+        rootLayout.layout(0, 0, rootLayout.measuredWidth, rootLayout.measuredHeight)
+        rootLayout.isDrawingCacheEnabled = false
+        rootLayout.destroyDrawingCache()
+        rootLayout.isDrawingCacheEnabled = true
+        rootLayout.drawingCacheQuality = View.DRAWING_CACHE_QUALITY_HIGH
+        rootLayout.buildDrawingCache()
+        val viewBmp = rootLayout.drawingCache
+        remoteViews.setImageViewBitmap(R.id.bitmapValuesView, viewBmp)
+        return viewBmp
+    }
 
-				text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.OWM_ONE_CALL).getResponseText();
-				owmJsonObject.addProperty(RetrofitClient.ServiceType.OWM_ONE_CALL.name(), text);
-				rootJsonObject.add(weatherProviderType.name(), owmJsonObject);
+    protected fun createBaseRemoteViews(): RemoteViews {
+        return RemoteViews(context.packageName, R.layout.view_widget)
+    }
 
-			} else if (weatherProviderType == WeatherProviderType.MET_NORWAY) {
-				JsonObject metNorwayJsonObject = new JsonObject();
+    open fun setResultViews(
+        appWidgetId: Int,
+        multipleWeatherRestApiCallback: MultipleWeatherRestApiCallback?,
+        zoneId: ZoneId?
+    ) {
+        if (!widgetDto.isInitialized) widgetDto.isInitialized = true
+        if (widgetDto.isLoadSuccessful) {
+            widgetDto.lastErrorType = null
+        } else {
+            if (widgetDto.lastErrorType == null) widgetDto.lastErrorType = RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA
+        }
+        widgetRepository.update(widgetDto, object : DbQueryCallback<WidgetDto?>() {
+            fun onResultSuccessful(result: WidgetDto) {
+                remoteViewsCallback!!.onResult(result.appWidgetId, createRemoteViews())
+            }
 
-				text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST).getResponseText();
-				metNorwayJsonObject.addProperty(RetrofitClient.ServiceType.MET_NORWAY_LOCATION_FORECAST.name(), text);
-				rootJsonObject.add(weatherProviderType.name(), metNorwayJsonObject);
+            fun onResultNoData() {}
+        })
+    }
 
-			} else if (weatherProviderType == WeatherProviderType.OWM_INDIVIDUAL) {
-				JsonObject owmIndividualJsonObject = new JsonObject();
+    val headerViewLayoutParams: RelativeLayout.LayoutParams
+        get() {
+            val layoutParams = RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            layoutParams.bottomMargin = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 4f,
+                context.resources.displayMetrics
+            ).toInt()
+            return layoutParams
+        }
 
-				if (weatherDataTypeSet.contains(WeatherDataType.currentConditions)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS).getResponseText();
-					owmIndividualJsonObject.addProperty(RetrofitClient.ServiceType.OWM_CURRENT_CONDITIONS.name(), text);
-				}
-				if (weatherDataTypeSet.contains(WeatherDataType.hourlyForecast)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST).getResponseText();
-					owmIndividualJsonObject.addProperty(RetrofitClient.ServiceType.OWM_HOURLY_FORECAST.name(), text);
-				}
-				if (weatherDataTypeSet.contains(WeatherDataType.dailyForecast)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.OWM_DAILY_FORECAST).getResponseText();
-					owmIndividualJsonObject.addProperty(RetrofitClient.ServiceType.OWM_DAILY_FORECAST.name(), text);
-				}
-				rootJsonObject.add(weatherProviderType.name(), owmIndividualJsonObject);
+    protected fun makeHeaderViews(layoutInflater: LayoutInflater, addressName: String?, lastRefreshDateTime: String?): View {
+        val view = layoutInflater.inflate(R.layout.header_view_in_widget, null, false)
+        (view.findViewById<View>(R.id.address) as TextView).text = addressName
+        (view.findViewById<View>(R.id.refresh) as TextView).text =
+            ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter)
+        return view
+    }
 
-			} else if (weatherProviderType == WeatherProviderType.KMA_API) {
-				JsonObject kmaJsonObject = new JsonObject();
+    fun createRemoteViews(): RemoteViews {
+        val remoteViews = createBaseRemoteViews()
+        remoteViews.setOnClickPendingIntent(R.id.root_layout, onClickedPendingIntent)
+        return remoteViews
+    }
 
-				if (weatherDataTypeSet.contains(WeatherDataType.currentConditions)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_NCST.name(), text);
+    abstract fun widgetProviderClass(): Class<*>
+    abstract fun setDisplayClock(displayClock: Boolean)
+    abstract fun setDataViewsOfSavedData()
+    abstract val requestWeatherDataTypeSet: Set<Any?>
+    fun getWidgetDto(): WidgetDto? {
+        return widgetDto
+    }
 
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name(), text);
-				}
-				if (weatherDataTypeSet.contains(WeatherDataType.hourlyForecast)) {
-					if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name())) {
-						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).getResponseText();
-						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name(), text);
-					}
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name(), text);
-				}
-				if (weatherDataTypeSet.contains(WeatherDataType.dailyForecast)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_MID_TA_FCST).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_MID_TA_FCST.name(), text);
+    interface WidgetUpdateCallback {
+        fun updatePreview()
+    }
 
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_MID_LAND_FCST).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_MID_LAND_FCST.name(), text);
+    abstract class RemoteViewsCallback(private val requestCount: Int) {
+        private val responseCount = AtomicInteger(0)
+        private val remoteViewsMap: MutableMap<Int, RemoteViews?> = ConcurrentHashMap()
+        fun onResult(id: Int, remoteViews: RemoteViews) {
+            remoteViewsMap[id] = remoteViews
+            if (responseCount.incrementAndGet() == requestCount) onFinished(remoteViewsMap)
+        }
 
-					if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name())) {
-						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST).getResponseText();
-						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_ULTRA_SRT_FCST.name(), text);
-					}
-					if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name())) {
-						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_VILAGE_FCST).getResponseText();
-						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_VILAGE_FCST.name(), text);
-					}
-					long tmFc = Long.parseLong(multipleWeatherRestApiCallback.getValue("tmFc"));
-					kmaJsonObject.addProperty("tmFc", tmFc);
-				}
-				rootJsonObject.add(weatherProviderType.name(), kmaJsonObject);
+        protected abstract fun onFinished(remoteViewsMap: Map<Int, RemoteViews?>)
+    }
 
-			} else if (weatherProviderType == WeatherProviderType.KMA_WEB) {
-				JsonObject kmaJsonObject = new JsonObject();
-
-				if (weatherDataTypeSet.contains(WeatherDataType.currentConditions)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_WEB_CURRENT_CONDITIONS.name(), text);
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS).getResponseText();
-					kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_WEB_FORECASTS.name(), text);
-				}
-				if (!kmaJsonObject.has(RetrofitClient.ServiceType.KMA_WEB_FORECASTS.name())) {
-					if (weatherDataTypeSet.contains(WeatherDataType.hourlyForecast) || weatherDataTypeSet.contains(WeatherDataType.dailyForecast)) {
-						text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.KMA_WEB_FORECASTS).getResponseText();
-						kmaJsonObject.addProperty(RetrofitClient.ServiceType.KMA_WEB_FORECASTS.name(), text);
-					}
-				}
-				rootJsonObject.add(weatherProviderType.name(), kmaJsonObject);
-
-			} else if (weatherProviderType == WeatherProviderType.ACCU_WEATHER) {
-				JsonObject accuJsonObject = new JsonObject();
-
-				if (weatherDataTypeSet.contains(WeatherDataType.currentConditions)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS).getResponseText();
-					accuJsonObject.addProperty(RetrofitClient.ServiceType.ACCU_CURRENT_CONDITIONS.name(), text);
-				}
-				if (weatherDataTypeSet.contains(WeatherDataType.hourlyForecast)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST).getResponseText();
-					accuJsonObject.addProperty(RetrofitClient.ServiceType.ACCU_HOURLY_FORECAST.name(), text);
-				}
-				if (weatherDataTypeSet.contains(WeatherDataType.dailyForecast)) {
-					text = requestWeatherSourceArr.get(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST).getResponseText();
-					accuJsonObject.addProperty(RetrofitClient.ServiceType.ACCU_DAILY_FORECAST.name(), text);
-				}
-				rootJsonObject.add(weatherProviderType.name(), accuJsonObject);
-
-			} else if (weatherProviderType == WeatherProviderType.AQICN) {
-				JsonObject aqiCnJsonObject = new JsonObject();
-
-				if (weatherDataTypeSet.contains(WeatherDataType.airQuality)) {
-					text = arrayMap.get(WeatherProviderType.AQICN).get(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED).getResponseText();
-					if (text != null && !text.equals("{}")) {
-						aqiCnJsonObject.addProperty(RetrofitClient.ServiceType.AQICN_GEOLOCALIZED_FEED.name(), text);
-					}
-				}
-				rootJsonObject.add(weatherProviderType.name(), aqiCnJsonObject);
-			}
-		}
-
-		if (zoneOffset != null) {
-			rootJsonObject.addProperty("zoneOffset", zoneOffset.getId());
-		}
-
-		rootJsonObject.addProperty("lastUpdatedDateTime", multipleWeatherRestApiCallback.getRequestDateTime().toString());
-		widgetDto.setResponseText(rootJsonObject.toString());
-	}
-
-
-	protected final void drawBitmap(ViewGroup rootLayout, @Nullable OnDrawBitmapCallback onDrawBitmapCallback, RemoteViews remoteViews,
-	                                @Nullable Integer parentWidth, @Nullable Integer parentHeight) {
-		int widthSize = 0;
-		int heightSize = 0;
-
-		if (parentWidth == null || parentHeight == null) {
-			int[] widgetSize = getWidgetExactSizeInPx(AppWidgetManager.getInstance(context));
-
-			widthSize = widgetSize[0];
-			heightSize = widgetSize[1];
-		} else {
-			widthSize = parentWidth;
-			heightSize = parentHeight;
-		}
-
-		final float widgetPadding = context.getResources().getDimension(R.dimen.widget_padding);
-
-		final int widthSpec = View.MeasureSpec.makeMeasureSpec((int) (widthSize - widgetPadding * 2), EXACTLY);
-		final int heightSpec = View.MeasureSpec.makeMeasureSpec((int) (heightSize - widgetPadding * 2), EXACTLY);
-
-		rootLayout.measure(widthSpec, heightSpec);
-
-		Bitmap viewBmp = drawBitmap(rootLayout, remoteViews);
-		if (onDrawBitmapCallback != null) {
-			onDrawBitmapCallback.onCreatedBitmap(viewBmp);
-		}
-
-	}
-
-	protected final Bitmap drawBitmap(ViewGroup rootLayout, RemoteViews remoteViews) {
-		rootLayout.layout(0, 0, rootLayout.getMeasuredWidth(), rootLayout.getMeasuredHeight());
-
-		rootLayout.setDrawingCacheEnabled(false);
-		rootLayout.destroyDrawingCache();
-
-		rootLayout.setDrawingCacheEnabled(true);
-		rootLayout.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-
-		rootLayout.buildDrawingCache();
-
-		Bitmap viewBmp = rootLayout.getDrawingCache();
-
-		remoteViews.setImageViewBitmap(R.id.bitmapValuesView, viewBmp);
-
-		return viewBmp;
-	}
-
-	protected final RemoteViews createBaseRemoteViews() {
-		return new RemoteViews(context.getPackageName(), R.layout.view_widget);
-	}
-
-	public void setResultViews(int appWidgetId,
-	                           @Nullable @org.jetbrains.annotations.Nullable MultipleWeatherRestApiCallback multipleWeatherRestApiCallback,
-	                           @Nullable ZoneId zoneId) {
-		if (!widgetDto.isInitialized())
-			widgetDto.setInitialized(true);
-
-		if (widgetDto.isLoadSuccessful()) {
-			widgetDto.setLastErrorType(null);
-		} else {
-			if (widgetDto.getLastErrorType() == null)
-				widgetDto.setLastErrorType(RemoteViewsUtil.ErrorType.FAILED_LOAD_WEATHER_DATA);
-		}
-
-		widgetRepository.update(widgetDto, new DbQueryCallback<WidgetDto>() {
-			@Override
-			public void onResultSuccessful(WidgetDto result) {
-				remoteViewsCallback.onResult(result.getAppWidgetId(), createRemoteViews());
-			}
-
-			@Override
-			public void onResultNoData() {
-
-			}
-		});
-
-	}
-
-	public RelativeLayout.LayoutParams getHeaderViewLayoutParams() {
-		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-				ViewGroup.LayoutParams.WRAP_CONTENT);
-		layoutParams.bottomMargin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4f,
-				context.getResources().getDisplayMetrics());
-
-		return layoutParams;
-	}
-
-	protected View makeHeaderViews(LayoutInflater layoutInflater, String addressName, String lastRefreshDateTime) {
-		View view = layoutInflater.inflate(R.layout.header_view_in_widget, null, false);
-		((TextView) view.findViewById(R.id.address)).setText(addressName);
-		((TextView) view.findViewById(R.id.refresh)).setText(ZonedDateTime.parse(lastRefreshDateTime).format(refreshDateTimeFormatter));
-
-		return view;
-	}
-
-	public RemoteViews createRemoteViews() {
-		RemoteViews remoteViews = createBaseRemoteViews();
-		remoteViews.setOnClickPendingIntent(R.id.root_layout, getOnClickedPendingIntent());
-		return remoteViews;
-	}
-
-	abstract public Class<?> widgetProviderClass();
-
-	abstract public void setDisplayClock(boolean displayClock);
-
-	abstract public void setDataViewsOfSavedData();
-
-	abstract public Set<WeatherDataType> getRequestWeatherDataTypeSet();
-
-	public WidgetDto getWidgetDto() {
-		return widgetDto;
-	}
-
-	public int getAppWidgetId() {
-		return appWidgetId;
-	}
-
-	public interface WidgetUpdateCallback {
-		void updatePreview();
-	}
-
-	public static abstract class RemoteViewsCallback {
-		private final int requestCount;
-		private final AtomicInteger responseCount = new AtomicInteger(0);
-		private final Map<Integer, RemoteViews> remoteViewsMap = new ConcurrentHashMap<>();
-
-		public RemoteViewsCallback(int requestCount) {
-			this.requestCount = requestCount;
-		}
-
-		private void onResult(int id, RemoteViews remoteViews) {
-			remoteViewsMap.put(id, remoteViews);
-			if (responseCount.incrementAndGet() == requestCount)
-				onFinished(remoteViewsMap);
-		}
-
-		abstract protected void onFinished(Map<Integer, RemoteViews> remoteViewsMap);
-	}
+    companion object {
+        fun getInstance(appWidgetManager: AppWidgetManager, context: Context, appWidgetId: Int): AbstractWidgetCreator? {
+            val appWidgetProviderInfo = appWidgetManager.getAppWidgetInfo(appWidgetId)
+            val providerClassName = appWidgetProviderInfo.provider.className
+            return if (providerClassName == FirstWidgetProvider::class.java.getName()) {
+                FirstWidgetCreator(context, null, appWidgetId)
+            } else if (providerClassName == SecondWidgetProvider::class.java.getName()) {
+                SecondWidgetCreator(context, null, appWidgetId)
+            } else if (providerClassName == ThirdWidgetProvider::class.java.getName()) {
+                ThirdWidgetCreator(context, null, appWidgetId)
+            } else if (providerClassName == FourthWidgetProvider::class.java.getName()) {
+                FourthWidgetCreator(context, null, appWidgetId)
+            } else if (providerClassName == FifthWidgetProvider::class.java.getName()) {
+                FifthWidgetCreator(context, null, appWidgetId)
+            } else if (providerClassName == SixthWidgetProvider::class.java.getName()) {
+                SixthWidgetCreator(context, null, appWidgetId)
+            } else if (providerClassName == SeventhWidgetProvider::class.java.getName()) {
+                SeventhWidgetCreator(context, null, appWidgetId)
+            } else if (providerClassName == EighthWidgetProvider::class.java.getName()) {
+                EighthWidgetCreator(context, null, appWidgetId)
+            } else if (providerClassName == NinthWidgetProvider::class.java.getName()) {
+                NinthWidgetCreator(context, null, appWidgetId)
+            } else if (providerClassName == TenthWidgetProvider::class.java.getName()) {
+                TenthWidgetCreator(context, null, appWidgetId)
+            } else if (providerClassName == EleventhWidgetProvider::class.java.getName()) {
+                EleventhWidgetCreator(context, null, appWidgetId)
+            } else {
+                null
+            }
+        }
+    }
 }
