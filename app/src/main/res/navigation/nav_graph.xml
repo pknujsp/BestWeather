@@ -1,4 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph" />
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+    <fragment
+        android:id="@+id/introFragment"
+        android:name="com.lifedawn.bestweather.ui.intro.IntroFragment"
+        android:label="IntroFragment" />
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.lifedawn.bestweather.ui.main.MainFragment"
+        android:label="MainFragment" >
+        <action
+            android:id="@+id/action_mainFragment_to_settingsMainFragment"
+            app:destination="@id/settingsMainFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_rainViewerFragment"
+            app:destination="@id/rainViewerFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_detailSunRiseSetFragment"
+            app:destination="@id/detailSunRiseSetFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsMainFragment"
+        android:name="com.lifedawn.bestweather.ui.settings.fragments.SettingsMainFragment"
+        android:label="SettingsMainFragment" />
+    <fragment
+        android:id="@+id/rainViewerFragment"
+        android:name="com.lifedawn.bestweather.ui.rainviewer.view.RainViewerFragment"
+        android:label="RainViewerFragment" />
+    <fragment
+        android:id="@+id/detailSunRiseSetFragment"
+        android:name="com.lifedawn.bestweather.ui.weathers.detailfragment.sunsetrise.DetailSunRiseSetFragment"
+        android:label="DetailSunRiseSetFragment" />
+</navigation>

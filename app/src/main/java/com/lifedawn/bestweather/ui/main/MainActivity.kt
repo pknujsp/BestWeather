@@ -104,10 +104,10 @@ class MainActivity : AppCompatActivity() {
             initOngoingNotifications()
             initDailyNotifications()
             //initWidgets();
-            val mainTransactionFragment = MainTransactionFragment()
+            val mainFragment = MainFragment()
             fragmentTransaction.add(
-                binding!!.fragmentContainer.id, mainTransactionFragment,
-                MainTransactionFragment::class.java.name
+                binding!!.fragmentContainer.id, mainFragment,
+                MainFragment::class.java.name
             ).commitNow()
         }
     }

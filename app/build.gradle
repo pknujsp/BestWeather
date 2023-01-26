@@ -6,6 +6,8 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'kotlin-parcelize'
     id 'org.jetbrains.kotlin.android'
+    // only for Kotlin
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 android {

@@ -1,117 +1,78 @@
-package com.lifedawn.bestweather.ui.notification.sunsetrise;
+package com.lifedawn.bestweather.ui.notification.sunsetrise
 
-import android.content.SharedPreferences;
-import android.os.Bundle;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.CompoundButton
+import android.widget.RelativeLayout
+import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
+import com.lifedawn.bestweather.R
+import com.lifedawn.bestweather.data.MyApplication
+import com.lifedawn.bestweather.databinding.FragmentSunSetRiseNotificationBinding
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
+class SunSetRiseNotificationFragment : Fragment() {
+    private var binding: FragmentSunSetRiseNotificationBinding? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CompoundButton;
-import android.widget.RelativeLayout;
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSunSetRiseNotificationBinding.inflate(inflater, container, false)
+        return binding!!.root
+    }
 
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.databinding.FragmentSunSetRiseNotificationBinding;
-import com.lifedawn.bestweather.data.MyApplication;
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val layoutParams = binding!!.toolbar.root.layoutParams as RelativeLayout.LayoutParams
+        layoutParams.topMargin = MyApplication.getStatusBarHeight()
+        binding!!.toolbar.root.layoutParams = layoutParams
+        binding!!.toolbar.backBtn.setOnClickListener { parentFragmentManager.popBackStackImmediate() }
+        binding!!.toolbar.fragmentTitle.setText(R.string.sun_set_rise_notification)
+        binding!!.sunRiseSwitch.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener {
+            var init = true
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+                if (!init) {
+                    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
+                    sharedPreferences.edit().putBoolean(getString(R.string.pref_key_sun_rise_notification), isChecked).commit()
+                } else {
+                    init = false
+                }
+            }
+        })
+        binding!!.sunSetSwitch.setOnCheckedChangeListener(object : CompoundButton.OnCheckedChangeListener {
+            var init = true
+            override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+                if (!init) {
+                    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
+                    sharedPreferences.edit().putBoolean(getString(R.string.pref_key_sun_set_notification), isChecked).commit()
+                } else {
+                    init = false
+                }
+            }
+        })
+        binding!!.sunriseTime.setOnClickListener {
+            showTimePicker(object : OnTimeListener {
+                override fun onResult(value: Long) {}
+            })
+        }
+        binding!!.sunsetTime.setOnClickListener {
+            showTimePicker(object : OnTimeListener {
+                override fun onResult(value: Long) {}
+            })
+        }
+    }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+    }
 
-public class SunSetRiseNotificationFragment extends Fragment {
-	private FragmentSunSetRiseNotificationBinding binding;
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-	}
-
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	                         Bundle savedInstanceState) {
-		binding = FragmentSunSetRiseNotificationBinding.inflate(inflater, container, false);
-		return binding.getRoot();
-	}
-
-	@Override
-	public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
-
-		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
-		layoutParams.topMargin = MyApplication.getStatusBarHeight();
-		binding.toolbar.getRoot().setLayoutParams(layoutParams);
-		binding.toolbar.backBtn.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getParentFragmentManager().popBackStackImmediate();
-			}
-		});
-		binding.toolbar.fragmentTitle.setText(R.string.sun_set_rise_notification);
-
-		binding.sunRiseSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			boolean init = true;
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (!init) {
-					SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
-					sharedPreferences.edit().putBoolean(getString(R.string.pref_key_sun_rise_notification), isChecked).commit();
-				} else {
-					init = false;
-				}
-			}
-		});
-
-		binding.sunSetSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			boolean init = true;
-
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (!init) {
-					SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
-					sharedPreferences.edit().putBoolean(getString(R.string.pref_key_sun_set_notification), isChecked).commit();
-				} else {
-					init = false;
-				}
-			}
-		});
-
-		binding.sunriseTime.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showTimePicker(new OnTimeListener() {
-					@Override
-					public void onResult(long value) {
-
-					}
-				});
-			}
-		});
-
-		binding.sunsetTime.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				showTimePicker(new OnTimeListener() {
-					@Override
-					public void onResult(long value) {
-
-					}
-				});
-			}
-		});
-	}
-
-	@Override
-	public void onSaveInstanceState(@NonNull Bundle outState) {
-		super.onSaveInstanceState(outState);
-	}
-
-	private void showTimePicker(OnTimeListener onTimeListener) {
-
-	}
-
-	public interface OnTimeListener {
-		void onResult(long value);
-	}
+    private fun showTimePicker(onTimeListener: OnTimeListener) {}
+    interface OnTimeListener {
+        fun onResult(value: Long)
+    }
 }

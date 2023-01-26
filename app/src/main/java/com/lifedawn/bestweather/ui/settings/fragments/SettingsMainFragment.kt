@@ -1,82 +1,49 @@
-package com.lifedawn.bestweather.ui.settings.fragments;
+package com.lifedawn.bestweather.ui.settings.fragments
 
-import android.os.Bundle;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
+import com.lifedawn.bestweather.R
+import com.lifedawn.bestweather.commons.interfaces.IAppbarTitle
+import com.lifedawn.bestweather.commons.views.BaseFragment
+import com.lifedawn.bestweather.data.MyApplication
+import com.lifedawn.bestweather.databinding.FragmentSettingsMainBinding
 
-import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+class SettingsMainFragment : BaseFragment<FragmentSettingsMainBinding>(R.layout.fragment_settings_main), IAppbarTitle {
+    private val onBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (!childFragmentManager.popBackStackImmediate()) {
+                parentFragmentManager.popBackStack()
+            }
+        }
+    }
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-
-import com.lifedawn.bestweather.R;
-import com.lifedawn.bestweather.commons.interfaces.IAppbarTitle;
-import com.lifedawn.bestweather.data.MyApplication;
-
-import org.jetbrains.annotations.NotNull;
-
-public class SettingsMainFragment extends Fragment implements IAppbarTitle {
-	private FragmentSettingsMainBinding binding;
-
-
-	private final OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
-		@Override
-		public void handleOnBackPressed() {
-			if (!getChildFragmentManager().popBackStackImmediate()) {
-				getParentFragmentManager().popBackStack();
-			}
-		}
-	};
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+    }
 
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		requireActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
-	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	                         Bundle savedInstanceState) {
-		binding = FragmentSettingsMainBinding.inflate(inflater, container, false);
-		return binding.getRoot();
-	}
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-	@Override
-	public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-		super.onViewCreated(view, savedInstanceState);
+        val settingsFragment = SettingsFragment(this)
+        childFragmentManager.beginTransaction().add(binding.fragmentContainer.getId(), settingsFragment).commitNow()
+        binding.toolbar.backBtn.setOnClickListener { view1 -> onBackPressedCallback.handleOnBackPressed() }
+        binding.toolbar.fragmentTitle.setText(R.string.settings)
+    }
 
-		LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) binding.toolbar.getRoot().getLayoutParams();
-		layoutParams.topMargin = MyApplication.getStatusBarHeight();
-		binding.toolbar.getRoot().setLayoutParams(layoutParams);
+    override fun onDestroy() {
+        super.onDestroy()
+        onBackPressedCallback.remove()
+    }
 
-		SettingsFragment settingsFragment = new SettingsFragment(this);
-		getChildFragmentManager().beginTransaction().add(binding.fragmentContainer.getId(), settingsFragment).commitNow();
-
-		binding.toolbar.backBtn.setOnClickListener(view1 -> onBackPressedCallback.handleOnBackPressed());
-
-		binding.toolbar.fragmentTitle.setText(R.string.settings);
-
-
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		onBackPressedCallback.remove();
-	}
-
-	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		binding = null;
-	}
-
-	@Override
-	public void setAppbarTitle(String title) {
-		binding.toolbar.fragmentTitle.setText(title);
-	}
+    override fun setAppbarTitle(title: String?) {
+        binding.toolbar.fragmentTitle.setText(title)
+    }
 }

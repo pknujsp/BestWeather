@@ -26,13 +26,20 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.classes.CloseWindow
+import com.lifedawn.bestweather.commons.constants.LocationType
+import com.lifedawn.bestweather.commons.views.BaseFragment
+import com.lifedawn.bestweather.data.MyApplication
+import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
 import com.lifedawn.bestweather.databinding.FragmentMainBinding
 import com.lifedawn.bestweather.ui.findaddress.map.MapFragment
+import com.lifedawn.bestweather.ui.settings.fragments.SettingsMainFragment
+import com.lifedawn.bestweather.ui.weathers.WeatherFragment
+import com.lifedawn.bestweather.ui.weathers.viewmodels.GetWeatherViewModel
 
-class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNav, IWeatherFragment {
+class MainFragment : BaseFragment<FragmentMainBinding>(R.layout.fragment_main), IRefreshFavoriteLocationListOnSideNav,
+    WeatherFragment.IWeatherFragment {
     private val favTypeTagInFavLocItemView = R.id.locationTypeTagInFavLocItemViewInSideNav
     private val favDtoTagInFavLocItemView = R.id.favoriteLocationDtoTagInFavLocItemViewInSideNav
-    private var binding: FragmentMainBinding? = null
     private var getWeatherViewModel: GetWeatherViewModel? = null
     private var sharedPreferences: SharedPreferences? = null
     private var favoriteAddressDtoList: List<FavoriteAddressDto> = ArrayList<FavoriteAddressDto>()
@@ -47,7 +54,7 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
             if (childFragmentManager.backStackEntryCount > 0) {
                 childFragmentManager.popBackStackImmediate()
             } else {
-                if (binding!!.drawerLayout.isDrawerOpen(binding!!.sideNavigation)) binding!!.drawerLayout.closeDrawer(binding!!.sideNavigation) else onBeforeCloseApp()
+                if (binding.drawerLayout.isDrawerOpen(binding.sideNavigation)) binding.drawerLayout.closeDrawer(binding.sideNavigation) else onBeforeCloseApp()
             }
         }
     }
@@ -60,24 +67,24 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
             ) {
                 super.onFragmentAttached(fm, f, context)
                 if (f is SettingsMainFragment) {
-                    originalUsingCurrentLocation = sharedPreferences!!.getBoolean(getString(R.string.pref_key_use_current_location), false)
+                    originalUsingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false)
                 }
             }
 
             override fun onFragmentStarted(fm: FragmentManager, f: Fragment) {
                 super.onFragmentStarted(fm, f)
-                if (!initViewModel!!.ready) initViewModel!!.ready = true
+                if (!initViewModel.ready) initViewModel.ready = true
             }
 
             override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
                 super.onFragmentDestroyed(fm, f)
                 if (f is SettingsMainFragment) {
-                    val newUsingCurrentLocation = sharedPreferences!!.getBoolean(
+                    val newUsingCurrentLocation = sharedPreferences.getBoolean(
                         getString(R.string.pref_key_use_current_location),
                         false
                     )
                     val lastSelectedLocationType: LocationType = LocationType.valueOf(
-                        sharedPreferences!!.getString(
+                        sharedPreferences.getString(
                             getString(R.string.pref_key_last_selected_location_type),
                             LocationType.CurrentLocation.name
                         )
@@ -93,9 +100,9 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
                             //현재 위치 사용을 끈 경우
                             if (lastSelectedLocationType === LocationType.CurrentLocation) {
                                 if (favoriteAddressDtoList.isEmpty()) {
-                                    binding!!.sideNavMenu.favorites.callOnClick()
+                                    binding.sideNavMenu.favorites.callOnClick()
                                 } else {
-                                    binding!!.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick()
+                                    binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick()
                                 }
                             } else {
                                 //날씨 프래그먼트 다시 그림
@@ -125,7 +132,7 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
         if (window != null) {
             window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             val layoutParams = WindowManager.LayoutParams()
-            layoutParams.copyFrom(dialog.window!!.attributes)
+            layoutParams.copyFrom(dialog.window.attributes)
             layoutParams.width = LinearLayout.LayoutParams.WRAP_CONTENT
         }
         val adLoader = AdLoader.Builder(requireContext().applicationContext, getString(R.string.NATIVE_ADVANCE_unitId))
@@ -145,8 +152,8 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
     }
 
     private fun setCurrentLocationState(newState: Boolean) {
-        binding!!.sideNavMenu.currentLocationLayout.isClickable = newState
-        binding!!.sideNavMenu.addressName.setText(if (newState) R.string.enabled_use_current_location else R.string.disabled_use_current_location)
+        binding.sideNavMenu.currentLocationLayout.isClickable = newState
+        binding.sideNavMenu.addressName.setText(if (newState) R.string.enabled_use_current_location else R.string.disabled_use_current_location)
     }
 
     override fun onAttach(context: Context) {
@@ -170,26 +177,14 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
                     if (locationResult.getLocations().get(0).getLatitude() == 0.0 ||
                         locationResult.getLocations().get(0).getLongitude() == 0.0
                     ) {
-                        binding!!.sideNavMenu.favorites.callOnClick()
+                        binding.sideNavMenu.favorites.callOnClick()
                     }
                 }
             }
         })
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentMainBinding.inflate(inflater, container, false)
-        binding!!.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-        binding!!.sideNavMenu.favorites.setOnClickListener(sideNavOnClickListener)
-        binding!!.sideNavMenu.settings.setOnClickListener(sideNavOnClickListener)
-        binding!!.sideNavMenu.notificationAlarmSettings.setOnClickListener(sideNavOnClickListener)
-        val padding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, resources.displayMetrics).toInt()
-        binding!!.sideNavMenu.currentLocationLayout.setPadding(
-            padding, MyApplication.getStatusBarHeight() + padding, padding,
-            padding
-        )
-        return binding!!.root
-    }
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -198,51 +193,63 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
         if (savedInstanceState != null) {
             currentAddressName = savedInstanceState.getString("currentAddressName")
         }
-        binding!!.sideNavMenu.currentLocationLayout.setOnClickListener {
+
+        binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        binding.sideNavMenu.favorites.setOnClickListener(sideNavOnClickListener)
+        binding.sideNavMenu.settings.setOnClickListener(sideNavOnClickListener)
+        binding.sideNavMenu.notificationAlarmSettings.setOnClickListener(sideNavOnClickListener)
+        val padding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12f, resources.displayMetrics).toInt()
+        binding.sideNavMenu.currentLocationLayout.setPadding(
+            padding, MyApplication.getStatusBarHeight() + padding, padding,
+            padding
+        )
+        
+        binding.sideNavMenu.currentLocationLayout.setOnClickListener {
             addWeatherFragment(LocationType.CurrentLocation, null, null)
-            binding!!.drawerLayout.closeDrawer(binding!!.sideNavigation)
+            binding.drawerLayout.closeDrawer(binding.sideNavigation)
         }
         getWeatherViewModel.getCurrentLocationLiveData().observe(viewLifecycleOwner) { addressName ->
             currentAddressName = addressName
             if (currentAddressName != null) {
-                binding!!.sideNavMenu.addressName.text = currentAddressName
+                binding.sideNavMenu.addressName.text = currentAddressName
             }
         }
         getWeatherViewModel.favoriteAddressListLiveData.observe(requireActivity()) { result ->
             createLocationsList(result)
             if (init) {
                 init = false
-                val usingCurrentLocation = sharedPreferences!!.getBoolean(getString(R.string.pref_key_use_current_location), false)
+                val usingCurrentLocation = sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false)
                 val lastSelectedLocationType: LocationType = LocationType.valueOf(
-                    sharedPreferences!!.getString(
+                    sharedPreferences.getString(
                         getString(R.string.pref_key_last_selected_location_type),
                         LocationType.CurrentLocation.name
                     )
                 )
                 setCurrentLocationState(usingCurrentLocation)
-                if (currentAddressName != null) binding!!.sideNavMenu.addressName.text = currentAddressName
+                if (currentAddressName != null) binding.sideNavMenu.addressName.text = currentAddressName
                 if (lastSelectedLocationType === LocationType.CurrentLocation) {
                     if (usingCurrentLocation) {
                         addWeatherFragment(lastSelectedLocationType, null, null)
                     } else {
                         if (favoriteAddressDtoList.size > 0) {
-                            binding!!.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick()
+                            binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick()
                         } else {
-                            binding!!.sideNavMenu.favorites.callOnClick()
+                            binding.sideNavMenu.favorites.callOnClick()
                         }
                     }
                 } else {
-                    val lastSelectedFavoriteId = sharedPreferences!!.getInt(
+                    val lastSelectedFavoriteId = sharedPreferences.getInt(
                         getString(R.string.pref_key_last_selected_favorite_address_id), -1
                     )
                     if (!clickLocationItemById(lastSelectedFavoriteId)) {
                         if (favoriteAddressDtoList.size > 0) {
-                            binding!!.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick()
+                            binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick()
                         } else {
-                            binding!!.sideNavMenu.favorites.callOnClick()
+                            binding.sideNavMenu.favorites.callOnClick()
                         }
                     }
                 }
@@ -261,8 +268,8 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
 
     override fun createLocationsList(result: List<FavoriteAddressDto>) {
         favoriteAddressDtoList = result
-        binding!!.sideNavMenu.favoriteAddressLayout.visibility = if (favoriteAddressDtoList.size > 0) View.VISIBLE else View.GONE
-        binding!!.sideNavMenu.favoriteAddressLayout.removeAllViews()
+        binding.sideNavMenu.favoriteAddressLayout.visibility = if (favoriteAddressDtoList.size > 0) View.VISIBLE else View.GONE
+        binding.sideNavMenu.favoriteAddressLayout.removeAllViews()
         val layoutInflater = layoutInflater
         for (favoriteAddressDto in favoriteAddressDtoList) {
             addFavoriteLocationItemView(layoutInflater, LocationType.SelectedAddress, favoriteAddressDto)
@@ -272,7 +279,7 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
     override fun onRefreshedFavoriteLocationsList(requestKey: String?, bundle: Bundle) {
         val isSelectedNewAddress = bundle.getBoolean("added")
         if (isSelectedNewAddress) {
-            val lastSelectedFavoriteAddressId = sharedPreferences!!.getInt(
+            val lastSelectedFavoriteAddressId = sharedPreferences.getInt(
                 getString(R.string.pref_key_last_selected_favorite_address_id), -1
             )
             clickLocationItemById(lastSelectedFavoriteAddressId)
@@ -282,14 +289,14 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
     }
 
     private fun processIfPreviousFragmentIsFavorite() {
-        val lastSelectedFavoriteAddressId = sharedPreferences!!.getInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1)
+        val lastSelectedFavoriteAddressId = sharedPreferences.getInt(getString(R.string.pref_key_last_selected_favorite_address_id), -1)
         val lastSelectedLocationType: LocationType = LocationType.valueOf(
-            sharedPreferences!!.getString(getString(R.string.pref_key_last_selected_location_type), LocationType.CurrentLocation.name)
+            sharedPreferences.getString(getString(R.string.pref_key_last_selected_location_type), LocationType.CurrentLocation.name)
         )
         if (lastSelectedLocationType === LocationType.SelectedAddress) {
             if (favoriteAddressDtoList.isEmpty()) {
                 setCurrentLocationState(true)
-                binding!!.sideNavMenu.currentLocationLayout.callOnClick()
+                binding.sideNavMenu.currentLocationLayout.callOnClick()
             } else {
                 var removed = true
                 for (favoriteAddressDto in favoriteAddressDtoList) {
@@ -299,22 +306,22 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
                     }
                 }
                 if (removed) {
-                    binding!!.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick()
+                    binding.sideNavMenu.favoriteAddressLayout.getChildAt(0).callOnClick()
                 }
             }
         } else {
             //현재 위치
-            binding!!.sideNavMenu.currentLocationLayout.callOnClick()
+            binding.sideNavMenu.currentLocationLayout.callOnClick()
         }
     }
 
     private fun clickLocationItemById(id: Int): Boolean {
         var favoriteAddressDto: FavoriteAddressDto? = null
-        for (childIdx in 0 until binding!!.sideNavMenu.favoriteAddressLayout.childCount) {
-            favoriteAddressDto = binding!!.sideNavMenu.favoriteAddressLayout
+        for (childIdx in 0 until binding.sideNavMenu.favoriteAddressLayout.childCount) {
+            favoriteAddressDto = binding.sideNavMenu.favoriteAddressLayout
                 .getChildAt(childIdx).getTag(favDtoTagInFavLocItemView) as FavoriteAddressDto
             if (favoriteAddressDto.id == id) {
-                binding!!.sideNavMenu.favoriteAddressLayout.getChildAt(childIdx).callOnClick()
+                binding.sideNavMenu.favoriteAddressLayout.getChildAt(childIdx).callOnClick()
                 return true
             }
         }
@@ -327,7 +334,7 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
     ) {
         val locationItemView = layoutInflater.inflate(R.layout.favorite_address_item_in_side_nav, null) as TextView
         locationItemView.setOnClickListener {
-            binding!!.drawerLayout.closeDrawer(binding!!.sideNavigation)
+            binding.drawerLayout.closeDrawer(binding.sideNavigation)
             addWeatherFragment(locationType, favoriteAddressDto, null)
         }
         locationItemView.setText(favoriteAddressDto.displayName)
@@ -340,7 +347,7 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
         val dp8 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8f, resources.displayMetrics).toInt()
         val dp16 = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16f, resources.displayMetrics).toInt()
         layoutParams.setMargins(dp16, dp8, dp16, dp8)
-        binding!!.sideNavMenu.favoriteAddressLayout.addView(locationItemView, layoutParams)
+        binding.sideNavMenu.favoriteAddressLayout.addView(locationItemView, layoutParams)
     }
 
     override fun onDestroy() {
@@ -354,7 +361,7 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
             R.id.favorites -> {
                 val mapFragment = MapFragment()
                 val bundle = Bundle()
-                bundle.putString(BundleKey.RequestFragment.name, MainTransactionFragment::class.java.name)
+                bundle.putString(BundleKey.RequestFragment.name, MainFragment::class.java.name)
                 mapFragment.arguments = bundle
                 mapFragment.setOnResultFavoriteListener(object : OnResultFavoriteListener {
                     override fun onAddedNewAddress(
@@ -374,15 +381,15 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
                 })
                 val tag = MapFragment::class.java.name
                 val transaction = childFragmentManager.beginTransaction()
-                transaction.hide(childFragmentManager.primaryNavigationFragment!!).add(
-                    binding!!.fragmentContainer.id, mapFragment,
+                transaction.hide(childFragmentManager.primaryNavigationFragment).add(
+                    binding.fragmentContainer.id, mapFragment,
                     tag
                 ).addToBackStack(tag).setPrimaryNavigationFragment(mapFragment).commitAllowingStateLoss()
             }
             R.id.settings -> {
                 val settingsMainFragment = SettingsMainFragment()
-                childFragmentManager.beginTransaction().hide(childFragmentManager.primaryNavigationFragment!!).add(
-                    binding!!.fragmentContainer.id, settingsMainFragment,
+                childFragmentManager.beginTransaction().hide(childFragmentManager.primaryNavigationFragment).add(
+                    binding.fragmentContainer.id, settingsMainFragment,
                     getString(R.string.tag_settings_main_fragment)
                 ).addToBackStack(
                     getString(R.string.tag_settings_main_fragment)
@@ -391,18 +398,18 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
             R.id.notificationAlarmSettings -> {
                 val notificationFragment = NotificationFragment()
                 val notiTag: String = NotificationFragment::class.java.getName()
-                childFragmentManager.beginTransaction().hide(childFragmentManager.primaryNavigationFragment!!).add(
-                    binding!!.fragmentContainer.id, notificationFragment,
+                childFragmentManager.beginTransaction().hide(childFragmentManager.primaryNavigationFragment).add(
+                    binding.fragmentContainer.id, notificationFragment,
                     notiTag
                 ).addToBackStack(notiTag).setPrimaryNavigationFragment(notificationFragment).commitAllowingStateLoss()
             }
         }
-        binding!!.drawerLayout.closeDrawer(binding!!.sideNavigation, false)
+        binding.drawerLayout.closeDrawer(binding.sideNavigation, false)
     }
 
     override fun onResultMapFragment(newFavoriteAddressDto: FavoriteAddressDto?) {
         //변경된 위치가 있는지 확인
-        setCurrentLocationState(sharedPreferences!!.getBoolean(getString(R.string.pref_key_use_current_location), false))
+        setCurrentLocationState(sharedPreferences.getBoolean(getString(R.string.pref_key_use_current_location), false))
         val added = newFavoriteAddressDto != null
         if (added) {
             //즐겨찾기 변동 발생
@@ -428,14 +435,14 @@ class MainTransactionFragment : Fragment(), IRefreshFavoriteLocationListOnSideNa
         })
         newWeatherFragment.setArguments(bundle)
         newWeatherFragment.setMenuOnClickListener(View.OnClickListener { v: View? ->
-            binding!!.drawerLayout.openDrawer(
-                binding!!.sideNavigation
+            binding.drawerLayout.openDrawer(
+                binding.sideNavigation
             )
         })
         newWeatherFragment.setiRefreshFavoriteLocationListOnSideNav(this as IRefreshFavoriteLocationListOnSideNav)
         val fragmentManager = childFragmentManager
         fragmentManager.beginTransaction().replace(
-            binding!!.fragmentContainer.id, newWeatherFragment,
+            binding.fragmentContainer.id, newWeatherFragment,
             WeatherFragment::class.java.getName()
         ).setPrimaryNavigationFragment(newWeatherFragment).commit()
     }

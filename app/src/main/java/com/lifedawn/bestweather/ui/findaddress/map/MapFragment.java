@@ -65,7 +65,7 @@ import com.lifedawn.bestweather.ui.findaddress.FoundAddressesAdapter;
 import com.lifedawn.bestweather.ui.findaddress.map.adapter.FavoriteLocationItemViewPagerAdapter;
 import com.lifedawn.bestweather.ui.findaddress.map.adapter.LocationItemViewPagerAdapter;
 import com.lifedawn.bestweather.ui.findaddress.map.interfaces.OnClickedScrollBtnListener;
-import com.lifedawn.bestweather.ui.main.MainTransactionFragment;
+import com.lifedawn.bestweather.ui.main.MainFragment;
 import com.lifedawn.bestweather.ui.notification.daily.fragment.DailyNotificationSettingsFragment;
 import com.lifedawn.bestweather.ui.notification.ongoing.OngoingNotificationSettingsFragment;
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback;
@@ -128,7 +128,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 		@Override
 		public void handleOnBackPressed() {
 			if (!getChildFragmentManager().popBackStackImmediate()) {
-				if (requestFragment.equals(MainTransactionFragment.class.getName()) || requestFragment.equals(WeatherFragment.class.getName())) {
+				if (requestFragment.equals(MainFragment.class.getName()) || requestFragment.equals(WeatherFragment.class.getName())) {
 					checkHaveLocations();
 				} else if (requestFragment.equals(OngoingNotificationSettingsFragment.class.getName()) ||
 						requestFragment.equals(DailyNotificationSettingsFragment.class.getName()) ||
@@ -461,7 +461,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
 		binding.headerLayout.setOnBackClickListener(v -> onBackPressedCallback.handleOnBackPressed());
 
-		if (requestFragment.equals(MainTransactionFragment.class.getName())) {
+		if (requestFragment.equals(MainFragment.class.getName())) {
 			binding.favorite.callOnClick();
 		}
 	}
