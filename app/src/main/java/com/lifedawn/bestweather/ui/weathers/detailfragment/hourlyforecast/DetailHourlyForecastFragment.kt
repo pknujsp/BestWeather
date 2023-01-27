@@ -10,7 +10,7 @@ import com.lifedawn.bestweather.ui.weathers.detailfragment.base.BaseDetailHourly
 
 class DetailHourlyForecastFragment : BaseDetailHourlyForecastFragment() {
     private var adapter: HourlyForecastListAdapter? = null
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }

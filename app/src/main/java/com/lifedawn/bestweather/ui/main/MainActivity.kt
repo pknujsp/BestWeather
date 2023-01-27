@@ -115,7 +115,7 @@ class MainActivity : AppCompatActivity() {
     private fun initOngoingNotifications() {
         ongoingNotificationViewModel.getOngoingNotificationDto(object : DbQueryCallback<OngoingNotificationDto?>() {
             fun onResultSuccessful(result: OngoingNotificationDto) {
-                if (result.isOn()) {
+                if (result.isOn) {
                     //ongoing notification
                     val helper = OngoingNotificationHelper(applicationContext)
                     val pendingIntent: PendingIntent = helper.createManualPendingIntent(

@@ -53,11 +53,11 @@ class SettingsFragment(iAppbarTitle: IAppbarTitle) : PreferenceFragmentCompat() 
         widgetRefreshIntervalPreference.setIconSpaceReserved(false)
         widgetRefreshIntervalPreference.setOnPreferenceClickListener(Preference.OnPreferenceClickListener {
             MaterialAlertDialogBuilder(getActivity()).setTitle(getString(R.string.pref_title_widget_refresh_interval))
-                .setSingleChoiceItems(widgetRefreshIntervalPreference.getWidgetRefreshIntervalTexts(),
-                    widgetRefreshIntervalPreference.getCurrentValueIndex(),
+                .setSingleChoiceItems(widgetRefreshIntervalPreference.widgetRefreshIntervalTexts,
+                    widgetRefreshIntervalPreference.currentValueIndex,
                     DialogInterface.OnClickListener { dialog, which ->
                         val newValue: Long = widgetRefreshIntervalPreference
-                            .getWidgetRefreshIntervalLongValues().get(which)
+                            .widgetRefreshIntervalLongValues.get(which)
                         sharedPreferences!!.edit()
                             .putLong(widgetRefreshIntervalPreference.getKey(), newValue).commit()
                         widgetRefreshIntervalPreference.setValue(newValue)
