@@ -40,22 +40,24 @@ class MainActivity : AppCompatActivity() {
         val content = findViewById<View>(R.id.content)
         content.viewTreeObserver.addOnPreDrawListener(
             object : ViewTreeObserver.OnPreDrawListener {
-                override fun onPreDraw(): Boolean {
-                    return if (initViewModel.ready) {
+                // 뷰가 화면에 그려지기 전에 호출됨
+                override fun onPreDraw() =
+                    if (initViewModel.ready) {
                         content.viewTreeObserver.removeOnPreDrawListener(this)
                         true
                     } else {
                         false
                     }
-                }
+
             })
 
         if (networkStatus.networkAvailable()) {
+            // 네트워크 연결 되어 있으면 앱을 계속 진행
             nextStep()
         } else {
             AlertDialog.Builder(this).setTitle(R.string.networkProblem)
                 .setMessage(com.lifedawn.bestweather.R.string.need_to_connect_network)
-                .setPositiveButton(com.lifedawn.bestweather.R.string.check) { dialog, which ->
+                .setPositiveButton(com.lifedawn.bestweather.R.string.check) { dialog, _ ->
                     dialog.dismiss()
                     finish()
                 }.setCancelable(false).create().show()

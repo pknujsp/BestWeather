@@ -18,7 +18,7 @@ import com.lifedawn.bestweather.ui.weathers.comparison.hourlyforecast.HourlyFore
 import com.lifedawn.bestweather.ui.weathers.detailfragment.base.BaseDetailHourlyForecastFragment.Companion.setHourlyForecastDtoList
 import com.lifedawn.bestweather.ui.weathers.detailfragment.hourlyforecast.DetailHourlyForecastFragment
 import com.lifedawn.bestweather.ui.weathers.simplefragment.base.BaseSimpleForecastFragment
-import com.lifedawn.bestweather.ui.weathers.view.*
+import com.lifedawn.bestweather.ui.weathers.customview.*
 import java.time.ZonedDateTime
 import java.util.*
 

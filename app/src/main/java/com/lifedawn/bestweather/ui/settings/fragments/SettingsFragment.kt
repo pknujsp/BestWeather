@@ -119,10 +119,10 @@ class SettingsFragment(iAppbarTitle: IAppbarTitle) : PreferenceFragmentCompat() 
         //날씨 제공사
         weatherDataSourcesPreference!!.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             iAppbarTitle.setAppbarTitle(getString(R.string.pref_title_weather_data_sources))
-            val weatherSourcesFragment = WeatherSourcesFragment()
+            val weatherProvidersFragment = WeatherProvidersFragment()
             getParentFragmentManager().beginTransaction().hide(this@SettingsFragment).add(
                 R.id.fragment_container,
-                weatherSourcesFragment, getString(R.string.tag_weather_data_sources_fragment)
+                weatherProvidersFragment, getString(R.string.tag_weather_data_sources_fragment)
             ).addToBackStack(
                 getString(R.string.tag_weather_data_sources_fragment)
             ).commit()

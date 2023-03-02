@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.classes.requestweathersource.RequestKma
 import com.lifedawn.bestweather.commons.views.ProgressDialog
-import com.lifedawn.bestweather.ui.weathers.view.SingleWeatherIconView
+import com.lifedawn.bestweather.ui.weathers.customview.SingleWeatherIconView
 import java.time.ZonedDateTime
 import java.util.*
 

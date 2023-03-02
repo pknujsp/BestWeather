@@ -19,9 +19,9 @@ import com.lifedawn.bestweather.commons.constants.BundleKey
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType
 import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding
-import com.lifedawn.bestweather.ui.weathers.view.DateView
-import com.lifedawn.bestweather.ui.weathers.view.ICleaner
-import com.lifedawn.bestweather.ui.weathers.view.NotScrolledView
+import com.lifedawn.bestweather.ui.weathers.customview.DateView
+import com.lifedawn.bestweather.ui.weathers.customview.ICleaner
+import com.lifedawn.bestweather.ui.weathers.customview.NotScrolledView
 import java.time.ZoneId
 
 open class BaseForecastComparisonFragment : Fragment() {

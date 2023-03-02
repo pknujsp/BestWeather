@@ -18,10 +18,10 @@ import com.lifedawn.bestweather.ui.weathers.comparison.dailyforecast.DailyForeca
 import com.lifedawn.bestweather.ui.weathers.detailfragment.base.BaseDetailDailyForecastFragment
 import com.lifedawn.bestweather.ui.weathers.detailfragment.dailyforecast.DetailDailyForecastFragment
 import com.lifedawn.bestweather.ui.weathers.simplefragment.base.BaseSimpleForecastFragment
-import com.lifedawn.bestweather.ui.weathers.view.DetailDoubleTemperatureView
-import com.lifedawn.bestweather.ui.weathers.view.DoubleWeatherIconView
-import com.lifedawn.bestweather.ui.weathers.view.IconTextView
-import com.lifedawn.bestweather.ui.weathers.view.TextsView
+import com.lifedawn.bestweather.ui.weathers.customview.DetailDoubleTemperatureView
+import com.lifedawn.bestweather.ui.weathers.customview.DoubleWeatherIconView
+import com.lifedawn.bestweather.ui.weathers.customview.IconTextView
+import com.lifedawn.bestweather.ui.weathers.customview.TextsView
 import java.time.format.DateTimeFormatter
 import java.util.*
 

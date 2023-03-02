@@ -10,28 +10,14 @@ import java.util.*
 @HiltAndroidApp
 class AppApplication : Application() {
     companion object {
-        private var _statusBarHeight = 0
-        val statusBarHeight get() = _statusBarHeight
-
-        private lateinit var _locale: Locale
-        val locale get() = _locale
-        private lateinit var _localeCountryCode: String
-        val localeCountryCode get() = _localeCountryCode
+        lateinit var locale: Locale
+        lateinit var localeCountryCode: String
     }
 
     override fun onCreate() {
         super.onCreate()
-
-        val id = resources.getIdentifier("status_bar_height", "dimen", "android")
-        if (id > 0)
-            _statusBarHeight = resources.getDimensionPixelSize(id)
-
-        _locale = resources.configuration.locales[0]
-        _localeCountryCode = _locale.country
-
+        locale = resources.configuration.locales[0]
+        localeCountryCode = locale.country
     }
 
-    override fun onLowMemory() {
-        super.onLowMemory()
-    }
 }

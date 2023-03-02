@@ -19,7 +19,7 @@ import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto
 import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.WeatherResponseProcessor
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WeatherRequestUtil.initWeatherSourceUniqueValues
-import com.lifedawn.bestweather.ui.weathers.view.DetailSingleTemperatureView
+import com.lifedawn.bestweather.ui.weathers.customview.DetailSingleTemperatureView
 import com.lifedawn.bestweather.ui.widget.OnDrawBitmapCallback
 import com.lifedawn.bestweather.ui.widget.widgetprovider.FifthWidgetProvider
 import java.time.ZoneId

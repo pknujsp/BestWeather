@@ -9,7 +9,7 @@ import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.views.BaseFragment
 import com.lifedawn.bestweather.databinding.FragmentWeatherSourcesBinding
 
-class WeatherSourcesFragment : BaseFragment<FragmentWeatherSourcesBinding>(R.layout.fragment_weather_sources) {
+class WeatherProvidersFragment : BaseFragment<FragmentWeatherSourcesBinding>(R.layout.fragment_weather_sources) {
     private var sharedPreferences: SharedPreferences? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

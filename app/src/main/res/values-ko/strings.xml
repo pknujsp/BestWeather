@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">날씨마법사</string>
+    <string name="app_name">스카이컴패어</string>
     <string name="kma">대한민국 기상청</string>
     <string name="met">노르웨이 기상청</string>
 

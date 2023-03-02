@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.view
+package com.lifedawn.bestweather.ui.weathers.customview
 
 import android.content.Context
 import android.graphics.*

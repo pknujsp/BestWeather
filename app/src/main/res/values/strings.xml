@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Weather Wizard</string>
+    <string name="app_name">SkyCompare</string>
 
     <!-- 날씨 제공사 -->
     <string name="kma">KoreaMA</string>

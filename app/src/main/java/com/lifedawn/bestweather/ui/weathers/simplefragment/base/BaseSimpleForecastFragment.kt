@@ -23,8 +23,8 @@ import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.databinding.BaseLayoutSimpleForecastBinding
 import com.lifedawn.bestweather.databinding.LoadingViewAsyncBinding
 import com.lifedawn.bestweather.ui.weathers.simplefragment.interfaces.IWeatherValues
-import com.lifedawn.bestweather.ui.weathers.view.DateView
-import com.lifedawn.bestweather.ui.weathers.view.ICleaner
+import com.lifedawn.bestweather.ui.weathers.customview.DateView
+import com.lifedawn.bestweather.ui.weathers.customview.ICleaner
 import com.lifedawn.bestweather.ui.weathers.viewmodels.WeatherFragmentViewModel
 import java.time.ZoneId
 import java.time.ZonedDateTime

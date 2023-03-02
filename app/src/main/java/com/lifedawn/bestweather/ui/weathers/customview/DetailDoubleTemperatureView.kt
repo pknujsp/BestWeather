@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.weathers.view
+package com.lifedawn.bestweather.ui.weathers.customview
 
 import android.content.Context
 import android.graphics.*
@@ -6,9 +6,16 @@ import android.text.TextPaint
 import android.util.TypedValue
 import android.view.View
 import com.lifedawn.bestweather.R
+import com.lifedawn.bestweather.ui.theme.AppTheme.getTextColor
+import com.lifedawn.bestweather.ui.weathers.FragmentType
 
-class DetailDoubleTemperatureViewForRemoteViews(
-    context: Context?, minTempList: List<Int>?,
+class DetailDoubleTemperatureView(
+    context: Context,
+    private val fragmentType: FragmentType,
+    private val viewWidth: Int,
+    private val viewHeight: Int,
+    private val columnWidth: Int,
+    minTempList: List<Int>?,
     maxTempList: List<Int>?
 ) : View(context), ICleaner {
     private val maxTemp: Int
@@ -18,8 +25,7 @@ class DetailDoubleTemperatureViewForRemoteViews(
     private val maxCirclePaint: Paint
     private val minCirclePaint: Paint
     private val circleRadius: Int
-    private val tempUnit = "°"
-    private val textRect = Rect()
+    private val tempUnit: String
     private val maxTempList: MutableList<Int> = ArrayList()
     private val minTempList: MutableList<Int> = ArrayList()
 
@@ -28,12 +34,12 @@ class DetailDoubleTemperatureViewForRemoteViews(
         tempPaint = TextPaint()
         tempPaint.textAlign = Paint.Align.CENTER
         tempPaint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, resources.displayMetrics)
-        tempPaint.color = Color.BLACK
+        tempPaint.color = getTextColor(fragmentType)
         linePaint = Paint()
         linePaint.isAntiAlias = true
         linePaint.style = Paint.Style.STROKE
         linePaint.strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.3f, resources.displayMetrics)
-        linePaint.color = Color.DKGRAY
+        linePaint.color = getTextColor(fragmentType)
         maxCirclePaint = Paint()
         maxCirclePaint.isAntiAlias = true
         maxCirclePaint.style = Paint.Style.FILL
@@ -62,6 +68,7 @@ class DetailDoubleTemperatureViewForRemoteViews(
         }
         this.maxTemp = max
         this.minTemp = min
+        tempUnit = context.getString(R.string.degree_symbol)
         setWillNotDraw(false)
     }
 
@@ -70,18 +77,12 @@ class DetailDoubleTemperatureViewForRemoteViews(
             TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, textSizeSp.toFloat(), resources.displayMetrics)
     }
 
-    fun setTempTextSizePx(textSize: Int) {
-        tempPaint.textSize = textSize.toFloat()
-    }
-
     fun setTextColor(textColor: Int) {
         tempPaint.color = textColor
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val test = "20°"
-        tempPaint.getTextBounds(test, 0, test.length, textRect)
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        setMeasuredDimension(viewWidth, viewHeight)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -96,7 +97,6 @@ class DetailDoubleTemperatureViewForRemoteViews(
         // 텍스트의 높이+원의 반지름 만큼 뷰의 상/하단에 여백을 설정한다.
         val TEXT_HEIGHT = tempPaint.descent() - tempPaint.ascent()
         val TEXT_ASCENT = -tempPaint.ascent()
-        val columnWidth = width / minTempList.size
         val VIEW_HEIGHT = height - (TEXT_HEIGHT + circleRadius) * 2
         val SPACING = VIEW_HEIGHT / (maxTemp - minTemp) / 10f
         var min = 0
@@ -112,7 +112,8 @@ class DetailDoubleTemperatureViewForRemoteViews(
         val maxCircleYArr = FloatArray(minTempList.size)
         val minLinePointList: MutableList<PointF> = ArrayList()
         val maxLinePointList: MutableList<PointF> = ArrayList()
-        for (index in maxTempList.indices) {
+        val tempsCount = minTempList.size
+        for (index in 0 until tempsCount) {
             min = minTempList[index]
             max = maxTempList[index]
             x = columnWidth / 2f + columnWidth * index
@@ -129,24 +130,19 @@ class DetailDoubleTemperatureViewForRemoteViews(
             minLinePointList.add(PointF(lastMinColumnPoint.x, lastMinColumnPoint.y))
             maxLinePointList.add(PointF(lastMaxColumnPoint.x, lastMaxColumnPoint.y))
         }
-        val tempsCount = minTempList.size
         val minPoints1 = arrayOfNulls<PointF>(tempsCount)
         val minPoints2 = arrayOfNulls<PointF>(tempsCount)
         val maxPoints1 = arrayOfNulls<PointF>(tempsCount)
         val maxPoints2 = arrayOfNulls<PointF>(tempsCount)
+        val minPath = Path()
+        val maxPath = Path()
+        minPath.moveTo(minLinePointList[0].x, minLinePointList[0].y)
+        maxPath.moveTo(maxLinePointList[0].x, maxLinePointList[0].y)
         for (i in 1 until tempsCount) {
             minPoints1[i] = PointF((minLinePointList[i].x + minLinePointList[i - 1].x) / 2, minLinePointList[i - 1].y)
             minPoints2[i] = PointF((minLinePointList[i].x + minLinePointList[i - 1].x) / 2, minLinePointList[i].y)
             maxPoints1[i] = PointF((maxLinePointList[i].x + maxLinePointList[i - 1].x) / 2, maxLinePointList[i - 1].y)
             maxPoints2[i] = PointF((maxLinePointList[i].x + maxLinePointList[i - 1].x) / 2, maxLinePointList[i].y)
-        }
-        val minPath = Path()
-        val maxPath = Path()
-        minPath.moveTo(minLinePointList[0].x, minLinePointList[0].y)
-        maxPath.moveTo(maxLinePointList[0].x, maxLinePointList[0].y)
-
-        //곡선 그리기
-        for (i in 1 until tempsCount) {
             minPath.cubicTo(
                 minPoints1[i]!!.x, minPoints1[i]!!.y, minPoints2[i]!!.x, minPoints2[i]!!.y, minLinePointList[i].x,
                 minLinePointList[i].y

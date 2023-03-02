@@ -72,7 +72,7 @@
                                 android:layout_height="wrap_content"
                                 />
 
-                            <com.lifedawn.bestweather.ui.weathers.view.NotScrolledView
+                            <com.lifedawn.bestweather.ui.weathers.customview.NotScrolledView
                                 android:id="@+id/pm10NoScrollView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
                                 android:layout_height="100dp"
                                 />
 
-                            <com.lifedawn.bestweather.ui.weathers.view.NotScrolledView
+                            <com.lifedawn.bestweather.ui.weathers.customview.NotScrolledView
                                 android:id="@+id/pm25NoScrollView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
                                 android:layout_height="100dp"
                                 />
 
-                            <com.lifedawn.bestweather.ui.weathers.view.NotScrolledView
+                            <com.lifedawn.bestweather.ui.weathers.customview.NotScrolledView
                                 android:id="@+id/o3NoScrollView"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
