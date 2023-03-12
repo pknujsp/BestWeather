@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.main
+package com.lifedawn.bestweather.ui.main.viewmodel
 
 import androidx.lifecycle.ViewModel
 

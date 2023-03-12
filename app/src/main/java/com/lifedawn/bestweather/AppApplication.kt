@@ -1,10 +1,7 @@
-package com.lifedawn.bestweather.ui.main
+package com.lifedawn.bestweather
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
 import java.util.*
 
 @HiltAndroidApp

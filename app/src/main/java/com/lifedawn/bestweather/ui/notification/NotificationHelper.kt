@@ -10,7 +10,7 @@ import android.os.Build
 import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationCompat
 import com.lifedawn.bestweather.R
-import com.lifedawn.bestweather.ui.main.MainActivity
+import com.lifedawn.bestweather.ui.main.view.MainActivity
 
 class NotificationHelper constructor(private val context: Context) {
     private val notificationManager: NotificationManager

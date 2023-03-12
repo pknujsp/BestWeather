@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.main
+package com.lifedawn.bestweather.ui.main.view
 
 import android.app.PendingIntent
 import android.os.Bundle
@@ -16,6 +16,7 @@ import com.lifedawn.bestweather.commons.classes.NetworkStatus
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
 import com.lifedawn.bestweather.databinding.ActivityMainBinding
 import com.lifedawn.bestweather.ui.intro.IntroTransactionFragment
+import com.lifedawn.bestweather.ui.main.viewmodel.InitViewModel
 import com.lifedawn.bestweather.ui.notification.daily.DailyNotificationHelper
 import com.lifedawn.bestweather.ui.notification.model.OngoingNotificationDto
 import com.lifedawn.bestweather.ui.notification.ongoing.OngoingNotificationHelper

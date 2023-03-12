@@ -1,4 +1,4 @@
-package com.lifedawn.bestweather.ui.main
+package com.lifedawn.bestweather.ui.main.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -32,6 +32,8 @@ import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
 import com.lifedawn.bestweather.databinding.FragmentMainBinding
 import com.lifedawn.bestweather.ui.findaddress.map.MapFragment
+import com.lifedawn.bestweather.ui.main.IRefreshFavoriteLocationListOnSideNav
+import com.lifedawn.bestweather.ui.main.viewmodel.InitViewModel
 import com.lifedawn.bestweather.ui.settings.fragments.SettingsMainFragment
 import com.lifedawn.bestweather.ui.weathers.WeatherFragment
 import com.lifedawn.bestweather.ui.weathers.viewmodels.GetWeatherViewModel

@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.gms.location.LocationResult
@@ -23,8 +22,8 @@ import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
 import com.lifedawn.bestweather.databinding.FragmentIntroBinding
 import com.lifedawn.bestweather.ui.findaddress.map.MapFragment
 import com.lifedawn.bestweather.ui.findaddress.map.MapFragment.OnResultFavoriteListener
-import com.lifedawn.bestweather.ui.main.InitViewModel
-import com.lifedawn.bestweather.ui.main.MainFragment
+import com.lifedawn.bestweather.ui.main.viewmodel.InitViewModel
+import com.lifedawn.bestweather.ui.main.view.MainFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
