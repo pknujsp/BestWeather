@@ -7,11 +7,11 @@ import android.graphics.drawable.Drawable
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
-import com.lifedawn.bestweather.ui.weathers.FragmentType
+import com.lifedawn.bestweather.ui.weathers.enums.WeatherDataType
 
 class SingleWeatherIconView(
     context: Context?,
-    private val fragmentType: FragmentType,
+    private val weatherDataType: WeatherDataType,
     private val viewWidth: Int,
     private val viewHeight: Int,
     private val columnWidth: Int

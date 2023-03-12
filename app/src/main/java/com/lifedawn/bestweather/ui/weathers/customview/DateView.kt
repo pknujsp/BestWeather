@@ -9,11 +9,11 @@ import android.util.TypedValue
 import android.view.View
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.ui.theme.AppTheme.getTextColor
-import com.lifedawn.bestweather.ui.weathers.FragmentType
+import com.lifedawn.bestweather.ui.weathers.enums.WeatherDataType
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-class DateView(context: Context, private val fragmentType: FragmentType, private val viewWidth: Int, private val columnWidth: Int) :
+class DateView(context: Context, private val weatherDataType: WeatherDataType, private val viewWidth: Int, private val columnWidth: Int) :
     View(context), ICleaner {
     private val dateTextPaint: TextPaint
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("M.d\nE")
@@ -28,7 +28,7 @@ class DateView(context: Context, private val fragmentType: FragmentType, private
         dateTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
         dateTextPaint.textAlign = Paint.Align.CENTER
         dateTextPaint.textSize = context.resources.getDimension(R.dimen.dateValueTextSizeInSCD)
-        dateTextPaint.color = getTextColor(fragmentType)
+        dateTextPaint.color = getTextColor(weatherDataType)
         setWillNotDraw(false)
     }
 

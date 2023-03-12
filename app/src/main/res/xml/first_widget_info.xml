@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:configure="com.lifedawn.bestweather.ui.widget.ConfigureWidgetActivity"
+    android:configure="com.lifedawn.bestweather.ui.widget.view.ConfigureWidgetActivity"
     android:initialLayout="@layout/view_widget"
     android:minWidth="@dimen/firstWidgetWidth"
     android:minHeight="@dimen/firstWidgetHeight"

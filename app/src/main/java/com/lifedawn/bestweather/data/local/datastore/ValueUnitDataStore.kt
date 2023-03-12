@@ -5,13 +5,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.lifedawn.bestweather.commons.constants.ValueUnits
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ValueUnitDataStore @Inject constructor(
     private val context: Context
 ) {
-
     private val Context.valueUnitDataStore by preferencesDataStore(name = "value_unit")
 
     private val TEMP_UNIT_KEY = stringPreferencesKey("temp")
@@ -56,6 +56,7 @@ class ValueUnitDataStore @Inject constructor(
             it[VISIBILITY_UNIT_KEY] = visibility.name
         }
     }
+
 
     suspend fun saveClockUnit(clock: ValueUnits) {
         context.valueUnitDataStore.edit {

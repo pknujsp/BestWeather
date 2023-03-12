@@ -24,7 +24,6 @@ import com.lifedawn.bestweather.commons.constants.WidgetNotiConstants.DataTypeOf
 import com.lifedawn.bestweather.commons.interfaces.BackgroundWorkCallback
 import com.lifedawn.bestweather.commons.utils.DeviceUtils.Companion.isScreenOn
 import com.lifedawn.bestweather.commons.views.ProgressResultView.onSuccessful
-import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto.countryCode
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto.latitude
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto.longitude

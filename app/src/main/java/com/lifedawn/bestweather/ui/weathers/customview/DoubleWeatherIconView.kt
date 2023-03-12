@@ -10,11 +10,11 @@ import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
-import com.lifedawn.bestweather.ui.weathers.FragmentType
+import com.lifedawn.bestweather.ui.weathers.enums.WeatherDataType
 
 class DoubleWeatherIconView(
     context: Context?,
-    private val fragmentType: FragmentType,
+    private val weatherDataType: WeatherDataType,
     private val viewWidth: Int,
     private val viewHeight: Int,
     private val columnWidth: Int
@@ -46,8 +46,8 @@ class DoubleWeatherIconView(
         imgSize = tempImgSize
         margin = tempMargin
         dividerPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        when (fragmentType) {
-            FragmentType.Simple -> dividerPaint.color = Color.WHITE
+        when (weatherDataType) {
+            WeatherDataType.Simple -> dividerPaint.color = Color.WHITE
             else -> dividerPaint.color = Color.BLACK
         }
         isClickable = true

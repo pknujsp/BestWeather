@@ -1,10 +1,5 @@
 package com.lifedawn.bestweather.data.local.favoriteaddress.repository
 
-import android.content.Context
-import androidx.lifecycle.LiveData
-import com.lifedawn.bestweather.data.MyApplication
-import com.lifedawn.bestweather.data.local.room.AppDb
-import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
 import com.lifedawn.bestweather.data.local.room.dao.FavoriteAddressDao
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
 import javax.inject.Inject

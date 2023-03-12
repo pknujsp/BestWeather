@@ -44,7 +44,7 @@
             android:turnScreenOn="true" />
 
         <activity
-            android:name=".ui.widget.ConfigureWidgetActivity"
+            android:name=".ui.widget.view.ConfigureWidgetActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Black">
@@ -54,7 +54,7 @@
         </activity>
 
         <activity
-            android:name=".ui.widget.DialogActivity"
+            android:name=".ui.widget.view.DialogActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:noHistory="true"

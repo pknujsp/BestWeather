@@ -27,16 +27,14 @@ import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.classes.CloseWindow
 import com.lifedawn.bestweather.commons.constants.LocationType
-import com.lifedawn.bestweather.commons.views.BaseFragment
-import com.lifedawn.bestweather.data.MyApplication
+import com.lifedawn.bestweather.commons.views.base.BaseFragment
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto
 import com.lifedawn.bestweather.databinding.FragmentMainBinding
 import com.lifedawn.bestweather.ui.findaddress.map.MapFragment
 import com.lifedawn.bestweather.ui.main.IRefreshFavoriteLocationListOnSideNav
 import com.lifedawn.bestweather.ui.main.viewmodel.InitViewModel
-import com.lifedawn.bestweather.ui.settings.fragments.SettingsMainFragment
-import com.lifedawn.bestweather.ui.weathers.WeatherFragment
-import com.lifedawn.bestweather.ui.weathers.viewmodels.GetWeatherViewModel
+import com.lifedawn.bestweather.ui.weathers.view.WeatherFragment
+import com.lifedawn.bestweather.ui.weathers.viewmodel.GetWeatherViewModel
 
 class MainFragment : BaseFragment<FragmentMainBinding>(R.layout.fragment_main), IRefreshFavoriteLocationListOnSideNav,
     WeatherFragment.IWeatherFragment {

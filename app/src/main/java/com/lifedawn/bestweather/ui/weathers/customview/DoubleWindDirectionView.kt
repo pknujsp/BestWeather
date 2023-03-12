@@ -10,11 +10,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import com.lifedawn.bestweather.R
-import com.lifedawn.bestweather.ui.weathers.FragmentType
+import com.lifedawn.bestweather.ui.weathers.enums.WeatherDataType
 
 class DoubleWindDirectionView(
     context: Context?,
-    private val fragmentType: FragmentType,
+    private val weatherDataType: WeatherDataType,
     private val viewWidth: Int,
     private val viewHeight: Int,
     private val columnWidth: Int

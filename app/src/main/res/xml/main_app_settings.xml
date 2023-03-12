@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        android:key="@string/pref_key_value_units"
+        android:summary="@string/pref_summary_value_units"
+        android:title="@string/pref_title_value_units"
+        app:iconSpaceReserved="false" />
+
+    <Preference
+        android:enabled="false"
+        android:key="@string/pref_key_app_theme"
+        android:summary="@string/pref_summary_app_theme"
+        android:title="@string/pref_title_app_theme"
+        app:iconSpaceReserved="false"
+        app:isPreferenceVisible="false" />
+
+    <Preference
+        android:key="@string/pref_key_weather_data_sources"
+        android:summary="@string/pref_summary_weather_data_sources"
+        android:title="@string/pref_title_weather_data_sources"
+        app:iconSpaceReserved="false" />
+
+    <SwitchPreference
+        android:key="@string/pref_key_use_current_location"
+        android:summary="@string/pref_summary_use_current_location"
+        android:title="@string/pref_title_use_current_location"
+        app:iconSpaceReserved="false" />
+
+    <SwitchPreference
+        android:key="@string/pref_key_show_background_animation"
+        android:summary="@string/pref_summary_show_background_animation"
+        android:title="@string/pref_title_show_background_animation"
+        app:iconSpaceReserved="false" />
+
+    <Preference
+        android:key="@string/pref_key_redraw_widgets"
+        android:summary="@string/pref_summary_redraw_widgets"
+        android:title="@string/pref_title_redraw_widgets"
+        app:iconSpaceReserved="false" />
+
+    <com.lifedawn.bestweather.ui.settings.refreshwidgets.WidgetRefreshIntervalPreference
+        android:key="@string/pref_key_widget_refresh_interval"
+        android:title="@string/pref_title_widget_refresh_interval"
+        android:widgetLayout="@layout/custom_preference_layout"
+        app:iconSpaceReserved="false" />
+
+</PreferenceScreen>

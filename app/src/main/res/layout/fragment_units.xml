@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.settings.fragments.UnitsFragment">
+    tools:context=".ui.settings.valueunits.view.UnitsFragment">
 
 
 </FrameLayout>

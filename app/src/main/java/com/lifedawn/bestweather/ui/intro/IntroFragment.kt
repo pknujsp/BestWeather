@@ -15,7 +15,7 @@ import com.lifedawn.bestweather.commons.classes.MainThreadWorker.runOnUiThread
 import com.lifedawn.bestweather.commons.classes.location.FusedLocation
 import com.lifedawn.bestweather.commons.constants.BundleKey
 import com.lifedawn.bestweather.commons.constants.LocationType
-import com.lifedawn.bestweather.commons.views.BaseFragment
+import com.lifedawn.bestweather.commons.views.base.BaseFragment
 import com.lifedawn.bestweather.commons.views.ProgressDialog.clearDialogs
 import com.lifedawn.bestweather.commons.views.ProgressDialog.show
 import com.lifedawn.bestweather.data.local.room.dto.FavoriteAddressDto

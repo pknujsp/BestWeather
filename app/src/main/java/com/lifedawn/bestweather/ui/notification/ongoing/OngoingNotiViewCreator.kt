@@ -11,7 +11,6 @@ import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil.o
 import com.lifedawn.bestweather.commons.classes.forremoteviews.RemoteViewsUtil.onSuccessfulProcess
 import com.lifedawn.bestweather.commons.constants.ValueUnits
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType
-import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.data.local.weather.models.AirQualityDto
 import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto
 import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto.Values.isHasPrecipitationVolume

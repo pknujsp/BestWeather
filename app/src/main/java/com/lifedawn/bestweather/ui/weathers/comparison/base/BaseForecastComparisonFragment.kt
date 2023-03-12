@@ -17,7 +17,6 @@ import com.google.android.gms.ads.AdRequest
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.constants.BundleKey
 import com.lifedawn.bestweather.commons.constants.WeatherProviderType
-import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.databinding.BaseLayoutForecastComparisonBinding
 import com.lifedawn.bestweather.ui.weathers.customview.DateView
 import com.lifedawn.bestweather.ui.weathers.customview.ICleaner

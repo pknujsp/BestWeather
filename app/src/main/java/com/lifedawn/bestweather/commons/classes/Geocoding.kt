@@ -3,7 +3,6 @@ package com.lifedawn.bestweather.commons.classes
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.JsonElement
-import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient
 import com.lifedawn.bestweather.data.remote.retrofit.client.RetrofitClient.getApiService
 import com.lifedawn.bestweather.data.remote.retrofit.parameters.nominatim.ReverseGeocodeParameterRest

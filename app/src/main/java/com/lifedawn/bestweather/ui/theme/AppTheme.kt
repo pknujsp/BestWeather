@@ -3,7 +3,7 @@ package com.lifedawn.bestweather.ui.theme
 import android.content.Context
 import android.graphics.Color
 import android.util.TypedValue
-import com.lifedawn.bestweather.ui.weathers.FragmentType
+import com.lifedawn.bestweather.ui.weathers.enums.WeatherDataType
 
 object AppTheme {
     fun getColor(context: Context, id: Int): Int {
@@ -13,9 +13,9 @@ object AppTheme {
     }
 
     @JvmStatic
-    fun getTextColor(fragmentType: FragmentType?): Int {
-        return when (fragmentType) {
-            FragmentType.Detail, FragmentType.Comparison -> Color.BLACK
+    fun getTextColor(weatherDataType: WeatherDataType?): Int {
+        return when (weatherDataType) {
+            WeatherDataType.Detail, WeatherDataType.Comparison -> Color.BLACK
             else -> Color.WHITE
         }
     }

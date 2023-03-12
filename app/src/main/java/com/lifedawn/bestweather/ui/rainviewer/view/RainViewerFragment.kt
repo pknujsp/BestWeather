@@ -17,7 +17,7 @@ import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.classes.LocationLifeCycleObserver
 import com.lifedawn.bestweather.commons.classes.location.FusedLocation
 import com.lifedawn.bestweather.commons.constants.BundleKey
-import com.lifedawn.bestweather.commons.views.BaseFragment
+import com.lifedawn.bestweather.commons.views.base.BaseFragment
 import com.lifedawn.bestweather.databinding.FragmentRainViewerBinding
 import com.lifedawn.bestweather.ui.rainviewer.viewmodel.RainViewerViewModel
 import dagger.hilt.android.AndroidEntryPoint

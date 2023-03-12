@@ -32,7 +32,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.Marker
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.alarm.AlarmSettingsFragment
-import com.lifedawn.bestweather.commons.views.BaseFragment
+import com.lifedawn.bestweather.commons.views.base.BaseFragment
 import com.lifedawn.bestweather.commons.views.ProgressDialog
 import com.lifedawn.bestweather.databinding.FragmentMapBinding
 import com.lifedawn.bestweather.ui.favoriteaddress.FavoriteAddressesAdapter

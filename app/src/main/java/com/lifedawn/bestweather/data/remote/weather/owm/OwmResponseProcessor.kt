@@ -2,21 +2,14 @@ package com.lifedawn.bestweather.data.remote.weather.owm
 
 import android.content.Context
 import com.google.gson.Gson
-import com.google.gson.JsonElement
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.constants.ValueUnits
-import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto
 import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto
 import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto
-import com.lifedawn.bestweather.data.remote.retrofit.callback.MultipleWeatherRestApiCallback
-import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.currentweather.OwmCurrentConditionsResponse
-import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.dailyforecast.OwmDailyForecastResponse
-import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.individual.hourlyforecast.OwmHourlyForecastResponse
 import com.lifedawn.bestweather.data.remote.retrofit.responses.openweathermap.onecall.OwmOneCallResponse
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.response.WeatherResponseProcessor
 import com.lifedawn.bestweather.data.remote.weather.dataprocessing.util.WindUtil
-import retrofit2.Response
 import java.time.ZoneId
 import java.util.*
 

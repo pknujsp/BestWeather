@@ -7,11 +7,11 @@ import android.util.TypedValue
 import android.view.View
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.ui.theme.AppTheme.getTextColor
-import com.lifedawn.bestweather.ui.weathers.FragmentType
+import com.lifedawn.bestweather.ui.weathers.enums.WeatherDataType
 
 class DetailDoubleTemperatureView(
     context: Context,
-    private val fragmentType: FragmentType,
+    private val weatherDataType: WeatherDataType,
     private val viewWidth: Int,
     private val viewHeight: Int,
     private val columnWidth: Int,
@@ -34,12 +34,12 @@ class DetailDoubleTemperatureView(
         tempPaint = TextPaint()
         tempPaint.textAlign = Paint.Align.CENTER
         tempPaint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 14f, resources.displayMetrics)
-        tempPaint.color = getTextColor(fragmentType)
+        tempPaint.color = getTextColor(weatherDataType)
         linePaint = Paint()
         linePaint.isAntiAlias = true
         linePaint.style = Paint.Style.STROKE
         linePaint.strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.3f, resources.displayMetrics)
-        linePaint.color = getTextColor(fragmentType)
+        linePaint.color = getTextColor(weatherDataType)
         maxCirclePaint = Paint()
         maxCirclePaint.isAntiAlias = true
         maxCirclePaint.style = Paint.Style.FILL

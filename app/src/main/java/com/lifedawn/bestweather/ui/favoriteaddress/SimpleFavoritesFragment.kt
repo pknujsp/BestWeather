@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.data.local.room.callback.DbQueryCallback
 import com.lifedawn.bestweather.databinding.FragmentSimpleFavoritesBinding
-import com.lifedawn.bestweather.ui.weathers.viewmodels.GetWeatherViewModel
+import com.lifedawn.bestweather.ui.weathers.viewmodel.GetWeatherViewModel
 
 class SimpleFavoritesFragment : Fragment() {
     private var binding: FragmentSimpleFavoritesBinding? = null

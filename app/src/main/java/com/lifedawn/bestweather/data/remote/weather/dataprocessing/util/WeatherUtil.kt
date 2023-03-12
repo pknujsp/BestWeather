@@ -4,7 +4,6 @@ import android.content.Context
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.constants.ValueUnits
 import com.lifedawn.bestweather.commons.constants.ValueUnits.Companion.convertTemperature
-import com.lifedawn.bestweather.data.MyApplication
 
 object WeatherUtil {
     fun calcFeelsLikeTemperature(celsiusTemperature: Double, kmPerHWindSpeed: Double, humidity: Double): Double {

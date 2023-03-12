@@ -5,7 +5,9 @@ import java.util.*
 enum class ValueUnits(
     val text: String
 ) {
-    celsius("℃"), fahrenheit("℉"), mPerSec("m/s"), kmPerHour("km/h"), km("km"), mile("mile"), clock12("3:00 PM"), clock24("15:00");
+    celsius("℃"), fahrenheit("℉"), mPerSec("m/s"), kmPerHour("km/h"), km("km"), mile("mile"), clock12("3:00 PM"), clock24("15:00"),
+    undefined("-");
+
 
     companion object {
         /*

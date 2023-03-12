@@ -19,7 +19,6 @@ import com.lifedawn.bestweather.commons.constants.LocationType
 import com.lifedawn.bestweather.commons.interfaces.OnCheckedSwitchInListListener
 import com.lifedawn.bestweather.commons.interfaces.OnClickedListViewItemListener
 import com.lifedawn.bestweather.commons.interfaces.OnClickedPopupMenuItemListener
-import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.data.local.room.dto.DailyPushNotificationDto
 import com.lifedawn.bestweather.data.local.room.repository.DailyPushNotificationRepository
 import com.lifedawn.bestweather.databinding.FragmentDailyPushNotificationListBinding

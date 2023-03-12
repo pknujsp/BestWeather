@@ -14,10 +14,10 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.ui.theme.AppTheme.getTextColor
-import com.lifedawn.bestweather.ui.weathers.FragmentType
+import com.lifedawn.bestweather.ui.weathers.enums.WeatherDataType
 
 class IconTextView(
-    context: Context, private val fragmentType: FragmentType, private val viewWidth: Int, private val columnWidth: Int,
+    context: Context, private val weatherDataType: WeatherDataType, private val viewWidth: Int, private val columnWidth: Int,
     iconId: Int
 ) : View(context), ICleaner {
     private val valueTextPaint: TextPaint
@@ -35,7 +35,7 @@ class IconTextView(
         valueTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
         valueTextPaint.textAlign = Paint.Align.CENTER
         valueTextPaint.textSize = context.resources.getDimension(R.dimen.iconValueTextSizeInSCD)
-        valueTextPaint.color = getTextColor(fragmentType)
+        valueTextPaint.color = getTextColor(weatherDataType)
         valueTextPaint.typeface = Typeface.create("sans-serif-condensed", Typeface.NORMAL)
         icon = ContextCompat.getDrawable(context, iconId)
         icon!!.setTintList(ColorStateList.valueOf(ContextCompat.getColor(context, R.color.blue)))

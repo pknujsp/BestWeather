@@ -4,7 +4,6 @@ import android.content.Context
 import com.google.gson.Gson
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.constants.ValueUnits
-import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.data.local.weather.models.CurrentConditionsDto
 import com.lifedawn.bestweather.data.local.weather.models.DailyForecastDto
 import com.lifedawn.bestweather.data.local.weather.models.HourlyForecastDto

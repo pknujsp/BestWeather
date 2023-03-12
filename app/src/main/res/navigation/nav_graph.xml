@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingsMainFragment"
-        android:name="com.lifedawn.bestweather.ui.settings.fragments.SettingsMainFragment"
+        android:name="com.lifedawn.bestweather.ui.settings.views.SettingsMainFragment"
         android:label="SettingsMainFragment" >
         <action
             android:id="@+id/action_settingsMainFragment_to_mainFragment"
@@ -28,11 +28,11 @@
         android:label="RainViewerFragment" />
     <fragment
         android:id="@+id/detailSunRiseSetFragment"
-        android:name="com.lifedawn.bestweather.ui.weathers.detailfragment.sunsetrise.DetailSunRiseSetFragment"
+        android:name="com.lifedawn.bestweather.ui.weathers.detail.sunsetrise.DetailSunRiseSetFragment"
         android:label="DetailSunRiseSetFragment" />
     <fragment
         android:id="@+id/weatherFragment"
-        android:name="com.lifedawn.bestweather.ui.weathers.WeatherFragment"
+        android:name="com.lifedawn.bestweather.ui.weathers.view.WeatherFragment"
         android:label="WeatherFragment" >
         <action
             android:id="@+id/action_weatherFragment_to_rainViewerFragment"
@@ -80,15 +80,15 @@
     </fragment>
     <fragment
         android:id="@+id/detailHourlyForecastFragment"
-        android:name="com.lifedawn.bestweather.ui.weathers.detailfragment.hourlyforecast.DetailHourlyForecastFragment"
+        android:name="com.lifedawn.bestweather.ui.weathers.detail.hourlyforecast.DetailHourlyForecastFragment"
         android:label="DetailHourlyForecastFragment" />
     <fragment
         android:id="@+id/detailAirQualityFragment"
-        android:name="com.lifedawn.bestweather.ui.weathers.detailfragment.aqicn.DetailAirQualityFragment"
+        android:name="com.lifedawn.bestweather.ui.weathers.detail.aqicn.DetailAirQualityFragment"
         android:label="DetailAirQualityFragment" />
     <fragment
         android:id="@+id/detailDailyForecastFragment"
-        android:name="com.lifedawn.bestweather.ui.weathers.detailfragment.dailyforecast.DetailDailyForecastFragment"
+        android:name="com.lifedawn.bestweather.ui.weathers.detail.dailyforecast.DetailDailyForecastFragment"
         android:label="DetailDailyForecastFragment" />
     <fragment
         android:id="@+id/mapFragment"

@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle
 import com.lifedawn.bestweather.commons.views.HeaderbarStyle.setStyle
-import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.databinding.FragmentAlertBinding
 
 class AlertFragment : Fragment() {

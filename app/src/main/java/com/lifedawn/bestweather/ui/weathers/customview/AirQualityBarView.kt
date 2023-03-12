@@ -9,11 +9,11 @@ import androidx.core.content.ContextCompat
 import com.lifedawn.bestweather.R
 import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnResponseProcessor.getGradeColorId
 import com.lifedawn.bestweather.data.remote.weather.aqicn.AqicnResponseProcessor.getGradeDescription
-import com.lifedawn.bestweather.ui.weathers.FragmentType
+import com.lifedawn.bestweather.ui.weathers.enums.WeatherDataType
 
 class AirQualityBarView(
     context: Context,
-    private val fragmentType: FragmentType,
+    private val weatherDataType: WeatherDataType,
     private val viewWidth: Int,
     private val viewHeight: Int,
     private val columnWidth: Int,

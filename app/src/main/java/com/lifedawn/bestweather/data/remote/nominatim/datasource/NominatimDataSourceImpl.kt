@@ -1,7 +1,6 @@
 package com.lifedawn.bestweather.data.remote.nominatim.datasource
 
 import com.google.gson.JsonElement
-import com.lifedawn.bestweather.data.MyApplication
 import com.lifedawn.bestweather.data.remote.retrofit.callback.ApiResponse
 import com.lifedawn.bestweather.data.remote.retrofit.callback.requestApiFlow
 import com.lifedawn.bestweather.data.remote.retrofit.client.RestfulApiQuery

@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
 import com.lifedawn.bestweather.R
-import com.lifedawn.bestweather.commons.views.BaseFragment
+import com.lifedawn.bestweather.commons.views.base.BaseFragment
 import com.lifedawn.bestweather.databinding.FragmentSimpleRainViewerBinding
-import com.lifedawn.bestweather.ui.weathers.viewmodels.WeatherFragmentViewModel
+import com.lifedawn.bestweather.ui.weathers.viewmodel.WeatherFragmentViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
