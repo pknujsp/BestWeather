@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:enabled="false"
+        android:icon="@drawable/owmicon"
+        android:key="@string/pref_key_open_weather_map"
+        android:summary="@string/pref_summary_open_weather_map"
+        android:title="@string/owm" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:enabled="false"
+        android:icon="@drawable/metlogo"
+        android:key="@string/pref_key_met"
+        android:summary="@string/pref_summary_met"
+        android:title="@string/met" />
+
+    <SwitchPreference
+        android:icon="@drawable/kmaicon"
+        android:key="@string/pref_key_kma_top_priority"
+        android:summary="@string/pref_summary_kma_top_priority"
+        android:title="@string/pref_title_kma_top_priority" />
+
+</PreferenceScreen>

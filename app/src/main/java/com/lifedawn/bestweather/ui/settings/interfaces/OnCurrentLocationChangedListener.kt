@@ -1,0 +1,3 @@
+package com.lifedawn.bestweather.ui.settings.interfaces
+
+interface OnCurrentLocationChangedListener 

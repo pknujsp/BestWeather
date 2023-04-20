@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -19,7 +18,7 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
-        android:name=".main.MyApplication"
+        android:name="com.lifedawn.bestweather.AppApplication"
         android:allowBackup="true"
         android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
@@ -45,7 +44,7 @@
             android:turnScreenOn="true" />
 
         <activity
-            android:name=".widget.ConfigureWidgetActivity"
+            android:name=".ui.widget.view.ConfigureWidgetActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Black">
@@ -55,7 +54,7 @@
         </activity>
 
         <activity
-            android:name=".widget.DialogActivity"
+            android:name=".ui.widget.view.DialogActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:noHistory="true"
@@ -63,7 +62,7 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <activity
-            android:name=".main.MainActivity"
+            android:name="com.lifedawn.bestweather.ui.main.view.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
@@ -77,7 +76,7 @@
         </activity>
 
         <receiver
-            android:name=".widget.widgetprovider.FirstWidgetProvider"
+            android:name=".ui.widget.widgetprovider.FirstWidgetProvider"
             android:enabled="true"
             android:exported="true"
             android:label="@string/firstWidgetLabel">
@@ -92,7 +91,7 @@
                 android:resource="@xml/first_widget_info" />
         </receiver>
         <receiver
-            android:name=".widget.widgetprovider.SecondWidgetProvider"
+            android:name=".ui.widget.widgetprovider.SecondWidgetProvider"
             android:enabled="true"
             android:exported="true"
             android:label="@string/secondWidgetLabel">
@@ -107,7 +106,7 @@
                 android:resource="@xml/second_widget_info" />
         </receiver>
         <receiver
-            android:name=".widget.widgetprovider.ThirdWidgetProvider"
+            android:name=".ui.widget.widgetprovider.ThirdWidgetProvider"
             android:enabled="true"
             android:exported="true"
             android:label="@string/thirdWidgetLabel">
@@ -122,7 +121,7 @@
                 android:resource="@xml/third_widget_info" />
         </receiver>
         <receiver
-            android:name=".widget.widgetprovider.FourthWidgetProvider"
+            android:name=".ui.widget.widgetprovider.FourthWidgetProvider"
             android:enabled="true"
             android:exported="true"
             android:label="@string/fourthWidgetLabel">
@@ -137,7 +136,7 @@
                 android:resource="@xml/fourth_widget_info" />
         </receiver>
         <receiver
-            android:name=".widget.widgetprovider.FifthWidgetProvider"
+            android:name=".ui.widget.widgetprovider.FifthWidgetProvider"
             android:exported="true"
             android:label="@string/fifthWidgetLabel">
             <intent-filter>
@@ -151,7 +150,7 @@
                 android:resource="@xml/fifth_widget_info" />
         </receiver>
         <receiver
-            android:name=".widget.widgetprovider.SixthWidgetProvider"
+            android:name=".ui.widget.widgetprovider.SixthWidgetProvider"
             android:exported="true"
             android:label="@string/sixthWidgetLabel">
             <intent-filter>
@@ -165,7 +164,7 @@
                 android:resource="@xml/sixth_widget_info" />
         </receiver>
         <receiver
-            android:name=".widget.widgetprovider.SeventhWidgetProvider"
+            android:name=".ui.widget.widgetprovider.SeventhWidgetProvider"
             android:exported="true"
             android:label="@string/seventhWidgetLabel">
             <intent-filter>
@@ -179,7 +178,7 @@
                 android:resource="@xml/seventh_widget_info" />
         </receiver>
         <receiver
-            android:name=".widget.widgetprovider.EighthWidgetProvider"
+            android:name=".ui.widget.widgetprovider.EighthWidgetProvider"
             android:exported="true"
             android:label="@string/eighthWidgetLabel">
             <intent-filter>
@@ -193,7 +192,7 @@
                 android:resource="@xml/eighth_widget_info" />
         </receiver>
         <receiver
-            android:name=".widget.widgetprovider.NinthWidgetProvider"
+            android:name=".ui.widget.widgetprovider.NinthWidgetProvider"
             android:exported="true"
             android:label="@string/ninthWidgetLabel">
             <intent-filter>
@@ -207,7 +206,7 @@
                 android:resource="@xml/ninth_widget_info" />
         </receiver>
         <receiver
-            android:name=".widget.widgetprovider.TenthWidgetProvider"
+            android:name=".ui.widget.widgetprovider.TenthWidgetProvider"
             android:exported="true"
             android:label="@string/tenthWidgetLabel">
             <intent-filter>
@@ -221,7 +220,7 @@
                 android:resource="@xml/tenth_widget_info" />
         </receiver>
         <receiver
-            android:name=".widget.widgetprovider.EleventhWidgetProvider"
+            android:name=".ui.widget.widgetprovider.EleventhWidgetProvider"
             android:exported="true"
             android:label="@string/eleventhWidgetLabel">
             <intent-filter>
@@ -235,7 +234,7 @@
                 android:resource="@xml/eleventh_widget_info" />
         </receiver>
         <receiver
-            android:name=".notification.ongoing.OngoingNotificationReceiver"
+            android:name=".ui.notification.ongoing.OngoingNotificationReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -253,7 +252,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".notification.daily.DailyPushNotificationReceiver"
+            android:name=".ui.notification.daily.DailyPushNotificationReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

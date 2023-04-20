@@ -1,45 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/drawer_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:openDrawer="start"
-    >
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_container"
+<layout>
+    <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        />
-
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/side_navigation"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:backgroundTint="@color/white"
+        tools:openDrawer="start"
         >
 
-        <androidx.core.widget.NestedScrollView
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            />
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/side_navigation"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:backgroundTint="@color/white"
             >
 
-            <LinearLayout
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
                 >
 
-                <include
-                    android:id="@+id/side_nav_menu"
-                    layout="@layout/side_nav_menu"
-                    />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    >
 
-            </LinearLayout>
+                    <include
+                        android:id="@+id/side_nav_menu"
+                        layout="@layout/side_nav_menu"
+                        />
 
-        </androidx.core.widget.NestedScrollView>
-    </com.google.android.material.navigation.NavigationView>
-</androidx.drawerlayout.widget.DrawerLayout>
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+        </com.google.android.material.navigation.NavigationView>
+    </androidx.drawerlayout.widget.DrawerLayout>
+</layout>

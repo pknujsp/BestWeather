@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/introFragment">
+    <fragment
+        android:id="@+id/introFragment"
+        android:name="com.lifedawn.bestweather.ui.intro.IntroFragment"
+        android:label="IntroFragment" >
+        <action
+            android:id="@+id/action_introFragment_to_mainFragment2"
+            app:destination="@id/mainFragment" />
+        <action
+            android:id="@+id/action_introFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsMainFragment"
+        android:name="com.lifedawn.bestweather.ui.settings.views.SettingsMainFragment"
+        android:label="SettingsMainFragment" >
+        <action
+            android:id="@+id/action_settingsMainFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/rainViewerFragment"
+        android:name="com.lifedawn.bestweather.ui.rainviewer.view.RainViewerFragment"
+        android:label="RainViewerFragment" />
+    <fragment
+        android:id="@+id/detailSunRiseSetFragment"
+        android:name="com.lifedawn.bestweather.ui.weathers.detail.sunsetrise.DetailSunRiseSetFragment"
+        android:label="DetailSunRiseSetFragment" />
+    <fragment
+        android:id="@+id/weatherFragment"
+        android:name="com.lifedawn.bestweather.ui.weathers.view.WeatherFragment"
+        android:label="WeatherFragment" >
+        <action
+            android:id="@+id/action_weatherFragment_to_rainViewerFragment"
+            app:destination="@id/rainViewerFragment" />
+        <action
+            android:id="@+id/action_weatherFragment_to_detailSunRiseSetFragment"
+            app:destination="@id/detailSunRiseSetFragment" />
+        <action
+            android:id="@+id/action_weatherFragment_to_detailHourlyForecastFragment"
+            app:destination="@id/detailHourlyForecastFragment" />
+        <action
+            android:id="@+id/action_weatherFragment_to_detailAirQualityFragment"
+            app:destination="@id/detailAirQualityFragment" />
+        <action
+            android:id="@+id/action_weatherFragment_to_detailDailyForecastFragment"
+            app:destination="@id/detailDailyForecastFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.lifedawn.bestweather.ui.main.view.MainFragment"
+        android:label="MainFragment" >
+        <action
+            android:id="@+id/action_mainFragment_to_weatherFragment2"
+            app:destination="@id/weatherFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_settingsMainFragment"
+            app:destination="@id/settingsMainFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_notificationFragment"
+            app:destination="@id/notificationFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="com.lifedawn.bestweather.ui.notification.NotificationFragment"
+        android:label="NotificationFragment" >
+        <action
+            android:id="@+id/action_notificationFragment_to_dailyPushNotificationListFragment"
+            app:destination="@id/dailyPushNotificationListFragment" />
+        <action
+            android:id="@+id/action_notificationFragment_to_ongoingNotificationSettingsFragment"
+            app:destination="@id/ongoingNotificationSettingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailHourlyForecastFragment"
+        android:name="com.lifedawn.bestweather.ui.weathers.detail.hourlyforecast.DetailHourlyForecastFragment"
+        android:label="DetailHourlyForecastFragment" />
+    <fragment
+        android:id="@+id/detailAirQualityFragment"
+        android:name="com.lifedawn.bestweather.ui.weathers.detail.aqicn.DetailAirQualityFragment"
+        android:label="DetailAirQualityFragment" />
+    <fragment
+        android:id="@+id/detailDailyForecastFragment"
+        android:name="com.lifedawn.bestweather.ui.weathers.detail.dailyforecast.DetailDailyForecastFragment"
+        android:label="DetailDailyForecastFragment" />
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.lifedawn.bestweather.ui.findaddress.map.MapFragment"
+        android:label="MapFragment" >
+        <action
+            android:id="@+id/action_mapFragment_to_introFragment"
+            app:destination="@id/introFragment" />
+        <action
+            android:id="@+id/action_mapFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/dailyPushNotificationListFragment"
+        android:name="com.lifedawn.bestweather.ui.notification.daily.fragment.DailyPushNotificationListFragment"
+        android:label="DailyPushNotificationListFragment" >
+        <action
+            android:id="@+id/action_dailyPushNotificationListFragment_to_dailyNotificationSettingsFragment"
+            app:destination="@id/dailyNotificationSettingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/dailyNotificationSettingsFragment"
+        android:name="com.lifedawn.bestweather.ui.notification.daily.fragment.DailyNotificationSettingsFragment"
+        android:label="DailyNotificationSettingsFragment" />
+    <fragment
+        android:id="@+id/ongoingNotificationSettingsFragment"
+        android:name="com.lifedawn.bestweather.ui.notification.ongoing.OngoingNotificationSettingsFragment"
+        android:label="OngoingNotificationSettingsFragment" />
+</navigation>

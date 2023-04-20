@@ -2,6 +2,29 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:key="@string/pref_key_unit_preference">
-    
+
+    <com.lifedawn.bestweather.ui.settings.valueunits.preference.UnitPreference
+        android:key="@string/pref_key_unit_temp"
+        android:title="@string/pref_title_unit_temp"
+        android:widgetLayout="@layout/custom_preference_layout"
+        app:iconSpaceReserved="false" />
+
+    <com.lifedawn.bestweather.ui.settings.valueunits.preference.UnitPreference
+        android:key="@string/pref_key_unit_wind"
+        android:title="@string/pref_title_unit_wind"
+        android:widgetLayout="@layout/custom_preference_layout"
+        app:iconSpaceReserved="false" />
+
+    <com.lifedawn.bestweather.ui.settings.valueunits.preference.UnitPreference
+        android:key="@string/pref_key_unit_visibility"
+        android:title="@string/pref_title_unit_visibility"
+        android:widgetLayout="@layout/custom_preference_layout"
+        app:iconSpaceReserved="false" />
+
+    <com.lifedawn.bestweather.ui.settings.valueunits.preference.UnitPreference
+        android:key="@string/pref_key_unit_clock"
+        android:title="@string/pref_title_unit_clock"
+        android:widgetLayout="@layout/custom_preference_layout"
+        app:iconSpaceReserved="false" />
 
 </PreferenceScreen>

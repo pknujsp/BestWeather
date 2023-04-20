@@ -1,107 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/map_layout"
+<layout>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipChildren="false"
         >
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/map_fragment_container"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/map_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipChildren="false"
+            >
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/map_fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <include
+                android:id="@+id/map_buttons"
+                layout="@layout/map_buttons_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:layout_marginBottom="48dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            >
+
+            <com.lifedawn.bestweather.commons.views.CustomSearchView
+                android:id="@+id/headerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="60dp"
+                android:layout_marginRight="16dp"
+                android:elevation="4dp"
+                app:backBtnVisibility="visible"
+                app:hint="@string/hint_input_address"
+                app:searchBtnVisibility="gone"
+                app:showStroke="true"
+                />
+
+            <LinearLayout
+                android:id="@+id/favorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/headerLayout"
+                android:layout_alignLeft="@id/headerLayout"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/rounded_btn_background"
+                android:backgroundTint="@color/white"
+                android:clickable="true"
+                android:elevation="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="12dp"
+                android:paddingTop="4dp"
+                android:paddingRight="12dp"
+                android:paddingBottom="4dp"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/ic_baseline_stars_24"
+                    android:drawableTint="@color/mapFavoriteMarkerColor"
+                    android:gravity="center_vertical"
+                    android:text="@string/favorite"
+                    />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <include
+            android:id="@+id/bottom_sheet_search_place"
+            layout="@layout/view_bottom_sheet_search_place"
             />
 
         <include
-            android:id="@+id/map_buttons"
-            layout="@layout/map_buttons_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="48dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
+            android:id="@+id/placeslist_bottom_sheet"
+            layout="@layout/place_list_bottom_sheet_view"
             />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        >
-
-        <com.lifedawn.bestweather.commons.views.CustomSearchView
-            android:id="@+id/headerLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="60dp"
-            android:layout_marginRight="16dp"
-            android:elevation="4dp"
-            app:backBtnVisibility="visible"
-            app:hint="@string/hint_input_address"
-            app:searchBtnVisibility="gone"
-            app:showStroke="true"
+        <include
+            android:id="@+id/favorites_bottom_sheet"
+            layout="@layout/favorites_bottom_sheet_view"
             />
 
-        <LinearLayout
-            android:id="@+id/favorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/headerLayout"
-            android:layout_alignLeft="@id/headerLayout"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/rounded_btn_background"
-            android:backgroundTint="@color/white"
-            android:clickable="true"
-            android:elevation="4dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingLeft="12dp"
-            android:paddingTop="4dp"
-            android:paddingRight="12dp"
-            android:paddingBottom="4dp"
-            >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/ic_baseline_stars_24"
-                android:drawableTint="@color/mapFavoriteMarkerColor"
-                android:gravity="center_vertical"
-                android:text="@string/favorite"
-                />
-
-        </LinearLayout>
-
-    </RelativeLayout>
-
-    <include
-        android:id="@+id/bottom_sheet_search_place"
-        layout="@layout/view_bottom_sheet_search_place"
-        />
-
-    <include
-        android:id="@+id/placeslist_bottom_sheet"
-        layout="@layout/place_list_bottom_sheet_view"
-        />
-
-    <include
-        android:id="@+id/favorites_bottom_sheet"
-        layout="@layout/favorites_bottom_sheet_view"
-        />
-
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
